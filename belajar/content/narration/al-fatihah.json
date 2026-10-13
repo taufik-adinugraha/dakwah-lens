@@ -196,193 +196,23 @@
         }
       ]
     },
-    "al-fatihah:1:map": {
-      "text": "Di ayat ini ada lima hal baru, di antaranya tiga jenis كَلِمَة, إِعْرَاب dan tandanya, serta حَرْف جَرّ. Ada dua hal lagi di ayat ini, yaitu شِبْه الجُمْلَة dan مَرْفُوع, tetapi baru kita bahas di ayat kedua.",
-      "display": "Di ayat ini ada lima hal baru, di antaranya tiga jenis kalimah (كَلِمَة), i’rab (إِعْرَاب) dan tandanya, serta huruf jar (حَرْف جَرّ). Ada dua hal lagi di ayat ini, yaitu syibhul jumlah (شِبْه الجُمْلَة) dan marfu’ (مَرْفُوع), tetapi baru kita bahas di ayat kedua.",
+    "al-fatihah:1:map:new": {
+      "text": "Di ayat ini ada dua hal baru: مَجْرُور dan حَرْف جَرّ.",
+      "display": "Di ayat ini ada dua hal baru: majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ).",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/6acbea32ec1061f7.mp3",
-        "ms": 17554,
-        "sha256": "597df0d8457857f2703fffdc3d445d91ebb9cc366a0145347ac92bbc8ca52bd8"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.16
-        },
-        {
-          "t": "ayat",
-          "s": 0.187,
-          "e": 0.4
-        },
-        {
-          "t": "ini",
-          "s": 0.5,
-          "e": 0.8
-        },
-        {
-          "t": "ada",
-          "s": 0.92,
-          "e": 1.28
-        },
-        {
-          "t": "lima",
-          "s": 1.32,
-          "e": 1.52
-        },
-        {
-          "t": "hal",
-          "s": 1.58,
-          "e": 1.76
-        },
-        {
-          "t": "baru,",
-          "s": 1.84,
-          "e": 2.64
-        },
-        {
-          "t": "di",
-          "s": 2.693,
-          "e": 2.8
-        },
-        {
-          "t": "antaranya",
-          "s": 2.86,
-          "e": 3.6
-        },
-        {
-          "t": "tiga",
-          "s": 3.72,
-          "e": 4.08
-        },
-        {
-          "t": "jenis",
-          "s": 4.147,
-          "e": 4.48
-        },
-        {
-          "t": "kalimah (كَلِمَة),",
-          "s": 4.52,
-          "e": 5.52
-        },
-        {
-          "t": "i’rab (إِعْرَاب)",
-          "s": 5.56,
-          "e": 6.08
-        },
-        {
-          "t": "dan",
-          "s": 6.12,
-          "e": 6.24
-        },
-        {
-          "t": "tandanya,",
-          "s": 6.288,
-          "e": 6.96
-        },
-        {
-          "t": "serta",
-          "s": 7.12,
-          "e": 7.92
-        },
-        {
-          "t": "huruf jar (حَرْف جَرّ).",
-          "s": 8.04,
-          "e": 8.96
-        },
-        {
-          "t": "Ada",
-          "s": 9.18,
-          "e": 9.84
-        },
-        {
-          "t": "dua",
-          "s": 9.9,
-          "e": 10.08
-        },
-        {
-          "t": "hal",
-          "s": 10.12,
-          "e": 10.24
-        },
-        {
-          "t": "lagi",
-          "s": 10.304,
-          "e": 10.56
-        },
-        {
-          "t": "di",
-          "s": 10.587,
-          "e": 10.64
-        },
-        {
-          "t": "ayat",
-          "s": 10.693,
-          "e": 10.88
-        },
-        {
-          "t": "ini,",
-          "s": 10.96,
-          "e": 11.6
-        },
-        {
-          "t": "yaitu",
-          "s": 11.68,
-          "e": 12.32
-        },
-        {
-          "t": "syibhul jumlah (شِبْه الجُمْلَة)",
-          "s": 12.48,
-          "e": 13.6
-        },
-        {
-          "t": "dan",
-          "s": 13.74,
-          "e": 14.16
-        },
-        {
-          "t": "marfu’ (مَرْفُوع),",
-          "s": 14.28,
-          "e": 15.44
-        },
-        {
-          "t": "tetapi",
-          "s": 15.48,
-          "e": 15.84
-        },
-        {
-          "t": "baru",
-          "s": 15.888,
-          "e": 16.08
-        },
-        {
-          "t": "kita",
-          "s": 16.128,
-          "e": 16.32
-        },
-        {
-          "t": "bahas",
-          "s": 16.38,
-          "e": 16.72
-        },
-        {
-          "t": "di",
-          "s": 16.773,
-          "e": 16.88
-        },
-        {
-          "t": "ayat",
-          "s": 16.907,
-          "e": 17.04
-        },
-        {
-          "t": "kedua.",
-          "s": 17.1,
-          "e": 17.52
-        }
-      ]
+      "focus": null
+    },
+    "al-fatihah:1:map:learnt": {
+      "text": "Sebelum ayat ini, kita sudah mempelajari dua hal. Yang kita temui lagi di ayat ini ada satu: tiga jenis kata.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari dua hal. Yang kita temui lagi di ayat ini ada satu: tiga jenis kata.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:1:map:later": {
+      "text": "Ada tiga hal lagi di ayat ini, tetapi baru kita bahas nanti: alif lam di ayat ketiga, نَعْت di ayat ketiga, dan idhofah di ayat keempat. Ada juga satu hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "display": "Ada tiga hal lagi di ayat ini, tetapi baru kita bahas nanti: alif lam (ال) di ayat ketiga, na’t (نَعْت) di ayat ketiga, dan idhafah (إِضَافَة) di ayat keempat. Ada juga satu hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
     },
     "al-fatihah:1:primer:1": {
       "text": "Sebelum membahas kata demi kata, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab.",
@@ -3328,355 +3158,16 @@
         }
       ]
     },
-    "al-fatihah:1:concept:kalimah-isim-fiil-huruf": {
-      "text": "Konsep baru: Tiga jenis كَلِمَة, atau kata: اِسْم, فِعْل, dan حَرْف. Setiap kata Arab termasuk salah satu dari tiga jenis: اِسْم, yaitu nama benda, orang, atau sifat, فِعْل, yaitu kata kerja, atau حَرْف, yaitu kata tugas.",
-      "display": "Konsep baru: Tiga jenis kalimah (كَلِمَة), atau kata: isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف). Setiap kata Arab termasuk salah satu dari tiga jenis: isim (اِسْم), yaitu nama benda, orang, atau sifat, fi’il (فِعْل), yaitu kata kerja, atau huruf (حَرْف), yaitu kata tugas.",
+    "al-fatihah:1:concept:majrur": {
+      "text": "Konsep baru: مَجْرُور, dan tandanya: كَسْرَة. Bunyi akhir banyak kata Arab berubah mengikuti perannya dalam kalimat; perubahan itu disebut إِعْرَاب. Salah satu keadaannya adalah مَجْرُور: اِسْم yang مَجْرُور umumnya berakhir كَسْرَة. Ada tiga sebab sebuah اِسْم menjadi مَجْرُور; yang pertama kita pelajari di ayat ini.",
+      "display": "Konsep baru: Majrur (مَجْرُور), dan tandanya: kasrah (كَسْرَة). Bunyi akhir banyak kata Arab berubah mengikuti perannya dalam kalimat; perubahan itu disebut i’rab (إِعْرَاب). Salah satu keadaannya adalah majrur (مَجْرُور): isim (اِسْم) yang majrur (مَجْرُور) umumnya berakhir kasrah (كَسْرَة). Ada tiga sebab sebuah isim (اِسْم) menjadi majrur (مَجْرُور); yang pertama kita pelajari di ayat ini.",
       "highlight": [
-        1
+        1,
+        2,
+        3,
+        4
       ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/e65b9eff220c8fed.mp3",
-        "ms": 21316,
-        "sha256": "58cafaf2f680a05431a88d28da3c0d73ca4793dfff907b46ee817cc78b7ad2a3"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.4
-        },
-        {
-          "t": "baru:",
-          "s": 0.48,
-          "e": 0.88
-        },
-        {
-          "t": "Tiga",
-          "s": 1.12,
-          "e": 1.6
-        },
-        {
-          "t": "jenis",
-          "s": 1.667,
-          "e": 2.0
-        },
-        {
-          "t": "kalimah (كَلِمَة),",
-          "s": 2.08,
-          "e": 2.64
-        },
-        {
-          "t": "atau",
-          "s": 2.72,
-          "e": 3.04
-        },
-        {
-          "t": "kata:",
-          "s": 3.136,
-          "e": 3.6
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 3.8,
-          "e": 4.4
-        },
-        {
-          "t": "fi’il (فِعْل),",
-          "s": 4.68,
-          "e": 5.36
-        },
-        {
-          "t": "dan",
-          "s": 5.48,
-          "e": 5.84
-        },
-        {
-          "t": "huruf (حَرْف).",
-          "s": 5.92,
-          "e": 6.4
-        },
-        {
-          "t": "Setiap",
-          "s": 6.64,
-          "e": 7.52
-        },
-        {
-          "t": "kata",
-          "s": 7.568,
-          "e": 7.76
-        },
-        {
-          "t": "Arab",
-          "s": 7.824,
-          "e": 8.08
-        },
-        {
-          "t": "termasuk",
-          "s": 8.128,
-          "e": 8.56
-        },
-        {
-          "t": "salah",
-          "s": 8.613,
-          "e": 8.88
-        },
-        {
-          "t": "satu",
-          "s": 8.944,
-          "e": 9.2
-        },
-        {
-          "t": "dari",
-          "s": 9.248,
-          "e": 9.44
-        },
-        {
-          "t": "tiga",
-          "s": 9.52,
-          "e": 9.68
-        },
-        {
-          "t": "jenis:",
-          "s": 9.773,
-          "e": 10.4
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 10.72,
-          "e": 11.44
-        },
-        {
-          "t": "yaitu",
-          "s": 11.68,
-          "e": 12.16
-        },
-        {
-          "t": "nama",
-          "s": 12.208,
-          "e": 12.4
-        },
-        {
-          "t": "benda,",
-          "s": 12.44,
-          "e": 13.04
-        },
-        {
-          "t": "orang,",
-          "s": 13.16,
-          "e": 13.84
-        },
-        {
-          "t": "atau",
-          "s": 13.936,
-          "e": 14.32
-        },
-        {
-          "t": "sifat,",
-          "s": 14.36,
-          "e": 14.88
-        },
-        {
-          "t": "fi’il (فِعْل),",
-          "s": 15.32,
-          "e": 16.16
-        },
-        {
-          "t": "yaitu",
-          "s": 16.36,
-          "e": 16.8
-        },
-        {
-          "t": "kata",
-          "s": 16.848,
-          "e": 17.04
-        },
-        {
-          "t": "kerja,",
-          "s": 17.12,
-          "e": 17.6
-        },
-        {
-          "t": "atau",
-          "s": 17.824,
-          "e": 18.72
-        },
-        {
-          "t": "huruf (حَرْف),",
-          "s": 18.8,
-          "e": 19.48
-        },
-        {
-          "t": "yaitu",
-          "s": 19.58,
-          "e": 20.08
-        },
-        {
-          "t": "kata",
-          "s": 20.16,
-          "e": 20.48
-        },
-        {
-          "t": "tugas.",
-          "s": 20.52,
-          "e": 21.28
-        }
-      ]
-    },
-    "al-fatihah:1:concept:tanda-irab": {
-      "text": "Konsep baru: إِعْرَاب dan tandanya, yaitu dhommah, فَتْحَة, كَسْرَة. Bunyi akhir banyak kata Arab berubah mengikuti perannya dalam kalimat; perubahan itu disebut إِعْرَاب, dan bunyi akhirnya menjadi tanda.",
-      "display": "Konsep baru: I’rab (إِعْرَاب) dan tandanya, yaitu dhammah (ضَمَّة), fathah (فَتْحَة), kasrah (كَسْرَة). Bunyi akhir banyak kata Arab berubah mengikuti perannya dalam kalimat; perubahan itu disebut i’rab (إِعْرَاب), dan bunyi akhirnya menjadi tanda.",
-      "highlight": [
-        1
-      ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/1b79d5eb26e67ddd.mp3",
-        "ms": 16588,
-        "sha256": "f4dc8f5bf543ec67c5b7f424565c8e48c3edb3e382f75ff21584b8c494643877"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.4
-        },
-        {
-          "t": "baru:",
-          "s": 0.48,
-          "e": 0.88
-        },
-        {
-          "t": "I’rab (إِعْرَاب)",
-          "s": 1.08,
-          "e": 1.76
-        },
-        {
-          "t": "dan",
-          "s": 1.82,
-          "e": 2.0
-        },
-        {
-          "t": "tandanya,",
-          "s": 2.048,
-          "e": 2.64
-        },
-        {
-          "t": "yaitu",
-          "s": 2.84,
-          "e": 3.44
-        },
-        {
-          "t": "dhammah (ضَمَّة),",
-          "s": 3.627,
-          "e": 4.88
-        },
-        {
-          "t": "fathah (فَتْحَة),",
-          "s": 4.92,
-          "e": 5.52
-        },
-        {
-          "t": "kasrah (كَسْرَة).",
-          "s": 5.72,
-          "e": 6.92
-        },
-        {
-          "t": "Bunyi",
-          "s": 7.05,
-          "e": 7.52
-        },
-        {
-          "t": "akhir",
-          "s": 7.6,
-          "e": 7.92
-        },
-        {
-          "t": "banyak",
-          "s": 7.966,
-          "e": 8.24
-        },
-        {
-          "t": "kata",
-          "s": 8.288,
-          "e": 8.48
-        },
-        {
-          "t": "Arab",
-          "s": 8.56,
-          "e": 8.88
-        },
-        {
-          "t": "berubah",
-          "s": 8.94,
-          "e": 9.44
-        },
-        {
-          "t": "mengikuti",
-          "s": 9.472,
-          "e": 9.92
-        },
-        {
-          "t": "perannya",
-          "s": 9.98,
-          "e": 10.48
-        },
-        {
-          "t": "dalam",
-          "s": 10.52,
-          "e": 10.72
-        },
-        {
-          "t": "kalimat;",
-          "s": 10.78,
-          "e": 11.76
-        },
-        {
-          "t": "perubahan",
-          "s": 11.8,
-          "e": 12.24
-        },
-        {
-          "t": "itu",
-          "s": 12.32,
-          "e": 12.56
-        },
-        {
-          "t": "disebut",
-          "s": 12.62,
-          "e": 13.12
-        },
-        {
-          "t": "i’rab (إِعْرَاب),",
-          "s": 13.28,
-          "e": 14.4
-        },
-        {
-          "t": "dan",
-          "s": 14.44,
-          "e": 14.56
-        },
-        {
-          "t": "bunyi",
-          "s": 14.64,
-          "e": 14.96
-        },
-        {
-          "t": "akhirnya",
-          "s": 15.04,
-          "e": 15.6
-        },
-        {
-          "t": "menjadi",
-          "s": 15.66,
-          "e": 16.08
-        },
-        {
-          "t": "tanda.",
-          "s": 16.12,
-          "e": 16.56
-        }
-      ]
+      "focus": null
     },
     "al-fatihah:1:concept:huruf-jar": {
       "text": "Konsep baru: حَرْف جَرّ, yaitu kata depan, dan اِسْم مَجْرُور. حَرْف جَرّ adalah kata depan seperti huruf بَاء yang artinya dengan, dan huruf لَام yang artinya bagi; اِسْم sesudahnya menjadi مَجْرُور, umumnya berakhir كَسْرَة.",
@@ -3845,269 +3336,6 @@
           "t": "kasrah (كَسْرَة).",
           "s": 17.6,
           "e": 18.08
-        }
-      ]
-    },
-    "al-fatihah:1:concept:idhafah": {
-      "text": "Konsep baru: Idhofah, yaitu sandaran kata: nama Alloh. Idhofah adalah gabungan dua اِسْم seperti nama Alloh, dan kata keduanya, atau mudhof ilaih, selalu مَجْرُور.",
-      "display": "Konsep baru: Idhafah (إِضَافَة), yaitu sandaran kata: “nama Allah”. Idhafah (إِضَافَة) adalah gabungan dua isim (اِسْم) seperti “nama Allah”, dan kata keduanya, atau mudhaf ilaih (مُضَاف إِلَيْه), selalu majrur (مَجْرُور).",
-      "highlight": [
-        1,
-        2
-      ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a4cd05115ef522a5.mp3",
-        "ms": 15229,
-        "sha256": "5ed1fe938af2615ab9bbc0135f9ae0fe47f9aceec72cbe8fe14a819a59ba7a65"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.4
-        },
-        {
-          "t": "baru:",
-          "s": 0.48,
-          "e": 0.88
-        },
-        {
-          "t": "Idhafah (إِضَافَة),",
-          "s": 1.12,
-          "e": 2.16
-        },
-        {
-          "t": "yaitu",
-          "s": 2.56,
-          "e": 3.2
-        },
-        {
-          "t": "sandaran",
-          "s": 3.264,
-          "e": 3.68
-        },
-        {
-          "t": "kata:",
-          "s": 3.76,
-          "e": 4.16
-        },
-        {
-          "t": "nama",
-          "s": 4.272,
-          "e": 4.72
-        },
-        {
-          "t": "Allah.",
-          "s": 4.8,
-          "e": 5.28
-        },
-        {
-          "t": "Idhafah (إِضَافَة)",
-          "s": 5.573,
-          "e": 6.64
-        },
-        {
-          "t": "adalah",
-          "s": 6.743,
-          "e": 7.36
-        },
-        {
-          "t": "gabungan",
-          "s": 7.42,
-          "e": 7.92
-        },
-        {
-          "t": "dua",
-          "s": 7.98,
-          "e": 8.16
-        },
-        {
-          "t": "isim (اِسْم)",
-          "s": 8.24,
-          "e": 8.64
-        },
-        {
-          "t": "seperti",
-          "s": 8.69,
-          "e": 9.04
-        },
-        {
-          "t": "nama",
-          "s": 9.104,
-          "e": 9.36
-        },
-        {
-          "t": "Allah,",
-          "s": 9.44,
-          "e": 9.84
-        },
-        {
-          "t": "dan",
-          "s": 9.98,
-          "e": 10.4
-        },
-        {
-          "t": "kata",
-          "s": 10.464,
-          "e": 10.72
-        },
-        {
-          "t": "keduanya,",
-          "s": 10.76,
-          "e": 11.76
-        },
-        {
-          "t": "atau",
-          "s": 11.856,
-          "e": 12.24
-        },
-        {
-          "t": "mudhaf ilaih (مُضَاف إِلَيْه),",
-          "s": 12.34,
-          "e": 13.92
-        },
-        {
-          "t": "selalu",
-          "s": 13.98,
-          "e": 14.48
-        },
-        {
-          "t": "majrur (مَجْرُور).",
-          "s": 14.6,
-          "e": 15.2
-        }
-      ]
-    },
-    "al-fatihah:1:concept:naat": {
-      "text": "Konsep baru: نَعْت, yaitu sifat yang mengikuti. نَعْت adalah اِسْم yang menyifati اِسْم sebelumnya dan mengikutinya dalam akhiran serta dalam tertentu atau tidaknya.",
-      "display": "Konsep baru: Na’t (نَعْت), yaitu sifat yang mengikuti. Na’t (نَعْت) adalah isim (اِسْم) yang menyifati isim (اِسْم) sebelumnya dan mengikutinya dalam akhiran serta dalam tertentu atau tidaknya.",
-      "highlight": [
-        2,
-        3,
-        4
-      ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/7970df3f425d94aa.mp3",
-        "ms": 13087,
-        "sha256": "059a6dbc0ce2a552424f4ce4e8d483a00ceec5cf1e9ecade73e096d78f5427c7"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "baru:",
-          "s": 0.4,
-          "e": 0.8
-        },
-        {
-          "t": "Na’t (نَعْت),",
-          "s": 1.08,
-          "e": 2.0
-        },
-        {
-          "t": "yaitu",
-          "s": 2.16,
-          "e": 2.72
-        },
-        {
-          "t": "sifat",
-          "s": 2.84,
-          "e": 3.28
-        },
-        {
-          "t": "yang",
-          "s": 3.312,
-          "e": 3.44
-        },
-        {
-          "t": "mengikuti.",
-          "s": 3.472,
-          "e": 4.16
-        },
-        {
-          "t": "Na’t (نَعْت)",
-          "s": 4.6,
-          "e": 5.28
-        },
-        {
-          "t": "adalah",
-          "s": 5.349,
-          "e": 5.76
-        },
-        {
-          "t": "isim (اِسْم)",
-          "s": 5.84,
-          "e": 6.16
-        },
-        {
-          "t": "yang",
-          "s": 6.208,
-          "e": 6.4
-        },
-        {
-          "t": "menyifati",
-          "s": 6.432,
-          "e": 7.12
-        },
-        {
-          "t": "isim (اِسْم)",
-          "s": 7.16,
-          "e": 7.44
-        },
-        {
-          "t": "sebelumnya",
-          "s": 7.52,
-          "e": 8.24
-        },
-        {
-          "t": "dan",
-          "s": 8.4,
-          "e": 8.88
-        },
-        {
-          "t": "mengikutinya",
-          "s": 8.912,
-          "e": 9.6
-        },
-        {
-          "t": "dalam",
-          "s": 9.653,
-          "e": 9.92
-        },
-        {
-          "t": "akhiran",
-          "s": 9.973,
-          "e": 10.4
-        },
-        {
-          "t": "serta",
-          "s": 10.547,
-          "e": 11.28
-        },
-        {
-          "t": "dalam",
-          "s": 11.333,
-          "e": 11.6
-        },
-        {
-          "t": "tertentu",
-          "s": 11.648,
-          "e": 12.16
-        },
-        {
-          "t": "atau",
-          "s": 12.208,
-          "e": 12.4
-        },
-        {
-          "t": "tidaknya.",
-          "s": 12.467,
-          "e": 13.04
         }
       ]
     },
@@ -5409,112 +4637,10 @@
       ]
     },
     "al-fatihah:1:learned": {
-      "text": "Di ayat ini kita sudah mempelajari lima hal baru, di antaranya tiga jenis كَلِمَة, إِعْرَاب dan tandanya, serta حَرْف جَرّ.",
-      "display": "Di ayat ini kita sudah mempelajari lima hal baru, di antaranya tiga jenis kalimah (كَلِمَة), i’rab (إِعْرَاب) dan tandanya, serta huruf jar (حَرْف جَرّ).",
+      "text": "Di ayat ini kita mempelajari dua hal baru: مَجْرُور dan حَرْف جَرّ. Dengan itu, sudah empat hal yang kita pelajari.",
+      "display": "Di ayat ini kita mempelajari dua hal baru: majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ). Dengan itu, sudah empat hal yang kita pelajari.",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/c5468ab3284f07df.mp3",
-        "ms": 9796,
-        "sha256": "b976d82a615962473bc23db0abc2623c40aa0ce0ea82f759062a9388282c753f"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.08
-        },
-        {
-          "t": "ayat",
-          "s": 0.133,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.42,
-          "e": 0.72
-        },
-        {
-          "t": "kita",
-          "s": 0.784,
-          "e": 1.04
-        },
-        {
-          "t": "sudah",
-          "s": 1.093,
-          "e": 1.36
-        },
-        {
-          "t": "mempelajari",
-          "s": 1.42,
-          "e": 2.16
-        },
-        {
-          "t": "lima",
-          "s": 2.22,
-          "e": 2.48
-        },
-        {
-          "t": "hal",
-          "s": 2.54,
-          "e": 2.72
-        },
-        {
-          "t": "baru,",
-          "s": 2.8,
-          "e": 3.76
-        },
-        {
-          "t": "di",
-          "s": 3.813,
-          "e": 3.92
-        },
-        {
-          "t": "antaranya",
-          "s": 3.96,
-          "e": 4.56
-        },
-        {
-          "t": "tiga",
-          "s": 4.64,
-          "e": 4.96
-        },
-        {
-          "t": "jenis",
-          "s": 5.027,
-          "e": 5.36
-        },
-        {
-          "t": "kalimah (كَلِمَة),",
-          "s": 5.4,
-          "e": 6.4
-        },
-        {
-          "t": "i’rab (إِعْرَاب)",
-          "s": 6.44,
-          "e": 6.96
-        },
-        {
-          "t": "dan",
-          "s": 7.0,
-          "e": 7.12
-        },
-        {
-          "t": "tandanya,",
-          "s": 7.184,
-          "e": 8.24
-        },
-        {
-          "t": "serta",
-          "s": 8.32,
-          "e": 8.72
-        },
-        {
-          "t": "huruf jar (حَرْف جَرّ).",
-          "s": 8.88,
-          "e": 9.76
-        }
-      ]
+      "focus": null
     },
     "al-fatihah:1:recap": {
       "text": "Dengarkan sekali lagi seluruh ayat pertama dibacakan imam.",
@@ -5819,268 +4945,23 @@
         }
       ]
     },
-    "al-fatihah:2:map": {
-      "text": "Di ayat ini ada tiga hal baru: جُمْلَة اِسْمِيَّة, شِبْه الجُمْلَة, dan جَمْع مُذَكَّر سَالِم. Kita juga mengulang empat hal yang sudah kita pelajari, di antaranya إِعْرَاب dan tandanya, serta حَرْف جَرّ. Ada dua hal lagi di ayat ini, tetapi baru kita bahas nanti: وَزْن dan تَصْرِيف di ayat ketiga, serta بَدَل di ayat ketujuh.",
-      "display": "Di ayat ini ada tiga hal baru: jumlah ismiyyah (جُمْلَة اِسْمِيَّة), syibhul jumlah (شِبْه الجُمْلَة), dan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم). Kita juga mengulang empat hal yang sudah kita pelajari, di antaranya i’rab (إِعْرَاب) dan tandanya, serta huruf jar (حَرْف جَرّ). Ada dua hal lagi di ayat ini, tetapi baru kita bahas nanti: wazan (وَزْن) dan tashrif (تَصْرِيف) di ayat ketiga, serta badal (بَدَل) di ayat ketujuh.",
+    "al-fatihah:2:map:new": {
+      "text": "Di ayat ini ada tiga hal baru: جُمْلَة اِسْمِيَّة, مَرْفُوع, dan جَمْع مُذَكَّر سَالِم.",
+      "display": "Di ayat ini ada tiga hal baru: jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/ff6a393ef3acd98b.mp3",
-        "ms": 25234,
-        "sha256": "8ceaf50c4ff007f949b2b60fc9c45b79a600b5262d188276f0f52a91a9471a40"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.08
-        },
-        {
-          "t": "ayat",
-          "s": 0.107,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.36,
-          "e": 0.48
-        },
-        {
-          "t": "ada",
-          "s": 0.54,
-          "e": 0.72
-        },
-        {
-          "t": "tiga",
-          "s": 0.76,
-          "e": 0.96
-        },
-        {
-          "t": "hal",
-          "s": 1.02,
-          "e": 1.2
-        },
-        {
-          "t": "baru:",
-          "s": 1.264,
-          "e": 2.08
-        },
-        {
-          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 2.12,
-          "e": 3.52
-        },
-        {
-          "t": "syibhul jumlah (شِبْه الجُمْلَة),",
-          "s": 3.56,
-          "e": 4.96
-        },
-        {
-          "t": "dan",
-          "s": 5.08,
-          "e": 5.44
-        },
-        {
-          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
-          "s": 5.6,
-          "e": 7.88
-        },
-        {
-          "t": "Kita",
-          "s": 8.06,
-          "e": 8.32
-        },
-        {
-          "t": "juga",
-          "s": 8.384,
-          "e": 8.64
-        },
-        {
-          "t": "mengulang",
-          "s": 8.672,
-          "e": 9.04
-        },
-        {
-          "t": "empat",
-          "s": 9.093,
-          "e": 9.36
-        },
-        {
-          "t": "hal",
-          "s": 9.44,
-          "e": 9.68
-        },
-        {
-          "t": "yang",
-          "s": 9.712,
-          "e": 9.84
-        },
-        {
-          "t": "sudah",
-          "s": 9.88,
-          "e": 10.08
-        },
-        {
-          "t": "kita",
-          "s": 10.112,
-          "e": 10.24
-        },
-        {
-          "t": "pelajari,",
-          "s": 10.3,
-          "e": 11.12
-        },
-        {
-          "t": "di",
-          "s": 11.173,
-          "e": 11.28
-        },
-        {
-          "t": "antaranya",
-          "s": 11.32,
-          "e": 11.84
-        },
-        {
-          "t": "i’rab (إِعْرَاب)",
-          "s": 12.0,
-          "e": 12.56
-        },
-        {
-          "t": "dan",
-          "s": 12.62,
-          "e": 12.8
-        },
-        {
-          "t": "tandanya,",
-          "s": 12.864,
-          "e": 13.76
-        },
-        {
-          "t": "serta",
-          "s": 13.813,
-          "e": 14.08
-        },
-        {
-          "t": "huruf jar (حَرْف جَرّ).",
-          "s": 14.2,
-          "e": 15.2
-        },
-        {
-          "t": "Ada",
-          "s": 15.38,
-          "e": 15.92
-        },
-        {
-          "t": "dua",
-          "s": 15.96,
-          "e": 16.08
-        },
-        {
-          "t": "hal",
-          "s": 16.14,
-          "e": 16.32
-        },
-        {
-          "t": "lagi",
-          "s": 16.368,
-          "e": 16.56
-        },
-        {
-          "t": "di",
-          "s": 16.613,
-          "e": 16.72
-        },
-        {
-          "t": "ayat",
-          "s": 16.747,
-          "e": 16.96
-        },
-        {
-          "t": "ini,",
-          "s": 17.02,
-          "e": 17.6
-        },
-        {
-          "t": "tetapi",
-          "s": 17.66,
-          "e": 18.16
-        },
-        {
-          "t": "baru",
-          "s": 18.224,
-          "e": 18.48
-        },
-        {
-          "t": "kita",
-          "s": 18.512,
-          "e": 18.64
-        },
-        {
-          "t": "bahas",
-          "s": 18.68,
-          "e": 18.96
-        },
-        {
-          "t": "nanti:",
-          "s": 19.0,
-          "e": 19.84
-        },
-        {
-          "t": "wazan (وَزْن)",
-          "s": 19.88,
-          "e": 20.32
-        },
-        {
-          "t": "dan",
-          "s": 20.42,
-          "e": 20.72
-        },
-        {
-          "t": "tashrif (تَصْرِيف)",
-          "s": 20.84,
-          "e": 21.52
-        },
-        {
-          "t": "di",
-          "s": 21.627,
-          "e": 21.84
-        },
-        {
-          "t": "ayat",
-          "s": 21.893,
-          "e": 22.08
-        },
-        {
-          "t": "ketiga,",
-          "s": 22.14,
-          "e": 22.56
-        },
-        {
-          "t": "serta",
-          "s": 22.707,
-          "e": 23.44
-        },
-        {
-          "t": "badal (بَدَل)",
-          "s": 23.56,
-          "e": 24.08
-        },
-        {
-          "t": "di",
-          "s": 24.187,
-          "e": 24.4
-        },
-        {
-          "t": "ayat",
-          "s": 24.453,
-          "e": 24.64
-        },
-        {
-          "t": "ketujuh.",
-          "s": 24.7,
-          "e": 25.2
-        }
-      ]
+      "focus": null
+    },
+    "al-fatihah:2:map:learnt": {
+      "text": "Sebelum ayat ini, kita sudah mempelajari empat hal. Yang kita temui lagi di ayat ini ada tiga: tiga jenis kata, مَجْرُور, dan حَرْف جَرّ.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari empat hal. Yang kita temui lagi di ayat ini ada tiga: tiga jenis kata, majrur (مَجْرُور), dan huruf jar (حَرْف جَرّ).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:2:map:later": {
+      "text": "Ada empat hal lagi di ayat ini, di antaranya alif lam dan نَعْت, tetapi baru kita bahas nanti. Ada juga dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "display": "Ada empat hal lagi di ayat ini, di antaranya alif lam (ال) dan na’t (نَعْت), tetapi baru kita bahas nanti. Ada juga dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
     },
     "al-fatihah:2:w1": {
       "text": "Kata pertama artinya: segala puji. Kata ini juga terdiri dari dua bagian.",
@@ -8802,140 +7683,13 @@
         }
       ]
     },
-    "al-fatihah:2:concept:syibhul-jumlah": {
-      "text": "Konsep baru: شِبْه الجُمْلَة, yaitu frasa جَارّ وَمَجْرُور sebagai khobar. Frasa حَرْف جَرّ dan اِسْم bisa mengisi posisi khobar; ulama menyebutnya شِبْه الجُمْلَة, yang artinya yang menyerupai kalimat.",
-      "display": "Konsep baru: Syibhul jumlah (شِبْه الجُمْلَة), yaitu frasa jar-majrur (جَارّ وَمَجْرُور) sebagai khabar (خَبَر). Frasa huruf jar (حَرْف جَرّ) + isim (اِسْم) bisa mengisi posisi khabar (خَبَر); ulama menyebutnya syibhul jumlah (شِبْه الجُمْلَة), yang artinya “yang menyerupai kalimat”.",
+    "al-fatihah:2:concept:marfu": {
+      "text": "Konsep baru: مَرْفُوع, dan tandanya: dhommah. Keadaan kedua adalah مَرْفُوع: اِسْم yang مَرْفُوع umumnya berakhir dhommah. مُبْتَدَأ, yang baru kita pelajari, selalu مَرْفُوع.",
+      "display": "Konsep baru: Marfu’ (مَرْفُوع), dan tandanya: dhammah (ضَمَّة). Keadaan kedua adalah marfu’ (مَرْفُوع): isim (اِسْم) yang marfu’ (مَرْفُوع) umumnya berakhir dhammah (ضَمَّة). Mubtada’ (مُبْتَدَأ), yang baru kita pelajari, selalu marfu’ (مَرْفُوع).",
       "highlight": [
-        2
+        1
       ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/56c3c83a4758d2c8.mp3",
-        "ms": 17789,
-        "sha256": "d8e42e35da3af4f600babaa1f1c2bc941d0542830f3dd99d62f885ba956631a6"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.4
-        },
-        {
-          "t": "baru:",
-          "s": 0.48,
-          "e": 1.08
-        },
-        {
-          "t": "Syibhul jumlah (شِبْه الجُمْلَة),",
-          "s": 1.22,
-          "e": 2.56
-        },
-        {
-          "t": "yaitu",
-          "s": 2.88,
-          "e": 3.6
-        },
-        {
-          "t": "frasa",
-          "s": 3.68,
-          "e": 4.16
-        },
-        {
-          "t": "jar-majrur (جَارّ وَمَجْرُور)",
-          "s": 4.32,
-          "e": 5.52
-        },
-        {
-          "t": "sebagai",
-          "s": 5.59,
-          "e": 6.08
-        },
-        {
-          "t": "khabar (خَبَر).",
-          "s": 6.133,
-          "e": 6.72
-        },
-        {
-          "t": "Frasa",
-          "s": 7.067,
-          "e": 8.16
-        },
-        {
-          "t": "huruf jar (حَرْف جَرّ)",
-          "s": 8.28,
-          "e": 9.04
-        },
-        {
-          "t": "dan",
-          "s": 9.12,
-          "e": 9.36
-        },
-        {
-          "t": "isim (اِسْم)",
-          "s": 9.44,
-          "e": 9.92
-        },
-        {
-          "t": "bisa",
-          "s": 10.032,
-          "e": 10.48
-        },
-        {
-          "t": "mengisi",
-          "s": 10.528,
-          "e": 10.96
-        },
-        {
-          "t": "posisi",
-          "s": 11.02,
-          "e": 11.44
-        },
-        {
-          "t": "khabar (خَبَر);",
-          "s": 11.467,
-          "e": 11.92
-        },
-        {
-          "t": "ulama",
-          "s": 12.187,
-          "e": 13.04
-        },
-        {
-          "t": "menyebutnya",
-          "s": 13.088,
-          "e": 13.76
-        },
-        {
-          "t": "syibhul jumlah (شِبْه الجُمْلَة),",
-          "s": 13.88,
-          "e": 15.04
-        },
-        {
-          "t": "yang",
-          "s": 15.152,
-          "e": 15.6
-        },
-        {
-          "t": "artinya",
-          "s": 15.66,
-          "e": 16.16
-        },
-        {
-          "t": "yang",
-          "s": 16.256,
-          "e": 16.64
-        },
-        {
-          "t": "menyerupai",
-          "s": 16.68,
-          "e": 17.2
-        },
-        {
-          "t": "kalimat.",
-          "s": 17.26,
-          "e": 17.76
-        }
-      ]
+      "focus": null
     },
     "al-fatihah:2:concept:jamak-mudzakkar-salim": {
       "text": "Konsep baru: جَمْع مُذَكَّر سَالِم, yaitu jamak akhiran una dan ina. Jamak laki-laki beraturan dibentuk dengan menambah akhiran una ketika رَفْع atau akhiran ina ketika نَصْب dan جَرّ pada bentuk tunggalnya.",
@@ -10504,82 +9258,10 @@
       ]
     },
     "al-fatihah:2:learned": {
-      "text": "Di ayat ini kita sudah mempelajari tiga hal baru: جُمْلَة اِسْمِيَّة, شِبْه الجُمْلَة, dan جَمْع مُذَكَّر سَالِم.",
-      "display": "Di ayat ini kita sudah mempelajari tiga hal baru: jumlah ismiyyah (جُمْلَة اِسْمِيَّة), syibhul jumlah (شِبْه الجُمْلَة), dan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
+      "text": "Di ayat ini kita mempelajari tiga hal baru: جُمْلَة اِسْمِيَّة, مَرْفُوع, dan جَمْع مُذَكَّر سَالِم. Dengan itu, sudah tujuh hal yang kita pelajari.",
+      "display": "Di ayat ini kita mempelajari tiga hal baru: jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم). Dengan itu, sudah tujuh hal yang kita pelajari.",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/cdc264a33a76905c.mp3",
-        "ms": 9796,
-        "sha256": "97a463b4388b12ba4fbe0ae493acbf8993b107254f63b7b736a1417dd545ddb9"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.16
-        },
-        {
-          "t": "ayat",
-          "s": 0.213,
-          "e": 0.4
-        },
-        {
-          "t": "ini",
-          "s": 0.5,
-          "e": 0.8
-        },
-        {
-          "t": "kita",
-          "s": 0.864,
-          "e": 1.12
-        },
-        {
-          "t": "sudah",
-          "s": 1.173,
-          "e": 1.44
-        },
-        {
-          "t": "mempelajari",
-          "s": 1.48,
-          "e": 2.08
-        },
-        {
-          "t": "tiga",
-          "s": 2.16,
-          "e": 2.48
-        },
-        {
-          "t": "hal",
-          "s": 2.54,
-          "e": 2.72
-        },
-        {
-          "t": "baru:",
-          "s": 2.8,
-          "e": 3.92
-        },
-        {
-          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 3.96,
-          "e": 5.12
-        },
-        {
-          "t": "syibhul jumlah (شِبْه الجُمْلَة),",
-          "s": 5.48,
-          "e": 6.8
-        },
-        {
-          "t": "dan",
-          "s": 7.0,
-          "e": 7.6
-        },
-        {
-          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
-          "s": 7.76,
-          "e": 9.76
-        }
-      ]
+      "focus": null
     },
     "al-fatihah:2:recap": {
       "text": "Dengarkan sekali lagi seluruh ayat kedua dibacakan imam.",
@@ -10874,118 +9556,23 @@
         }
       ]
     },
-    "al-fatihah:3:map": {
-      "text": "Di ayat ini ada satu hal baru: وَزْن dan تَصْرِيف. Kita juga mengulang satu hal yang sudah kita pelajari: نَعْت.",
-      "display": "Di ayat ini ada satu hal baru: wazan (وَزْن) dan tashrif (تَصْرِيف). Kita juga mengulang satu hal yang sudah kita pelajari: na’t (نَعْت).",
+    "al-fatihah:3:map:new": {
+      "text": "Di ayat ini ada dua hal baru: alif lam dan نَعْت.",
+      "display": "Di ayat ini ada dua hal baru: alif lam (ال) dan na’t (نَعْت).",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/2cb7dc461ec0cb94.mp3",
-        "ms": 9482,
-        "sha256": "68e9bc3c0405f03cf5d08dc34c312b83e9b067ed516fce826b6cf0e9b21c31b6"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.08
-        },
-        {
-          "t": "ayat",
-          "s": 0.133,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.42,
-          "e": 0.72
-        },
-        {
-          "t": "ada",
-          "s": 0.82,
-          "e": 1.12
-        },
-        {
-          "t": "satu",
-          "s": 1.168,
-          "e": 1.36
-        },
-        {
-          "t": "hal",
-          "s": 1.42,
-          "e": 1.6
-        },
-        {
-          "t": "baru:",
-          "s": 1.664,
-          "e": 2.64
-        },
-        {
-          "t": "wazan (وَزْن)",
-          "s": 2.68,
-          "e": 3.28
-        },
-        {
-          "t": "dan",
-          "s": 3.4,
-          "e": 3.76
-        },
-        {
-          "t": "tashrif (تَصْرِيف).",
-          "s": 3.88,
-          "e": 4.64
-        },
-        {
-          "t": "Kita",
-          "s": 5.04,
-          "e": 5.52
-        },
-        {
-          "t": "juga",
-          "s": 5.568,
-          "e": 5.76
-        },
-        {
-          "t": "mengulang",
-          "s": 5.808,
-          "e": 6.24
-        },
-        {
-          "t": "satu",
-          "s": 6.304,
-          "e": 6.56
-        },
-        {
-          "t": "hal",
-          "s": 6.62,
-          "e": 6.8
-        },
-        {
-          "t": "yang",
-          "s": 6.832,
-          "e": 6.96
-        },
-        {
-          "t": "sudah",
-          "s": 7.013,
-          "e": 7.28
-        },
-        {
-          "t": "kita",
-          "s": 7.312,
-          "e": 7.44
-        },
-        {
-          "t": "pelajari:",
-          "s": 7.48,
-          "e": 8.64
-        },
-        {
-          "t": "na’t (نَعْت).",
-          "s": 8.68,
-          "e": 9.2
-        }
-      ]
+      "focus": null
+    },
+    "al-fatihah:3:map:learnt": {
+      "text": "Sebelum ayat ini, kita sudah mempelajari tujuh hal. Yang kita temui lagi di ayat ini ada dua: tiga jenis kata dan مَجْرُور.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari tujuh hal. Yang kita temui lagi di ayat ini ada dua: tiga jenis kata dan majrur (مَجْرُور).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:3:map:later": {
+      "text": "Di ayat ini ada satu hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "display": "Di ayat ini ada satu hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
     },
     "al-fatihah:3:w1": {
       "text": "Kata pertama artinya: Yang Maha Pengasih. Kata yang sama sudah kita pelajari di ayat pertama.",
@@ -11992,18 +10579,27 @@
         }
       ]
     },
-    "al-fatihah:3:concept:wazan-dan-tashrif": {
-      "text": "Konsep baru: وَزْن dan تَصْرِيف, yaitu cetakan kata. وَزْن adalah cetakan kata yang ditulis dengan tiga huruf فَاء, عَيْن, dan لَام, dan تَصْرِيف adalah mengubah satu akar ke berbagai cetakan.",
-      "display": "Konsep baru: Wazan (وَزْن) dan tashrif (تَصْرِيف), yaitu cetakan kata. Wazan (وَزْن) adalah cetakan kata yang ditulis dengan tiga huruf fa’ (ف), ‘ain (ع), dan lam (ل), dan tashrif (تَصْرِيف) adalah mengubah satu akar ke berbagai cetakan.",
+    "al-fatihah:3:concept:alif-lam": {
+      "text": "Konsep baru: Alif lam, penanda اِسْم yang tertentu. Alif lam hanya masuk pada اِسْم, dan اِسْم yang diawalinya menjadi tertentu, atau مَعْرِفَة. Nama diri, seperti lafaz Alloh di ayat dua, sudah مَعْرِفَة tanpa alif lam.",
+      "display": "Konsep baru: Alif lam (ال), penanda isim (اِسْم) yang tertentu. Alif lam (ال) hanya masuk pada isim (اِسْم), dan isim (اِسْم) yang diawalinya menjadi tertentu, atau ma’rifah (مَعْرِفَة). Nama diri, seperti lafaz “Allah” di ayat dua, sudah ma’rifah (مَعْرِفَة) tanpa alif lam (ال).",
+      "highlight": [
+        1,
+        2
+      ],
+      "focus": null
+    },
+    "al-fatihah:3:concept:naat": {
+      "text": "Konsep baru: نَعْت, yaitu sifat yang mengikuti. نَعْت adalah اِسْم yang menyifati اِسْم sebelumnya dan mengikutinya dalam akhiran serta dalam tertentu atau tidaknya.",
+      "display": "Konsep baru: Na’t (نَعْت), yaitu sifat yang mengikuti. Na’t (نَعْت) adalah isim (اِسْم) yang menyifati isim (اِسْم) sebelumnya dan mengikutinya dalam akhiran serta dalam tertentu atau tidaknya.",
       "highlight": [
         1,
         2
       ],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/accca4fb4b0743eb.mp3",
-        "ms": 16771,
-        "sha256": "13d56948bb5a537402c5dc559911a56eaf3dd073ce855b762abab01e49186a9a"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/7970df3f425d94aa.mp3",
+        "ms": 13087,
+        "sha256": "059a6dbc0ce2a552424f4ce4e8d483a00ceec5cf1e9ecade73e096d78f5427c7"
       },
       "tokens": [
         {
@@ -12017,144 +10613,109 @@
           "e": 0.8
         },
         {
-          "t": "Wazan (وَزْن)",
+          "t": "Na’t (نَعْت),",
           "s": 1.08,
-          "e": 1.76
-        },
-        {
-          "t": "dan",
-          "s": 1.88,
-          "e": 2.24
-        },
-        {
-          "t": "tashrif (تَصْرِيف),",
-          "s": 2.28,
-          "e": 2.88
+          "e": 2.0
         },
         {
           "t": "yaitu",
-          "s": 3.16,
-          "e": 3.72
+          "s": 2.16,
+          "e": 2.72
         },
         {
-          "t": "cetakan",
-          "s": 3.76,
-          "e": 4.64
-        },
-        {
-          "t": "kata.",
-          "s": 4.72,
-          "e": 5.12
-        },
-        {
-          "t": "Wazan (وَزْن)",
-          "s": 5.56,
-          "e": 6.4
-        },
-        {
-          "t": "adalah",
-          "s": 6.469,
-          "e": 6.88
-        },
-        {
-          "t": "cetakan",
-          "s": 6.94,
-          "e": 7.36
-        },
-        {
-          "t": "kata",
-          "s": 7.424,
-          "e": 7.68
+          "t": "sifat",
+          "s": 2.84,
+          "e": 3.28
         },
         {
           "t": "yang",
-          "s": 7.728,
-          "e": 7.92
+          "s": 3.312,
+          "e": 3.44
         },
         {
-          "t": "ditulis",
-          "s": 7.96,
-          "e": 8.32
+          "t": "mengikuti.",
+          "s": 3.472,
+          "e": 4.16
         },
         {
-          "t": "dengan",
-          "s": 8.354,
-          "e": 8.56
-        },
-        {
-          "t": "tiga",
-          "s": 8.64,
-          "e": 8.88
-        },
-        {
-          "t": "huruf",
-          "s": 8.92,
-          "e": 9.28
-        },
-        {
-          "t": "fa’ (ف),",
-          "s": 9.72,
-          "e": 10.48
-        },
-        {
-          "t": "‘ain (ع),",
-          "s": 10.68,
-          "e": 11.28
-        },
-        {
-          "t": "dan",
-          "s": 11.4,
-          "e": 11.76
-        },
-        {
-          "t": "lam (ل),",
-          "s": 11.8,
-          "e": 12.16
-        },
-        {
-          "t": "dan",
-          "s": 12.38,
-          "e": 13.04
-        },
-        {
-          "t": "tashrif (تَصْرِيف)",
-          "s": 13.08,
-          "e": 13.6
+          "t": "Na’t (نَعْت)",
+          "s": 4.6,
+          "e": 5.28
         },
         {
           "t": "adalah",
-          "s": 13.703,
-          "e": 14.32
+          "s": 5.349,
+          "e": 5.76
         },
         {
-          "t": "mengubah",
-          "s": 14.352,
-          "e": 14.72
+          "t": "isim (اِسْم)",
+          "s": 5.84,
+          "e": 6.16
         },
         {
-          "t": "satu",
-          "s": 14.784,
-          "e": 15.04
+          "t": "yang",
+          "s": 6.208,
+          "e": 6.4
         },
         {
-          "t": "akar",
-          "s": 15.12,
-          "e": 15.44
+          "t": "menyifati",
+          "s": 6.432,
+          "e": 7.12
         },
         {
-          "t": "ke",
-          "s": 15.493,
-          "e": 15.6
+          "t": "isim (اِسْم)",
+          "s": 7.16,
+          "e": 7.44
         },
         {
-          "t": "berbagai",
-          "s": 15.64,
-          "e": 16.0
+          "t": "sebelumnya",
+          "s": 7.52,
+          "e": 8.24
         },
         {
-          "t": "cetakan.",
-          "s": 16.06,
-          "e": 16.72
+          "t": "dan",
+          "s": 8.4,
+          "e": 8.88
+        },
+        {
+          "t": "mengikutinya",
+          "s": 8.912,
+          "e": 9.6
+        },
+        {
+          "t": "dalam",
+          "s": 9.653,
+          "e": 9.92
+        },
+        {
+          "t": "akhiran",
+          "s": 9.973,
+          "e": 10.4
+        },
+        {
+          "t": "serta",
+          "s": 10.547,
+          "e": 11.28
+        },
+        {
+          "t": "dalam",
+          "s": 11.333,
+          "e": 11.6
+        },
+        {
+          "t": "tertentu",
+          "s": 11.648,
+          "e": 12.16
+        },
+        {
+          "t": "atau",
+          "s": 12.208,
+          "e": 12.4
+        },
+        {
+          "t": "tidaknya.",
+          "s": 12.467,
+          "e": 13.04
         }
       ]
     },
@@ -12899,77 +11460,10 @@
       ]
     },
     "al-fatihah:3:learned": {
-      "text": "Di ayat ini kita sudah mempelajari satu hal baru: وَزْن dan تَصْرِيف.",
-      "display": "Di ayat ini kita sudah mempelajari satu hal baru: wazan (وَزْن) dan tashrif (تَصْرِيف).",
+      "text": "Di ayat ini kita mempelajari dua hal baru: alif lam dan نَعْت. Dengan itu, sudah sembilan hal yang kita pelajari.",
+      "display": "Di ayat ini kita mempelajari dua hal baru: alif lam (ال) dan na’t (نَعْت). Dengan itu, sudah sembilan hal yang kita pelajari.",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/5bdc9ac5239c30e6.mp3",
-        "ms": 6113,
-        "sha256": "44be26d4d5245620587b2a94575b2f087b54f7c622b5cf295fae47ef827f1c2a"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.08
-        },
-        {
-          "t": "ayat",
-          "s": 0.133,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.4,
-          "e": 0.64
-        },
-        {
-          "t": "kita",
-          "s": 0.704,
-          "e": 0.96
-        },
-        {
-          "t": "sudah",
-          "s": 1.013,
-          "e": 1.28
-        },
-        {
-          "t": "mempelajari",
-          "s": 1.32,
-          "e": 1.84
-        },
-        {
-          "t": "satu",
-          "s": 1.888,
-          "e": 2.08
-        },
-        {
-          "t": "hal",
-          "s": 2.14,
-          "e": 2.32
-        },
-        {
-          "t": "baru:",
-          "s": 2.4,
-          "e": 2.8
-        },
-        {
-          "t": "wazan (وَزْن)",
-          "s": 3.2,
-          "e": 4.0
-        },
-        {
-          "t": "dan",
-          "s": 4.12,
-          "e": 4.48
-        },
-        {
-          "t": "tashrif (تَصْرِيف).",
-          "s": 4.6,
-          "e": 6.08
-        }
-      ]
+      "focus": null
     },
     "al-fatihah:3:recap": {
       "text": "Dengarkan sekali lagi seluruh ayat ketiga dibacakan imam.",
@@ -13254,133 +11748,23 @@
         }
       ]
     },
-    "al-fatihah:4:map": {
-      "text": "Di ayat ini ada satu hal baru: اِسْم فَاعِل. Kita juga mengulang tiga hal yang sudah kita pelajari: idhofah, نَعْت, serta وَزْن dan تَصْرِيف.",
-      "display": "Di ayat ini ada satu hal baru: isim fa’il (اِسْم فَاعِل). Kita juga mengulang tiga hal yang sudah kita pelajari: idhafah (إِضَافَة), na’t (نَعْت), serta wazan (وَزْن) dan tashrif (تَصْرِيف).",
+    "al-fatihah:4:map:new": {
+      "text": "Di ayat ini ada satu hal baru: idhofah.",
+      "display": "Di ayat ini ada satu hal baru: idhafah (إِضَافَة).",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/ee6c24adca7b4493.mp3",
-        "ms": 12121,
-        "sha256": "fc46a0943683304c1b08cb75ffd11c9f52560086ffe126d22a1f10021dad9c4d"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.08
-        },
-        {
-          "t": "ayat",
-          "s": 0.107,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.38,
-          "e": 0.56
-        },
-        {
-          "t": "ada",
-          "s": 0.62,
-          "e": 0.8
-        },
-        {
-          "t": "satu",
-          "s": 0.864,
-          "e": 1.12
-        },
-        {
-          "t": "hal",
-          "s": 1.18,
-          "e": 1.36
-        },
-        {
-          "t": "baru:",
-          "s": 1.424,
-          "e": 2.32
-        },
-        {
-          "t": "isim fa’il (اِسْم فَاعِل).",
-          "s": 2.36,
-          "e": 3.6
-        },
-        {
-          "t": "Kita",
-          "s": 3.88,
-          "e": 4.32
-        },
-        {
-          "t": "juga",
-          "s": 4.368,
-          "e": 4.56
-        },
-        {
-          "t": "mengulang",
-          "s": 4.608,
-          "e": 5.04
-        },
-        {
-          "t": "tiga",
-          "s": 5.12,
-          "e": 5.36
-        },
-        {
-          "t": "hal",
-          "s": 5.44,
-          "e": 5.68
-        },
-        {
-          "t": "yang",
-          "s": 5.712,
-          "e": 5.84
-        },
-        {
-          "t": "sudah",
-          "s": 5.893,
-          "e": 6.16
-        },
-        {
-          "t": "kita",
-          "s": 6.208,
-          "e": 6.4
-        },
-        {
-          "t": "pelajari:",
-          "s": 6.44,
-          "e": 7.68
-        },
-        {
-          "t": "idhafah (إِضَافَة),",
-          "s": 7.733,
-          "e": 8.88
-        },
-        {
-          "t": "na’t (نَعْت),",
-          "s": 8.96,
-          "e": 9.8
-        },
-        {
-          "t": "serta",
-          "s": 9.873,
-          "e": 10.24
-        },
-        {
-          "t": "wazan (وَزْن)",
-          "s": 10.28,
-          "e": 10.8
-        },
-        {
-          "t": "dan",
-          "s": 10.94,
-          "e": 11.36
-        },
-        {
-          "t": "tashrif (تَصْرِيف).",
-          "s": 11.44,
-          "e": 12.08
-        }
-      ]
+      "focus": null
+    },
+    "al-fatihah:4:map:learnt": {
+      "text": "Sebelum ayat ini, kita sudah mempelajari sembilan hal. Yang kita temui lagi di ayat ini ada empat, di antaranya tiga jenis kata dan مَجْرُور.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari sembilan hal. Yang kita temui lagi di ayat ini ada empat, di antaranya tiga jenis kata dan majrur (مَجْرُور).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:4:map:later": {
+      "text": "Di ayat ini ada dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "display": "Di ayat ini ada dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
     },
     "al-fatihah:4:w1": {
       "text": "Kata pertama artinya: Pemilik.",
@@ -14568,143 +12952,135 @@
         }
       ]
     },
-    "al-fatihah:4:concept:isim-fail": {
-      "text": "Konsep baru: اِسْم فَاعِل, yaitu kata pelaku. اِسْم فَاعِل adalah اِسْم turunan dari مَصْدَر, yaitu kata benda perbuatan, yang menyebut pelakunya, seperti kata pertama yang artinya Pemilik.",
-      "display": "Konsep baru: Isim fa’il (اِسْم فَاعِل), yaitu kata pelaku. Isim fa’il (اِسْم فَاعِل) adalah isim (اِسْم) turunan dari mashdar (مَصْدَر), yaitu kata benda perbuatan, yang menyebut pelakunya, seperti kata pertama yang artinya “Pemilik”.",
+    "al-fatihah:4:concept:idhafah": {
+      "text": "Konsep baru: Idhofah, yaitu sandaran kata: nama Alloh. Idhofah adalah gabungan dua اِسْم seperti nama Alloh, dan kata keduanya, atau mudhof ilaih, selalu مَجْرُور.",
+      "display": "Konsep baru: Idhafah (إِضَافَة), yaitu sandaran kata: “nama Allah”. Idhafah (إِضَافَة) adalah gabungan dua isim (اِسْم) seperti “nama Allah”, dan kata keduanya, atau mudhaf ilaih (مُضَاف إِلَيْه), selalu majrur (مَجْرُور).",
       "highlight": [
-        1
+        1,
+        2,
+        3
       ],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/bcb8868449fd8296.mp3",
-        "ms": 15151,
-        "sha256": "f0f65fcc026552055d779e45b3b5eacad98f4a52f33c56c667684629d4a07aed"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a4cd05115ef522a5.mp3",
+        "ms": 15229,
+        "sha256": "5ed1fe938af2615ab9bbc0135f9ae0fe47f9aceec72cbe8fe14a819a59ba7a65"
       },
       "tokens": [
         {
           "t": "Konsep",
           "s": 0.0,
-          "e": 0.32
+          "e": 0.4
         },
         {
           "t": "baru:",
-          "s": 0.384,
-          "e": 0.72
+          "s": 0.48,
+          "e": 0.88
         },
         {
-          "t": "Isim fa’il (اِسْم فَاعِل),",
-          "s": 0.88,
-          "e": 2.32
+          "t": "Idhafah (إِضَافَة),",
+          "s": 1.12,
+          "e": 2.16
         },
         {
           "t": "yaitu",
-          "s": 2.64,
-          "e": 3.36
+          "s": 2.56,
+          "e": 3.2
         },
         {
-          "t": "kata",
-          "s": 3.472,
-          "e": 3.92
+          "t": "sandaran",
+          "s": 3.264,
+          "e": 3.68
         },
         {
-          "t": "pelaku.",
-          "s": 3.96,
-          "e": 4.48
+          "t": "kata:",
+          "s": 3.76,
+          "e": 4.16
         },
         {
-          "t": "Isim fa’il (اِسْم فَاعِل)",
-          "s": 4.84,
-          "e": 5.92
+          "t": "nama",
+          "s": 4.272,
+          "e": 4.72
+        },
+        {
+          "t": "Allah.",
+          "s": 4.8,
+          "e": 5.28
+        },
+        {
+          "t": "Idhafah (إِضَافَة)",
+          "s": 5.573,
+          "e": 6.64
         },
         {
           "t": "adalah",
-          "s": 6.0,
-          "e": 6.48
+          "s": 6.743,
+          "e": 7.36
         },
         {
-          "t": "isim (اِسْم)",
-          "s": 6.56,
-          "e": 6.88
+          "t": "gabungan",
+          "s": 7.42,
+          "e": 7.92
         },
         {
-          "t": "turunan",
-          "s": 6.94,
-          "e": 7.28
-        },
-        {
-          "t": "dari",
-          "s": 7.328,
-          "e": 7.52
-        },
-        {
-          "t": "mashdar (مَصْدَر),",
-          "s": 7.56,
+          "t": "dua",
+          "s": 7.98,
           "e": 8.16
         },
         {
-          "t": "yaitu",
-          "s": 8.36,
-          "e": 8.88
-        },
-        {
-          "t": "kata",
-          "s": 8.928,
-          "e": 9.12
-        },
-        {
-          "t": "benda",
-          "s": 9.2,
-          "e": 9.52
-        },
-        {
-          "t": "perbuatan,",
-          "s": 9.56,
-          "e": 10.6
-        },
-        {
-          "t": "yang",
-          "s": 10.688,
-          "e": 11.04
-        },
-        {
-          "t": "menyebut",
-          "s": 11.072,
-          "e": 11.44
-        },
-        {
-          "t": "pelakunya,",
-          "s": 11.5,
-          "e": 12.56
+          "t": "isim (اِسْم)",
+          "s": 8.24,
+          "e": 8.64
         },
         {
           "t": "seperti",
-          "s": 12.61,
-          "e": 12.96
+          "s": 8.69,
+          "e": 9.04
+        },
+        {
+          "t": "nama",
+          "s": 9.104,
+          "e": 9.36
+        },
+        {
+          "t": "Allah,",
+          "s": 9.44,
+          "e": 9.84
+        },
+        {
+          "t": "dan",
+          "s": 9.98,
+          "e": 10.4
         },
         {
           "t": "kata",
-          "s": 13.008,
-          "e": 13.2
+          "s": 10.464,
+          "e": 10.72
         },
         {
-          "t": "pertama",
-          "s": 13.248,
-          "e": 13.68
+          "t": "keduanya,",
+          "s": 10.76,
+          "e": 11.76
         },
         {
-          "t": "yang",
-          "s": 13.712,
-          "e": 13.84
+          "t": "atau",
+          "s": 11.856,
+          "e": 12.24
         },
         {
-          "t": "artinya",
-          "s": 13.9,
-          "e": 14.4
+          "t": "mudhaf ilaih (مُضَاف إِلَيْه),",
+          "s": 12.34,
+          "e": 13.92
         },
         {
-          "t": "Pemilik.",
-          "s": 14.48,
-          "e": 15.12
+          "t": "selalu",
+          "s": 13.98,
+          "e": 14.48
+        },
+        {
+          "t": "majrur (مَجْرُور).",
+          "s": 14.6,
+          "e": 15.2
         }
       ]
     },
@@ -15620,67 +13996,10 @@
       ]
     },
     "al-fatihah:4:learned": {
-      "text": "Di ayat ini kita sudah mempelajari satu hal baru: اِسْم فَاعِل.",
-      "display": "Di ayat ini kita sudah mempelajari satu hal baru: isim fa’il (اِسْم فَاعِل).",
+      "text": "Di ayat ini kita mempelajari satu hal baru: idhofah. Dengan itu, sudah sepuluh hal yang kita pelajari.",
+      "display": "Di ayat ini kita mempelajari satu hal baru: idhafah (إِضَافَة). Dengan itu, sudah sepuluh hal yang kita pelajari.",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/d0ac9c41ae62a42e.mp3",
-        "ms": 4676,
-        "sha256": "631decd24eedceb8a20837b8e604762605f3a663c4a8e1f35c6c5102de192e96"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.08
-        },
-        {
-          "t": "ayat",
-          "s": 0.133,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.38,
-          "e": 0.56
-        },
-        {
-          "t": "kita",
-          "s": 0.608,
-          "e": 0.8
-        },
-        {
-          "t": "sudah",
-          "s": 0.853,
-          "e": 1.12
-        },
-        {
-          "t": "mempelajari",
-          "s": 1.16,
-          "e": 1.76
-        },
-        {
-          "t": "satu",
-          "s": 1.808,
-          "e": 2.0
-        },
-        {
-          "t": "hal",
-          "s": 2.06,
-          "e": 2.24
-        },
-        {
-          "t": "baru:",
-          "s": 2.304,
-          "e": 3.28
-        },
-        {
-          "t": "isim fa’il (اِسْم فَاعِل).",
-          "s": 3.32,
-          "e": 4.64
-        }
-      ]
+      "focus": null
     },
     "al-fatihah:4:recap": {
       "text": "Dengarkan sekali lagi seluruh ayat keempat dibacakan imam.",
@@ -16010,233 +14329,23 @@
         }
       ]
     },
-    "al-fatihah:5:map": {
-      "text": "Di ayat ini ada delapan hal baru, di antaranya مُعْرَب dan مَبْنِيّ, dhomir, serta تَقْدِيم المَفْعُول. Kita juga mengulang satu hal yang sudah kita pelajari: tiga jenis كَلِمَة. Ada satu hal lagi di ayat ini, yaitu مَفْعُول بِه, tetapi baru kita bahas di ayat keenam.",
-      "display": "Di ayat ini ada delapan hal baru, di antaranya mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), dhamir (ضَمِير), serta taqdim maf’ul (تَقْدِيم المَفْعُول). Kita juga mengulang satu hal yang sudah kita pelajari: tiga jenis kalimah (كَلِمَة). Ada satu hal lagi di ayat ini, yaitu maf’ul bih (مَفْعُول بِه), tetapi baru kita bahas di ayat keenam.",
+    "al-fatihah:5:map:new": {
+      "text": "Di ayat ini ada tiga hal baru: dhomir, fi'il mudhori', serta مُعْرَب dan مَبْنِيّ.",
+      "display": "Di ayat ini ada tiga hal baru: dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), serta mu’rab (مُعْرَب) dan mabni (مَبْنِيّ).",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/9a367ba8b01498f5.mp3",
-        "ms": 21629,
-        "sha256": "cee97c283ef95279164ba97f08beb8a811c46e66e58f0f0ce1022b075cd1d9a4"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.08
-        },
-        {
-          "t": "ayat",
-          "s": 0.133,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.4,
-          "e": 0.64
-        },
-        {
-          "t": "ada",
-          "s": 0.74,
-          "e": 1.04
-        },
-        {
-          "t": "delapan",
-          "s": 1.08,
-          "e": 1.44
-        },
-        {
-          "t": "hal",
-          "s": 1.48,
-          "e": 1.6
-        },
-        {
-          "t": "baru,",
-          "s": 1.68,
-          "e": 2.4
-        },
-        {
-          "t": "di",
-          "s": 2.427,
-          "e": 2.48
-        },
-        {
-          "t": "antaranya",
-          "s": 2.54,
-          "e": 3.2
-        },
-        {
-          "t": "mu’rab (مُعْرَب)",
-          "s": 3.4,
-          "e": 4.08
-        },
-        {
-          "t": "dan",
-          "s": 4.22,
-          "e": 4.64
-        },
-        {
-          "t": "mabni (مَبْنِيّ),",
-          "s": 4.8,
-          "e": 5.92
-        },
-        {
-          "t": "dhamir (ضَمِير),",
-          "s": 5.973,
-          "e": 6.48
-        },
-        {
-          "t": "serta",
-          "s": 6.613,
-          "e": 7.28
-        },
-        {
-          "t": "taqdim maf’ul (تَقْدِيم المَفْعُول).",
-          "s": 7.48,
-          "e": 8.8
-        },
-        {
-          "t": "Kita",
-          "s": 9.12,
-          "e": 9.6
-        },
-        {
-          "t": "juga",
-          "s": 9.648,
-          "e": 9.84
-        },
-        {
-          "t": "mengulang",
-          "s": 9.888,
-          "e": 10.32
-        },
-        {
-          "t": "satu",
-          "s": 10.384,
-          "e": 10.64
-        },
-        {
-          "t": "hal",
-          "s": 10.7,
-          "e": 10.88
-        },
-        {
-          "t": "yang",
-          "s": 10.912,
-          "e": 11.04
-        },
-        {
-          "t": "sudah",
-          "s": 11.093,
-          "e": 11.36
-        },
-        {
-          "t": "kita",
-          "s": 11.408,
-          "e": 11.6
-        },
-        {
-          "t": "pelajari:",
-          "s": 11.64,
-          "e": 12.24
-        },
-        {
-          "t": "tiga",
-          "s": 12.6,
-          "e": 13.2
-        },
-        {
-          "t": "jenis",
-          "s": 13.267,
-          "e": 13.6
-        },
-        {
-          "t": "kalimah (كَلِمَة).",
-          "s": 13.64,
-          "e": 14.16
-        },
-        {
-          "t": "Ada",
-          "s": 14.34,
-          "e": 14.88
-        },
-        {
-          "t": "satu",
-          "s": 14.928,
-          "e": 15.12
-        },
-        {
-          "t": "hal",
-          "s": 15.16,
-          "e": 15.28
-        },
-        {
-          "t": "lagi",
-          "s": 15.344,
-          "e": 15.6
-        },
-        {
-          "t": "di",
-          "s": 15.653,
-          "e": 15.76
-        },
-        {
-          "t": "ayat",
-          "s": 15.787,
-          "e": 16.0
-        },
-        {
-          "t": "ini,",
-          "s": 16.06,
-          "e": 16.72
-        },
-        {
-          "t": "yaitu",
-          "s": 16.76,
-          "e": 17.28
-        },
-        {
-          "t": "maf’ul bih (مَفْعُول بِه),",
-          "s": 17.44,
-          "e": 19.04
-        },
-        {
-          "t": "tetapi",
-          "s": 19.1,
-          "e": 19.68
-        },
-        {
-          "t": "baru",
-          "s": 19.776,
-          "e": 20.16
-        },
-        {
-          "t": "kita",
-          "s": 20.208,
-          "e": 20.4
-        },
-        {
-          "t": "bahas",
-          "s": 20.44,
-          "e": 20.72
-        },
-        {
-          "t": "di",
-          "s": 20.773,
-          "e": 20.88
-        },
-        {
-          "t": "ayat",
-          "s": 20.933,
-          "e": 21.12
-        },
-        {
-          "t": "keenam.",
-          "s": 21.184,
-          "e": 21.6
-        }
-      ]
+      "focus": null
+    },
+    "al-fatihah:5:map:learnt": {
+      "text": "Sebelum ayat ini, kita sudah mempelajari sepuluh hal. Yang kita temui lagi di ayat ini ada dua: tiga jenis kata dan مَرْفُوع.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari sepuluh hal. Yang kita temui lagi di ayat ini ada dua: tiga jenis kata dan marfu’ (مَرْفُوع).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:5:map:later": {
+      "text": "Ada tiga hal lagi di ayat ini, tetapi baru kita bahas nanti: جُمْلَة فِعْلِيَّة di ayat keenam, مَفْعُول بِه di ayat keenam, dan عَطْف di ayat ketujuh. Ada juga tiga hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "display": "Ada tiga hal lagi di ayat ini, tetapi baru kita bahas nanti: jumlah fi’liyyah (جُمْلَة فِعْلِيَّة) di ayat keenam, maf’ul bih (مَفْعُول بِه) di ayat keenam, dan ‘athaf (عَطْف) di ayat ketujuh. Ada juga tiga hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
     },
     "al-fatihah:5:w1": {
       "text": "Kata pertama artinya: hanya kepada Engkau.",
@@ -18025,157 +16134,6 @@
         }
       ]
     },
-    "al-fatihah:5:concept:murab-mabni": {
-      "text": "Konsep baru: مُعْرَب dan مَبْنِيّ, yaitu akhiran berubah atau tetap. Kata مُعْرَب akhirnya berubah mengikuti perannya dalam kalimat, sedangkan kata مَبْنِيّ akhirnya tetap di posisi mana pun.",
-      "display": "Konsep baru: Mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), yaitu akhiran berubah atau tetap. Kata mu’rab (مُعْرَب) akhirnya berubah mengikuti perannya dalam kalimat, sedangkan kata mabni (مَبْنِيّ) akhirnya tetap di posisi mana pun.",
-      "highlight": [
-        1,
-        2
-      ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/35083a22fffb9963.mp3",
-        "ms": 14028,
-        "sha256": "d210ebdb028039a321ca36a9ed30da327c9cf09db7d27c7cb7dd0475aadf1e05"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.4
-        },
-        {
-          "t": "baru:",
-          "s": 0.464,
-          "e": 0.8
-        },
-        {
-          "t": "Mu’rab (مُعْرَب)",
-          "s": 1.0,
-          "e": 1.68
-        },
-        {
-          "t": "dan",
-          "s": 1.78,
-          "e": 2.08
-        },
-        {
-          "t": "mabni (مَبْنِيّ),",
-          "s": 2.12,
-          "e": 3.12
-        },
-        {
-          "t": "yaitu",
-          "s": 3.2,
-          "e": 3.52
-        },
-        {
-          "t": "akhiran",
-          "s": 3.627,
-          "e": 4.08
-        },
-        {
-          "t": "berubah",
-          "s": 4.12,
-          "e": 4.56
-        },
-        {
-          "t": "atau",
-          "s": 4.64,
-          "e": 4.96
-        },
-        {
-          "t": "tetap.",
-          "s": 5.02,
-          "e": 5.44
-        },
-        {
-          "t": "Kata",
-          "s": 5.6,
-          "e": 6.24
-        },
-        {
-          "t": "mu’rab (مُعْرَب)",
-          "s": 6.32,
-          "e": 6.8
-        },
-        {
-          "t": "akhirnya",
-          "s": 6.907,
-          "e": 7.44
-        },
-        {
-          "t": "berubah",
-          "s": 7.48,
-          "e": 7.92
-        },
-        {
-          "t": "mengikuti",
-          "s": 7.952,
-          "e": 8.48
-        },
-        {
-          "t": "perannya",
-          "s": 8.52,
-          "e": 8.88
-        },
-        {
-          "t": "dalam",
-          "s": 8.933,
-          "e": 9.2
-        },
-        {
-          "t": "kalimat,",
-          "s": 9.24,
-          "e": 10.24
-        },
-        {
-          "t": "sedangkan",
-          "s": 10.28,
-          "e": 10.72
-        },
-        {
-          "t": "kata",
-          "s": 10.768,
-          "e": 10.96
-        },
-        {
-          "t": "mabni (مَبْنِيّ)",
-          "s": 11.0,
-          "e": 11.52
-        },
-        {
-          "t": "akhirnya",
-          "s": 11.653,
-          "e": 12.24
-        },
-        {
-          "t": "tetap",
-          "s": 12.3,
-          "e": 12.64
-        },
-        {
-          "t": "di",
-          "s": 12.72,
-          "e": 12.88
-        },
-        {
-          "t": "posisi",
-          "s": 12.94,
-          "e": 13.28
-        },
-        {
-          "t": "mana",
-          "s": 13.328,
-          "e": 13.52
-        },
-        {
-          "t": "pun.",
-          "s": 13.6,
-          "e": 14.0
-        }
-      ]
-    },
     "al-fatihah:5:concept:dhamir": {
       "text": "Konsep baru: Dhomir, yaitu kata ganti: مُتَّصِل dan مُنْفَصِل. Dhomir adalah kata ganti seperti kami, Engkau, dan mereka; ada yang menempel pada kata lain, atau مُتَّصِل, dan ada yang berdiri sendiri, atau مُنْفَصِل.",
       "display": "Konsep baru: Dhamir (ضَمِير), yaitu kata ganti: muttashil (مُتَّصِل) dan munfashil (مُنْفَصِل). Dhamir (ضَمِير) adalah kata ganti seperti “kami”, “Engkau”, dan “mereka”; ada yang menempel pada kata lain, atau muttashil (مُتَّصِل), dan ada yang berdiri sendiri, atau munfashil (مُنْفَصِل).",
@@ -18354,169 +16312,6 @@
           "t": "munfashil (مُنْفَصِل).",
           "s": 19.72,
           "e": 20.72
-        }
-      ]
-    },
-    "al-fatihah:5:concept:taqdim-maful": {
-      "text": "Konsep baru: تَقْدِيم المَفْعُول, yaitu objek di depan: makna hanya. Mendahulukan objek sebelum kata kerjanya memberi makna pengkhususan; karena itu kata pertama dan kedua diterjemahkan hanya kepada Engkaulah kami menyembah.",
-      "display": "Konsep baru: Taqdim maf’ul (تَقْدِيم المَفْعُول), yaitu objek di depan: makna “hanya”. Mendahulukan objek sebelum kata kerjanya memberi makna pengkhususan; karena itu kata pertama dan kedua diterjemahkan “hanya kepada Engkaulah kami menyembah”.",
-      "highlight": [
-        1,
-        2,
-        3,
-        4
-      ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/81bc1276b5ee5dc8.mp3",
-        "ms": 18678,
-        "sha256": "ba76d11887f25a3e592b38d57ef38c3e12d58b1f1ae93e485fcd5fcb1c9e7a69"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.4
-        },
-        {
-          "t": "baru:",
-          "s": 0.464,
-          "e": 0.8
-        },
-        {
-          "t": "Taqdim maf’ul (تَقْدِيم المَفْعُول),",
-          "s": 1.0,
-          "e": 3.04
-        },
-        {
-          "t": "yaitu",
-          "s": 3.24,
-          "e": 3.84
-        },
-        {
-          "t": "objek",
-          "s": 3.96,
-          "e": 4.4
-        },
-        {
-          "t": "di",
-          "s": 4.453,
-          "e": 4.56
-        },
-        {
-          "t": "depan:",
-          "s": 4.64,
-          "e": 5.04
-        },
-        {
-          "t": "makna",
-          "s": 5.18,
-          "e": 5.76
-        },
-        {
-          "t": "hanya.",
-          "s": 5.853,
-          "e": 6.4
-        },
-        {
-          "t": "Mendahulukan",
-          "s": 6.56,
-          "e": 7.68
-        },
-        {
-          "t": "objek",
-          "s": 7.76,
-          "e": 8.16
-        },
-        {
-          "t": "sebelum",
-          "s": 8.213,
-          "e": 8.56
-        },
-        {
-          "t": "kata",
-          "s": 8.608,
-          "e": 8.8
-        },
-        {
-          "t": "kerjanya",
-          "s": 8.84,
-          "e": 9.44
-        },
-        {
-          "t": "memberi",
-          "s": 9.497,
-          "e": 9.92
-        },
-        {
-          "t": "makna",
-          "s": 10.0,
-          "e": 10.32
-        },
-        {
-          "t": "pengkhususan;",
-          "s": 10.384,
-          "e": 11.92
-        },
-        {
-          "t": "karena",
-          "s": 11.966,
-          "e": 12.24
-        },
-        {
-          "t": "itu",
-          "s": 12.36,
-          "e": 12.72
-        },
-        {
-          "t": "kata",
-          "s": 12.816,
-          "e": 13.2
-        },
-        {
-          "t": "pertama",
-          "s": 13.248,
-          "e": 13.6
-        },
-        {
-          "t": "dan",
-          "s": 13.64,
-          "e": 13.76
-        },
-        {
-          "t": "kedua",
-          "s": 13.82,
-          "e": 14.24
-        },
-        {
-          "t": "diterjemahkan",
-          "s": 14.32,
-          "e": 15.36
-        },
-        {
-          "t": "hanya",
-          "s": 15.48,
-          "e": 16.08
-        },
-        {
-          "t": "kepada",
-          "s": 16.16,
-          "e": 16.64
-        },
-        {
-          "t": "Engkaulah",
-          "s": 16.8,
-          "e": 17.68
-        },
-        {
-          "t": "kami",
-          "s": 17.744,
-          "e": 18.0
-        },
-        {
-          "t": "menyembah.",
-          "s": 18.048,
-          "e": 18.64
         }
       ]
     },
@@ -18741,17 +16536,18 @@
         }
       ]
     },
-    "al-fatihah:5:concept:jumlah-filiyyah": {
-      "text": "Konsep baru: جُمْلَة فِعْلِيَّة, yaitu kalimat verbal: فِعْل dan فَاعِل. جُمْلَة فِعْلِيَّة adalah kalimat yang intinya فِعْل, yaitu kata kerja, beserta فَاعِل, yaitu pelakunya; pelaku itu bisa tertulis atau tersirat.",
-      "display": "Konsep baru: Jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), yaitu kalimat verbal: fi’il (فِعْل) dan fa’il (فَاعِل). Jumlah fi’liyyah (جُمْلَة فِعْلِيَّة) adalah kalimat yang intinya fi’il (فِعْل), yaitu kata kerja, beserta fa’il (فَاعِل), yaitu pelakunya; pelaku itu bisa tertulis atau tersirat.",
+    "al-fatihah:5:concept:murab-mabni": {
+      "text": "Konsep baru: مُعْرَب dan مَبْنِيّ, yaitu akhiran berubah atau tetap. Kata مُعْرَب akhirnya berubah mengikuti perannya dalam kalimat, sedangkan kata مَبْنِيّ akhirnya tetap di posisi mana pun.",
+      "display": "Konsep baru: Mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), yaitu akhiran berubah atau tetap. Kata mu’rab (مُعْرَب) akhirnya berubah mengikuti perannya dalam kalimat, sedangkan kata mabni (مَبْنِيّ) akhirnya tetap di posisi mana pun.",
       "highlight": [
+        1,
         2
       ],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/943d08cba78e7cb6.mp3",
-        "ms": 18834,
-        "sha256": "d34a0fd4e2de246b8a7fae82992b76ff72a1be4d1eaacac7eeda9bfb9354120f"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/35083a22fffb9963.mp3",
+        "ms": 14028,
+        "sha256": "d210ebdb028039a321ca36a9ed30da327c9cf09db7d27c7cb7dd0475aadf1e05"
       },
       "tokens": [
         {
@@ -18761,646 +16557,133 @@
         },
         {
           "t": "baru:",
-          "s": 0.48,
-          "e": 0.88
-        },
-        {
-          "t": "Jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
-          "s": 1.16,
-          "e": 2.56
-        },
-        {
-          "t": "yaitu",
-          "s": 2.8,
-          "e": 3.44
-        },
-        {
-          "t": "kalimat",
-          "s": 3.5,
-          "e": 3.92
-        },
-        {
-          "t": "verbal:",
-          "s": 4.0,
-          "e": 4.64
-        },
-        {
-          "t": "fi’il (فِعْل)",
-          "s": 4.72,
-          "e": 5.04
-        },
-        {
-          "t": "dan",
-          "s": 5.18,
-          "e": 5.6
-        },
-        {
-          "t": "fa’il (فَاعِل).",
-          "s": 5.76,
-          "e": 6.4
-        },
-        {
-          "t": "Jumlah fi’liyyah (جُمْلَة فِعْلِيَّة)",
-          "s": 6.68,
-          "e": 8.2
-        },
-        {
-          "t": "adalah",
-          "s": 8.24,
-          "e": 8.48
-        },
-        {
-          "t": "kalimat",
-          "s": 8.52,
-          "e": 8.96
-        },
-        {
-          "t": "yang",
-          "s": 9.008,
-          "e": 9.2
-        },
-        {
-          "t": "intinya",
-          "s": 9.26,
-          "e": 9.76
-        },
-        {
-          "t": "fi’il (فِعْل),",
-          "s": 9.88,
-          "e": 10.32
-        },
-        {
-          "t": "yaitu",
-          "s": 10.48,
-          "e": 11.04
-        },
-        {
-          "t": "kata",
-          "s": 11.088,
-          "e": 11.28
-        },
-        {
-          "t": "kerja,",
-          "s": 11.36,
-          "e": 11.84
-        },
-        {
-          "t": "beserta",
-          "s": 12.02,
-          "e": 12.88
-        },
-        {
-          "t": "fa’il (فَاعِل),",
-          "s": 13.04,
-          "e": 13.68
-        },
-        {
-          "t": "yaitu",
-          "s": 13.84,
-          "e": 14.4
-        },
-        {
-          "t": "pelakunya;",
-          "s": 14.48,
-          "e": 15.92
-        },
-        {
-          "t": "pelaku",
-          "s": 15.94,
-          "e": 16.32
-        },
-        {
-          "t": "itu",
-          "s": 16.4,
-          "e": 16.64
-        },
-        {
-          "t": "bisa",
-          "s": 16.704,
-          "e": 16.96
-        },
-        {
-          "t": "tertulis",
-          "s": 17.008,
-          "e": 17.6
-        },
-        {
-          "t": "atau",
-          "s": 17.712,
-          "e": 18.16
-        },
-        {
-          "t": "tersirat.",
-          "s": 18.224,
-          "e": 18.8
-        }
-      ]
-    },
-    "al-fatihah:5:concept:athaf": {
-      "text": "Konsep baru: عَطْف, yaitu kata sambung: وَاو yang artinya dan. عَطْف adalah menyambungkan kata atau kalimat dengan huruf seperti وَاو yang artinya dan; kata yang disambungkan mengikuti إِعْرَاب kata sebelumnya.",
-      "display": "Konsep baru: ‘Athaf (عَطْف), yaitu kata sambung: wawu (و) yang artinya “dan”. ‘Athaf (عَطْف) adalah menyambungkan kata atau kalimat dengan huruf seperti wawu (و) yang artinya “dan”; kata yang disambungkan mengikuti i’rab (إِعْرَاب) kata sebelumnya.",
-      "highlight": [
-        1,
-        2,
-        3,
-        4
-      ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a469e99bf84e5fe5.mp3",
-        "ms": 17241,
-        "sha256": "9ae21d884db6036ebec0551f470805ee9922a6e0ef09a88f2f4d87eb5a5f0a2b"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "baru:",
-          "s": 0.4,
+          "s": 0.464,
           "e": 0.8
         },
         {
-          "t": "‘Athaf (عَطْف),",
-          "s": 1.08,
-          "e": 1.92
-        },
-        {
-          "t": "yaitu",
-          "s": 2.2,
-          "e": 2.8
-        },
-        {
-          "t": "kata",
-          "s": 2.864,
-          "e": 3.12
-        },
-        {
-          "t": "sambung:",
-          "s": 3.16,
-          "e": 3.76
-        },
-        {
-          "t": "wawu (و)",
-          "s": 4.08,
-          "e": 4.72
-        },
-        {
-          "t": "yang",
-          "s": 4.784,
-          "e": 5.04
-        },
-        {
-          "t": "artinya",
-          "s": 5.1,
-          "e": 5.52
-        },
-        {
-          "t": "dan.",
-          "s": 5.64,
-          "e": 6.08
-        },
-        {
-          "t": "‘Athaf (عَطْف)",
-          "s": 6.56,
-          "e": 7.36
-        },
-        {
-          "t": "adalah",
-          "s": 7.429,
-          "e": 7.84
-        },
-        {
-          "t": "menyambungkan",
-          "s": 7.888,
-          "e": 8.56
-        },
-        {
-          "t": "kata",
-          "s": 8.672,
-          "e": 9.12
-        },
-        {
-          "t": "atau",
-          "s": 9.184,
-          "e": 9.44
-        },
-        {
-          "t": "kalimat",
-          "s": 9.5,
-          "e": 10.0
-        },
-        {
-          "t": "dengan",
-          "s": 10.046,
-          "e": 10.32
-        },
-        {
-          "t": "huruf",
-          "s": 10.38,
-          "e": 10.8
-        },
-        {
-          "t": "seperti",
-          "s": 10.85,
-          "e": 11.2
-        },
-        {
-          "t": "wawu (و)",
-          "s": 11.32,
-          "e": 11.68
-        },
-        {
-          "t": "yang",
-          "s": 11.792,
-          "e": 12.24
-        },
-        {
-          "t": "artinya",
-          "s": 12.3,
-          "e": 12.72
-        },
-        {
-          "t": "dan;",
-          "s": 12.82,
-          "e": 13.2
-        },
-        {
-          "t": "kata",
-          "s": 13.392,
-          "e": 14.16
-        },
-        {
-          "t": "yang",
-          "s": 14.176,
-          "e": 14.24
-        },
-        {
-          "t": "disambungkan",
-          "s": 14.3,
-          "e": 14.96
-        },
-        {
-          "t": "mengikuti",
-          "s": 15.008,
-          "e": 15.6
-        },
-        {
-          "t": "i’rab (إِعْرَاب)",
-          "s": 15.68,
-          "e": 16.24
-        },
-        {
-          "t": "kata",
-          "s": 16.304,
-          "e": 16.56
-        },
-        {
-          "t": "sebelumnya.",
-          "s": 16.613,
-          "e": 17.2
-        }
-      ]
-    },
-    "al-fatihah:5:concept:bab-istifal": {
-      "text": "Konsep baru: Bab اِسْتِفْعَال, yaitu وَزْن اِسْتَفْعَلَ: meminta. وَزْن اِسْتَفْعَلَ dibentuk dengan menambah هَمْزَة, سِين, dan تَاء di depan akar; makna yang paling dikenal adalah meminta, seperti kata keempat yang artinya kami memohon pertolongan.",
-      "display": "Konsep baru: Bab istif‘āl (اِسْتِفْعَال), yaitu wazan (وَزْن) istaf‘ala (اِسْتَفْعَلَ): meminta. Wazan (وَزْن) istaf‘ala (اِسْتَفْعَلَ) dibentuk dengan menambah hamzah (ء), sin (س), dan ta’ (ت) di depan akar; makna yang paling dikenal adalah meminta, seperti kata keempat yang artinya “kami memohon pertolongan”.",
-      "highlight": [
-        4
-      ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/d262af28bfdca24f.mp3",
-        "ms": 23327,
-        "sha256": "d6552c02163499385ce6df58bad068a272c7d1bc76565f36a12937f21b3b5114"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.4
-        },
-        {
-          "t": "baru:",
-          "s": 0.48,
-          "e": 0.88
-        },
-        {
-          "t": "Bab",
-          "s": 1.08,
+          "t": "Mu’rab (مُعْرَب)",
+          "s": 1.0,
           "e": 1.68
         },
         {
-          "t": "istif‘āl (اِسْتِفْعَال),",
-          "s": 1.8,
-          "e": 2.72
-        },
-        {
-          "t": "yaitu",
-          "s": 3.08,
-          "e": 3.84
-        },
-        {
-          "t": "wazan (وَزْن)",
-          "s": 4.08,
-          "e": 4.72
-        },
-        {
-          "t": "istaf‘ala (اِسْتَفْعَلَ):",
-          "s": 4.84,
-          "e": 5.76
-        },
-        {
-          "t": "meminta.",
-          "s": 5.96,
-          "e": 7.04
-        },
-        {
-          "t": "Wazan (وَزْن)",
-          "s": 7.6,
-          "e": 8.4
-        },
-        {
-          "t": "istaf‘ala (اِسْتَفْعَلَ)",
-          "s": 8.48,
-          "e": 9.28
-        },
-        {
-          "t": "dibentuk",
-          "s": 9.38,
-          "e": 10.08
-        },
-        {
-          "t": "dengan",
-          "s": 10.114,
-          "e": 10.32
-        },
-        {
-          "t": "menambah",
-          "s": 10.36,
-          "e": 10.8
-        },
-        {
-          "t": "hamzah (ء),",
-          "s": 10.92,
-          "e": 12.16
-        },
-        {
-          "t": "sin (س),",
-          "s": 12.28,
-          "e": 12.8
-        },
-        {
           "t": "dan",
-          "s": 12.94,
-          "e": 13.36
+          "s": 1.78,
+          "e": 2.08
         },
         {
-          "t": "ta’ (ت)",
-          "s": 13.52,
-          "e": 13.84
-        },
-        {
-          "t": "di",
-          "s": 14.0,
-          "e": 14.32
-        },
-        {
-          "t": "depan",
-          "s": 14.373,
-          "e": 14.64
-        },
-        {
-          "t": "akar;",
-          "s": 14.72,
-          "e": 15.12
-        },
-        {
-          "t": "makna",
-          "s": 15.36,
-          "e": 16.24
-        },
-        {
-          "t": "yang",
-          "s": 16.272,
-          "e": 16.4
-        },
-        {
-          "t": "paling",
-          "s": 16.44,
-          "e": 16.64
-        },
-        {
-          "t": "dikenal",
-          "s": 16.68,
-          "e": 17.2
-        },
-        {
-          "t": "adalah",
-          "s": 17.257,
-          "e": 17.6
-        },
-        {
-          "t": "meminta,",
-          "s": 17.66,
-          "e": 18.88
-        },
-        {
-          "t": "seperti",
-          "s": 18.94,
-          "e": 19.36
-        },
-        {
-          "t": "kata",
-          "s": 19.408,
-          "e": 19.6
-        },
-        {
-          "t": "keempat",
-          "s": 19.653,
-          "e": 20.08
-        },
-        {
-          "t": "yang",
-          "s": 20.112,
-          "e": 20.24
-        },
-        {
-          "t": "artinya",
-          "s": 20.3,
-          "e": 20.88
-        },
-        {
-          "t": "kami",
-          "s": 21.056,
-          "e": 21.76
-        },
-        {
-          "t": "memohon",
-          "s": 21.86,
-          "e": 22.48
-        },
-        {
-          "t": "pertolongan.",
-          "s": 22.544,
-          "e": 23.28
-        }
-      ]
-    },
-    "al-fatihah:5:concept:ilal": {
-      "text": "Konsep baru: إِعْلَال, yaitu perubahan huruf وَاو dan يَاء. إِعْلَال adalah perubahan pada حَرْف عِلَّة, yaitu alif, وَاو, يَاء, agar kata lebih ringan diucapkan, misalnya نَسْتَعْوِنُ menjadi kata keempat.",
-      "display": "Konsep baru: I’lal (إِعْلَال), yaitu perubahan huruf wawu (و) dan ya’ (ي). I’lal (إِعْلَال) adalah perubahan pada huruf ‘illah (حَرْف عِلَّة), yaitu alif (ا), wawu (و), ya’ (ي), agar kata lebih ringan diucapkan, misalnya nasta‘winu (نَسْتَعْوِنُ) menjadi kata keempat.",
-      "highlight": [
-        4
-      ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/93b27a3107fbcdd9.mp3",
-        "ms": 17789,
-        "sha256": "a2d12df6e5aafc3fff2bd5e84383554fc937cda4a04c58eed6717229345f5e11"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "baru:",
-          "s": 0.4,
-          "e": 0.8
-        },
-        {
-          "t": "I’lal (إِعْلَال),",
-          "s": 1.0,
-          "e": 1.92
+          "t": "mabni (مَبْنِيّ),",
+          "s": 2.12,
+          "e": 3.12
         },
         {
           "t": "yaitu",
-          "s": 2.16,
-          "e": 2.72
-        },
-        {
-          "t": "perubahan",
-          "s": 2.76,
-          "e": 3.2
-        },
-        {
-          "t": "huruf",
-          "s": 3.24,
+          "s": 3.2,
           "e": 3.52
         },
         {
-          "t": "wawu (و)",
-          "s": 3.56,
-          "e": 3.84
+          "t": "akhiran",
+          "s": 3.627,
+          "e": 4.08
         },
         {
-          "t": "dan",
-          "s": 3.92,
-          "e": 4.16
+          "t": "berubah",
+          "s": 4.12,
+          "e": 4.56
         },
         {
-          "t": "ya’ (ي).",
-          "s": 4.2,
+          "t": "atau",
+          "s": 4.64,
+          "e": 4.96
+        },
+        {
+          "t": "tetap.",
+          "s": 5.02,
           "e": 5.44
         },
         {
-          "t": "I’lal (إِعْلَال)",
-          "s": 5.48,
-          "e": 6.0
+          "t": "Kata",
+          "s": 5.6,
+          "e": 6.24
         },
         {
-          "t": "adalah",
-          "s": 6.069,
-          "e": 6.48
+          "t": "mu’rab (مُعْرَب)",
+          "s": 6.32,
+          "e": 6.8
         },
         {
-          "t": "perubahan",
-          "s": 6.52,
-          "e": 6.96
+          "t": "akhirnya",
+          "s": 6.907,
+          "e": 7.44
         },
         {
-          "t": "pada",
-          "s": 7.024,
-          "e": 7.28
-        },
-        {
-          "t": "huruf ‘illah (حَرْف عِلَّة),",
-          "s": 7.32,
+          "t": "berubah",
+          "s": 7.48,
           "e": 7.92
         },
         {
-          "t": "yaitu",
-          "s": 8.2,
-          "e": 8.72
+          "t": "mengikuti",
+          "s": 7.952,
+          "e": 8.48
         },
         {
-          "t": "alif (ا),",
-          "s": 8.8,
-          "e": 9.56
+          "t": "perannya",
+          "s": 8.52,
+          "e": 8.88
         },
         {
-          "t": "wawu (و),",
-          "s": 9.7,
-          "e": 10.16
+          "t": "dalam",
+          "s": 8.933,
+          "e": 9.2
         },
         {
-          "t": "ya’ (ي),",
-          "s": 10.44,
+          "t": "kalimat,",
+          "s": 9.24,
+          "e": 10.24
+        },
+        {
+          "t": "sedangkan",
+          "s": 10.28,
+          "e": 10.72
+        },
+        {
+          "t": "kata",
+          "s": 10.768,
           "e": 10.96
         },
         {
-          "t": "agar",
-          "s": 11.104,
-          "e": 11.68
+          "t": "mabni (مَبْنِيّ)",
+          "s": 11.0,
+          "e": 11.52
         },
         {
-          "t": "kata",
-          "s": 11.728,
-          "e": 11.92
-        },
-        {
-          "t": "lebih",
-          "s": 11.973,
+          "t": "akhirnya",
+          "s": 11.653,
           "e": 12.24
         },
         {
-          "t": "ringan",
-          "s": 12.288,
-          "e": 12.56
+          "t": "tetap",
+          "s": 12.3,
+          "e": 12.64
         },
         {
-          "t": "diucapkan,",
-          "s": 12.613,
-          "e": 13.84
+          "t": "di",
+          "s": 12.72,
+          "e": 12.88
         },
         {
-          "t": "misalnya",
-          "s": 13.9,
-          "e": 14.64
+          "t": "posisi",
+          "s": 12.94,
+          "e": 13.28
         },
         {
-          "t": "nasta‘winu (نَسْتَعْوِنُ)",
-          "s": 14.92,
-          "e": 16.16
+          "t": "mana",
+          "s": 13.328,
+          "e": 13.52
         },
         {
-          "t": "menjadi",
-          "s": 16.26,
-          "e": 16.96
-        },
-        {
-          "t": "kata",
-          "s": 17.024,
-          "e": 17.28
-        },
-        {
-          "t": "keempat.",
-          "s": 17.333,
-          "e": 17.76
+          "t": "pun.",
+          "s": 13.6,
+          "e": 14.0
         }
       ]
     },
@@ -20601,433 +17884,11 @@
         }
       ]
     },
-    "al-fatihah:5:ex:wazn-factory:intro": {
-      "text": "Latihan bentuk-bentuk kata, empat soal. Pilih bentuk fi'il mudhori' atau اِسْم فَاعِل yang ditanyakan. Bentuk-bentuk ini kata Arab hasil تَصْرِيف, bukan kutipan ayat.",
-      "display": "Latihan bentuk-bentuk kata, empat soal. Pilih bentuk fi’il mudhari’ (فِعْل مُضَارِع) atau isim fa’il (اِسْم فَاعِل) yang ditanyakan. Bentuk-bentuk ini kata Arab hasil tashrif (تَصْرِيف), bukan kutipan ayat.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/58e87333b9db5dcc.mp3",
-        "ms": 12278,
-        "sha256": "5689a795cb3dc0e720f8255da1da2a93866e28238b4a4ffbb9c44184b26a2b47"
-      },
-      "tokens": [
-        {
-          "t": "Latihan",
-          "s": 0.0,
-          "e": 0.4
-        },
-        {
-          "t": "bentuk-bentuk",
-          "s": 0.448,
-          "e": 0.96
-        },
-        {
-          "t": "kata,",
-          "s": 1.04,
-          "e": 1.84
-        },
-        {
-          "t": "empat",
-          "s": 1.893,
-          "e": 2.08
-        },
-        {
-          "t": "soal.",
-          "s": 2.16,
-          "e": 2.56
-        },
-        {
-          "t": "Pilih",
-          "s": 2.88,
-          "e": 3.52
-        },
-        {
-          "t": "bentuk",
-          "s": 3.568,
-          "e": 3.84
-        },
-        {
-          "t": "fi’il mudhari’ (فِعْل مُضَارِع)",
-          "s": 3.92,
-          "e": 4.88
-        },
-        {
-          "t": "atau",
-          "s": 5.008,
-          "e": 5.52
-        },
-        {
-          "t": "isim fa’il (اِسْم فَاعِل)",
-          "s": 5.6,
-          "e": 6.32
-        },
-        {
-          "t": "yang",
-          "s": 6.352,
-          "e": 6.48
-        },
-        {
-          "t": "ditanyakan.",
-          "s": 6.52,
-          "e": 7.2
-        },
-        {
-          "t": "Bentuk-bentuk",
-          "s": 7.376,
-          "e": 8.48
-        },
-        {
-          "t": "ini",
-          "s": 8.56,
-          "e": 8.8
-        },
-        {
-          "t": "kata",
-          "s": 8.864,
-          "e": 9.12
-        },
-        {
-          "t": "Arab",
-          "s": 9.184,
-          "e": 9.44
-        },
-        {
-          "t": "hasil",
-          "s": 9.52,
-          "e": 9.92
-        },
-        {
-          "t": "tashrif (تَصْرِيف),",
-          "s": 9.96,
-          "e": 10.96
-        },
-        {
-          "t": "bukan",
-          "s": 11.04,
-          "e": 11.36
-        },
-        {
-          "t": "kutipan",
-          "s": 11.42,
-          "e": 11.84
-        },
-        {
-          "t": "ayat.",
-          "s": 11.893,
-          "e": 12.24
-        }
-      ]
-    },
-    "al-fatihah:5:ex:wazn-factory:1:why": {
-      "text": "Itu bentuk fi'il mudhori', yaitu kata kerja sekarang dan akan datang.",
-      "display": "Itu bentuk fi’il mudhari’ (فِعْل مُضَارِع), yaitu kata kerja sekarang dan akan datang.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/dd002d8dc81c6904.mp3",
-        "ms": 5146,
-        "sha256": "c9fa54cd7495b155a920b511531220be41076f0fd17aeeb03069de333c8811e5"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "bentuk",
-          "s": 0.304,
-          "e": 0.64
-        },
-        {
-          "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 0.693,
-          "e": 1.76
-        },
-        {
-          "t": "yaitu",
-          "s": 2.0,
-          "e": 2.64
-        },
-        {
-          "t": "kata",
-          "s": 2.672,
-          "e": 2.8
-        },
-        {
-          "t": "kerja",
-          "s": 2.88,
-          "e": 3.28
-        },
-        {
-          "t": "sekarang",
-          "s": 3.36,
-          "e": 3.84
-        },
-        {
-          "t": "dan",
-          "s": 3.92,
-          "e": 4.16
-        },
-        {
-          "t": "akan",
-          "s": 4.24,
-          "e": 4.56
-        },
-        {
-          "t": "datang.",
-          "s": 4.62,
-          "e": 5.12
-        }
-      ]
-    },
-    "al-fatihah:5:ex:wazn-factory:2:why": {
-      "text": "Itu bentuk اِسْم فَاعِل, yaitu kata pelaku.",
-      "display": "Itu bentuk isim fa’il (اِسْم فَاعِل), yaitu kata pelaku.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4431086bdd349ffa.mp3",
-        "ms": 4127,
-        "sha256": "b2cb774169ae5b720f4041a399f470179026d88e909005e2ca0e4cdcfc279c05"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "bentuk",
-          "s": 0.352,
-          "e": 0.64
-        },
-        {
-          "t": "isim fa’il (اِسْم فَاعِل),",
-          "s": 0.72,
-          "e": 2.2
-        },
-        {
-          "t": "yaitu",
-          "s": 2.34,
-          "e": 2.88
-        },
-        {
-          "t": "kata",
-          "s": 2.976,
-          "e": 3.36
-        },
-        {
-          "t": "pelaku.",
-          "s": 3.42,
-          "e": 4.08
-        }
-      ]
-    },
-    "al-fatihah:5:ex:wazn-factory:3:why": {
-      "text": "Itu bentuk اِسْم فَاعِل, yaitu kata pelaku.",
-      "display": "Itu bentuk isim fa’il (اِسْم فَاعِل), yaitu kata pelaku.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4431086bdd349ffa.mp3",
-        "ms": 4127,
-        "sha256": "b2cb774169ae5b720f4041a399f470179026d88e909005e2ca0e4cdcfc279c05"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "bentuk",
-          "s": 0.352,
-          "e": 0.64
-        },
-        {
-          "t": "isim fa’il (اِسْم فَاعِل),",
-          "s": 0.72,
-          "e": 2.2
-        },
-        {
-          "t": "yaitu",
-          "s": 2.34,
-          "e": 2.88
-        },
-        {
-          "t": "kata",
-          "s": 2.976,
-          "e": 3.36
-        },
-        {
-          "t": "pelaku.",
-          "s": 3.42,
-          "e": 4.08
-        }
-      ]
-    },
-    "al-fatihah:5:ex:wazn-factory:4:why": {
-      "text": "Itu bentuk fi'il mudhori', yaitu kata kerja sekarang dan akan datang.",
-      "display": "Itu bentuk fi’il mudhari’ (فِعْل مُضَارِع), yaitu kata kerja sekarang dan akan datang.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/dd002d8dc81c6904.mp3",
-        "ms": 5146,
-        "sha256": "c9fa54cd7495b155a920b511531220be41076f0fd17aeeb03069de333c8811e5"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "bentuk",
-          "s": 0.304,
-          "e": 0.64
-        },
-        {
-          "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 0.693,
-          "e": 1.76
-        },
-        {
-          "t": "yaitu",
-          "s": 2.0,
-          "e": 2.64
-        },
-        {
-          "t": "kata",
-          "s": 2.672,
-          "e": 2.8
-        },
-        {
-          "t": "kerja",
-          "s": 2.88,
-          "e": 3.28
-        },
-        {
-          "t": "sekarang",
-          "s": 3.36,
-          "e": 3.84
-        },
-        {
-          "t": "dan",
-          "s": 3.92,
-          "e": 4.16
-        },
-        {
-          "t": "akan",
-          "s": 4.24,
-          "e": 4.56
-        },
-        {
-          "t": "datang.",
-          "s": 4.62,
-          "e": 5.12
-        }
-      ]
-    },
     "al-fatihah:5:learned": {
-      "text": "Di ayat ini kita sudah mempelajari delapan hal baru, di antaranya مُعْرَب dan مَبْنِيّ, dhomir, serta تَقْدِيم المَفْعُول.",
-      "display": "Di ayat ini kita sudah mempelajari delapan hal baru, di antaranya mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), dhamir (ضَمِير), serta taqdim maf’ul (تَقْدِيم المَفْعُول).",
+      "text": "Di ayat ini kita mempelajari tiga hal baru: dhomir, fi'il mudhori', serta مُعْرَب dan مَبْنِيّ. Dengan itu, sudah tiga belas hal yang kita pelajari.",
+      "display": "Di ayat ini kita mempelajari tiga hal baru: dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), serta mu’rab (مُعْرَب) dan mabni (مَبْنِيّ). Dengan itu, sudah tiga belas hal yang kita pelajari.",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0f206ceac2fbd6d3.mp3",
-        "ms": 8986,
-        "sha256": "fc9b5fafa99d8ac887a75cf7fc7d5b48b8b39564e01edc546adefc623e07902a"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.08
-        },
-        {
-          "t": "ayat",
-          "s": 0.133,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.38,
-          "e": 0.56
-        },
-        {
-          "t": "kita",
-          "s": 0.608,
-          "e": 0.8
-        },
-        {
-          "t": "sudah",
-          "s": 0.853,
-          "e": 1.12
-        },
-        {
-          "t": "mempelajari",
-          "s": 1.16,
-          "e": 1.76
-        },
-        {
-          "t": "delapan",
-          "s": 1.8,
-          "e": 2.16
-        },
-        {
-          "t": "hal",
-          "s": 2.24,
-          "e": 2.48
-        },
-        {
-          "t": "baru,",
-          "s": 2.544,
-          "e": 3.36
-        },
-        {
-          "t": "di",
-          "s": 3.413,
-          "e": 3.52
-        },
-        {
-          "t": "antaranya",
-          "s": 3.58,
-          "e": 4.24
-        },
-        {
-          "t": "mu’rab (مُعْرَب)",
-          "s": 4.4,
-          "e": 5.04
-        },
-        {
-          "t": "dan",
-          "s": 5.1,
-          "e": 5.28
-        },
-        {
-          "t": "mabni (مَبْنِيّ),",
-          "s": 5.32,
-          "e": 6.4
-        },
-        {
-          "t": "dhamir (ضَمِير),",
-          "s": 6.453,
-          "e": 7.28
-        },
-        {
-          "t": "serta",
-          "s": 7.333,
-          "e": 7.6
-        },
-        {
-          "t": "taqdim maf’ul (تَقْدِيم المَفْعُول).",
-          "s": 7.68,
-          "e": 8.96
-        }
-      ]
+      "focus": null
     },
     "al-fatihah:5:recap": {
       "text": "Dengarkan sekali lagi seluruh ayat kelima dibacakan imam.",
@@ -21322,148 +18183,23 @@
         }
       ]
     },
-    "al-fatihah:6:map": {
-      "text": "Di ayat ini ada dua hal baru: فِعْل أَمْر dan مَفْعُول بِه. Kita juga mengulang enam hal yang sudah kita pelajari, di antaranya إِعْرَاب dan tandanya, serta نَعْت.",
-      "display": "Di ayat ini ada dua hal baru: fi’il amr (فِعْل أَمْر) dan maf’ul bih (مَفْعُول بِه). Kita juga mengulang enam hal yang sudah kita pelajari, di antaranya i’rab (إِعْرَاب) dan tandanya, serta na’t (نَعْت).",
+    "al-fatihah:6:map:new": {
+      "text": "Di ayat ini ada tiga hal baru: جُمْلَة فِعْلِيَّة, مَفْعُول بِه, dan مَنْصُوب.",
+      "display": "Di ayat ini ada tiga hal baru: jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), dan manshub (مَنْصُوب).",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/79d17c13470b7aba.mp3",
-        "ms": 13166,
-        "sha256": "c0c201f6eb66cf3a3c42ead47bf1ff7c9bab6f60b8eb0ca8ed3fd7cb539ea877"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.08
-        },
-        {
-          "t": "ayat",
-          "s": 0.133,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.42,
-          "e": 0.72
-        },
-        {
-          "t": "ada",
-          "s": 0.78,
-          "e": 0.96
-        },
-        {
-          "t": "dua",
-          "s": 1.02,
-          "e": 1.2
-        },
-        {
-          "t": "hal",
-          "s": 1.26,
-          "e": 1.44
-        },
-        {
-          "t": "baru:",
-          "s": 1.52,
-          "e": 2.48
-        },
-        {
-          "t": "fi’il amr (فِعْل أَمْر)",
-          "s": 2.52,
-          "e": 3.44
-        },
-        {
-          "t": "dan",
-          "s": 3.56,
-          "e": 3.92
-        },
-        {
-          "t": "maf’ul bih (مَفْعُول بِه).",
-          "s": 4.0,
-          "e": 5.28
-        },
-        {
-          "t": "Kita",
-          "s": 5.48,
-          "e": 5.76
-        },
-        {
-          "t": "juga",
-          "s": 5.808,
-          "e": 6.0
-        },
-        {
-          "t": "mengulang",
-          "s": 6.048,
-          "e": 6.56
-        },
-        {
-          "t": "enam",
-          "s": 6.608,
-          "e": 6.8
-        },
-        {
-          "t": "hal",
-          "s": 6.88,
-          "e": 7.12
-        },
-        {
-          "t": "yang",
-          "s": 7.168,
-          "e": 7.36
-        },
-        {
-          "t": "sudah",
-          "s": 7.4,
-          "e": 7.6
-        },
-        {
-          "t": "kita",
-          "s": 7.632,
-          "e": 7.76
-        },
-        {
-          "t": "pelajari,",
-          "s": 7.8,
-          "e": 8.8
-        },
-        {
-          "t": "di",
-          "s": 8.853,
-          "e": 8.96
-        },
-        {
-          "t": "antaranya",
-          "s": 9.02,
-          "e": 9.76
-        },
-        {
-          "t": "i’rab (إِعْرَاب)",
-          "s": 9.96,
-          "e": 10.56
-        },
-        {
-          "t": "dan",
-          "s": 10.62,
-          "e": 10.8
-        },
-        {
-          "t": "tandanya,",
-          "s": 10.864,
-          "e": 11.92
-        },
-        {
-          "t": "serta",
-          "s": 12.0,
-          "e": 12.4
-        },
-        {
-          "t": "na’t (نَعْت).",
-          "s": 12.52,
-          "e": 13.12
-        }
-      ]
+      "focus": null
+    },
+    "al-fatihah:6:map:learnt": {
+      "text": "Sebelum ayat ini, kita sudah mempelajari tiga belas hal. Yang kita temui lagi di ayat ini ada empat, di antaranya tiga jenis kata dan alif lam.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari tiga belas hal. Yang kita temui lagi di ayat ini ada empat, di antaranya tiga jenis kata dan alif lam (ال).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:6:map:later": {
+      "text": "Ada satu hal lagi di ayat ini, yaitu فِعْل أَمْر, tetapi baru kita bahas nanti. Ada juga tiga hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "display": "Ada satu hal lagi di ayat ini, yaitu fi’il amr (فِعْل أَمْر), tetapi baru kita bahas nanti. Ada juga tiga hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
     },
     "al-fatihah:6:w1": {
       "text": "Kata pertama artinya: tunjukilah kami. Kata ini juga terdiri dari dua bagian.",
@@ -23381,188 +20117,156 @@
         }
       ]
     },
-    "al-fatihah:6:concept:fiil-amr": {
-      "text": "Konsep baru: فِعْل أَمْر, yaitu bentuk perintah, juga untuk doa. فِعْل أَمْر adalah bentuk perintah, seperti kata yang artinya katakanlah; bila diucapkan hamba kepada Alloh subhanahu wa ta'ala maknanya permohonan, doa, seperti kata pertama tunjukilah kami.",
-      "display": "Konsep baru: Fi’il amr (فِعْل أَمْر), yaitu bentuk perintah, juga untuk doa. Fi’il amr (فِعْل أَمْر) adalah bentuk perintah, seperti kata yang artinya “katakanlah”; bila diucapkan hamba kepada Allah subhanahu wa ta'ala maknanya permohonan (doa), seperti kata pertama “tunjukilah kami”.",
-      "highlight": [
-        1
-      ],
+    "al-fatihah:6:concept:jumlah-filiyyah": {
+      "text": "Konsep baru: جُمْلَة فِعْلِيَّة, yaitu kalimat verbal: فِعْل dan فَاعِل. جُمْلَة فِعْلِيَّة adalah kalimat yang intinya فِعْل, yaitu kata kerja, beserta فَاعِل, yaitu pelakunya; pelaku itu bisa tertulis atau tersirat.",
+      "display": "Konsep baru: Jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), yaitu kalimat verbal: fi’il (فِعْل) dan fa’il (فَاعِل). Jumlah fi’liyyah (جُمْلَة فِعْلِيَّة) adalah kalimat yang intinya fi’il (فِعْل), yaitu kata kerja, beserta fa’il (فَاعِل), yaitu pelakunya; pelaku itu bisa tertulis atau tersirat.",
+      "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/20f1d4a4185644cd.mp3",
-        "ms": 21394,
-        "sha256": "0776ecde5e8de1af618f801c9601d5deecdef20a3d8a97aa2813ddfea4c09f0a"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/943d08cba78e7cb6.mp3",
+        "ms": 18834,
+        "sha256": "d34a0fd4e2de246b8a7fae82992b76ff72a1be4d1eaacac7eeda9bfb9354120f"
       },
       "tokens": [
         {
           "t": "Konsep",
           "s": 0.0,
-          "e": 0.32
+          "e": 0.4
         },
         {
           "t": "baru:",
-          "s": 0.384,
-          "e": 1.28
+          "s": 0.48,
+          "e": 0.88
         },
         {
-          "t": "Fi’il amr (فِعْل أَمْر),",
-          "s": 1.32,
-          "e": 2.16
+          "t": "Jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
+          "s": 1.16,
+          "e": 2.56
         },
         {
           "t": "yaitu",
-          "s": 2.36,
-          "e": 2.88
+          "s": 2.8,
+          "e": 3.44
         },
         {
-          "t": "bentuk",
-          "s": 2.928,
-          "e": 3.28
+          "t": "kalimat",
+          "s": 3.5,
+          "e": 3.92
         },
         {
-          "t": "perintah,",
-          "s": 3.32,
-          "e": 3.84
+          "t": "verbal:",
+          "s": 4.0,
+          "e": 4.64
         },
         {
-          "t": "juga",
-          "s": 3.984,
-          "e": 4.56
+          "t": "fi’il (فِعْل)",
+          "s": 4.72,
+          "e": 5.04
         },
         {
-          "t": "untuk",
-          "s": 4.613,
-          "e": 4.88
+          "t": "dan",
+          "s": 5.18,
+          "e": 5.6
         },
         {
-          "t": "doa.",
-          "s": 4.96,
-          "e": 5.36
+          "t": "fa’il (فَاعِل).",
+          "s": 5.76,
+          "e": 6.4
         },
         {
-          "t": "Fi’il amr (فِعْل أَمْر)",
-          "s": 5.8,
-          "e": 7.04
+          "t": "Jumlah fi’liyyah (جُمْلَة فِعْلِيَّة)",
+          "s": 6.68,
+          "e": 8.2
         },
         {
           "t": "adalah",
-          "s": 7.131,
-          "e": 7.68
+          "s": 8.24,
+          "e": 8.48
         },
         {
-          "t": "bentuk",
-          "s": 7.744,
-          "e": 8.08
-        },
-        {
-          "t": "perintah,",
-          "s": 8.12,
-          "e": 9.04
-        },
-        {
-          "t": "seperti",
-          "s": 9.1,
-          "e": 9.52
-        },
-        {
-          "t": "kata",
-          "s": 9.6,
-          "e": 9.92
+          "t": "kalimat",
+          "s": 8.52,
+          "e": 8.96
         },
         {
           "t": "yang",
-          "s": 9.952,
-          "e": 10.08
+          "s": 9.008,
+          "e": 9.2
         },
         {
-          "t": "artinya",
-          "s": 10.14,
-          "e": 10.64
+          "t": "intinya",
+          "s": 9.26,
+          "e": 9.76
         },
         {
-          "t": "katakanlah;",
-          "s": 10.72,
-          "e": 11.52
+          "t": "fi’il (فِعْل),",
+          "s": 9.88,
+          "e": 10.32
         },
         {
-          "t": "bila",
-          "s": 12.0,
-          "e": 12.64
-        },
-        {
-          "t": "diucapkan",
-          "s": 12.693,
-          "e": 13.28
-        },
-        {
-          "t": "hamba",
-          "s": 13.36,
-          "e": 13.84
-        },
-        {
-          "t": "kepada",
-          "s": 13.886,
-          "e": 14.16
-        },
-        {
-          "t": "Allah",
-          "s": 14.24,
-          "e": 14.48
-        },
-        {
-          "t": "subhanahu",
-          "s": 14.54,
-          "e": 14.96
-        },
-        {
-          "t": "wa",
-          "s": 14.987,
-          "e": 15.04
-        },
-        {
-          "t": "ta'ala",
-          "s": 15.12,
-          "e": 15.68
-        },
-        {
-          "t": "maknanya",
-          "s": 15.84,
-          "e": 16.56
-        },
-        {
-          "t": "permohonan,",
-          "s": 16.608,
-          "e": 17.68
-        },
-        {
-          "t": "doa,",
-          "s": 17.76,
-          "e": 18.8
-        },
-        {
-          "t": "seperti",
-          "s": 18.85,
-          "e": 19.2
+          "t": "yaitu",
+          "s": 10.48,
+          "e": 11.04
         },
         {
           "t": "kata",
-          "s": 19.264,
-          "e": 19.52
+          "s": 11.088,
+          "e": 11.28
         },
         {
-          "t": "pertama",
-          "s": 19.568,
-          "e": 20.0
+          "t": "kerja,",
+          "s": 11.36,
+          "e": 11.84
         },
         {
-          "t": "tunjukilah",
-          "s": 20.12,
-          "e": 20.88
+          "t": "beserta",
+          "s": 12.02,
+          "e": 12.88
         },
         {
-          "t": "kami.",
-          "s": 20.96,
-          "e": 21.36
+          "t": "fa’il (فَاعِل),",
+          "s": 13.04,
+          "e": 13.68
+        },
+        {
+          "t": "yaitu",
+          "s": 13.84,
+          "e": 14.4
+        },
+        {
+          "t": "pelakunya;",
+          "s": 14.48,
+          "e": 15.92
+        },
+        {
+          "t": "pelaku",
+          "s": 15.94,
+          "e": 16.32
+        },
+        {
+          "t": "itu",
+          "s": 16.4,
+          "e": 16.64
+        },
+        {
+          "t": "bisa",
+          "s": 16.704,
+          "e": 16.96
+        },
+        {
+          "t": "tertulis",
+          "s": 17.008,
+          "e": 17.6
+        },
+        {
+          "t": "atau",
+          "s": 17.712,
+          "e": 18.16
+        },
+        {
+          "t": "tersirat.",
+          "s": 18.224,
+          "e": 18.8
         }
       ]
     },
@@ -23716,6 +20420,15 @@
           "e": 17.68
         }
       ]
+    },
+    "al-fatihah:6:concept:manshub": {
+      "text": "Konsep baru: مَنْصُوب, dan tandanya: فَتْحَة. Keadaan ketiga adalah مَنْصُوب: اِسْم yang مَنْصُوب umumnya berakhir فَتْحَة. مَفْعُول بِه adalah اِسْم yang مَنْصُوب. Jadi sebuah اِسْم punya tiga keadaan: مَرْفُوع, مَنْصُوب, dan مَجْرُور.",
+      "display": "Konsep baru: Manshub (مَنْصُوب), dan tandanya: fathah (فَتْحَة). Keadaan ketiga adalah manshub (مَنْصُوب): isim (اِسْم) yang manshub (مَنْصُوب) umumnya berakhir fathah (فَتْحَة). Maf’ul bih (مَفْعُول بِه) adalah isim (اِسْم) yang manshub (مَنْصُوب). Jadi sebuah isim (اِسْم) punya tiga keadaan: marfu’ (مَرْفُوع), manshub (مَنْصُوب), dan majrur (مَجْرُور).",
+      "highlight": [
+        2,
+        3
+      ],
+      "focus": null
     },
     "al-fatihah:6:structure": {
       "text": "Sekarang susunan kalimatnya. Kalimat kata kerja berupa kata perintah, atau فِعْل أَمْر, yang di sini bermakna doa: kata pertama memuat pelaku yang tidak tertulis, Engkau, dan objek pertama akhiran, yang artinya kami, lalu kata kedua menjadi objek kedua. Kata ketiga adalah sifat bagi kata kedua, maka ikut مَنْصُوب, yaitu berakhiran فَتْحَة.",
@@ -24668,423 +21381,11 @@
         }
       ]
     },
-    "al-fatihah:6:ex:wazn-factory:intro": {
-      "text": "Latihan bentuk-bentuk kata, empat soal. Pilih bentuk فِعْل أَمْر, fi'il mudhori', atau اِسْم فَاعِل yang ditanyakan. Bentuk-bentuk ini kata Arab hasil تَصْرِيف, bukan kutipan ayat.",
-      "display": "Latihan bentuk-bentuk kata, empat soal. Pilih bentuk fi’il amr (فِعْل أَمْر), fi’il mudhari’ (فِعْل مُضَارِع), atau isim fa’il (اِسْم فَاعِل) yang ditanyakan. Bentuk-bentuk ini kata Arab hasil tashrif (تَصْرِيف), bukan kutipan ayat.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/abdb3beeebbee55e.mp3",
-        "ms": 14211,
-        "sha256": "27365cb07fa6dd6ff2a636ebb53adbe0e7f48067932159cd6e77f966931a8aa8"
-      },
-      "tokens": [
-        {
-          "t": "Latihan",
-          "s": 0.0,
-          "e": 0.56
-        },
-        {
-          "t": "bentuk-bentuk",
-          "s": 0.608,
-          "e": 1.2
-        },
-        {
-          "t": "kata,",
-          "s": 1.28,
-          "e": 2.0
-        },
-        {
-          "t": "empat",
-          "s": 2.053,
-          "e": 2.24
-        },
-        {
-          "t": "soal.",
-          "s": 2.32,
-          "e": 2.8
-        },
-        {
-          "t": "Pilih",
-          "s": 3.04,
-          "e": 3.52
-        },
-        {
-          "t": "bentuk",
-          "s": 3.568,
-          "e": 4.0
-        },
-        {
-          "t": "fi’il amr (فِعْل أَمْر),",
-          "s": 4.04,
-          "e": 5.04
-        },
-        {
-          "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 5.067,
-          "e": 5.92
-        },
-        {
-          "t": "atau",
-          "s": 6.08,
-          "e": 6.72
-        },
-        {
-          "t": "isim fa’il (اِسْم فَاعِل)",
-          "s": 6.76,
-          "e": 7.6
-        },
-        {
-          "t": "yang",
-          "s": 7.712,
-          "e": 8.16
-        },
-        {
-          "t": "ditanyakan.",
-          "s": 8.22,
-          "e": 8.96
-        },
-        {
-          "t": "Bentuk-bentuk",
-          "s": 9.152,
-          "e": 10.4
-        },
-        {
-          "t": "ini",
-          "s": 10.46,
-          "e": 10.64
-        },
-        {
-          "t": "kata",
-          "s": 10.704,
-          "e": 10.96
-        },
-        {
-          "t": "Arab",
-          "s": 11.04,
-          "e": 11.36
-        },
-        {
-          "t": "hasil",
-          "s": 11.427,
-          "e": 11.76
-        },
-        {
-          "t": "tashrif (تَصْرِيف),",
-          "s": 11.84,
-          "e": 12.88
-        },
-        {
-          "t": "bukan",
-          "s": 12.933,
-          "e": 13.28
-        },
-        {
-          "t": "kutipan",
-          "s": 13.32,
-          "e": 13.76
-        },
-        {
-          "t": "ayat.",
-          "s": 13.813,
-          "e": 14.16
-        }
-      ]
-    },
-    "al-fatihah:6:ex:wazn-factory:1:why": {
-      "text": "Itu bentuk فِعْل أَمْر, yaitu bentuk perintah, juga untuk doa.",
-      "display": "Itu bentuk fi’il amr (فِعْل أَمْر), yaitu bentuk perintah, juga untuk doa.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/737d54d3f0a9d762.mp3",
-        "ms": 4833,
-        "sha256": "a4f4949d585abd95600d80210d4a75daefa6d813a7e3f23e40324a0b4f9c858a"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "bentuk",
-          "s": 0.288,
-          "e": 0.56
-        },
-        {
-          "t": "fi’il amr (فِعْل أَمْر),",
-          "s": 0.64,
-          "e": 1.6
-        },
-        {
-          "t": "yaitu",
-          "s": 1.8,
-          "e": 2.32
-        },
-        {
-          "t": "bentuk",
-          "s": 2.368,
-          "e": 2.64
-        },
-        {
-          "t": "perintah,",
-          "s": 2.7,
-          "e": 3.6
-        },
-        {
-          "t": "juga",
-          "s": 3.664,
-          "e": 3.92
-        },
-        {
-          "t": "untuk",
-          "s": 3.987,
-          "e": 4.32
-        },
-        {
-          "t": "doa.",
-          "s": 4.4,
-          "e": 4.8
-        }
-      ]
-    },
-    "al-fatihah:6:ex:wazn-factory:2:why": {
-      "text": "Itu bentuk اِسْم فَاعِل, yaitu kata pelaku.",
-      "display": "Itu bentuk isim fa’il (اِسْم فَاعِل), yaitu kata pelaku.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4431086bdd349ffa.mp3",
-        "ms": 4127,
-        "sha256": "b2cb774169ae5b720f4041a399f470179026d88e909005e2ca0e4cdcfc279c05"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "bentuk",
-          "s": 0.352,
-          "e": 0.64
-        },
-        {
-          "t": "isim fa’il (اِسْم فَاعِل),",
-          "s": 0.72,
-          "e": 2.2
-        },
-        {
-          "t": "yaitu",
-          "s": 2.34,
-          "e": 2.88
-        },
-        {
-          "t": "kata",
-          "s": 2.976,
-          "e": 3.36
-        },
-        {
-          "t": "pelaku.",
-          "s": 3.42,
-          "e": 4.08
-        }
-      ]
-    },
-    "al-fatihah:6:ex:wazn-factory:3:why": {
-      "text": "Itu bentuk fi'il mudhori', yaitu kata kerja sekarang dan akan datang.",
-      "display": "Itu bentuk fi’il mudhari’ (فِعْل مُضَارِع), yaitu kata kerja sekarang dan akan datang.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/dd002d8dc81c6904.mp3",
-        "ms": 5146,
-        "sha256": "c9fa54cd7495b155a920b511531220be41076f0fd17aeeb03069de333c8811e5"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "bentuk",
-          "s": 0.304,
-          "e": 0.64
-        },
-        {
-          "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 0.693,
-          "e": 1.76
-        },
-        {
-          "t": "yaitu",
-          "s": 2.0,
-          "e": 2.64
-        },
-        {
-          "t": "kata",
-          "s": 2.672,
-          "e": 2.8
-        },
-        {
-          "t": "kerja",
-          "s": 2.88,
-          "e": 3.28
-        },
-        {
-          "t": "sekarang",
-          "s": 3.36,
-          "e": 3.84
-        },
-        {
-          "t": "dan",
-          "s": 3.92,
-          "e": 4.16
-        },
-        {
-          "t": "akan",
-          "s": 4.24,
-          "e": 4.56
-        },
-        {
-          "t": "datang.",
-          "s": 4.62,
-          "e": 5.12
-        }
-      ]
-    },
-    "al-fatihah:6:ex:wazn-factory:4:why": {
-      "text": "Itu bentuk فِعْل أَمْر, yaitu bentuk perintah, juga untuk doa.",
-      "display": "Itu bentuk fi’il amr (فِعْل أَمْر), yaitu bentuk perintah, juga untuk doa.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/737d54d3f0a9d762.mp3",
-        "ms": 4833,
-        "sha256": "a4f4949d585abd95600d80210d4a75daefa6d813a7e3f23e40324a0b4f9c858a"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "bentuk",
-          "s": 0.288,
-          "e": 0.56
-        },
-        {
-          "t": "fi’il amr (فِعْل أَمْر),",
-          "s": 0.64,
-          "e": 1.6
-        },
-        {
-          "t": "yaitu",
-          "s": 1.8,
-          "e": 2.32
-        },
-        {
-          "t": "bentuk",
-          "s": 2.368,
-          "e": 2.64
-        },
-        {
-          "t": "perintah,",
-          "s": 2.7,
-          "e": 3.6
-        },
-        {
-          "t": "juga",
-          "s": 3.664,
-          "e": 3.92
-        },
-        {
-          "t": "untuk",
-          "s": 3.987,
-          "e": 4.32
-        },
-        {
-          "t": "doa.",
-          "s": 4.4,
-          "e": 4.8
-        }
-      ]
-    },
     "al-fatihah:6:learned": {
-      "text": "Di ayat ini kita sudah mempelajari dua hal baru: فِعْل أَمْر dan مَفْعُول بِه.",
-      "display": "Di ayat ini kita sudah mempelajari dua hal baru: fi’il amr (فِعْل أَمْر) dan maf’ul bih (مَفْعُول بِه).",
+      "text": "Di ayat ini kita mempelajari tiga hal baru: جُمْلَة فِعْلِيَّة, مَفْعُول بِه, dan مَنْصُوب. Dengan itu, sudah enam belas hal yang kita pelajari.",
+      "display": "Di ayat ini kita mempelajari tiga hal baru: jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), dan manshub (مَنْصُوب). Dengan itu, sudah enam belas hal yang kita pelajari.",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/32d2fd20741a51d4.mp3",
-        "ms": 5642,
-        "sha256": "8eb73739fababd7d706ed4d8b194c28484e29d8aecdc4b9565bd3c31f649d381"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.16
-        },
-        {
-          "t": "ayat",
-          "s": 0.187,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.4,
-          "e": 0.64
-        },
-        {
-          "t": "kita",
-          "s": 0.704,
-          "e": 0.96
-        },
-        {
-          "t": "sudah",
-          "s": 1.0,
-          "e": 1.2
-        },
-        {
-          "t": "mempelajari",
-          "s": 1.24,
-          "e": 1.76
-        },
-        {
-          "t": "dua",
-          "s": 1.82,
-          "e": 2.0
-        },
-        {
-          "t": "hal",
-          "s": 2.06,
-          "e": 2.24
-        },
-        {
-          "t": "baru:",
-          "s": 2.304,
-          "e": 3.36
-        },
-        {
-          "t": "fi’il amr (فِعْل أَمْر)",
-          "s": 3.4,
-          "e": 4.16
-        },
-        {
-          "t": "dan",
-          "s": 4.28,
-          "e": 4.64
-        },
-        {
-          "t": "maf’ul bih (مَفْعُول بِه).",
-          "s": 4.76,
-          "e": 5.6
-        }
-      ]
+      "focus": null
     },
     "al-fatihah:6:recap": {
       "text": "Dengarkan sekali lagi seluruh ayat keenam dibacakan imam.",
@@ -25459,163 +21760,23 @@
         }
       ]
     },
-    "al-fatihah:7:map": {
-      "text": "Di ayat ini ada enam hal baru, di antaranya بَدَل, اِسْم مَوْصُول, dan فِعْل مَاضٍ. Kita juga mengulang sembilan hal yang sudah kita pelajari, di antaranya tiga jenis كَلِمَة dan حَرْف جَرّ.",
-      "display": "Di ayat ini ada enam hal baru, di antaranya badal (بَدَل), isim maushul (اِسْم مَوْصُول), dan fi’il madhi (فِعْل مَاضٍ). Kita juga mengulang sembilan hal yang sudah kita pelajari, di antaranya tiga jenis kalimah (كَلِمَة) dan huruf jar (حَرْف جَرّ).",
+    "al-fatihah:7:map:new": {
+      "text": "Di ayat ini ada tiga hal baru: اِسْم مَوْصُول, فِعْل مَاضٍ, dan عَطْف.",
+      "display": "Di ayat ini ada tiga hal baru: isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), dan ‘athaf (عَطْف).",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/fb5a6b17d5519050.mp3",
-        "ms": 15229,
-        "sha256": "45783124be5e1f2ba0ea08a091d286150e1f941e9188be22e176859393692215"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.08
-        },
-        {
-          "t": "ayat",
-          "s": 0.133,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.4,
-          "e": 0.64
-        },
-        {
-          "t": "ada",
-          "s": 0.74,
-          "e": 1.04
-        },
-        {
-          "t": "enam",
-          "s": 1.104,
-          "e": 1.36
-        },
-        {
-          "t": "hal",
-          "s": 1.42,
-          "e": 1.6
-        },
-        {
-          "t": "baru,",
-          "s": 1.68,
-          "e": 2.56
-        },
-        {
-          "t": "di",
-          "s": 2.587,
-          "e": 2.64
-        },
-        {
-          "t": "antaranya",
-          "s": 2.7,
-          "e": 3.52
-        },
-        {
-          "t": "badal (بَدَل),",
-          "s": 3.72,
-          "e": 4.32
-        },
-        {
-          "t": "isim maushul (اِسْم مَوْصُول),",
-          "s": 4.6,
-          "e": 5.68
-        },
-        {
-          "t": "dan",
-          "s": 5.82,
-          "e": 6.24
-        },
-        {
-          "t": "fi’il madhi (فِعْل مَاضٍ).",
-          "s": 6.32,
-          "e": 7.2
-        },
-        {
-          "t": "Kita",
-          "s": 7.56,
-          "e": 8.08
-        },
-        {
-          "t": "juga",
-          "s": 8.128,
-          "e": 8.32
-        },
-        {
-          "t": "mengulang",
-          "s": 8.352,
-          "e": 8.8
-        },
-        {
-          "t": "sembilan",
-          "s": 8.84,
-          "e": 9.2
-        },
-        {
-          "t": "hal",
-          "s": 9.26,
-          "e": 9.44
-        },
-        {
-          "t": "yang",
-          "s": 9.472,
-          "e": 9.6
-        },
-        {
-          "t": "sudah",
-          "s": 9.653,
-          "e": 9.92
-        },
-        {
-          "t": "kita",
-          "s": 9.952,
-          "e": 10.08
-        },
-        {
-          "t": "pelajari,",
-          "s": 10.12,
-          "e": 11.28
-        },
-        {
-          "t": "di",
-          "s": 11.333,
-          "e": 11.44
-        },
-        {
-          "t": "antaranya",
-          "s": 11.48,
-          "e": 12.24
-        },
-        {
-          "t": "tiga",
-          "s": 12.4,
-          "e": 12.8
-        },
-        {
-          "t": "jenis",
-          "s": 12.867,
-          "e": 13.2
-        },
-        {
-          "t": "kalimah (كَلِمَة)",
-          "s": 13.24,
-          "e": 13.68
-        },
-        {
-          "t": "dan",
-          "s": 13.84,
-          "e": 14.32
-        },
-        {
-          "t": "huruf jar (حَرْف جَرّ).",
-          "s": 14.4,
-          "e": 15.2
-        }
-      ]
+      "focus": null
+    },
+    "al-fatihah:7:map:learnt": {
+      "text": "Sebelum ayat ini, kita sudah mempelajari enam belas hal. Yang kita temui lagi di ayat ini ada sepuluh, di antaranya tiga jenis kata dan مَجْرُور.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari enam belas hal. Yang kita temui lagi di ayat ini ada sepuluh, di antaranya tiga jenis kata dan majrur (مَجْرُور).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:map:later": {
+      "text": "Ada satu hal lagi di ayat ini, yaitu بَدَل, tetapi baru kita bahas nanti. Ada juga empat hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "display": "Ada satu hal lagi di ayat ini, yaitu badal (بَدَل), tetapi baru kita bahas nanti. Ada juga empat hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
     },
     "al-fatihah:7:w1": {
       "text": "Kata pertama artinya: jalan. Kata ini sama dengan kata yang artinya jalan di ayat keenam, tetapi tanpa alif lam.",
@@ -30820,152 +26981,6 @@
         }
       ]
     },
-    "al-fatihah:7:concept:badal": {
-      "text": "Konsep baru: بَدَل, yaitu pengganti yang menjelaskan. بَدَل adalah اِسْم yang mengulang atau menggantikan اِسْم sebelumnya untuk menjelaskannya, dan ia mengikuti seluruh إِعْرَاب اِسْم itu.",
-      "display": "Konsep baru: Badal (بَدَل), yaitu pengganti yang menjelaskan. Badal (بَدَل) adalah isim (اِسْم) yang mengulang atau menggantikan isim (اِسْم) sebelumnya untuk menjelaskannya, dan ia mengikuti seluruh i’rab (إِعْرَاب) isim (اِسْم) itu.",
-      "highlight": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/ddfe339d0adeca96.mp3",
-        "ms": 14838,
-        "sha256": "33c9ea8f73598a07efae48764a5016192c3456460a4eb77cd12dbe0abce573a4"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "baru:",
-          "s": 0.4,
-          "e": 1.04
-        },
-        {
-          "t": "Badal (بَدَل),",
-          "s": 1.2,
-          "e": 2.16
-        },
-        {
-          "t": "yaitu",
-          "s": 2.36,
-          "e": 2.88
-        },
-        {
-          "t": "pengganti",
-          "s": 2.928,
-          "e": 3.44
-        },
-        {
-          "t": "yang",
-          "s": 3.472,
-          "e": 3.6
-        },
-        {
-          "t": "menjelaskan.",
-          "s": 3.648,
-          "e": 4.4
-        },
-        {
-          "t": "Badal (بَدَل)",
-          "s": 4.84,
-          "e": 5.68
-        },
-        {
-          "t": "adalah",
-          "s": 5.783,
-          "e": 6.4
-        },
-        {
-          "t": "isim (اِسْم)",
-          "s": 6.48,
-          "e": 6.88
-        },
-        {
-          "t": "yang",
-          "s": 6.992,
-          "e": 7.44
-        },
-        {
-          "t": "mengulang",
-          "s": 7.472,
-          "e": 8.0
-        },
-        {
-          "t": "atau",
-          "s": 8.064,
-          "e": 8.32
-        },
-        {
-          "t": "menggantikan",
-          "s": 8.368,
-          "e": 9.04
-        },
-        {
-          "t": "isim (اِسْم)",
-          "s": 9.08,
-          "e": 9.36
-        },
-        {
-          "t": "sebelumnya",
-          "s": 9.413,
-          "e": 10.08
-        },
-        {
-          "t": "untuk",
-          "s": 10.173,
-          "e": 10.64
-        },
-        {
-          "t": "menjelaskannya,",
-          "s": 10.672,
-          "e": 12.08
-        },
-        {
-          "t": "dan",
-          "s": 12.14,
-          "e": 12.32
-        },
-        {
-          "t": "ia",
-          "s": 12.4,
-          "e": 12.56
-        },
-        {
-          "t": "mengikuti",
-          "s": 12.592,
-          "e": 13.12
-        },
-        {
-          "t": "seluruh",
-          "s": 13.18,
-          "e": 13.6
-        },
-        {
-          "t": "i’rab (إِعْرَاب)",
-          "s": 13.68,
-          "e": 14.08
-        },
-        {
-          "t": "isim (اِسْم)",
-          "s": 14.12,
-          "e": 14.32
-        },
-        {
-          "t": "itu.",
-          "s": 14.42,
-          "e": 14.8
-        }
-      ]
-    },
     "al-fatihah:7:concept:isim-maushul": {
       "text": "Konsep baru: اِسْم مَوْصُول, yaitu kata penghubung yang artinya yang. اِسْم مَوْصُول seperti kata kedua, yang artinya orang-orang yang, kata yang artinya yang, dan kata yang artinya apa yang baru lengkap maknanya dengan kalimat penjelas sesudahnya, yang disebut صِلَة.",
       "display": "Konsep baru: Isim maushul (اِسْم مَوْصُول), yaitu kata penghubung yang artinya “yang”. Isim maushul (اِسْم مَوْصُول) seperti kata kedua, yang artinya “orang-orang yang”, kata yang artinya “yang”, dan kata yang artinya “apa yang” baru lengkap maknanya dengan kalimat penjelas sesudahnya, yang disebut shilah (صِلَة).",
@@ -31388,353 +27403,18 @@
         }
       ]
     },
-    "al-fatihah:7:concept:bab-ifal": {
-      "text": "Konsep baru: Bab إِفْعَال, yaitu وَزْن أَفْعَلَ. وَزْن أَفْعَلَ dibentuk dengan menambah هَمْزَة di depan akar tiga huruf; kata ketiga, yang artinya Engkau telah memberi nikmat, memakai pola ini.",
-      "display": "Konsep baru: Bab if‘āl (إِفْعَال), yaitu wazan (وَزْن) af‘ala (أَفْعَلَ). Wazan (وَزْن) af‘ala (أَفْعَلَ) dibentuk dengan menambah hamzah (ء) di depan akar tiga huruf; kata ketiga, yang artinya “Engkau telah memberi nikmat”, memakai pola ini.",
+    "al-fatihah:7:concept:athaf": {
+      "text": "Konsep baru: عَطْف, yaitu kata sambung: وَاو yang artinya dan. عَطْف adalah menyambungkan kata atau kalimat dengan huruf seperti وَاو yang artinya dan; kata yang disambungkan mengikuti إِعْرَاب kata sebelumnya.",
+      "display": "Konsep baru: ‘Athaf (عَطْف), yaitu kata sambung: wawu (و) yang artinya “dan”. ‘Athaf (عَطْف) adalah menyambungkan kata atau kalimat dengan huruf seperti wawu (و) yang artinya “dan”; kata yang disambungkan mengikuti i’rab (إِعْرَاب) kata sebelumnya.",
       "highlight": [
-        3
+        8,
+        9
       ],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/642c6a732bb87743.mp3",
-        "ms": 16353,
-        "sha256": "a41b23af56f26998d315ada8e73225c416fb6ebe55953fd782cc42c5c1c9a47a"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "baru:",
-          "s": 0.384,
-          "e": 0.72
-        },
-        {
-          "t": "Bab",
-          "s": 0.88,
-          "e": 1.36
-        },
-        {
-          "t": "if‘āl (إِفْعَال),",
-          "s": 1.48,
-          "e": 2.16
-        },
-        {
-          "t": "yaitu",
-          "s": 2.44,
-          "e": 3.12
-        },
-        {
-          "t": "wazan (وَزْن)",
-          "s": 3.44,
-          "e": 4.32
-        },
-        {
-          "t": "af‘ala (أَفْعَلَ).",
-          "s": 4.48,
-          "e": 5.2
-        },
-        {
-          "t": "Wazan (وَزْن)",
-          "s": 5.6,
-          "e": 6.4
-        },
-        {
-          "t": "af‘ala (أَفْعَلَ)",
-          "s": 6.48,
-          "e": 7.04
-        },
-        {
-          "t": "dibentuk",
-          "s": 7.16,
-          "e": 7.76
-        },
-        {
-          "t": "dengan",
-          "s": 7.794,
-          "e": 8.0
-        },
-        {
-          "t": "menambah",
-          "s": 8.04,
-          "e": 8.56
-        },
-        {
-          "t": "hamzah (ء)",
-          "s": 8.6,
-          "e": 9.12
-        },
-        {
-          "t": "di",
-          "s": 9.2,
-          "e": 9.36
-        },
-        {
-          "t": "depan",
-          "s": 9.413,
-          "e": 9.6
-        },
-        {
-          "t": "akar",
-          "s": 9.68,
-          "e": 9.92
-        },
-        {
-          "t": "tiga",
-          "s": 10.0,
-          "e": 10.16
-        },
-        {
-          "t": "huruf;",
-          "s": 10.22,
-          "e": 10.64
-        },
-        {
-          "t": "kata",
-          "s": 10.784,
-          "e": 11.36
-        },
-        {
-          "t": "ketiga,",
-          "s": 11.42,
-          "e": 11.92
-        },
-        {
-          "t": "yang",
-          "s": 12.016,
-          "e": 12.4
-        },
-        {
-          "t": "artinya",
-          "s": 12.46,
-          "e": 12.96
-        },
-        {
-          "t": "Engkau",
-          "s": 13.12,
-          "e": 13.76
-        },
-        {
-          "t": "telah",
-          "s": 13.813,
-          "e": 14.08
-        },
-        {
-          "t": "memberi",
-          "s": 14.126,
-          "e": 14.52
-        },
-        {
-          "t": "nikmat,",
-          "s": 14.55,
-          "e": 15.36
-        },
-        {
-          "t": "memakai",
-          "s": 15.4,
-          "e": 15.68
-        },
-        {
-          "t": "pola",
-          "s": 15.74,
-          "e": 15.92
-        },
-        {
-          "t": "ini.",
-          "s": 15.98,
-          "e": 16.32
-        }
-      ]
-    },
-    "al-fatihah:7:concept:isim-maful": {
-      "text": "Konsep baru: اِسْم مَفْعُول, yaitu kata bagi yang dikenai perbuatan. اِسْم مَفْعُول adalah اِسْم turunan dari مَصْدَر, yaitu kata benda perbuatan, yang menyebut pihak yang dikenai perbuatan, seperti kata keenam yang artinya yang dimurkai.",
-      "display": "Konsep baru: Isim maf’ul (اِسْم مَفْعُول), yaitu kata bagi yang dikenai perbuatan. Isim maf’ul (اِسْم مَفْعُول) adalah isim (اِسْم) turunan dari mashdar (مَصْدَر), yaitu kata benda perbuatan, yang menyebut pihak yang dikenai perbuatan, seperti kata keenam yang artinya “yang dimurkai”.",
-      "highlight": [
-        6
-      ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/ffa2b08c6e82334f.mp3",
-        "ms": 19487,
-        "sha256": "3bf9c247c118494971502b9f01419ce82c02af36ff6e8c166df15788745aad05"
-      },
-      "tokens": [
-        {
-          "t": "Konsep",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "baru:",
-          "s": 0.4,
-          "e": 1.0
-        },
-        {
-          "t": "Isim maf’ul (اِسْم مَفْعُول),",
-          "s": 1.14,
-          "e": 2.481
-        },
-        {
-          "t": "yaitu",
-          "s": 2.84,
-          "e": 3.6
-        },
-        {
-          "t": "kata",
-          "s": 3.712,
-          "e": 4.16
-        },
-        {
-          "t": "bagi",
-          "s": 4.24,
-          "e": 4.56
-        },
-        {
-          "t": "yang",
-          "s": 4.608,
-          "e": 4.8
-        },
-        {
-          "t": "dikenai",
-          "s": 4.84,
-          "e": 5.28
-        },
-        {
-          "t": "perbuatan.",
-          "s": 5.34,
-          "e": 6.0
-        },
-        {
-          "t": "Isim maf’ul (اِسْم مَفْعُول)",
-          "s": 6.4,
-          "e": 7.68
-        },
-        {
-          "t": "adalah",
-          "s": 7.76,
-          "e": 8.24
-        },
-        {
-          "t": "isim (اِسْم)",
-          "s": 8.36,
-          "e": 8.72
-        },
-        {
-          "t": "turunan",
-          "s": 8.8,
-          "e": 9.28
-        },
-        {
-          "t": "dari",
-          "s": 9.328,
-          "e": 9.52
-        },
-        {
-          "t": "mashdar (مَصْدَر),",
-          "s": 9.6,
-          "e": 10.32
-        },
-        {
-          "t": "yaitu",
-          "s": 10.6,
-          "e": 11.28
-        },
-        {
-          "t": "kata",
-          "s": 11.36,
-          "e": 11.68
-        },
-        {
-          "t": "benda",
-          "s": 11.72,
-          "e": 12.08
-        },
-        {
-          "t": "perbuatan,",
-          "s": 12.14,
-          "e": 12.88
-        },
-        {
-          "t": "yang",
-          "s": 12.992,
-          "e": 13.44
-        },
-        {
-          "t": "menyebut",
-          "s": 13.488,
-          "e": 13.92
-        },
-        {
-          "t": "pihak",
-          "s": 14.0,
-          "e": 14.32
-        },
-        {
-          "t": "yang",
-          "s": 14.368,
-          "e": 14.56
-        },
-        {
-          "t": "dikenai",
-          "s": 14.62,
-          "e": 14.96
-        },
-        {
-          "t": "perbuatan,",
-          "s": 15.02,
-          "e": 16.24
-        },
-        {
-          "t": "seperti",
-          "s": 16.3,
-          "e": 16.72
-        },
-        {
-          "t": "kata",
-          "s": 16.768,
-          "e": 16.96
-        },
-        {
-          "t": "keenam",
-          "s": 17.024,
-          "e": 17.36
-        },
-        {
-          "t": "yang",
-          "s": 17.408,
-          "e": 17.6
-        },
-        {
-          "t": "artinya",
-          "s": 17.66,
-          "e": 18.16
-        },
-        {
-          "t": "yang",
-          "s": 18.256,
-          "e": 18.64
-        },
-        {
-          "t": "dimurkai.",
-          "s": 18.7,
-          "e": 19.44
-        }
-      ]
-    },
-    "al-fatihah:7:concept:naib-fail": {
-      "text": "Konsep baru: نَائِب فَاعِل, yaitu pengganti pelaku. نَائِب فَاعِل adalah kata yang menempati posisi pelaku ketika pelakunya tidak disebut; kedudukannya رَفْع.",
-      "display": "Konsep baru: Na’ib fa’il (نَائِب فَاعِل), yaitu pengganti pelaku. Na’ib fa’il (نَائِب فَاعِل) adalah kata yang menempati posisi pelaku ketika pelakunya tidak disebut; kedudukannya rafa’ (رَفْع).",
-      "highlight": [
-        6,
-        7
-      ],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/3dfb44fbc3d6fcfe.mp3",
-        "ms": 12748,
-        "sha256": "6db289fe01d9f1a31cbf7d557dcc54913170b19d2ae1b16f1e8a389e31fae882"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a469e99bf84e5fe5.mp3",
+        "ms": 17241,
+        "sha256": "9ae21d884db6036ebec0551f470805ee9922a6e0ef09a88f2f4d87eb5a5f0a2b"
       },
       "tokens": [
         {
@@ -31748,89 +27428,144 @@
           "e": 0.8
         },
         {
-          "t": "Na’ib fa’il (نَائِب فَاعِل),",
-          "s": 1.04,
-          "e": 2.32
+          "t": "‘Athaf (عَطْف),",
+          "s": 1.08,
+          "e": 1.92
         },
         {
           "t": "yaitu",
-          "s": 2.52,
-          "e": 3.04
-        },
-        {
-          "t": "pengganti",
-          "s": 3.104,
-          "e": 3.68
-        },
-        {
-          "t": "pelaku.",
-          "s": 3.74,
-          "e": 4.32
-        },
-        {
-          "t": "Na’ib fa’il (نَائِب فَاعِل)",
-          "s": 4.72,
-          "e": 5.92
-        },
-        {
-          "t": "adalah",
-          "s": 5.977,
-          "e": 6.32
+          "s": 2.2,
+          "e": 2.8
         },
         {
           "t": "kata",
-          "s": 6.4,
-          "e": 6.72
+          "s": 2.864,
+          "e": 3.12
+        },
+        {
+          "t": "sambung:",
+          "s": 3.16,
+          "e": 3.76
+        },
+        {
+          "t": "wawu (و)",
+          "s": 4.08,
+          "e": 4.72
         },
         {
           "t": "yang",
-          "s": 6.752,
-          "e": 6.88
+          "s": 4.784,
+          "e": 5.04
         },
         {
-          "t": "menempati",
-          "s": 6.92,
-          "e": 7.52
+          "t": "artinya",
+          "s": 5.1,
+          "e": 5.52
         },
         {
-          "t": "posisi",
-          "s": 7.56,
-          "e": 7.92
+          "t": "dan.",
+          "s": 5.64,
+          "e": 6.08
         },
         {
-          "t": "pelaku",
-          "s": 7.96,
-          "e": 8.48
+          "t": "‘Athaf (عَطْف)",
+          "s": 6.56,
+          "e": 7.36
         },
         {
-          "t": "ketika",
-          "s": 8.54,
-          "e": 8.88
+          "t": "adalah",
+          "s": 7.429,
+          "e": 7.84
         },
         {
-          "t": "pelakunya",
-          "s": 8.94,
-          "e": 9.52
+          "t": "menyambungkan",
+          "s": 7.888,
+          "e": 8.56
         },
         {
-          "t": "tidak",
-          "s": 9.587,
-          "e": 9.92
+          "t": "kata",
+          "s": 8.672,
+          "e": 9.12
         },
         {
-          "t": "disebut;",
-          "s": 9.96,
-          "e": 10.48
+          "t": "atau",
+          "s": 9.184,
+          "e": 9.44
         },
         {
-          "t": "kedudukannya",
-          "s": 10.66,
-          "e": 11.76
+          "t": "kalimat",
+          "s": 9.5,
+          "e": 10.0
         },
         {
-          "t": "rafa’ (رَفْع).",
-          "s": 12.0,
+          "t": "dengan",
+          "s": 10.046,
+          "e": 10.32
+        },
+        {
+          "t": "huruf",
+          "s": 10.38,
+          "e": 10.8
+        },
+        {
+          "t": "seperti",
+          "s": 10.85,
+          "e": 11.2
+        },
+        {
+          "t": "wawu (و)",
+          "s": 11.32,
+          "e": 11.68
+        },
+        {
+          "t": "yang",
+          "s": 11.792,
+          "e": 12.24
+        },
+        {
+          "t": "artinya",
+          "s": 12.3,
           "e": 12.72
+        },
+        {
+          "t": "dan;",
+          "s": 12.82,
+          "e": 13.2
+        },
+        {
+          "t": "kata",
+          "s": 13.392,
+          "e": 14.16
+        },
+        {
+          "t": "yang",
+          "s": 14.176,
+          "e": 14.24
+        },
+        {
+          "t": "disambungkan",
+          "s": 14.3,
+          "e": 14.96
+        },
+        {
+          "t": "mengikuti",
+          "s": 15.008,
+          "e": 15.6
+        },
+        {
+          "t": "i’rab (إِعْرَاب)",
+          "s": 15.68,
+          "e": 16.24
+        },
+        {
+          "t": "kata",
+          "s": 16.304,
+          "e": 16.56
+        },
+        {
+          "t": "sebelumnya.",
+          "s": 16.613,
+          "e": 17.2
         }
       ]
     },
@@ -33439,398 +29174,11 @@
         }
       ]
     },
-    "al-fatihah:7:ex:wazn-factory:intro": {
-      "text": "Latihan bentuk-bentuk kata, empat soal. Pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil تَصْرِيف, bukan kutipan ayat.",
-      "display": "Latihan bentuk-bentuk kata, empat soal. Pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif (تَصْرِيف), bukan kutipan ayat.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/f6237d3155d9d5a9.mp3",
-        "ms": 10266,
-        "sha256": "ce3f375443b1809cb6ff7e470dad9be8475d3ed55272b49fd7ae1157a7ea6a78"
-      },
-      "tokens": [
-        {
-          "t": "Latihan",
-          "s": 0.0,
-          "e": 0.48
-        },
-        {
-          "t": "bentuk-bentuk",
-          "s": 0.528,
-          "e": 1.04
-        },
-        {
-          "t": "kata,",
-          "s": 1.12,
-          "e": 1.52
-        },
-        {
-          "t": "empat",
-          "s": 1.6,
-          "e": 1.84
-        },
-        {
-          "t": "soal.",
-          "s": 1.947,
-          "e": 2.48
-        },
-        {
-          "t": "Pilih",
-          "s": 2.76,
-          "e": 3.28
-        },
-        {
-          "t": "bentuk",
-          "s": 3.328,
-          "e": 3.6
-        },
-        {
-          "t": "yang",
-          "s": 3.648,
-          "e": 3.84
-        },
-        {
-          "t": "sesuai",
-          "s": 3.9,
-          "e": 4.32
-        },
-        {
-          "t": "dengan",
-          "s": 4.354,
-          "e": 4.56
-        },
-        {
-          "t": "namanya.",
-          "s": 4.62,
-          "e": 5.12
-        },
-        {
-          "t": "Bentuk-bentuk",
-          "s": 5.312,
-          "e": 6.48
-        },
-        {
-          "t": "ini",
-          "s": 6.56,
-          "e": 6.8
-        },
-        {
-          "t": "kata",
-          "s": 6.88,
-          "e": 7.2
-        },
-        {
-          "t": "Arab",
-          "s": 7.264,
-          "e": 7.52
-        },
-        {
-          "t": "hasil",
-          "s": 7.587,
-          "e": 7.92
-        },
-        {
-          "t": "tashrif (تَصْرِيف),",
-          "s": 8.04,
-          "e": 8.72
-        },
-        {
-          "t": "bukan",
-          "s": 8.88,
-          "e": 9.36
-        },
-        {
-          "t": "kutipan",
-          "s": 9.42,
-          "e": 9.84
-        },
-        {
-          "t": "ayat.",
-          "s": 9.893,
-          "e": 10.24
-        }
-      ]
-    },
-    "al-fatihah:7:ex:wazn-factory:1:why": {
-      "text": "Itu bentuk فِعْل مَاضٍ, yaitu kata kerja lampau.",
-      "display": "Itu bentuk fi’il madhi (فِعْل مَاضٍ), yaitu kata kerja lampau.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/cb950313526424fd.mp3",
-        "ms": 3709,
-        "sha256": "7937561d3c14d83704e7e66c094e28abbf5a888d7a649a0965072bc8140d51c1"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "bentuk",
-          "s": 0.368,
-          "e": 0.72
-        },
-        {
-          "t": "fi’il madhi (فِعْل مَاضٍ),",
-          "s": 0.76,
-          "e": 1.8
-        },
-        {
-          "t": "yaitu",
-          "s": 1.9,
-          "e": 2.32
-        },
-        {
-          "t": "kata",
-          "s": 2.384,
-          "e": 2.64
-        },
-        {
-          "t": "kerja",
-          "s": 2.7,
-          "e": 3.04
-        },
-        {
-          "t": "lampau.",
-          "s": 3.12,
-          "e": 3.68
-        }
-      ]
-    },
-    "al-fatihah:7:ex:wazn-factory:2:why": {
-      "text": "Itu bentuk اِسْم مَفْعُول, yaitu kata bagi yang dikenai perbuatan.",
-      "display": "Itu bentuk isim maf’ul (اِسْم مَفْعُول), yaitu kata bagi yang dikenai perbuatan.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/01feb61ef7c894fc.mp3",
-        "ms": 4676,
-        "sha256": "3be99c4f1d42cad3ce3ae6828d407ce7d3e214ba668819ec5c4d518798ef51bf"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "bentuk",
-          "s": 0.288,
-          "e": 0.64
-        },
-        {
-          "t": "isim maf’ul (اِسْم مَفْعُول),",
-          "s": 0.68,
-          "e": 1.8
-        },
-        {
-          "t": "yaitu",
-          "s": 1.94,
-          "e": 2.4
-        },
-        {
-          "t": "kata",
-          "s": 2.48,
-          "e": 2.8
-        },
-        {
-          "t": "bagi",
-          "s": 2.864,
-          "e": 3.12
-        },
-        {
-          "t": "yang",
-          "s": 3.168,
-          "e": 3.36
-        },
-        {
-          "t": "dikenai",
-          "s": 3.4,
-          "e": 3.84
-        },
-        {
-          "t": "perbuatan.",
-          "s": 3.9,
-          "e": 4.64
-        }
-      ]
-    },
-    "al-fatihah:7:ex:wazn-factory:3:why": {
-      "text": "Itu bentuk اِسْم فَاعِل, yaitu kata pelaku.",
-      "display": "Itu bentuk isim fa’il (اِسْم فَاعِل), yaitu kata pelaku.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4431086bdd349ffa.mp3",
-        "ms": 4127,
-        "sha256": "b2cb774169ae5b720f4041a399f470179026d88e909005e2ca0e4cdcfc279c05"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "bentuk",
-          "s": 0.352,
-          "e": 0.64
-        },
-        {
-          "t": "isim fa’il (اِسْم فَاعِل),",
-          "s": 0.72,
-          "e": 2.2
-        },
-        {
-          "t": "yaitu",
-          "s": 2.34,
-          "e": 2.88
-        },
-        {
-          "t": "kata",
-          "s": 2.976,
-          "e": 3.36
-        },
-        {
-          "t": "pelaku.",
-          "s": 3.42,
-          "e": 4.08
-        }
-      ]
-    },
-    "al-fatihah:7:ex:wazn-factory:4:why": {
-      "text": "Itu bentuk اِسْم فَاعِل, yaitu kata pelaku.",
-      "display": "Itu bentuk isim fa’il (اِسْم فَاعِل), yaitu kata pelaku.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4431086bdd349ffa.mp3",
-        "ms": 4127,
-        "sha256": "b2cb774169ae5b720f4041a399f470179026d88e909005e2ca0e4cdcfc279c05"
-      },
-      "tokens": [
-        {
-          "t": "Itu",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "bentuk",
-          "s": 0.352,
-          "e": 0.64
-        },
-        {
-          "t": "isim fa’il (اِسْم فَاعِل),",
-          "s": 0.72,
-          "e": 2.2
-        },
-        {
-          "t": "yaitu",
-          "s": 2.34,
-          "e": 2.88
-        },
-        {
-          "t": "kata",
-          "s": 2.976,
-          "e": 3.36
-        },
-        {
-          "t": "pelaku.",
-          "s": 3.42,
-          "e": 4.08
-        }
-      ]
-    },
     "al-fatihah:7:learned": {
-      "text": "Di ayat ini kita sudah mempelajari enam hal baru, di antaranya بَدَل, اِسْم مَوْصُول, dan فِعْل مَاضٍ.",
-      "display": "Di ayat ini kita sudah mempelajari enam hal baru, di antaranya badal (بَدَل), isim maushul (اِسْم مَوْصُول), dan fi’il madhi (فِعْل مَاضٍ).",
+      "text": "Di ayat ini kita mempelajari tiga hal baru: اِسْم مَوْصُول, فِعْل مَاضٍ, dan عَطْف. Dengan itu, sudah sembilan belas hal yang kita pelajari.",
+      "display": "Di ayat ini kita mempelajari tiga hal baru: isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), dan ‘athaf (عَطْف). Dengan itu, sudah sembilan belas hal yang kita pelajari.",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/526a490c39c9ec38.mp3",
-        "ms": 8673,
-        "sha256": "81811f9e96a05ecbb4c982361d34457ac00f92efcb93c477dabdfdbdffc3cdbe"
-      },
-      "tokens": [
-        {
-          "t": "Di",
-          "s": 0.0,
-          "e": 0.08
-        },
-        {
-          "t": "ayat",
-          "s": 0.133,
-          "e": 0.32
-        },
-        {
-          "t": "ini",
-          "s": 0.42,
-          "e": 0.72
-        },
-        {
-          "t": "kita",
-          "s": 0.784,
-          "e": 1.04
-        },
-        {
-          "t": "sudah",
-          "s": 1.093,
-          "e": 1.36
-        },
-        {
-          "t": "mempelajari",
-          "s": 1.42,
-          "e": 2.0
-        },
-        {
-          "t": "enam",
-          "s": 2.08,
-          "e": 2.4
-        },
-        {
-          "t": "hal",
-          "s": 2.48,
-          "e": 2.72
-        },
-        {
-          "t": "baru,",
-          "s": 2.784,
-          "e": 3.6
-        },
-        {
-          "t": "di",
-          "s": 3.653,
-          "e": 3.76
-        },
-        {
-          "t": "antaranya",
-          "s": 3.82,
-          "e": 4.56
-        },
-        {
-          "t": "badal (بَدَل),",
-          "s": 4.8,
-          "e": 5.52
-        },
-        {
-          "t": "isim maushul (اِسْم مَوْصُول),",
-          "s": 5.76,
-          "e": 7.2
-        },
-        {
-          "t": "dan",
-          "s": 7.28,
-          "e": 7.52
-        },
-        {
-          "t": "fi’il madhi (فِعْل مَاضٍ).",
-          "s": 7.64,
-          "e": 8.64
-        }
-      ]
+      "focus": null
     },
     "al-fatihah:7:recap": {
       "text": "Dengarkan sekali lagi seluruh ayat ketujuh dibacakan imam.",

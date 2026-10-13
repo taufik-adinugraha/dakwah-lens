@@ -51,9 +51,14 @@ function mahallPos(mahall: string): string {
  * One word of an ayah, simplified for older learners (senior-ux §3.6).
  * Collapsed by default to what a beginner needs: the word, how to say it,
  * what it means, how it ends and the ONE-sentence reason why. Everything
- * else — role, root, wazan, kedudukan, concepts, sharaf, other scholars'
+ * else — role, root, kedudukan, concepts, sharaf, other scholars'
  * views and the full Rujukan list — sits behind one labelled tap that shows
  * the source count, so every citation stays one tap away (AGENTS.md).
+ *
+ * No wazan row in a BASIC lesson (operator-approved 2026-10-13, kurikulum-dasar.md decision 6: "All
+ * sharaf is 'tingkat lanjut' … The wazan badge and the wazn-factory exercise leave the basic
+ * lessons"; plan L26). Every lesson today is basic, so the row is off unless a page of the next
+ * level asks for it (`wazan`); the Kosakata and Konsep pages keep their sharaf content.
  *
  * Arabic with every term and Qur'anic word (operator 2026-10-12, on ‘alaihim's card: "better to
  * write the arabic words, not only the transliteration"): a word of a marked lesson
@@ -71,9 +76,12 @@ export function WordCard({
   concepts = [],
   listen,
   lookup,
+  wazan = false,
 }: {
   word: Word;
   labels: WordCardLabels;
+  /** Show the word's wazan (pattern) among its details: a next-level lesson only (decision 6). */
+  wazan?: boolean;
   /** The lemma's shared Kosakata entry (tashrif, i'lal), when present. */
   lexeme?: Lexeme;
   /** Concepts this word illustrates (Konsep library), resolved by the page, with the Arabic
@@ -113,7 +121,7 @@ export function WordCard({
     : null;
   const why = tok(mk?.why);
   const role = word.role ? tok(mk?.role) : null;
-  const wazn = word.wazn ? tok(mk?.wazn) : null;
+  const wazn = wazan && word.wazn ? tok(mk?.wazn) : null;
   const mahall = word.case.mahall ? mahallMarked(word.case.mahall) : null;
   const mahallText = word.case.mahall
     ? mk && lookup && mahall
@@ -196,8 +204,8 @@ export function WordCard({
                   )}
                 </dd>
               </div>
-              {word.wazn ? (
-                <div>
+              {wazan && word.wazn ? (
+                <div data-word-wazan>
                   <dt className="text-sm font-semibold text-ink-muted">{labels.wazn}</dt>
                   <dd className="text-base text-ink">
                     <Prose tokens={wazn} plain={word.wazn} />

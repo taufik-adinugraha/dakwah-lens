@@ -63,11 +63,13 @@ describe("quizzes (content/quiz)", () => {
     const ar = new Map(LIBRARY.terms.map((t) => [t.id, t.ar]));
     const q = quizFor("al-fatihah")!;
     for (const st of ["marfu", "manshub", "majrur", "mabni"]) expect(q.states[st]).toContain(ar.get(st)!);
-    expect(q.labels["fi'il mudhari'"]).toContain(ar.get("fiil-mudhari")!);
+    // No form labels: the wazan exercise left the basic lessons (kurikulum-dasar.md decision 6,
+    // 2026-10-13: "All sharaf is 'tingkat lanjut'"), in the authored plan and the mechanical ones.
+    expect(q.labels).toEqual({});
+    for (const s of SURAHS) for (const a of s.ayat) expect(planOf(quizAyah(s.slug, a.ayah), "wazn-factory"), a.loc).toBeNull();
     // Ayah 2 sorts into the two states taught by then: marfu' (at its first word) and majrur.
     expect(planOf(quizAyah("al-fatihah", 2), "sort-case")?.bins).toEqual(["marfu", "majrur"]);
     expect(planOf(quizAyah("al-fatihah", 1), "sort-case")).toBeNull();
-    expect(planOf(quizAyah("al-fatihah", 4), "wazn-factory")).toBeNull();
   });
 });
 

@@ -17,11 +17,12 @@ import {
 } from "@/components/exercises/guide";
 
 import { SURAHS } from "../content";
-import { conceptsIntroducedIn, LIBRARY } from "../library";
+import { CURRICULUM, taughtAt } from "../curriculum";
 import { quizAyah } from "../quiz-content";
 import { loadCheckInput, quizAyahOf } from "./checks";
+import { ayahLessonId, taughtIn, type CurriculumFile } from "./curriculum";
 import { availableExercises, questionNumbers } from "./exercises";
-import { buildAutoplaySequence, introducedConcepts } from "./sequence";
+import { buildAutoplaySequence } from "./sequence";
 import { ID_TEXTS } from "./texts";
 import { EXERCISE_KEYS, GUIDE_PARTS, PARTS_OF } from "./types";
 
@@ -43,7 +44,7 @@ describe("autoplay parity", () => {
           surahName: s.name_id,
           ayahCount: s.ayat.length,
           ayah: a,
-          introduced: conceptsIntroducedIn(a.loc),
+          introduced: taughtAt(a),
           exercises: availableExercises(quizAyah(s.slug, a.ayah)),
           texts: ID_TEXTS,
         });
@@ -56,10 +57,21 @@ describe("autoplay parity", () => {
     }
   });
 
-  it("introduces concepts by the library's rule (conceptsIntroducedIn)", () => {
+  it("teaches what the curriculum gives each ayah's lesson — the page from the validated file, the check script from raw JSON", () => {
+    // Until 2026-10-13 a concept was introduced in the ayah of its first example, a rule the app
+    // (library.conceptsIntroducedIn) and the engine (introducedConcepts) each had a copy of. Both
+    // now read content/curriculum.json (plan L26).
+    const file = raw.curriculum as CurriculumFile;
+    expect(JSON.stringify(file)).toBe(JSON.stringify(CURRICULUM));
     for (const s of SURAHS) {
+      const r = raw.surahs.find((x) => x.slug === s.slug)!;
       for (const a of s.ayat) {
-        expect(introducedConcepts(LIBRARY.concepts, a.loc).map((c) => c.id)).toEqual(conceptsIntroducedIn(a.loc).map((c) => c.id));
+        const ra = r.ayat.find((x) => x.ayah === a.ayah)!;
+        const page = taughtAt(a);
+        expect(JSON.stringify(taughtIn(file, raw.concepts, ra)), a.loc).toBe(JSON.stringify(page));
+        const lesson = CURRICULUM.lessons.find((l) => l.id === ayahLessonId(a.surah, a.ayah))!;
+        expect(page.map((t) => `concept:${t.id}`), a.loc).toEqual((lesson.lines ?? []).map((l) => l.line));
+        expect(page.length, a.loc).toBeLessThanOrEqual(3);
       }
     }
   });
@@ -77,7 +89,7 @@ describe("autoplay parity", () => {
           surahName: s.name_id,
           ayahCount: s.ayat.length,
           ayah: a,
-          introduced: conceptsIntroducedIn(a.loc),
+          introduced: taughtAt(a),
           exercises: availableExercises(quizAyah(s.slug, a.ayah)),
           questions: questionNumbers(quizAyah(s.slug, a.ayah)),
           texts: ID_TEXTS,
@@ -87,7 +99,7 @@ describe("autoplay parity", () => {
           surahName: r.name_id,
           ayahCount: r.ayat.length,
           ayah: ra,
-          introduced: introducedConcepts(raw.concepts, ra.loc),
+          introduced: taughtIn(raw.curriculum as CurriculumFile, raw.concepts, ra),
           exercises: availableExercises(quizAyahOf(raw.quiz?.[r.slug], ra.ayah)),
           questions: questionNumbers(quizAyahOf(raw.quiz?.[r.slug], ra.ayah)),
           texts: ID_TEXTS,

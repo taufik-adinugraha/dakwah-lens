@@ -1,191 +1,189 @@
 /**
- * The LESSON MAP of an ayah (operator 2026-10-13, plan L23: "at the beginning of the ayat, better
- * to inform what concept we will learn in this ayat, also explain maybe we skip some concept and
- * will visit later in next ayat instead of explaining all concepts in 1 ayat … so at the beginning
- * we inform what will be learnt, in the end recap what we've learnt"; "if some concept already done
- * in previous ayat, we say we repeat what we've learnt before").
+ * The LESSON MAP of an ayah, version 2 (operator 2026-10-13, plan L23: "at the beginning of the
+ * ayat, better to inform what concept we will learn in this ayat, also explain maybe we skip some
+ * concept and will visit later in next ayat instead of explaining all concepts in 1 ayat … so at the
+ * beginning we inform what will be learnt, in the end recap what we've learnt"; "if some concept
+ * already done in previous ayat, we say we repeat what we've learnt before" — and, with the basic
+ * curriculum, plan L26: "so the knowledge is accummulating and repeated"; "but separate new vs
+ * already knows concept, this is what new, this is what we've learnt so far").
  *
- * Which Konsep are NEW in an ayah, which are REPEATED from an earlier one and which are present
- * but taught LATER is derived, never written per ayah (pipeline/lessonmap.py has the rules):
- *   present(ayah)  the concept ids its words are tagged with, and those its structure groups name;
- *   taught(id)     the ayah of the concept's FIRST example (library.conceptsIntroducedIn);
- *   new            the concepts taught in this ayah, in the library's order (its "Konsep baru" lines);
- *   review         present here, taught in an EARLIER ayah of the lessons;
- *   later          present here, taught in a LATER ayah (the lessons postpone these).
- * review and later are in the order they are taught, then the library's.
- *
- * The pipeline writes the result to content/map/${slug}.json (build_map.py) with each concept's
- * NAME — the name its "Konsep baru: …" caption opens with (src/lib/emphasis.ts conceptName) — for
- * every surah that is switched on (pipeline/authored/${slug}.map.json; Al-Fatihah only today).
- * This module derives the same lists from the content (deriveLessonMap), so the file is held to
- * the lessons at build time (lessonMapProblems; src/lib/map-content.ts) and in the tests, and
- * turns one ayah's entry into what the lesson needs (lessonMapInputOf): two steps of the autoplay
- * sequence — "map" right after the imam's recitation, "learned" right before the recap — and the
- * card the stage shows with them (src/components/lesson/LessonMapCard.tsx).
- *
- * Besides the derived lists an ayah's `later` may hold a TOPIC, an authored item that is no Konsep
- * (operator 2026-10-13: "in ayat-1, it mentions 'bentuk tertentu' but no explanation about marfu'
- * itself, better to inform it will be learnt later"): ayah 1 shows that a base form ends in
- * dhammah, and the state is named marfu' only by a word's line of ayah 2. The pipeline holds it to
- * that line (it exists, lies in a later ayah, names the thing); here it is a record with
- * `from: "topic"`, a `note` (what the learner is left wondering) and its `line`.
- *
- * The file is data to reuse: a surah's end review is the union of its ayat's `new`.
+ * Four lists per ayah, of STEPS of the curriculum (./curriculum.ts; content/curriculum.json):
+ *   new      what this ayah's lesson teaches, in the order its lines are said (at most three);
+ *   learnt   EVERY step of every earlier lesson — the whole list so far — each with `here`: it
+ *            comes up again in this ayah;
+ *   later    steps of later lessons that occur in this ayah, each with where it is taught;
+ *   lanjut   the next-level Konsep records on this ayah: named on the card, never taught here.
+ * Version 1 listed Konsep records by their first example (new 5 / 3 / 1 / 1 / 8 / 2 / 6 on
+ * Al-Fatihah) and showed the repeated ones only; nothing is derived here any more: the lists are
+ * the curriculum's, copied by the pipeline (build_map.py) into content/map/${slug}.json with each
+ * name, for every surah that is switched on (pipeline/authored/${slug}.map.json; Al-Fatihah only
+ * today). lessonMapProblems holds a file to the curriculum at build time (src/lib/map-content.ts)
+ * and in the tests; lessonMapInputOf turns one ayah's entry into what the lesson needs: the
+ * opening steps of the autoplay sequence — ONE per group, in step with the narrator ("map:new",
+ * "map:learnt", "map:later", right after the imam's recitation) —, the closing ("learned", right
+ * before the recap), and the card the stage shows with each (LessonMapCard.tsx).
  *
  * Pure (type imports only): scripts/autoplay-check.ts runs it under tsx without node_modules.
  */
-import type { Ayah, Concept } from "@/content/schema";
+import { lessonAyah, lessonRanks, type CurriculumFile } from "./curriculum";
 
-/** A concept of content/map/${slug}.json: `name` its caption form (dictionary terms as "na’t
- *  (نَعْت)"), `latin` the same name as prose, `from` where the name comes from (the caption's
- *  title, or an explicit name in the authored file), `surah` / `ayah` where it is taught. */
-export type LessonMapConcept = {
-  name: string;
-  latin: string;
-  from: "title" | "authored" | "topic";
-  surah: number;
+/** A step as content/map/${slug}.json names it: `name` its caption form (dictionary terms as
+ *  "na’t (نَعْت)"), `latin` the same as prose, `lesson` the curriculum lesson that teaches it. */
+export type LessonMapStep = { name: string; latin: string; lesson: string };
+
+/** A next-level record as the file names it (from its Konsep title, or an explicit name). */
+export type LessonMapRecord = { name: string; latin: string; from: "title" | "authored" };
+
+/** One ayah of the file. */
+export type LessonMapAyah = {
   ayah: number;
-  /** A topic only: what is left unexplained, in caption form, and the narration line that teaches it. */
-  note?: string;
-  line?: string;
+  new: string[];
+  learnt: { id: string; here: boolean }[];
+  later: string[];
+  lanjut: string[];
 };
-
-/** One ayah of the file: concept ids. */
-export type LessonMapAyah = { ayah: number; new: string[]; review: string[]; later: string[] };
 
 /** content/map/${slug}.json (zod: src/content/map-schema.ts). */
 export type LessonMapFile = {
   version: number;
   slug: string;
   surah: number;
-  concepts: Record<string, LessonMapConcept>;
+  steps: Record<string, LessonMapStep>;
+  lanjut: Record<string, LessonMapRecord>;
   ayat: LessonMapAyah[];
 };
 
-/** A concept as the card lists it: its name as the caption shows it, and where it is taught. */
-export type LessonMapItem = { id: string; name: string; surah: number; ayah: number; /** A topic's note. */ note?: string };
+/** A step or a record as the card lists it: its name as the captions show it. */
+export type LessonMapItem = { id: string; name: string };
 
-/** One ayah's lesson map as the lesson takes it. `surah`: this ayah's surah number (an item
- *  taught in another surah is shown with that surah). */
+/** One ayah's lesson map as the lesson takes it. */
 export type LessonMapInput = {
+  /** This ayah's surah (a step taught in another surah is shown with that surah). */
   surah: number;
   new: LessonMapItem[];
-  review: LessonMapItem[];
-  later: LessonMapItem[];
+  /** The whole list learnt so far, in teaching order; `here`: it comes up again in this ayah. */
+  learnt: (LessonMapItem & { here: boolean })[];
+  /** Where each is taught: an ayah (`surah`, `ayah`), or null for both (a lesson that is no
+   *  whole ayah). */
+  later: (LessonMapItem & { surah: number | null; ayah: number | null })[];
+  lanjut: LessonMapItem[];
 };
 
-export const LESSON_MAP_GROUPS = ["new", "review", "later"] as const;
-export type LessonMapGroup = (typeof LESSON_MAP_GROUPS)[number];
+/** The groups of the opening, in the order their steps are played. */
+export const MAP_GROUPS = ["new", "learnt", "later"] as const;
+export type MapGroup = (typeof MAP_GROUPS)[number];
+/** The closing step and line. */
+export const MAP_CLOSING = "learned";
 
-/** The ayah's entry of a map file with its concepts' names, or null: no map for the surah (it is
- *  not switched on) or for that ayah. */
+/** The opening groups an ayah's map has (the twin of pipeline/validate_narration.py
+ *  map_opening_parts): what is new always; what was learnt so far once something was; what is
+ *  postponed or next-level when there is any. */
+export function mapOpening(map: Pick<LessonMapInput, "learnt" | "later" | "lanjut">): MapGroup[] {
+  return ["new", ...(map.learnt.length ? (["learnt"] as const) : []), ...(map.later.length || map.lanjut.length ? (["later"] as const) : [])];
+}
+
+/** The steps learnt so far that come up again in this ayah. */
+export const mapHere = (map: Pick<LessonMapInput, "learnt">) => map.learnt.filter((x) => x.here);
+
+/** How many steps have been learnt once this ayah's lesson is through. */
+export const mapTotal = (map: Pick<LessonMapInput, "learnt" | "new">) => map.learnt.length + map.new.length;
+
+/** Up to this many learnt steps that come up again are listed on the card in full, one per row
+ *  with their Arabic — as many as the narrator names in full (validate_narration.py MAP_ALL);
+ *  more are a flowing line of their names in Latin. Measured in CI on a 390×844 phone (base
+ *  branch, 2026-10-13): the card has about 270px above the caption panel at the normal text size,
+ *  less at the larger ones, and one heading with three names is about 265px. */
+export const MAP_HERE_FULL = 3;
+
+/** … and up to this many postponed steps, each with its ayah (the next-level topics share their
+ *  card): more are a flowing line too. */
+export const MAP_LATER_FULL = 2;
+
+/** The Arabic a caption name carries in brackets after a term, with the space before it
+ *  (scripts/ci/screenshots.mjs lessonMapChecks strips a name with the same pattern;
+ *  lesson-map.test.ts checks they agree). */
+export const MAP_ARABIC_GLOSS = / \([^()]*[\u0600-\u06FF][^()]*\)/g;
+
+/** The Latin name a step is listed by in a flowing line: its caption name without the Arabic in
+ *  brackets ("Mu’rab (مُعْرَب) dan mabni (مَبْنِيّ)" → "Mu’rab dan mabni"). */
+export const mapLatinName = (name: string): string => name.replace(MAP_ARABIC_GLOSS, "");
+
+/** The ayah's entry of a map file with its names, or null: no map for the surah (it is not
+ *  switched on) or for that ayah. */
 export function lessonMapInputOf(file: LessonMapFile | null | undefined, ayah: number): LessonMapInput | null {
   const entry = file?.ayat.find((a) => a.ayah === ayah);
   if (!file || !entry) return null;
-  const item = (id: string): LessonMapItem[] => {
-    const c = file.concepts[id];
-    return c ? [{ id, name: c.name, surah: c.surah, ayah: c.ayah, ...(c.note ? { note: c.note } : {}) }] : [];
+  const step = (id: string): LessonMapItem[] => (file.steps[id] ? [{ id, name: file.steps[id].name }] : []);
+  return {
+    surah: file.surah,
+    new: entry.new.flatMap(step),
+    learnt: entry.learnt.flatMap((x) => step(x.id).map((it) => ({ ...it, here: x.here }))),
+    later: entry.later.flatMap((id) =>
+      step(id).map((it) => {
+        const at = lessonAyah(file.steps[id].lesson);
+        return { ...it, surah: at?.surah ?? null, ayah: at?.ayah ?? null };
+      }),
+    ),
+    lanjut: entry.lanjut.flatMap((id) => (file.lanjut[id] ? [{ id, name: file.lanjut[id].name }] : [])),
   };
-  return { surah: file.surah, new: entry.new.flatMap(item), review: entry.review.flatMap(item), later: entry.later.flatMap(item) };
-}
-
-type MapAyah = Pick<Ayah, "surah" | "ayah" | "words" | "structure">;
-/** The lesson surahs in the lessons' order (mushaf order), each with its ayat. */
-export type MapSurahs = readonly { ayat: readonly MapAyah[] }[];
-type MapConcept = Pick<Concept, "id" | "examples">;
-
-const placeKey = (surah: number, ayah: number) => `${surah}:${ayah}`;
-
-/** "1:2" of a concept's first example: where it is taught; null without one. */
-const taughtAt = (c: MapConcept): string | null => c.examples[0]?.loc.split(":").slice(0, 2).join(":") ?? null;
-
-/** The concept ids an ayah carries, in the order it meets them: its words' tags, then the ones
- *  only a structure group names (today every group's concept is tagged on a word as well). */
-export function presentConcepts(a: Pick<Ayah, "words" | "structure">): string[] {
-  const out: string[] = [];
-  for (const w of a.words) for (const c of w.concepts ?? []) if (!out.includes(c)) out.push(c);
-  for (const g of a.structure?.groups ?? []) if (g.concept && !out.includes(g.concept)) out.push(g.concept);
-  return out;
 }
 
 /**
- * The new / review / later lists of every ayah of surah number `surah`, derived from the content
- * (the rules at the head of this file; the twin of pipeline/lessonmap.py derive). A concept an
- * ayah carries that no lesson introduces is left out of all three: lessonMapProblems reports it.
+ * What a map file says against the curriculum (empty when fine): its ayat are lessons of the
+ * curriculum, each list is the one the curriculum gives for that lesson (so NEW is the lesson's
+ * steps, LEARNT every earlier step with `here` where it occurs, LATER a later step that occurs,
+ * LANJUT the next-level records tagged there — src/lib/curriculum.ts holds the curriculum itself
+ * to the lessons); new, learnt and later are always apart; every listed step and record has its
+ * name, and a step's name and lesson are the curriculum's.
  */
-export function deriveLessonMap(surahs: MapSurahs, concepts: readonly MapConcept[], surah: number): LessonMapAyah[] {
-  const rank = new Map<string, number>();
-  for (const s of surahs) for (const a of s.ayat) rank.set(placeKey(a.surah, a.ayah), rank.size);
-  const index = new Map(concepts.map((c, i) => [c.id, i]));
-  const taught = new Map(concepts.map((c) => [c.id, taughtAt(c)]));
-  const rankOf = (id: string) => rank.get(taught.get(id) ?? "") ?? null;
-  const byTaught = (a: string, b: string) => (rankOf(a) ?? 0) - (rankOf(b) ?? 0) || (index.get(a) ?? 0) - (index.get(b) ?? 0);
-  const out: LessonMapAyah[] = [];
-  for (const s of surahs) {
-    for (const a of s.ayat) {
-      if (a.surah !== surah) continue;
-      const here = rank.get(placeKey(a.surah, a.ayah)) ?? 0;
-      const present = presentConcepts(a).filter((id) => rankOf(id) !== null);
-      out.push({
-        ayah: a.ayah,
-        new: concepts.filter((c) => taughtAt(c) === placeKey(a.surah, a.ayah)).map((c) => c.id),
-        review: present.filter((id) => (rankOf(id) ?? 0) < here).sort(byTaught),
-        later: present.filter((id) => (rankOf(id) ?? 0) > here).sort(byTaught),
-      });
-    }
-  }
-  return out;
-}
-
-/**
- * What a map file says against the lessons and the library (empty when fine): its ayat are the
- * surah's, each list equals the derivation (so NEW is the ayah's concept lines, REVIEW is taught
- * earlier and LATER later, and every concept of the ayah is in exactly one of them), and every
- * listed concept has its record with the ayah that teaches it. A topic is set aside from the
- * derivation: it is no Konsep, is only ever under `later`, and its teaching line is a line of a
- * later ayah of this surah (that the line exists and names it is the pipeline's check).
- */
-export function lessonMapProblems(file: LessonMapFile, surahs: MapSurahs, concepts: readonly MapConcept[]): string[] {
+export function lessonMapProblems(file: LessonMapFile, curriculum: Pick<CurriculumFile, "lessons" | "steps" | "lanjut">): string[] {
   const out: string[] = [];
   const where = `content/map/${file.slug}.json`;
-  const want = deriveLessonMap(surahs, concepts, file.surah);
-  if (!want.length) return [`${where}: no lesson has surah ${file.surah}`];
-  if (JSON.stringify(file.ayat.map((a) => a.ayah)) !== JSON.stringify(want.map((a) => a.ayah))) {
-    return [`${where}: its ayat are not the lesson's ayat, each once, in order`];
-  }
-  const known = new Set(concepts.map((c) => c.id));
-  for (const s of surahs) {
-    for (const a of s.ayat) {
-      if (a.surah !== file.surah) continue;
-      const lost = presentConcepts(a).filter((id) => !known.has(id) || !concepts.some((c) => c.id === id && c.examples.length));
-      if (lost.length) out.push(`${where} ayah ${a.ayah}: ${lost.join(", ")} tagged on a word and never introduced`);
-    }
-  }
-  const taught = new Map(concepts.map((c) => [c.id, taughtAt(c)]));
-  const isTopic = (id: string) => file.concepts[id]?.from === "topic";
+  if (file.version !== 2) return [`${where}: version ${file.version} is not 2 (rebuild with build_map.py)`];
+  const rank = lessonRanks(curriculum);
+  const steps = new Map(curriculum.steps.map((s) => [s.id, s]));
   const listed = new Set<string>();
-  file.ayat.forEach((entry, i) => {
-    for (const g of LESSON_MAP_GROUPS) {
-      for (const id of entry[g]) listed.add(id);
-      const derived = entry[g].filter((id) => !isTopic(id));
-      if (JSON.stringify(derived) !== JSON.stringify(want[i][g])) {
-        out.push(`${where} ayah ${entry.ayah}: ${g} ${JSON.stringify(derived)} is not what the lessons give (${JSON.stringify(want[i][g])})`);
-      }
-      for (const id of entry[g].filter(isTopic)) {
-        const c = file.concepts[id];
-        if (g !== "later") out.push(`${where} ayah ${entry.ayah}: topic ${id} is listed as ${g} (a topic is only ever taught later)`);
-        else if (c.surah !== file.surah || c.ayah <= entry.ayah) out.push(`${where} ayah ${entry.ayah}: topic ${id} is taught in ${c.surah}:${c.ayah}, which is not a later ayah`);
+  const listedLanjut = new Set<string>();
+  if (!file.ayat.length) return [`${where}: no ayah`];
+  for (const entry of file.ayat) {
+    const id = `${file.surah}:${entry.ayah}`;
+    const lesson = curriculum.lessons.find((l) => l.id === id);
+    const here = rank.get(id);
+    if (!lesson?.map || here === undefined) {
+      out.push(`${where} ayah ${entry.ayah}: ${id} is no lesson of the curriculum with derived lists`);
+      continue;
+    }
+    const got = { new: entry.new, learnt: entry.learnt, later: entry.later, lanjut: entry.lanjut };
+    for (const g of ["new", "learnt", "later", "lanjut"] as const) {
+      if (JSON.stringify(got[g]) !== JSON.stringify(lesson.map[g])) {
+        out.push(`${where} ayah ${entry.ayah}: ${g} ${JSON.stringify(got[g])} is not what the curriculum gives (${JSON.stringify(lesson.map[g])})`);
       }
     }
-  });
-  for (const id of listed) {
-    const c = file.concepts[id];
-    if (!c) out.push(`${where}: ${id} is listed and has no record in concepts`);
-    else if (c.from === "topic") {
-      if (known.has(id)) out.push(`${where}: topic ${id} has the id of a Konsep`);
-      if (!c.note || !c.line?.startsWith(`${file.slug}:${c.ayah}:`)) out.push(`${where}: topic ${id} needs its note and a teaching line of ayah ${c.ayah}`);
-    } else if (placeKey(c.surah, c.ayah) !== taught.get(id)) out.push(`${where}: ${id} is taught in ${taught.get(id)}, not ${c.surah}:${c.ayah}`);
+    const every = [...entry.new, ...entry.learnt.map((x) => x.id), ...entry.later];
+    if (new Set(every).size !== every.length) out.push(`${where} ayah ${entry.ayah}: a step is listed twice (new, learnt and later are always apart)`);
+    for (const sid of every) listed.add(sid);
+    for (const cid of entry.lanjut) listedLanjut.add(cid);
+    for (const sid of entry.learnt.map((x) => x.id)) {
+      const at = rank.get(steps.get(sid)?.lesson ?? "");
+      if (at === undefined || at >= here) out.push(`${where} ayah ${entry.ayah}: learnt lists ${sid}, which is not taught earlier`);
+    }
+    for (const sid of entry.later) {
+      const at = rank.get(steps.get(sid)?.lesson ?? "");
+      if (at === undefined || at <= here) out.push(`${where} ayah ${entry.ayah}: later lists ${sid}, which is not taught later`);
+    }
   }
-  for (const id of Object.keys(file.concepts)) if (!listed.has(id)) out.push(`${where}: ${id} has a record and no ayah lists it`);
+  for (const sid of listed) {
+    const s = file.steps[sid];
+    const c = steps.get(sid);
+    if (!s) out.push(`${where}: ${sid} is listed and has no record in steps`);
+    else if (!c) out.push(`${where}: ${sid} is no step of the curriculum`);
+    else if (s.name !== c.name || s.latin !== c.latin || s.lesson !== c.lesson) out.push(`${where}: step ${sid} is not named and placed as the curriculum has it (${c.name}, ${c.lesson})`);
+  }
+  for (const sid of Object.keys(file.steps)) if (!listed.has(sid)) out.push(`${where}: ${sid} has a record and no ayah lists it`);
+  for (const cid of listedLanjut) {
+    if (!file.lanjut[cid]) out.push(`${where}: next-level record ${cid} is listed and has no name`);
+    if (!curriculum.lanjut.includes(cid)) out.push(`${where}: ${cid} is listed as next-level and is not in the curriculum's lanjut`);
+  }
+  for (const cid of Object.keys(file.lanjut)) if (!listedLanjut.has(cid)) out.push(`${where}: next-level record ${cid} has a name and no ayah lists it`);
   return out;
 }

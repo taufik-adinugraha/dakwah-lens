@@ -12,7 +12,7 @@ import {
   stripArabic,
   type StepTexts,
 } from "./lessonSteps";
-import { conceptsIntroducedIn } from "./library";
+import { taughtAt } from "./curriculum";
 
 const T: StepTexts = {
   intro: (n) => `Ayat ${n}`,
@@ -64,7 +64,7 @@ describe("buildLessonSteps", () => {
 
   it("never puts Arabic script in a caption (the narrator must not voice Qur'an)", () => {
     for (const a of surah.ayat) {
-      for (const s of buildLessonSteps(a, conceptsIntroducedIn(a.loc), T)) {
+      for (const s of buildLessonSteps(a, taughtAt(a), T)) {
         expect(s.caption).not.toMatch(/[؀-ۿ]/);
       }
     }
@@ -73,7 +73,7 @@ describe("buildLessonSteps", () => {
   it("leaves Arabic-script sentences out of captions, keeping the rest", () => {
     const why = "Akhirnya fathah karena menjadi objek. Polanya فَاعِل seperti kata lain.";
     const long: Ayah = { ...ayah, words: ayah.words.map((w, i) => (i === 0 ? { ...w, why } : w)) };
-    const [concept] = conceptsIntroducedIn("1:1");
+    const [concept] = taughtAt(surah.ayat[0]);
     const arabic = { ...concept, id: "uji", summary: "Wazan ditulis dengan huruf ف ع ل, dan seterusnya." };
     const mixed = { ...concept, id: "uji-2", summary: "Kalimat pertama biasa. Contohnya رَبِّ di ayat ini." };
     const s = buildLessonSteps(long, [arabic, mixed], T);
@@ -85,7 +85,7 @@ describe("buildLessonSteps", () => {
 
   it("never shows an explanation longer than 180 characters when it can be split", () => {
     for (const a of surah.ayat) {
-      for (const s of buildLessonSteps(a, conceptsIntroducedIn(a.loc), T)) {
+      for (const s of buildLessonSteps(a, taughtAt(a), T)) {
         if (s.kind === "explain") expect(s.caption.length).toBeLessThanOrEqual(MAX_CAPTION);
       }
     }

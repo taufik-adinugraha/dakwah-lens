@@ -1057,19 +1057,24 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
         for (const u of fetched) expect(seen, u).toContain(u);
         expect(r.lines.filter((l) => !l.fromCopy).map((l) => l.url)).toEqual([r.lines[0].url]);
         // At the start: the intro line and the next step's, not the step two steps on — the
-        // lesson map's line (plan L23; the primer's before that step existed). That line has a
-        // file only once it is rendered: until then nothing lies two steps ahead of the start.
+        // lesson map's first line (plan L23, L26; the primer's before those steps existed). That
+        // line has a file only once it is rendered: until then nothing lies two steps ahead of the
+        // start.
         const first = reduceAutoplay(seq, createAutoplayState(seq), { type: "start", reason: "fresh" });
         const u = aheadUpdate(seq, first, { conn, soundLoading: false, heardFor: null });
         expect(u.wanted).toEqual(lookaheadAudio(seq, first, { steps: 1 }));
         expect(u.path).toEqual(lookaheadAudio(seq, first, { steps: LOOKAHEAD_STEPS }));
         const twoOn = seq.steps[2].cues.flatMap((c) => c.audio.map((f) => f.url));
         expect(u.path).toEqual([...u.wanted, ...twoOn]);
-        // … and from the imam's step, whose step two ahead (the primer) is rendered: strictly further.
-        const onRecite = reduceAutoplay(seq, first, { type: "next" });
-        expect(seq.steps[onRecite.idx].id).toBe("recite");
-        const v = aheadUpdate(seq, onRecite, { conn, soundLoading: false, heardFor: null });
-        expect(v.wanted).toEqual(lookaheadAudio(seq, onRecite, { steps: 1 }));
+        // … and from the harakat primer's step, whose step two ahead (the first word's line) is
+        // rendered: strictly further. (Until 2026-10-13 this was asked from the imam's step, two
+        // ahead of which the primer stood; the lesson map's three steps stand there now, and their
+        // lines have a file only once they are rendered.)
+        let onPrimer = first;
+        while (seq.steps[onPrimer.idx].id !== "primer") onPrimer = reduceAutoplay(seq, onPrimer, { type: "next" });
+        expect(seq.steps[onPrimer.idx + 2].id).toBe("w1");
+        const v = aheadUpdate(seq, onPrimer, { conn, soundLoading: false, heardFor: null });
+        expect(v.wanted).toEqual(lookaheadAudio(seq, onPrimer, { steps: 1 }));
         expect(v.path.length).toBeGreaterThan(v.wanted.length);
       }
     } finally {

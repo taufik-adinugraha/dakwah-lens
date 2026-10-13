@@ -1,313 +1,525 @@
 {
- "version": 1,
+ "version": 2,
  "slug": "al-fatihah",
  "surah": 1,
- "concepts": {
-  "kalimah-isim-fiil-huruf": {
-   "name": "Tiga jenis kalimah (كَلِمَة)",
-   "latin": "Tiga jenis kalimah",
-   "from": "title",
-   "surah": 1,
-   "ayah": 1
+ "steps": {
+  "harakat": {
+   "name": "Harakat",
+   "latin": "Harakat",
+   "lesson": "0"
   },
-  "tanda-irab": {
-   "name": "I’rab (إِعْرَاب) dan tandanya",
-   "latin": "I'rab dan tandanya",
-   "from": "title",
-   "surah": 1,
-   "ayah": 1
+  "kalimah": {
+   "name": "Tiga jenis kata",
+   "latin": "Tiga jenis kata",
+   "lesson": "0"
+  },
+  "majrur": {
+   "name": "Majrur (مَجْرُور)",
+   "latin": "Majrur",
+   "lesson": "1:1"
   },
   "huruf-jar": {
    "name": "Huruf jar (حَرْف جَرّ)",
    "latin": "Huruf jar",
-   "from": "title",
-   "surah": 1,
-   "ayah": 1
-  },
-  "idhafah": {
-   "name": "Idhafah (إِضَافَة)",
-   "latin": "Idhafah",
-   "from": "title",
-   "surah": 1,
-   "ayah": 1
-  },
-  "naat": {
-   "name": "Na’t (نَعْت)",
-   "latin": "Na't",
-   "from": "title",
-   "surah": 1,
-   "ayah": 1
+   "lesson": "1:1"
   },
   "jumlah-ismiyyah": {
    "name": "Jumlah ismiyyah (جُمْلَة اِسْمِيَّة)",
    "latin": "Jumlah ismiyyah",
-   "from": "title",
-   "surah": 1,
-   "ayah": 2
-  },
-  "syibhul-jumlah": {
-   "name": "Syibhul jumlah (شِبْه الجُمْلَة)",
-   "latin": "Syibhul jumlah",
-   "from": "title",
-   "surah": 1,
-   "ayah": 2
-  },
-  "jamak-mudzakkar-salim": {
-   "name": "Jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم)",
-   "latin": "Jamak mudzakkar salim",
-   "from": "title",
-   "surah": 1,
-   "ayah": 2
+   "lesson": "1:2"
   },
   "marfu": {
    "name": "Marfu’ (مَرْفُوع)",
    "latin": "Marfu'",
-   "from": "topic",
-   "note": "mengapa bentuk dasar berakhir dhammah (ضَمَّة)",
-   "surah": 1,
-   "ayah": 2,
-   "line": "al-fatihah:2:w1:compose:8"
+   "lesson": "1:2"
   },
-  "wazan-dan-tashrif": {
-   "name": "Wazan (وَزْن) dan tashrif (تَصْرِيف)",
-   "latin": "Wazan dan tashrif",
-   "from": "title",
-   "surah": 1,
-   "ayah": 3
+  "jamak-mudzakkar-salim": {
+   "name": "Jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم)",
+   "latin": "Jamak mudzakkar salim",
+   "lesson": "1:2"
   },
-  "isim-fail": {
-   "name": "Isim fa’il (اِسْم فَاعِل)",
-   "latin": "Isim fa'il",
-   "from": "title",
-   "surah": 1,
-   "ayah": 4
+  "alif-lam": {
+   "name": "Alif lam (ال)",
+   "latin": "Alif lam",
+   "lesson": "1:3"
   },
-  "murab-mabni": {
-   "name": "Mu’rab (مُعْرَب) dan mabni (مَبْنِيّ)",
-   "latin": "Mu'rab dan mabni",
-   "from": "title",
-   "surah": 1,
-   "ayah": 5
+  "naat": {
+   "name": "Na’t (نَعْت)",
+   "latin": "Na't",
+   "lesson": "1:3"
+  },
+  "idhafah": {
+   "name": "Idhafah (إِضَافَة)",
+   "latin": "Idhafah",
+   "lesson": "1:4"
   },
   "dhamir": {
    "name": "Dhamir (ضَمِير)",
    "latin": "Dhamir",
-   "from": "title",
-   "surah": 1,
-   "ayah": 5
-  },
-  "taqdim-maful": {
-   "name": "Taqdim maf’ul (تَقْدِيم المَفْعُول)",
-   "latin": "Taqdim maf'ul",
-   "from": "title",
-   "surah": 1,
-   "ayah": 5
+   "lesson": "1:5"
   },
   "fiil-mudhari": {
    "name": "Fi’il mudhari’ (فِعْل مُضَارِع)",
    "latin": "Fi'il mudhari'",
-   "from": "title",
-   "surah": 1,
-   "ayah": 5
+   "lesson": "1:5"
+  },
+  "murab-mabni": {
+   "name": "Mu’rab (مُعْرَب) dan mabni (مَبْنِيّ)",
+   "latin": "Mu'rab dan mabni",
+   "lesson": "1:5"
   },
   "jumlah-filiyyah": {
    "name": "Jumlah fi’liyyah (جُمْلَة فِعْلِيَّة)",
    "latin": "Jumlah fi'liyyah",
-   "from": "title",
-   "surah": 1,
-   "ayah": 5
-  },
-  "athaf": {
-   "name": "‘Athaf (عَطْف)",
-   "latin": "'Athaf",
-   "from": "title",
-   "surah": 1,
-   "ayah": 5
-  },
-  "bab-istifal": {
-   "name": "Bab istif‘āl (اِسْتِفْعَال)",
-   "latin": "Bab istif'al",
-   "from": "title",
-   "surah": 1,
-   "ayah": 5
-  },
-  "ilal": {
-   "name": "I’lal (إِعْلَال)",
-   "latin": "I'lal",
-   "from": "title",
-   "surah": 1,
-   "ayah": 5
-  },
-  "fiil-amr": {
-   "name": "Fi’il amr (فِعْل أَمْر)",
-   "latin": "Fi'il amr",
-   "from": "title",
-   "surah": 1,
-   "ayah": 6
+   "lesson": "1:6"
   },
   "maful-bih": {
    "name": "Maf’ul bih (مَفْعُول بِه)",
    "latin": "Maf'ul bih",
-   "from": "title",
-   "surah": 1,
-   "ayah": 6
+   "lesson": "1:6"
   },
-  "badal": {
-   "name": "Badal (بَدَل)",
-   "latin": "Badal",
-   "from": "title",
-   "surah": 1,
-   "ayah": 7
+  "manshub": {
+   "name": "Manshub (مَنْصُوب)",
+   "latin": "Manshub",
+   "lesson": "1:6"
   },
   "isim-maushul": {
    "name": "Isim maushul (اِسْم مَوْصُول)",
    "latin": "Isim maushul",
-   "from": "title",
-   "surah": 1,
-   "ayah": 7
+   "lesson": "1:7"
   },
   "fiil-madhi": {
    "name": "Fi’il madhi (فِعْل مَاضٍ)",
    "latin": "Fi'il madhi",
-   "from": "title",
-   "surah": 1,
-   "ayah": 7
+   "lesson": "1:7"
+  },
+  "athaf": {
+   "name": "‘Athaf (عَطْف)",
+   "latin": "'Athaf",
+   "lesson": "1:7"
+  },
+  "fiil-amr": {
+   "name": "Fi’il amr (فِعْل أَمْر)",
+   "latin": "Fi'il amr",
+   "lesson": "114:1"
+  },
+  "badal": {
+   "name": "Badal (بَدَل)",
+   "latin": "Badal",
+   "lesson": "114:2"
+  }
+ },
+ "lanjut": {
+  "syibhul-jumlah": {
+   "name": "Syibhul jumlah (شِبْه الجُمْلَة)",
+   "latin": "Syibhul jumlah",
+   "from": "title"
+  },
+  "wazan-dan-tashrif": {
+   "name": "Wazan (وَزْن) dan tashrif (تَصْرِيف)",
+   "latin": "Wazan dan tashrif",
+   "from": "title"
+  },
+  "isim-fail": {
+   "name": "Isim fa’il (اِسْم فَاعِل)",
+   "latin": "Isim fa'il",
+   "from": "title"
+  },
+  "taqdim-maful": {
+   "name": "Taqdim maf’ul (تَقْدِيم المَفْعُول)",
+   "latin": "Taqdim maf'ul",
+   "from": "title"
+  },
+  "bab-istifal": {
+   "name": "Bab istif‘āl (اِسْتِفْعَال)",
+   "latin": "Bab istif'al",
+   "from": "title"
+  },
+  "ilal": {
+   "name": "I’lal (إِعْلَال)",
+   "latin": "I'lal",
+   "from": "title"
   },
   "bab-ifal": {
    "name": "Bab if‘āl (إِفْعَال)",
    "latin": "Bab if'al",
-   "from": "title",
-   "surah": 1,
-   "ayah": 7
+   "from": "title"
   },
   "isim-maful": {
    "name": "Isim maf’ul (اِسْم مَفْعُول)",
    "latin": "Isim maf'ul",
-   "from": "title",
-   "surah": 1,
-   "ayah": 7
+   "from": "title"
   },
   "naib-fail": {
    "name": "Na’ib fa’il (نَائِب فَاعِل)",
    "latin": "Na'ib fa'il",
-   "from": "title",
-   "surah": 1,
-   "ayah": 7
+   "from": "title"
   }
  },
  "ayat": [
   {
    "ayah": 1,
    "new": [
-    "kalimah-isim-fiil-huruf",
-    "tanda-irab",
-    "huruf-jar",
-    "idhafah",
-    "naat"
+    "majrur",
+    "huruf-jar"
    ],
-   "review": [],
+   "learnt": [
+    {
+     "id": "harakat",
+     "here": false
+    },
+    {
+     "id": "kalimah",
+     "here": true
+    }
+   ],
    "later": [
-    "syibhul-jumlah",
-    "marfu"
+    "alif-lam",
+    "naat",
+    "idhafah"
+   ],
+   "lanjut": [
+    "syibhul-jumlah"
    ]
   },
   {
    "ayah": 2,
    "new": [
     "jumlah-ismiyyah",
-    "syibhul-jumlah",
+    "marfu",
     "jamak-mudzakkar-salim"
    ],
-   "review": [
-    "tanda-irab",
-    "huruf-jar",
-    "idhafah",
-    "naat"
+   "learnt": [
+    {
+     "id": "harakat",
+     "here": false
+    },
+    {
+     "id": "kalimah",
+     "here": true
+    },
+    {
+     "id": "majrur",
+     "here": true
+    },
+    {
+     "id": "huruf-jar",
+     "here": true
+    }
    ],
    "later": [
-    "wazan-dan-tashrif",
+    "alif-lam",
+    "naat",
+    "idhafah",
     "badal"
+   ],
+   "lanjut": [
+    "syibhul-jumlah",
+    "wazan-dan-tashrif"
    ]
   },
   {
    "ayah": 3,
    "new": [
-    "wazan-dan-tashrif"
-   ],
-   "review": [
+    "alif-lam",
     "naat"
    ],
-   "later": []
+   "learnt": [
+    {
+     "id": "harakat",
+     "here": false
+    },
+    {
+     "id": "kalimah",
+     "here": true
+    },
+    {
+     "id": "majrur",
+     "here": true
+    },
+    {
+     "id": "huruf-jar",
+     "here": false
+    },
+    {
+     "id": "jumlah-ismiyyah",
+     "here": false
+    },
+    {
+     "id": "marfu",
+     "here": false
+    },
+    {
+     "id": "jamak-mudzakkar-salim",
+     "here": false
+    }
+   ],
+   "later": [],
+   "lanjut": [
+    "wazan-dan-tashrif"
+   ]
   },
   {
    "ayah": 4,
    "new": [
+    "idhafah"
+   ],
+   "learnt": [
+    {
+     "id": "harakat",
+     "here": false
+    },
+    {
+     "id": "kalimah",
+     "here": true
+    },
+    {
+     "id": "majrur",
+     "here": true
+    },
+    {
+     "id": "huruf-jar",
+     "here": false
+    },
+    {
+     "id": "jumlah-ismiyyah",
+     "here": false
+    },
+    {
+     "id": "marfu",
+     "here": false
+    },
+    {
+     "id": "jamak-mudzakkar-salim",
+     "here": false
+    },
+    {
+     "id": "alif-lam",
+     "here": true
+    },
+    {
+     "id": "naat",
+     "here": true
+    }
+   ],
+   "later": [],
+   "lanjut": [
+    "wazan-dan-tashrif",
     "isim-fail"
-   ],
-   "review": [
-    "idhafah",
-    "naat",
-    "wazan-dan-tashrif"
-   ],
-   "later": []
+   ]
   },
   {
    "ayah": 5,
    "new": [
-    "murab-mabni",
     "dhamir",
-    "taqdim-maful",
     "fiil-mudhari",
-    "jumlah-filiyyah",
-    "athaf",
-    "bab-istifal",
-    "ilal"
+    "murab-mabni"
    ],
-   "review": [
-    "kalimah-isim-fiil-huruf"
+   "learnt": [
+    {
+     "id": "harakat",
+     "here": false
+    },
+    {
+     "id": "kalimah",
+     "here": true
+    },
+    {
+     "id": "majrur",
+     "here": false
+    },
+    {
+     "id": "huruf-jar",
+     "here": false
+    },
+    {
+     "id": "jumlah-ismiyyah",
+     "here": false
+    },
+    {
+     "id": "marfu",
+     "here": true
+    },
+    {
+     "id": "jamak-mudzakkar-salim",
+     "here": false
+    },
+    {
+     "id": "alif-lam",
+     "here": false
+    },
+    {
+     "id": "naat",
+     "here": false
+    },
+    {
+     "id": "idhafah",
+     "here": false
+    }
    ],
    "later": [
-    "maful-bih"
+    "jumlah-filiyyah",
+    "maful-bih",
+    "athaf"
+   ],
+   "lanjut": [
+    "taqdim-maful",
+    "bab-istifal",
+    "ilal"
    ]
   },
   {
    "ayah": 6,
    "new": [
-    "fiil-amr",
-    "maful-bih"
+    "jumlah-filiyyah",
+    "maful-bih",
+    "manshub"
    ],
-   "review": [
-    "tanda-irab",
-    "naat",
+   "learnt": [
+    {
+     "id": "harakat",
+     "here": false
+    },
+    {
+     "id": "kalimah",
+     "here": true
+    },
+    {
+     "id": "majrur",
+     "here": false
+    },
+    {
+     "id": "huruf-jar",
+     "here": false
+    },
+    {
+     "id": "jumlah-ismiyyah",
+     "here": false
+    },
+    {
+     "id": "marfu",
+     "here": false
+    },
+    {
+     "id": "jamak-mudzakkar-salim",
+     "here": false
+    },
+    {
+     "id": "alif-lam",
+     "here": true
+    },
+    {
+     "id": "naat",
+     "here": true
+    },
+    {
+     "id": "idhafah",
+     "here": false
+    },
+    {
+     "id": "dhamir",
+     "here": true
+    },
+    {
+     "id": "fiil-mudhari",
+     "here": false
+    },
+    {
+     "id": "murab-mabni",
+     "here": false
+    }
+   ],
+   "later": [
+    "fiil-amr"
+   ],
+   "lanjut": [
     "isim-fail",
-    "dhamir",
     "bab-istifal",
     "ilal"
-   ],
-   "later": []
+   ]
   },
   {
    "ayah": 7,
    "new": [
-    "badal",
     "isim-maushul",
     "fiil-madhi",
+    "athaf"
+   ],
+   "learnt": [
+    {
+     "id": "harakat",
+     "here": false
+    },
+    {
+     "id": "kalimah",
+     "here": true
+    },
+    {
+     "id": "majrur",
+     "here": true
+    },
+    {
+     "id": "huruf-jar",
+     "here": true
+    },
+    {
+     "id": "jumlah-ismiyyah",
+     "here": false
+    },
+    {
+     "id": "marfu",
+     "here": false
+    },
+    {
+     "id": "jamak-mudzakkar-salim",
+     "here": true
+    },
+    {
+     "id": "alif-lam",
+     "here": true
+    },
+    {
+     "id": "naat",
+     "here": false
+    },
+    {
+     "id": "idhafah",
+     "here": true
+    },
+    {
+     "id": "dhamir",
+     "here": true
+    },
+    {
+     "id": "fiil-mudhari",
+     "here": false
+    },
+    {
+     "id": "murab-mabni",
+     "here": true
+    },
+    {
+     "id": "jumlah-filiyyah",
+     "here": true
+    },
+    {
+     "id": "maful-bih",
+     "here": false
+    },
+    {
+     "id": "manshub",
+     "here": true
+    }
+   ],
+   "later": [
+    "badal"
+   ],
+   "lanjut": [
+    "isim-fail",
     "bab-ifal",
     "isim-maful",
     "naib-fail"
-   ],
-   "review": [
-    "kalimah-isim-fiil-huruf",
-    "huruf-jar",
-    "idhafah",
-    "jamak-mudzakkar-salim",
-    "isim-fail",
-    "murab-mabni",
-    "dhamir",
-    "jumlah-filiyyah",
-    "athaf"
-   ],
-   "later": []
+   ]
   }
  ]
 }
