@@ -102,9 +102,15 @@ export const Word = z.object({
 });
 export type Word = z.infer<typeof Word>;
 
+/**
+ * An ayah's recording and its word timings. ONE imam everywhere, and no reciter setting (operator
+ * 2026-10-13, plan L21: "better to use alafasy for all? no need to give option to user to
+ * change"): the reciter is Mishary Rashid Alafasy and no other, and an ayah has exactly one
+ * recitation (Ayah.recitation below). pipeline/validate.py refuses a second one too.
+ */
 export const Recitation = z.object({
-  /** Reciter id, e.g. "Husary_Muallim_128kbps". */
-  reciter: z.string(),
+  /** The imam's id on EveryAyah: the only value there is. */
+  reciter: z.enum(["Alafasy_128kbps"]),
   /** Streamed, never re-hosted (plan §6.2). */
   url: z.string().url(),
   /** quran-align segments: [wordIndex (1-based), startMs, endMs]. */
@@ -129,7 +135,8 @@ export const Ayah = z.object({
     source_label: z.string().min(3),
     version: z.string().optional(),
   }),
-  recitation: z.array(Recitation).min(1),
+  /** Exactly one: the one imam's (see Recitation). A list, as the content has always had it. */
+  recitation: z.array(Recitation).length(1),
   /** Sentence structure (nahwu) of the ayah, taught as a whole. */
   structure: z
     .object({

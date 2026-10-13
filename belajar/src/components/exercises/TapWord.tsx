@@ -68,7 +68,7 @@ export function TapWord(props: Props) {
    *  from "Dengarkan kata" to the words only then, so a voiced prompt never
    *  starts over the imam. */
   const [heard, setHeard] = useState<number | null>(null);
-  const p = useSegmentPlayer([props.source], {
+  const p = useSegmentPlayer(props.source, {
     rate: imamRate,
     onFinish: () => setHeard(askedRef.current),
   });

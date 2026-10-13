@@ -90,7 +90,7 @@ export function MushafLine({
           </span>
         ) : null;
         if (!canPlay(w.index)) {
-          // No timing for this word in the chosen recording: plain text.
+          // No timing for this word in the recording: plain text.
           return withMarker(
             i,
             <span

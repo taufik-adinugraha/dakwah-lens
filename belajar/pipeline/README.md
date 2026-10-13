@@ -40,7 +40,7 @@ python3 build_library.py           # write ../content/library.json (Kosakata, Ak
 python3 build_surah.py al-fatihah  # write ../content/al-fatihah.json; prints data warnings
 python3 build_surah.py al-ikhlas   # … and the same for al-falaq, an-nas
 python3 validate.py                # re-check every lesson, the library and the links between them; exit 1 on any failure
-python3 test_validate.py           # mutation tests: plants 66 faults in copies of the outputs, each must fail validate
+python3 test_validate.py           # mutation tests: plants 74 faults in copies of the outputs and of the source registry (a second reciter in content or pinned in sources.json among them), each must fail validate
 python3 build_ayat.py              # ../content/ayat/locations.json: every ayah a fact card locates, for its popup (see "Ayat popup"); after the lessons, whose facts it reads
 python3 validate_ayat.py           # the popup data against Tanzil, QuranEnc, the lessons and the pins (CI: --no-corpus); exit 1 on any failure
 python3 test_validate_ayat.py      # plants 28 faults (a missing or extra entry, another ayah's bytes, a stale pin, a name the cards spell otherwise, …) (CI: --no-corpus)
@@ -50,7 +50,7 @@ python3 test_validate_compose.py   # plants 65 faults in copies of the compositi
 python3 validate_terms.py          # Konsep terms in Arabic script + inline markup (CI: --no-corpus); see "Konsep"
 python3 test_validate_terms.py     # plants 54 faults (retyped term, unmarked term, wrong word bytes, a ref whose Latin names other bytes, ketuk, a gloss variant whose ref does not resolve, Arabic typed by hand, a marked lesson or Kosakata twin that drifted, …)
 python3 validate_clips.py          # the imam's voice of every Konsep example: library.json `clips` (CI: --no-corpus); see "Suara contoh"
-python3 test_validate_clips.py     # plants 57 faults (an example with no voice, an unwanted clip, another ayah's or reciter's file, a word's timing off by one in a lesson or outside the lessons, an implausible length, a Harakat sign that is not heard where its example is, an ayah's last word without `last`, a hamzat-washal tile played alone, a fixture that drifted, a stale pin, …) (CI: --no-corpus)
+python3 test_validate_clips.py     # plants 58 faults (an example with no voice, an unwanted clip, another ayah's or reciter's file, a word's timing off by one in a lesson or outside the lessons, an implausible length, a Harakat sign that is not heard where its example is, an ayah's last word without `last`, a hamzat-washal tile played alone, a fixture that drifted, a stale pin, …) (CI: --no-corpus)
 python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Kuis"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
@@ -139,11 +139,11 @@ a machine whose cache predates them). `cache/` is git-ignored.
 | `tanzil_uthmani` | Tanzil Quran Text (Uthmani), txt with ayah numbers and the licence footer, kept verbatim | 1.1; URL `https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&agree=true` |
 | `tanzil_metadata` | Tanzil `quran-data.xml` (surah Arabic name; ayah counts cross-check) | 1.0 |
 | `qac_morphology` | Quranic Arabic Corpus morphology, GitHub mirror of the unmodified file (official download needs an email) | 0.4 (header checked) |
-| `quran_align` | cpfair/quran-align release zip; `Husary_Muallim_128kbps.json` and `Alafasy_128kbps.json` checked against the SHA-1s in the release README | release-2016-11-24 |
+| `quran_align` | cpfair/quran-align release zip; `Alafasy_128kbps.json` (the one imam, plan L21) checked against the SHA-1 in the release README | release-2016-11-24 |
 | `quranenc_indonesian_affairs` | QuranEnc API: sura 1 (top-level fields, unchanged) and suras 112, 113, 114 (`suras` map, one pinned file each, same endpoint), plus the translations list for the version and title | 1.0.1 as reported by `translations/list` |
 | `quranenc_indonesian_affairs_quran` | The same translation for every sura 1..114 (the fact cards' ayah popup: the facts locate ayat in 103 suras), one pinned file per sura in `cache/quranenc/`; a file another input pins too must carry the same pin | 1.0.1 (sura 1's translations list) |
 | `quranenc_sura_names` | QuranEnc's Indonesian sura list (`/id/browse/indonesian_affairs`), cached and pinned as the extracted `number\|ayat\|arabic\|name` text (the HTML carries tokens); ayah counts checked against Tanzil | `text_sha256` |
-| `everyayah_*` | The 44 streamed MP3s (2 reciters × 22 ayat), downloaded only to measure their length (never committed or served); url pattern `{SSS}{AAA}.mp3` | per-file sha256 + duration |
+| `everyayah_alafasy` | The 22 streamed MP3s (the imam's file of each of the 22 lesson ayat), downloaded only to measure their length (never committed or served); url pattern `{SSS}{AAA}.mp3` | per-file sha256 + duration |
 
 **Tanzil download options.** On tanzil.net/download the four checkboxes (pause marks, sajdah
 signs, rub-el-hizb signs, tatweel before superscript alef) are left unticked, so every
@@ -305,9 +305,23 @@ Translation - Ministry of Religious Affairs"); it is **not** labelled "Kemenag 2
 
 ## Recitation
 
-Two entries per ayah, streamed from EveryAyah (`Husary_Muallim_128kbps`, `Alafasy_128kbps`;
-Alafasy is the default voice, plan L7). `validate.py` also re-derives every segment list from the
-pinned quran-align file and fails on any difference.
+**One entry per ayah: one imam everywhere, and no reciter setting** (operator 2026-10-13, plan
+L21: "better to use alafasy for all? no need to give option to user to change"). The entry is
+Mishary Rashid Alafasy's file of the ayah, streamed from EveryAyah (`Alafasy_128kbps`;
+`build_surah.RECITER`), in a `recitation` list of exactly one (`schema.ts`: `.length(1)`, and the
+reciter's id is the only value its enum has). `validate.py` (check 3) refuses a second reciter in
+an ayah, another reciter in the imam's place, another reciter's file or credit line in the imam's
+entry, and another reciter's quran-align member or EveryAyah probes pinned in `sources.json`;
+`test_validate.py` plants each. It also re-derives every segment list from the pinned quran-align
+file and fails on any difference.
+
+Until that day every ayah carried two entries (Husary Mu'allim first, Alafasy second, the default
+since plan L7) and "Pengaturan" offered the choice. Husary's entries, his quran-align member and
+his 22 EveryAyah probes were removed from the content and from `sources.json`
+(`data_versions.quran_align` of each lesson no longer names his member); nothing reads the files
+of his that an older `pipeline/cache` still holds, and `fetch.py` no longer downloads them. The
+example clips (`clips.py`) and the ayah popup were Alafasy's already.
+
 quran-align segments `[wordStart0, wordEndExclusive0, startMs, endMs]` become
 `[wordIndex1, startMs, endMs]`; a segment spanning more than one word stops the build. Checked:
 integers, sorted, non-overlapping, endMs > startMs, word indices cover 1..N exactly once, and the
@@ -377,7 +391,7 @@ QuranEnc footnotes); the app serves it one ayah at a time from `GET /belajar/api
   edit shows — and the names); Tanzil's bytes, QuranEnc's text and a fresh build run locally.
 
 The recitation is not in the file: the dialog streams Mishary Alafasy's file of the ayah from
-EveryAyah (`Alafasy_128kbps/SSSAAA.mp3`, the lessons' default reciter and URL scheme), only once the
+EveryAyah (`Alafasy_128kbps/SSSAAA.mp3`, the lessons' one imam and URL scheme), only once the
 learner presses play, never stored on our server.
 
 ## Shared library: Kosakata (lexicon) and Akar (roots)
@@ -1385,14 +1399,12 @@ fixed the plan; `quiz.py`'s docstring has the rules.
   Shown verbatim; a correction overlay (plan §5.1) would be the place to fix them.
 - QAC root counts mix meanings: ر ح م includes arḥām (wombs), ع و ن includes ‘awān (2:68). The
   root-family cards say so instead of implying one meaning.
-- quran-align Husary Mu'allim 1:7 has a 4.1 s gap before word 5 (gairi, 0.3 s long) and non-zero
-  matcher stats; 1:1 has one deletion. Check by ear before shipping.
-- quran-align covers every word of 112–114 for both reciters, one word per segment, no gap over
-  1.5 s and no word under 0.2 s. Husary Mu'allim has non-zero matcher stats on 112:2 (1 deletion),
-  113:2 (1 deletion) and 114:6 (3 insertions); check by ear. Alafasy holds the last word of every
-  An-Nas ayah for 3.8–4.5 s (madd at the pause plus the breath) — expected, but it inflates a
-  word-length "madd" display. The Husary 113:5 file has 347 bytes outside MPEG frames (the
-  duration probe skips them).
+- quran-align covers every word of 112–114 for Alafasy, one word per segment, no gap over
+  1.5 s and no word under 0.2 s. He holds the last word of every An-Nas ayah for 3.8–4.5 s (madd
+  at the pause plus the breath) — expected, but it inflates a word-length "madd" display. (The
+  issues once listed here for Husary Mu'allim — a 4.1 s gap in 1:7, non-zero matcher statistics
+  on 1:1, 1:7, 112:2, 113:2 and 114:6, 347 stray bytes in his 113:5 file — left with his
+  recordings, plan L21.)
 - QAC 0.4 spells the lemma of a‘ūżu (113:1:2, 114:1:2) `Eu*o` (عُذْ, an imperative form) and gives
   ṣamad, nās and naffāṡāt their assimilation shaddah (`S~amad`, `n~aAs`, `n~af~a`va`t`); shown
   verbatim, like the Al-Fatihah lemma oddities above.

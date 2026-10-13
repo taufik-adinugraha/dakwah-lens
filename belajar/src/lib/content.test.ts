@@ -1,4 +1,9 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
 import { describe, expect, it } from "vitest";
+
+import { SurahContent } from "@/content/schema";
 
 import { getAyah, getSurah, hasDrafts, SURAHS } from "./content";
 
@@ -59,8 +64,9 @@ describe.each(EXPECTED)("$name content (build-time invariants)", ({ slug, surah,
     }
   });
 
-  it("times every word once, in order, for every reciter", () => {
+  it("times every word once, in order, in the ayah's recitation", () => {
     for (const a of s.ayat) {
+      expect(a.recitation, a.loc).toHaveLength(1);
       for (const r of a.recitation) {
         expect(r.segments.map(([w]) => w)).toEqual(a.words.map((_, i) => i + 1));
         for (const [, start, end] of r.segments) expect(end).toBeGreaterThan(start);
@@ -71,15 +77,16 @@ describe.each(EXPECTED)("$name content (build-time invariants)", ({ slug, surah,
     }
   });
 
-  it("streams this surah's recitation and offers the default reciter (Alafasy)", () => {
+  // One imam everywhere, and no reciter setting (operator 2026-10-13, plan L21: "better to use
+  // alafasy for all? no need to give option to user to change"). Until then this asked only that
+  // Alafasy be AMONG an ayah's reciters (toContain): Husary Mu'allim was the other.
+  it("streams this surah's recitation from ONE imam: every ayah has exactly one recitation, Mishary Alafasy's", () => {
     const nnn = String(surah).padStart(3, "0");
     for (const a of s.ayat) {
-      expect(a.recitation.map((r) => r.reciter)).toContain("Alafasy_128kbps");
-      for (const r of a.recitation) {
-        expect(r.url).toBe(
-          `https://everyayah.com/data/${r.reciter}/${nnn}${String(a.ayah).padStart(3, "0")}.mp3`,
-        );
-      }
+      expect(a.recitation.map((r) => r.reciter), a.loc).toEqual(["Alafasy_128kbps"]);
+      const [r] = a.recitation;
+      expect(r.url).toBe(`https://everyayah.com/data/Alafasy_128kbps/${nnn}${String(a.ayah).padStart(3, "0")}.mp3`);
+      expect(r.credit).toBe("Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)");
     }
   });
 
@@ -111,5 +118,43 @@ describe.each(EXPECTED)("$name content (build-time invariants)", ({ slug, surah,
     for (const h of s.hadith) expect(h.status).toBe("draft");
     expect(getAyah(s, words.length)?.loc).toBe(`${surah}:${words.length}`);
     expect(getAyah(s, words.length + 1)).toBeUndefined();
+  });
+});
+
+// ONE imam everywhere, and no reciter setting (operator 2026-10-13, plan L21: "better to use
+// alafasy for all? no need to give option to user to change"). The lessons carry one recitation
+// per ayah, and the schema every page is built through (content.ts load()) refuses anything else:
+// the faults are planted in a copy of the real file, which itself must pass.
+describe("one imam: a second reciter in content is refused (planted faults)", () => {
+  type RawAyah = { recitation: { reciter: string; url: string; segments: number[][]; credit: string }[] };
+  const file = fileURLToPath(new URL("../../content/al-fatihah.json", import.meta.url));
+  const fresh = () => JSON.parse(readFileSync(file, "utf8")) as { ayat: RawAyah[] };
+  /** The entry the lessons carried beside the imam's until 2026-10-13, for `ayah`. */
+  const husary = (ayah: RawAyah) => ({
+    ...ayah.recitation[0],
+    reciter: "Husary_Muallim_128kbps",
+    url: ayah.recitation[0].url.replace("Alafasy_128kbps", "Husary_Muallim_128kbps"),
+    credit: "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)",
+  });
+  /** The paths the schema objects to ("ayat.0.recitation"), empty when it accepts the file. */
+  const refusedAt = (raw: unknown) => {
+    const r = SurahContent.safeParse(raw);
+    return r.success ? [] : r.error.issues.map((i) => i.path.join("."));
+  };
+
+  it("the file as built passes", () => {
+    expect(refusedAt(fresh())).toEqual([]);
+  });
+
+  it.each([
+    ["a second reciter after the imam", (a: RawAyah) => a.recitation.push(husary(a)), "ayat.0.recitation"],
+    ["a second reciter before the imam", (a: RawAyah) => a.recitation.unshift(husary(a)), "ayat.0.recitation"],
+    ["the imam's own entry twice", (a: RawAyah) => a.recitation.push({ ...a.recitation[0] }), "ayat.0.recitation"],
+    ["another reciter in the imam's place", (a: RawAyah) => a.recitation.splice(0, 1, husary(a)), "ayat.0.recitation.0.reciter"],
+    ["no recitation at all", (a: RawAyah) => a.recitation.splice(0), "ayat.0.recitation"],
+  ])("%s", (_name, plant, where) => {
+    const raw = fresh();
+    plant(raw.ayat[0]);
+    expect(refusedAt(raw)).toContain(where);
   });
 });

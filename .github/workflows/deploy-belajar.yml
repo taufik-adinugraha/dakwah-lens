@@ -278,9 +278,24 @@ jobs:
           grep -q 'href="/belajar/id/quran/al-fatihah"' <<<"$track"
           # Ayah chips on the track page: hub → track → ayah N is two taps.
           grep -q 'href="/belajar/id/quran/al-fatihah/7"' <<<"$track"
-          # The lesson page carries the streamed recitation + the AI-assisted footer.
+          # The lesson page carries the streamed recitation + the AI-assisted footer. ONE imam
+          # everywhere and no reciter setting (operator, 2026-10-13: "better to use alafasy for
+          # all? no need to give option to user to change"; plan L21): the page carries Mishary
+          # Alafasy's recording of its ayah (the address the stage plays; until then this grepped
+          # his name, which stood in a reciter dropdown) and nothing of the second reciter the
+          # lessons carried, not even in the next-intl messages payload: no dropdown, no reciter
+          # attribute. The Kredit page credits him and no other. Every published ayah page gets
+          # the same check in surahs-smoke.mjs (oneImam); the open "Pengaturan" panel as a browser
+          # draws it in screenshots.mjs (assertNoReciterChoice).
           page="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/1)"
-          grep -q "Alafasy" <<<"$page"
+          grep -qF "https://everyayah.com/data/Alafasy_128kbps/001001.mp3" <<<"$page" || { echo "✗ ayah 1 page does not carry the imam's recording of its ayah"; exit 1; }
+          for path in /belajar/id/quran/al-fatihah/1 /belajar/en/quran/al-fatihah/1 /belajar/id/kredit /belajar/en/kredit; do
+            html="$(curl -fsS "http://127.0.0.1:3300${path}")"
+            if grep -qiE "husary|mu.?allim|<select|data-reciter" <<<"$html"; then echo "✗ ${path}: offers or names a second reciter (one imam, plan L21)"; exit 1; fi
+          done
+          # The credit line as the lessons' content carries it (the page lists those lines);
+          # $html is the last page of the loop, the English Kredit page.
+          grep -qF "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)" <<<"$html" || { echo "✗ the Kredit page does not list the imam's credit line"; exit 1; }
           grep -q "Dibantu AI" <<<"$page"
           # No human review step exists (operator, 2026-10-09): nothing on the
           # page, including the next-intl messages payload, may promise one.

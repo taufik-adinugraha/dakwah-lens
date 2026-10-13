@@ -394,9 +394,10 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     }, /is not \[start, end\) of an EveryAyah file/],
     ["a beat with a word and a clip", 1, (l) => void (beat(l, "concept:naat:1").clip = LIBRARY.clips["1:1:3"]), /exactly one of a word of this ayah and a clip/],
     ["a beat with neither", 1, (l) => void (beat(l, "concept:naat:1").word = null), /exactly one of a word of this ayah and a clip/],
-    ["this ayah's word without a timing in one recitation", 1, (l) => {
-      l.ctx = { ...l.ctx, ayah: { ...l.ayah, recitation: l.ayah.recitation.map((r, i) => (i === 0 ? { ...r, segments: r.segments.filter(([w]) => w !== 2) } : r)) } };
-    }, /has no timing for word 2/],
+    // The ayah's recitation: one, the imam's (plan L21; until 2026-10-13 the first of two).
+    ["this ayah's word without a timing in the ayah's recitation", 1, (l) => {
+      l.ctx = { ...l.ctx, ayah: { ...l.ayah, recitation: l.ayah.recitation.map((r) => ({ ...r, segments: r.segments.filter(([w]) => w !== 2) })) } };
+    }, /Alafasy_128kbps has no timing for word 2/],
     ["Arabic that is not the content's bytes", 1, (l) => void (example(l, "concept:naat:1").ar = l.ayah.words[0].ar), /is not the content's bytes/],
     ["Arabic script in a caption", 1, (l) => void setCaption(beat(l, "concept:naat:1"), `Contoh: ${l.ayah.words[2].ar}, ar-raḥmāni.`), /carries Arabic script/],
     ["a caption that does not name its example", 1, (l) => void setCaption(beat(l, "concept:naat:1"), "Contoh: kata ke-3."), /does not name the example/],

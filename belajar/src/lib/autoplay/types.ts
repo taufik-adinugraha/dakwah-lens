@@ -244,8 +244,8 @@ export type Cue = {
 
 // ───────────────────────────── Example beats ─────────────────────────────
 
-/** The imam's voice of an example in another ayah: that ayah's streamed recording by the default
- *  reciter and [start, end) of the word (or run) in it, in ms, from the pinned quran-align
+/** The imam's voice of an example in another ayah: that ayah's streamed recording (the one
+ *  imam's, plan L21) and [start, end) of the word (or run) in it, in ms, from the pinned quran-align
  *  timings (content/library.json `clips`, content/compose `examples`; pipeline/clips.py). `last`:
  *  the word ends its ayah, where the imam stops. Nothing is cut or stored: the player seeks and
  *  stops (src/hooks/useExamplePlayer.ts). */

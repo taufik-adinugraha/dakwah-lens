@@ -5,8 +5,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { type AudioLoading, mediaLoading, type MediaEventType } from "@/lib/autoplay/loading";
 
 export type Segment = [word: number, startMs: number, endMs: number];
+/** An ayah's recording and its word timings: the one imam's (Mishary Alafasy; operator 2026-10-13,
+ *  plan L21: "better to use alafasy for all? no need to give option to user to change"), so a
+ *  player has one source and nothing to choose. */
 export type RecitationSource = {
-  reciter: string;
   url: string;
   segments: Segment[];
 };
@@ -74,7 +76,7 @@ const markUnlocked = (a: HTMLAudioElement) => {
  *   unlock()'s silent play. The lesson stage says "Memuat bacaan imam…"
  *   once it lasts.
  * - `warm(url)` (operator 2026-10-11: the recitation ready when its step
- *   comes): fetches the chosen recording ahead of its first play, into this
+ *   comes): fetches the recording ahead of its first play, into this
  *   very element, once the lesson has started (src/lib/autoplay/warm.ts).
  *   Never part of `loading`, never reported as `failed`: nothing was asked
  *   to play.
@@ -83,7 +85,7 @@ const markUnlocked = (a: HTMLAudioElement) => {
  * components never touch a ref during render (React Compiler rule).
  */
 export function useSegmentPlayer(
-  sources: RecitationSource[],
+  source: RecitationSource,
   opts: {
     /** Called when playback finishes on its own — the ayah ended or a
      *  single word's segment completed — never on a user pause. */
@@ -132,7 +134,6 @@ export function useSegmentPlayer(
    *  While it is clear, the element only fetches ahead (warm()) or sits paused: its errors are
    *  nobody's failed play. Left set by mistake, an error is reported as before 2026-10-11. */
   const askedRef = useRef(false);
-  const [sourceIdx, setSourceIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [activeWord, setActiveWord] = useState<number | null>(null);
   const [ownRate, setRate] = useState<PlaybackRate>(1);
@@ -141,8 +142,6 @@ export function useSegmentPlayer(
   const [failed, setFailed] = useState(false);
   /** A playback asked for and not heard yet, or stalled (src/lib/autoplay/loading.ts). */
   const [loading, setLoading] = useState<AudioLoading | null>(null);
-
-  const source = sources[sourceIdx] ?? sources[0];
 
   // Create the element once; the highlight loop lives in this closure.
   useEffect(() => {
@@ -274,8 +273,7 @@ export function useSegmentPlayer(
     };
   }, []);
 
-  // Point the element at the chosen reciter's file: fetched on play — or at once, when warm()
-  // has set this page's element to load ahead (a reciter chosen after the lesson started).
+  // Point the element at the ayah's recording: fetched on play, or ahead of it by warm().
   useEffect(() => {
     segmentsRef.current = source.segments;
     const a = audioRef.current;
@@ -416,9 +414,9 @@ export function useSegmentPlayer(
    * Fetch the recording the element points at NOW, ahead of its first play (operator 2026-10-11;
    * when: src/lib/autoplay/warm.ts — the lesson has started and will play it). `preload` goes
    * from "none" to "auto": the browser starts the load it had put off, into this very element, so
-   * the play that follows starts from the element's own buffer; a reciter chosen later loads as
-   * soon as the element points at it. A browser that leaves the put-off load where it was (the
-   * element idle, nothing loaded) is told with load(), which starts it over under "auto" — never
+   * the play that follows starts from the element's own buffer. A browser that leaves the put-off
+   * load where it was (the element idle, nothing loaded) is told with load(), which starts it
+   * over under "auto" — never
    * while unlock()'s silent play is under way (not paused: load() would abort it), never once
    * anything is loaded. Nothing plays, so none of the events `loading` is made of fires.
    * The element's own load, not fetch() or <link rel="preload">: the module's CSP lets only media
@@ -442,15 +440,6 @@ export function useSegmentPlayer(
     a.preservesPitch = true;
   }, []);
 
-  const chooseSource = useCallback((i: number) => {
-    askedRef.current = false;
-    audioRef.current?.pause();
-    stopAtRef.current = null;
-    setActiveWord(null);
-    setFailed(false);
-    setSourceIdx(i);
-  }, []);
-
   const hasWord = useCallback(
     (w: number) => source.segments.some(([sw]) => sw === w),
     [source],
@@ -465,9 +454,6 @@ export function useSegmentPlayer(
   }, []);
 
   return {
-    source,
-    sourceIdx,
-    chooseSource,
     playing,
     activeWord,
     rate,
@@ -482,7 +468,7 @@ export function useSegmentPlayer(
     pause,
     hasWord,
     unlock,
-    /** Fetch the chosen recording ahead of its first play (the lesson has started). */
+    /** Fetch the recording ahead of its first play (the lesson has started). */
     warm,
     /** A play asked for is sounding right now. */
     flowing,

@@ -27,7 +27,7 @@ import { Link } from "@/i18n/navigation";
 import { surahNamesFor } from "@/lib/ayat";
 import { composeFor } from "@/lib/compose-content";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
-import { orderRecitations, stageExamples } from "@/lib/autoplay";
+import { stageExamples } from "@/lib/autoplay";
 import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY, TERMS } from "@/lib/library";
 import { quizAyah } from "@/lib/quiz-content";
 import { planOf } from "@/lib/quiz-plan";
@@ -47,11 +47,6 @@ export function generateStaticParams() {
     s.ayat.map((a) => ({ surah: s.slug, ayah: String(a.ayah) })),
   );
 }
-
-const RECITER_LABEL: Record<string, string> = {
-  Husary_Muallim_128kbps: "Al-Husary (Mu'allim)",
-  Alafasy_128kbps: "Mishary Alafasy",
-};
 
 export async function generateMetadata({
   params,
@@ -139,18 +134,14 @@ export default async function AyahPage({
     translit: w.translit,
     gloss: w.gloss,
   }));
-  // Default reciter: Mishary Alafasy (operator's choice, 2026-10-09); Husary
-  // Mu'allim stays available for its built-in "repeat after me" gaps. Their
-  // credit lines are listed on the Kredit page (kredit/page.tsx). One
-  // order for the page and the autoplay engine (RECITER_ORDER there), so
-  // the exercises the lesson waits at are exactly the ones rendered.
-  const sources = orderRecitations(a.recitation).map((r) => ({
-    reciter: r.reciter,
-    url: r.url,
-    segments: r.segments,
-    label: RECITER_LABEL[r.reciter] ?? r.reciter,
-  }));
-  const timed = new Set(sources.flatMap((r) => r.segments.map(([w]) => w)));
+  // One imam everywhere, and no reciter setting (operator 2026-10-13: "better to use alafasy for
+  // all? no need to give option to user to change"; plan L21): the ayah's one recitation, Mishary
+  // Alafasy's (the content has exactly one, schema.ts). Its credit line is on the Kredit page
+  // (kredit/page.tsx). The stage, the standalone "Dengar dan klik" and the word cards' "Dengar"
+  // all play this recording.
+  const [recitation] = a.recitation;
+  const source = { url: recitation.url, segments: recitation.segments };
+  const timed = new Set(source.segments.map(([w]) => w));
   // The ayah's quiz (content/quiz, pipeline/build_quiz.py): every exercise asks only what the
   // lesson has taught by this ayah, with wrong options from the ayat already studied (operator
   // 2026-10-10: "make sure all questions in quiz already have lesson beforehand"). The stage and
@@ -264,7 +255,7 @@ export default async function AyahPage({
             surahName={s.name_id}
             following={following}
             words={playerWords}
-            sources={sources}
+            source={source}
             translation={translation}
             exercise={{ words: a.words, lexemes, quiz }}
             compose={compose && (compose.primer || Object.keys(compose.words).length) ? compose : null}
@@ -341,7 +332,7 @@ export default async function AyahPage({
                 </h2>
                 <p className="mt-1 max-w-prose text-base text-ink-muted">{t("practice_intro")}</p>
               </div>
-              {tapPlan && <TapWord id={`${key}/tap`} words={playerWords} questions={tapPlan.questions} source={sources[0]} />}
+              {tapPlan && <TapWord id={`${key}/tap`} words={playerWords} questions={tapPlan.questions} source={source} />}
               {whyPlan && <WhyHarakat id={`${key}/why`} words={a.words} questions={whyPlan.questions} states={quiz.states} />}
               {sortPlan && (
                 <SortCase id={`${key}/sort`} words={a.words} questions={sortPlan.questions} bins={sortPlan.bins} states={quiz.states} />

@@ -73,8 +73,6 @@ QUIZ_VERSION = 1
 EXERCISE_KEYS = ("tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory")
 # The case states a beginner sorts and is asked "why" about (src/lib/cases.ts SORT_BINS).
 SORT_BINS = ("marfu", "manshub", "majrur", "mabni")
-# The page's first recitation (the one Dengar dan klik plays): src/lib/autoplay/exercises.ts.
-RECITER_ORDER = ("Alafasy_128kbps", "Husary_Muallim_128kbps")
 # Case state → its term in the table.
 STATE_TERM = {"marfu": "marfu", "manshub": "manshub", "majrur": "majrur", "mabni": "mabni", "majzum": "majzum"}
 # One cause, two names: a sifat is a na't; a jar-majrur phrase is a huruf jar with its majrur; an
@@ -404,10 +402,10 @@ def term_classes(text: str, terms: Terms) -> set[str]:
 
 # ------------------------------------------------------------------ the lesson
 def timed_words(ayah: dict) -> list[int]:
-    """1-based word numbers timed in the page's first recitation (Dengar dan klik plays it)."""
-    rank = {r: i for i, r in enumerate(RECITER_ORDER)}
-    srcs = sorted(ayah.get("recitation") or [], key=lambda r: rank.get(r["reciter"], len(RECITER_ORDER)))
-    return sorted({seg[0] for seg in srcs[0]["segments"]}) if srcs else []
+    """1-based word numbers timed in the ayah's recitation (the one imam's, plan L21; Dengar dan
+    klik plays it): src/lib/autoplay/exercises.ts timedWords."""
+    recs = ayah.get("recitation") or []
+    return sorted({seg[0] for seg in recs[0]["segments"]}) if recs else []
 
 
 def word_at(lesson: dict, loc: str) -> dict:
@@ -792,7 +790,7 @@ def plan_problems(quiz: dict, lesson: dict, library: dict, terms: Terms, manifes
                     errs.append(f"{where}: fewer than two words")
                 for q in qs:
                     if q["word"] not in timed:
-                        errs.append(f"{where} q{q['n']}: word {q['word']} has no timing in the first recitation")
+                        errs.append(f"{where} q{q['n']}: word {q['word']} has no timing in the ayah's recitation")
             if key in ("why-harakat", "label-role"):
                 for q in qs:
                     w = words[q["word"] - 1]

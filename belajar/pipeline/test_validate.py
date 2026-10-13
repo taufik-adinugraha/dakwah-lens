@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Mutation tests for validate.py: each case plants one deliberate fault in a copy of the lessons
-in content/ (al-fatihah.json and every other built surah), content/library.json or the app's
-src/lib/content.ts / routes.ts, and asserts that validate.py fails with the expected message. The
-unmutated copies must pass. Standard library only; run from belajar/pipeline:
+in content/ (al-fatihah.json and every other built surah), content/library.json, the app's
+src/lib/content.ts / routes.ts or the source registry (sources.json, as validate.py reads it), and
+asserts that validate.py fails with the expected message. The unmutated copies must pass. Standard
+library only; run from belajar/pipeline:
 
     python3 test_validate.py          # table of faults and the message that caught each
     python3 -m unittest test_validate # the same as a unittest run
@@ -52,8 +53,26 @@ def set_(obj, key, val):
     obj[key] = val
 
 
-def rc_of(ay, reciter):
-    return next(r for r in ay["recitation"] if r["reciter"] == reciter)
+# The reciter the lessons carried beside the imam until 2026-10-13 (plan L21: one imam, Mishary
+# Alafasy, and no reciter setting). Planted below as the second reciter validate.py must refuse.
+OTHER_RECITER = "Husary_Muallim_128kbps"
+
+
+def second_reciter(ay) -> dict:
+    """A recitation entry of another reciter for `ay`, shaped as the lessons shipped one."""
+    imam = ay["recitation"][0]
+    return {"reciter": OTHER_RECITER, "url": imam["url"].replace(imam["reciter"], OTHER_RECITER),
+            "segments": copy.deepcopy(imam["segments"]),
+            "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · "
+                      "Word timings: Collin Fair, quran-align (CC BY 4.0)"}
+
+
+def shift_timings(ay, ms: int) -> None:
+    """Every word timing of the ayah's recitation moved by `ms`: still sorted, whole and inside
+    the file — as another recording's timings would be — and no longer the pinned entry."""
+    for seg in ay["recitation"][0]["segments"]:
+        seg[1] += ms
+        seg[2] += ms
 
 
 def foreign_concept(loc):
@@ -211,10 +230,35 @@ MULTI = [
     ("data_versions.quranenc pins sura 1 in another sura's lesson", "lessons",
      lambda ls: set_(ls[SECOND]["data_versions"], "quranenc", SURAH["data_versions"]["quranenc"]),
      "data_versions.quranenc does not carry the pinned sha256"),
-    ("Alafasy timings replaced by Husary's", "last",
-     lambda d: set_(rc_of(ayah(d, 1), "Alafasy_128kbps"), "segments",
-                    copy.deepcopy(rc_of(ayah(d, 1), "Husary_Muallim_128kbps")["segments"])),
-     "segments differ from the pinned quran-align entry"),
+    # Until 2026-10-13 this fault copied Husary's timings over Alafasy's; the lessons carry one
+    # recitation now (plan L21), so the timings that are not the pinned ones are made here.
+    ("the imam's timings are not the pinned quran-align ones (every word 40 ms late)", "last",
+     lambda d: shift_timings(ayah(d, 1), 40), "segments differ from the pinned quran-align entry"),
+    # --- one imam, no reciter setting (operator 2026-10-13, plan L21)
+    ("a second reciter in content (an ayah with two recitations)", "surah",
+     lambda d: ayah(d, 1)["recitation"].append(second_reciter(ayah(d, 1))),
+     f"recitation by ['Alafasy_128kbps', '{OTHER_RECITER}']; every ayah has exactly one, by Alafasy_128kbps"),
+    ("a second reciter in a later surah, listed first", "last",
+     lambda d: ayah(d, 2)["recitation"].insert(0, second_reciter(ayah(d, 2))),
+     f"recitation by ['{OTHER_RECITER}', 'Alafasy_128kbps']; every ayah has exactly one, by Alafasy_128kbps"),
+    ("the one recitation is another reciter's", "surah",
+     lambda d: set_(ayah(d, 3), "recitation", [second_reciter(ayah(d, 3))]),
+     f"recitation by ['{OTHER_RECITER}']; every ayah has exactly one, by Alafasy_128kbps"),
+    ("an ayah with no recitation", "second",
+     lambda d: set_(ayah(d, 1), "recitation", []), "no recitation"),
+    ("the imam's entry streams another reciter's file", "surah",
+     lambda d: set_(ayah(d, 1)["recitation"][0], "url",
+                    ayah(d, 1)["recitation"][0]["url"].replace("Alafasy_128kbps", OTHER_RECITER)), "unexpected url"),
+    ("the imam's entry carries another reciter's credit line", "surah",
+     lambda d: set_(ayah(d, 1)["recitation"][0], "credit", second_reciter(ayah(d, 1))["credit"]),
+     "credit line lacks the imam's attribution pinned in sources.json"),
+    ("a second reciter's quran-align member pinned again in sources.json", "sources",
+     lambda src: src["inputs"]["quran_align"]["members"].__setitem__(
+         f"{OTHER_RECITER}.json", {"readme_sha1": "0" * 40, "sha256": "0" * 64}),
+     "sources.json quran_align.members"),
+    ("a second reciter's EveryAyah probes pinned again in sources.json", "sources",
+     lambda src: src["inputs"].__setitem__("everyayah_husary_muallim", copy.deepcopy(src["inputs"]["everyayah_alafasy"])),
+     "sources.json EveryAyah probe inputs"),
     ("recitation streams the Al-Fatihah file of the same ayah", "second",
      lambda d: set_(ayah(d, 1)["recitation"][0], "url",
                     ayah(d, 1)["recitation"][0]["url"][:-10] + "001001.mp3"), "unexpected url"),
@@ -248,7 +292,7 @@ NEEDS_OTHER = {"second", "last", "lessons", "content.ts", "routes.ts"}
 
 
 def run_validate(lessons: dict, lib: dict, content_ts: str | None = None,
-                 routes_ts: str | None = None) -> tuple[int, list[str]]:
+                 routes_ts: str | None = None, sources: dict | None = None) -> tuple[int, list[str]]:
     with tempfile.TemporaryDirectory() as tmp:
         t = Path(tmp)
         for slug, d in lessons.items():
@@ -259,14 +303,16 @@ def run_validate(lessons: dict, lib: dict, content_ts: str | None = None,
                        encoding="utf-8")
         rts.write_text(routes_ts if routes_ts is not None else ROUTES_TS.read_text(encoding="utf-8"),
                        encoding="utf-8")
-        saved = V.LESSON_DIR, V.LIBRARY, V.CONTENT_TS_PATH, V.ROUTES_TS_PATH
+        saved = V.LESSON_DIR, V.LIBRARY, V.CONTENT_TS_PATH, V.ROUTES_TS_PATH, V.load_sources
         V.LESSON_DIR, V.LIBRARY, V.CONTENT_TS_PATH, V.ROUTES_TS_PATH = t, libp, cts, rts
+        if sources is not None:  # the registry as validate.py reads it (the file is left alone)
+            V.load_sources = lambda: sources
         V.fails.clear()
         try:
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                 rc = V.main()
         finally:
-            V.LESSON_DIR, V.LIBRARY, V.CONTENT_TS_PATH, V.ROUTES_TS_PATH = saved
+            V.LESSON_DIR, V.LIBRARY, V.CONTENT_TS_PATH, V.ROUTES_TS_PATH, V.load_sources = saved
         return rc, list(V.fails)
 
 
@@ -277,7 +323,7 @@ def runnable(target: str) -> bool:
 def apply(name: str):
     _, target, fn, expect = next(m for m in ALL if m[0] == name)
     lessons, lib = copy.deepcopy(LESSONS), copy.deepcopy(LIB)
-    content_ts = routes_ts = None
+    content_ts = routes_ts = sources = None
     if target == "surah":
         fn(lessons["al-fatihah"])
     elif target == "library":
@@ -290,9 +336,12 @@ def apply(name: str):
         content_ts = fn(CONTENT_TS.read_text(encoding="utf-8"))
     elif target == "routes.ts":
         routes_ts = fn(ROUTES_TS.read_text(encoding="utf-8"))
+    elif target == "sources":
+        sources = load_sources()
+        fn(sources)
     else:
         raise ValueError(target)
-    rc, fails = run_validate(lessons, lib, content_ts, routes_ts)
+    rc, fails = run_validate(lessons, lib, content_ts, routes_ts, sources)
     hit = next((f for f in fails if expect in f), None)
     return rc, fails, hit
 

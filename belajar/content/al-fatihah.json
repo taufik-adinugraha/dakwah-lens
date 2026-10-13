@@ -271,33 +271,6 @@
       },
       "recitation": [
         {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001001.mp3",
-          "segments": [
-            [
-              1,
-              0,
-              820
-            ],
-            [
-              2,
-              830,
-              1520
-            ],
-            [
-              3,
-              1530,
-              2790
-            ],
-            [
-              4,
-              2800,
-              4240
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
-        {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/001001.mp3",
           "segments": [
@@ -783,33 +756,6 @@
       },
       "recitation": [
         {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001002.mp3",
-          "segments": [
-            [
-              1,
-              250,
-              1060
-            ],
-            [
-              2,
-              1070,
-              1950
-            ],
-            [
-              3,
-              1960,
-              2660
-            ],
-            [
-              4,
-              2670,
-              4360
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
-        {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/001002.mp3",
           "segments": [
@@ -1079,23 +1025,6 @@
       },
       "recitation": [
         {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001003.mp3",
-          "segments": [
-            [
-              1,
-              250,
-              1570
-            ],
-            [
-              2,
-              1580,
-              2990
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
-        {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/001003.mp3",
           "segments": [
@@ -1363,28 +1292,6 @@
         "version": "1.0.1"
       },
       "recitation": [
-        {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001004.mp3",
-          "segments": [
-            [
-              1,
-              250,
-              1160
-            ],
-            [
-              2,
-              1170,
-              1800
-            ],
-            [
-              3,
-              1810,
-              2980
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
         {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/001004.mp3",
@@ -1759,33 +1666,6 @@
       },
       "recitation": [
         {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001005.mp3",
-          "segments": [
-            [
-              1,
-              250,
-              1380
-            ],
-            [
-              2,
-              1390,
-              2320
-            ],
-            [
-              3,
-              2330,
-              3820
-            ],
-            [
-              4,
-              3830,
-              5430
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
-        {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/001005.mp3",
           "segments": [
@@ -2115,28 +1995,6 @@
         "version": "1.0.1"
       },
       "recitation": [
-        {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001006.mp3",
-          "segments": [
-            [
-              1,
-              50,
-              780
-            ],
-            [
-              2,
-              790,
-              1940
-            ],
-            [
-              3,
-              1950,
-              3940
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
         {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/001006.mp3",
@@ -2854,58 +2712,6 @@
         "version": "1.0.1"
       },
       "recitation": [
-        {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001007.mp3",
-          "segments": [
-            [
-              1,
-              450,
-              1050
-            ],
-            [
-              2,
-              1060,
-              2070
-            ],
-            [
-              3,
-              2080,
-              3160
-            ],
-            [
-              4,
-              3170,
-              4300
-            ],
-            [
-              5,
-              8400,
-              8700
-            ],
-            [
-              6,
-              8710,
-              10330
-            ],
-            [
-              7,
-              10340,
-              11500
-            ],
-            [
-              8,
-              11510,
-              11870
-            ],
-            [
-              9,
-              11880,
-              16640
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
         {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
@@ -5292,7 +5098,7 @@
     "tanzil": "uthmani-1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "tanzil_metadata": "1.0 sha256:8867c1d88191472adec9db694b3cd9f135b1a2ef580574d32cf888dcb22c5c7a",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Husary_Muallim_128kbps.json sha256:3719fb5c482d7db7086b4a81cdb6f114aa71979899917a74e6c8ae5bec684f5f; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
+    "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
     "authored_words": "authored/al-fatihah.words.json sha256:da89efdc7759bde444bf41930ca91a8515e5bca1713dcc03f75ff33ba60d49c4",
     "authored_structure": "authored/al-fatihah.structure.json sha256:d5f5d06071f57afd240cd62d782903d72b2fe6c028e216ea253b218be1727e33",

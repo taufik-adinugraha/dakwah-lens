@@ -176,14 +176,12 @@
     "mahall_plain": "Its position is {pos}, even though its ending stays the same."
   },
   "Player": {
-    "reciter": "Imam's voice (reciter)",
     "play_word": "Word {n}: hear {translit} — {gloss}",
     "word_place": "Word {n}",
     "heading": "The imam's recitation",
     "speed": "Imam's speed: {speed}",
     "speed_normal": "Normal",
     "speed_slow": "Slow",
-    "husary_note": "Al-Husary (Mu'allim) leaves gaps so you can repeat after him.",
     "failed": "The recitation could not play. Check your internet connection, then click that word again.",
     "listen": "Listen",
     "listen_detail": "word {n}, {translit}"

@@ -1,7 +1,7 @@
 /**
  * The quizzes (content/quiz/<slug>.json, pipeline/build_quiz.py), validated at BUILD time like
  * the lesson content: the zod shape, then every reference against the content — each question's
- * word is a word of its ayah, a tap word is timed in the page's first recitation, a sort word's
+ * word is a word of its ayah, a tap word is timed in the ayah's recitation, a sort word's
  * state is one of the bins, a wazan question's lexeme has the forms it names. A mismatch fails
  * `next build` instead of reaching a learner. The pipeline's own guard (validate_quiz.py) proves
  * that every question was taught before it is asked (operator 2026-10-10, narration rule 16).

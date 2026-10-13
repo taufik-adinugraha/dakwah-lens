@@ -427,10 +427,8 @@ def main() -> int:
         print("quranenc_sura_names"); fetch_quranenc_sura_names(I["quranenc_sura_names"], I["tanzil_metadata"], args.refresh, repin)
     if want("shamela_istilah"):
         print("shamela_istilah"); fetch_shamela_istilah(I["shamela_istilah"], args.refresh, repin)
-    if not args.skip_audio:
-        for k in ("everyayah_husary_muallim", "everyayah_alafasy"):
-            if want(k):
-                print(k); fetch_everyayah(k, I[k], args.refresh, repin)
+    if not args.skip_audio and want("everyayah_alafasy"):  # the one imam (plan L21)
+        print("everyayah_alafasy"); fetch_everyayah("everyayah_alafasy", I["everyayah_alafasy"], args.refresh, repin)
     if problems:
         print("\nFETCH FAILED:", file=sys.stderr)
         for p in problems:

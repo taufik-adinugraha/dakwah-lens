@@ -122,10 +122,15 @@ CASES = [
      "is not the lesson's timing"),
     ("lesson-run-off-by-10ms", "library", lambda d: d["clips"]["112:1:2-3"].update(start=d["clips"]["112:1:2-3"]["start"] + 10),
      "is not the lesson's timing of word(s) 2..3 of 112:1"),
+    # The lessons carry ONE recitation, the imam's (plan L21): entry 0. Until 2026-10-13 it was
+    # entry 1, after Husary Mu'allim's.
     ("lesson-segment-drifted", "lesson",
-     lambda d: d["ayat"][0]["recitation"][1]["segments"][1].__setitem__(1, 700),
+     lambda d: d["ayat"][0]["recitation"][0]["segments"][1].__setitem__(1, 700),
      "is not the lesson's timing of word(s) 2..2 of 1:1"),
-    ("lesson-has-no-alafasy", "lesson", lambda d: d["ayat"][0]["recitation"].pop(1),
+    ("lesson-has-no-alafasy", "lesson", lambda d: d["ayat"][0]["recitation"].pop(0),
+     "has no Alafasy_128kbps recitation entry"),
+    ("lesson-recitation-is-another-reciter", "lesson",
+     lambda d: d["ayat"][0]["recitation"][0].update(reciter="Husary_Muallim_128kbps"),
      "has no Alafasy_128kbps recitation entry"),
     ("page-bytes-not-the-lesson-word", "library",
      lambda d: d["quran"].__setitem__("1:1:1", d["quran"]["1:1:2"]),
