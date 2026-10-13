@@ -20,7 +20,7 @@ import {
   namesFor,
   parseAyahLoc,
   parseAyahPayload,
-  POPUP_RECITER,
+  RECITER,
   recitationUrl,
 } from "./ayah";
 import { surahNamesFor } from "./ayat";
@@ -45,26 +45,32 @@ describe("the ayah popup's locations (operator 2026-10-12)", () => {
     }
   });
 
-  it("maps a location to its EveryAyah file, SSSAAA.mp3 (Alafasy, the lessons' default imam)", () => {
-    expect(POPUP_RECITER).toBe("Alafasy_128kbps");
+  it("maps a location to its EveryAyah file, SSSAAA.mp3 (Alafasy, the one imam)", () => {
+    expect(RECITER).toBe("Alafasy_128kbps");
     expect(recitationUrl("2:255")).toBe("https://everyayah.com/data/Alafasy_128kbps/002255.mp3");
     expect(recitationUrl("1:1")).toBe("https://everyayah.com/data/Alafasy_128kbps/001001.mp3");
     expect(recitationUrl("114:6")).toBe("https://everyayah.com/data/Alafasy_128kbps/114006.mp3");
-    expect(recitationUrl("2:255", "Husary_Muallim_128kbps")).toBe("https://everyayah.com/data/Husary_Muallim_128kbps/002255.mp3");
+    // One imam (operator 2026-10-13, plan L21): the file is named by the location alone. Until then
+    // a second argument named another reciter's folder; one passed now changes nothing.
+    expect((recitationUrl as (loc: string, reciter: string) => string | null)("2:255", "Husary_Muallim_128kbps")).toBe(
+      "https://everyayah.com/data/Alafasy_128kbps/002255.mp3",
+    );
     expect(recitationUrl("115:1")).toBeNull();
   });
 
-  it("names exactly the file every lesson already streams for that ayah, by every reciter", () => {
+  it("names exactly the file every lesson already streams for that ayah: the lesson's one recitation, the same imam", () => {
     let n = 0;
     for (const s of SURAHS) {
       for (const a of s.ayat) {
-        for (const r of a.recitation) {
-          expect(recitationUrl(a.loc, r.reciter), `${a.loc} ${r.reciter}`).toBe(r.url);
-          n++;
-        }
+        // One imam (plan L21): the popup's file of a lesson ayah IS the lesson's recording.
+        expect(a.recitation.map((r) => r.reciter), a.loc).toEqual([RECITER]);
+        expect(recitationUrl(a.loc), a.loc).toBe(a.recitation[0].url);
+        n++;
       }
     }
-    expect(n).toBeGreaterThanOrEqual(44);
+    // Every lesson ayah (until 2026-10-13 this counted 44: two reciters' files of each).
+    expect(n).toBe(SURAHS.reduce((sum, s) => sum + s.ayat.length, 0));
+    expect(n).toBeGreaterThanOrEqual(22);
     // and its host is one the CSP lets media come from
     expect(read("next.config.ts")).toContain('"https://everyayah.com"');
   });

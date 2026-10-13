@@ -17,10 +17,14 @@ Checks (per lesson unless said otherwise)
   2. Words: per ayah exactly common.SURAHS' counts (Al-Fatihah 4+4+2+3+4+3+9 = 29, Al-Ikhlas
      4+2+4+5, Al-Falaq 4+4+5+5+5, An-Nas 4+2+2+4+5+3), equal to the QAC 0.4 word counts, locs
      consecutive and matching their ayah.
-  3. Recitation segments, per reciter: exactly Husary Mu'allim + Alafasy (L7 default); segments
-     equal the pinned quran-align entry (0-based [start, end) -> 1-based word); integers, sorted,
-     non-overlapping, endMs > startMs, word indices cover 1..N exactly once, last end not after
-     the measured length of the streamed file of that surah and ayah.
+  3. Recitation: every ayah has exactly ONE, by the one imam, Mishary Alafasy (operator
+     2026-10-13, plan L21: "better to use alafasy for all? no need to give option to user to
+     change") — a second reciter, or another one in his place, is refused; so is a quran-align
+     member or an EveryAyah probe set of another reciter pinned in sources.json (an input no
+     lesson reads). Its segments equal the pinned quran-align entry (0-based [start, end) ->
+     1-based word); integers, sorted, non-overlapping, endMs > startMs, word indices cover 1..N
+     exactly once, last end not after the measured length of the streamed file of that surah and
+     ayah.
   4. Sources: every word and fact has >= 1 SourceRef with a kitab; urls are http(s).
   5. Review: every status is "draft".
   6. Shape: every object's keys match the field names in belajar/src/content/schema.ts
@@ -94,8 +98,10 @@ LIBRARY = CONTENT_DIR / "library.json"
 CONTENT_TS_PATH = CONTENT_TS
 ROUTES_TS_PATH = ROUTES_TS
 AUTHORED = PIPELINE / "authored"
-# reciter -> sources.json input holding its duration probes (L7: Alafasy is the default voice)
-RECITERS = {"Husary_Muallim_128kbps": "everyayah_husary_muallim", "Alafasy_128kbps": "everyayah_alafasy"}
+# The one imam (plan L21), stated here and not imported from the build this file re-checks, and
+# the sources.json input holding the measured length of each of his streamed files.
+RECITER = "Alafasy_128kbps"
+RECITER_PROBES = "everyayah_alafasy"
 # Typed (non-Qur'anic) Arabic in the library: letters U+0621–U+063A, U+0641–U+064A; harakat and
 # tanwin U+064B–U+0652; spaces. Tatweel (U+0640), alif wasla, superscript alif and Qur'anic marks
 # are Uthmani-only and never appear in a tashrif or i'lal form.
@@ -756,21 +762,27 @@ def _cached(key: tuple, load):
     return _PARSED[key]
 
 
-def load_align(src: dict) -> dict[str, dict]:
-    """reciter -> {(surah, ayah): quran-align entry}, from the pinned release members."""
+def load_align(src: dict) -> dict:
+    """{(surah, ayah): quran-align entry} of the imam, from the pinned release member."""
     I = src["inputs"]
-    qa_dir = (PIPELINE / I["quran_align"]["cache_path"]).parent
-    out = {}
-    for reciter in RECITERS:
-        p = qa_dir / f"{reciter}.json"
-        want = I["quran_align"]["members"][f"{reciter}.json"]["sha256"]
-        if not p.exists() or sha256_file(p) != want:
-            fail(f"quran-align {reciter}.json missing or not matching its pin; run fetch.py")
-            out[reciter] = {}
-            continue
-        out[reciter] = _cached(("align", want), lambda p=p: {(e["surah"], e["ayah"]): e
-                                                              for e in json.loads(p.read_text())})
-    return out
+    p = (PIPELINE / I["quran_align"]["cache_path"]).parent / f"{RECITER}.json"
+    want = I["quran_align"]["members"].get(f"{RECITER}.json", {}).get("sha256")
+    if not want or not p.exists() or sha256_file(p) != want:
+        fail(f"quran-align {RECITER}.json missing or not matching its pin; run fetch.py")
+        return {}
+    return _cached(("align", want), lambda: {(e["surah"], e["ayah"]): e for e in json.loads(p.read_text())})
+
+
+def check_one_imam_pins(I: dict) -> None:
+    """Check 3, the inputs' side: sources.json pins the imam's timings and probes and no other
+    reciter's — an input no lesson reads would still be named in data_versions and on the Kredit
+    page ("Versi data")."""
+    members = sorted(I["quran_align"].get("members", {}))
+    if members != [f"{RECITER}.json"]:
+        fail(f"sources.json quran_align.members {members} != ['{RECITER}.json'] (one imam, plan L21)")
+    probes = sorted(k for k in I if k.startswith("everyayah_"))
+    if probes != [RECITER_PROBES]:
+        fail(f"sources.json EveryAyah probe inputs {probes} != ['{RECITER_PROBES}'] (one imam, plan L21)")
 
 
 def lesson_paths() -> dict[str, Path]:
@@ -821,7 +833,7 @@ def check_lesson(spec, data: dict, ctx: dict) -> tuple[list[tuple[str, str]], se
     qe, qe_path = quranenc_sura(src, S)
     qe_rows = _cached(("quranenc", qe["sha256"]), lambda: {
         int(r["aya"]): r for r in json.loads(qe_path.read_text(encoding="utf-8"))["result"]})
-    probes = {r: I[k]["files"] for r, k in RECITERS.items()}
+    probes = I.get(RECITER_PROBES, {}).get("files", {})
     for ay in ayat:
         s, a = ay["surah"], ay["ayah"]
         p = f"ayah {s}:{a}"
@@ -898,14 +910,15 @@ def check_lesson(spec, data: dict, ctx: dict) -> tuple[list[tuple[str, str]], se
         if tr.get("version") != qe["version"]:
             fail(f"{p}: translation version {tr.get('version')!r} != QuranEnc {qe['version']!r}")
         check_prose(tr["text"], raw, f"{p}.translation")
-        # 3. recitation
+        # 3. recitation: exactly one, by the one imam (plan L21)
         if not ay.get("recitation"):
             fail(f"{p}: no recitation")
         reciters = [rc.get("reciter") for rc in ay.get("recitation", [])]
-        if sorted(reciters) != sorted(RECITERS):
-            fail(f"{p}: reciters {reciters} != {sorted(RECITERS)} (Alafasy is the default, plan L7)")
+        if reciters != [RECITER]:
+            fail(f"{p}: recitation by {reciters}; every ayah has exactly one, by {RECITER} "
+                 f"(one imam and no reciter setting, plan L21)")
         for rc in ay.get("recitation", []):
-            rp = f"{p} {rc['reciter']}"
+            rp = f"{p} {rc.get('reciter')}"
             segs = rc["segments"]
             if not all(isinstance(x, int) for sg in segs for x in sg) or any(len(sg) != 3 for sg in segs):
                 fail(f"{rp}: segments must be [int, int, int]")
@@ -924,19 +937,23 @@ def check_lesson(spec, data: dict, ctx: dict) -> tuple[list[tuple[str, str]], se
                 if st < 0:
                     fail(f"{rp} word {w}: negative start")
                 prev = en
-            qa = ctx["align"].get(rc["reciter"], {}).get((s, a))
+            qa = ctx["align"].get((s, a)) if rc.get("reciter") == RECITER else None
             want = [[ws + 1, int(s_ms), int(e_ms)] for ws, _we, s_ms, e_ms in qa["segments"]] if qa else None
             if segs != want:
                 fail(f"{rp}: segments differ from the pinned quran-align entry for {s}:{a}")
-            probe = probes.get(rc["reciter"], {}).get(f"{s:03d}{a:03d}.mp3")
+            probe = probes.get(f"{s:03d}{a:03d}.mp3") if rc.get("reciter") == RECITER else None
             if not probe:
                 fail(f"{rp}: no duration probe in sources.json")
             elif segs and segs[-1][2] > probe["duration_ms"]:
                 fail(f"{rp}: last segment ends after the streamed file ({segs[-1][2]} > {probe['duration_ms']} ms)")
-            if rc["url"] != f"https://everyayah.com/data/{rc['reciter']}/{s:03d}{a:03d}.mp3":
+            if rc["url"] != f"https://everyayah.com/data/{RECITER}/{s:03d}{a:03d}.mp3":
                 fail(f"{rp}: unexpected url {rc['url']}")
             if "quran-align (CC BY 4.0)" not in rc["credit"]:
                 fail(f"{rp}: credit line lacks the quran-align attribution")
+            # The Kredit page lists these lines as they are: the imam's pinned attribution, no other's.
+            attribution = I.get(RECITER_PROBES, {}).get("attribution")
+            if not attribution or attribution not in rc["credit"]:
+                fail(f"{rp}: credit line lacks the imam's attribution pinned in sources.json ({RECITER_PROBES})")
         if ay.get("status") != "draft":
             fail(f"{p}: status must be draft")
         if "tafsir" in ay:
@@ -1061,6 +1078,7 @@ def main() -> int:
     CHECKED_SURAHS = {SURAH_BY_SLUG[slug].surah for slug in lessons}
     ctx = {"T": T, "raw": raw, "I": I, "src": src, "qw": qw, "stems": stems, "names_ar": names_ar,
            "align": load_align(src)}
+    check_one_imam_pins(I)
 
     # 6. shape against schema.ts (keys), 12. zod constraints
     if not SCHEMA_TS.exists():

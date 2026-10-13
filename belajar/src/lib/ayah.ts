@@ -7,8 +7,9 @@
  */
 import type { AyatFile } from "@/content/ayat-schema";
 
-/** The imam the popup plays: the module's default reciter (plan L7), the lessons' own files. */
-export const POPUP_RECITER = "Alafasy_128kbps";
+/** The one imam (operator 2026-10-13, plan L21: Mishary Rashid Alafasy everywhere, no reciter
+ *  setting): his id on EveryAyah. The popup plays the lessons' own files. */
+export const RECITER = "Alafasy_128kbps";
 const EVERYAYAH = "https://everyayah.com/data";
 
 /** Where the browser asks for one ayah (src/app/api/ayah/route.ts): same origin, CSP connect-src 'self'. */
@@ -32,9 +33,9 @@ const pad3 = (n: number) => String(n).padStart(3, "0");
  * the lesson content): "2:255" → https://everyayah.com/data/Alafasy_128kbps/002255.mp3. Streamed
  * from the provider, never stored on our server (media-src lists the host, next.config.ts).
  */
-export function recitationUrl(loc: string, reciter: string = POPUP_RECITER): string | null {
+export function recitationUrl(loc: string): string | null {
   const r = parseAyahLoc(loc);
-  return r ? `${EVERYAYAH}/${reciter}/${pad3(r.surah)}${pad3(r.ayah)}.mp3` : null;
+  return r ? `${EVERYAYAH}/${RECITER}/${pad3(r.surah)}${pad3(r.ayah)}.mp3` : null;
 }
 
 /** The API address of one ayah, or null for a malformed location. */

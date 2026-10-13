@@ -40,10 +40,6 @@ import { MushafLine, type PlayerWord } from "./AyahPlayer";
 import { ExampleCard, type ExampleCardState } from "./ExampleCard";
 import { type StageCompose, WordComposition } from "./WordComposition";
 
-/** A recording the stage can play, with its reciter's name for the select.
- *  Its credit line is on the Kredit page, not on the stage. */
-export type StageSource = RecitationSource & { label: string };
-
 /**
  * "▶ Dengar" for a word card (WordCard's optional `listen` slot). It asks
  * the lesson stage to play the word on its one player; a running lesson
@@ -163,10 +159,12 @@ function LoadingMark({ className }: { className?: string }) {
  *   automatically: the bar offers "Lihat bagian yang ditandai", which
  *   scrolls only on the learner's click.
  * - Every secondary control (pace Biasa / Pelan / Tunggu saya, the imam's
- *   speed, the reciter, text size) sits behind ONE labelled "⚙ Pengaturan"
- *   button at the top of the stage: an inline panel, closed by "Tutup
- *   pengaturan", Escape or the button again. The reciters' credit lines are
- *   on the Kredit page.
+ *   speed, text size) sits behind ONE labelled "⚙ Pengaturan" button at the
+ *   top of the stage: an inline panel, closed by "Tutup pengaturan", Escape
+ *   or the button again. No reciter to choose: one imam everywhere, Mishary
+ *   Alafasy (operator 2026-10-13, plan L21: "better to use alafasy for all?
+ *   no need to give option to user to change"); his credit line is on the
+ *   Kredit page.
  *
  * The narrator never voices Qur'anic words (plan §6.1 A1): the caption
  * shows what is spoken — word by word as a karaoke caption once the
@@ -210,7 +208,7 @@ export function LessonStage({
   surahName,
   following,
   words,
-  sources,
+  source,
   translation,
   exercise,
   compose = null,
@@ -226,7 +224,8 @@ export function LessonStage({
    *  end card offers the first published one (useUpNext.ts). */
   following: SurahRef[];
   words: PlayerWord[];
-  sources: StageSource[];
+  /** The ayah's recording and its word timings: the one imam's (plan L21). */
+  source: RecitationSource;
   /** The ayah's translation with footnotes and source, rendered by the page. */
   translation: ReactNode;
   /** What the exercises need inside the stage. */
@@ -244,7 +243,7 @@ export function LessonStage({
   /** The word card's "yang artinya “…”", its gloss emphasised (glossSlot). */
   const cardMeaning = (gloss: string) => glossSlot((g) => t("card_meaning", { gloss: g }), gloss);
   const uid = useId();
-  const ap = useAutoplay(seq, sources, title);
+  const ap = useAutoplay(seq, source, title);
   const { state, view, actions, player: p } = ap;
   const upNext = useUpNext(following);
   // "Mulai" clicked and its first line not heard yet: the stage before "Mulai" stays, its button
@@ -309,7 +308,6 @@ export function LessonStage({
   const exerciseSteps = seq.steps.filter((s) => s.kind === "exercise");
   const exerciseN = exerciseSteps.findIndex((s) => s.id === step.id) + 1;
   const pace = started ? state.pace : ap.pace;
-  const lessonAudio = state.activity?.kind === "recite";
   const pct = Math.round(((view.index + 1) / view.total) * 100);
   const settingsId = `${uid}-settings`;
   // The step and the narration line on screen, named on the stage and the
@@ -507,10 +505,6 @@ export function LessonStage({
       data-example={beat?.beat.id}
       data-example-state={beatState ?? undefined}
       data-example-clip={beat?.beat.key}
-      // The reciter chosen, by the id the content gives him ("Alafasy_128kbps"): the CI check of
-      // the early fetch finds his recording's address by it (scripts/ci/screenshots.mjs
-      // warmupChecks; operator 2026-10-11).
-      data-reciter={p.source?.reciter}
       className="stage-card scroll-mt-2 overflow-x-clip"
     >
       <h2 id={`${uid}-guided`} className="sr-only">
@@ -552,8 +546,8 @@ export function LessonStage({
           </div>
         )}
 
-        {/* Settings: pace, the imam, text size — labelled, behind the one
-            button. Always in the page (hidden when closed), so the button's
+        {/* Settings: pace, the imam's speed, text size — labelled, behind the
+            one button. Always in the page (hidden when closed), so the button's
             aria-controls names a real element. */}
         <div
           id={settingsId}
@@ -617,7 +611,7 @@ export function LessonStage({
             <p className="mt-2 max-w-prose text-sm text-ink-muted">{t(`pace_hint_${pace}`)}</p>
           </fieldset>
 
-          {/* The imam's recitation: speed and reciter. */}
+          {/* The imam's recitation: its speed. One imam, so no reciter to choose (plan L21). */}
           <div role="group" aria-labelledby={`${uid}-imam`} className="mt-6">
             <p id={`${uid}-imam`} className="text-base font-semibold text-ink">
               {tp("heading")}
@@ -630,32 +624,6 @@ export function LessonStage({
               <Gauge aria-hidden className="h-5 w-5" />
               {tp("speed", { speed: ap.imamRate === 1 ? tp("speed_normal") : tp("speed_slow") })}
             </button>
-
-            {sources.length > 1 && (
-              <div className="mt-4">
-                <label htmlFor={`${uid}-reciter`} className="block text-base font-semibold text-ink">
-                  {tp("reciter")}
-                </label>
-                <select
-                  id={`${uid}-reciter`}
-                  value={p.sourceIdx}
-                  onChange={(e) => {
-                    // Switching reciters stops the recording in play: pause
-                    // the lesson rather than wait for audio that won't end.
-                    if (lessonAudio) actions.pause();
-                    p.chooseSource(Number(e.target.value));
-                  }}
-                  className="mt-2 min-h-12 w-full max-w-sm cursor-pointer rounded-xl border-[1.5px] border-border-ui bg-white px-3 text-base text-ink hover:border-forest"
-                >
-                  {sources.map((s, i) => (
-                    <option key={s.reciter} value={i}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-2 max-w-prose text-sm text-ink-muted">{tp("husary_note")}</p>
-              </div>
-            )}
           </div>
 
           <div className="mt-6">
@@ -858,7 +826,7 @@ export function LessonStage({
                   progressId={spec.progressId}
                   data={exercise}
                   tapWords={words}
-                  tapSource={sources[0]}
+                  tapSource={source}
                   guided={guided}
                 />
               </div>

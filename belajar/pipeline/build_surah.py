@@ -5,9 +5,9 @@
     python3 build_surah.py al-ikhlas       # any slug registered in common.SURAHS
 
 Inputs (all pinned in sources.json and verified by sha256 before use):
-  Tanzil Uthmani 1.1 text + metadata, QAC 0.4 morphology, quran-align (Husary Mu'allim,
-  Alafasy), QuranEnc indonesian_affairs (the surah's own sura file), EveryAyah duration probes,
-  and the hand-authored inventory authored/<slug>.words.json.
+  Tanzil Uthmani 1.1 text + metadata, QAC 0.4 morphology, quran-align (Alafasy, the one imam:
+  RECITER below), QuranEnc indonesian_affairs (the surah's own sura file), EveryAyah duration
+  probes, and the hand-authored inventory authored/<slug>.words.json.
 Library links (hand-authored, shared with build_library.py):
   Word.lemma_id  = the authored/library.lexicon.json id of the word's QAC STEM LEM (same key as
                    build_library.py --word-map);
@@ -51,12 +51,14 @@ FACT_KEYS = ["id", "title", "body", "locations", "method", "sources", "status"] 
 HADITH_KEYS = ["citation", "ar", "id", "grade", "provenance", "status"]  # schema.ts Hadith
 REVIEWER_ONLY = {"review_notes"}
 
-RECITERS = [
-    ("Husary_Muallim_128kbps", "everyayah_husary_muallim",
-     "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"),
-    ("Alafasy_128kbps", "everyayah_alafasy",
-     "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"),
-]
+# ONE imam everywhere, and no reciter setting (operator 2026-10-13, plan L21: "better to use alafasy
+# for all? no need to give option to user to change"): every ayah ships exactly one recitation,
+# Mishary Rashid Alafasy's EveryAyah file with its quran-align word timings. validate.py refuses a
+# second one. Until that day the lessons also carried Husary Mu'allim, as a choice in "Pengaturan".
+RECITER = "Alafasy_128kbps"
+RECITER_PROBES = "everyayah_alafasy"  # sources.json input: the measured length of each streamed file
+RECITER_CREDIT = ("Recitation: Mishary Rashid Alafasy via EveryAyah.com · "
+                  "Word timings: Collin Fair, quran-align (CC BY 4.0)")
 GAP_WARN_MS = 1500
 SHORT_WARN_MS = 200
 
@@ -64,10 +66,10 @@ errors: list[str] = []
 warnings: list[str] = []
 
 
-def everyayah_url(reciter: str, s: int, a: int) -> str:
-    """The streamed file of one ayah on EveryAyah ({SSS}{AAA}.mp3; never re-hosted, plan §6.2).
-    The lessons' Recitation.url and the Konsep examples' clips (clips.py) are both this."""
-    return f"https://everyayah.com/data/{reciter}/{s:03d}{a:03d}.mp3"
+def everyayah_url(s: int, a: int) -> str:
+    """The imam's streamed file of one ayah on EveryAyah ({SSS}{AAA}.mp3; never re-hosted, plan
+    §6.2). The lessons' Recitation.url and the Konsep examples' clips (clips.py) are both this."""
+    return f"https://everyayah.com/data/{RECITER}/{s:03d}{a:03d}.mp3"
 
 
 def word_segments(entry: dict) -> tuple[list[list[int]], list[tuple[int, int]]]:
@@ -422,15 +424,10 @@ def build(spec: SurahSpec) -> int:
     W = qac_words(segs)
     qe, qe_path = quranenc_sura(src, S)
     qe_rows = {int(r["aya"]): r for r in json.loads(qe_path.read_text(encoding="utf-8"))["result"]}
-    qa_dir = PIPELINE / I["quran_align"]["cache_path"]
-    qa_dir = qa_dir.parent
-    align = {}
-    for reciter, probe_key, _ in RECITERS:
-        p = qa_dir / f"{reciter}.json"
-        want = I["quran_align"]["members"][f"{reciter}.json"]["sha256"]
-        if sha256_file(p) != want:
-            raise SystemExit(f"quran-align {reciter}.json sha256 mismatch; run fetch.py")
-        align[reciter] = {(e["surah"], e["ayah"]): e for e in json.loads(p.read_text())}
+    qa_path = (PIPELINE / I["quran_align"]["cache_path"]).parent / f"{RECITER}.json"
+    if sha256_file(qa_path) != I["quran_align"]["members"][f"{RECITER}.json"]["sha256"]:
+        raise SystemExit(f"quran-align {RECITER}.json sha256 mismatch; run fetch.py")
+    align = {(e["surah"], e["ayah"]): e for e in json.loads(qa_path.read_text())}
     authored = json.loads(words_path.read_text(encoding="utf-8"))
     kitab = authored["kitab"]
     mk = LessonMarkup(T, W) if slug in MARKED_SURAHS else None
@@ -564,21 +561,21 @@ def build(spec: SurahSpec) -> int:
         if markers != fn_markers:
             errors.append(f"translation {S}:{a}: markers in text {markers} != footnote markers {fn_markers}")
 
+        # The ayah's ONE recitation (RECITER, above): a list of one, the shape schema.ts keeps.
         recitation = []
-        for reciter, probe_key, credit in RECITERS:
-            e = align[reciter].get((S, a))
-            if not e:
-                errors.append(f"quran-align {reciter}: no entry for {S}:{a}")
-                continue
+        e = align.get((S, a))
+        if not e:
+            errors.append(f"quran-align {RECITER}: no entry for {S}:{a}")
+        else:
             segs_out, joined = word_segments(e)
             for first, last in joined:
-                errors.append(f"{reciter} {S}:{a}: segment covers words {first}..{last} together; "
+                errors.append(f"{RECITER} {S}:{a}: segment covers words {first}..{last} together; "
                               f"cannot give per-word timing")
-            probe = I[probe_key]["files"].get(f"{S:03d}{a:03d}.mp3", {})
-            check_segments(reciter, S, a, segs_out, len(tokens), probe.get("duration_ms"), e.get("stats", {}))
-            recitation.append({"reciter": reciter,
-                               "url": everyayah_url(reciter, S, a),
-                               "segments": segs_out, "credit": credit})
+            probe = I[RECITER_PROBES]["files"].get(f"{S:03d}{a:03d}.mp3", {})
+            check_segments(RECITER, S, a, segs_out, len(tokens), probe.get("duration_ms"), e.get("stats", {}))
+            recitation.append({"reciter": RECITER,
+                               "url": everyayah_url(S, a),
+                               "segments": segs_out, "credit": RECITER_CREDIT})
 
         ayah = {
             "loc": f"{S}:{a}", "surah": S, "ayah": a, "ar": verse, "words": words,

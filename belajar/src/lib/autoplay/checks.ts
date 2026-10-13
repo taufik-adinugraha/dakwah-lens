@@ -35,7 +35,7 @@
  *     and every word whose harakah its own line explains has its beat — or is
  *     listed with the reason (no Qur'anic example exists, the ending is not
  *     heard there); each beat has its Arabic (the content's bytes) and a
- *     recording (this ayah's word timed in every recitation, or the clip the
+ *     recording (this ayah's word timed in its recitation, or the clip the
  *     content gives), is labelled by what is heard (waqf, hamzat washal), is
  *     no narration line, and at most two follow one rule. A beat whose
  *     recording cannot be played never stops the lesson (the machine checks).
@@ -49,7 +49,7 @@ import { hasWaqfNote, waqfDrop } from "../heard";
 import { MAX_CAPTION, type Pace } from "../lessonSteps";
 import { SURAH_SLUGS } from "../routes";
 import { lessonExamples, MAX_EXAMPLES_PER_RULE, type ComposeLike, type ExampleGap, type LessonExample } from "./examples";
-import { availableExercises, orderRecitations, questionNumbers, type QuizAyahLike } from "./exercises";
+import { availableExercises, questionNumbers, type QuizAyahLike } from "./exercises";
 import { LINE_ID_RE, manifestParts, parseLineId, promptLineId } from "./ids";
 import {
   createAutoplayState,
@@ -383,7 +383,7 @@ const EVERYAYAH_FILE = /^https:\/\/everyayah\.com\/data\/[A-Za-z0-9_]+\/\d{6}\.m
  *   harakah its own line explains has its beat, or is listed with a reason (`derived.gaps`);
  *   every composition step ends with the imam reciting its word (the joined word);
  * - each beat is one the content gives (examples.ts), in the right step, after the right line;
- *   exactly one recording: this ayah's word, timed in EVERY recitation of the ayah, or the clip
+ *   exactly one recording: this ayah's word, timed in the ayah's recitation, or the clip
  *   the content gives for its key (an EveryAyah file, start before end);
  * - its Arabic is the content's bytes, its caption is plain on-screen text that names it (no
  *   Arabic script, parts ≤ 180 characters) — and no narration line;
@@ -994,8 +994,8 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
       }
 
       // Drive it: caption-only (as the content is today) and with audio.
-      // Recitation length from the default reciter's word timings (estimate).
-      const segments = orderRecitations(ayah.recitation)[0]?.segments ?? [];
+      // Recitation length from the imam's word timings (estimate).
+      const segments = ayah.recitation[0]?.segments ?? [];
       const reciteMs = (a: Extract<Activity, { kind: "recite" }>) => {
         if (a.target === "ayah") return segments.reduce((m, [, , end]) => Math.max(m, end), 0) || 6000;
         if (a.target === "clip") return a.clip.end - a.clip.start;

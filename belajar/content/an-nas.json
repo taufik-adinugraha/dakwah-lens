@@ -274,33 +274,6 @@
       },
       "recitation": [
         {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114001.mp3",
-          "segments": [
-            [
-              1,
-              250,
-              690
-            ],
-            [
-              2,
-              700,
-              1830
-            ],
-            [
-              3,
-              1840,
-              3050
-            ],
-            [
-              4,
-              3060,
-              4820
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
-        {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/114001.mp3",
           "segments": [
@@ -558,23 +531,6 @@
       },
       "recitation": [
         {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114002.mp3",
-          "segments": [
-            [
-              1,
-              250,
-              1140
-            ],
-            [
-              2,
-              1150,
-              2860
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
-        {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/114002.mp3",
           "segments": [
@@ -803,23 +759,6 @@
         "version": "1.0.1"
       },
       "recitation": [
-        {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114003.mp3",
-          "segments": [
-            [
-              1,
-              40,
-              1300
-            ],
-            [
-              2,
-              1310,
-              3100
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
         {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/114003.mp3",
@@ -1196,33 +1135,6 @@
         "version": "1.0.1"
       },
       "recitation": [
-        {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114004.mp3",
-          "segments": [
-            [
-              1,
-              150,
-              1010
-            ],
-            [
-              2,
-              1020,
-              2010
-            ],
-            [
-              3,
-              2020,
-              3910
-            ],
-            [
-              4,
-              3920,
-              6370
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
         {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/114004.mp3",
@@ -1684,38 +1596,6 @@
       },
       "recitation": [
         {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114005.mp3",
-          "segments": [
-            [
-              1,
-              150,
-              1570
-            ],
-            [
-              2,
-              1580,
-              3110
-            ],
-            [
-              3,
-              3120,
-              3750
-            ],
-            [
-              4,
-              3760,
-              5130
-            ],
-            [
-              5,
-              5140,
-              6850
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
-        {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/114005.mp3",
           "segments": [
@@ -2062,28 +1942,6 @@
         "version": "1.0.1"
       },
       "recitation": [
-        {
-          "reciter": "Husary_Muallim_128kbps",
-          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114006.mp3",
-          "segments": [
-            [
-              1,
-              250,
-              560
-            ],
-            [
-              2,
-              570,
-              2460
-            ],
-            [
-              3,
-              2470,
-              4800
-            ]
-          ],
-          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
-        },
         {
           "reciter": "Alafasy_128kbps",
           "url": "https://everyayah.com/data/Alafasy_128kbps/114006.mp3",
@@ -2959,7 +2817,7 @@
     "tanzil": "uthmani-1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "tanzil_metadata": "1.0 sha256:8867c1d88191472adec9db694b3cd9f135b1a2ef580574d32cf888dcb22c5c7a",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Husary_Muallim_128kbps.json sha256:3719fb5c482d7db7086b4a81cdb6f114aa71979899917a74e6c8ae5bec684f5f; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
+    "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:c2ad413ccfcc97d833774096a916bf5b4ba2dfad6f107f851ba1129103cacd00",
     "authored_words": "authored/an-nas.words.json sha256:97b826e21f12f63bac6fbe9f097b3efca375c6005e5f04401aec386d1779a84d",
     "authored_structure": "authored/an-nas.structure.json sha256:7ca6490b3e02bac7aa3ef6b4918fe513609d6d235bbd242f5cac4aaf3c3e2de8",

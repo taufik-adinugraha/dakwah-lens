@@ -12,7 +12,6 @@ import {
   firstNarration,
   hasArabicScript,
   idlePreloadUrl,
-  orderRecitations,
   questionNumbers,
   recitationToWarm,
   reduceAutoplay,
@@ -141,9 +140,9 @@ describe("autoplay stage: what the lesson page ships", () => {
 });
 
 describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-11)", () => {
-  /** What the ayah page hands the stage (page.tsx): the recordings in the page's order — the
-   *  first is the one chosen until the learner picks another. */
-  const pageSources = (a: (typeof SURAHS)[number]["ayat"][number]) => orderRecitations(a.recitation).map((r) => r.url);
+  /** What the ayah page hands the stage (page.tsx): the ayah's one recording, the one imam's
+   *  (operator 2026-10-13, plan L21; until then two, the second chosen in "Pengaturan"). */
+  const pageSource = (a: (typeof SURAHS)[number]["ayat"][number]) => a.recitation[0].url;
 
   // What this walk can and cannot show (review 2026-10-11): the rule returns the recording it is
   // handed, so the walk proves WHEN the lesson asks (never on a page view, from the first line to
@@ -157,11 +156,12 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
         for (const a of s.ayat) {
           for (const locale of ["id", "en"]) {
             const seq = stageSequence(s, a, locale);
-            const sources = pageSources(a);
-            const want = (st: ReturnType<typeof createAutoplayState>, chosen = 0) =>
-              recitationToWarm({ started: st.started, currentUrl: sources[chosen] ?? null });
+            const source = pageSource(a);
+            const want = (st: ReturnType<typeof createAutoplayState>) => recitationToWarm({ started: st.started, currentUrl: source });
             const where = `${s.slug} ${a.ayah} [${locale}]`;
-            expect(sources.length, where).toBeGreaterThan(0);
+            // One recording, so nothing else the lesson could ask for: no second reciter's.
+            expect(a.recitation, where).toHaveLength(1);
+            expect(source, where).toMatch(/^https:\/\/everyayah\.com\/data\/Alafasy_128kbps\/\d{6}\.mp3$/);
             const idle = createAutoplayState(seq);
             expect(want(idle), where).toBeNull();
 
@@ -176,9 +176,7 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
               const st = reduceAutoplay(seq, idle, start);
               expect(st.started, where).toBe(true);
               expect(st.activity?.kind, `${where} ${start.reason}`).not.toBe("recite");
-              expect(want(st), where).toBe(sources[0]);
-              // Another reciter chosen in Pengaturan: his recording of this ayah.
-              if (sources.length > 1) expect(want(st, 1), where).toBe(sources[1]);
+              expect(want(st), where).toBe(source);
             }
 
             // The whole lesson, step by step ("Berikutnya ›", "Lewati latihan" at an exercise):
@@ -187,7 +185,7 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
             let st = reduceAutoplay(seq, idle, { type: "start", reason: "fresh" });
             for (let i = 0; i < 300 && st.phase !== "finished"; i++) {
               const v = viewAutoplay(seq, st);
-              expect(want(st), `${where} step ${v.step.id}`).toBe(sources[0]);
+              expect(want(st), `${where} step ${v.step.id}`).toBe(source);
               st = reduceAutoplay(seq, st, { type: v.showSkip ? "skip" : "next" });
             }
             expect(st.phase, where).toBe("finished");
@@ -206,10 +204,9 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
     for (const s of SURAHS) {
       const owner = new Map<string, number>();
       for (const a of s.ayat) {
-        for (const url of pageSources(a)) {
-          expect(owner.get(url) ?? a.ayah, `${s.slug}: ${url}`).toBe(a.ayah);
-          owner.set(url, a.ayah);
-        }
+        const url = pageSource(a);
+        expect(owner.get(url) ?? a.ayah, `${s.slug}: ${url}`).toBe(a.ayah);
+        owner.set(url, a.ayah);
       }
     }
   });
@@ -230,7 +227,9 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
         }
       }
     }
-    expect(n).toBeGreaterThan(40);
+    // One recording per lesson ayah (until 2026-10-13 two: this counted past 40).
+    expect(n).toBe(SURAHS.reduce((sum, s) => sum + s.ayat.length, 0));
+    expect(n).toBeGreaterThan(20);
   });
 
   it("is wired from the runner to the stage's one player, and a page view alone leaves the recording alone", () => {
@@ -249,16 +248,21 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
     expect(player.match(/new Audio\(\)/g)).toHaveLength(2); // stageAudio(), and a standalone player's own
     const page = read("src/app/[locale]/quran/[surah]/[ayah]/page.tsx");
     expect(page).not.toContain("next.recitation");
-    expect(page).toContain("sources={sources}");
+    // The page hands the stage ONE recording, the ayah's (one imam, plan L21), and the runner
+    // asks for that very one: its address is the source's, not a reciter state's.
+    expect(page).toContain("const [recitation] = a.recitation;");
+    expect(page).toContain("source={source}");
     const stage = read("src/components/lesson/LessonStage.tsx");
-    expect(stage).toContain("useAutoplay(seq, sources, title)");
-    // The CI check finds the chosen recording by the stage's data-reciter, and tells that the imam
-    // is really sounding by the place of the word lit (a later word needs the recording to advance).
-    expect(stage).toContain("data-reciter={p.source?.reciter}");
+    expect(stage).toContain("useAutoplay(seq, source, title)");
+    expect(runner).toContain("const reciteUrl = source.url;");
+    // The CI check finds the recording in the content (the ayah's one recitation: the stage has
+    // no reciter to name any more, so no data-reciter), and tells that the imam is really
+    // sounding by the place of the word lit (a later word needs the recording to advance).
     expect(read("src/components/lesson/AyahPlayer.tsx")).toContain("data-word={w.index}");
     const ci = read("scripts/ci/screenshots.mjs");
-    expect(ci).toContain('getAttribute("data-reciter")');
+    expect(ci).toContain("const [only, ...more] = content.ayat.find((a) => a.ayah === ayah)?.recitation ?? [];");
     expect(ci).toContain('getAttribute("data-word")');
+    for (const src of [stage, ci, player, runner]) expect(src).not.toContain("data-reciter");
   });
 });
 

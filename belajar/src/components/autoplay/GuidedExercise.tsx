@@ -56,7 +56,7 @@ export function GuidedExercise({
   data: StageExerciseData;
   /** The mushaf words of the ayah (Dengar dan klik). */
   tapWords: { index: number; ar: string; translit: string; gloss: string }[];
-  /** The page's first (default) recitation — the one the standalone copy uses. */
+  /** The ayah's recording (the one imam's) — the one the standalone copy uses. */
   tapSource: RecitationSource;
   guided: ExerciseGuide;
 }) {

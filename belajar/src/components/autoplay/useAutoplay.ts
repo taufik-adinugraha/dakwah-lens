@@ -105,8 +105,7 @@ const IDLE_PRELOAD_TIMEOUT_MS = 3000;
 const EXAMPLE_WATCH_MS = 1000;
 
 /** The origin of a recording's address ("https://everyayah.com"), or null. */
-function originOf(url: string | undefined): string | null {
-  if (!url) return null;
+function originOf(url: string): string | null {
   try {
     return new URL(url).origin;
   } catch {
@@ -193,7 +192,7 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  *   (lock screen, earphones) play/pause/next/previous.
  * - Never scrolls the page.
  */
-export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], title: string) {
+export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, title: string) {
   const router = useRouter();
   const { pace, setPace: storePace } = usePace();
   const [imamRate, setImamRate] = useImamRate();
@@ -254,7 +253,7 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
   const foreignAtRef = useRef(0);
   const foreignRef = useRef<HTMLAudioElement | null>(null);
 
-  const player = useSegmentPlayer(sources, {
+  const player = useSegmentPlayer(source, {
     // The stage's element is kept across ayah pages, so the one "Mulai" tap
     // keeps it allowed to play (iOS Safari) when the lesson moves on.
     keep: true,
@@ -271,19 +270,19 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
   // The example player: clips of OTHER ayat (an example beat), at the learner's speed for the imam.
   const examplePlayer = useExamplePlayer({ rate: imamRate });
   const { play: playExample, unlock: unlockExample, warm: warmExample, flowing: exampleFlowing, owns: ownsExample } = examplePlayer;
-  // The imam's recitation streams from the reciter's CDN (next.config.ts RECITATION_HOSTS): a
-  // preconnect hint to the chosen reciter's host (the connection set up ahead, operator
-  // 2026-10-11) — never a preload of the recording itself before "Mulai": learners on mobile
-  // data pay for every byte. React hoists it into <head>, once per origin.
-  const reciteUrl = player.source?.url ?? null;
-  const reciteOrigin = originOf(reciteUrl ?? undefined);
+  // The imam's recitation streams from the provider's CDN (next.config.ts RECITATION_HOSTS): a
+  // preconnect hint to its host (the connection set up ahead, operator 2026-10-11) — never a
+  // preload of the recording itself before "Mulai": learners on mobile data pay for every byte.
+  // React hoists it into <head>, once per origin.
+  const reciteUrl = source.url;
+  const reciteOrigin = originOf(reciteUrl);
   if (reciteOrigin) preconnect(reciteOrigin);
 
   // ── Once the lesson has started: the imam's recitation, fetched early ──
-  // (operator 2026-10-11; when and why: src/lib/autoplay/warm.ts). This ayah's recording by the
-  // reciter chosen, on the stage's own player, while the narrator speaks the opening line — and
-  // again when another reciter is chosen. It only asks the browser to fetch: nothing plays,
-  // nothing is reported, and the loading notice stays the waiting activity's alone.
+  // (operator 2026-10-11; when and why: src/lib/autoplay/warm.ts). This ayah's recording, on the
+  // stage's own player, while the narrator speaks the opening line. It only asks the browser to
+  // fetch: nothing plays, nothing is reported, and the loading notice stays the waiting
+  // activity's alone.
   const lessonStarted = state.started;
   useEffect(() => {
     const url = recitationToWarm({ started: lessonStarted, currentUrl: reciteUrl });
@@ -310,7 +309,7 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
   }, [seq, exampleUrl, warmExample]);
 
   // Latest player functions for the executor, which must not restart its
-  // activity when they change identity (e.g. the reciter changed).
+  // activity when they change identity.
   const playerRef = useRef({ playWord, playAll, restart, pauseAudio, unlock, flowing, playExample, unlockExample, exampleFlowing });
   useEffect(() => {
     playerRef.current = { playWord, playAll, restart, pauseAudio, unlock, flowing, playExample, unlockExample, exampleFlowing };
@@ -474,7 +473,7 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
       reciteLiveRef.current = true;
       ownerRef.current = token;
       if (activity.target === "word") {
-        // No timing for this word in the chosen recording: the step lasts its
+        // No timing for this word in the recording: the step lasts its
         // reading time only.
         if (!p.playWord(activity.word)) heard = true;
       } else if (activity.resume) {

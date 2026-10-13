@@ -11,27 +11,11 @@ import type { Ayah } from "@/content/schema";
 
 import { EXERCISE_KEYS, type ExerciseKey } from "./types";
 
-/**
- * Reciter order of the lesson page (its RECITER_ORDER): Mishary Alafasy is
- * the default (operator, 2026-10-09), Husary Mu'allim second. The page's
- * first source is the one TapWord plays.
- */
-export const RECITER_ORDER = ["Alafasy_128kbps", "Husary_Muallim_128kbps"] as const;
-
-const reciterRank = (id: string) => {
-  const i = (RECITER_ORDER as readonly string[]).indexOf(id);
-  return i === -1 ? RECITER_ORDER.length : i;
-};
-
-/** An ayah's recitations in the page's order (stable for equal ranks). */
-export function orderRecitations<R extends { reciter: string }>(recitation: readonly R[]): R[] {
-  return [...recitation].sort((x, y) => reciterRank(x.reciter) - reciterRank(y.reciter));
-}
-
-/** 1-based word indices timed in the page's first (default) recitation. */
+/** 1-based word indices timed in the ayah's recitation (the one imam's, plan L21: what the stage
+ *  and TapWord play). */
 export function timedWords(ayah: Pick<Ayah, "recitation">): number[] {
-  const first = orderRecitations(ayah.recitation)[0];
-  return first ? [...new Set(first.segments.map(([w]) => w))] : [];
+  const [recitation] = ayah.recitation;
+  return recitation ? [...new Set(recitation.segments.map(([w]) => w))] : [];
 }
 
 /** What the engine reads of one ayah's quiz (content/quiz, src/content/quiz-schema.ts): no zod

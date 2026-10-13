@@ -94,6 +94,39 @@ function chipsNotLinks(where, html, slug, ayah = null) {
   return want.size;
 }
 
+/**
+ * ONE imam everywhere, and no reciter setting (operator 2026-10-13: "better to use alafasy for all?
+ * no need to give option to user to change"; docs/belajar-plan.md L21). Read from the WHOLE
+ * response of a lesson's ayah page — server HTML, RSC payload and the message catalogue next-intl
+ * puts into every page's scripts:
+ *   - the content gives the ayah exactly one recitation, Mishary Alafasy's EveryAyah file, and the
+ *     page carries that address (what the stage plays) and no other recording of that host;
+ *   - nothing names the reciter the lessons carried beside him until that day (Husary Mu'allim):
+ *     no option, no note, no message, no recording;
+ *   - the page has no dropdown (the reciter choice was the module's only <select>) and the stage
+ *     no reciter attribute.
+ * That the "⚙ Pengaturan" panel as a browser draws it offers no such choice is checked by
+ * screenshots.mjs (autoplayShots). Returns 1 when the page was checked.
+ */
+const IMAM = "Alafasy_128kbps";
+function oneImam(where, html, slug, ayah) {
+  const a = SURAH[slug].ayat.find((x) => x.ayah === ayah);
+  const recs = a?.recitation ?? [];
+  const want = `https://everyayah.com/data/${IMAM}/${String(SURAH[slug].surah).padStart(3, "0")}${String(ayah).padStart(3, "0")}.mp3`;
+  if (recs.length !== 1 || recs[0].reciter !== IMAM || recs[0].url !== want) {
+    fail(where, `content/${slug}.json gives ayah ${ayah} ${JSON.stringify(recs.map((r) => r.url))}, expected exactly [${want}] (one imam)`);
+    return 0;
+  }
+  if (!html.includes(want)) fail(where, `the page does not carry the imam's recording of this ayah (${want})`);
+  const others = [...new Set([...html.matchAll(/https:\/\/everyayah\.com\/data\/[A-Za-z0-9_]+\/\d{6}\.mp3/g)].map((m) => m[0]))].filter((u) => !u.includes(`/data/${IMAM}/`));
+  if (others.length) fail(where, `carries a recording that is not the imam's: ${others.slice(0, 3).join(", ")}`);
+  const named = /husary|mu.?allim/i.exec(html);
+  if (named) fail(where, `names another reciter: "…${html.slice(Math.max(0, named.index - 50), named.index + 40)}…"`);
+  if (/<select\b|<option\b/i.test(html)) fail(where, "has a dropdown (<select>): the reciter choice is back");
+  if (html.includes("data-reciter")) fail(where, "the stage carries a reciter attribute (data-reciter)");
+  return 1;
+}
+
 async function get(path, headers = {}) {
   const res = await fetch(BASE + path, { redirect: "manual", headers });
   return { status: res.status, location: res.headers.get("location"), html: await res.text() };
@@ -290,19 +323,27 @@ async function checkHidden() {
   console.log(`kosakata: ${LIBRARY.lexicon.length} page(s), ${plainPlaces} place(s) in a hidden surah shown as plain text`);
   if (plainPlaces === 0) fail("kosakata", "no word place in a hidden surah was found as plain text");
   let chipped = 0;
+  let imam = 0;
   for (const path of [...DEFAULT.flatMap((s) => lessonPaths("id", s)), "/belajar/id/konsep", "/belajar/id/kredit", "/belajar/en/kredit"]) {
     const { status, html } = await get(path);
     if (status !== 200) fail(path, `status ${status}, expected 200`);
     noLinkInto(path, html, hidden);
     const lesson = /^\/belajar\/id\/quran\/([^/]+)(?:\/(\d+))?$/.exec(path);
     if (lesson) chipped += chipsNotLinks(path, html, lesson[1], lesson[2] ? Number(lesson[2]) : null);
+    if (lesson?.[2]) imam += oneImam(path, html, lesson[1], Number(lesson[2]));
     if (path.endsWith("/kredit")) {
       const text = visibleText(mainOf(html));
       for (const slug of hidden) if (text.includes(SURAH[slug].name_id)) fail(path, `names the hidden ${slug}`);
+      // The recitation credits are derived from the content: one imam, one line (plan L21).
+      const credit = SURAH[DEFAULT[0]].ayat[0].recitation[0]?.credit ?? "";
+      if (!credit.includes("Mishary Rashid Alafasy") || !visibleText(html).includes(credit)) fail(path, `the imam's credit line is not shown ("${credit}")`);
+      if (/husary|mu.?allim/i.test(html)) fail(path, "credits a reciter no lesson plays (Husary Mu'allim)");
     }
   }
   console.log(`fact cards: ${chipped} location chip(s) on the published lesson pages, buttons, no quran.com link`);
   if (chipped === 0) fail("fact cards", "no location chip found on the published lesson pages");
+  console.log(`one imam: ${imam} published ayah page(s) carry Alafasy's recording of their ayah and no other reciter, no dropdown; the Kredit pages credit him alone`);
+  if (imam !== DEFAULT.reduce((n, s) => n + SURAH[s].ayat.length, 0)) fail("one imam", `checked ${imam} ayah page(s), not every published one`);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -312,6 +353,7 @@ async function checkHidden() {
 async function checkShown() {
   await api(SLUGS);
   let chipped = 0;
+  let imam = 0;
   for (const slug of SLUGS) {
     for (const path of [...lessonPaths("id", slug), `/belajar/en/quran/${slug}`, `/belajar/en/quran/${slug}/1`]) {
       const { status, html } = await get(path);
@@ -323,6 +365,8 @@ async function checkShown() {
       const ayah = /\/quran\/[^/]+\/(\d+)$/.exec(path);
       chipped += chipsNotLinks(path, html, slug, ayah ? Number(ayah[1]) : null);
       if (!ayah) continue;
+      // One imam, no reciter choice (plan L21): on every ayah page of every surah, both locales.
+      imam += oneImam(path, html, slug, Number(ayah[1]));
       // The autoplay lesson: the single "Mulai pelajaran" button and the one-line hint, server
       // rendered; "klik", never "ketuk" (operator, 2026-10-10).
       if (!html.includes('data-autoplay="start"')) fail(path, "no autoplay start button");
@@ -335,6 +379,8 @@ async function checkShown() {
   }
   console.log(`fact cards: ${chipped} location chip(s) on every surah's pages, buttons, no quran.com link`);
   if (chipped === 0) fail("fact cards", "no location chip found on any lesson page");
+  console.log(`one imam: ${imam} ayah page(s) carry Alafasy's recording of their ayah and no other reciter, no dropdown`);
+  if (imam < SLUGS.reduce((n, s) => n + SURAH[s].ayat.length, 0)) fail("one imam", `checked ${imam} ayah page(s), fewer than every lesson ayah`);
   // An unknown ayah is still the module's 404.
   for (const path of ["/belajar/id/quran/an-nas/7", "/belajar/id/quran/al-ikhlas/5"]) {
     const { status } = await get(path);

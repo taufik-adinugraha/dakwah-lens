@@ -176,14 +176,12 @@
     "mahall_plain": "Kedudukannya {pos}, meski bentuk akhirnya tetap."
   },
   "Player": {
-    "reciter": "Suara imam (qari)",
     "play_word": "Kata ke-{n}: dengar {translit} — {gloss}",
     "word_place": "Kata ke-{n}",
     "heading": "Bacaan imam",
     "speed": "Kecepatan imam: {speed}",
     "speed_normal": "Biasa",
     "speed_slow": "Pelan",
-    "husary_note": "Al-Husary (Mu'allim) memberi jeda untuk menirukan.",
     "failed": "Bacaan imam belum bisa diputar. Periksa sambungan internet Anda, lalu klik kata itu sekali lagi.",
     "listen": "Dengar",
     "listen_detail": "kata ke-{n}, {translit}"

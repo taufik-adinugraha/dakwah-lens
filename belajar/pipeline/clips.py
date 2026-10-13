@@ -7,8 +7,8 @@ only for harakah, but also for all rules").
 A clip is one ayah's streamed recording and the place of one word (or one run of words) in it:
 `{"url": <EveryAyah file of that ayah>, "start": ms, "end": ms}` and `"last": true` when its (last)
 word ends the ayah, keyed by the word's location ("5:23:6", or "55:78:1-2" for a run). The voice is
-the IMAM, never the narrator: Mishary Alafasy (`Alafasy_128kbps`, the module's default reciter, plan
-L7), the very files and the very timing convention the lessons use — the pinned quran-align
+the IMAM, never the narrator: Mishary Alafasy (`Alafasy_128kbps`, the module's one imam, plan L7 and
+L21), the very files and the very timing convention the lessons use — the pinned quran-align
 release, read through build_surah.word_segments (segment [wordStart0, wordEndExclusive0, startMs,
 endMs] → word wordStart0 + 1, the Tanzil token index of common.lesson_ayah) and
 build_surah.everyayah_url. Nothing is cut, copied or stored: the browser seeks within the streamed
@@ -73,10 +73,9 @@ import json
 import re
 
 import terms as TM
-from build_surah import everyayah_url, word_segments
+from build_surah import RECITER, everyayah_url, word_segments  # the one imam (plan L21)
 from common import PIPELINE, SURAH_BY_NUM, Tanzil, lesson_ayah, sha256_file
 
-RECITER = "Alafasy_128kbps"  # plan L7: the default voice (build_surah.RECITERS, src/lib/ayah.ts)
 ALIGN_MEMBER = f"{RECITER}.json"
 MIN_MS = 150
 MAX_MS = 4000
@@ -200,8 +199,8 @@ def clip_problems(key: str, clip) -> list[str]:
     out = []
     if "last" in clip and clip["last"] is not True:
         out.append(f"{where}: `last` is true or absent, got {clip['last']!r}")
-    if clip["url"] != everyayah_url(RECITER, s, a):
-        out.append(f"{where}: url {clip['url']!r} is not {RECITER}'s file of {s}:{a} ({everyayah_url(RECITER, s, a)})")
+    if clip["url"] != everyayah_url(s, a):
+        out.append(f"{where}: url {clip['url']!r} is not {RECITER}'s file of {s}:{a} ({everyayah_url(s, a)})")
     st, en = clip["start"], clip["end"]
     if not all(isinstance(x, int) and not isinstance(x, bool) for x in (st, en)):
         return out + [f"{where}: start and end must be integers (ms), got {st!r}, {en!r}"]
@@ -266,7 +265,7 @@ def clip_from(key: str, align: dict, T) -> tuple[dict | None, list[str], list[st
     if errs:
         return None, errs, warns
     by_w = {x[0]: x for x in segs}
-    clip = {"url": everyayah_url(RECITER, s, a), "start": by_w[w][1], "end": by_w[w2][2]}
+    clip = {"url": everyayah_url(s, a), "start": by_w[w][1], "end": by_w[w2][2]}
     if w2 == len(tokens):
         clip["last"] = True  # the imam stops here (waqf): a final harakah or tanwin is not heard
     stats = e.get("stats", {})

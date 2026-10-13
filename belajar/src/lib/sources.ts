@@ -233,16 +233,9 @@ export const SOURCES: Source[] = [
   },
   {
     name: "Bacaan Syaikh Mishary Rasyid Alafasy",
-    role: "Bacaan imam utama (diputar langsung dari EveryAyah.com, tidak disimpan di server kami)",
+    role: "Bacaan imam (diputar langsung dari EveryAyah.com, tidak disimpan di server kami)",
     licence: "Diputar dari server penyedia; hak rekaman tetap pada pemiliknya",
     credit: "Recitation: Mishary Rashid Alafasy via EveryAyah.com",
-    url: "https://everyayah.com",
-  },
-  {
-    name: "Bacaan Syaikh Mahmud Khalil al-Husary (Mu'allim)",
-    role: "Bacaan imam untuk mendengar dan menirukan (diputar langsung, tidak disimpan)",
-    licence: "Diputar dari server penyedia; hak rekaman tetap pada pemiliknya",
-    credit: "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com",
     url: "https://everyayah.com",
   },
   {

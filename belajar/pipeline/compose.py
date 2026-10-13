@@ -524,7 +524,7 @@ EXAMPLE_KEYS_UNVOICED = {"frame", "form", "unvoiced"}
 
 class Voices:
     """What the voice of a bentuk dasar is chosen with, beside the corpus: the pinned quran-align
-    entries of the default reciter (None in CI: no cache), the lessons' transliterations and the
+    entries of the imam (None in CI: no cache), the lessons' transliterations and the
     `washal` of the library's base-form tiles — where the transliteration of a word outside the
     lessons is typed (authored/library.parts.json `before`; content/library.json, built first)."""
 

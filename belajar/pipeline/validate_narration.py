@@ -199,7 +199,7 @@ EXERCISE_GUIDE_PARTS: dict[str, tuple[str, ...]] = {
     "wazn-factory": ("options", "reveal", "next"),
 }
 # Which exercises an ayah shows, and their questions: content/quiz/<slug>.json (quiz.py; the
-# reciter order and the case states the components used to count with live there since 2026-10-11).
+# timed words and the case states the components used to count with live there since 2026-10-11).
 
 # Generic lines, shared by every lesson (shared.json, "shared:${key}"). The exercise prompts
 # "shared:ex:${key}:${part}" are added from EXERCISE_GUIDE_PARTS.
