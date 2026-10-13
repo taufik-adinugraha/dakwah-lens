@@ -540,8 +540,13 @@ Isma'il, Rasm al-Mushaf hlm. 97; SKB maddah), with an example letter.
 `build_narration.py` (lines) and the stage (`src/components/lesson/WordComposition.tsx`, in the
 word card's slot, as tall as the word's tallest frame — every frame is laid out invisibly under the
 one on screen, so nothing jumps and nothing is clipped at any text size; CI measures it; the
-sequence step `w${n}:compose` after `w${n}`, ending with the imam reciting the joined word, its tile
-filled forest; the step `primer` after the imam's ayah).
+sequence step `w${n}:compose` after `w${n}`, its last line said over the last frame, the joined
+word — the imam does not recite the word again there: he says it once, when the word's step opens
+(`w${n}:recite`; operator 2026-10-13, plan L24); the step `primer` after the imam's ayah). Only
+an ayah's LAST word is recited once more, after the last line of its composition, its tile filled
+forest: the composition that ends on the frame whose note is "imam berhenti di sini", said over
+by its last line (`src/lib/composition.ts` `STOP_NOTE`). Keep exactly that note for that frame,
+and write it nowhere else: the build refuses it on any other frame (`composeFileProblems`).
 
 **Forms, never typed Arabic.** Each named form says where its bytes come from (`compose.py` has
 the grammar): a lesson word or a slice of it in whole pieces (`{"word": "1:1:1", "pieces": [0,
@@ -628,13 +633,15 @@ every such word. The first harakah of each word's explanation carries its sound 
 visual) when combined with harf jar, it becomes ismi (read by voice + visual). in principel, each
 explanation should be followed by examples (visual + voice)", "not only for harakah, but also for
 all rules"; plan L20). When a `base` frame is on the stage the imam recites that base form — never
-the narrator — and the step still ends with him reciting the joined word. The build writes one
+the narrator. (Until plan L24, 2026-10-13, the step also ended with him reciting the joined word;
+the lesson's own word is now recited once, when its step opens — an ayah's last word once more,
+after the line that says he stops on it.) The build writes one
 entry of `examples[<word loc>]` per base frame (`compose.build_examples`), chosen by what is HEARD
 (the rules of "Suara contoh" below, `clips.py`; never a hand list):
 
 | the base form | its voice |
 |---|---|
-| is the lesson word itself (`{"word": <this loc>}`: al-ḥamdu, na‘budu, nasta‘īnu) | `unvoiced: "own"` — the step's own recitation of that word is its example |
+| is the lesson word itself (`{"word": <this loc>}`: al-ḥamdu, na‘budu, nasta‘īnu) | `unvoiced: "own"` — the imam recites that very word when its step opens (until plan L24 also at the end of its composition; nasta‘īnu, its ayah's last word, still is) |
 | quotes a place (`{"tanzil": loc}`, another lesson's `{"word": loc}`) | that place, the one the frame's note names; it must be heard as shown or the build stops |
 | is derived (an edit, a join) and stands in the Qur'an | the place with a clean alignment, then in the shortest ayah (the browser streams that ayah's file for one word), then mushaf order |
 | is derived and stands nowhere (māliku, aṣ-ṣirāṭu, al-mustaqīmu, al-magḍūbu) | `unvoiced: "unattested"`: a teaching form, no reciter says it |
@@ -858,13 +865,17 @@ narrator and nothing is rendered; `content/narration/*.json` did not change.
   note names the word's own harakah), one more from the concept's other examples that does not
   end its ayah (a clip of `library.json` `clips`; none in the lessons today); (b) in a word's
   composition, the bentuk dasar after the last line of its `base` frame (`content/compose`
-  `examples`, above), the joined word being the step's own recitation at the last frame as
-  before; (c) for a word WITHOUT a composition whose line explains its harakah, that word again
-  right after the line — unless the harakah is not heard there (`heard.ts` `signNotHeard`). At
+  `examples`, above). The lesson's OWN word is recited once, when its step opens
+  (`w${n}:recite`), and not again (operator 2026-10-13, plan L24: "when transation from word X to
+  X+1, i think we dont need to recite the X, just directly to X+1"): neither at the end of its
+  composition nor — the former rule (c), for a word WITHOUT a composition — as a beat after the
+  line that explains its harakah. The one exception is an ayah's last word, recited once more
+  after the composition line that says the imam stops on it (all seven ayat of Al-Fatihah). At
   most two beats per rule; a rule without a beat of its own is listed with its reason.
 - **Al-Fatihah**: 35 beats — 26 concept examples (this ayah's own word, on the stage's recitation
-  player) and 9 bentuk dasar clips from other ayat (the example player) — adding 240 s in Biasa
-  (445 s in Pelan) to a lesson of about 73 minutes: 57 · 37 · 6 · 12 · 62 · 12 · 55 s for ayat 1–7.
+  player) and 9 bentuk dasar clips from other ayat (the example player) — adding 153 s in Biasa
+  (340 s in Pelan) to a lesson of about 65 minutes: 37 · 25 · 4 · 7 · 42 · 7 · 32 s for ayat 1–7
+  (240 s and 445 s until plan L24, when a beat was held for its caption's `captionMs`).
   7 base frames have no beat of their own (3 "own", 4 "unattested"). `npx tsx
   scripts/autoplay-check.ts --examples` lists every beat and every reason.
 - **What is heard**: a beat on an ayah's last word says "Di akhir ayat imam berhenti, jadi harakat
@@ -874,7 +885,8 @@ narrator and nothing is rendered; `content/narration/*.json` did not change.
   dibaca."
 - **The engine** (`machine.ts`): an `example` action issues a recite activity that names the beat
   (target `word`, or `clip` for another ayah's word); one activity at a time, so it never plays
-  over the narrator or another recording; at least its caption's reading time; twice in "Pelan";
+  over the narrator or another recording; at least its caption's reading time — the reading
+  alone, 10 / 6 characters a second (`timing.ts` `exampleReadMs`, plan L24) —; twice in "Pelan";
   "Tunggu saya" waits for Lanjut after it; pause / resume, "↺ Ulangi langkah ini" and ‹ › work on
   its step. A recording that fails, or does not sound within 6 s (`EXAMPLE_LOAD_LIMIT_MS`), is
   given up: the example stays on screen 3 s with "Suara contoh ini belum bisa diputar." and the

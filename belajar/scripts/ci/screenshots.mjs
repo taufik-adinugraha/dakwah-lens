@@ -2184,13 +2184,22 @@ async function aheadChecks(page, vp, index) {
  * The composition animation on the stage's word-card slot (operator 2026-10-10, narration rule 14),
  * on the real page: the harakat primer (frame 2: fathah on its dotted circle, بَ "b + a"), then
  * word 1 of Al-Fatihah 1 explained by its parts — its first frame [بِ] + [ٱسْمُ], MID-WAY through
- * the change frame (the dhammah fading into kasrah, مُ → مِ, u → i), the change settled, and the
- * join (بِٱسْمِ, "bi + ismi → bismi"), the recited tile (forest fill, checked by computed style);
- * plus the change frame with reduced motion (static). Each is checked unclipped (composeFit). In the
- * "Tunggu saya" pace each caption-only line waits for Lanjut, so the frames are stepped through by
- * clicking it (rendered lines play on by themselves); "↺ Ulangi" starts each step even if the
- * imam's stream paused the lesson on the way. Fails the job if the animation never shows or sits
- * under the bottom panel.
+ * the change frame (the dhammah fading into kasrah, مُ → مِ, u → i), the change settled, the
+ * join (بِٱسْمِ, "bi + ismi → bismi"), and the LAST frame, the joined word exactly as the ayah
+ * writes it (content/al-fatihah.json, never typed here): on screen while a line of that frame is
+ * the caption, no tile filled as "being recited", and the step ENDS there, waiting for Lanjut with
+ * its last line still the caption — the imam does not recite the word again (operator 2026-10-13,
+ * docs/belajar-plan.md L24: "when transation from word X to X+1, i think we dont need to recite
+ * the X, just directly to X+1"; until then this check waited for a "recited" tile here); plus the
+ * change frame with reduced motion (static); and THE AYAH'S LAST WORD (word 4), the one word
+ * recited once more: after the last line of its composition — the line that says the imam stops
+ * on it — its last frame is marked "recited" (data-recited), still shows the word as the ayah
+ * writes it, that line still the caption, and its tile is filled forest with its word readable
+ * (computed style: the review of 2026-10-10 found it white on white). Each is
+ * checked unclipped (composeFit). In the "Tunggu saya" pace each caption-only line waits for
+ * Lanjut, so the frames are stepped through by clicking it (rendered lines play on by themselves);
+ * "↺ Ulangi" starts each step even if the imam's stream paused the lesson on the way. Fails the
+ * job if the animation never shows or sits under the bottom panel.
  */
 async function assertComposeLayout(page, vp) {
   const box = async (sel) => {
@@ -2308,7 +2317,7 @@ async function composeFitSweep(page, vp, size, ayat, units) {
               await page.locator('[data-autoplay="replay"]').click();
               const change = page.locator('[data-autoplay="composition"][data-compose-stage="change"]');
               // Caption-only here: three lines at reading pace (~35 s), then the bentuk dasar's example
-              // (plan L20: its caption's reading time, ~14 s), then the change frame.
+              // (plan L20: its caption's reading time, ~11 s since plan L24), then the change frame.
               for (let w = 0; w < 180 && (await change.count()) === 0; w++) await page.waitForTimeout(500);
               if ((await change.count()) === 0) throw new Error(`${vp} ${size}: word 1 never reached its change frame`);
               await page.waitForTimeout(1600);
@@ -2333,6 +2342,24 @@ async function composeFitSweep(page, vp, size, ayat, units) {
 }
 
 async function composeShots(page, vp, index) {
+  // Word 1's composition and the word itself, from the content: its last frame is the joined word.
+  const composeFile = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", "al-fatihah.json"), "utf8"));
+  const lessonFile = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "al-fatihah.json"), "utf8"));
+  const unit = composeFile.words?.["1:1:1"];
+  const word1 = lessonFile.ayat.find((a) => a.ayah === 1)?.words[0];
+  if (!unit?.frames?.length || !unit.lines?.length || !word1?.ar) throw new Error(`${vp}: composition check — content/compose/al-fatihah.json has no composition for 1:1:1, or content/al-fatihah.json no word 1:1:1`);
+  const lastFrame = unit.frames.length;
+  /** The narration lines said over the last frame ("al-fatihah:1:w1:compose:8", …), in order. */
+  const lastFrameLines = unit.lines.flatMap((l, k) => (l.frame === lastFrame ? [`al-fatihah:1:w1:compose:${k + 1}`] : []));
+  const lastLine = `al-fatihah:1:w1:compose:${unit.lines.length}`;
+  if (lastFrameLines.at(-1) !== lastLine) throw new Error(`${vp}: composition check — the last line of 1:1:1's composition is not said over its last frame (${lastFrame})`);
+  // The ayah's last word and its composition: the one the imam recites once more (plan L24).
+  const ayah1 = lessonFile.ayat.find((a) => a.ayah === 1);
+  const lastWord = ayah1.words.length;
+  const stopWord = ayah1.words[lastWord - 1];
+  const stopUnit = composeFile.words?.[stopWord.loc];
+  if (!stopUnit?.frames?.length || !stopUnit.lines?.length) throw new Error(`${vp}: composition check — content/compose/al-fatihah.json has no composition for ${stopWord.loc}, the last word of ayah 1`);
+  const stopLine = `al-fatihah:1:w${lastWord}:compose:${stopUnit.lines.length}`;
   const served = [];
   const handler = narrationRoute(index, served);
   await page.route(isNarration, handler);
@@ -2399,21 +2426,51 @@ async function composeShots(page, vp, index) {
     await page.waitForTimeout(1800);
     await assertComposeFits(page, `${vp}: word 1 join`);
     await shot("autoplay-ayah1-compose-4-join");
-    // While the imam recites the joined word (and, in "Tunggu saya", until Lanjut), the last
-    // tile is filled forest with paper text — the review found it white on white (2026-10-10).
-    await advanceTo('[data-recited="true"]');
-    await page.waitForTimeout(700);
-    const fill = await page
-      .locator('[data-autoplay="composition"][data-recited="true"] [data-compose-layer] [data-compose-tile]')
-      .last()
-      .evaluate((el) => {
-        const ar = el.querySelector('[lang="ar"]');
-        return { bg: getComputedStyle(el).backgroundColor, fg: getComputedStyle(ar ?? el).color };
-      });
-    if (fill.bg === "rgb(255, 255, 255)" || fill.bg === fill.fg) throw new Error(`${vp}: recited tile is ${fill.fg} on ${fill.bg}`);
-    console.log(`  recited tile: ${fill.fg} on ${fill.bg}`);
-    await assertComposeFits(page, `${vp}: word 1 recited`);
-    await shot("autoplay-ayah1-compose-5-recited");
+    // The last frame: the joined word, while a line of that frame is said. Nothing follows it in
+    // the step — the imam does not recite word 1 again (plan L24; only the ayah's last word,
+    // below) — so no tile is filled as "being recited" and the figure carries no such mark.
+    await advanceTo(`[data-compose-word="1"][data-compose-frame="${lastFrame}"]`);
+    await page.waitForTimeout(1600);
+    const caption = page.locator('[data-autoplay="caption"]').first();
+    const joined = {
+      step: await stage.getAttribute("data-step"),
+      frame: await comp.getAttribute("data-compose-frame"),
+      line: await caption.getAttribute("data-line"),
+      tiles: await comp.locator("[data-compose-layer] [data-compose-tile]").evaluateAll((els) =>
+        els.map((el) => ({ ar: [...el.querySelectorAll('[lang="ar"]')].map((n) => n.textContent ?? ""), bg: getComputedStyle(el).backgroundColor })),
+      ),
+    };
+    const lastTile = joined.tiles.at(-1);
+    const joinedProblems = [];
+    if (joined.step !== "w1:compose" || joined.frame !== String(lastFrame)) joinedProblems.push(`the stage is on step "${joined.step}", frame ${joined.frame}, not on w1:compose frame ${lastFrame}`);
+    if (!lastFrameLines.includes(joined.line ?? "")) joinedProblems.push(`the caption is line ${joined.line ?? "—"}, not a line said over the last frame (${lastFrameLines.join(", ")})`);
+    // (a tile that changes shows the form it changes from first, then the form it becomes: the last)
+    if (joined.tiles.length !== 1 || lastTile?.ar.at(-1) !== word1.ar) joinedProblems.push(`the last frame does not show the one word as the ayah writes it (tiles: ${JSON.stringify(joined.tiles.map((t) => t.ar))})`);
+    if (joined.tiles.some((t) => t.bg === FOREST)) joinedProblems.push(`a tile of the last frame is filled forest, as if the imam were reciting the joined word (${joined.tiles.map((t) => t.bg).join(", ")})`);
+    if (joinedProblems.length) throw new Error(`${vp}: word 1's joined word — ${joinedProblems.join("; ")}`);
+    await assertComposeFits(page, `${vp}: word 1 joined`);
+    await shot("autoplay-ayah1-compose-5-joined");
+    // … and the step ends on it: "Tunggu saya" waits for Lanjut with the composition's last line
+    // still the caption and the joined word still on screen (a line that is caption-only here is
+    // held for Lanjut too: clicked through, as advanceTo does).
+    let ended = false;
+    for (const deadline = Date.now() + 60_000; Date.now() < deadline && !ended; ) {
+      const [guide, line] = [await middle.getAttribute("data-guide"), await caption.getAttribute("data-line")];
+      if (guide === "lanjut" && line === lastLine) ended = true;
+      else if (guide === "lanjut") await middle.click();
+      if (!ended) await page.waitForTimeout(300);
+    }
+    const atEnd = {
+      step: await stage.getAttribute("data-step"),
+      frame: await comp.getAttribute("data-compose-frame").catch(() => null),
+      line: await caption.getAttribute("data-line"),
+      recited: await comp.getAttribute("data-recited").catch(() => null),
+    };
+    if (!ended || atEnd.step !== "w1:compose" || atEnd.frame !== String(lastFrame)) {
+      throw new Error(`${vp}: word 1's composition did not end on its joined word waiting for Lanjut (${ended ? "Lanjut shows" : "no Lanjut within 60 s"}; step "${atEnd.step}", frame ${atEnd.frame}, line ${atEnd.line ?? "—"})`);
+    }
+    if (atEnd.recited !== null) throw new Error(`${vp}: word 1's composition ends marked "recited" (data-recited="${atEnd.recited}"): only the ayah's last word is recited once more`);
+    console.log(`  joined word: frame ${lastFrame} of ${lastFrame} shows ${word1.translit} as the ayah writes it while ${joined.line} is said, no tile filled; the step ends there (Lanjut, line ${atEnd.line}) — no recitation after it`);
     // The change frame again with reduced motion: static frames, no transition.
     await page.emulateMedia({ reducedMotion: "reduce" });
     await replay.click();
@@ -2423,6 +2480,35 @@ async function composeShots(page, vp, index) {
     await page.emulateMedia({ reducedMotion: null });
     const text = (await comp.innerText()).replace(/\s+/g, " ").trim();
     console.log(`  composition: ${text}`);
+    // The ayah's last word: its lines, then the imam recites it once more — "recited" from the
+    // moment the lesson asks him (whether this runner can play the recording or not), and, in
+    // "Tunggu saya", until Lanjut. The tile is filled forest, its word readable on it.
+    await setPace("Biasa");
+    await toStep(page, vp, `w${lastWord}:compose`);
+    await setPace("Tunggu saya");
+    await replay.click();
+    await advanceTo(`[data-compose-word="${lastWord}"][data-recited="true"]`);
+    await page.waitForTimeout(700);
+    const stop = {
+      step: await stage.getAttribute("data-step"),
+      frame: await comp.getAttribute("data-compose-frame"),
+      line: await caption.getAttribute("data-line"),
+      tiles: await comp.locator("[data-compose-layer] [data-compose-tile]").evaluateAll((els) =>
+        els.map((el) => {
+          const ar = [...el.querySelectorAll('[lang="ar"]')];
+          return { ar: ar.map((n) => n.textContent ?? ""), bg: getComputedStyle(el).backgroundColor, fg: getComputedStyle(ar.at(-1) ?? el).color };
+        }),
+      ),
+    };
+    const stopProblems = [];
+    if (stop.step !== `w${lastWord}:compose` || stop.frame !== String(stopUnit.frames.length)) stopProblems.push(`the stage is on step "${stop.step}", frame ${stop.frame}, not on the last frame (${stopUnit.frames.length}) of w${lastWord}:compose`);
+    if (stop.line !== stopLine) stopProblems.push(`the caption is line ${stop.line ?? "—"}, not the composition's last line (${stopLine}), which says the imam stops on this word`);
+    if (stop.tiles.length !== 1 || stop.tiles[0].ar.at(-1) !== stopWord.ar) stopProblems.push(`the frame does not show the one word as the ayah writes it (tiles: ${JSON.stringify(stop.tiles.map((t) => t.ar))})`);
+    else if (stop.tiles[0].bg === "rgb(255, 255, 255)" || stop.tiles[0].bg === stop.tiles[0].fg) stopProblems.push(`the recited tile is ${stop.tiles[0].fg} on ${stop.tiles[0].bg}`);
+    if (stopProblems.length) throw new Error(`${vp}: the ayah's last word recited once more — ${stopProblems.join("; ")}`);
+    console.log(`  last word (${stopWord.translit}): recited after ${stopLine}, frame ${stop.frame} "recited", tile ${stop.tiles[0].fg} on ${stop.tiles[0].bg}`);
+    await assertComposeFits(page, `${vp}: word ${lastWord} recited`);
+    await shot("autoplay-ayah1-compose-last-word-recited");
     await setPace("Biasa");
   } catch (err) {
     await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-compose-FAILED.png`, fullPage: true }).catch(() => {});
@@ -2574,8 +2660,15 @@ async function exampleChecks(page, vp, index) {
     // The tile changes colour over 300 ms (motion-safe): read once it has settled.
     await page.waitForTimeout(400);
     if ((await attr("data-example")) === baseId && (await attr("data-example-state")) === "reciting") {
-      const fill = await comp.locator("[data-compose-layer] [data-compose-tile]").evaluateAll((els) => els.map((el) => getComputedStyle(el).backgroundColor));
-      if (!fill.includes(FOREST)) fail(`while the imam recites the bentuk dasar, no tile is filled forest (tiles: ${fill.join(", ")})`);
+      const fill = await comp.locator("[data-compose-layer] [data-compose-tile]").evaluateAll((els) =>
+        els.map((el) => ({ bg: getComputedStyle(el).backgroundColor, fg: getComputedStyle(el.querySelector('[lang="ar"]') ?? el).color })),
+      );
+      const filled = fill.find((t) => t.bg === FOREST);
+      if (!filled) fail(`while the imam recites the bentuk dasar, no tile is filled forest (tiles: ${fill.map((t) => t.bg).join(", ")})`);
+      // The filled tile's word must stay readable: the review found a filled tile's word in the
+      // tile's own colour (2026-10-10; checked on the joined word's tile until plan L24 took its
+      // recitation away).
+      if (filled.fg === filled.bg) fail(`the tile filled while the imam recites the bentuk dasar shows its word ${filled.fg} on ${filled.bg}`);
     }
     await assertComposeLayout(page, vp);
     await assertComposeFits(page, `${vp}: word 1 base example`);

@@ -251,9 +251,10 @@ export type Cue = {
  *  stops (src/hooks/useExamplePlayer.ts). */
 export type ExampleClip = { url: string; start: number; end: number; last?: boolean };
 
-/** What an example beat exemplifies: a concept just introduced, the bentuk dasar a composition's
- *  `base` frame shows, or the word whose harakah was just explained. */
-export type ExampleOf = "concept" | "base" | "word";
+/** What an example beat exemplifies: a concept just introduced, or the bentuk dasar a composition's
+ *  `base` frame shows. (Until 2026-10-13 also "word": the lesson's own word recited again after
+ *  its line; plan L24 — a word is recited once, at its opening step.) */
+export type ExampleOf = "concept" | "base";
 
 /**
  * One example beat of a step: the stage shows the example (its Arabic comes from the content
@@ -261,7 +262,7 @@ export type ExampleOf = "concept" | "base" | "word";
  */
 export type ExampleBeat = {
   /** Unique in the sequence, and the key of the stage's drawing of it: "concept:huruf-jar:1",
-   *  "w1:base:2" (word 1's composition, frame 2), "w3:word". */
+   *  "w1:base:2" (word 1's composition, frame 2). */
   id: string;
   of: ExampleOf;
   /** The cue of its step it comes after (index); -1: it opens the step (an example step). */
@@ -287,8 +288,10 @@ export type StepKind =
   | "primer"
   | "recite_word"
   | "explain"
-  /** A word explained by its parts, over its animation; ends with the imam
-   *  reciting the joined word. */
+  /** A word explained by its parts, over its animation; its last line is said
+   *  over the last frame, the joined word. No recitation of its own (the imam
+   *  said the word at "recite_word", plan L24) — except the ayah's last word,
+   *  recited once more after the line that says he stops on it. */
   | "compose"
   | "structure"
   | "concept"
@@ -341,7 +344,9 @@ export type AutoplayStep = {
   frames?: number;
   /** That word's loc ("1:2:3"). */
   loc?: string;
-  /** The imam's recitation, played after the cues (never during them). */
+  /** The imam's recitation, played after the cues (never during them): the whole ayah
+   *  (recite_ayah, recap) or the step's word — recite_word, the one time a word is recited,
+   *  and the composition of the ayah's last word, which is recited once more (plan L24). */
   recite?: ReciteTarget;
   exercise?: ExerciseSpec;
   /** The step's example beats, each after the cue it names (operator 2026-10-12, plan L20). */

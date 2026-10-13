@@ -21,6 +21,20 @@
  *    settle pause; without audio, after captionMs(part, pace) per caption
  *    part. "Tunggu saya" (pace "tunggu") holds every narration caption and
  *    the end of every step until `next` (the "Lanjut" button).
+ *  - A WORD IS RECITED ONCE, when its part of the lesson opens ("w${n}:recite";
+ *    "Pelan": twice there, with a gap), and the lesson then explains it and
+ *    goes straight on to the next word (operator 2026-10-13: "when transation
+ *    from word X to X+1, i think we dont need to recite the X, just directly to
+ *    X+1"; plan L24). That step lasts as long as the imam's word and the pause
+ *    after him when the narrator's voice explains the word next (wordVoiced);
+ *    only where that line is caption-only does its caption keep a reading time
+ *    (timing.ts: what the imam's word waits for). EXCEPT THE AYAH'S LAST WORD:
+ *    the last line of its composition says the imam stops on it and what is
+ *    not heard there, and no next word follows — so he recites it once more
+ *    right after that line (its step carries `recite`; sequence.ts), the line
+ *    still the caption and the joined word still on screen, for as long as his
+ *    word and the pause after him ("Pelan": twice). No reading time there in
+ *    any lesson: no new caption appears.
  *  - Exercise steps NEVER advance by themselves: only `exercise_done` (the
  *    line playing ends, then a short hold so the learner sees the result)
  *    or `skip` ("Lewati latihan", at once) moves past them; `next` is
@@ -76,7 +90,8 @@
  *    with the beat's caption and the imam recites it (a recite activity that
  *    names the beat: a word of this ayah on the stage's player, or `clip`,
  *    another ayah's word, on the example player), then the usual pause after
- *    the imam. It lasts at least its caption's reading time; "Pelan" hears it
+ *    the imam. It lasts at least its caption's reading time, the reading alone
+ *    (timing.ts exampleReadMs: text the narrator does not say); "Pelan" hears it
  *    twice, as it hears every word twice. A beat is NEVER a dead stop: if its
  *    recording cannot be played (recite_error: it failed, or did not start
  *    within EXAMPLE_LOAD_LIMIT_MS, which the runner times), the example stays
@@ -96,6 +111,7 @@ import {
   REMINDER_AT_MS,
   SCREEN_IDLE_LIMIT_MS,
   WORD_REPEAT_GAP_MS,
+  exampleReadMs,
   readMs,
   settleAfterNarrationMs,
   settleAfterReciteMs,
@@ -182,6 +198,9 @@ export type Action =
   | { t: "gap" }
   /** A silent pause: EXERCISE_DONE_HOLD_MS, or `ms`. */
   | { t: "hold"; ms?: number; part?: GuidePart }
+  /** The imam: word `word`, or (null) the whole ayah. `hold`: it lasts at least the reading time
+   *  of the caption shown with it — only where no voice follows to say what that caption says
+   *  (a caption-only lesson; never in "Tunggu saya", which waits for Lanjut instead). */
   | { t: "recite"; word: number | null; show: CaptionRef | null; hold: boolean; resume: boolean; part?: GuidePart }
   /** Shows a caption without saying it (a control's prompt met again). */
   | { t: "show"; ref: CueRef; part: GuidePart }
@@ -312,6 +331,18 @@ function cueOf(seq: AutoplaySequence, step: AutoplayStep, ref: CueRef): Cue {
 
 const audible = (s: AutoplayState, cue: Cue) => cue.audio.length > 0 && !s.noAudio.includes(cue.line);
 
+/**
+ * Does the narrator's VOICE explain word `word` right after the imam says it — is the word's own
+ * line (its "explain" step's) narration audio that has not failed this visit? Then the word's
+ * opening step need not wait for its caption to be read (planFor). Asked of that one line, not of
+ * the sequence (`hasAudio` is true as soon as any line has a voice, the shared "Kita lanjutkan."
+ * included): a lesson whose own lines are caption-only keeps its reading pace.
+ */
+function wordVoiced(seq: AutoplaySequence, s: AutoplayState, word: number): boolean {
+  const line = seq.steps.find((x) => x.kind === "explain" && x.word === word)?.cues[0];
+  return line !== undefined && audible(s, line);
+}
+
 const isOpen = (ex: ExerciseState | null): ex is ExerciseState => !!ex && ex.closed === null;
 
 function narrate(s: AutoplayState, cue: Cue, seg: number): AutoplayState {
@@ -354,11 +385,11 @@ function explainPlan(s: AutoplayState, step: AutoplayStep, seq: AutoplaySequence
 }
 
 function captionParts(seq: AutoplaySequence, step: AutoplayStep, ref: CaptionRef): { parts: string[]; line: string | null } {
-  // A compose step's own caption is the imam's word ("Kata ke-1: bismi.
-  // Dengarkan imam membacanya."), shown while he recites the joined word after
-  // the frames' lines — not its first line again.
+  // A step's own caption: its first line's (a step shown before any line plays), or — a word's
+  // opening step, which has no line — the imam's word ("Kata ke-1: bismi. Dengarkan imam
+  // membacanya.").
   if (ref === "step") {
-    return step.cues.length && step.kind !== "compose" ? { parts: step.cues[0].parts, line: null } : { parts: [step.caption], line: null };
+    return step.cues.length ? { parts: step.cues[0].parts, line: null } : { parts: [step.caption], line: null };
   }
   // An example beat's caption ("Contoh: …"): on-screen text only, no narration line.
   if ("x" in ref) return { parts: step.examples?.[ref.x]?.parts ?? [step.caption], line: null };
@@ -445,11 +476,18 @@ function planFor(seq: AutoplaySequence, s: AutoplayState, step: AutoplayStep): A
     return plan;
   }
   if (step.recite?.target === "word") {
+    // A word's opening step, the one time the imam says it (plan L24). Its caption names the
+    // word the card shows; it is held for its reading time only where the word's explanation
+    // has no voice — there the caption is all the learner has.
+    // Or the composition of the ayah's last word: its lines, then the imam once more — the last
+    // line (what is not heard where he stops) stays the caption, so nothing waits to be read.
     const word = step.recite.word;
+    const opening = step.kind === "recite_word";
+    const show: CaptionRef | null = opening ? "step" : null;
     step.cues.forEach((_, i) => say(i));
-    plan.push({ t: "recite", word, show: "step", hold: true, resume: false });
+    plan.push({ t: "recite", word, show, hold: opening && !wordVoiced(seq, s, word), resume: false });
     if (s.pace === "pelan") {
-      plan.push({ t: "gap" }, { t: "recite", word, show: "step", hold: false, resume: false });
+      plan.push({ t: "gap" }, { t: "recite", word, show, hold: false, resume: false });
     }
     plan.push({ t: "settle", after: "recite" });
     return plan;
@@ -510,9 +548,9 @@ function run(seq: AutoplaySequence, s: AutoplayState, viaNext: boolean): Autopla
       const shown: AutoplayState = { ...s, caption: { x: a.x }, part: 0, guides: step.guides };
       // Its recording could not be played: the example stays on screen a moment, then on.
       if (a.failed) return issue(shown, { kind: "wait", ms: EXAMPLE_FAILED_HOLD_MS });
-      // At least its caption's reading time (not "Tunggu saya", which waits for Lanjut at the
-      // step's end; not the second hearing of "Pelan").
-      const minMs = a.again || s.pace === "tunggu" ? 0 : readMs(b.parts.join(" "), s.pace);
+      // At least its caption's reading time, the reading alone (timing.ts exampleReadMs; not
+      // "Tunggu saya", which waits for Lanjut at the step's end; not the second hearing of "Pelan").
+      const minMs = a.again || s.pace === "tunggu" ? 0 : exampleReadMs(b.parts.join(" "), s.pace);
       if (b.word !== null) return issue(shown, { kind: "recite", target: "word", word: b.word, minMs, example: b.id });
       if (b.clip) return issue(shown, { kind: "recite", target: "clip", clip: b.clip, key: b.key, minMs, example: b.id });
       return run(seq, { ...s, at: s.at + 1 }, viaNext);

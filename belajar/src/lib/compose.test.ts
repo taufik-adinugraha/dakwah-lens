@@ -13,6 +13,7 @@ import {
   ID_TEXTS,
   parseLineId,
   reduceAutoplay,
+  viewAutoplay,
   type Activity,
   type AutoplayEvent,
   type AutoplaySequence,
@@ -20,7 +21,7 @@ import {
   type NarrationManifest,
 } from "./autoplay";
 import { composeFor, composeInput, COMPOSED_SLUGS } from "./compose-content";
-import { applyOp, composeFileProblems, composeInputFor, diffPieces, pieces } from "./composition";
+import { applyOp, composeFileProblems, composeInputFor, diffPieces, pieces, STOP_NOTE } from "./composition";
 import { SURAHS } from "./content";
 
 // Word composition and the harakat primer (operator 2026-10-10, narration
@@ -93,6 +94,9 @@ describe("content/compose/al-fatihah.json", () => {
     // A join may write one letter in its other shape (عَلَى + هُمْ → عَلَيْهُمْ: alif maqsura → ya'),
     // never another letter.
     ["a join that changes a letter", (f) => (f.words["1:7:4"].forms.alaihum.ar = f.words["1:7:4"].forms.alaihum.ar.replace("\u064A", "\u0648")), /source gives|a letter changed/],
+    // The stop note makes the lesson recite the word once more (plan L24): only where the imam stops.
+    ["the stop note on a word that does not end its ayah", (f) => (f.words["1:1:1"].frames[4].note = STOP_NOTE), /1:1:1: frame 5 carries the stop note/],
+    ["the stop note on a frame that is not the last", (f) => (f.words["1:1:4"].frames[0].note = STOP_NOTE), /1:1:4: frame 1 carries the stop note/],
   ];
   it.each(faults)("catches %s", (_name, mutate, expected) => {
     const f = copy();
@@ -141,7 +145,18 @@ describe("the autoplay sequence with compositions", () => {
     ]);
     const c = seq.steps.find((s) => s.id === "w1:compose")!;
     expect(c.kind).toBe("compose");
-    expect(c.recite).toEqual({ target: "word", word: 1 });
+    // No recitation of its own (operator 2026-10-13, plan L24: "when transation from word X to
+    // X+1, i think we dont need to recite the X, just directly to X+1"; until then the step ended
+    // with the imam reciting word 1 again): the word is recited by its opening step alone, and
+    // the step's own caption is its first line's, no longer "Kata ke-1: bismi. Dengarkan imam …".
+    // Only the ayah's LAST word is recited once more, by its composition (its last frame is the
+    // stop frame, "imam berhenti di sini": no next word follows it).
+    expect(c.recite).toBeUndefined();
+    expect(seq.steps.filter((s) => s.recite?.target === "word").map((s) => s.id)).toEqual(["w1:recite", "w2:recite", "w3:recite", "w4:recite", "w4:compose"]);
+    expect(seq.steps.find((s) => s.id === "w4:compose")?.recite).toEqual({ target: "word", word: 4 });
+    expect(Object.entries(composeInput("al-fatihah", ayah1)?.words ?? {}).map(([loc, u]) => [loc, u.stop ?? false])).toEqual([["1:1:1", false], ["1:1:2", false], ["1:1:3", false], ["1:1:4", true]]);
+    expect(raw.words["1:1:4"].frames.at(-1)?.note).toBe(STOP_NOTE);
+    expect(c.caption).toBe(c.cues[0].caption);
     expect(c.frames).toBe(5);
     expect(c.cues.map((q) => q.frame)).toEqual(raw.words["1:1:1"].lines.map((l) => l.frame));
     expect(c.cues.every((q) => q.highlight.join() === "1" && q.focus === 1)).toBe(true);
@@ -160,21 +175,109 @@ describe("the autoplay sequence with compositions", () => {
     expect(p.cues.map((q) => parseLineId(q.line)?.kind)).toEqual(p.cues.map(() => "ayah"));
   });
 
-  it("the stage shows each line's frame, then the last frame while the imam recites the joined word", () => {
-    const seq = seq1(manifest);
-    const idx = seq.steps.findIndex((s) => s.id === "w1:compose");
-    let s: AutoplayState = reduceAutoplay(seq, createAutoplayState(seq, { idx }), { type: "start", from: idx, reason: "continue" });
-    const seen: string[] = [];
-    for (let i = 0; i < 400 && s.idx === idx; i++) {
-      const f = stageFrame(seq, s);
-      const m = stageMarks(seq, s);
-      if (f) seen.push(`${f.frame}${f.recited ? "r" : ""}`);
-      if (f) expect(m).toEqual({ marked: [1], focus: 1 });
-      if (!s.activity) break;
-      s = reduceAutoplay(seq, s, end(s.activity));
+  // Until 2026-10-13 the step went on, after its lines, to the imam reciting the joined word over
+  // the last frame (a "recited" look: the tile filled). Plan L24 took that recitation away: the
+  // last line is said over the last frame, the joined word, and the next thing heard is the imam
+  // saying the NEXT word.
+  it("the stage shows each line's frame; the last line is said over the joined word, and the imam does not recite it again", () => {
+    for (const pace of ["biasa", "pelan", "tunggu"] as const) {
+      const seq = seq1(manifest);
+      const idx = seq.steps.findIndex((s) => s.id === "w1:compose");
+      const step = seq.steps[idx];
+      let s: AutoplayState = reduceAutoplay(seq, createAutoplayState(seq, { idx, pace }), { type: "start", pace, from: idx, reason: "continue" });
+      const seen: number[] = [];
+      const played: string[] = [];
+      let lastLineFrame: number | null = null;
+      for (let i = 0; i < 400 && s.idx === idx; i++) {
+        const f = stageFrame(seq, s);
+        const m = stageMarks(seq, s);
+        if (f) seen.push(f.frame);
+        if (f) expect(m, pace).toEqual({ marked: [1], focus: 1 });
+        const a = s.activity;
+        if (a) played.push(a.kind);
+        if (a?.kind === "narrate" && a.line === step.lines[step.lines.length - 1]) lastLineFrame = f?.frame ?? null;
+        if (a) s = reduceAutoplay(seq, s, end(a));
+        else if (s.phase === "ready") {
+          // "Tunggu saya", the step's lines through: the joined word stays until Lanjut — not
+          // marked "recited": the imam does not say word 1 here.
+          expect([f?.frame, f?.recited, pace], "the end of the step").toEqual([5, false, "tunggu"]);
+          s = reduceAutoplay(seq, s, { type: "next" });
+        } else break;
+      }
+      expect([...new Set(seen)], pace).toEqual([1, 2, 3, 4, 5]);
+      expect(lastLineFrame, pace).toBe(5);
+      // Nothing but the narrator and his pauses: no recitation inside the step (this sequence
+      // has no example beats; with them, the bentuk dasar's clip is the only one — examples.test.ts).
+      expect([...new Set(played)].sort(), pace).toEqual(["narrate", "wait"]);
+      // … and straight on to word 2, said by the imam.
+      expect([seq.steps[s.idx].id, s.activity?.kind === "recite" && s.activity.target === "word" ? s.activity.word : null], pace).toEqual(["w2:recite", 2]);
     }
-    const order = [...new Set(seen)];
-    expect(order).toEqual(["1", "2", "3", "4", "5", "5r"]);
+  });
+
+  // The exception: ar-raḥīmi ends the ayah. The last line of its composition says the imam stops
+  // on it, so its kasrah is not heard — and he then recites it, once more, to be heard doing so.
+  it("the ayah's last word: after the line that says the imam stops on it, he recites it — the joined word 'recited', that line still the caption, no reading time", () => {
+    for (const narrated of [true, false]) {
+      for (const pace of ["biasa", "pelan", "tunggu"] as const) {
+        const where = `${narrated ? "narrated" : "caption-only"} ${pace}`;
+        const seq = seq1(narrated ? manifest : null);
+        const idx = seq.steps.findIndex((s) => s.id === "w4:compose");
+        const step = seq.steps[idx];
+        const lastLine = step.lines[step.lines.length - 1];
+        let s: AutoplayState = reduceAutoplay(seq, createAutoplayState(seq, { idx, pace }), { type: "start", pace, from: idx, reason: "continue" });
+        const frames: string[] = [];
+        const imam: AutoplayState[] = [];
+        let lanjut = 0;
+        for (let i = 0; i < 400 && s.idx === idx; i++) {
+          const f = stageFrame(seq, s);
+          if (f) frames.push(`${f.frame}${f.recited ? "r" : ""}`);
+          const a = s.activity;
+          if (a?.kind === "recite") imam.push(s);
+          if (a) s = reduceAutoplay(seq, s, end(a));
+          else if (s.phase === "ready") {
+            lanjut++;
+            s = reduceAutoplay(seq, s, { type: "next" });
+          } else break;
+        }
+        expect([...new Set(frames)], where).toEqual(["1", "2", "3", "3r"]);
+        // His word as long as it lasts — twice in Pelan — in every kind of lesson: no hold.
+        for (const x of imam) expect(x.activity, where).toMatchObject({ kind: "recite", target: "word", word: 4, minMs: 0 });
+        expect(imam.length, where).toBe(pace === "pelan" ? 2 : 1);
+        for (const x of imam) {
+          expect(viewAutoplay(seq, x).caption.line, where).toBe(lastLine);
+          expect(stageMarks(seq, x), where).toEqual({ marked: [4], focus: 4 });
+        }
+        // "Tunggu saya": Lanjut at the end of the step (and, caption-only, after each line), as ever.
+        expect(lanjut, where).toBe(pace !== "tunggu" ? 0 : narrated ? 1 : step.cues.reduce((n, c) => n + c.parts.length, 0) + 1);
+        // Then the lesson goes on: no word follows the ayah's last.
+        expect(seq.steps[s.idx].id, where).toBe(seq.steps[idx + 1].id);
+        expect(s.activity?.kind === "recite", where).toBe(false);
+      }
+    }
+    // The rule is not the word's position alone: without the stop note on its last frame (a last
+    // word whose last line is about something else), the composition ends with its line.
+    const unmarked = copy();
+    delete unmarked.words["1:1:4"].frames[unmarked.words["1:1:4"].frames.length - 1].note;
+    const input = composeInputFor(unmarked, ayah1);
+    expect(input?.words["1:1:4"].stop).toBeUndefined();
+    const plainEnd = buildAutoplaySequence({ slug: "al-fatihah", surahName: "Al-Fatihah", ayahCount: 7, ayah: ayah1 as Ayah, introduced: [], exercises: [], texts: ID_TEXTS, narration: manifest, compose: input });
+    expect(plainEnd.steps.filter((x) => x.recite?.target === "word").map((x) => x.id)).toEqual(["w1:recite", "w2:recite", "w3:recite", "w4:recite"]);
+    // … nor the note alone: a last frame the last line is not said over is no stop.
+    const unsaid = copy();
+    unsaid.words["1:1:4"].lines = unsaid.words["1:1:4"].lines.map((x) => ({ ...x, frame: Math.min(x.frame, unsaid.words["1:1:4"].frames.length - 1) }));
+    expect(composeInputFor(unsaid, ayah1)?.words["1:1:4"].stop).toBeUndefined();
+    // … nor on a word that does not end its ayah (the build refuses the note there; the lesson
+    // would not act on it either).
+    const misplaced = copy();
+    misplaced.words["1:1:1"].frames[misplaced.words["1:1:1"].frames.length - 1].note = STOP_NOTE;
+    expect(Object.entries(composeInputFor(misplaced, ayah1)?.words ?? {}).filter(([, u]) => u.stop).map(([loc]) => loc)).toEqual(["1:1:4"]);
+    // Paused while he recites and resumed: "Kita lanjutkan." over the joined word, then he again.
+    const seq = seq1(manifest);
+    const idx = seq.steps.findIndex((x) => x.id === "w4:compose");
+    let s: AutoplayState = reduceAutoplay(seq, createAutoplayState(seq, { idx }), { type: "start", from: idx, reason: "continue" });
+    for (let i = 0; i < 100 && s.activity?.kind !== "recite"; i++) s = reduceAutoplay(seq, s, end(s.activity!));
+    const resumed = reduceAutoplay(seq, reduceAutoplay(seq, s, { type: "pause" }), { type: "resume" });
+    expect([resumed.caption, stageFrame(seq, resumed)]).toEqual([{ s: "resume" }, { step: "compose", word: 4, frame: 3, recited: false }]);
   });
 
   it("no frame outside a primer / compose step, nor before the start", () => {
