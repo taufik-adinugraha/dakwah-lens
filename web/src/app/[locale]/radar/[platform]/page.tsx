@@ -664,11 +664,18 @@ function LiveStream({
               })}
               className="mt-1.5 block text-pretty text-sm text-ink-muted"
             />
-            {/* The "chart vs chip count" disclaimer was only needed while
-                the post list was capped at 50 (and later 1000) — chip
-                counts now match the chart because the list shows every
-                post (sentiment classification is 100% coverage), so the
-                note is omitted to reduce footer noise. */}
+            {/* The list is the top TOP_STORIES_LIMIT posts (lib/briefing-data.ts: an
+                unbounded list took the site down on 2026-10-13), while the chart and the
+                total count every post — so say so wherever the list is shorter than the
+                total, or the chip counts and the chart look like they disagree. */}
+            {live.totalPosts > live.topStories.length && (
+              <p className="mt-1 block text-pretty text-xs text-ink-faint" data-top-stories-note="">
+                {tInsights("live_top_stories_note", {
+                  shown: live.topStories.length.toLocaleString(),
+                  total: live.totalPosts.toLocaleString(),
+                })}
+              </p>
+            )}
           </div>
 
           {/* Sentiment mix mini-chart */}

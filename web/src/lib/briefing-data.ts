@@ -49,6 +49,22 @@ export function stripWordCountAnnotations(md: string | null): string | null {
     .replace(/ {2,}/g, " ");
 }
 
+/**
+ * The most stories a platform page loads and hands to the browser, and how much of each
+ * story's text (the card shows 280 characters, PlatformStoriesFilter.tsx).
+ *
+ * 2026-10-13 incident: the list had NO limit ("Mainstream is the largest at ~8K posts").
+ * By then mainstream held 222,549 posts (550 MB of text), X 168,718, YouTube 70,567, and
+ * the page selected every row with its full text and serialised all of it into the page:
+ * /radar/x came to 122 MB and took two minutes, /radar/mainstream never finished, and each
+ * request pushed the Next.js server past its heap limit — the web container restarted twice
+ * (site-wide 502s) after five such requests from a deploy check. These pages are public and
+ * crawlable, so any visitor could do the same. A list a person reads is bounded; the totals
+ * and the sentiment chart still count every post (the aggregates below).
+ */
+export const TOP_STORIES_LIMIT = 300;
+export const STORY_TEXT_CHARS = 300;
+
 export type PlatformInsights = {
   totalPosts: number;
   uniqueAuthors: number;
@@ -173,10 +189,31 @@ export async function getPlatformInsights(
   // The list is collapsed-by-default in the UI, so the larger result
   // pool here doesn't pay an initial-render cost — only when a user
   // explicitly expands the section.
+  // Two steps (2026-10-13): rank on the small columns and keep TOP_STORIES_LIMIT ids, THEN read
+  // the text of those rows alone. In one step Postgres cut every row's text before sorting —
+  // 550 MB of mainstream articles detoasted per request, 36 s measured — against 4.6 s this way.
+  const rank = sql<number>`(
+        COALESCE(${schema.socialPosts.dawahOpportunity}, 0)
+        + GREATEST(0, 1 - EXTRACT(EPOCH FROM (now() - ${schema.socialPosts.postedAt})) / (7 * 86400.0))
+        + LEAST(LN(1 + COALESCE(${schema.socialPosts.engagementScore}, 0)) / 12.0, 1.0)
+      )`;
+  const top = db
+    .select({ id: schema.socialPosts.id, rank: rank.as("rank") })
+    .from(schema.socialPosts)
+    .where(platformWhere)
+    .orderBy(desc(rank))
+    // Capped (TOP_STORIES_LIMIT, see its comment for the 2026-10-13 incident). The cap was
+    // removed once so the chip counts would equal the Sentiment-mix chart. The page now says
+    // under the section title that the list is the top N of the total instead
+    // (Briefing.live_top_stories_note).
+    .limit(TOP_STORIES_LIMIT)
+    .as("top");
   const topStories = await db
     .select({
       id: schema.socialPosts.id,
-      text: schema.socialPosts.text,
+      // Only what the card can show (280 characters and an ellipsis): a mainstream row's text
+      // is a whole article, 2.5 KB on average.
+      text: sql<string>`LEFT(COALESCE(${schema.socialPosts.text}, ''), ${STORY_TEXT_CHARS})`,
       author: schema.socialPosts.author,
       url: schema.socialPosts.url,
       sentimentLabel: schema.socialPosts.sentimentLabel,
@@ -185,25 +222,9 @@ export async function getPlatformInsights(
       themeGroup: schema.socialPosts.themeGroup,
       postedAt: schema.socialPosts.postedAt,
     })
-    .from(schema.socialPosts)
-    .where(platformWhere)
-    .orderBy(
-      desc(sql`(
-        COALESCE(${schema.socialPosts.dawahOpportunity}, 0)
-        + GREATEST(0, 1 - EXTRACT(EPOCH FROM (now() - ${schema.socialPosts.postedAt})) / (7 * 86400.0))
-        + LEAST(LN(1 + COALESCE(${schema.socialPosts.engagementScore}, 0)) / 12.0, 1.0)
-      )`),
-    )
-    // No cap — return every post for the platform. The list is
-    // collapsed by default so the initial paint pays no rendering cost
-    // for the larger payload; only users who explicitly expand take the
-    // DOM hit. Removing the cap also makes the chip-filter counts equal
-    // the Sentiment-mix chart (sentiment classification is currently
-    // 100% across all platforms), eliminating the "why are these
-    // numbers different" disclaimer that previously sat under the
-    // section header. Mainstream is the largest at ~8K posts; transfer
-    // size is acceptable with the collapsed default.
-;
+    .from(top)
+    .innerJoin(schema.socialPosts, eq(schema.socialPosts.id, top.id))
+    .orderBy(desc(top.rank));
 
   // Sentiment mix — count per label.
   const sentimentRows = (await db
