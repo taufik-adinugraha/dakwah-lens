@@ -11,8 +11,10 @@
  *     the "learned" step right before the recap, and neither anywhere else;
  *     the harakat primer right after the imam's ayah (after the map step,
  *     where there is one), and each word's recite → explain → compose (when it
- *     has a composition: one cue per line, frames in order, the imam
- *     reciting that word); the composition files themselves replayed
+ *     has a composition: one cue per line, frames in order); each word
+ *     recited by ONE step, its opening one — and the ayah's last word once
+ *     more, by the composition that ends on the stop frame (operator
+ *     2026-10-13, plan L24); the composition files themselves replayed
  *     (src/lib/composition.ts: every Arabic form from its source);
  *  2. narration manifests, IF they exist: every line the sequences play is
  *     there, ids are well-formed, spoken text never carries a transliterated
@@ -35,13 +37,13 @@
  *     followed by examples (visual + voice)", "not only for harakah, but also
  *     for all rules"; plan L20; exampleProblems): every concept line is
  *     followed by its example step, every bentuk dasar a composition shows
- *     and every word whose harakah its own line explains has its beat — or is
- *     listed with the reason (no Qur'anic example exists, the ending is not
- *     heard there); each beat has its Arabic (the content's bytes) and a
- *     recording (this ayah's word timed in its recitation, or the clip the
- *     content gives), is labelled by what is heard (waqf, hamzat washal), is
- *     no narration line, and at most two follow one rule. A beat whose
- *     recording cannot be played never stops the lesson (the machine checks).
+ *     has its beat — or is listed with the reason (no Qur'anic example
+ *     exists, it is the lesson's own word); each beat has its Arabic (the
+ *     content's bytes) and a recording (this ayah's word timed in its
+ *     recitation, or the clip the content gives), is labelled by what is
+ *     heard (waqf, hamzat washal), is no narration line, and at most two
+ *     follow one rule. A beat whose recording cannot be played never stops
+ *     the lesson (the machine checks).
  * Pure: file access is injected (loadCheckInput).
  */
 import type { ComposeFile } from "@/content/compose-schema";
@@ -272,9 +274,19 @@ export function sequenceProblems(
   for (const s of steps) {
     if (s.kind === "recite_word" && (s.recite?.target !== "word" || s.recite.word !== s.word)) out.push(`${s.id}: recites the wrong thing`);
     if ((s.kind === "recite_ayah" || s.kind === "recap") && s.recite?.target !== "ayah") out.push(`${s.id}: the imam does not recite the ayah`);
+    // A word is recited once, by its opening step (plan L24; until 2026-10-13 every composition
+    // step ended with the imam too) — except the ayah's last word, once more at the end of the
+    // composition that ends on the stop frame (composition.ts STOP_NOTE): that step, and no other.
+    if (s.kind !== "recite_word") {
+      const stop = s.kind === "compose" && s.word === ctx.ayah.words.length && ctx.compose?.words[s.loc ?? ""]?.stop === true;
+      if (s.recite?.target === "word" && !stop) {
+        out.push(`${s.id}: a ${s.kind} step ends with the imam reciting word ${s.recite.word} (a word is recited once, when its step opens; only the ayah's last word again, after the line that says he stops on it)`);
+      } else if (stop && (s.recite?.target !== "word" || s.recite.word !== s.word)) {
+        out.push(`${s.id}: the ayah's last word, whose last line says the imam stops on it, is not recited after that line`);
+      }
+    }
     if (s.kind === "compose" || s.kind === "primer") {
       const unit = s.kind === "primer" ? ctx.compose?.primer : ctx.compose?.words[s.loc ?? ""];
-      if (s.kind === "compose" && (s.recite?.target !== "word" || s.recite.word !== s.word)) out.push(`${s.id}: does not end with the imam reciting its word`);
       if (!unit || s.cues.length !== unit.lines.length || s.frames !== unit.frames) out.push(`${s.id}: cues/frames differ from its composition`);
       const frames = s.cues.map((c) => c.frame);
       if (frames.some((f, k) => f === null || f < 1 || f > (s.frames ?? 0) || (k > 0 && f < (frames[k - 1] ?? 0)))) {
@@ -408,9 +420,10 @@ const EVERYAYAH_FILE = /^https:\/\/everyayah\.com\/data\/[A-Za-z0-9_]+\/\d{6}\.m
 /**
  * Problems of one ayah's example beats (operator 2026-10-12, plan L20; empty when fine):
  * - COVERAGE: every concept line is followed by its example step, whose first beat is the
- *   concept's example in this ayah; every `base` frame of a composition and every word whose
- *   harakah its own line explains has its beat, or is listed with a reason (`derived.gaps`);
- *   every composition step ends with the imam reciting its word (the joined word);
+ *   concept's example in this ayah; every `base` frame of a composition has its beat, or is
+ *   listed with a reason (`derived.gaps`); no composition step but that of the ayah's last
+ *   word ends with the imam reciting its word again, and no word's own line is followed by a
+ *   beat (plan L24: recited once, when its step opens);
  * - each beat is one the content gives (examples.ts), in the right step, after the right line;
  *   exactly one recording: this ayah's word, timed in the ayah's recitation, or the clip
  *   the content gives for its key (an EveryAyah file, start before end);
@@ -432,7 +445,7 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
 
   seq.steps.forEach((s, i) => {
     const beats = s.examples ?? [];
-    if (beats.length && s.kind !== "example" && s.kind !== "compose" && s.kind !== "explain") out.push(`${s.id}: a ${s.kind} step has example beats`);
+    if (beats.length && s.kind !== "example" && s.kind !== "compose") out.push(`${s.id}: a ${s.kind} step has example beats`);
     if (beats.length > MAX_EXAMPLES_PER_RULE && s.kind !== "compose") out.push(`${s.id}: ${beats.length} example beats after one rule (at most ${MAX_EXAMPLES_PER_RULE})`);
     for (const b of beats) {
       const w = `${s.id} example ${b.id}`;
@@ -451,7 +464,7 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
         const before = seq.steps[i - 1];
         if (s.kind !== "example" || s.id !== d.step || b.after !== -1) out.push(`${w}: a concept's example plays in its own example step`);
         else if (before?.kind !== "concept" || `${before.id}:ex` !== s.id) out.push(`${w}: its example step does not follow its concept's line`);
-      } else if (b.of === "base") {
+      } else {
         const cue = s.cues[b.after];
         if (s.kind !== "compose" || s.id !== d.step || !cue) out.push(`${w}: a bentuk dasar's example plays in its word's composition step, after a line`);
         else if (cue.frame !== b.frame || s.cues.slice(b.after + 1).some((c) => c.frame === b.frame)) {
@@ -459,8 +472,6 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
         } else if (ctx.compose?.words[s.loc ?? ""]?.frames[(b.frame ?? 0) - 1]?.stage !== "base") {
           out.push(`${w}: frame ${b.frame} of the composition is not a base frame`);
         }
-      } else if (s.kind !== "explain" || s.id !== d.step || b.after !== 0) {
-        out.push(`${w}: a word's own example plays right after its line`);
       }
       // What the imam recites: one recording, and it exists.
       if ((b.word === null) === (b.clip === null)) out.push(`${w}: needs exactly one of a word of this ayah and a clip`);
@@ -499,7 +510,7 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
       if (d.waqf !== waqf || b.caption.includes(ctx.texts.example.waqf) !== waqf) {
         out.push(`${w}: ${waqf ? "ends its ayah, where its last harakah is not heard, and does not say so" : "says its last harakah is not heard, which is not so here"}`);
       }
-      if (last && (b.of === "base" || b.of === "word" || (b.of === "concept" && b.id.endsWith(":2")))) out.push(`${w}: ends its ayah, so the ending it is there for is not heard`);
+      if (last && (b.of === "base" || (b.of === "concept" && b.id.endsWith(":2")))) out.push(`${w}: ends its ayah, so the ending it is there for is not heard`);
       const run = b.key.includes("-");
       if (run !== (d.washal !== null)) out.push(`${w}: ${run ? "a run is played without saying what is heard" : "says what a run sounds like, but plays one word"}`);
       if (d.washal && !b.caption.includes(d.washal.heard)) out.push(`${w}: played with the word before it, and the caption does not say what is heard (${d.washal.heard})`);
@@ -521,9 +532,8 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
   }
   seq.steps.forEach((s) => {
     const beats = s.examples ?? [];
-    const word = s.word ? words[s.word - 1] : undefined;
     if (s.kind === "compose") {
-      if (s.recite?.target !== "word" || s.recite.word !== s.word) out.push(`${s.id}: does not end with the imam reciting the joined word`);
+      if (s.recite && s.word !== n) out.push(`${s.id}: ends with the imam reciting its word again (a word is recited once, when its step opens; only the ayah's last word again)`);
       const base = (ctx.compose?.words[s.loc ?? ""]?.frames ?? []).flatMap((f, k) => (f.stage === "base" ? [k + 1] : []));
       const voiced = beats.filter((b) => b.of === "base").map((b) => b.frame);
       const unvoiced = gapsOf(s.id).length;
@@ -531,12 +541,6 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
         out.push(`${s.id}: base frame(s) ${base.filter((k) => !voiced.includes(k)).join(", ")} have neither the imam's voice of the bentuk dasar nor a reason`);
       }
       if (voiced.length !== new Set(voiced).size) out.push(`${s.id}: two examples for one base frame`);
-    }
-    if (s.kind === "explain" && word && !seq.steps.some((x) => x.id === `${s.id}:compose`)) {
-      const harakah = ["fathah", "kasrah", "dhammah", "fathatain", "kasratain", "dhammatain"].includes(word.case.sign);
-      if (harakah && !beats.some((b) => b.of === "word" && b.word === s.word) && !gapsOf(s.id).length) {
-        out.push(`${s.id}: the line explains the word's ${word.case.sign}, and neither the imam's recitation of it follows nor a reason`);
-      }
     }
   });
   return out;

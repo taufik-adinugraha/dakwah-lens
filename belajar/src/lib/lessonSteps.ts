@@ -77,6 +77,16 @@ export function captionMs(text: string, pace: AutoPace): number {
   return Math.round(Math.max(min, settle + (text.length / CPS[pace]) * 1000));
 }
 
+/**
+ * The reading time of a text alone, at the same pace: no settle time for the eyes and no minimum.
+ * For on-screen text that comes WITH a sound and beside the thing it names — an example beat's
+ * "Contoh: …" under its card (autoplay/timing.ts exampleReadMs) — where captionMs' five or six
+ * seconds held a one-line card long after the imam had said its word.
+ */
+export function readingMs(text: string, pace: AutoPace): number {
+  return Math.round((text.length / CPS[pace]) * 1000);
+}
+
 /** Longest caption shown as one step. */
 export const MAX_CAPTION = 180;
 

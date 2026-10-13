@@ -26,8 +26,11 @@ const VOWEL: ReadonlySet<ComposeMark> = new Set(["fathah", "kasrah", "dhammah", 
  * kasrah (u → i) → written together → the alif drops → [بِسْمِ] — or the
  * harakat primer (each mark on a dotted circle, its sound, an example from
  * the ayah). One FRAME at a time, the one the line on screen is said over
- * (caption.ts stageFrame); the imam then recites the joined word over the
- * last frame ("recited": the tile filled forest, as the mushaf's active word).
+ * (caption.ts stageFrame). An ayah's LAST word alone is then recited by the
+ * imam once more, over its last frame — the frame that says he stops on it
+ * ("recited": the tile filled forest, as the mushaf's active word); every
+ * other composition ends with its last line (operator 2026-10-13, plan L24:
+ * a word is recited when its step opens, not again at the end).
  * On a `base` frame the imam may recite the bentuk dasar itself (operator
  * 2026-10-12: "ismu (read by voice + show visual) … becomes ismi (read by voice
  * + visual)"; plan L20, an example beat): `example` names that beat, and while

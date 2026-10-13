@@ -21,15 +21,20 @@
  *     frame is on screen and its lines are said: the imam's clip of that base form where the
  *     build found it heard as shown (content/compose `examples`, pipeline/compose.py: never an
  *     ayah's last word; a word that starts with hamzat washal mid-ayah is played with the word
- *     before it, "tabārakasmu", and says so). The joined word is the step's own recitation at its
- *     last frame, as before: "ismu (read by voice + show visual) … becomes ismi (read by voice +
- *     visual)". A base frame without a voice of its own is listed with the build's reason (gaps).
- * (c) WORD — when a word's harakah is explained by its own line (a word WITHOUT a composition:
- *     "Akhirnya kasrah karena …", the word card's "Kenapa akhirnya dibaca …"), the imam recites
- *     that word right after — unless the harakah is not heard there (src/lib/heard.ts
- *     signNotHeard: the ayah's last word, a tanwin before a letter that hides its n), which is
- *     listed with the reason. A word WITH a composition is recited at the end of its composition
- *     step already, right after its ending is explained: no second time.
+ *     before it, "tabārakasmu", and says so). The joined word — "… becomes ismi (read by voice +
+ *     visual)" — is the lesson's own word, which the imam recites when its step opens
+ *     ("w${n}:recite"), before it is explained. A base frame without a voice of its own is listed
+ *     with the build's reason (gaps).
+ *
+ * NO SECOND RECITATION OF THE LESSON'S OWN WORD (operator 2026-10-13: "when transation from word X
+ * to X+1, i think we dont need to recite the X, just directly to X+1"; plan L24). Until then the
+ * imam said word n again when its explanation was through — at the end of its composition step,
+ * and, for a word without a composition, as a beat (c) after the line that explains its harakah —
+ * and then word n + 1 at once: two recitations and two reading pauses between two explanations.
+ * A word is now recited once, at its opening step; rule (c) and its list of harakat that are not
+ * heard are gone with it. One word is still recited a second time: the ayah's LAST word, after
+ * the last line of its composition, which says the imam stops on it and what is not heard there
+ * (no next word follows it; composition.ts STOP_NOTE, sequence.ts).
  *
  * At most two beats per rule. Every beat is labelled by what is heard (src/lib/heard.ts, the
  * rules of PR #100's review): `waqf` on an ayah-final word whose last harakah the pause drops,
@@ -38,8 +43,7 @@
  */
 import type { Ayah, Concept } from "@/content/schema";
 
-import { signNotHeard, waqfDrop } from "../heard";
-import { letters } from "../terms";
+import { waqfDrop } from "../heard";
 import type { ExampleClip, ExampleOf } from "./types";
 
 /** The harakat a word's `case.sign` can name, as the mark names of src/lib/heard.ts. */
@@ -48,12 +52,12 @@ const HARAKAT: ReadonlySet<string> = new Set(["fathah", "kasrah", "dhammah", "fa
 export const ENDING_MARKS = ["fathah", "kasrah", "dhammah"] as const;
 export type EndingMark = (typeof ENDING_MARKS)[number];
 
-/** At most this many example beats per rule (a concept, a bentuk dasar, a word's line). */
+/** At most this many example beats per rule (a concept, a bentuk dasar). */
 export const MAX_EXAMPLES_PER_RULE = 2;
 
 /** Why a `base` frame of a composition has no voice of its own (pipeline/compose.py UNVOICED). */
 export const UNVOICED_REASON: Readonly<Record<string, string>> = {
-  own: "the bentuk dasar is this very word; the step ends with the imam reciting it",
+  own: "the bentuk dasar is this very word, which the imam recites when its step opens",
   unattested: "no word of the Qur'an has these bytes (a teaching form)",
   unheard: "the Qur'an has these bytes, but in no place are they heard as shown",
 };
@@ -104,7 +108,7 @@ export type LessonExample = {
   id: string;
   of: ExampleOf;
   /** The step it plays in: an example step of its own ("concept:${id}:ex") or the lesson step
-   *  it is part of ("w1:compose", "w3"). */
+   *  it is part of ("w1:compose"). */
   step: string;
   /** base: the composition frame it plays over (after that frame's last line); else null. */
   frame: number | null;
@@ -146,13 +150,12 @@ const endingMark = (sign: string): EndingMark | null => (ENDING_MARKS as readonl
 export function lessonExamples(src: ExampleSource): { examples: LessonExample[]; gaps: ExampleGap[] } {
   const { ayah } = src;
   const words = ayah.words;
-  const tokens = words.map((w) => w.ar);
   const numberOf = new Map(words.map((w, i) => [w.loc, i + 1]));
   const examples: LessonExample[] = [];
   const gaps: ExampleGap[] = [];
   const here = { surah: ayah.surah, ayah: ayah.ayah };
 
-  // (b) the bentuk dasar of a composition, and (c) the word whose harakah its own line explains
+  // (b) the bentuk dasar of a composition (a word without one has no beat of its own: plan L24)
   words.forEach((w, i) => {
     const n = i + 1;
     const unit = src.compose?.words[w.loc];
@@ -185,31 +188,7 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
           ending: null,
         });
       }
-      return;
     }
-    const sign = w.case.sign;
-    if (!HARAKAT.has(sign)) return; // its line explains no harakah (a mabni word's sukun, a letter, none)
-    const unheard = signNotHeard([sign], letters(w.ar).length, n, tokens);
-    if (unheard) {
-      gaps.push({ step: `w${n}`, rule: `akhiran ${w.translit}`, why: `its ${sign} is not heard here (${unheard})` });
-      return;
-    }
-    examples.push({
-      id: `w${n}:word`,
-      of: "word",
-      step: `w${n}`,
-      frame: null,
-      key: w.loc,
-      word: n,
-      clip: null,
-      translit: w.translit,
-      gloss: w.gloss,
-      place: here,
-      waqf: false,
-      washal: null,
-      ar: w.ar,
-      ending: endingMark(sign),
-    });
   });
 
   // (a) each concept introduced here: its example in this ayah, then at most one from elsewhere

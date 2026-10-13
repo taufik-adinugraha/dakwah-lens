@@ -63,8 +63,9 @@ form: a clip of one word (or a run) of an ayah's streamed recording, as on the K
 narrator never voices a Qur'anic word). The build writes, for every `base` frame, one entry of
 `examples[<word loc>]`: {frame, form, loc, key, clip[, washal]} — or {frame, form, unvoiced: why}.
 Which place, by what is HEARD there (clips.py "WHAT IS HEARD"; never a hand list):
-  - the base form is the lesson word itself ({"word": <this loc>}): `unvoiced: "own"` — the step
-    ends with the imam reciting that very word, which is its example;
+  - the base form is the lesson word itself ({"word": <this loc>}): `unvoiced: "own"` — the imam
+    recites that very word when its step opens (and, until plan L24 of 2026-10-13, again at the
+    end of its step), which is its example;
   - the base form QUOTES a place ({"tanzil": loc} or another lesson's {"word": loc}, whole): that
     place, the one the frame's note names ("seperti di QS 55:78"). It must be heard as shown, or
     the build stops and the author quotes another place;
@@ -513,7 +514,7 @@ EXAMPLES_FIXTURE_COMMENT = (
 )
 # Why a `base` frame has no voice of its own (the lesson says nothing false there: nothing plays).
 UNVOICED = {
-    "own": "the bentuk dasar is this very word; the step ends with the imam reciting it",
+    "own": "the bentuk dasar is this very word, which the imam recites when its step opens",
     "unattested": "no word of the Qur'an has these bytes (a teaching form)",
     "unheard": "the Qur'an has these bytes, but in no place are they heard as shown (each ends its ayah, starts "
                "with a hamzat washal in mid-recitation, or has no timing of its own)",

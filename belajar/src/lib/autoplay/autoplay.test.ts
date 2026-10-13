@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import { captionMs } from "../lessonSteps";
-import { loadCheckInput, quizAyahOf, runAutoplayChecks } from "./checks";
+import { loadCheckInput, quizAyahOf, runAutoplayChecks, sequenceProblems } from "./checks";
 import { availableExercises, questionNumbers } from "./exercises";
 import { LINE_ID_RE, manifestParts, parseLineId } from "./ids";
 import {
@@ -41,7 +41,7 @@ import {
 } from "./persist";
 import { buildAutoplaySequence, introducedConcepts, sequenceLineIds } from "./sequence";
 import { ID_TEXTS } from "./texts";
-import { advanceHoldMs, partAt, readMs, settleAfterNarrationMs, settleAfterReciteMs, WORD_REPEAT_GAP_MS } from "./timing";
+import { advanceHoldMs, exampleReadMs, partAt, readMs, settleAfterNarrationMs, settleAfterReciteMs, WORD_REPEAT_GAP_MS } from "./timing";
 import { SHARED_KEYS, type AutoplaySequence, type NarrationManifest, type Pace } from "./types";
 
 const CONTENT = fileURLToPath(new URL("../../../content/", import.meta.url));
@@ -255,7 +255,8 @@ describe("autoplay machine", () => {
     expect(r.s.activity).toMatchObject({ kind: "wait", ms: settleAfterReciteMs("biasa") });
     r.send(end(r.s.activity!));
     expect(r.s.idx).toBe(2);
-    expect(r.s.activity).toMatchObject({ kind: "recite", target: "word", word: 1 });
+    // Caption-only: the word's caption is all the learner has, so it keeps its reading time.
+    expect(r.s.activity).toMatchObject({ kind: "recite", target: "word", word: 1, minMs: readMs(seq.steps[2].caption, "biasa") });
     expect(viewAutoplay(seq, r.s).focusWord).toBe(1);
     expect(viewAutoplay(seq, r.s).guides.map((g) => g.target)).toEqual(["mushaf-word:1"]);
   });
@@ -278,6 +279,8 @@ describe("autoplay machine", () => {
       "recite", // word 1
     ]);
     expect(r.log[6]).toMatchObject({ kind: "recite", target: "ayah", minMs: 0 });
+    // The word too: the narrator explains it next, so it does not wait for its caption (plan L24).
+    expect(r.log[8]).toMatchObject({ kind: "recite", target: "word", word: 1, minMs: 0 });
     // One activity at a time, by construction; a late end of a cancelled clip changes nothing.
     const before = r.s;
     expect(reduceAutoplay(seq, before, { type: "narration_end", token: before.activity!.token })).toBe(before);
@@ -464,6 +467,126 @@ describe("autoplay machine", () => {
       expect(r.s.idx).toBe(seq.steps.length - 1);
       expect(r.s.intent).toBeNull();
     }
+  });
+});
+
+// "Why there is rather long pause when reciting verses word by word? loading issue?" — "when
+// transation from word X to X+1, i think we dont need to recite the X, just directly to X+1"
+// (operator 2026-10-13, plan L24). No loading: every recitation of a word was held for the reading
+// time of the caption under it (6.9 s at Biasa for "Kata ke-1: bismi. Dengarkan imam
+// membacanya.", 10.3 s at Pelan), a rule from before the narration had a voice.
+describe("a word's opening step: as long as the imam's word when the narrator explains it next (operator 2026-10-13)", () => {
+  const plain = seqFor("al-fatihah", 2);
+  const audio = withAudio(plain);
+  const narrated = seqFor("al-fatihah", 2, audio);
+  const W1 = 2; // intro, recite, w1:recite
+  const caption = plain.steps[W1].caption;
+
+  it("the sequence: each word recited by one step, its opening one; its caption names the word", () => {
+    expect(plain.steps[W1]).toMatchObject({ id: "w1:recite", kind: "recite_word", cues: [], recite: { target: "word", word: 1 } });
+    const word1 = input.surahs.find((s) => s.slug === "al-fatihah")?.ayat[1].words[0];
+    expect(caption).toBe(`Kata ke-1: ${word1?.translit}. Dengarkan imam membacanya.`);
+    for (const seq of [plain, narrated]) {
+      expect(seq.steps.filter((s) => s.recite?.target === "word").map((s) => s.id)).toEqual(["w1:recite", "w2:recite", "w3:recite", "w4:recite"]);
+      // An explain step neither recites nor carries a beat that would (until 2026-10-13: "w1:word").
+      for (const s of seq.steps.filter((x) => x.kind === "explain")) expect([s.id, s.recite, s.examples]).toEqual([s.id, undefined, undefined]);
+    }
+  });
+
+  it("the engine's own check refuses a step that recites a word again (checks.ts sequenceProblems)", () => {
+    const ayah = input.surahs.find((s) => s.slug === "al-fatihah")?.ayat[1];
+    if (!ayah) throw new Error("no Al-Fatihah 2");
+    const ctx = { ayah, last: false, exercises: availableExercises(quizOf("al-fatihah", 2)), introduced: introducedConcepts(input.concepts, ayah.loc), compose: null };
+    expect(sequenceProblems(plain, ctx)).toEqual([]);
+    // What every composition step did until 2026-10-13, planted on a word's explanation.
+    const again = structuredClone(plain);
+    const w1 = again.steps.find((s) => s.id === "w1");
+    if (!w1) throw new Error("no step w1");
+    w1.recite = { target: "word", word: 1 };
+    expect(sequenceProblems(again, ctx)).toEqual([
+      "w1: a explain step ends with the imam reciting word 1 (a word is recited once, when its step opens; only the ayah's last word again, after the line that says he stops on it)",
+    ]);
+  });
+
+  it("narrated, Biasa: the imam's word, the pause after him, the narrator — no reading time", () => {
+    const r = runner(narrated, "biasa");
+    r.send({ type: "start", from: W1, reason: "continue" });
+    expect(r.s.activity).toMatchObject({ kind: "recite", target: "word", word: 1, minMs: 0 });
+    // Its caption is still on screen while he says it.
+    expect(viewAutoplay(narrated, r.s).caption).toEqual({ parts: [caption], part: 0, line: null });
+    r.send(end(r.s.activity!));
+    expect(r.s.activity).toMatchObject({ kind: "wait", ms: settleAfterReciteMs("biasa") });
+    r.send(end(r.s.activity!));
+    expect(r.s.idx).toBe(W1 + 1);
+    expect(r.s.activity).toMatchObject({ kind: "narrate", line: "al-fatihah:2:w1" });
+  });
+
+  it("narrated, Pelan: both hearings and the gap between them, neither held for the caption", () => {
+    const r = runner(narrated, "pelan");
+    r.send({ type: "start", from: W1, reason: "continue" });
+    expect(r.s.activity).toMatchObject({ kind: "recite", target: "word", word: 1, minMs: 0 });
+    r.send(end(r.s.activity!));
+    expect(r.s.activity).toMatchObject({ kind: "wait", ms: WORD_REPEAT_GAP_MS });
+    r.send(end(r.s.activity!));
+    expect(r.s.activity).toMatchObject({ kind: "recite", target: "word", word: 1, minMs: 0 });
+    r.send(end(r.s.activity!));
+    expect(r.s.activity).toMatchObject({ kind: "wait", ms: settleAfterReciteMs("pelan") });
+    r.send(end(r.s.activity!));
+    expect(r.s.activity).toMatchObject({ kind: "narrate", line: "al-fatihah:2:w1" });
+  });
+
+  it("“Tunggu saya” is as it was, narrated or not: the word, then Lanjut", () => {
+    for (const seq of [narrated, plain]) {
+      const r = runner(seq, "tunggu");
+      r.send({ type: "start", from: W1, reason: "continue" });
+      expect(r.s.activity).toMatchObject({ kind: "recite", target: "word", word: 1, minMs: 0 });
+      r.send(end(r.s.activity!));
+      expect(r.s.activity).toMatchObject({ kind: "wait", ms: settleAfterReciteMs("tunggu") });
+      r.send(end(r.s.activity!));
+      expect([r.s.phase, r.s.idx, viewAutoplay(seq, r.s).showLanjut]).toEqual(["ready", W1, true]);
+      r.send({ type: "next" });
+      expect(r.s.idx).toBe(W1 + 1);
+    }
+  });
+
+  it("caption-only keeps the reading hold (Biasa and Pelan): the caption is all the learner has", () => {
+    for (const pace of ["biasa", "pelan"] as const) {
+      const r = runner(plain, pace);
+      r.send({ type: "start", from: W1, reason: "continue" });
+      expect(r.s.activity).toMatchObject({ kind: "recite", target: "word", word: 1, minMs: readMs(caption, pace) });
+      expect(readMs(caption, pace)).toBeGreaterThanOrEqual(pace === "pelan" ? 6000 : 5000);
+    }
+  });
+
+  it("decided by the word's own line, not by the sequence: shared lines with a voice do not make a caption-only lesson narrated", () => {
+    // The Mu'awwidzat on the Indonesian page today: "Kita lanjutkan." and the exercise prompts
+    // have audio (content/narration/shared.json), the ayah's own lines have none yet.
+    const silent: NarrationManifest = { ...audio.narration, lines: Object.fromEntries(Object.entries(audio.narration.lines).map(([id, l]) => [id, { text: l.text }])) };
+    const seq = seqFor("al-fatihah", 2, { narration: silent, shared: audio.shared });
+    expect(seq.hasAudio).toBe(true);
+    const r = runner(seq, "biasa");
+    r.send({ type: "start", from: W1, reason: "continue" });
+    expect(r.s.activity).toMatchObject({ kind: "recite", target: "word", word: 1, minMs: readMs(caption, "biasa") });
+    // … and one word's line without a voice (not rendered yet) keeps the hold for that word only.
+    const part: NarrationManifest = { ...audio.narration, lines: { ...audio.narration.lines, "al-fatihah:2:w2": { text: "teks" } } };
+    const mixed = seqFor("al-fatihah", 2, { narration: part, shared: audio.shared });
+    const minOf = (id: string) => {
+      const m = runner(mixed, "biasa");
+      m.send({ type: "start", from: mixed.steps.findIndex((x) => x.id === id), reason: "continue" });
+      return m.s.activity?.kind === "recite" ? m.s.activity.minMs : null;
+    };
+    expect([minOf("w1:recite"), minOf("w2:recite"), minOf("w3:recite")]).toEqual([0, readMs(mixed.steps.find((x) => x.id === "w2:recite")!.caption, "biasa"), 0]);
+  });
+
+  it("a line whose audio failed this visit is caption-only from then on: its word's step gets the hold back", () => {
+    const r = runner(narrated, "biasa");
+    r.send({ type: "start", from: W1 + 1, reason: "continue" });
+    expect(r.s.activity).toMatchObject({ kind: "narrate", line: "al-fatihah:2:w1" });
+    r.send({ type: "narration_error", token: r.s.activity!.token });
+    expect(r.s.noAudio).toEqual(["al-fatihah:2:w1"]);
+    r.send({ type: "prev" });
+    expect(r.s.idx).toBe(W1);
+    expect(r.s.activity).toMatchObject({ kind: "recite", target: "word", word: 1, minMs: readMs(caption, "biasa") });
   });
 });
 
@@ -1010,6 +1133,27 @@ describe("autoplay timing", () => {
     expect(readMs("x".repeat(180), "biasa")).toBe(captionMs("x".repeat(180), "biasa"));
     expect(readMs("x".repeat(180), "pelan")).toBe(captionMs("x".repeat(180), "pelan"));
     expect(readMs("x".repeat(180), "tunggu")).toBe(captionMs("x".repeat(180), "biasa"));
+  });
+
+  // Operator 2026-10-13 (plan L24): an example card is not held five seconds for one line. The
+  // real captions, shortest and longest of each kind (measured over the four surahs).
+  it("an example beat's card stays for its caption's reading alone: 10 / 6 characters a second, no settle, no floor", () => {
+    const label = "Contoh: kata ke-1, qul."; // 23 characters, the shortest
+    const base = "Contoh: ar-raḥmānu, di QS 20:5."; // 31
+    const waqf = "Contoh: kata ke-4, nasta‘īnu. Di akhir ayat imam berhenti, jadi harakat akhirnya tidak terdengar."; // 97
+    const washal = "Contoh: ismu, di QS 55:78. Bersama kata sebelumnya terdengar “tabārakasmu”, karena alif di awalnya tidak dibaca."; // 112, the longest
+    expect([label, base, waqf, washal].map((c) => c.length)).toEqual([23, 31, 97, 112]);
+    expect([label, base, waqf, washal].map((c) => exampleReadMs(c, "biasa"))).toEqual([2300, 3100, 9700, 11200]);
+    expect([label, base, waqf, washal].map((c) => exampleReadMs(c, "pelan"))).toEqual([3833, 5167, 16167, 18667]);
+    // What it was (captionMs): a one-line card five seconds and more.
+    expect([label, base, waqf, washal].map((c) => readMs(c, "biasa"))).toEqual([5000, 5600, 12200, 13700]);
+    expect([label, base, waqf, washal].map((c) => readMs(c, "pelan"))).toEqual([6833, 8167, 19167, 21667]);
+    for (const c of [label, base, waqf, washal]) {
+      for (const pace of ["biasa", "pelan", "tunggu"] as const) expect(exampleReadMs(c, pace)).toBeLessThan(readMs(c, pace));
+      expect(exampleReadMs(c, "pelan")).toBeGreaterThan(exampleReadMs(c, "biasa"));
+      expect(exampleReadMs(c, "tunggu")).toBe(exampleReadMs(c, "biasa"));
+    }
+    expect(exampleReadMs("", "biasa")).toBe(0);
   });
 });
 

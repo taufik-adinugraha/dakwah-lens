@@ -343,12 +343,36 @@ async function answerExercise(page, vp, label, key) {
  *  plays and the KARAOKE caption shows (routed narration, as in screenshots.mjs).
  *  The EXAMPLE beats (operator 2026-10-12, plan L20): a concept's example is a step of its own,
  *  so its card ("Contoh" · the word · "yang artinya …") and its caption are measured like any
- *  step — at once, with no wait for a karaoke caption it never has (the beat lasts a few seconds
- *  and the lesson then moves on by itself); the first is also shot at each size. A bentuk dasar's
- *  example comes inside its composition step, after its base frame's lines: on the narrated
- *  lesson the first one is waited for and its caption measured (and shot) too. */
+ *  step — at once, with no wait for a karaoke caption it never has; the first is also shot at
+ *  each size. A bentuk dasar's example comes inside its composition step, after its base frame's
+ *  lines: on the narrated lesson the first one is waited for and its caption measured (and shot)
+ *  too.
+ *  BRIEF steps are measured PAUSED (operator 2026-10-13, plan L24): a word's opening step
+ *  ("w3:recite": the imam says the word) now lasts as long as his word, about a second and a
+ *  half, and a concept's example about three (they were 7.7 s and 5.8 s) — less than three sizes
+ *  take to measure, and the lesson would move on under the measurement. "Jeda" keeps the step as
+ *  it is (its caption, the word card or the example card); "Lanjutkan" before the walk moves on,
+ *  so the steps after it run as before (an exercise needs the lesson running). */
 /** How long the walk waits, inside a composition step, for its bentuk dasar's example to come. */
 const BASE_EXAMPLE_WAIT_MS = 45_000;
+const MIDDLE = '[data-autoplay="middle"]';
+/** A word's opening step, by the stage's data-step ("w1:recite"). */
+const WORD_RECITE_STEP = /^w\d+:recite$/;
+/** The middle control's mode ("pause" while the lesson runs, "resume" while it is paused). */
+const middleMode = (page) => page.locator(MIDDLE).first().getAttribute("data-mode").catch(() => null);
+/** "Jeda", when the lesson runs. True when this call paused it. */
+async function pauseLesson(page) {
+  if ((await middleMode(page)) !== "pause") return false;
+  await press(page.locator(MIDDLE).first());
+  await page.waitForTimeout(150);
+  return (await middleMode(page)) === "resume";
+}
+/** "Lanjutkan", when the lesson is paused. */
+async function resumeLesson(page) {
+  if ((await middleMode(page)) !== "resume") return;
+  await press(page.locator(MIDDLE).first());
+  await page.waitForTimeout(150);
+}
 async function lessonPages(page, vp, index) {
   const answered = new Set();
   for (const [urlPath, narrated] of LESSONS) {
@@ -372,10 +396,14 @@ async function lessonPages(page, vp, index) {
         const at = await stepOf(page);
         if (!at) break;
         let shot = null;
+        // A word's opening step and a concept's example step are brief: paused while measured.
+        const stepId = await page.locator(STAGE).first().getAttribute("data-step").catch(() => null);
         // A concept's example step: its card is on screen at once, and only for a few seconds.
         const onExample = (await page.locator(`${STAGE} [data-autoplay="example"]`).count()) > 0;
+        const brief = onExample || WORD_RECITE_STEP.test(stepId ?? "");
+        const held = brief ? await pauseLesson(page) : false;
         if (onExample && examples++ === 0) shot = "example";
-        if (narrated && !onExample) {
+        if (narrated && !brief) {
           await press(page.locator('[data-autoplay="replay"]')).catch(() => {});
           const word = page.locator('[data-autoplay="caption"] [data-karaoke]').first();
           if (await word.waitFor({ state: "attached", timeout: 4000 }).then(() => true, () => false)) {
@@ -391,6 +419,7 @@ async function lessonPages(page, vp, index) {
         await settle(page);
         await measureAllSizes(page, vp, `${urlPath} step ${at[0]}/${at[1]}`, STAGE, shot);
         steps++;
+        if (held) await resumeLesson(page);
         // The first bentuk dasar's example of the narrated lesson: inside word 1's composition,
         // once its base frame's lines are said (its caption says what is heard: the longest).
         if (narrated && !baseExample && (await page.locator(`${STAGE}[data-step="w1:compose"]`).count())) {

@@ -192,9 +192,11 @@ function LoadingMark({ className }: { className?: string }) {
  * slot (ExampleCard: "Contoh", the word big, its transliteration and meaning)
  * and the IMAM recites it, the mushaf line lighting it; in a word's
  * composition, when the bentuk dasar is ringed, the imam recites that base
- * form from where it stands in the Qur'an (its tile filled as he does), and
- * the joined word at the end as before — "ismu (read by voice + show visual)
- * … becomes ismi (read by voice + visual)". The beat's caption, in the bottom
+ * form from where it stands in the Qur'an (its tile filled as he does) — "ismu
+ * (read by voice + show visual) … becomes ismi (read by voice + visual)": the
+ * joined word is the lesson's own, recited when its step opens and not again at
+ * the end, except an ayah's last word, after the line that says the imam stops
+ * on it (operator 2026-10-13, plan L24). The beat's caption, in the bottom
  * panel, says what is shown and what is heard ("Contoh: ismu, di QS 55:78 … :
  * bersama kata sebelumnya terdengar “tabārakasmu”."); the narrator says
  * nothing. A clip that takes long shows "Memuat bacaan imam…" like any

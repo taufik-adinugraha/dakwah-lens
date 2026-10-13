@@ -41,8 +41,11 @@
  *
  * The animation in the word card's slot (stageFrame, operator 2026-10-10,
  * narration rule 14): on a primer or compose step, the frame the line on
- * screen is said over; while the imam recites the joined word after the
- * lines (and in his settle pause), the last frame, "recited".
+ * screen is said over. The last line is said over the last frame — the joined
+ * word — which stays to the step's end. The imam does not recite the word
+ * again there (operator 2026-10-13, plan L24: he said it when its step
+ * opened) — except an ayah's last word, after the line that says he stops on
+ * it: while he recites it (and in his settle pause), the last frame, "recited".
  *
  * An example beat (stageExample; operator 2026-10-12, plan L20: "each
  * explanation should be followed by examples (visual + voice)"): which beat
@@ -310,15 +313,15 @@ export function stageMarks(seq: AutoplaySequence, state: AutoplayState): { marke
   // A word step is about its word, the imam reciting it or not.
   if (step.kind === "recite_word" && step.word) return { marked: [step.word], focus: step.word };
   // An example beat: its word when it is this ayah's (lit as the imam recites it), else the word
-  // the step explains. The word card stays for a word's own recitation after its line; a
-  // concept's example has a card of its own (LessonStage), a bentuk dasar its composition.
+  // the step explains. A concept's example has a card of its own (LessonStage), a bentuk dasar
+  // its composition.
   const ex = stageExample(seq, state);
   if (ex) {
     const word = ex.beat.word ?? step.word ?? null;
-    return { marked: word === null ? [] : [word], focus: ex.beat.of === "word" || ex.beat.of === "base" ? (step.word ?? null) : null };
+    return { marked: word === null ? [] : [word], focus: ex.beat.of === "base" ? (step.word ?? null) : null };
   }
   // The imam recites the ayah (and its settle pause): his current word only.
-  // A compose step's recitation is its own word, the composition on screen.
+  // A compose step's recitation (the ayah's last word) is its own word, the composition on screen.
   const here = state.plan[state.at];
   if (state.activity?.kind === "recite" || (here?.t === "settle" && here.after === "recite")) {
     return step.kind === "compose" && step.word ? { marked: [step.word], focus: step.word } : none;
@@ -336,15 +339,18 @@ export function stageMarks(seq: AutoplaySequence, state: AutoplayState): { marke
 }
 
 /** The animation on screen: which step's frames, which frame (1-based), and
- *  whether the imam is reciting the result. */
+ *  whether the imam is reciting the result (the composition of an ayah's last
+ *  word, after its last line; no other step: plan L24). */
 export type StageFrame = { step: "primer" | "compose"; word: number | null; frame: number; recited: boolean };
 
 /**
  * The frame of a primer / compose step to show (null on any other step,
  * before the start and after the end). It follows the plan: the line being
  * said (or the one a shared line like "Kita lanjutkan." comes before), the
- * line that just ended while its settle pause runs, the last frame
- * ("recited") while the imam recites the joined word and after. A step shown
+ * line that just ended while its settle pause runs, and the last frame — a
+ * word's joined form — once the step's lines are through ("Tunggu saya"
+ * waiting for Lanjut): "recited" while the imam recites it and after, on the
+ * one composition that ends with him (an ayah's last word). A step shown
  * paused before its first line shows its first frame.
  */
 export function stageFrame(seq: AutoplaySequence, state: AutoplayState): StageFrame | null {
@@ -366,7 +372,7 @@ export function stageFrame(seq: AutoplaySequence, state: AutoplayState): StageFr
     const a = plan[i];
     return a?.t === "recite" || a?.t === "gap" || (a?.t === "settle" && a.after === "recite");
   };
-  if (state.at >= plan.length) return { step: step.kind, word, frame: last, recited: step.kind === "compose" };
+  if (state.at >= plan.length) return { step: step.kind, word, frame: last, recited: step.recite !== undefined };
   if (reciting(state.at)) return { step: step.kind, word, frame: last, recited: true };
   const here = frameAt(state.at);
   if (here !== null) return { step: step.kind, word, frame: here, recited: false };
@@ -380,6 +386,8 @@ export function stageFrame(seq: AutoplaySequence, state: AutoplayState): StageFr
   for (let i = state.at + 1; i < plan.length; i++) {
     const f = frameAt(i);
     if (f !== null) return { step: step.kind, word, frame: f, recited: false };
+    // "Kita lanjutkan." before the imam's word (resumed there): the joined word, not yet recited.
+    if (reciting(i)) return { step: step.kind, word, frame: last, recited: false };
   }
   return { step: step.kind, word, frame: 1, recited: false };
 }
