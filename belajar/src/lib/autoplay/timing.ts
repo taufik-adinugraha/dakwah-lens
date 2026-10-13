@@ -45,8 +45,24 @@ export function advanceHoldMs(pace: Pace, right: boolean): number {
 export const REMINDER_AT_MS = [20_000, 40_000, 60_000] as const;
 /** At most this many reminders between two actions of the learner. */
 export const MAX_REMINDERS = REMINDER_AT_MS.length;
-/** Suggested interval of the UI's `idle_tick` while an exercise waits. */
+/** Suggested interval of the UI's `idle_tick` while the lesson waits for the learner. */
 export const IDLE_TICK_MS = 1000;
+
+/**
+ * The screen lock's time limit while the lesson waits for the learner (src/lib/autoplay/wake.ts;
+ * review 2026-10-12: with no limit, a phone left at an exercise kept its screen on until the
+ * battery died). An exercise's reminders end with the third, at 60 s of silence; the lock is let
+ * go this much silent time after it.
+ */
+export const SCREEN_IDLE_AFTER_REMINDERS_MS = 60_000;
+/**
+ * Silent waiting time at which the screen lock is let go: the last reminder's time plus
+ * SCREEN_IDLE_AFTER_REMINDERS_MS (120 s). The same for an exercise waiting (its `idleMs`, once
+ * its reminders are through) and for a caption "Tunggu saya" holds for "Lanjut" (`heldMs`, which
+ * has no reminders). The lesson itself does not change at this limit: only the lock is let go,
+ * and the learner's next action there takes it again.
+ */
+export const SCREEN_IDLE_LIMIT_MS = REMINDER_AT_MS[REMINDER_AT_MS.length - 1] + SCREEN_IDLE_AFTER_REMINDERS_MS;
 
 /**
  * Which caption part to show `elapsedMs` into a narration line of `totalMs`

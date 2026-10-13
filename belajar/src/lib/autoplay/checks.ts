@@ -382,6 +382,13 @@ export function transitionProblem(seq: AutoplaySequence, b: AutoplayState, e: Au
     }
   }
   if (a.exercise && a.exercise.reminders > MAX_REMINDERS) return "more than three reminders";
+  // heldMs (the screen lock's time limit, wake.ts) is the silence of one wait for "Lanjut": it is
+  // counted in "ready" only, by idle ticks only, and starts over with anything else that happens.
+  if (a.heldMs !== 0 && a.phase !== "ready") return `silent time counted (${a.heldMs} ms) while ${a.phase}`;
+  if (a.heldMs !== 0 && e.type !== "idle_tick" && a !== b) return `${e.type} changed the state and kept the silent time (${a.heldMs} ms)`;
+  if (e.type === "idle_tick" && b.phase === "ready" && JSON.stringify({ ...a, heldMs: 0 }) !== JSON.stringify({ ...b, heldMs: 0 })) {
+    return "an idle tick changed more than the silent time while a caption is held";
+  }
   return null;
 }
 
