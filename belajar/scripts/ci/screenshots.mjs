@@ -2244,7 +2244,9 @@ async function composeFitSweep(page, vp, size, ayat, units) {
               // ↺ plays the step from its start even if the imam's stream paused the lesson.
               await page.locator('[data-autoplay="replay"]').click();
               const change = page.locator('[data-autoplay="composition"][data-compose-stage="change"]');
-              for (let w = 0; w < 120 && (await change.count()) === 0; w++) await page.waitForTimeout(500);
+              // Caption-only here: three lines at reading pace (~35 s), then the bentuk dasar's example
+              // (plan L20: its caption's reading time, ~14 s), then the change frame.
+              for (let w = 0; w < 180 && (await change.count()) === 0; w++) await page.waitForTimeout(500);
               if ((await change.count()) === 0) throw new Error(`${vp} ${size}: word 1 never reached its change frame`);
               await page.waitForTimeout(1600);
               await assertComposeFits(page, `${vp} ${size}: word 1 change frame`);
@@ -2365,6 +2367,260 @@ async function composeShots(page, vp, index) {
     console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
     throw err;
   } finally {
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
+/**
+ * The examples inside the autoplay lesson (operator 2026-10-12: "in explanation, for example when
+ * explaining dhommah, kasrah, etc provide example + additional voice. e.g ismu (read by voice + show
+ * visual) when combined with harf jar, it becomes ismi (read by voice + visual). in principel, each
+ * explanation should be followed by examples (visual + voice)" — "not only for harakah, but also
+ * for all rules"; docs/belajar-plan.md L20), on Al-Fatihah 1, its remembered place cleared. The
+ * narration is answered in the browser (narrationRoute: silent stand-ins as long as the manifests
+ * say), so the lines last as long as the lesson's; the reciters' host is the real CDN, only
+ * OBSERVED (watchRecitations) — in step 3 one file's requests are HELD BACK (a route that waits,
+ * then goes on to the CDN), nothing is answered here. Which examples: read from the content
+ * (content/compose/al-fatihah.json `examples`, content/library.json concepts), never typed.
+ *   1. THE BENTUK DASAR, IN THE BISMI COMPOSITION ("ismu (read by voice + show visual)"): reached
+ *      paused (toStep "w1:compose"), the recording of its base form (QS 55:78) has NOT been asked
+ *      for — a page that is only looked at, or a step that is not running, asks the reciters' host
+ *      for no example. "↺ Ulangi" plays the step: by the time the `base` frame's lines are said
+ *      and the beat shows (the stage's data-example = the composition's, on its base frame), the
+ *      recording has been requested; the lesson asks the imam for it (data-example-state
+ *      "reciting", the ringed tile filled forest); the caption says "Contoh", the base form, where
+ *      it stands and what is heard with the word before it ("tabārakasmu": its hamzat washal);
+ *      nothing in the figure is clipped and it stays above the panel. Then the composition goes on
+ *      to its `change` frame BY ITSELF — whether the runner could play the recording or not.
+ *   2. A CLIP THAT DOES NOT COME IS NEVER A DEAD STOP (phone): word 2's composition with every
+ *      request for its base form's recording (QS 112:2) held back. The beat shows; "Memuat bacaan
+ *      imam…" shows in the bottom panel; after the lesson's own limit (EXAMPLE_LOAD_LIMIT_MS, not
+ *      sooner) the example is given up — data-example-state "failed", "Suara contoh ini belum
+ *      bisa diputar." — and the lesson, never paused, goes on to the next frame by itself.
+ *   3. A CONCEPT'S EXAMPLE: the first concept introduced at this ayah, its line played from its
+ *      start ("↺ Ulangi" on the concept's step); when the line is through the lesson moves BY
+ *      ITSELF to the example step: the example card in the word card's slot ("Contoh", the word's
+ *      Arabic exactly as content/al-fatihah.json has it, its transliteration and meaning), above
+ *      the panel; the caption names the example; the lesson asks the imam for the word (this
+ *      ayah's own recording, already requested: the stage's player); the mushaf line marks that
+ *      word. Then the lesson goes on by itself to the next concept's line.
+ * Shots: the base example and the concept example (stage; on a phone also the viewport), and the
+ * given-up example. What this cannot show: that the right word is HEARD (an ear does that; the
+ * clips are checked against the pinned timings by pipeline/validate_compose.py and
+ * validate_clips.py), and iOS Safari letting the example player sound without a new tap.
+ * Fails the job on 1–3.
+ */
+/** = src/lib/autoplay/timing.ts (examples.test.ts checks they agree). */
+const EXAMPLE_LOAD_LIMIT_MS = 6000;
+const EXAMPLE_FAILED_HOLD_MS = 3000;
+async function exampleChecks(page, vp, index) {
+  const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
+  const msgs = (await read("messages/id.json")).Guided;
+  const lesson = await read("content/al-fatihah.json");
+  const lib = await read("content/library.json");
+  const compose = await read("content/compose/al-fatihah.json");
+  const lines = (await read("content/narration/al-fatihah.json")).lines ?? {};
+  const ayah1 = lesson.ayat.find((a) => a.ayah === 1);
+  const voiced = (loc) => (compose.examples?.[loc] ?? []).find((e) => e.clip);
+  const [ismu, allahu] = [voiced("1:1:1"), voiced("1:1:2")];
+  const introduced = lib.concepts.filter((c) => /^1:1:\d+$/.test(c.examples?.[0]?.loc ?? ""));
+  const [concept, after] = introduced;
+  if (!ayah1 || !ismu?.washal || !allahu || !concept || !after) {
+    throw new Error(`${vp}: example check — the content has no voiced bentuk dasar for 1:1:1 (with washal) and 1:1:2, or fewer than two concepts introduced at Al-Fatihah 1`);
+  }
+  const word = ayah1.words[Number(concept.examples[0].loc.split(":")[2]) - 1];
+  const lineMs = (id) => lineFiles(lines, id).reduce((n, u) => n + (index.get(u) ?? 0), 0) || 20_000;
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const watch = watchRecitations(page, new Set(["everyayah.com"]));
+  // Step 2: every request for one recording waits until the check lets it go.
+  let release = () => {};
+  const gate = new Promise((done) => (release = done));
+  const heldBack = [];
+  const isHeld = (url) => url.href === allahu.clip.url;
+  const hold = async (route) => {
+    heldBack.push(Date.now());
+    await gate;
+    await route.continue().catch(() => {});
+  };
+  const stage = page.locator('[data-autoplay="stage"]');
+  const middle = page.locator('[data-autoplay="middle"]');
+  const replay = page.locator('[data-autoplay="replay"]');
+  const caption = page.locator('[data-autoplay="caption"]');
+  const comp = page.locator('[data-autoplay="composition"]');
+  const text = async (loc) => ((await loc.first().innerText().catch(() => "")) ?? "").replace(/\s+/g, " ").trim();
+  const attr = (name) => stage.getAttribute(name);
+  const fail = (m) => {
+    throw new Error(`${vp}: lesson examples (Al-Fatihah 1) — ${m}`);
+  };
+  /** Waits until the stage shows example beat `id`; false after `ms`. */
+  const beatShows = (id, ms) => until(page, async () => (await attr("data-example")) === id, ms);
+  /** The states the beat on screen goes through until `done` is true (or `ms` passed). */
+  const follow = async (id, done, ms) => {
+    const seen = [];
+    const ok = await until(
+      page,
+      async () => {
+        const s = (await attr("data-example")) === id ? await attr("data-example-state") : null;
+        if (s && seen.at(-1) !== s) seen.push(s);
+        return done();
+      },
+      ms,
+    );
+    return { ok, seen };
+  };
+  const running = async () => (await middle.getAttribute("data-mode").catch(() => null)) === "pause";
+  try {
+    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    // The earlier checks left a remembered place on this ayah ("Lanjutkan dari langkah N").
+    await page.evaluate(() => localStorage.removeItem("belajar:v1:autoplay:al-fatihah/1"));
+    await page.reload({ waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('[data-autoplay="start"]').click();
+    await settleScroll(page);
+
+    // 1. The bentuk dasar of bismi: "ismu (read by voice + show visual)".
+    const baseId = `w1:base:${ismu.frame}`;
+    await toStep(page, vp, "w1:compose");
+    await page.waitForTimeout(800);
+    if (watch.requested(ismu.clip.url)) fail(`${recordingName(ismu.clip.url)} was requested before its step played (requests: ${watch.list()})`);
+    const t1 = Date.now();
+    await replay.click();
+    const untilBase = compose.words["1:1:1"].lines.filter((l) => l.frame <= ismu.frame).length;
+    const baseWait = Array.from({ length: untilBase }, (_, k) => lineMs(`al-fatihah:1:w1:compose:${k + 1}`)).reduce((a, b) => a + b, 0);
+    if (!(await beatShows(baseId, baseWait + 20_000))) {
+      fail(`the bentuk dasar's example (${baseId}) never showed in word 1's composition (step "${await attr("data-step")}", frame ${await comp.getAttribute("data-compose-frame").catch(() => "—")})`);
+    }
+    const shownAfter = Date.now() - t1;
+    const at = { step: await attr("data-step"), stage: await comp.getAttribute("data-compose-stage"), frame: await comp.getAttribute("data-compose-frame"), on: await comp.getAttribute("data-example"), clip: await attr("data-example-clip") };
+    if (at.step !== "w1:compose" || at.stage !== "base" || at.frame !== String(ismu.frame) || at.on !== baseId || at.clip !== ismu.key) {
+      fail(`the base example is not on the composition's base frame playing ${ismu.key}: ${JSON.stringify(at)}`);
+    }
+    if (!watch.requested(ismu.clip.url)) fail(`at the base frame the recording of the bentuk dasar (${recordingName(ismu.clip.url)}) had not been requested (requests: ${watch.list()})`);
+    const said = await text(caption);
+    for (const part of [msgs.example_tag, compose.words["1:1:1"].forms[ismu.form].translit, `QS ${ismu.loc.split(":").slice(0, 2).join(":")}`, ismu.washal.heard]) {
+      if (!said.includes(part)) fail(`the base example's caption “${said}” does not say “${part}”`);
+    }
+    // "reciting": the lesson has asked the imam for it; "failed": it asked, and this runner could
+    // not play the recording (an example given up) — either way the beat was played, not skipped.
+    const asked = async () => ["reciting", "failed"].includes((await attr("data-example-state")) ?? "") || (await attr("data-example")) !== baseId;
+    const base = await follow(baseId, asked, 5_000);
+    if (!base.seen.some((s) => s === "reciting" || s === "failed")) fail(`the lesson never asked the imam for the bentuk dasar (states: ${base.seen.join(" → ") || "none"})`);
+    // The tile changes colour over 300 ms (motion-safe): read once it has settled.
+    await page.waitForTimeout(400);
+    if ((await attr("data-example")) === baseId && (await attr("data-example-state")) === "reciting") {
+      const fill = await comp.locator("[data-compose-layer] [data-compose-tile]").evaluateAll((els) => els.map((el) => getComputedStyle(el).backgroundColor));
+      if (!fill.includes(FOREST)) fail(`while the imam recites the bentuk dasar, no tile is filled forest (tiles: ${fill.join(", ")})`);
+    }
+    await assertComposeLayout(page, vp);
+    await assertComposeFits(page, `${vp}: word 1 base example`);
+    await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-example-base.png` });
+    console.log(`shot ${vp}-autoplay-ayah1-example-base`);
+    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-example-base-viewport.png` });
+    const change = page.locator('[data-autoplay="composition"][data-compose-stage="change"]');
+    // Its caption's reading time (the lesson's rule), or the limit and the hold if it did not come.
+    const onward = await follow(baseId, async () => (await change.count()) > 0, 20_000 + EXAMPLE_LOAD_LIMIT_MS + EXAMPLE_FAILED_HOLD_MS);
+    if (!onward.ok) fail(`after the base example the composition did not go on to its change frame by itself (step "${await attr("data-step")}", mode ${await middle.getAttribute("data-mode")})`);
+    if (!(await running())) fail("the lesson is paused after the base example");
+    console.log(
+      `  examples 1/3: ${baseId} on the base frame ${shownAfter} ms into the step, ${recordingName(ismu.clip.url)} requested (${watch.answered.get(ismu.clip.url) ?? "no answer yet"}), ` +
+        `caption “${said}”, states ${[...new Set([...base.seen, ...onward.seen])].join(" → ")}, then the change frame by itself`,
+    );
+
+    // 2. A recording that does not come: the status, then given up — the lesson goes on.
+    if (vp === "phone") {
+      const heldId = `w2:base:${allahu.frame}`;
+      await page.route(isHeld, hold);
+      try {
+        await toStep(page, vp, "w2:compose");
+        await replay.click();
+        const wait2 = compose.words["1:1:2"].lines.filter((l) => l.frame <= allahu.frame).length * 12_000;
+        if (!(await beatShows(heldId, wait2 + 20_000))) fail(`the example ${heldId} never showed in word 2's composition (step "${await attr("data-step")}")`);
+        const t2 = Date.now();
+        const status = page.locator('[data-autoplay="loading"][data-kind="recitation"]');
+        await status.waitFor({ state: "visible", timeout: 3_000 }).catch(() => fail(`with ${recordingName(allahu.clip.url)} held back, no loading status showed within 3 s of the beat`));
+        const says = await text(status);
+        if (says !== msgs.loading_recitation) fail(`the loading status says “${says}”, expected “${msgs.loading_recitation}”`);
+        if (!heldBack.length) fail(`${recordingName(allahu.clip.url)} was never requested (nothing was held back)`);
+        await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-example-loading.png` });
+        console.log(`shot ${vp}-autoplay-ayah1-example-loading`);
+        const gone = await follow(heldId, async () => (await attr("data-example-state")) === "failed", EXAMPLE_LOAD_LIMIT_MS + 5_000);
+        const gaveUpAfter = Date.now() - t2;
+        if (!gone.ok) fail(`the example whose recording was held back was not given up within ${EXAMPLE_LOAD_LIMIT_MS + 5_000} ms (states: ${gone.seen.join(" → ")}; mode ${await middle.getAttribute("data-mode")})`);
+        if (gaveUpAfter < EXAMPLE_LOAD_LIMIT_MS - 1_500) fail(`the example was given up after ${gaveUpAfter} ms, before the lesson's limit (${EXAMPLE_LOAD_LIMIT_MS} ms)`);
+        const sorry = await text(page.locator('[data-autoplay="example-failed"]'));
+        if (sorry !== msgs.example_failed) fail(`the given-up example says “${sorry}”, expected “${msgs.example_failed}”`);
+        if ((await page.locator('[data-autoplay="panel"]').innerText()).includes(msgs.recite_failed)) fail("a given-up example shows the lesson's “Bacaan imam belum bisa diputar” (a dead stop)");
+        await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-example-given-up.png` });
+        console.log(`shot ${vp}-autoplay-ayah1-example-given-up`);
+        const change2 = page.locator('[data-autoplay="composition"][data-compose-word="2"][data-compose-stage="change"]');
+        if (!(await until(page, async () => (await change2.count()) > 0, EXAMPLE_FAILED_HOLD_MS + 8_000))) {
+          fail(`after the given-up example the lesson did not go on by itself (step "${await attr("data-step")}", mode ${await middle.getAttribute("data-mode")})`);
+        }
+        if (!(await running())) fail("the lesson is paused after a given-up example");
+        console.log(`  examples 2/3: ${recordingName(allahu.clip.url)} held back → “${says}”, given up after ${gaveUpAfter} ms (limit ${EXAMPLE_LOAD_LIMIT_MS} ms) with “${sorry}”, then the next frame by itself, never paused`);
+      } finally {
+        release();
+        await page.unroute(isHeld, hold).catch(() => {});
+      }
+    }
+
+    // 3. A concept's line, then its example by itself, then the next concept's line.
+    const conceptStep = `concept:${concept.id}`;
+    const exampleId = `${conceptStep}:1`;
+    await toStep(page, vp, conceptStep);
+    const t3 = Date.now();
+    await replay.click();
+    if (!(await until(page, async () => (await attr("data-step")) === `${conceptStep}:ex`, lineMs(`al-fatihah:1:${conceptStep}`) + 20_000))) {
+      fail(`after the line of ${concept.id} the lesson did not go on to its example by itself (step "${await attr("data-step")}", mode ${await middle.getAttribute("data-mode")})`);
+    }
+    const lineTook = Date.now() - t3;
+    const card = page.locator(`[data-autoplay="example"][data-example="${exampleId}"]`);
+    await card.waitFor({ state: "visible", timeout: 5_000 }).catch(() => fail(`on the example step of ${concept.id} no example card shows`));
+    const cardText = await text(card);
+    for (const part of [msgs.example_tag, word.ar, word.translit, word.gloss]) if (!cardText.includes(part)) fail(`the example card “${cardText}” does not show “${part}”`);
+    const cap = await text(caption);
+    for (const part of [msgs.example_tag, word.translit]) if (!cap.includes(part)) fail(`the example's caption “${cap}” does not say “${part}”`);
+    const asked3 = async () => ["reciting", "failed"].includes((await attr("data-example-state")) ?? "") || (await attr("data-example")) !== exampleId;
+    const first = await follow(exampleId, asked3, 5_000);
+    if (!first.seen.some((s) => s === "reciting" || s === "failed")) fail(`the lesson never asked the imam for the concept's example (states: ${first.seen.join(" → ") || "none"})`);
+    const reciter = await attr("data-reciter");
+    const mine = ayah1.recitation.find((r) => r.reciter === reciter)?.url;
+    if (!mine || !watch.requested(mine)) fail(`the example is this ayah's word, and the ayah's recording (${mine ? recordingName(mine) : "—"}) was never requested`);
+    // The word on the mushaf line is marked (its ring), the card clear of the panel, the caption on screen.
+    const n = concept.examples[0].loc.split(":")[2];
+    const chip = (await stage.locator(`button[data-word="${n}"]`).first().getAttribute("class").catch(() => null)) ?? "";
+    if (!chip.includes("ring-forest")) fail(`word ${n} on the mushaf line is not marked while it is the example (class “${chip}”)`);
+    const box = async (sel) => {
+      const b = await page.locator(sel).first().boundingBox();
+      if (!b) fail(`${sel} is not rendered`);
+      return { top: b.y, bottom: b.y + b.height };
+    };
+    const [cardBox, panelBox, capBox, controls] = [await box('[data-autoplay="example"]'), await box('[data-autoplay="panel"]'), await box('[data-autoplay="caption"]'), await box('[data-autoplay="panel"] [role="group"]')];
+    if (cardBox.top < 0 || cardBox.bottom > panelBox.top + 1) fail(`the example card ${fmt(cardBox)} is off screen or under the panel ${fmt(panelBox)}`);
+    if (capBox.top < 0 || capBox.bottom > controls.top + 1) fail(`the example's caption ${fmt(capBox)} is not above the controls ${fmt(controls)}`);
+    await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-example-concept.png` });
+    console.log(`shot ${vp}-autoplay-ayah1-example-concept`);
+    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-example-concept-viewport.png` });
+    const nextStep = `concept:${after.id}`;
+    if (!(await until(page, async () => (await attr("data-step")) === nextStep, 15_000 + EXAMPLE_LOAD_LIMIT_MS + EXAMPLE_FAILED_HOLD_MS))) {
+      fail(`after the example of ${concept.id} the lesson did not go on to ${nextStep} by itself (step "${await attr("data-step")}", mode ${await middle.getAttribute("data-mode")})`);
+    }
+    console.log(
+      `  examples 3/3: ${conceptStep} (line ${lineTook} ms) → its example by itself: card “${cardText}”, caption “${cap}”, states ${first.seen.join(" → ")}; then ${nextStep} by itself. ` +
+        `Reciters' host: ${[...new Set(watch.seen)].map((u) => `${recordingName(u)} ${watch.answered.get(u) ?? "…"}`).join(", ")}`,
+    );
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-example-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the lesson's example beats check (Al-Fatihah 1) failed`);
+    console.error(`  requests to the reciters' host (${watch.seen.length}):\n    ${watch.list()}`);
+    console.error(`  narration requests answered: ${served.length}`);
+    throw err;
+  } finally {
+    release();
+    watch.stop();
     await page.unroute(isNarration, handler);
   }
   await page.goto("about:blank");
@@ -2568,6 +2824,7 @@ try {
     if (vp === "phone") await warmupChecks(page, vp, narration);
     if (vp === "phone") await aheadChecks(page, vp, narration);
     await composeShots(page, vp, narration);
+    await exampleChecks(page, vp, narration);
     await quizVoiceCheck(page, vp, narration);
     // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).
     await composeFitSweep(page, vp, "normal", [1], units);

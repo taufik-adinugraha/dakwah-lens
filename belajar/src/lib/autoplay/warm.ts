@@ -31,8 +31,23 @@
  * The recordings still stream from the provider and are stored nowhere on our server (the Kredit
  * page's promise): only the moment the learner's browser asks for them moved.
  *
+ * AN EXAMPLE'S CLIP FROM ANOTHER AYAH (operator 2026-10-12, plan L20; exampleToWarm) is a
+ * recitation too, never narration: the look-ahead (lookahead.ts) does not list it. It is fetched
+ * on the example player's own element, by the same rule of thumb as above and no sooner: only
+ * while the lesson RUNS, and only the clip the CURRENT step is about to play — asked for when
+ * that step begins, while the narrator says the lines before it (a composition's first lines
+ * last 10 s and more) — never a later step's, never another ayah's lesson's. Unlike the ayah's own
+ * recording, the lesson can go on without an example, so with Save-Data or a 2G-class connection
+ * (loading.ts savesData) it is not fetched ahead at all: it loads when its beat plays, and is
+ * skipped if it does not come (timing.ts EXAMPLE_LOAD_LIMIT_MS). And only once the step has been
+ * the one wanting it for EXAMPLE_WARM_DELAY_MS (the runner's timer): a learner who steps through
+ * the lesson with "Berikutnya ›" asks the reciters' host for nothing on the way.
+ *
  * Pure (no React, no DOM): unit-tested (warm.test.ts).
  */
+import { savesData, type ConnectionHints } from "./loading";
+import { lessonRuns, type AutoplayState } from "./machine";
+import type { AutoplaySequence } from "./types";
 
 export type RecitationWarmInput = {
   /** The lesson has started (AutoplayState.started): a click on "Mulai" / "Lanjutkan dari langkah
@@ -46,4 +61,24 @@ export type RecitationWarmInput = {
  *  nothing (yet). Rules: the head of this file. */
 export function recitationToWarm(i: RecitationWarmInput): string | null {
   return i.started ? i.currentUrl || null : null;
+}
+
+/** How long a step must have wanted its example clip before the runner asks for it (above). */
+export const EXAMPLE_WARM_DELAY_MS = 1200;
+
+/**
+ * The recording of the example clip the lesson in state `s` wants fetched ahead on the example
+ * player; null: none. The next clip of another ayah that the CURRENT step still plays (an example
+ * that failed is not asked for again). Rules: the head of this file.
+ */
+export function exampleToWarm(seq: AutoplaySequence, s: AutoplayState, conn?: ConnectionHints | null): string | null {
+  if (!lessonRuns(s) || savesData(conn)) return null;
+  const beats = seq.steps[s.idx]?.examples;
+  if (!beats) return null;
+  for (const a of s.plan.slice(s.at)) {
+    if (a.t !== "example" || a.failed) continue;
+    const clip = beats[a.x]?.clip;
+    if (clip) return clip.url;
+  }
+  return null;
 }

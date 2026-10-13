@@ -9,11 +9,19 @@
  * English page stays caption-only (its own captions, reading-time paced)
  * until English narration exists, rather than switching voice and subtitles
  * to Indonesian. The word compositions (content/compose) go to every page.
+ *
+ * The example beats (operator 2026-10-12: "each explanation should be followed
+ * by examples (visual + voice)"; plan L20; src/lib/autoplay/examples.ts) go to
+ * every page too: they are the imam's recitation and an on-screen caption in
+ * the page's locale, never narration. lessonExamplesFor derives them from the
+ * content; the sequence takes what it needs of them (no Arabic), the stage
+ * their drawing (stageExamples: the content's bytes, by beat id).
  */
 import type { Ayah, SurahContent } from "@/content/schema";
-import { availableExercises, buildAutoplaySequence, questionNumbers, type AutoplaySequence } from "@/lib/autoplay";
-import { composeInput } from "@/lib/compose-content";
-import { conceptsIntroducedIn } from "@/lib/library";
+import { availableExercises, buildAutoplaySequence, lessonExamples, questionNumbers, type AutoplaySequence, type ExampleGap, type LessonExample } from "@/lib/autoplay";
+import { composeFor, composeInput } from "@/lib/compose-content";
+import { SURAHS } from "@/lib/content";
+import { conceptsIntroducedIn, LIBRARY } from "@/lib/library";
 import { quizAyah } from "@/lib/quiz-content";
 
 import { narrationFor, SHARED_NARRATION } from "./manifests";
@@ -21,6 +29,21 @@ import { autoplayTexts } from "./texts";
 
 /** The language the narration manifests are written in. */
 export const NARRATION_LOCALE = "id";
+
+/** Every lesson word, by loc: a concept's example may stand in another ayah, or another surah. */
+const WORDS = new Map(SURAHS.flatMap((x) => x.ayat.flatMap((y) => y.words.map((w) => [w.loc, w] as const))));
+
+/** The example beats of one ayah's lesson (which, and why: src/lib/autoplay/examples.ts), and the
+ *  rules it explains without one, each with its reason. */
+export function lessonExamplesFor(s: SurahContent, a: Ayah): { examples: LessonExample[]; gaps: ExampleGap[] } {
+  return lessonExamples({
+    ayah: a,
+    introduced: conceptsIntroducedIn(a.loc),
+    compose: composeFor(s.slug),
+    clips: LIBRARY.clips,
+    wordAt: (loc) => WORDS.get(loc),
+  });
+}
 
 export function stageSequence(s: SurahContent, a: Ayah, locale: string): AutoplaySequence {
   const quiz = quizAyah(s.slug, a.ayah);
@@ -41,5 +64,6 @@ export function stageSequence(s: SurahContent, a: Ayah, locale: string): Autopla
     // an English page shows their Indonesian lines as captions, as it shows
     // the words' Indonesian explanations.
     compose: composeInput(s.slug, a),
+    examples: lessonExamplesFor(s, a).examples,
   });
 }

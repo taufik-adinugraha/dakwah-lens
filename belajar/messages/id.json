@@ -317,7 +317,11 @@
     "selected": "Dipilih",
     "replay": "Ulangi langkah ini",
     "replay_short": "Ulangi",
-    "card_meaning": "yang artinya “{gloss}”"
+    "card_meaning": "yang artinya “{gloss}”",
+    "example_tag": "Contoh",
+    "example_place": "QS {surah}:{ayah}",
+    "example_ending": "akhirnya",
+    "example_failed": "Suara contoh ini belum bisa diputar. Pelajaran berlanjut sendiri."
   },
   "Compose": {
     "word_n": "Kata ke-{n}",

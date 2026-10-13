@@ -35,6 +35,15 @@
  * screen is said over; while the imam recites the joined word after the
  * lines (and in his settle pause), the last frame, "recited".
  *
+ * An example beat (stageExample; operator 2026-10-12, plan L20: "each
+ * explanation should be followed by examples (visual + voice)"): which beat
+ * of the step is on screen — while the imam recites it, in the pause before
+ * its second hearing ("Pelan") and in the pause after it; on a concept's
+ * example step also before its first beat and after its last ("Tunggu saya",
+ * a paused step) — whether he is reciting it now, and whether its recording
+ * failed. The mushaf line marks the example's word when it is this ayah's;
+ * a composition keeps the frame the beat belongs to (its `base` frame).
+ *
  * And what a screen reader is told (srAnnouncement): a polite live region
  * never reads the caption's Arabic or transliteration out — the device's
  * voice would say it, and over the imam. It announces the line's text
@@ -51,6 +60,7 @@ import {
   type AutoplaySequence,
   type AutoplayState,
   type Cue,
+  type ExampleBeat,
   type KaraokeWord,
 } from "@/lib/autoplay";
 import { alignEmphasis, partEmphasis, type Emphasis, type EmphasisKind } from "@/lib/emphasis";
@@ -97,7 +107,43 @@ export function captionCue(seq: AutoplaySequence, state: AutoplayState): Cue | n
   const ref = state.caption;
   if (ref === "step") return null;
   if ("c" in ref) return seq.steps[state.idx]?.cues[ref.c] ?? null;
-  return seq.shared[ref.s] ?? null;
+  // An example beat's caption is no narration line.
+  return "s" in ref ? (seq.shared[ref.s] ?? null) : null;
+}
+
+/** The example beat on screen: the beat, whether the imam is reciting it right now, and whether
+ *  its recording could not be played (it is then shown a moment longer, and the lesson goes on). */
+export type StageExampleView = { beat: ExampleBeat; reciting: boolean; failed: boolean };
+
+/**
+ * The example beat of the current step to show, or null (rules: the head of this file). It
+ * follows the plan: the beat being recited; the one just recited while its pause runs, or while
+ * the gap before its second hearing runs; on a concept's example step — which is nothing but its
+ * beats — the next one still to come (a paused step, "Kita lanjutkan."), else its last.
+ */
+export function stageExample(seq: AutoplaySequence, state: AutoplayState): StageExampleView | null {
+  if (!state.started || state.phase === "idle" || state.phase === "finished") return null;
+  const step = seq.steps[state.idx];
+  const beats = step?.examples;
+  if (!beats?.length) return null;
+  const plan = state.plan;
+  const at = (i: number) => {
+    const a = plan[i];
+    return a?.t === "example" ? a : null;
+  };
+  const here = plan[state.at];
+  let a = at(state.at);
+  if (!a && here?.t === "settle" && here.after === "example") a = at(state.at - 1);
+  if (!a && here?.t === "hold" && at(state.at - 1) && at(state.at + 1)) a = at(state.at - 1);
+  if (!a && step.kind === "example") {
+    for (let i = state.at; i < plan.length && !a; i++) a = at(i);
+    for (let i = Math.min(state.at, plan.length) - 1; i >= 0 && !a; i--) a = at(i);
+  }
+  const beat = a ? beats[a.x] : step.kind === "example" ? beats[0] : undefined;
+  if (!beat) return null;
+  const act = state.activity;
+  const reciting = act?.kind === "recite" && act.target !== "ayah" && act.example === beat.id;
+  return { beat, reciting, failed: a?.failed === true };
 }
 
 /** Is this cue spoken by narration audio now (it has audio that did not fail)? */
@@ -207,6 +253,14 @@ export function stageMarks(seq: AutoplaySequence, state: AutoplayState): { marke
   if (!step || step.kind === "exercise") return none;
   // A word step is about its word, the imam reciting it or not.
   if (step.kind === "recite_word" && step.word) return { marked: [step.word], focus: step.word };
+  // An example beat: its word when it is this ayah's (lit as the imam recites it), else the word
+  // the step explains. The word card stays for a word's own recitation after its line; a
+  // concept's example has a card of its own (LessonStage), a bentuk dasar its composition.
+  const ex = stageExample(seq, state);
+  if (ex) {
+    const word = ex.beat.word ?? step.word ?? null;
+    return { marked: word === null ? [] : [word], focus: ex.beat.of === "word" || ex.beat.of === "base" ? (step.word ?? null) : null };
+  }
   // The imam recites the ayah (and its settle pause): his current word only.
   // A compose step's recitation is its own word, the composition on screen.
   const here = state.plan[state.at];
@@ -244,9 +298,12 @@ export function stageFrame(seq: AutoplaySequence, state: AutoplayState): StageFr
   const last = step.frames;
   const frameOf = (c: number) => step.cues[c]?.frame ?? 1;
   const plan = state.plan;
-  const sayOf = (i: number) => {
+  /** The frame action i is said or recited over: a line's (its cue's), or an example beat's own
+   *  (the `base` frame whose bentuk dasar the imam recites); null for anything else. */
+  const frameAt = (i: number): number | null => {
     const a = plan[i];
-    return a?.t === "say" && "c" in a.ref ? a.ref.c : null;
+    if (a?.t === "example") return step.examples?.[a.x]?.frame ?? null;
+    return a?.t === "say" && "c" in a.ref ? frameOf(a.ref.c) : null;
   };
   const word = step.word ?? null;
   const reciting = (i: number) => {
@@ -255,18 +312,18 @@ export function stageFrame(seq: AutoplaySequence, state: AutoplayState): StageFr
   };
   if (state.at >= plan.length) return { step: step.kind, word, frame: last, recited: step.kind === "compose" };
   if (reciting(state.at)) return { step: step.kind, word, frame: last, recited: true };
-  const here = sayOf(state.at);
-  if (here !== null) return { step: step.kind, word, frame: frameOf(here), recited: false };
-  // A settle pause after a line, or a shared line: the frame of the step's
-  // line before it, else the one after it.
+  const here = frameAt(state.at);
+  if (here !== null) return { step: step.kind, word, frame: here, recited: false };
+  // A settle pause after a line or an example, the gap before an example's second hearing, or a
+  // shared line: the frame of the step's line (or example) before it, else the one after it.
   for (let i = state.at - 1; i >= 0; i--) {
-    const c = sayOf(i);
-    if (c !== null) return { step: step.kind, word, frame: frameOf(c), recited: false };
+    const f = frameAt(i);
+    if (f !== null) return { step: step.kind, word, frame: f, recited: false };
     if (reciting(i)) return { step: step.kind, word, frame: last, recited: true };
   }
   for (let i = state.at + 1; i < plan.length; i++) {
-    const c = sayOf(i);
-    if (c !== null) return { step: step.kind, word, frame: frameOf(c), recited: false };
+    const f = frameAt(i);
+    if (f !== null) return { step: step.kind, word, frame: f, recited: false };
   }
   return { step: step.kind, word, frame: 1, recited: false };
 }

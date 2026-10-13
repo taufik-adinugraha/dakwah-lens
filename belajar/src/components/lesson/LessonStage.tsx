@@ -28,14 +28,16 @@ import { type SurahRef, useUpNext } from "@/components/autoplay/useUpNext";
 import { guideSelector } from "@/components/exercises/guide";
 import { MixedText } from "@/components/library/MixedText";
 import { TextSizeOptions } from "@/components/TextSizeSwitch";
+import type { ComposeFile } from "@/content/compose-schema";
 import type { RecitationSource } from "@/hooks/useSegmentPlayer";
 import { Link } from "@/i18n/navigation";
-import type { AutoplaySequence } from "@/lib/autoplay";
+import type { AutoplaySequence, StageExample } from "@/lib/autoplay";
 import { glossSlot } from "@/lib/emphasis";
 import { PACES } from "@/lib/lessonSteps";
 import { ayahHref } from "@/lib/routes";
 
 import { MushafLine, type PlayerWord } from "./AyahPlayer";
+import { ExampleCard, type ExampleCardState } from "./ExampleCard";
 import { type StageCompose, WordComposition } from "./WordComposition";
 
 /** A recording the stage can play, with its reciter's name for the select.
@@ -183,6 +185,23 @@ function LoadingMark({ className }: { className?: string }) {
  * from a polite live region — never over the imam. The rest of the page
  * (word cards, Latihan, Pelajari lebih dalam) waits, collapsed, under the
  * stage in "Materi lengkap ayat ini".
+ *
+ * EXAMPLES (operator 2026-10-12: "in principel, each explanation should be
+ * followed by examples (visual + voice)", "not only for harakah, but also for
+ * all rules"; plan L20; src/lib/autoplay/examples.ts): after each "Konsep
+ * baru" line the concept's example in this ayah is shown in the word card's
+ * slot (ExampleCard: "Contoh", the word big, its transliteration and meaning)
+ * and the IMAM recites it, the mushaf line lighting it; in a word's
+ * composition, when the bentuk dasar is ringed, the imam recites that base
+ * form from where it stands in the Qur'an (its tile filled as he does), and
+ * the joined word at the end as before — "ismu (read by voice + show visual)
+ * … becomes ismi (read by voice + visual)". The beat's caption, in the bottom
+ * panel, says what is shown and what is heard ("Contoh: ismu, di QS 55:78 … :
+ * bersama kata sebelumnya terdengar “tabārakasmu”."); the narrator says
+ * nothing. A clip that takes long shows "Memuat bacaan imam…" like any
+ * recitation; one that does not come is given up after a few seconds — the
+ * example stays a moment with "Suara contoh ini belum bisa diputar." and the
+ * lesson goes on by itself (never a dead stop).
  */
 export function LessonStage({
   seq,
@@ -195,6 +214,8 @@ export function LessonStage({
   translation,
   exercise,
   compose = null,
+  examples = {},
+  marks = null,
 }: {
   seq: AutoplaySequence;
   /** Page title, also the lock-screen title (Media Session). */
@@ -212,6 +233,10 @@ export function LessonStage({
   exercise: StageExerciseData;
   /** This ayah's word compositions and harakat primer (content bytes), if any. */
   compose?: StageCompose | null;
+  /** What each example beat of this lesson shows (content bytes), by beat id. */
+  examples?: Readonly<Record<string, StageExample>>;
+  /** The marks an example can name with its sound (content/compose `marks`), if the surah has them. */
+  marks?: ComposeFile["marks"] | null;
 }) {
   const t = useTranslations("Guided");
   const tp = useTranslations("Player");
@@ -273,6 +298,10 @@ export function LessonStage({
   const marked = ap.marks.marked;
   // The animation in the card's slot: the primer, or the word's composition.
   const anim = ap.frame && compose ? (ap.frame.step === "primer" ? compose.primer : ap.frame.word ? compose.words[ap.frame.word] : null) : null;
+  // The example beat on screen (caption.ts stageExample): what it is doing, and its drawing.
+  const beat = live ? ap.example : null;
+  const beatState: ExampleCardState | null = beat ? (beat.failed ? "failed" : beat.reciting ? "reciting" : "shown") : null;
+  const beatDrawing = beat ? examples[beat.beat.id] : undefined;
   const showMushaf = !started || (live && !spec);
   const spotGuides = spec ? state.guides.filter((g) => g.target.startsWith("exercise:")) : [];
   const skipGuide = view.showSkip ? state.guides.find((g) => g.target === "skip") : undefined;
@@ -420,6 +449,12 @@ export function LessonStage({
           {t("recite_failed")}
         </p>
       )}
+      {/* An example whose recording did not come: said, and the lesson goes on by itself. */}
+      {beatState === "failed" && (
+        <p role="status" data-autoplay="example-failed" className={notice}>
+          {t("example_failed")}
+        </p>
+      )}
       {/* A word the learner clicked to hear could not stream (only theirs:
           the lesson's own recitation failing says so above, and a step
           change or replay hands the player back to the lesson). */}
@@ -467,6 +502,11 @@ export function LessonStage({
       ref={stageRef}
       data-autoplay="stage"
       data-step={live ? step.id : undefined}
+      // The example beat on screen, what the imam recites for it and what it is doing (the CI
+      // checks of plan L20 find a beat by these, never by timing).
+      data-example={beat?.beat.id}
+      data-example-state={beatState ?? undefined}
+      data-example-clip={beat?.beat.key}
       // The reciter chosen, by the id the content gives him ("Alafasy_128kbps"): the CI check of
       // the early fetch finds his recording's address by it (scripts/ci/screenshots.mjs
       // warmupChecks; operator 2026-10-11).
@@ -686,7 +726,10 @@ export function LessonStage({
                 marks={compose.marks}
                 word={ap.frame.word}
                 stepKey={step.id}
+                example={beat && beatState && beat.beat.of === "base" ? { id: beat.beat.id, key: beat.beat.key, state: beatState } : null}
               />
+            ) : beat && beatState && beatDrawing && beat.beat.of === "concept" ? (
+              <ExampleCard id={beat.beat.id} example={beatDrawing} state={beatState} marks={marks} />
             ) : focusWord ? (
               <div
                 data-guide="word-card"

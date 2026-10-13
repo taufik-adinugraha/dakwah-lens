@@ -317,7 +317,11 @@
     "selected": "Selected",
     "replay": "Replay this step",
     "replay_short": "Replay",
-    "card_meaning": "meaning “{gloss}”"
+    "card_meaning": "meaning “{gloss}”",
+    "example_tag": "Example",
+    "example_place": "QS {surah}:{ayah}",
+    "example_ending": "it ends in",
+    "example_failed": "This example's sound could not be played. The lesson goes on by itself."
   },
   "Compose": {
     "word_n": "Word {n}",

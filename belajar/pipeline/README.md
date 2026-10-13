@@ -44,9 +44,9 @@ python3 test_validate.py           # mutation tests: plants 66 faults in copies 
 python3 build_ayat.py              # ../content/ayat/locations.json: every ayah a fact card locates, for its popup (see "Ayat popup"); after the lessons, whose facts it reads
 python3 validate_ayat.py           # the popup data against Tanzil, QuranEnc, the lessons and the pins (CI: --no-corpus); exit 1 on any failure
 python3 test_validate_ayat.py      # plants 28 faults (a missing or extra entry, another ayah's bytes, a stale pin, a name the cards spell otherwise, …) (CI: --no-corpus)
-python3 build_compose.py           # word compositions + harakat primer ../content/compose/*.json (see "Komposisi kata")
-python3 validate_compose.py        # composition checks against the corpus (CI: --no-corpus); exit 1 on any failure
-python3 test_validate_compose.py   # plants 34 faults in copies of the compositions, each must fail (CI: --no-corpus)
+python3 build_compose.py           # word compositions + harakat primer + the imam's voice of each bentuk dasar ../content/compose/*.json, and fixtures/compose_examples.json (see "Komposisi kata"); after build_library.py, whose library.json it reads
+python3 validate_compose.py        # composition checks against the corpus, the example voices included (CI: --no-corpus); exit 1 on any failure
+python3 test_validate_compose.py   # plants 65 faults in copies of the compositions and of the examples' fixture (a base frame without its voice, a hamzat-washal form played alone, a clip shifted to the next word, a word that ends its ayah, an untrue reason, …), each must fail (CI: --no-corpus, 60 of them)
 python3 validate_terms.py          # Konsep terms in Arabic script + inline markup (CI: --no-corpus); see "Konsep"
 python3 test_validate_terms.py     # plants 54 faults (retyped term, unmarked term, wrong word bytes, a ref whose Latin names other bytes, ketuk, a gloss variant whose ref does not resolve, Arabic typed by hand, a marked lesson or Kosakata twin that drifted, …)
 python3 validate_clips.py          # the imam's voice of every Konsep example: library.json `clips` (CI: --no-corpus); see "Suara contoh"
@@ -107,9 +107,10 @@ a machine whose cache predates them). `cache/` is git-ignored.
 | `build_library.py` | 2 | Joins QAC 0.4 + the authored library files into `belajar/content/library.json` (`Library`) |
 | `authored/<slug>.compose.json` | 3 | Hand-authored word compositions and the harakat primer: named FORMS (each by where its bytes come from — never typed Arabic), FRAMES (the animation's stages) and the narration sentences said over each frame (see "Komposisi kata") |
 | `compose.py` | — | Pieces (a letter + its marks), the deterministic edits, form resolution (lesson word / Tanzil / QAC / edit / join), chips, and every composition check, with and without the corpus |
-| `build_compose.py` | 2 | Writes `belajar/content/compose/<slug>.json`; `--show <loc>` prints a word's pieces and QAC segments, `--find <loc>` where that token stands in the Qur'an |
-| `validate_compose.py` | 6 | Composition checks (local: Tanzil/QAC bytes, attestations, parts = QAC segments, equality with a fresh build; `--no-corpus` in CI: replays, stages, last frame = the word, authored hash) |
-| `test_validate_compose.py` | 6 | Mutation tests for `validate_compose.py` (`--no-corpus` skips the corpus-only faults by name) |
+| `build_compose.py` | 2 | Writes `belajar/content/compose/<slug>.json` — the compositions, the primer and `examples` (the imam's voice of each bentuk dasar, from the pinned quran-align file; reads `content/library.json` for the transliteration typed for a word outside the lessons) — and `fixtures/compose_examples.json`; prints every base frame with its voice or the reason it has none; `--show <loc>` prints a word's pieces and QAC segments, `--find <loc>` where that token stands in the Qur'an |
+| `fixtures/compose_examples.json` | — | Written by `build_compose.py`: the Tanzil line and the quran-align Alafasy entry of every ayah an example clip of the lessons uses outside the lessons (7 ayat), exactly as the pinned files have them, so CI (no cache) can check those clips too. Never edited by hand |
+| `validate_compose.py` | 6 | Composition checks (local: Tanzil/QAC bytes, attestations, parts = QAC segments, equality with a fresh build; `--no-corpus` in CI: replays, stages, last frame = the word, authored hash) and the example voices (every base frame has its entry; what is heard; the clips through `clips.problems`: the lessons' own timings, the fixture, the pin — locally also a fresh cut and the fixture against the pinned files) |
+| `test_validate_compose.py` | 6 | Mutation tests for `validate_compose.py` (`--no-corpus` skips the corpus-only faults by name) + unit tests of the voice rules (which place, the run with the word before it) |
 | `authored/library.terms.json` | 3 | The ONE table of grammar terms in Arabic script (latin, forms, ar, group, harakah reminder), each spelling attested by the pronunciation dictionary or a pinned Shamela excerpt; unverified terms have `ar: null` + a reason |
 | `authored/library.basics.json` | 3 | Dasar membaca: the Harakat page (signs with an example letter as a q-ref into Tanzil) |
 | `authored/library.parts.json` | 3 | Words explained by their parts (rule 14): tiles as q-refs (each part's bentuk dasar), the letters that change and the letters not written, sourced steps |
@@ -609,6 +610,45 @@ tulisan, tidak terdengar.", "Karena ayat ini dimulai dari kata ini, alif di awal
 article's alif in the middle of an ayah is tagged on screen (`silent: [0]` on the join frame) at
 every such word. The first harakah of each word's explanation carries its sound ("kasrah, bunyi i").
 
+**The imam's voice of each bentuk dasar** (operator 2026-10-12: "e.g ismu (read by voice + show
+visual) when combined with harf jar, it becomes ismi (read by voice + visual). in principel, each
+explanation should be followed by examples (visual + voice)", "not only for harakah, but also for
+all rules"; plan L20). When a `base` frame is on the stage the imam recites that base form — never
+the narrator — and the step still ends with him reciting the joined word. The build writes one
+entry of `examples[<word loc>]` per base frame (`compose.build_examples`), chosen by what is HEARD
+(the rules of "Suara contoh" below, `clips.py`; never a hand list):
+
+| the base form | its voice |
+|---|---|
+| is the lesson word itself (`{"word": <this loc>}`: al-ḥamdu, na‘budu, nasta‘īnu) | `unvoiced: "own"` — the step's own recitation of that word is its example |
+| quotes a place (`{"tanzil": loc}`, another lesson's `{"word": loc}`) | that place, the one the frame's note names; it must be heard as shown or the build stops |
+| is derived (an edit, a join) and stands in the Qur'an | the place with a clean alignment, then in the shortest ayah (the browser streams that ayah's file for one word), then mushaf order |
+| is derived and stands nowhere (māliku, aṣ-ṣirāṭu, al-mustaqīmu, al-magḍūbu) | `unvoiced: "unattested"`: a teaching form, no reciter says it |
+| stands only where it is not heard as shown | `unvoiced: "unheard"` |
+
+*Heard as shown* (`compose.place_voice`): not its ayah's last word (the imam stops there and the
+ending a base frame shows is not pronounced); a word that starts with hamzat washal (ٱ) is used at
+the start of its ayah (ar-raḥmānu, QS 20:5:1: the alif is read) or, mid-ayah, played with the word
+before it and shipped with what is heard (`washal`, `clips.washal_of`: ismu, QS 55:78:1-2,
+"tabārakasmu") — `before`, that word's transliteration, is the lessons' own or the one typed in the
+library's base-form tile of the same place, so a place with neither is not usable. An entry:
+`{"frame": 2, "form": "ismu", "loc": "55:78:2", "key": "55:78:1-2", "clip": {"url": "https://everyayah.com/data/Alafasy_128kbps/055078.mp3", "start": 30, "end": 1490}, "washal": {"run": "55:78:1-2", "before": "tabāraka", "heard": "tabārakasmu"}}`.
+Al-Fatihah has 16 base frames: 9 voiced (ismu 55:78:1-2 · Allāhu 112:2:1, twice · ar-raḥmānu 20:5:1
+· rabbu 41:9:13 · yaumu 37:20:4 · ṣirāṭu 6:126:2 · an‘ama 5:23:6 · gairu 74:10:3), 3 "own", 4
+"unattested". Two quoted places moved for it, display only (their frame notes; the narration names
+no ayah, and its manifests are byte-identical): **an‘ama** from 4:69:8 to **5:23:6**, the Konsep
+diagram's place (plan L19), and **rabbu** from 7:54:31 (alignment: insertions 4) to **41:9:13**,
+"żālika rabbu al-‘ālamīna", a clean alignment with the same phrase the line speaks of ("dalam
+ungkapan yang artinya “Tuhan seluruh alam”").
+The clips are checked as library.json's are, through `clips.problems` over the examples as a library
+of their own (`compose.voice_library`): url, integers, a plausible length, the lessons' own timing
+in a lesson ayah (112:2:1), the committed fixture `fixtures/compose_examples.json` for the 7 ayat
+outside the lessons (5:23, 6:126, 20:5, 37:20, 41:9, 55:78, 74:10), the quran-align pin
+(`data_versions.quran_align`), one clip per place; with the cache a fresh cut from the pinned file,
+the Tanzil tokens, the fixture against the pinned files and equality with a fresh build (which is
+what proves a derived form's place is the rule's choice). A quoted place whose alignment is not clean
+is a warning. Which beats the lesson then plays, and how: "Contoh di dalam pelajaran" below.
+
 ## Konsep: istilah dalam huruf Arab, kata Qur'an dari byte konten
 
 Operator, 2026-10-10, on /belajar/id/konsep: "mention the arabic word like majrur in arabic letter
@@ -787,6 +827,69 @@ examples (visual + voice)", then "not only for harakah, but also for all rules" 
 - **By ear** (no check can hear): each clip's cut, above all the two runs (tabāraka-smu,
   huwa-llāhu) and the tiles whose NEXT word starts with hamzat washal (rabbu → s-samāwāti,
   an‘ama → llāhu), whose last consonant runs into the next word's doubled letter.
+
+## Contoh di dalam pelajaran (examples inside the autoplay lesson, 2026-10-12)
+
+Operator, 2026-10-12, the same request as "Suara contoh" ("in principel, each explanation should
+be followed by examples (visual + voice)" — "not only for harakah, but also for all rules"), now
+INSIDE the autoplay lesson, where the narrator explains each word, each new concept and each word
+by its parts (plan L20). An example BEAT is the stage showing the example and the IMAM reciting
+it, with an on-screen caption ("Contoh: …"). It has no narration line: nothing was written for the
+narrator and nothing is rendered; `content/narration/*.json` did not change.
+
+- **Which beats** (`src/lib/autoplay/examples.ts` `lessonExamples`, derived from the content):
+  (a) after each "Konsep baru" line, the concept's example in THIS ayah (its first example, the
+  rule that makes it "introduced here"), in a step of its own (`concept:<id>:ex`, kind
+  `example`) — and, when that word ends its ayah and the example is about its last harakah (its
+  note names the word's own harakah), one more from the concept's other examples that does not
+  end its ayah (a clip of `library.json` `clips`; none in the lessons today); (b) in a word's
+  composition, the bentuk dasar after the last line of its `base` frame (`content/compose`
+  `examples`, above), the joined word being the step's own recitation at the last frame as
+  before; (c) for a word WITHOUT a composition whose line explains its harakah, that word again
+  right after the line — unless the harakah is not heard there (`heard.ts` `signNotHeard`). At
+  most two beats per rule; a rule without a beat of its own is listed with its reason.
+- **Al-Fatihah**: 35 beats — 26 concept examples (this ayah's own word, on the stage's recitation
+  player) and 9 bentuk dasar clips from other ayat (the example player) — adding 240 s in Biasa
+  (445 s in Pelan) to a lesson of about 73 minutes: 57 · 37 · 6 · 12 · 62 · 12 · 55 s for ayat 1–7.
+  7 base frames have no beat of their own (3 "own", 4 "unattested"). `npx tsx
+  scripts/autoplay-check.ts --examples` lists every beat and every reason.
+- **What is heard**: a beat on an ayah's last word says "Di akhir ayat imam berhenti, jadi harakat
+  akhirnya tidak terdengar." (al-‘ālamīna 1:2:4; nasta‘īnu 1:5:4, twice) and never names an ending
+  as heard there; a bentuk dasar is never an ayah's last word; ismu is played with tabāraka and
+  the caption says "Bersama kata sebelumnya terdengar “tabārakasmu”, karena alif di awalnya tidak
+  dibaca."
+- **The engine** (`machine.ts`): an `example` action issues a recite activity that names the beat
+  (target `word`, or `clip` for another ayah's word); one activity at a time, so it never plays
+  over the narrator or another recording; at least its caption's reading time; twice in "Pelan";
+  "Tunggu saya" waits for Lanjut after it; pause / resume, "↺ Ulangi langkah ini" and ‹ › work on
+  its step. A recording that fails, or does not sound within 6 s (`EXAMPLE_LOAD_LIMIT_MS`), is
+  given up: the example stays on screen 3 s with "Suara contoh ini belum bisa diputar." and the
+  lesson goes on — never the dead stop of the ayah's own recitation failing. A beat is running
+  time for the screen lock, and is never in the narration look-ahead; the clip its step is about
+  to play is fetched ahead on the example player only while the lesson runs, 1.2 s after the step
+  began, and never with Save-Data / 2G (`warm.ts` `exampleToWarm`).
+- **The stage**: `ExampleCard` in the word card's slot for a concept's example ("Contoh" · "Kata
+  ke-1" · the word's Tanzil bytes · transliteration · "yang artinya …", and "akhirnya kasrah
+  (كَسْرَة) · bunyi i" when the example is about that harakah and it is heard); for a bentuk dasar
+  the composition stays on its base frame and the ringed tile is filled while the imam recites
+  it. `useExamplePlayer` is a third kept Audio element, unlocked in the "Mulai" tap with a moment
+  of silence (a blob, no request) and kept across the hand-off like the other two.
+- **Checks**: `src/lib/autoplay/checks.ts` `exampleProblems` over every lesson (coverage, one
+  recording that exists, the content's bytes, what is heard, no narration line, at most two per
+  rule) and `transitionProblem` (a failed example never stops the lesson) — run by
+  `scripts/autoplay-check.ts` and vitest; `src/components/autoplay/examples.test.ts` (which beats;
+  28 planted faults; the machine at every beat and pace: recited once, reachable, replayed,
+  skipped cleanly, the screen on, not in the look-ahead; the stage's frame and marks; the warm
+  rule; the seconds added); `pipeline/validate_compose.py` for the clips; in the browser
+  `scripts/ci/screenshots.mjs` `exampleChecks` (the base form's recording requested by its base
+  frame and not before the step plays; a held-back recording shows "Memuat bacaan imam…", is given
+  up at the limit and the lesson goes on; a concept's line is followed by its example card by
+  itself, and the lesson goes on) and `linebreaks.mjs` (the example card and the bentuk dasar's
+  caption at the three text sizes).
+- **By ear, and on a phone** (no check can): each of the 9 clips' cut (above all the run
+  tabāraka-smu, and rabbu → l-‘ālamīna, an‘ama → llāhu, whose last consonant runs into the next
+  word); that iOS Safari lets the example player sound after the one "Mulai" tap and across the
+  hand-off.
 
 ## Narasi (guided-lesson narration)
 

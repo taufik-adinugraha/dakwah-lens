@@ -53,6 +53,38 @@ The checks (`problems`) run in two modes: with the pinned corpus (local: Tanzil 
 attestations, the parts against QAC's segments) and without it (CI: everything the content and
 the lesson files can prove — derived forms replayed, word slices, stage semantics, the last
 frame equal to the word, the cut chips, the line plan).
+
+THE IMAM'S VOICE OF A BENTUK DASAR (operator 2026-10-12: "e.g ismu (read by voice + show visual)
+when combined with harf jar, it becomes ismi (read by voice + visual). in principel, each
+explanation should be followed by examples (visual + voice)" — "not only for harakah, but also for
+all rules"; plan L20). In the lesson, when a `base` frame is on screen, the imam recites that base
+form: a clip of one word (or a run) of an ayah's streamed recording, as on the Konsep pages
+(clips.py: the same reciter, the same pinned quran-align timings, nothing cut or stored; the
+narrator never voices a Qur'anic word). The build writes, for every `base` frame, one entry of
+`examples[<word loc>]`: {frame, form, loc, key, clip[, washal]} — or {frame, form, unvoiced: why}.
+Which place, by what is HEARD there (clips.py "WHAT IS HEARD"; never a hand list):
+  - the base form is the lesson word itself ({"word": <this loc>}): `unvoiced: "own"` — the step
+    ends with the imam reciting that very word, which is its example;
+  - the base form QUOTES a place ({"tanzil": loc} or another lesson's {"word": loc}, whole): that
+    place, the one the frame's note names ("seperti di QS 55:78"). It must be heard as shown, or
+    the build stops and the author quotes another place;
+  - a derived form (an edit or a join): among the places where exactly those bytes stand as a
+    word and are heard as shown, one whose quran-align alignment is clean before any other, then
+    the one in the SHORTEST ayah (fewest words: the learner's browser streams that ayah's file to
+    play one word of it, and learners on mobile data pay for every byte), then mushaf order;
+    `unvoiced: "unattested"` when no word of the Qur'an has those bytes (a teaching form),
+    `unvoiced: "unheard"` when none of its places is heard as shown.
+  HEARD AS SHOWN (`place_voice`): not its ayah's last word (the imam stops there and the ending,
+  the very thing a base frame shows, is not pronounced); and a word that starts with hamzat
+  washal (ٱ) and is not its ayah's first word is played with the word before it and ships what is
+  heard (`washal` {run, before, heard}, clips.washal_of: ismu after tabāraka → "tabārakasmu") —
+  `before`, that word's transliteration, is the lessons' own or the one typed in the library's
+  base-form tile of the same place (authored/library.parts.json); without one the place is not
+  usable. A quoted place whose alignment is not clean is a warning ("check by ear").
+The clips' ayat outside the lessons are written, as the pinned files have them, to
+fixtures/compose_examples.json, so CI (no cache) checks those clips too (`voice_problems`, through
+clips.problems: url, lengths, the lessons' own timings, the fixture, the pin; with the corpus also a
+fresh build and the Tanzil tokens).
 """
 from __future__ import annotations
 
@@ -61,7 +93,8 @@ import re
 import unicodedata
 from pathlib import Path
 
-from common import (AUTHORED_DIR, CONTENT_DIR, SURAH_BY_SLUG, bw_to_ar, lesson_ayah, load_qac, load_sources,
+import clips as CL
+from common import (AUTHORED_DIR, CONTENT_DIR, PIPELINE, SURAH_BY_SLUG, bw_to_ar, lesson_ayah, load_qac, load_sources,
                     load_tanzil, normalise, qac_words, require_pinned, sha256_file)
 
 COMPOSE_DIR = CONTENT_DIR / "compose"
@@ -467,8 +500,335 @@ def _frame_chips(fr: dict, forms: dict) -> list[dict]:
     return []
 
 
-def build(slug: str, lessons: dict[str, dict], corpus: Corpus, authored_path: Path | None = None) -> dict:
-    """content/compose/<slug>.json from authored/<slug>.compose.json."""
+# ------------------------------------------------------------------ the imam's voice of a bentuk dasar
+# (operator 2026-10-12, plan L20; rules: the module docstring, "THE IMAM'S VOICE OF A BENTUK DASAR")
+EXAMPLES_FIXTURE = PIPELINE / "fixtures" / "compose_examples.json"
+EXAMPLES_FIXTURE_COMMENT = (
+    "The ayat of the lessons' example clips OUTSIDE the lessons (content/compose/<slug>.json `examples`: the imam's "
+    "voice of a bentuk dasar, played when its `base` frame is on the lesson stage), exactly as the pinned files have "
+    "them: `tanzil` = the Tanzil Uthmani line, `segments` and `stats` = the quran-align Alafasy_128kbps entry. "
+    "pipeline/cache is git-ignored, so without this file CI could not tell a shifted timing or a wrong word in "
+    "these clips. Written by build_compose.py (compose.examples_fixture); validate_compose.py checks it against the "
+    "pinned files when the cache is present, and the clips against it in every run. Never edit by hand."
+)
+# Why a `base` frame has no voice of its own (the lesson says nothing false there: nothing plays).
+UNVOICED = {
+    "own": "the bentuk dasar is this very word; the step ends with the imam reciting it",
+    "unattested": "no word of the Qur'an has these bytes (a teaching form)",
+    "unheard": "the Qur'an has these bytes, but in no place are they heard as shown (each ends its ayah, starts "
+               "with a hamzat washal in mid-recitation, or has no timing of its own)",
+}
+EXAMPLE_KEYS_VOICED = {"frame", "form", "loc", "key", "clip"}
+EXAMPLE_KEYS_UNVOICED = {"frame", "form", "unvoiced"}
+
+
+class Voices:
+    """What the voice of a bentuk dasar is chosen with, beside the corpus: the pinned quran-align
+    entries of the default reciter (None in CI: no cache), the lessons' transliterations and the
+    `washal` of the library's base-form tiles — where the transliteration of a word outside the
+    lessons is typed (authored/library.parts.json `before`; content/library.json, built first)."""
+
+    def __init__(self, align: dict | None, lessons: dict[str, dict], library: dict | None):
+        self.align = align
+        self.translit = CL.lesson_translit(lessons)
+        self.tiles: dict[str, dict] = {}
+        for part in (library or {}).get("parts", []):
+            for tile in part.get("tiles", []):
+                key = CL.key_of(tile.get("q", ""))
+                if key and isinstance(tile.get("washal"), dict):
+                    self.tiles[key] = tile["washal"]
+
+    @classmethod
+    def load(cls, lessons: dict[str, dict], *, corpus: bool = True) -> "Voices":
+        align = None
+        if corpus:
+            align, why = CL.load_alignment(load_sources())
+            if align is None:
+                raise ComposeError(why)
+        lib = CONTENT_DIR / "library.json"
+        return cls(align, lessons, json.loads(lib.read_text(encoding="utf-8")) if lib.exists() else None)
+
+    def before(self, loc: str) -> str | None:
+        """The transliteration of the word before `loc`: the lessons' own, else the one typed in
+        the library's tile of `loc`."""
+        s, a, w = loc.split(":")
+        return self.translit.get(f"{s}:{a}:{int(w) - 1}") or (self.tiles.get(loc) or {}).get("before")
+
+
+def quoted_place(sp) -> str | None:
+    """The one place a form's source quotes whole: {"word": loc} or {"tanzil": loc}; None for a
+    slice, a QAC segment, an edit or a join."""
+    if not isinstance(sp, dict) or set(sp) - {"word", "tanzil"} or len(sp) != 1:
+        return None
+    loc = sp.get("word") or sp.get("tanzil")
+    return loc if isinstance(loc, str) and LOC.match(loc) else None
+
+
+def washal_run(translit: str, word: str, loc: str, prev: str | None, before: str | None) -> tuple[dict | None, list[str]]:
+    """clips.washal_of for the word at `loc`."""
+    s, a, w = (int(x) for x in loc.split(":"))
+    return CL.washal_of(translit, word, (s, a, w), prev, before)
+
+
+def place_voice(loc: str, translit: str, corpus: Corpus, voices: Voices) -> tuple[dict | None, str | None, list[str]]:
+    """(example, None, warnings) when the word at `loc` is HEARD as a base frame shows it, else
+    (None, why not, []). The example: {loc, key, clip[, washal]}."""
+    s, a, w = (int(x) for x in loc.split(":"))
+    tokens = lesson_ayah(corpus.T, s, a)[0].split(" ")
+    word = tokens[w - 1]
+    if w == len(tokens):
+        return None, "ends its ayah: the imam stops there (waqf), so its ending is not heard", []
+    key, washal = loc, None
+    if word.startswith(CL.WASHAL) and w > 1:
+        washal, errs = washal_run(translit, word, loc, tokens[w - 2], voices.before(loc))
+        if washal is None:
+            return None, ("starts with hamzat washal in mid-recitation, where its alif is not read, and cannot be "
+                          "played with the word before it: " + "; ".join(errs)), []
+        key = washal["run"]
+    clip, errs, warns = CL.clip_from(key, voices.align or {}, corpus.T)
+    if errs or clip is None:
+        return None, "has no clip: " + "; ".join(errs), []
+    return ({"loc": loc, "key": key, "clip": clip, **({"washal": washal} if washal else {})}, None, warns)
+
+
+def base_voice(word_loc: str, name: str, form: dict, corpus: Corpus, voices: Voices) -> tuple[dict, list[str]]:
+    """(the `examples` entry of one base frame, without its frame number; warnings): rules in the
+    module docstring."""
+    quoted = quoted_place(form.get("src"))
+    if quoted == word_loc:
+        return {"unvoiced": "own"}, []
+    if quoted:
+        ex, why, warns = place_voice(quoted, form["translit"], corpus, voices)
+        if ex is None:
+            raise ComposeError(f"{word_loc}: the bentuk dasar {name!r} quotes {quoted} ({form['ar']}), which {why}; "
+                               f"quote another place (build_compose.py --find {quoted})")
+        return ex, [f"{word_loc}: bentuk dasar {name!r}: {x}" for x in warns]
+    places = corpus.index.get(form["ar"], [])
+    if not places:
+        return {"unvoiced": "unattested"}, []
+    usable = []
+    for i, loc in enumerate(places):
+        ex, _why, warns = place_voice(loc, form["translit"], corpus, voices)
+        if ex is not None:
+            s, a, _w = (int(x) for x in loc.split(":"))
+            # a clean alignment before any other, then the shortest ayah, then mushaf order
+            usable.append((bool(warns), len(lesson_ayah(corpus.T, s, a)[0].split(" ")), i, ex, warns))
+    if not usable:
+        return {"unvoiced": "unheard"}, []
+    _unclean, _words, _i, ex, warns = min(usable, key=lambda u: u[:3])
+    return ex, [f"{word_loc}: bentuk dasar {name!r}: {x}" for x in warns]
+
+
+def build_examples(words: dict[str, dict], corpus: Corpus, voices: Voices) -> tuple[dict[str, list[dict]], list[str]]:
+    """`examples` of a built file ({word loc: [one entry per base frame]}), and the warnings."""
+    out: dict[str, list[dict]] = {}
+    warns: list[str] = []
+    for loc, unit in words.items():
+        rows = []
+        for k, fr in enumerate(unit["frames"], 1):
+            if fr.get("stage") != "base" or fr.get("focus") not in unit["forms"]:
+                continue
+            entry, w = base_voice(loc, fr["focus"], unit["forms"][fr["focus"]], corpus, voices)
+            warns += w
+            rows.append({"frame": k, "form": fr["focus"], **entry})
+        if rows:
+            out[loc] = rows
+    return out, warns
+
+
+def example_keys(contents: dict[str, dict]) -> list[str]:
+    """The clip key of every voiced example of the built files, each once, in mushaf order."""
+    keys = {e["key"] for c in contents.values() for rows in (c.get("examples") or {}).values()
+            for e in rows if isinstance(e, dict) and isinstance(e.get("key"), str)}
+    return sorted(keys, key=lambda k: (CL.order(k), k))
+
+
+def examples_fixture(contents: dict[str, dict], corpus: Corpus, voices: Voices) -> dict:
+    """EXAMPLES_FIXTURE's content for these built files (clips.fixture_from: the same shape as the
+    library's fixture)."""
+    return CL.fixture_from(example_keys(contents), voices.align or {}, corpus.T, load_sources(),
+                           comment=EXAMPLES_FIXTURE_COMMENT)
+
+
+def load_examples_fixture() -> dict | None:
+    if not EXAMPLES_FIXTURE.exists():
+        return None
+    try:
+        return json.loads(EXAMPLES_FIXTURE.read_text(encoding="utf-8"))
+    except ValueError:
+        return None
+
+
+def _ayah_tokens(s: int, a: int, lessons: dict[str, dict], T) -> list[str] | None:
+    """An ayah's words: a lesson ayah's own (Tanzil-verified by validate.py), else the Tanzil line
+    of `T` (the fixture's in CI, the pinned file's locally)."""
+    return CL.tokens_reader(lessons, T)(s, a)
+
+
+def example_problems(content: dict, lessons: dict[str, dict], voices: Voices, T) -> list[str]:
+    """The `examples` of one built file, from the content, the lessons, the library's tiles and the
+    Tanzil lines of the ayat outside the lessons (`T`: the fixture's, or the pinned file's): every
+    base frame has exactly one entry and no other frame has one; an unvoiced entry says why, truly;
+    a voiced one names a place whose bytes are the base form's, heard as shown (never an ayah's
+    last word; a hamzat-washal word mid-ayah played with the word before it, `washal` exactly as
+    derived). The clips themselves: `voice_problems`."""
+    where = f"compose/{content.get('slug')}"
+    ex = content.get("examples")
+    if not isinstance(ex, dict):
+        return [f"{where}: no `examples` (the imam's voice of each bentuk dasar; rebuild: build_compose.py)"]
+    errs: list[str] = []
+    units = content.get("words") or {}
+    for loc in ex:
+        if loc not in units:
+            errs.append(f"{where}: examples[{loc}] is not a composed word of this file")
+    for loc, unit in units.items():
+        if not isinstance(unit, dict) or not isinstance(unit.get("frames"), list) or not isinstance(unit.get("forms"), dict):
+            continue
+        w = f"{where} {loc}"
+        base = [(k, fr.get("focus")) for k, fr in enumerate(unit["frames"], 1) if isinstance(fr, dict) and fr.get("stage") == "base"]
+        rows = ex.get(loc, [])
+        if not isinstance(rows, list) or not all(isinstance(e, dict) for e in rows):
+            errs.append(f"{w}: examples must be a list of entries")
+            continue
+        if [(e.get("frame"), e.get("form")) for e in rows] != base:
+            errs.append(f"{w}: examples {[(e.get('frame'), e.get('form')) for e in rows]} are not one entry per base "
+                        f"frame {base} (every bentuk dasar shown has its voice, or says why not; rebuild: build_compose.py)")
+            continue
+        for e in rows:
+            f = f"{w} frame {e['frame']}"
+            form = unit["forms"].get(e["form"])
+            if not isinstance(form, dict):
+                continue
+            quoted = quoted_place(form.get("src"))
+            if "unvoiced" in e:
+                why = e["unvoiced"]
+                if set(e) != EXAMPLE_KEYS_UNVOICED or why not in UNVOICED:
+                    errs.append(f"{f}: an unvoiced entry is exactly {{frame, form, unvoiced}}, unvoiced one of {sorted(UNVOICED)}")
+                elif (why == "own") != (quoted == loc):
+                    errs.append(f"{f}: unvoiced {why!r}, but the bentuk dasar {e['form']!r} "
+                                f"{'is' if quoted == loc else 'is not'} the lesson word itself")
+                elif why != "own" and quoted:
+                    errs.append(f"{f}: unvoiced {why!r}, but the bentuk dasar quotes {quoted}: that place is its voice")
+                elif (why == "unattested") != (not form.get("attested")) and why != "own":
+                    errs.append(f"{f}: unvoiced {why!r}, but the form's attested list is {form.get('attested')}")
+                continue
+            if not EXAMPLE_KEYS_VOICED <= set(e) <= EXAMPLE_KEYS_VOICED | {"washal"} or not isinstance(e.get("loc"), str) \
+                    or not LOC.match(e["loc"]) or not isinstance(e.get("key"), str) or not CL.parse_key(e["key"]):
+                errs.append(f"{f}: a voiced entry is exactly {{frame, form, loc, key, clip[, washal]}}")
+                continue
+            if quoted == loc:
+                errs.append(f"{f}: the bentuk dasar is the lesson word itself, whose own recitation ends the step; "
+                            "no second voice of it")
+            if quoted and quoted != e["loc"]:
+                errs.append(f"{f}: the bentuk dasar quotes {quoted}, but its voice is {e['loc']}")
+            s, a, n = (int(x) for x in e["loc"].split(":"))
+            tokens = _ayah_tokens(s, a, lessons, T)
+            if not tokens or n > len(tokens):
+                errs.append(f"{f}: cannot tell what is heard at {e['loc']}: the ayah's words are not known (a lesson "
+                            f"ayah, or one of {EXAMPLES_FIXTURE.name}; run build_compose.py)")
+                continue
+            word = tokens[n - 1]
+            if word != form.get("ar"):
+                errs.append(f"{f}: the word at {e['loc']} is {word}, not the bentuk dasar {form.get('ar')}")
+            if n == len(tokens):
+                errs.append(f"{f}: {word} ({e['loc']}) is its ayah's last word: the imam stops there (waqf), so the "
+                            "ending a base frame shows is not heard; use another place")
+            ws = e.get("washal")
+            if word.startswith(CL.WASHAL) and n > 1:
+                before = ws.get("before") if isinstance(ws, dict) else None
+                want, werrs = washal_run(form.get("translit") or "", word, e["loc"], tokens[n - 2], before)
+                errs += [f"{f}: {x}" for x in werrs]
+                if ws is None:
+                    errs.append(f"{f}: {word} ({e['loc']}) starts with hamzat washal mid-ayah, where the imam does not "
+                                "read its alif: it is played with the word before it (`washal`)")
+                elif not werrs and ws != want:
+                    errs.append(f"{f}: washal {ws!r} is not what the bytes give, {want!r} (rebuild: build_compose.py)")
+                elif not werrs and e["key"] != want["run"]:
+                    errs.append(f"{f}: plays {e['key']}, not the run with the word before it ({want['run']})")
+                if before is not None and voices.before(e["loc"]) not in (None, before):
+                    errs.append(f"{f}: before {before!r} is not the transliteration on record of the word before "
+                                f"{e['loc']}, {voices.before(e['loc'])!r}")
+            else:
+                if ws is not None:
+                    errs.append(f"{f}: `washal` on a word that does not start with hamzat washal mid-ayah")
+                if e["key"] != e["loc"]:
+                    errs.append(f"{f}: plays {e['key']}, not the word itself ({e['loc']})")
+    return errs
+
+
+def voice_library(contents: dict[str, dict], lessons: dict[str, dict], T) -> dict:
+    """The voiced examples of the built files as a library of their own, so that clips.problems
+    checks them exactly as it checks library.json's: `clips` (by key, mushaf order), `quran` (the
+    bytes the stage shows for each key: the base form, with the word before it for a run), one
+    concept whose examples are the keys, and the quran-align pin."""
+    clips, quran, pins = {}, {}, set()
+    for c in contents.values():
+        pins.add((c.get("data_versions") or {}).get(CL.DATA_VERSION, ""))
+        for loc, rows in (c.get("examples") or {}).items():
+            for e in rows if isinstance(rows, list) else []:
+                if not isinstance(e, dict) or not isinstance(e.get("key"), str) or "clip" not in e:
+                    continue
+                form = ((c.get("words") or {}).get(loc) or {}).get("forms", {}).get(e.get("form")) or {}
+                shown = form.get("ar") or ""
+                p = CL.parse_key(e["key"])
+                if p and p[2] != p[3]:
+                    tokens = _ayah_tokens(p[0], p[1], lessons, T) or []
+                    shown = " ".join([*tokens[p[2] - 1:p[3] - 1], shown])
+                clips[e["key"]] = e["clip"]
+                quran[e["key"]] = shown
+    keys = sorted(clips, key=lambda k: (CL.order(k), k))
+    return {"concepts": [{"id": "bentuk-dasar", "examples": [{"loc": f"q:{k}"} for k in keys]}], "basics": [], "parts": [],
+            "clips": {k: clips[k] for k in keys}, "quran": quran,
+            "data_versions": {CL.DATA_VERSION: " ".join(sorted(pins))}}
+
+
+def voice_problems(contents: dict[str, dict], lessons: dict[str, dict], corpus: Corpus | None,
+                   fixture: dict | None, voices: Voices | None = None) -> tuple[list[str], list[str]]:
+    """(errors, warnings) of the example clips of every built file: clips.problems over
+    `voice_library`, with EXAMPLES_FIXTURE for the ayat outside the lessons."""
+    src = load_sources()
+    T = corpus.T if corpus is not None else None
+    align = voices.align if voices is not None and corpus is not None else None
+    fx_T = CL.fixture_sources(fixture)[1]
+    lib = voice_library(contents, lessons, T or fx_T)
+    errs, warns = CL.problems(lib, lessons, src, align, T, fixture, EXAMPLES_FIXTURE.name)
+    # One place, one clip: two base frames that play the same word play the same cut of it.
+    seen: dict[str, tuple[str, dict]] = {}
+    for slug, c in contents.items():
+        for loc, rows in (c.get("examples") or {}).items():
+            for e in rows if isinstance(rows, list) else []:
+                if not isinstance(e, dict) or not isinstance(e.get("key"), str) or "clip" not in e:
+                    continue
+                first = seen.setdefault(e["key"], (f"{slug} {loc}", e["clip"]))
+                if first[1] != e["clip"]:
+                    errs.append(f"{slug} {loc} frame {e.get('frame')}: plays {e['key']} as {e['clip']}, but {first[0]} "
+                                f"plays the same place as {first[1]} (rebuild: build_compose.py)")
+    fix = lambda x: x.replace("build_library.py", "build_compose.py").replace("library.json", "content/compose")  # noqa: E731
+    return [f"compose examples: {fix(x)}" for x in errs], [f"compose examples: {fix(x)}" for x in warns]
+
+
+def example_summary(contents: dict[str, dict]) -> list[str]:
+    """One line per base frame of every built file: its voice, or why it has none."""
+    out = []
+    for slug, c in contents.items():
+        for loc, rows in (c.get("examples") or {}).items():
+            for e in rows:
+                form = c["words"][loc]["forms"][e["form"]]
+                head = f"{slug} {loc} frame {e['frame']} {form['translit']}"
+                if "unvoiced" in e:
+                    out.append(f"{head}: no voice of its own — {UNVOICED.get(e['unvoiced'], e['unvoiced'])}")
+                else:
+                    heard = f" heard “{e['washal']['heard']}”" if e.get("washal") else ""
+                    out.append(f"{head}: {e['key']}{heard} [{e['clip']['start']}–{e['clip']['end']} ms of "
+                               f"{e['clip']['url'].rsplit('/', 1)[-1]}]")
+    return out
+
+
+def build(slug: str, lessons: dict[str, dict], corpus: Corpus, authored_path: Path | None = None,
+          voices: Voices | None = None, warnings: list[str] | None = None) -> dict:
+    """content/compose/<slug>.json from authored/<slug>.compose.json. `voices`: what the example
+    voices are chosen with (default: the pinned quran-align file, the lessons, library.json);
+    `warnings`: collects the build's warnings (an example whose alignment is not clean)."""
     path = authored_path or AUTHORED_DIR / f"{slug}.compose.json"
     raw = json.loads(path.read_text(encoding="utf-8"))
     spec = SURAH_BY_SLUG[slug]
@@ -489,10 +849,17 @@ def build(slug: str, lessons: dict[str, dict], corpus: Corpus, authored_path: Pa
         if unit.get("lead"):
             rec["lead"] = unit["lead"]
         out["words"][loc] = {**rec, **built, "sources": unit.get("sources") or [], "status": "draft"}
+    voices = voices or Voices.load(lessons)
+    out["examples"], warns = build_examples(out["words"], corpus, voices)
+    if warnings is not None:
+        warnings += [f"{slug}: {x}" for x in warns]
+    qa = load_sources()["inputs"]["quran_align"]
     out["data_versions"] = {
         "tanzil": f"uthmani sha256:{corpus.tanzil_sha}",
         "qac": f"0.4 sha256:{corpus.qac_sha}",
         "authored_compose": f"authored/{path.name} sha256:{sha256_file(path)}",
+        CL.DATA_VERSION: f"{qa['version']} {CL.ALIGN_MEMBER} sha256:{qa['members'][CL.ALIGN_MEMBER]['sha256']} "
+                         "(examples: the imam's voice of a bentuk dasar)",
     }
     return out
 
@@ -634,14 +1001,18 @@ def _given_of(unit: dict) -> dict:
     return g
 
 
-def problems(content: dict, lessons: dict[str, dict], corpus: Corpus | None = None) -> list[str]:
-    """Everything wrong with one built composition file. `corpus` None = CI mode."""
+def problems(content: dict, lessons: dict[str, dict], corpus: Corpus | None = None, *,
+             voices: Voices | None = None, fixture: dict | None = None) -> list[str]:
+    """Everything wrong with one built composition file. `corpus` None = CI mode. `voices` (default:
+    the lessons and library.json, no alignment) and `fixture` (default: EXAMPLES_FIXTURE on disk):
+    what the example voices are checked with (`example_problems`; their clips: `voice_problems`,
+    once over all the files)."""
     errs: list[str] = []
     slug = content.get("slug") if isinstance(content, dict) else None
     where = f"compose/{slug}"
     if not isinstance(content, dict) or slug not in SURAH_BY_SLUG:
         return [f"{where}: not a composition file of a lesson surah"]
-    keys = {"version", "slug", "surah", "marks", "primer", "words", "data_versions"}
+    keys = {"version", "slug", "surah", "marks", "primer", "words", "examples", "data_versions"}
     if set(content) != keys:
         errs.append(f"{where}: keys {sorted(content)} must be exactly {sorted(keys)}")
     if content.get("version") != VERSION or content.get("surah") != SURAH_BY_SLUG[slug].surah:
@@ -669,6 +1040,10 @@ def problems(content: dict, lessons: dict[str, dict], corpus: Corpus | None = No
         if unit.get("loc") != loc or unit.get("ar") != words[loc]:
             errs.append(f"{w}: loc/ar must be the lesson word's own ({words[loc]!r})")
         errs += unit_problems(unit, words, corpus, w, kind="word", word_ar=words[loc])
+    voices = voices or Voices.load(lessons, corpus=False)
+    if fixture is None:
+        fixture = load_examples_fixture()
+    errs += example_problems(content, lessons, voices, corpus.T if corpus is not None else CL.fixture_sources(fixture)[1])
     return errs
 
 

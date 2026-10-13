@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState, useSyncExternalStore } from "react";
 import { preconnect } from "react-dom";
 
+import { useExamplePlayer } from "@/hooks/useExamplePlayer";
 import { useNarrationPlayer } from "@/hooks/useNarrationPlayer";
 import { readPace, useImamRate, usePace } from "@/hooks/usePace";
 import { useWakeLock } from "@/hooks/useWakeLock";
@@ -19,6 +20,9 @@ import {
   browserStorage,
   createAutoplayState,
   createPrefetcher,
+  EXAMPLE_WARM_DELAY_MS,
+  exampleGivesUp,
+  exampleToWarm,
   firstNarration,
   IDLE_TICK_MS,
   idlePreloadUrl,
@@ -54,6 +58,7 @@ import {
   playingWords,
   srAnnouncement,
   stageCaption,
+  stageExample,
   stageFrame,
   stageMarks,
   type VoicePos,
@@ -95,6 +100,9 @@ function useLoadingNotice(loading: AudioLoading | null): LoadingNotice | null {
 
 /** How long after load the page waits for an idle moment before warming the first line. */
 const IDLE_PRELOAD_TIMEOUT_MS = 3000;
+
+/** How often an example beat asks whether its recording has come (timing.ts exampleGivesUp). */
+const EXAMPLE_WATCH_MS = 1000;
 
 /** The origin of a recording's address ("https://everyayah.com"), or null. */
 function originOf(url: string | undefined): string | null {
@@ -168,6 +176,19 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  *   across the hand-off to the next ayah, whose lesson adopts the lock. Where
  *   the lesson waits for the learner (an exercise, "Tunggu saya") the lock is
  *   let go after two minutes of silence; the lesson waits on.
+ * - EXAMPLE BEATS (operator 2026-10-12: "each explanation should be followed
+ *   by examples (visual + voice)"; plan L20; machine.ts): a recite activity
+ *   that names a beat. A word of this ayah plays on the stage's player like
+ *   any word; a word of ANOTHER ayah is a clip on the example player
+ *   (useExamplePlayer: its own kept element, unlocked in the same "Mulai" tap
+ *   as the others). The beat ends when the clip has ended and its caption
+ *   has had its reading time. It is never a dead stop: a recording that fails,
+ *   or does not sound within EXAMPLE_LOAD_LIMIT_MS, is reported as
+ *   recite_error and the machine moves on; "Memuat bacaan imam…" shows
+ *   meanwhile as for any recitation. The clip the current step is about to
+ *   play is fetched ahead on the example player (warm.ts exampleToWarm: only
+ *   while the lesson runs, never with Save-Data) — a recitation, so the
+ *   narration look-ahead never lists it.
  * - Remembers the step per ayah; hands off to the next ayah; Media Session
  *   (lock screen, earphones) play/pause/next/previous.
  * - Never scrolls the page.
@@ -246,7 +267,10 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     // except an exercise's word, which the learner's own replay just said.
     onInterrupt: () => interruptRef.current?.(),
   });
-  const { playWord, playAll, restart, pause: pauseAudio, unlock, warm: warmPlayer } = player;
+  const { playWord, playAll, restart, pause: pauseAudio, unlock, warm: warmPlayer, flowing } = player;
+  // The example player: clips of OTHER ayat (an example beat), at the learner's speed for the imam.
+  const examplePlayer = useExamplePlayer({ rate: imamRate });
+  const { play: playExample, unlock: unlockExample, warm: warmExample, flowing: exampleFlowing, owns: ownsExample } = examplePlayer;
   // The imam's recitation streams from the reciter's CDN (next.config.ts RECITATION_HOSTS): a
   // preconnect hint to the chosen reciter's host (the connection set up ahead, operator
   // 2026-10-11) — never a preload of the recording itself before "Mulai": learners on mobile
@@ -266,12 +290,31 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     if (url) warmPlayer(url);
   }, [lessonStarted, reciteUrl, warmPlayer]);
 
+  // ── While the lesson runs: the example clip this step is about to play, fetched early ──
+  // (operator 2026-10-12, plan L20; when and why: warm.ts exampleToWarm). On the example player's
+  // own element; nothing plays, nothing is reported. Asked for only once the step has wanted it
+  // for a moment (stepping through with "Berikutnya ›" fetches nothing), and never when the
+  // browser asks to save data (the rule again, with the connection: read in the timer, not in render).
+  const exampleUrl = exampleToWarm(seq, state);
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+  useEffect(() => {
+    if (!exampleUrl) return;
+    const id = window.setTimeout(() => {
+      const conn = (navigator as Navigator & { connection?: ConnectionHints }).connection;
+      if (exampleToWarm(seq, stateRef.current, conn) === exampleUrl) warmExample(exampleUrl);
+    }, EXAMPLE_WARM_DELAY_MS);
+    return () => window.clearTimeout(id);
+  }, [seq, exampleUrl, warmExample]);
+
   // Latest player functions for the executor, which must not restart its
   // activity when they change identity (e.g. the reciter changed).
-  const playerRef = useRef({ playWord, playAll, restart, pauseAudio, unlock });
+  const playerRef = useRef({ playWord, playAll, restart, pauseAudio, unlock, flowing, playExample, unlockExample, exampleFlowing });
   useEffect(() => {
-    playerRef.current = { playWord, playAll, restart, pauseAudio, unlock };
-  }, [playWord, playAll, restart, pauseAudio, unlock]);
+    playerRef.current = { playWord, playAll, restart, pauseAudio, unlock, flowing, playExample, unlockExample, exampleFlowing };
+  }, [playWord, playAll, restart, pauseAudio, unlock, flowing, playExample, unlockExample, exampleFlowing]);
 
   // ── The executor: one activity at a time ──
   const activity = state.activity;
@@ -327,13 +370,73 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
       return () => stop?.();
     }
 
-    // The imam: ends when the audio has ended AND minMs has passed.
     const p = playerRef.current;
+    if (activity.target === "clip") {
+      // An example beat's word of another ayah: its clip, on the example player. Ends when the
+      // clip has ended AND its caption has had its reading time; never a dead stop — a recording
+      // that fails, or does not sound in time, is given up (the machine shows the example a
+      // moment longer and goes on).
+      let live = true;
+      let heard = false;
+      let read = activity.minMs <= 0;
+      const timers: number[] = [];
+      const settle = () => {
+        if (!live || !heard || !read) return;
+        live = false;
+        dispatch({ type: "recite_end", token });
+      };
+      const giveUp = () => {
+        if (!live) return;
+        live = false;
+        dispatch({ type: "recite_error", token });
+      };
+      const stop = p.playExample(activity.clip, {
+        onEnd: () => {
+          heard = true;
+          settle();
+        },
+        onError: (reason) => {
+          if (!live) return;
+          if (reason === "blocked") {
+            live = false;
+            setBlocked(true);
+            dispatch({ type: "pause" });
+          } else giveUp();
+        },
+        // Another recording started (the learner clicked a word): pause, like "Jeda".
+        onInterrupted: () => {
+          if (live) dispatch({ type: "pause" });
+        },
+      });
+      if (!read) {
+        timers.push(
+          window.setTimeout(() => {
+            read = true;
+            settle();
+          }, activity.minMs),
+        );
+      }
+      // Once a second: has the clip come? Past the limit, one that is neither heard nor
+      // sounding (it never started, or stalled for good) is given up.
+      const since = Date.now();
+      const watch = window.setInterval(() => {
+        if (exampleGivesUp(Date.now() - since, { heard, flowing: p.exampleFlowing() })) giveUp();
+      }, EXAMPLE_WATCH_MS);
+      return () => {
+        live = false;
+        window.clearInterval(watch);
+        timers.forEach((id) => window.clearTimeout(id));
+        stop();
+      };
+    }
+
+    // The imam: ends when the audio has ended AND minMs has passed.
     const quiz = activity.target === "word" && activity.inExercise === true;
     let live = true;
     let heard = false;
     let read = activity.minMs <= 0;
     const timers: number[] = [];
+    let watch: number | null = null;
     const settle = () => {
       if (!live || !heard || !read) return;
       live = false;
@@ -389,6 +492,17 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
       } else if (heard) {
         timers.push(window.setTimeout(settle, 0));
       }
+      // An example beat (this ayah's own word as the example of a rule) never holds the lesson:
+      // past the limit, a recording that is neither heard nor sounding is given up.
+      if (activity.target === "word" && activity.example !== undefined) {
+        const since = Date.now();
+        watch = window.setInterval(() => {
+          if (!live || !exampleGivesUp(Date.now() - since, { heard, flowing: p.flowing() })) return;
+          live = false;
+          reciteLiveRef.current = false;
+          dispatch({ type: "recite_error", token });
+        }, EXAMPLE_WATCH_MS);
+      }
     };
     // An exercise's word waits for the learner's own replay to stop (one
     // voice at a time), as narration lines do.
@@ -414,6 +528,7 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
       errorRef.current = null;
       interruptRef.current = null;
       timers.forEach((id) => window.clearTimeout(id));
+      if (watch !== null) window.clearInterval(watch);
       // Stop the imam only if this activity still owns the playback (not
       // when the learner just started a word of their own).
       if (ownerRef.current === token) {
@@ -476,7 +591,7 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
   // before the look-ahead — unless the page's own fetch of it is under way or due
   // (nextLinePreload).
   const nextUrl = nextNarration(seq, state);
-  const soundLoading = narrationLoading !== null || player.loading !== null;
+  const soundLoading = narrationLoading !== null || player.loading !== null || examplePlayer.loading !== null;
   useEffect(() => {
     const p = prefetchRef.current;
     const conn = (navigator as Navigator & { connection?: ConnectionHints }).connection;
@@ -548,13 +663,13 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
   useEffect(() => {
     const onStart = (e: Event) => {
       const el = (e as CustomEvent<HTMLAudioElement>).detail;
-      if (ownsNarration(el) || reciteLiveRef.current) return;
+      if (ownsNarration(el) || ownsExample(el) || reciteLiveRef.current) return;
       foreignAtRef.current = Date.now();
       foreignRef.current = el instanceof HTMLAudioElement ? el : null;
     };
     window.addEventListener(AUDIO_START_EVENT, onStart);
     return () => window.removeEventListener(AUDIO_START_EVENT, onStart);
-  }, [ownsNarration]);
+  }, [ownsNarration, ownsExample]);
 
   // ── Remember the step (by id) ──
   const toSave = positionToSave(seq, state);
@@ -653,7 +768,13 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
 
   // ── Loading: the current activity's sound, asked for and not flowing yet ──
   const loading =
-    activity?.kind === "narrate" ? narrationLoading : activity?.kind === "recite" ? player.loading : null;
+    activity?.kind === "narrate"
+      ? narrationLoading
+      : activity?.kind === "recite"
+        ? activity.target === "clip"
+          ? examplePlayer.loading
+          : player.loading
+        : null;
   const loadingNotice = useLoadingNotice(loading);
   // "Menyiapkan pelajaran…": from the click until its first line is heard — or shown at once
   // (a caption-only line, a failed file, a blocked sound: each is a new activity or none), or
@@ -672,6 +793,8 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     setBlocked(false);
     setLearnerWord(false);
     playerRef.current.unlock();
+    // The example player's element too: a clip of another ayah plays later, with no tap.
+    playerRef.current.unlockExample();
   };
   const actions = {
     /** "Mulai" (from 0) or "Lanjutkan dari langkah N". */
@@ -763,6 +886,8 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     marks,
     /** The animation frame in the word card's slot (primer / compose steps). */
     frame,
+    /** The example beat on screen (caption.ts stageExample), or null. */
+    example: stageExample(seq, state),
     lineHasVoice,
     /** Replays so far (the stage keys its exercise with it). */
     replays,

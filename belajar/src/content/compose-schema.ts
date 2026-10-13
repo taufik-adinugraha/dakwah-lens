@@ -7,7 +7,7 @@
  */
 import { z } from "zod";
 
-import { ReviewStatus, SourceRef, WordLoc } from "./schema";
+import { Clip, ReviewStatus, SourceRef, WordLoc } from "./schema";
 
 // ───────────────────────── Word composition & harakat primer ─────────────────────────
 // content/compose/<slug>.json, built by pipeline/build_compose.py from
@@ -104,6 +104,32 @@ export type Composition = z.infer<typeof Composition>;
 export const Primer = z.object({ ayah: z.number().int().positive(), ...ComposeUnit });
 export type Primer = z.infer<typeof Primer>;
 
+/**
+ * The imam's voice of the bentuk dasar a `base` frame shows (operator 2026-10-12: "e.g ismu (read
+ * by voice + show visual) when combined with harf jar, it becomes ismi (read by voice + visual)";
+ * plan L20): one entry per base frame, written by pipeline/build_compose.py and chosen by what is
+ * HEARD (pipeline/compose.py "THE IMAM'S VOICE OF A BENTUK DASAR"). Voiced: the place in the Qur'an
+ * (`loc`), the clip key the lesson plays (`key`: that word, or — a word that starts with hamzat
+ * washal mid-ayah — the run with the word before it, with `washal` saying what is heard) and the
+ * clip itself, [start, end) of that ayah's streamed recording. Unvoiced: why — "own" (the base
+ * form is the lesson word itself, recited at the end of its step), "unattested" (no word of the
+ * Qur'an has those bytes), "unheard" (none of its places is heard as shown).
+ */
+export const ComposeExample = z.union([
+  z
+    .object({
+      frame: z.number().int().positive(),
+      form: z.string().min(1),
+      loc: WordLoc,
+      key: z.string().regex(/^\d{1,3}:\d{1,3}:\d{1,3}(?:-\d{1,3})?$/),
+      clip: Clip,
+      washal: z.object({ run: z.string().min(1), before: z.string().min(1), heard: z.string().min(1) }).strict().optional(),
+    })
+    .strict(),
+  z.object({ frame: z.number().int().positive(), form: z.string().min(1), unvoiced: z.enum(["own", "unattested", "unheard"]) }).strict(),
+]);
+export type ComposeExample = z.infer<typeof ComposeExample>;
+
 export const ComposeFile = z.object({
   version: z.literal(1),
   slug: z.string(),
@@ -113,6 +139,8 @@ export const ComposeFile = z.object({
   marks: z.record(z.string(), z.object({ char: z.string().length(1), sound: z.string().nullable(), display: z.string() })),
   primer: Primer.nullable(),
   words: z.record(WordLoc, Composition),
+  /** By composed word: the voice of each of its base frames, or why it has none. */
+  examples: z.record(WordLoc, z.array(ComposeExample)),
   data_versions: z.record(z.string(), z.string()),
 });
 export type ComposeFile = z.infer<typeof ComposeFile>;

@@ -6,7 +6,8 @@
  * The UI executes `state.activity` — exactly ONE thing at a time — and
  * reports its end with the activity's token:
  *   narrate → narration_end | narration_error   (play activity.url)
- *   recite  → recite_end    | recite_error      (imam: whole ayah or word n;
+ *   recite  → recite_end    | recite_error      (imam: whole ayah, word n, or
+ *             — an example beat — the clip of a word of another ayah;
  *             end only when the audio has ended AND activity.minMs passed)
  *   read    → timer   (caption-only: show the caption for activity.ms)
  *   wait    → timer   (silent pause for activity.ms)
@@ -69,11 +70,28 @@
  *    step again from its start — also from a pause, and from "Tunggu saya"'s
  *    Lanjut — and plays on from there. An exercise starts over at its first
  *    control (the stage remounts the exercise itself).
+ *  - EXAMPLE BEATS (operator 2026-10-12: "each explanation should be followed
+ *    by examples (visual + voice)"; plan L20; types.ts ExampleBeat): a step's
+ *    beat comes right after the line it follows — the stage shows the example
+ *    with the beat's caption and the imam recites it (a recite activity that
+ *    names the beat: a word of this ayah on the stage's player, or `clip`,
+ *    another ayah's word, on the example player), then the usual pause after
+ *    the imam. It lasts at least its caption's reading time; "Pelan" hears it
+ *    twice, as it hears every word twice. A beat is NEVER a dead stop: if its
+ *    recording cannot be played (recite_error: it failed, or did not start
+ *    within EXAMPLE_LOAD_LIMIT_MS, which the runner times), the example stays
+ *    on screen with its caption for EXAMPLE_FAILED_HOLD_MS and the lesson goes
+ *    on — unlike the ayah's own recitation, without which there is no lesson.
+ *    A beat is part of its step: "↺ Ulangi" and ‹ › reach it with the step
+ *    (a concept's examples are a step of their own), pause / resume play it
+ *    from its start, and it is neither narration (never in the look-ahead)
+ *    nor silent waiting (the screen stays on: the lesson runs).
  * No clocks, no randomness: the same events give the same states.
  */
 import type { Pace } from "../lessonSteps";
 import {
   advanceHoldMs,
+  EXAMPLE_FAILED_HOLD_MS,
   MAX_REMINDERS,
   REMINDER_AT_MS,
   SCREEN_IDLE_LIMIT_MS,
@@ -88,6 +106,7 @@ import {
   type AutoplaySequence,
   type AutoplayStep,
   type Cue,
+  type ExampleClip,
   type ExerciseKey,
   type Guide,
   type GuidePart,
@@ -140,19 +159,26 @@ export type Activity =
        *  starting (the learner's own replay) ends it, rather than pausing
        *  the lesson. */
       inExercise?: boolean;
-    };
+      /** An example beat (its id): this ayah's own word as the example of a rule. */
+      example?: string;
+    }
+  /** An example beat whose word is another ayah's: `clip` of that ayah's streamed recording, on
+   *  the example player (never the stage's: its element holds this ayah's recording). */
+  | { kind: "recite"; token: number; target: "clip"; clip: ExampleClip; key: string; minMs: number; example: string };
 
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
 
 /** A step's cue (by index) or a shared line. */
 export type CueRef = { c: number } | { s: SharedKey };
-/** Which caption the stage shows: a cue, or the step's own caption. */
-export type CaptionRef = CueRef | "step";
+/** Which caption the stage shows: a cue, an example beat's (by index in the step's examples),
+ *  or the step's own caption. */
+export type CaptionRef = CueRef | { x: number } | "step";
 
 /** One thing a step does; a step's plan is a list of these, run in order. */
 export type Action =
   | { t: "say"; ref: CueRef; from?: number; part?: GuidePart }
-  | { t: "settle"; after: "narration" | "recite"; part?: GuidePart }
+  /** `after: "example"`: the pause after an example beat (as long as after any recitation). */
+  | { t: "settle"; after: "narration" | "recite" | "example"; part?: GuidePart }
   | { t: "gap" }
   /** A silent pause: EXERCISE_DONE_HOLD_MS, or `ms`. */
   | { t: "hold"; ms?: number; part?: GuidePart }
@@ -163,6 +189,10 @@ export type Action =
   | { t: "heard"; word: number; part: GuidePart }
   /** The settled question moves on: exercise.advance + 1. */
   | { t: "advance"; part: GuidePart }
+  /** Example beat `x` of the step (step.examples[x]): shown with its caption, recited by the
+   *  imam. `again`: the second hearing of "Pelan" (no reading time of its own); `failed`: its
+   *  recording could not be played — shown for EXAMPLE_FAILED_HOLD_MS, then on. */
+  | { t: "example"; x: number; again?: boolean; failed?: boolean }
   | { t: "await" };
 
 /** The control an action belongs to, if any. */
@@ -330,6 +360,8 @@ function captionParts(seq: AutoplaySequence, step: AutoplayStep, ref: CaptionRef
   if (ref === "step") {
     return step.cues.length && step.kind !== "compose" ? { parts: step.cues[0].parts, line: null } : { parts: [step.caption], line: null };
   }
+  // An example beat's caption ("Contoh: …"): on-screen text only, no narration line.
+  if ("x" in ref) return { parts: step.examples?.[ref.x]?.parts ?? [step.caption], line: null };
   const cue = cueOf(seq, step, ref);
   return { parts: cue.parts, line: cue.line };
 }
@@ -389,9 +421,23 @@ function partPlan(
 const withLanjut = (seq: AutoplaySequence, guides: Guide[]) =>
   guides.some((g) => g.target === "lanjut") ? guides : [...guides, seq.lanjutGuide];
 
+/** The example beats of `step` that come after cue `after` (-1: before any line), as a plan: each
+ *  recited by the imam ("Pelan": twice, as every word is), then the pause after him. */
+function beatsPlan(s: AutoplayState, step: AutoplayStep, after: number): Action[] {
+  const out: Action[] = [];
+  (step.examples ?? []).forEach((b, x) => {
+    if (b.after !== after) return;
+    out.push({ t: "example", x });
+    if (s.pace === "pelan") out.push({ t: "hold", ms: WORD_REPEAT_GAP_MS }, { t: "example", x, again: true });
+    out.push({ t: "settle", after: "example" });
+  });
+  return out;
+}
+
 function planFor(seq: AutoplaySequence, s: AutoplayState, step: AutoplayStep): Action[] {
   const plan: Action[] = [];
-  const say = (c: number) => plan.push(...sayPlan(s, step, seq, { c }));
+  // A line, then the examples that follow it (operator 2026-10-12, plan L20).
+  const say = (c: number) => plan.push(...sayPlan(s, step, seq, { c }), ...beatsPlan(s, step, c));
   if (step.kind === "exercise" && step.exercise && s.exercise) {
     step.exercise.lead.forEach(say);
     plan.push(...partPlan(seq, s, step, s.exercise, s.exercise.part, "say"));
@@ -423,6 +469,8 @@ function planFor(seq: AutoplaySequence, s: AutoplayState, step: AutoplayStep): A
     plan.push({ t: "settle", after: "recite" });
     return plan;
   }
+  // An example step has no line: its beats open it.
+  plan.push(...beatsPlan(s, step, -1));
   step.cues.forEach((_, i) => say(i));
   return plan;
 }
@@ -454,8 +502,21 @@ function run(seq: AutoplaySequence, s: AutoplayState, viaNext: boolean): Autopla
     case "settle":
       return issue(s, {
         kind: "wait",
-        ms: a.after === "recite" ? settleAfterReciteMs(s.pace) : settleAfterNarrationMs(s.pace),
+        ms: a.after === "narration" ? settleAfterNarrationMs(s.pace) : settleAfterReciteMs(s.pace),
       });
+    case "example": {
+      const b = step.examples?.[a.x];
+      if (!b) return run(seq, { ...s, at: s.at + 1 }, viaNext);
+      const shown: AutoplayState = { ...s, caption: { x: a.x }, part: 0, guides: step.guides };
+      // Its recording could not be played: the example stays on screen a moment, then on.
+      if (a.failed) return issue(shown, { kind: "wait", ms: EXAMPLE_FAILED_HOLD_MS });
+      // At least its caption's reading time (not "Tunggu saya", which waits for Lanjut at the
+      // step's end; not the second hearing of "Pelan").
+      const minMs = a.again || s.pace === "tunggu" ? 0 : readMs(b.parts.join(" "), s.pace);
+      if (b.word !== null) return issue(shown, { kind: "recite", target: "word", word: b.word, minMs, example: b.id });
+      if (b.clip) return issue(shown, { kind: "recite", target: "clip", clip: b.clip, key: b.key, minMs, example: b.id });
+      return run(seq, { ...s, at: s.at + 1 }, viaNext);
+    }
     case "gap":
       return issue(s, { kind: "wait", ms: WORD_REPEAT_GAP_MS });
     case "hold":
@@ -704,6 +765,15 @@ function reduce(seq: AutoplaySequence, s: AutoplayState, e: AutoplayEvent): Auto
     case "recite_error": {
       const a = s.activity;
       if (!a || a.token !== e.token || a.kind !== "recite") return s;
+      const here = s.plan[s.at];
+      if (a.target !== "ayah" && a.example !== undefined && here?.t === "example") {
+        // An example beat is never a dead stop: it stays on screen with its caption for a
+        // moment, and the lesson goes on. Its second hearing ("Pelan") would fail the same way.
+        const rest = s.plan.slice(s.at + 1);
+        const twice = rest[0]?.t === "hold" && rest[1]?.t === "example" && rest[1].x === here.x;
+        const plan: Action[] = [...s.plan.slice(0, s.at), { t: "example", x: here.x, failed: true }, ...(twice ? rest.slice(2) : rest)];
+        return run(seq, { ...s, plan, activity: null }, false);
+      }
       return { ...s, phase: "paused", pausedFrom: "running", activity: null, resumeRecite: false, error: "recite" };
     }
 

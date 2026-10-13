@@ -24,7 +24,7 @@ import { conceptsIntroducedIn } from "@/lib/library";
 import { quizAyah } from "@/lib/quiz-content";
 import { SURAH_SLUGS } from "@/lib/routes";
 
-import { stageSequence } from "./build";
+import { lessonExamplesFor, stageSequence } from "./build";
 import { NARRATED_SLUGS, narrationFor, SHARED_NARRATION } from "./manifests";
 import { AUTOPLAY_TEXT_SETS, autoplayTexts } from "./texts";
 
@@ -85,6 +85,8 @@ describe("autoplay stage: what the lesson page ships", () => {
             shared: locale === "id" ? SHARED_NARRATION : null,
             // Word compositions + the harakat primer go to every locale (rule 14).
             compose: composeInput(s.slug, a),
+            // The example beats too (plan L20): the imam and a caption, no narration.
+            examples: lessonExamplesFor(s, a).examples,
           });
           expect(JSON.stringify(seq)).toBe(JSON.stringify(direct));
           // Every line the Indonesian stage can speak has its manifest text

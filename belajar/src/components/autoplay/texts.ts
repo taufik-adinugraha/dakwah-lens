@@ -81,6 +81,13 @@ const EN: AutoplayTexts = {
   recap: "Listen to the whole ayah once more, and recite along with the imam.",
   next: ({ ayah }) => `This ayah's lesson is complete. Next: ayah ${ayah}.`,
   done: ({ surah }) => `This ayah's lesson is complete. It is the last ayah of surah ${surah}.`,
+  example: {
+    word: ({ n, translit }) => `Example: word ${n}, ${translit}.`,
+    other: ({ translit, surah, ayah }) => `Another example: ${translit}, in QS ${surah}:${ayah}.`,
+    base: ({ translit, surah, ayah }) => `Example: ${translit}, in QS ${surah}:${ayah}.`,
+    waqf: "The imam stops at the end of the ayah, so its last vowel is not heard.",
+    washal: ({ heard }) => `With the word before it you hear “${heard}”, because its first alif is not read.`,
+  },
   shared: {
     start: "The lesson begins. Just listen and watch the screen; when there is practice, you will be guided.",
     resume: "Let us continue.",

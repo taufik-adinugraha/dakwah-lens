@@ -4,7 +4,7 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { stageSequence } from "@/components/autoplay/build";
+import { lessonExamplesFor, stageSequence } from "@/components/autoplay/build";
 import { BackLink } from "@/components/BackLink";
 import { LabelRole } from "@/components/exercises/LabelRole";
 import { SortCase } from "@/components/exercises/SortCase";
@@ -27,7 +27,7 @@ import { Link } from "@/i18n/navigation";
 import { surahNamesFor } from "@/lib/ayat";
 import { composeFor } from "@/lib/compose-content";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
-import { orderRecitations } from "@/lib/autoplay";
+import { orderRecitations, stageExamples } from "@/lib/autoplay";
 import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY, TERMS } from "@/lib/library";
 import { quizAyah } from "@/lib/quiz-content";
 import { planOf } from "@/lib/quiz-plan";
@@ -173,6 +173,10 @@ export default async function AyahPage({
   // time: captions in the page's locale, narration audio from
   // content/narration/ when it has been rendered.
   const seq = stageSequence(s, a, locale);
+  // The example beats' drawing (operator 2026-10-12: "each explanation should be followed by
+  // examples (visual + voice)"; plan L20): each example's Arabic, exactly the content's bytes, its
+  // transliteration and meaning, by beat id; the sequence above carries their captions only.
+  const examples = stageExamples(lessonExamplesFor(s, a).examples);
   // The word compositions and the harakat primer of this ayah (content/compose,
   // operator 2026-10-10, narration rule 14): the bytes the stage's animation
   // shows, by word number; the sequence above carries only their lines.
@@ -264,6 +268,8 @@ export default async function AyahPage({
             translation={translation}
             exercise={{ words: a.words, lexemes, quiz }}
             compose={compose && (compose.primer || Object.keys(compose.words).length) ? compose : null}
+            examples={examples}
+            marks={composeFile?.marks ?? null}
           />
         </div>
 

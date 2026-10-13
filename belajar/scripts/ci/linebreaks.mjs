@@ -340,7 +340,15 @@ async function answerExercise(page, vp, label, key) {
 /** The lesson stage before "Mulai", then every step "Berikutnya ›" reaches (the caption, the word
  *  card, the mushaf line, an exercise and its prompt), up to the last step; on an exercise step
  *  of a kind not yet answered, its feedback too. Narrated: each step is replayed so its narration
- *  plays and the KARAOKE caption shows (routed narration, as in screenshots.mjs). */
+ *  plays and the KARAOKE caption shows (routed narration, as in screenshots.mjs).
+ *  The EXAMPLE beats (operator 2026-10-12, plan L20): a concept's example is a step of its own,
+ *  so its card ("Contoh" · the word · "yang artinya …") and its caption are measured like any
+ *  step — at once, with no wait for a karaoke caption it never has (the beat lasts a few seconds
+ *  and the lesson then moves on by itself); the first is also shot at each size. A bentuk dasar's
+ *  example comes inside its composition step, after its base frame's lines: on the narrated
+ *  lesson the first one is waited for and its caption measured (and shot) too. */
+/** How long the walk waits, inside a composition step, for its bentuk dasar's example to come. */
+const BASE_EXAMPLE_WAIT_MS = 45_000;
 async function lessonPages(page, vp, index) {
   const answered = new Set();
   for (const [urlPath, narrated] of LESSONS) {
@@ -350,6 +358,8 @@ async function lessonPages(page, vp, index) {
     let karaoke = 0;
     let cards = 0;
     let steps = 0;
+    let examples = 0;
+    let baseExample = 0;
     try {
       if (!(await open(page, vp, urlPath))) continue;
       await measureAllSizes(page, vp, `${urlPath} before Mulai`, STAGE);
@@ -362,7 +372,10 @@ async function lessonPages(page, vp, index) {
         const at = await stepOf(page);
         if (!at) break;
         let shot = null;
-        if (narrated) {
+        // A concept's example step: its card is on screen at once, and only for a few seconds.
+        const onExample = (await page.locator(`${STAGE} [data-autoplay="example"]`).count()) > 0;
+        if (onExample && examples++ === 0) shot = "example";
+        if (narrated && !onExample) {
           await press(page.locator('[data-autoplay="replay"]')).catch(() => {});
           const word = page.locator('[data-autoplay="caption"] [data-karaoke]').first();
           if (await word.waitFor({ state: "attached", timeout: 4000 }).then(() => true, () => false)) {
@@ -378,6 +391,16 @@ async function lessonPages(page, vp, index) {
         await settle(page);
         await measureAllSizes(page, vp, `${urlPath} step ${at[0]}/${at[1]}`, STAGE, shot);
         steps++;
+        // The first bentuk dasar's example of the narrated lesson: inside word 1's composition,
+        // once its base frame's lines are said (its caption says what is heard: the longest).
+        if (narrated && !baseExample && (await page.locator(`${STAGE}[data-step="w1:compose"]`).count())) {
+          const beat = page.locator(`${STAGE}[data-example^="w1:base:"]`);
+          if (await beat.waitFor({ state: "attached", timeout: BASE_EXAMPLE_WAIT_MS }).then(() => true, () => false)) {
+            await settle(page);
+            await measureAllSizes(page, vp, `${urlPath} step ${at[0]}/${at[1]} · bentuk dasar example`, STAGE, "example-base");
+            baseExample++;
+          }
+        }
         const key = await exerciseOn(page);
         if (key && !answered.has(key)) {
           answered.add(key);
@@ -398,7 +421,15 @@ async function lessonPages(page, vp, index) {
     } finally {
       if (narrated) await page.unroute(isNarration, handler);
     }
-    console.log(`  ${vp}: ${urlPath} — ${steps} steps measured${narrated ? `, karaoke on ${karaoke}` : ""}`);
+    console.log(
+      `  ${vp}: ${urlPath} — ${steps} steps measured${narrated ? `, karaoke on ${karaoke}` : ""}, ${examples} example card(s)${narrated ? `, ${baseExample} bentuk dasar example` : ""}`,
+    );
+    // Not vacuous: each of these lessons introduces a concept, so it shows an example card; the
+    // narrated one (Al-Fatihah 1) also plays the bentuk dasar of its first word.
+    if (steps > 0 && examples === 0)
+      record({ page: urlPath, viewport: vp, size: "-", kind: "nothing-measured", where: "example", detail: "no example card was on screen at any step", text: "" });
+    if (narrated && steps > 0 && baseExample === 0)
+      record({ page: urlPath, viewport: vp, size: "-", kind: "nothing-measured", where: "example", detail: "the bentuk dasar's example never showed in word 1's composition", text: "" });
     if (steps === 0) record({ page: urlPath, viewport: vp, size: "-", kind: "nothing-measured", where: "stage", detail: "no lesson step was measured", text: "" });
     // Not vacuous: the narrated ayah must have shown its karaoke words.
     if (narrated && karaoke === 0)
