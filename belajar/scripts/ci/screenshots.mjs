@@ -7,7 +7,8 @@
 // Waris hidden (since 2026-10-10) and the Qur'an track on Al-Fatihah only
 // (operator, 2026-10-10: the Mu'awwidzat "segera hadir", not clickable),
 // including the 404 a hidden waris or surah URL answers, the "Segera hadir"
-// cards (checked: no link, nothing to focus) and the end of Al-Fatihah
+// cards (checked: no link, nothing to focus), the curriculum page (checked:
+// only reachable lessons are links, the others say "Belum tersedia") and the end of Al-Fatihah
 // (checked: the next surah is coming soon, nothing to click, no move).
 // `--waris`: only the Ilmu Waris pages, from a container started with
 // BELAJAR_WARIS=on. `--surahs`: the Mu'awwidzat lessons, from a container
@@ -26,9 +27,12 @@ const BASE = process.env.BASE_URL ?? "http://127.0.0.1:3300";
 // URL shape: plan L9 (hub → /quran track; Konsep/Kosakata at hub level).
 const AYAH_1 = "/belajar/id/quran/al-fatihah/1";
 const AYAH_2 = "/belajar/id/quran/al-fatihah/2";
+// The basic curriculum's page (plan L27; src/lib/routes.ts curriculumHref).
+const CURRICULUM = "/belajar/id/quran/kurikulum";
 const PAGES = [
   ["hub", "/belajar/id"],
   ["track", "/belajar/id/quran"],
+  ["kurikulum", CURRICULUM],
   ["surah", "/belajar/id/quran/al-fatihah"],
   ["ayah-2", AYAH_2],
   ["ayah-7", "/belajar/id/quran/al-fatihah/7"],
@@ -46,6 +50,8 @@ const PAGES = [
 // and a lesson of two of them.
 const SURAH_PAGES = [
   ["track-semua-surah", "/belajar/id/quran"],
+  // The curriculum page with the Mu'awwidzat lessons as links.
+  ["kurikulum-semua-surah", CURRICULUM],
   ["ikhlas-1", "/belajar/id/quran/al-ikhlas/1"],
   ["nas-6", "/belajar/id/quran/an-nas/6"],
 ];
@@ -503,6 +509,7 @@ async function ogShots(request) {
   const { writeFile } = await import("node:fs/promises");
   for (const [name, path] of [
     ["og-hub-id", "/belajar/id/og"],
+    ["og-kurikulum-id", `${CURRICULUM}/og`],
     ["og-al-fatihah-1-id", "/belajar/id/quran/al-fatihah/1/og"],
   ]) {
     const res = await request.get(BASE + path);
@@ -745,6 +752,82 @@ async function comingSoonCheck(page, vp) {
   }
   if (problems.length) throw new Error(`${vp}: track page — ${problems.join("; ")}`);
   console.log(`  ${vp}: "Segera hadir" cards ok (${slugs.join(", ")}: plain elements, nothing to focus)`);
+  await page.goto("about:blank");
+}
+
+/**
+ * The curriculum page as a browser draws it (operator, 2026-10-13: "we should also explain this
+ * curriculum in the page"; plan L27), against content/curriculum.json: every lesson of the file
+ * is listed once, in its order; a lesson visitors can reach — a written ayah of a published surah
+ * (`surahsOn`: every surah with lesson pages; else all but HIDDEN_SURAHS) — has ONE link into the
+ * track, to that ayah; every other lesson (a hidden surah's, Ayat Kursi's segments, the
+ * introduction, which has no route yet: src/lib/routes.ts lessonHref) has no link into the track
+ * and shows the words "Belum tersedia" (messages/id.json, never typed here) in a label that is
+ * VISIBLE and has nothing to click or focus. As production shows it, no link on the page leads
+ * into a hidden surah. And at the largest text size nothing makes the page scroll sideways (the
+ * line breaks themselves are linebreaks.mjs's); on the phone that size is shot too. Fails the job
+ * otherwise.
+ */
+async function curriculumCheck(page, vp, surahsOn) {
+  const file = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "curriculum.json"), "utf8"));
+  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8"));
+  const mark = msgs.Curriculum?.unavailable;
+  if (!mark) throw new Error("messages/id.json has no Curriculum.unavailable");
+  const slugOf = Object.fromEntries(file.units.map((u) => [u.id, u.slug ?? null]));
+  const reachable = (l) => {
+    const slug = slugOf[l.unit];
+    return !!slug && (surahsOn || !HIDDEN_SURAHS.includes(slug)) && l.ayah !== undefined && l.segment === undefined && !!l.map;
+  };
+  await page.goto(BASE + CURRICULUM, { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+  const rows = await page.locator("main [data-lesson]").evaluateAll((els) =>
+    els.map((e) => {
+      const status = e.querySelector("[data-lesson-status]");
+      const box = status ? status.getBoundingClientRect() : null;
+      return {
+        id: e.getAttribute("data-lesson"),
+        links: [...e.querySelectorAll('a[href*="/quran/"]')].map((a) => a.getAttribute("href")),
+        status: status && box.width > 0 && box.height > 0 ? (status.textContent ?? "").trim() : null,
+        focusable: status ? status.querySelectorAll("a, button, input, select, textarea, summary, [tabindex]").length : 0,
+      };
+    }),
+  );
+  const problems = [];
+  const want = file.lessons.map((l) => l.id);
+  if (JSON.stringify(rows.map((r) => r.id)) !== JSON.stringify(want)) problems.push(`lists ${rows.length} lesson(s), not the ${want.length} of content/curriculum.json in its order`);
+  let linked = 0;
+  for (const l of file.lessons) {
+    const r = rows.find((x) => x.id === l.id);
+    if (!r) continue;
+    if (reachable(l)) {
+      const href = `/belajar/id/quran/${slugOf[l.unit]}/${l.ayah}`;
+      if (JSON.stringify(r.links) !== JSON.stringify([href])) problems.push(`${l.id}: links ${JSON.stringify(r.links)}, expected [${href}]`);
+      else linked++;
+      if (r.status !== null) problems.push(`${l.id}: a lesson that can be opened says "${r.status}"`);
+    } else {
+      if (r.links.length > 0) problems.push(`${l.id}: ${r.links.length} link(s) into the track from a lesson that is not available`);
+      if (r.status !== mark) problems.push(`${l.id}: no visible "${mark}" (got ${JSON.stringify(r.status)})`);
+      if (r.focusable > 0) problems.push(`${l.id}: ${r.focusable} focusable element(s) inside its "${mark}" label`);
+    }
+  }
+  if (linked === 0) problems.push("no lesson is linked");
+  if (!surahsOn) {
+    for (const slug of HIDDEN_SURAHS) {
+      const n = await page.locator(`a[href^="/belajar/id/quran/${slug}"]`).count();
+      if (n > 0) problems.push(`${n} link(s) into the hidden ${slug}`);
+    }
+  }
+  await setTextSizeAttr(page, "sangat-besar");
+  const wide = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth }));
+  if (wide.scroll > wide.inner + 1) problems.push(`scrolls sideways at the largest text size (${wide.scroll} > ${wide.inner})`);
+  if (vp === "phone") {
+    const name = surahsOn ? "kurikulum-semua-surah-sangat-besar" : "kurikulum-sangat-besar";
+    await page.screenshot({ path: `shots/${vp}-${name}.png`, fullPage: true });
+    console.log(`shot ${vp}-${name} (${CURRICULUM}, text size sangat-besar)`);
+  }
+  await setTextSizeAttr(page, null);
+  if (problems.length) throw new Error(`${vp}: curriculum page — ${problems.join("; ")}`);
+  console.log(`  ${vp}: curriculum page ok (${rows.length} lessons in the file's order, ${linked} linked, ${rows.length - linked} "${mark}" as plain text${surahsOn ? "" : ", no link into a hidden surah"})`);
   await page.goto("about:blank");
 }
 
@@ -3379,6 +3462,7 @@ try {
       continue;
     }
     if (SURAHS_ON) {
+      await curriculumCheck(page, vp, true);
       await endCardShots(page, vp, true);
       await ctx.close();
       continue;
@@ -3420,6 +3504,7 @@ try {
     await composeFitSweep(page, vp, "besar", [1], units);
     await composeFitSweep(page, vp, "sangat-besar", [1, 2, 3, 4, 5, 6, 7], units);
     await comingSoonCheck(page, vp);
+    await curriculumCheck(page, vp, false);
     await endCardShots(page, vp, false);
     await ctx.close();
   }

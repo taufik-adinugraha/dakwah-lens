@@ -7,6 +7,12 @@
 //   - `--hidden`, on the production-like container (no BELAJAR_SURAHS): checkHidden() below;
 //   - no flag, on a container started with every surah listed: checkShown().
 //
+// Both also read the curriculum page (/quran/kurikulum; docs/belajar-plan.md L27), which NAMES
+// every unit of the basic curriculum, the hidden surahs and Ayat Kursi too: curriculumPage()
+// below holds it to content/curriculum.json and to the switch — a lesson is a link only when its
+// surah is published, every other lesson is plain text marked "Belum tersedia", and nothing on
+// the page, rendered or in the RSC payload, leads into a hidden surah.
+//
 // Text checks read the VISIBLE text: <script>, <style> and <template> bodies are removed first,
 // because next-intl serialises the whole message catalogue ("Segera hadir" included) into every
 // page's scripts. Link checks read the whole response: an <a href="/belajar/id/quran/al-ikhlas">,
@@ -38,6 +44,7 @@ const MUAWWIDZAT = ["al-ikhlas", "al-falaq", "an-nas"];
 const SURAH = Object.fromEntries(await Promise.all(SLUGS.map(async (slug) => [slug, await readJson(`content/${slug}.json`)])));
 const BY_NUMBER = Object.fromEntries(SLUGS.map((slug) => [SURAH[slug].surah, slug]));
 const LIBRARY = await readJson("content/library.json");
+const CURRICULUM = await readJson("content/curriculum.json");
 const MSG = { id: await readJson("messages/id.json"), en: await readJson("messages/en.json") };
 const fmt = (template, values) => template.replace(/\{(\w+)\}/g, (all, k) => (k in values ? String(values[k]) : all));
 
@@ -155,6 +162,61 @@ for (const slug of SLUGS) {
   }
 }
 
+/**
+ * The curriculum page (/belajar/{locale}/quran/kurikulum) with `published` surahs visible and
+ * `hidden` ones not, both locales:
+ *   - every lesson of content/curriculum.json is listed once, in the file's order (the page marks
+ *     each one data-lesson, with data-available);
+ *   - a lesson is available exactly when it is a written ayah (the built file carries its derived
+ *     lists) of a published surah, and then the page links that ayah's lesson page; lesson "0"
+ *     (the introduction: no route yet, src/lib/routes.ts lessonHref), the segments of Ayat Kursi
+ *     and every lesson of a hidden surah are not available;
+ *   - "Belum tersedia" (messages, Curriculum.unavailable) is in the visible text once per lesson
+ *     that is not available: the state is said in words;
+ *   - the page links nowhere into a hidden surah (noLinkInto: the server HTML and the RSC payload),
+ *     while it does name every unit, as plain text.
+ */
+async function curriculumPage(published, hidden) {
+  const slugOf = Object.fromEntries(CURRICULUM.units.map((u) => [u.id, u.slug ?? null]));
+  const reachable = (l) => {
+    const slug = slugOf[l.unit];
+    return !!slug && published.includes(slug) && l.ayah !== undefined && l.segment === undefined && !!l.map;
+  };
+  for (const locale of ["id", "en"]) {
+    const path = `/belajar/${locale}/quran/kurikulum`;
+    const { status, html } = await get(path);
+    console.log(`${path} -> ${status}`);
+    if (status !== 200) {
+      fail(path, `status ${status}, expected 200`);
+      continue;
+    }
+    const rows = [...html.matchAll(/<li\b[^>]*\bdata-lesson="([^"]+)" data-available="(true|false)"/g)].map((m) => ({ id: m[1], available: m[2] === "true" }));
+    const want = CURRICULUM.lessons.map((l) => l.id);
+    if (JSON.stringify(rows.map((r) => r.id)) !== JSON.stringify(want)) {
+      fail(path, `lists ${rows.length} lesson(s), not the ${want.length} of content/curriculum.json in its order`);
+    }
+    let linked = 0;
+    for (const l of CURRICULUM.lessons) {
+      const row = rows.find((r) => r.id === l.id);
+      if (!row) continue;
+      const open = reachable(l);
+      if (row.available !== open) fail(path, `lesson ${l.id} is ${row.available ? "available" : "not available"}, expected ${open ? "a link" : "plain text"}`);
+      if (!open) continue;
+      const href = `href="/belajar/${locale}/quran/${slugOf[l.unit]}/${l.ayah}"`;
+      if (html.includes(href)) linked++;
+      else fail(path, `no link to lesson ${l.id} (${href})`);
+    }
+    if (linked === 0) fail(path, "links no lesson at all");
+    noLinkInto(path, html, hidden);
+    const text = visibleText(mainOf(html));
+    const mark = MSG[locale].Curriculum.unavailable;
+    const closed = CURRICULUM.lessons.filter((l) => !reachable(l)).length;
+    if (count(text, mark) !== closed) fail(path, `"${mark}" shown ${count(text, mark)} time(s), expected ${closed}`);
+    for (const u of CURRICULUM.units) if (u.surah !== undefined && !text.includes(u.name)) fail(path, `does not name the unit ${u.name}`);
+    console.log(`  ${linked} lesson(s) linked, ${closed} marked "${mark}"`);
+  }
+}
+
 async function api(expected) {
   const res = await fetch(`${BASE}/belajar/api/surahs`);
   const body = await res.json().catch(() => null);
@@ -257,7 +319,12 @@ async function checkHidden() {
     const soon = MSG[locale].Quran.coming_soon;
     if (count(text, soon) !== hidden.length) fail(path, `"${soon}" shown ${count(text, soon)} time(s), expected ${hidden.length}`);
     for (const slug of hidden) if (!text.includes(SURAH[slug].name_id)) fail(path, `the card of ${slug} does not name it`);
+    // … and it links the curriculum page (plan L27).
+    if (!html.includes(`href="/belajar/${locale}/quran/kurikulum"`)) fail(path, "no link to the curriculum page");
   }
+
+  // 4b. The curriculum page names the hidden surahs as plain text: no lesson of theirs is a link.
+  await curriculumPage(DEFAULT, hidden);
 
   // 5. The hub: "Tersedia sekarang" names the published surahs only, "Segera hadir" the others.
   for (const locale of ["id", "en"]) {
@@ -397,6 +464,8 @@ async function checkShown() {
     if (status !== 308 || path !== to) fail(from, `${status} ${path}, expected 308 ${to}`);
     else if ((await get(to)).status !== 200) fail(to, "not 200 after the redirect");
   }
+  // The curriculum page links every written lesson now; Ayat Kursi and the introduction stay plain.
+  await curriculumPage(SLUGS, []);
   for (const locale of ["id", "en"]) {
     const track = await get(`/belajar/${locale}/quran`);
     if (track.html.includes("data-coming-soon")) fail(`/belajar/${locale}/quran`, 'a "Segera hadir" card with every surah published');

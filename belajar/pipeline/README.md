@@ -1026,6 +1026,13 @@ and `src/components/autoplay/curriculum.test.ts` holds the TypeScript derivation
   `after` (how many steps are learnt), and `map` — `new`, `learnt` (EVERY earlier step, `here`
   where it occurs in this ayah), `later` (a later lesson's step that occurs here), `lanjut`.
 
+**The learner reads it too** (operator, 2026-10-13: "we should also explain this curriculum in the
+page"; plan L27): `/belajar/{locale}/quran/kurikulum` draws this file and nothing else — the units
+in lesson order, each lesson's steps by their `name`, `after` as the running total, `map.learnt`
+(`here`) as what a review lesson repeats, `lanjut` as the closing list
+(`src/lib/curriculumOutline.ts`). A step's `name` is therefore on a public page for every unit,
+written or not.
+
 `validate_curriculum.py` checks, each on its own: lesson ids unique and in a documented form;
 every step in one lesson that exists, at most three a lesson; concept and basics ids exist; a
 Konsep record is taught whole, or split into numbered parts, or next-level — never two of them,

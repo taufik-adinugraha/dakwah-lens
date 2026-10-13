@@ -98,6 +98,7 @@ describe("every place that lists or links surahs reads the switch", () => {
     for (const page of [
       "src/app/[locale]/page.tsx",
       "src/app/[locale]/quran/page.tsx",
+      "src/app/[locale]/quran/kurikulum/page.tsx",
       "src/app/[locale]/konsep/[id]/page.tsx",
       "src/app/[locale]/kosakata/[id]/page.tsx",
       "src/app/[locale]/kredit/page.tsx",
@@ -128,6 +129,7 @@ describe("every place that lists or links surahs reads the switch", () => {
     const allowed = new Set([
       "src/lib/routes.ts", // the helpers themselves
       "src/app/[locale]/quran/page.tsx", // published surahs only; the others are "Segera hadir" cards
+      "src/lib/curriculumOutline.ts", // the curriculum page's lessons: a written ayah of a published surah; the others plain text
       "src/app/[locale]/kosakata/[id]/page.tsx", // published surahs only; the others plain text
       "src/components/library/ConceptCard.tsx", // surahPublished()
       "src/app/[locale]/quran/[surah]/page.tsx", // within its own surah, reached only when published
@@ -139,7 +141,8 @@ describe("every place that lists or links surahs reads the switch", () => {
       .map((f) => `src/${f.split("\\").join("/")}`)
       .filter((f) => /\.(ts|tsx)$/.test(f) && !/\.test\.ts$/.test(f));
     expect(files.length).toBeGreaterThan(20);
-    const linking = files.filter((f) => /\b(ayahHref|surahHref)\(/.test(read(f)));
+    // lessonHref: the curriculum's own link builder (lib/routes.ts), an ayahHref by another name.
+    const linking = files.filter((f) => /\b(ayahHref|surahHref|lessonHref)\(/.test(read(f)));
     for (const f of linking) expect(allowed.has(f), `${f} builds a lesson link: gate it on BELAJAR_SURAHS`).toBe(true);
   });
 
