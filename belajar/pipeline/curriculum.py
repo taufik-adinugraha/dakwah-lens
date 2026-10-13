@@ -339,6 +339,12 @@ def taught_text(content: dict, library: dict, step_id: str) -> tuple[str, str] |
 
 
 # ------------------------------------------------------------------ who owns a term
+def always_steps(cur: dict) -> set[str]:
+    """The steps that occur in EVERY ayah (`occurs.always`: the three kinds of word). A lesson
+    map's "met again" line names one only when no other step is met again (2026-10-13)."""
+    return {s["id"] for s in cur.get("steps") or [] if isinstance(s.get("occurs"), dict) and s["occurs"].get("always") is True}
+
+
 def owners(cur: dict) -> dict[str, str]:
     """term id → the step that teaches it (the first one listed: a term in two steps is the
     validator's finding)."""

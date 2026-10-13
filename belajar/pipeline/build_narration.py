@@ -810,9 +810,11 @@ def map_new(entry: dict, steps: dict) -> str:
     return f"Di ayat ini ada {num_id(len(new))} hal baru: {_names([low(c) for c in new])}."
 
 
-def map_learnt(entry: dict, steps: dict) -> str | None:
-    """How much has been learnt so far, and which of it comes up again in this ayah; None when
-    nothing was learnt before (the first lesson of all)."""
+def map_learnt(entry: dict, steps: dict, always: set[str] | frozenset[str] = frozenset()) -> str | None:
+    """How much has been learnt so far, and which of it comes up again in this ayah — the most
+    recently taught first (validate_narration.named_again; `always`: the steps that occur in every
+    ayah, named only when nothing else is met again); None when nothing was learnt before (the
+    first lesson of all)."""
     low = lambda sid: V._low(steps[sid]["latin"])  # noqa: E731
     learnt = entry["learnt"]
     if not learnt:
@@ -822,9 +824,8 @@ def map_learnt(entry: dict, steps: dict) -> str | None:
     if not again:
         return f"{lead} Tidak ada yang kita temui lagi di ayat ini."
     count = f"Yang kita temui lagi di ayat ini ada {num_id(len(again))}"
-    if len(again) <= MAP_ALL:
-        return f"{lead} {count}: {_names([low(c) for c in again])}."
-    return f"{lead} {count}, di antaranya {_names([low(c) for c in again[:MAP_NAMED_MORE]])}."
+    named, every = V.named_again(entry, always)
+    return f"{lead} {count}{':' if every else ', di antaranya'} {_names([low(c) for c in named])}."
 
 
 def map_later(entry: dict, steps: dict, surah: int) -> str | None:
@@ -889,7 +890,7 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
         # words — one line per group of its card.
         mapped = LM.ayah_entry(lessonmap, A)
         if mapped is not None:
-            said = {"map:new": map_new(mapped, lessonmap["steps"]), "map:learnt": map_learnt(mapped, lessonmap["steps"]),
+            said = {"map:new": map_new(mapped, lessonmap["steps"]), "map:learnt": map_learnt(mapped, lessonmap["steps"], CUR.always_steps(curriculum or {})),
                     "map:later": map_later(mapped, lessonmap["steps"], S)}
             for part in V.map_opening_parts(mapped):
                 add(part, said[part])

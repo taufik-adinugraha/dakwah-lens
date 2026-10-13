@@ -34,6 +34,7 @@ import build_narration as B
 import curriculum as CUR
 import encode_narration as E
 import render_narration as R
+import terms as TERMS
 import validate_narration as V
 
 MANIFESTS, LESSONS, LIBRARY = V.load_all()
@@ -297,7 +298,7 @@ def bad_token_text(ln):
 
 # --- the lesson map's lines (operator 2026-10-13, plan L23 and L26): one per group of the card
 N1, N2, N3, N4 = (f"al-fatihah:{n}:map:new" for n in (1, 2, 3, 4))
-L2, L3, L4 = (f"al-fatihah:{n}:map:learnt" for n in (2, 3, 4))
+L1, L2, L3, L4 = (f"al-fatihah:{n}:map:learnt" for n in (1, 2, 3, 4))
 T1, T3 = (f"al-fatihah:{n}:map:later" for n in (1, 3))
 
 
@@ -614,13 +615,20 @@ MUTATIONS = [
     # what has been learnt so far, and what of it comes up again here
     ("the count of steps learnt so far", both(L2, "mempelajari empat hal.", "mempelajari lima hal."),
      "says lima step(s) learnt so far, the lesson map has 4"),
-    ("the count of repeated steps", both(L2, "ada tiga:", "ada empat:"), "says empat repeated step(s), the lesson map has 3"),
-    ("a repeated step the map does not mark here", both(L3, "dan majrur (مَجْرُور)", "dan huruf jar (حَرْف جَرّ)", "dan مَجْرُور", "dan حَرْف جَرّ"),
-     "names ['kalimah', 'huruf-jar'] as repeated step(s); the lesson map gives ['kalimah', 'majrur']"),
-    ("“di antaranya” where every repeated step is named", both(L3, "ada dua: ", "ada dua, di antaranya "),
-     "“di antaranya” is said exactly when more than 3"),
-    ("two of four repeated steps named without “di antaranya”", both(L4, "ada empat, di antaranya ", "ada empat: "),
-     "“di antaranya” is said exactly when more than 3"),
+    ("the count of repeated steps", both(L2, "ada tiga,", "ada empat,"), "says empat repeated step(s), the lesson map has 3"),
+    ("a repeated step the map does not mark here", both(L3, "di antaranya majrur (مَجْرُور)", "di antaranya huruf jar (حَرْف جَرّ)", "di antaranya مَجْرُور", "di antaranya حَرْف جَرّ"),
+     "names ['huruf-jar'] as repeated step(s)"),
+    # … by recency (decision 8: "preferring the ones taught most recently"), and a step that
+    # occurs in every ayah only when nothing else is met again (2026-10-13)
+    ("the repeated steps named oldest first, as until 2026-10-13",
+     both(L2, "huruf jar (حَرْف جَرّ) dan majrur (مَجْرُور)", "majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ)", "حَرْف جَرّ dan مَجْرُور", "مَجْرُور dan حَرْف جَرّ"),
+     "the most recently taught come first, and a step that occurs in every ayah is named only when no other is met again: ['huruf-jar', 'majrur']"),
+    ("the step that occurs in every ayah named beside another", both(L3, "di antaranya majrur (مَجْرُور).", "di antaranya majrur (مَجْرُور) dan tiga jenis kata.", "di antaranya مَجْرُور.", "di antaranya مَجْرُور dan tiga jenis kata."),
+     "names ['majrur', 'kalimah'] as repeated step(s)"),
+    ("“di antaranya” where every repeated step is named", both(L1, "ada satu: ", "ada satu, di antaranya "),
+     "“di antaranya” is said exactly when not every repeated step is named"),
+    ("some repeated steps named without “di antaranya”", both(L4, "ada empat, di antaranya ", "ada empat: "),
+     "“di antaranya” is said exactly when not every repeated step is named"),
     ("what comes up again left out", first_sentence_only(L3),
      "does not say how many steps have been learnt so far, then which of them come up again here"),
     # what is taught later, and how many next-level topics there are
@@ -690,6 +698,14 @@ MUTATIONS = [
      "al-fatihah:1:w1 no longer uses 'idhafah' too early (stale): remove it"),
     ("a stale term on a listed line", then(more(W, *EARLY), listed(W, ["idhafah", "badal"])),
      "al-fatihah:2:w1 no longer uses 'badal' too early (stale): remove it"),
+    # … also a term the pronunciation dictionary has no entry for, or does not match in the form
+    # the prose writes (2026-10-13): found by the term table's own forms
+    ("a term with no dictionary entry planted before its lesson (zharaf)", more(W, "Kata ini zharaf."),
+     "al-fatihah:2:w1: uses the term 'zharaf' before the lesson that teaches it (taught in 2:255/5)"),
+    ("a next-level term with no dictionary entry (mubalaghah)", more(W, "Ini bentuk mubalaghah."),
+     "al-fatihah:2:w1: uses the term 'mubalaghah' before the lesson that teaches it (taught in tingkat lanjut)"),
+    ("a dictionary term in a form the dictionary does not match (-nya)", more(W, "Badal-nya kata kedua."),
+     "al-fatihah:2:w1: uses the term 'badal' before the lesson that teaches it (taught in 114:2)"),
     ("an entry for a line that does not exist", listed("al-fatihah:2:w99", ["idhafah"]),
      "al-fatihah:2:w99 no longer uses 'idhafah' too early (stale): remove it"),
     ("map:later naming a term that is none of the steps it announces", more(T1, "Juga badal (بَدَل).", "Juga بَدَل."),
@@ -786,7 +802,7 @@ class LessonMapLines(unittest.TestCase):
 
     def test_wording(self):
         n = lambda new: B.map_new(self.entry(new), self.S)  # noqa: E731
-        k = lambda again="", rest="": B.map_learnt(self.entry("", again, rest), self.S)  # noqa: E731
+        k = lambda again="", rest="", always=frozenset(): B.map_learnt(self.entry("", again, rest), self.S, always)  # noqa: E731
         t = lambda later="", lanjut=0: B.map_later(self.entry("", "", "", later, lanjut), self.S, 1)  # noqa: E731
         c = lambda new="", again="", rest="": B.map_closing(self.entry(new, again, rest), self.S)  # noqa: E731
         # what is new: every step named (at most three), a name with a "dan" of its own set apart
@@ -799,11 +815,24 @@ class LessonMapLines(unittest.TestCase):
         self.assertIsNone(k())  # nothing learnt before: no line
         self.assertEqual(k("", "ab"), "Sebelum ayat ini, kita sudah mempelajari dua hal. Tidak ada yang kita temui lagi di ayat ini.")
         self.assertEqual(k("a", "bd"), "Sebelum ayat ini, kita sudah mempelajari tiga hal. Yang kita temui lagi di ayat ini ada satu: na't.")
+        # … the most recently taught first (decision 8), all of them up to three
         self.assertEqual(k("zab", "d"), "Sebelum ayat ini, kita sudah mempelajari empat hal. Yang kita temui lagi di ayat ini ada tiga: "
-                                         "tiga jenis kata, na't, dan badal.")
-        # more than three come up again: two are named
+                                         "badal, na't, dan tiga jenis kata.")
+        # more than three come up again: the two most recent are named
         self.assertEqual(k("zabd", "e"), "Sebelum ayat ini, kita sudah mempelajari lima hal. Yang kita temui lagi di ayat ini ada empat, "
-                                          "di antaranya tiga jenis kata dan na't.")
+                                          "di antaranya idhafah dan badal.")
+        # a step that occurs in every ayah ("z": the three kinds of word) is counted and not named
+        # — so "di antaranya" — unless it is the only one met again
+        self.assertEqual(k("zab", "d", {"z"}), "Sebelum ayat ini, kita sudah mempelajari empat hal. Yang kita temui lagi di ayat ini ada tiga, "
+                                                "di antaranya badal dan na't.")
+        self.assertEqual(k("zabd", "e", {"z"}), "Sebelum ayat ini, kita sudah mempelajari lima hal. Yang kita temui lagi di ayat ini ada empat, "
+                                                 "di antaranya idhafah, badal, dan na't.")
+        self.assertEqual(k("z", "ab", {"z"}), "Sebelum ayat ini, kita sudah mempelajari tiga hal. Yang kita temui lagi di ayat ini ada satu: "
+                                               "tiga jenis kata.")
+        self.assertEqual(V.named_again(self.entry("", "zabde"), {"z"}), (["e", "d"], False))
+        self.assertEqual(V.named_again(self.entry("", "ab"), {"z"}), (["b", "a"], True))
+        # The curriculum says which steps those are.
+        self.assertEqual(CUR.always_steps(CURRICULUM), {"kalimah"})
         # what is taught later: one ayah, two ayat, another surah, more than three
         self.assertIsNone(t())
         self.assertEqual(t("b"), "Ada satu hal lagi di ayat ini, yaitu badal, tetapi baru kita bahas di ayat ketujuh.")
@@ -970,6 +999,29 @@ class LessonMapLines(unittest.TestCase):
         self.assertNotIn("audio", new({"x:3:concept:naat": bare(text + " Lagi.")})["x:3:concept:naat"])
         # a line that kept its id and changed its text loses its audio, as before
         self.assertNotIn("audio", new({"x:1:w1": bare("Kata pertama, lagi.")})["x:1:w1"])
+
+    def test_terms_the_dictionary_does_not_match_are_found_by_the_term_table(self):
+        # 2026-10-13: nafi, zharaf, mubalaghah, maqul al-qaul … have no pronunciation entry, so a
+        # line says them in Latin and the dictionary-only check did not see them; nor a dictionary
+        # term with -nya.
+        ids = V.term_ids(LEX)
+        self.assertNotIn("nafi", set(ids.values()))
+        self.assertNotIn("zharaf", set(ids.values()))
+        self.assertEqual(V.prose_terms("Huruf yang menafikan, lalu zharaf dan maqul al-qaul.", LEX, ids), ["nafi", "zharaf", "maqul-al-qaul"])
+        self.assertEqual(V.prose_terms("Fa'il-nya tersirat, dan shilah-nya dua kata.", LEX, ids), ["fail", "shilah"])
+        # … in the order they stand, among the dictionary's own matches, each once per use
+        self.assertEqual(V.prose_terms("Ini badal, lalu zharaf, lalu na't, lalu zharaf.", LEX, ids), ["badal", "zharaf", "naat", "zharaf"])
+        # A caption shows the same: display forms for the dictionary's, Latin for the rest.
+        sp = B.Speech(LEX)
+        prose = "Ini badal, lalu zharaf, dan fa'il-nya."
+        self.assertEqual(V.caption_terms(sp.shown(sp.mark(prose), None), LEX, ids), V.prose_terms(prose, LEX, ids))
+        # A form that is an ordinary Indonesian word too is the author's call: not found.
+        forms = TERMS.TermForms([{"id": "hal", "forms": ["hal"], "ambiguous_forms": ["hal"]}, {"id": "jar", "forms": ["jar"]},
+                                 {"id": "huruf-jar", "forms": ["huruf jar"]}])
+        self.assertEqual([t for _a, _b, t in forms.spans("Dua hal: huruf jar, lalu jar-nya, bukan jarak.")], ["huruf-jar", "jar"])
+        self.assertEqual(TERMS.TermForms([]).spans("apa saja"), [])
+        # Without the term table beside the ids (a plain dict), only the dictionary's matches.
+        self.assertEqual(V.prose_terms("Ini badal, lalu zharaf.", LEX, dict(ids)), ["badal"])
 
     def test_terms_in_prose_and_caption_agree(self):
         ids = V.term_ids(LEX)

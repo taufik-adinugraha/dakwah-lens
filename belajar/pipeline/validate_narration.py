@@ -155,6 +155,7 @@ import compose as COMPOSE
 import curriculum as CUR
 import lessonmap as LESSONMAP
 import quiz as QUIZ
+import terms as TERMS
 from common import AUTHORED_DIR, BELAJAR, CONTENT_DIR, SURAHS, normalise
 
 NARRATION_DIR = CONTENT_DIR / "narration"
@@ -1831,6 +1832,46 @@ def _map_group(lid: str, what: str, m: re.Match, want: list[str], known: dict[st
     return errs, ids
 
 
+def named_again(entry: dict, always: set[str] | frozenset[str] = frozenset()) -> tuple[list[str], bool]:
+    """Which of the learnt steps met again in an ayah its `map:learnt` line NAMES, in the order
+    it names them, and whether those are all of them.
+
+    By RECENCY (decision 8 of kurikulum-dasar.md: an ayah reviews the earlier topics that occur
+    in it, "preferring the ones taught most recently"): the most recently taught first — all of
+    them up to MAP_ALL, else the MAP_NAMED_MORE most recent. A step that occurs in EVERY ayah
+    (`always`: the three kinds of word, curriculum.always_steps) is named only when nothing else
+    is met again: until 2026-10-13 the line named the steps in teaching order, so "tiga jenis
+    kata" took a slot in every ayah and a long list always opened with the two oldest steps.
+    The count the line says is every step met again, the unnamed ones included (it is the
+    card's count); "di antaranya" is said exactly when not all are named."""
+    again = LESSONMAP.here_ids(entry)
+    recent = [sid for sid in reversed(again) if sid not in always]
+    if not recent:
+        return again, True
+    named = recent if len(recent) <= MAP_ALL else recent[:MAP_NAMED_MORE]
+    return named, len(named) == len(again)
+
+
+def _map_again(lid: str, m: re.Match, entry: dict, known: dict[str, str], always: set[str]) -> list[str]:
+    """The second sentence of a map:learnt line against the map: the count of the steps met
+    again, which of them it names (named_again) and whether it says "di antaranya"."""
+    errs = []
+    again = LESSONMAP.here_ids(entry)
+    if count_value(m.group("n")) != len(again):
+        errs.append(f"{lid}: says {m.group('n')} repeated step(s), the lesson map has {len(again)}")
+    got = named_concepts(m.group("list"), known)
+    if got is None:
+        return errs + [f"{lid}: its repeated step(s) are not a list of the map's step names (“{m.group('list')}”)"]
+    expect, every = named_again(entry, always)
+    ids = [sid for sid, _a in got]
+    if ids != expect:
+        errs.append(f"{lid}: names {ids} as repeated step(s); the most recently taught come first, and a step that "
+                    f"occurs in every ayah is named only when no other is met again: {expect}")
+    if (m.group("some").strip(", ") == "di antaranya") == every:
+        errs.append(f"{lid}: “di antaranya” is said exactly when not every repeated step is named")
+    return errs
+
+
 def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict, curriculum: dict | None = None) -> list[str]:
     """The map and learned lines of every ayah of a surah with a lesson map, read back from their
     captions against content/map/<slug>.json (module docstring, "The lesson map"). The captions
@@ -1902,7 +1943,7 @@ def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict, curricul
                 elif not g:
                     errs.append(f"{lid}: does not say which learnt steps come up again here ({len(again)} in the lesson map)")
                 else:
-                    errs += _map_group(lid, "repeated step(s)", g, again, known)[0]
+                    errs += _map_again(lid, g, entry, known, CUR.always_steps(curriculum or load_curriculum()))
         # --- what is taught later, and how many next-level topics there are
         lid = f"{base}:map:later"
         shown = _field_of(lines, lid, "display")
@@ -2008,18 +2049,51 @@ def term_ids(lex: "Lexicon", table: list[dict] | None = None) -> dict[str, str]:
     authored/library.terms.json id: the two tables spell a term's Arabic alike, byte for byte
     (validate_terms.py). A narrated term the term table does not have — a letter's name, "Allah",
     an example word, "alif lam" — has no id: it is free."""
-    by_ar = {t["ar"]: t["id"] for t in (QUIZ.load_terms() if table is None else table) if t.get("ar")}
-    return {t.term: by_ar[t.term] for t in lex.terms if t.term in by_ar}
+    table = QUIZ.load_terms() if table is None else table
+    by_ar = {t["ar"]: t["id"] for t in table if t.get("ar")}
+    out = TermIds({t.term: by_ar[t.term] for t in lex.terms if t.term in by_ar})
+    out.forms = TERMS.TermForms(table)
+    return out
+
+
+class TermIds(dict):
+    """term_ids' answer, with the term table's own forms beside it (`forms`: terms.TermForms).
+
+    2026-10-13: the pronunciation dictionary alone left a hole in the rule "no term before its
+    lesson". A library term the dictionary has no entry for is written in Latin in a line (nafi,
+    zharaf, mubalaghah, maqul al-qaul …), and a dictionary term the prose writes in a form the
+    dictionary does not match ("fa'il-nya") stays in Latin too: neither was found. What a line
+    USES is therefore the dictionary's matches AND, in the text between them, the term table's
+    forms (terms.unmarked's rule: whole words, with -nya, the longest form, ambiguous forms left
+    to the author)."""
+
+    forms: "TERMS.TermForms | None" = None
+
+
+def _with_latin(text: str, found: list[tuple[int, int, str | None]], ids: dict[str, str]) -> list[str]:
+    """The term ids of `found` — (start, end, id or None) of the dictionary's matches in `text` —
+    together with the term table's forms in the rest of the text, in the order they stand."""
+    forms = getattr(ids, "forms", None)
+    out = [(a, tid) for a, _b, tid in found if tid is not None]
+    if forms is not None:
+        rest = list(text)
+        for a, b, _tid in found:
+            rest[a:b] = " " * (b - a)
+        out += [(a, tid) for a, _b, tid in forms.spans("".join(rest))]
+    return [tid for _a, tid in sorted(out, key=lambda x: x[0])]
 
 
 def prose_terms(prose: str, lex: "Lexicon", ids: dict[str, str]) -> list[str]:
-    """The library terms a line's prose uses, in order (each as often as it is used)."""
-    return [ids[t.term] for _a, _b, t, _cap_ in lex.latin_matches(prose) if t.term in ids]
+    """The library terms a line's prose uses, in order (each as often as it is used): the
+    dictionary terms it writes in Latin, and the term table's forms beside them (TermIds)."""
+    return _with_latin(prose, [(a, b, ids.get(t.term)) for a, b, t, _cap_ in lex.latin_matches(prose)], ids)
 
 
 def caption_terms(display: str, lex: "Lexicon", ids: dict[str, str]) -> list[str]:
-    """The library terms a caption shows, in order: its dictionary display forms."""
-    return [ids[lex._groups[m.lastgroup].term] for m in lex.display_rx.finditer(display) if lex._groups[m.lastgroup].term in ids]
+    """The library terms a caption shows, in order: its dictionary display forms, and the term
+    table's forms in the Latin text between them (what the dictionary did not turn into a
+    display form stands in the caption as the prose wrote it)."""
+    return _with_latin(display, [(m.start(), m.end(), ids.get(lex._groups[m.lastgroup].term)) for m in lex.display_rx.finditer(display)], ids)
 
 
 def later_allowance(entry: dict | None, lessonmap: dict | None, terms_of) -> set[str]:

@@ -518,6 +518,33 @@ def unmarked(text: str, table: dict) -> list[str]:
     return found
 
 
+class TermForms:
+    """The term table's forms as ONE compiled matcher, for texts that carry no markup and are
+    read many times (the narration's lines: validate_narration.prose_terms). The rule is
+    `unmarked`'s: a form as a whole word, also with -nya ("fa'il-nya"), the longest form at each
+    place, and the forms a term lists as `ambiguous_forms` left to the author (they are ordinary
+    Indonesian words too). Apostrophe-like marks are read as one."""
+
+    _APOS = re.compile("[’‘ʼ`']")
+
+    def __init__(self, terms: list[dict]):
+        self.by_form: dict[str, str] = {}
+        for t in terms:
+            amb = {f.lower() for f in t.get("ambiguous_forms", [])}
+            for f in t.get("forms", []):
+                if f.lower() not in amb:
+                    self.by_form.setdefault(self._APOS.sub("'", f.lower()), t["id"])
+        forms = sorted(self.by_form, key=len, reverse=True)
+        self.rx = re.compile(rf"(?<![{_WORD_CHARS}])({'|'.join(re.escape(f) for f in forms)})(?:-?nya)?(?![{_WORD_CHARS}])", re.I) \
+            if forms else None
+
+    def spans(self, text: str) -> list[tuple[int, int, str]]:
+        """(start, end, term id) of every form in `text`, in order."""
+        if self.rx is None:
+            return []
+        return [(m.start(), m.end(), self.by_form[m.group(1).lower()]) for m in self.rx.finditer(self._APOS.sub("'", text))]
+
+
 def mark_terms(text: str, table: dict, ambiguous: bool = False) -> str:
     """`text` (no markup) with every term form marked by id, [[surface|id]], longest form first,
     whole words (the forms `unmarked` finds; with `ambiguous`, the ambiguous forms too). Only for
