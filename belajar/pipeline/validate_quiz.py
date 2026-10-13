@@ -14,7 +14,11 @@ Checks (quiz.py has the rules and their reasons):
      wrong role option shares a term with the answer (two correct options), no sort over one state,
      and TAUGHT(ayah) ⊇ REQUIRED(question) for every question of every ayah — TAUGHT derived from
      the narration lines the lesson plays before the exercises (content/narration/<slug>.json),
-     never a hand list;
+     never a hand list. Since the basic curriculum moved where a concept is taught (2026-10-13,
+     plan L26) the questions that still need an untaught term are listed in
+     authored/curriculum.pending.json `quiz`, held both ways: one that is not listed fails, a
+     listed one that is taught again fails as stale. And no basic lesson asks the wazan exercise
+     (decision 6);
   4. the narration has the intro of every exercise and one explanation line per question
      ("<slug>:<ayah>:ex:<key>:<n>:why"), and nothing for an exercise the plan does not have.
 Prints the per-ayah quiz and what each ayah teaches. Exit 1 on any failure.
@@ -26,6 +30,7 @@ import re
 import sys
 
 import build_quiz as BQ
+import curriculum as CUR
 import quiz as Q
 from common import CONTENT_DIR, SURAHS
 
@@ -48,8 +53,10 @@ def narration_problems(content: dict, manifest: dict | None) -> list[str]:
 
 
 def check(lessons: dict[str, dict], library: dict, terms: Q.Terms, quizzes: dict[str, dict],
-          manifests: dict[str, dict], *, fresh: dict[str, dict] | None = None) -> list[str]:
-    """Every check above; `fresh`: the quiz files a build produces now (default: built here)."""
+          manifests: dict[str, dict], *, fresh: dict[str, dict] | None = None,
+          pending: dict[str, list[str]] | None = None) -> list[str]:
+    """Every check above; `fresh`: the quiz files a build produces now (default: built here);
+    `pending`: authored/curriculum.pending.json `quiz` (default: from disk)."""
     errs: list[str] = []
     if fresh is None:
         try:
@@ -65,7 +72,7 @@ def check(lessons: dict[str, dict], library: dict, terms: Q.Terms, quizzes: dict
             continue
         if Q.dump(content) != Q.dump(fresh.get(sp.slug) or {}):
             errs.append(f"{sp.slug}: content/quiz/{sp.slug}.json is out of date with build_quiz.py (rebuild, do not hand-edit)")
-        errs += Q.plan_problems(content, lessons[sp.slug], library, terms, manifests.get(sp.slug))
+        errs += Q.plan_problems(content, lessons[sp.slug], library, terms, manifests.get(sp.slug), pending)
         errs += narration_problems(content, manifests.get(sp.slug))
     return errs
 
@@ -106,12 +113,16 @@ def main() -> int:
             print(f"{sp.slug}: {n_q} questions — {kind}")
             if c.get("authored"):
                 print("\n".join(report(c, lessons[sp.slug], terms, manifests.get(sp.slug))))
+    listed = CUR.load_pending()["quiz"]
+    if listed:
+        print(f"\ntolerated for now (authored/curriculum.pending.json): {len(listed)} question(s) need a term the lesson has not "
+              "taught by their ayah since the curriculum moved it — " + ", ".join(listed))
     if errs:
         print(f"\nFAIL: {len(errs)} problem(s)")
         for e in errs:
             print("  -", e)
         return 1
-    print("\nOK: every quiz question was taught before it is asked")
+    print("\nOK: every quiz question was taught before it is asked" + (" (but for the listed ones)" if listed else ""))
     return 0
 
 

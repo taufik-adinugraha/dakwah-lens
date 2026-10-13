@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
-"""Builds content/map/<slug>.json — the lesson map of a surah: per ayah, the Konsep that are new
-there, repeated from an earlier ayah, or present but taught later (lessonmap.py has the format and
-the rules; operator 2026-10-13, docs/belajar-plan.md L23) — for every surah that has
-authored/<slug>.map.json (the per-surah switch; Al-Fatihah only today). Derived from
-content/<slug>.json and content/library.json; the names through the narration's own sanitiser and
-pronunciation dictionary. Deterministic, stdlib only, no network, no LLM. Run from
-belajar/pipeline, after build_surah.py / build_library.py and BEFORE build_narration.py (whose
-"map" and "learned" lines read it):
+"""Builds content/map/<slug>.json — the lesson map of a surah, version 2: per ayah, the steps that
+are new there, every step learnt so far (and which of them come up again), the steps present but
+taught later, and the next-level topics (lessonmap.py has the format and the rules; operator
+2026-10-13, docs/belajar-plan.md L23 and L26) — for every surah that has authored/<slug>.map.json
+(the per-surah switch; Al-Fatihah only today). The four lists are the curriculum's
+(content/curriculum.json, build_curriculum.py); a step is named as the curriculum names it, a
+next-level record through the narration's own sanitiser and pronunciation dictionary.
+Deterministic, stdlib only, no network, no LLM. Run from belajar/pipeline, after
+build_curriculum.py and BEFORE build_narration.py (whose map and learned lines read it):
 
     python3 build_map.py            # write content/map/*.json
     python3 build_map.py --check    # exit 1 if a file on disk differs from a fresh build
-    python3 build_map.py --show     # print the new / review / later table and every name
+    python3 build_map.py --show     # print the table and every name
 
-A concept whose caption title gives no clean name stops the build: give it one in
-authored/<slug>.map.json `names`.
+A step whose name the narrator cannot say, a new step with no text, or a next-level record whose
+title gives no clean name stops the build (the last: give it one in authored/<slug>.map.json `names`).
 """
 from __future__ import annotations
 
@@ -22,40 +23,36 @@ import json
 import re
 import sys
 
+import build_curriculum as BC
 import build_narration as B
+import curriculum as CUR
 import lessonmap as LM
 import validate_narration as V
 from common import CONTENT_DIR, SURAHS
 
-
-def load_lessons() -> dict[str, dict]:
-    return {sp.slug: json.loads((CONTENT_DIR / f"{sp.slug}.json").read_text(encoding="utf-8"))
-            for sp in SURAHS if (CONTENT_DIR / f"{sp.slug}.json").exists()}
+load_lessons = BC.load_lessons
 
 
-class Namer:
-    """A concept's name as the narration says and shows it (lessonmap.Namer).
+class Namer(BC.Namer):
+    """The names of a lesson map (lessonmap.Namer).
 
-    From the title: the caption title is written exactly as build_narration.surah_lines writes it
-    for the concept's "Konsep baru: …" line (the sanitised title, in the ayah that introduces it),
-    and the name is what that title opens with (lessonmap.cut_name) — checked against the caption:
-    the title's caption form must open with the name's, at a "," ":" "." ";" or the " (" of its
-    gloss, which is where src/lib/emphasis.ts conceptName ends the name it emphasises.
-    Authored: the explicit name, sanitised in strict mode (a Qur'anic word in it stops the build).
-    Either way the name is at most lessonmap.NAME_WORDS words, passes the narration's own checks
-    (no Qur'anic word, no digit, no Arabic outside the dictionary) and is no word place."""
+    A STEP is named by the curriculum (content/curriculum.json `name` / `latin`,
+    build_curriculum.Namer.step); here its name is only held to what the narrator may say
+    (step_problems), because a map line says it.
 
-    def __init__(self, lessons: dict[str, dict], lex: V.Lexicon | None = None):
-        self.lex = lex or V.load_lexicon()
-        self.san = B.Sanitiser(lessons)
-        self.sp = B.Speech(self.lex)
+    A NEXT-LEVEL RECORD is named from its Konsep title: the title is written as the narration
+    writes a caption title (the sanitised title, read in the ayah of the record's first example),
+    and the name is what that title opens with (lessonmap.cut_name) — its caption form must open
+    the title's, at a "," ":" "." ";" or the " (" of its gloss, which is where src/lib/emphasis.ts
+    conceptName ends a name. Or, authored: the explicit name, sanitised in strict mode. Either way
+    at most lessonmap.NAME_WORDS words, passing the narration's own checks, and no word place."""
 
     def title(self, concept: dict, surah: int, ayah: int) -> str:
         """The caption title's prose (build_narration.surah_lines)."""
         return B._cap(self.san.prose(concept["title"], surah, ayah))
 
-    def shown(self, prose: str) -> str:
-        return self.sp.shown(self.sp.mark(prose), None)
+    def step_problems(self, sid: str, latin: str) -> list[str]:
+        return self.step({"id": sid, "name": latin})[1]
 
     def __call__(self, concept: dict, surah: int, ayah: int, explicit: str | None) -> dict:
         cid = concept["id"]
@@ -94,53 +91,34 @@ class Namer:
         return {"name": name, "latin": latin, "from": source}
 
 
-    def topic(self, cid: str, name: str, note: str, surah: int, ayah: int) -> dict:
-        """An authored later item (lessonmap.py "TOPICS"): its name and its note, sanitised in
-        strict mode like every authored narration text, the name at most NAME_WORDS words. The
-        name is spoken (the map line names it); the note is shown on the card only, in its
-        caption form (dictionary terms with their Arabic)."""
-        try:
-            latin = B._cap(self.san.prose(name, surah, ayah, strict=f"later[{cid}] name"))
-            said = self.san.prose(note, surah, ayah, strict=f"later[{cid}] note")
-        except SystemExit as e:
-            raise LM.MapError(str(e)) from None
-        if len(latin.split()) > LM.NAME_WORDS:
-            raise LM.MapError(f"{cid}: the name {latin!r} is longer than {LM.NAME_WORDS} words")
-        out, errs = {}, []
-        for key, prose in (("name", latin), ("note", said)):
-            marked = self.sp.mark(prose)
-            shown, spoken = self.sp.shown(marked, None), self.sp.spoken(marked)
-            errs += (V.check_text(f"{key} of {cid}", prose, self.san.forms, max_len=None)
-                     + V.check_spoken(f"{key} of {cid}", spoken, self.san.forms, self.lex)
-                     + V.check_display(f"{key} of {cid}", shown, spoken, self.san.forms, self.lex, None))
-            out[key] = shown
-        if errs:
-            raise LM.MapError("; ".join(errs))
-        return {"name": out["name"], "latin": latin, "from": LM.TOPIC, "note": out["note"]}
-
-
 def build_all(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = None,
-              authored: dict[str, dict] | None = None) -> dict[str, dict]:
+              authored: dict[str, dict] | None = None, curriculum: dict | None = None) -> dict[str, dict]:
     """slug → content/map/<slug>.json for every surah with an authored map file. `authored`: the
-    authored files by slug (default: from disk)."""
+    authored files by slug, `curriculum`: content/curriculum.json (both default: from disk)."""
+    curriculum = CUR.load_content() if curriculum is None else curriculum
+    if curriculum is None:
+        raise LM.MapError("content/curriculum.json is missing (run build_curriculum.py first)")
     namer = Namer(lessons, lex)
     slugs = LM.authored_slugs() if authored is None else [sp.slug for sp in SURAHS if sp.slug in authored]
-    return {slug: LM.build(slug, lessons, library, namer, None if authored is None else authored[slug])
+    return {slug: LM.build(slug, lessons, library, curriculum, namer, None if authored is None else authored[slug])
             for slug in slugs if slug in lessons}
 
 
 def table(content: dict) -> list[str]:
-    """The new / review / later table of one map, and each concept's name."""
-    c = content["concepts"]
-    where = lambda cid: f"{cid} (ayat {c[cid]['ayah']})" if c[cid]["surah"] == content["surah"] else f"{cid} (QS {c[cid]['surah']}:{c[cid]['ayah']})"  # noqa: E731
+    """One map: per ayah the four lists, then every name."""
+    steps = content["steps"]
+    where = lambda sid: f"{sid} ({steps[sid]['lesson']})"  # noqa: E731
     out = [f"{content['slug']}:"]
     for a in content["ayat"]:
+        here = LM.here_ids(a)
         out.append(f"  ayat {a['ayah']}: new {len(a['new'])}: {', '.join(a['new']) or '—'}")
-        out.append(f"          review {len(a['review'])}: {', '.join(map(where, a['review'])) or '—'}")
+        out.append(f"          learnt {len(a['learnt'])}, here {len(here)}: {', '.join(here) or '—'}")
         out.append(f"          later {len(a['later'])}: {', '.join(map(where, a['later'])) or '—'}")
-    out.append("  names:")
-    out += [f"    {cid}: {x['name']}  [{x['from']}]" + (f"  — {x['note']}  (taught by {x['line']})" if x["from"] == LM.TOPIC else "")
-            for cid, x in c.items()]
+        out.append(f"          lanjut {len(a['lanjut'])}: {', '.join(a['lanjut']) or '—'}")
+    out.append("  steps:")
+    out += [f"    {sid}: {x['name']}  [{x['lesson']}]" for sid, x in steps.items()]
+    out.append("  next level:")
+    out += [f"    {cid}: {x['name']}  [{x['from']}]" for cid, x in content["lanjut"].items()]
     return out
 
 
@@ -151,14 +129,15 @@ def main() -> int:
     args = ap.parse_args()
     lessons = load_lessons()
     library = json.loads((CONTENT_DIR / "library.json").read_text(encoding="utf-8"))
+    curriculum = CUR.load_content()
     try:
-        built = build_all(lessons, library)
+        built = build_all(lessons, library, curriculum=curriculum)
     except LM.MapError as e:
         print(f"BUILD FAILED: {e}", file=sys.stderr)
         return 1
     failed = False
     for slug, content in built.items():
-        errs = LM.problems(content, lessons, library)
+        errs = LM.problems(content, lessons, library, curriculum)
         if errs:
             print(f"{slug}: BUILD FAILED:\n  " + "\n  ".join(errs), file=sys.stderr)
             failed = True
@@ -183,9 +162,9 @@ def main() -> int:
         path = LM.MAP_DIR / f"{slug}.json"
         if stale(path, LM.dump(content)):
             path.write_text(LM.dump(content), encoding="utf-8")
-        n = {g: sum(len(a[g]) for a in content["ayat"]) for g in LM.GROUPS}
-        print(f"{slug:12s} {len(content['ayat'])} ayat  {len(content['concepts'])} concepts  new {n['new']}  "
-              f"review {n['review']}  later {n['later']}  -> {path.relative_to(CONTENT_DIR.parent)}")
+        new = sum(len(a["new"]) for a in content["ayat"])
+        print(f"{slug:12s} {len(content['ayat'])} ayat  {len(content['steps'])} steps listed ({new} taught here)  "
+              f"{len(content['lanjut'])} next-level records  -> {path.relative_to(CONTENT_DIR.parent)}")
     for slug in orphans:
         print(f"WARN  content/map/{slug}.json has no authored/{slug}.map.json behind it: remove it (it is still read)")
     return 0

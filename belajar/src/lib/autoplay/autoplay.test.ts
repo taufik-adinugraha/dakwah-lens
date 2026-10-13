@@ -39,7 +39,8 @@ import {
   takeContinue,
   type StorageLike,
 } from "./persist";
-import { buildAutoplaySequence, introducedConcepts, sequenceLineIds } from "./sequence";
+import { taughtIn, type CurriculumFile } from "./curriculum";
+import { buildAutoplaySequence, sequenceLineIds } from "./sequence";
 import { ID_TEXTS } from "./texts";
 import { advanceHoldMs, exampleReadMs, partAt, readMs, settleAfterNarrationMs, settleAfterReciteMs, WORD_REPEAT_GAP_MS } from "./timing";
 import { SHARED_KEYS, type AutoplaySequence, type NarrationManifest, type Pace } from "./types";
@@ -50,6 +51,8 @@ const { input, errors: loadErrors } = loadCheckInput((rel) => {
   return existsSync(path) ? readFileSync(path, "utf8") : null;
 });
 const quizOf = (slug: string, n: number) => quizAyahOf(input.quiz?.[slug], n);
+/** What an ayah's lesson teaches as "Konsep baru": the curriculum's steps (plan L26). */
+const taught = (ayah: Parameters<typeof taughtIn>[2]) => taughtIn(input.curriculum as CurriculumFile, input.concepts, ayah);
 
 /** One ayah's sequence, caption-only unless manifests are given. */
 function seqFor(
@@ -65,7 +68,7 @@ function seqFor(
     surahName: surah.name_id,
     ayahCount: surah.ayat.length,
     ayah,
-    introduced: introducedConcepts(input.concepts, ayah.loc),
+    introduced: taught(ayah),
     exercises: availableExercises(quizOf(slug, n)),
     questions: questionNumbers(quizOf(slug, n)),
     texts: ID_TEXTS,
@@ -142,15 +145,17 @@ describe("autoplay sequence", () => {
       "recite_word",
       "explain",
     ]);
-    // The lesson page's order: the new concepts, then the structure that uses them.
+    // The lesson page's order: the new concepts, then the structure that uses them. Which ones
+    // is the curriculum's (plan L26): a whole record, a step's own text (marfu', a part of the
+    // i'rab record), a whole record — and no line for syibhul jumlah, a next-level record.
     expect(kinds.slice(10, 14)).toEqual(["concept", "concept", "concept", "structure"]);
     expect(seq.steps.filter((s) => s.kind === "concept").map((s) => s.id)).toEqual([
       "concept:jumlah-ismiyyah",
-      "concept:syibhul-jumlah",
+      "concept:marfu",
       "concept:jamak-mudzakkar-salim",
     ]);
     // The ayah's quiz (content/quiz, taught before tested since 2026-10-11): marfu' is taught at
-    // its first word, so the case sort comes in; wazan only from ayah 5.
+    // its first word, so the case sort comes in; no wazan exercise at the basic level (decision 6).
     expect(seq.steps.filter((s) => s.kind === "exercise").map((s) => s.exercise?.key)).toEqual([
       "tap-word",
       "sort-case",
@@ -180,7 +185,11 @@ describe("autoplay sequence", () => {
 
   it("waits only at the exercises the page renders (Al-Ikhlas 3 has no graded case endings)", () => {
     const keys = seqFor("al-ikhlas", 3).steps.filter((s) => s.kind === "exercise").map((s) => s.exercise?.key);
-    expect(keys).toEqual(["tap-word", "label-role", "wazn-factory"]);
+    expect(keys).toEqual(["tap-word", "label-role"]);
+    // No basic lesson asks the wazan exercise (kurikulum-dasar.md decision 6, 2026-10-13).
+    for (const surah of input.surahs) {
+      for (const a of surah.ayat) expect(availableExercises(quizOf(surah.slug, a.ayah)), a.loc).not.toContain("wazn-factory");
+    }
   });
 
   it("never puts Arabic script in a caption, and every line id is on the contract", () => {
@@ -396,7 +405,7 @@ describe("autoplay machine", () => {
     const seq = seqFor("al-ikhlas", 3);
     const r = runner(seq);
     r.send({ type: "start" });
-    for (const key of ["tap-word", "label-role", "wazn-factory"] as const) r.send({ type: "exercise_done", key });
+    for (const key of ["tap-word", "label-role"] as const) r.send({ type: "exercise_done", key });
     r.until((s) => s.phase === "waiting" || s.phase === "finished" || s.idx === seq.steps.length - 1);
     expect(r.s.phase).not.toBe("waiting");
     expect(seq.steps[r.s.idx].kind).toBe("next");
@@ -496,7 +505,7 @@ describe("a word's opening step: as long as the imam's word when the narrator ex
   it("the engine's own check refuses a step that recites a word again (checks.ts sequenceProblems)", () => {
     const ayah = input.surahs.find((s) => s.slug === "al-fatihah")?.ayat[1];
     if (!ayah) throw new Error("no Al-Fatihah 2");
-    const ctx = { ayah, last: false, exercises: availableExercises(quizOf("al-fatihah", 2)), introduced: introducedConcepts(input.concepts, ayah.loc), compose: null };
+    const ctx = { ayah, last: false, exercises: availableExercises(quizOf("al-fatihah", 2)), introduced: taught(ayah), compose: null };
     expect(sequenceProblems(plain, ctx)).toEqual([]);
     // What every composition step did until 2026-10-13, planted on a word's explanation.
     const again = structuredClone(plain);

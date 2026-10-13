@@ -18,6 +18,7 @@ import { LessonStage, WordListenButton } from "@/components/lesson/LessonStage";
 import { MaterialsDisclosure } from "@/components/lesson/MaterialsDisclosure";
 import { WordCard } from "@/components/lesson/WordCard";
 import { ConceptCard } from "@/components/library/ConceptCard";
+import { StepCard } from "@/components/library/StepCard";
 import { MixedText } from "@/components/library/MixedText";
 import { SourceList } from "@/components/library/SourceList";
 import { StructureSection } from "@/components/library/StructureSection";
@@ -28,7 +29,8 @@ import { surahNamesFor } from "@/lib/ayat";
 import { composeFor } from "@/lib/compose-content";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
 import { stageExamples } from "@/lib/autoplay";
-import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY, TERMS } from "@/lib/library";
+import { taughtAt, taughtBefore } from "@/lib/curriculum";
+import { getConcept, getLexeme, LIBRARY, TERMS } from "@/lib/library";
 import { lessonMapInput } from "@/lib/map-content";
 import { quizAyah } from "@/lib/quiz-content";
 import { planOf } from "@/lib/quiz-plan";
@@ -160,7 +162,9 @@ export default async function AyahPage({
   // move under /quran so saved progress survives it.
   const key = `${s.slug}/${a.ayah}`;
   const pageTitle = `${s.name_id} · ${t("ayah", { n: a.ayah })}`;
-  const introduced = conceptsIntroducedIn(a.loc);
+  // What this ayah's lesson teaches as "Konsep baru": the curriculum's steps (operator-approved
+  // 2026-10-13, plan L26; at most three), each a whole Konsep record or a step's own text.
+  const introduced = taughtAt(a);
   // The autoplay lesson of this ayah (src/lib/autoplay), built here at build
   // time: captions in the page's locale, narration audio from
   // content/narration/ when it has been rendered.
@@ -210,15 +214,16 @@ export default async function AyahPage({
     sources: tw("sources"),
   };
   const hasDeeper = !!a.structure || introduced.length > 0 || !!a.tafsir || facts.length > 0;
-  // The lesson map of this ayah (operator 2026-10-13, plan L23), for a surah that has one: the
-  // stage's two cards, and on a word card the mark under a concept an earlier ayah already taught.
+  // The lesson map of this ayah (operator 2026-10-13, plan L23 and L26), for a surah that has one:
+  // the stage's cards. With it, a word card marks a concept an EARLIER lesson of the curriculum
+  // taught, under its chip: "sudah dipelajari di ayat 1" — for a record that arrives in parts
+  // (i'rab), the part this word shows (its state). Text only; nothing for a next-level record.
   const lessonMap = lessonMapInput(s.slug, a.ayah);
-  const taughtBefore = Object.fromEntries(
-    (lessonMap?.review ?? []).map((it) => [
-      it.id,
-      it.surah === s.surah ? tw("concept_taught", { n: it.ayah }) : tw("concept_taught_surah", { surah: it.surah, ayah: it.ayah }),
-    ]),
-  );
+  const taughtNote = (w: (typeof a.words)[number], record: string): string | null => {
+    const at = lessonMap ? taughtBefore(a, w, record) : null;
+    if (!at) return null;
+    return at.surah === s.surah ? tw("concept_taught", { n: at.ayah }) : tw("concept_taught_surah", { surah: at.surah, ayah: at.ayah });
+  };
 
   // Through MixedText (line breaks, operator 2026-10-10): the quotes and a
   // footnote mark stay on their word ("pembalasan.[1]”"), "orang-orang" and
@@ -271,8 +276,9 @@ export default async function AyahPage({
             compose={compose && (compose.primer || Object.keys(compose.words).length) ? compose : null}
             examples={examples}
             marks={composeFile?.marks ?? null}
-            // The lesson map's card (operator 2026-10-13, plan L23): what this ayah brings and what
-            // it taught, for a surah that has a map (content/map); the sequence above has its steps.
+            // The lesson map's card (operator 2026-10-13, plan L23 and L26): what this ayah brings,
+            // one group at a time, and what it taught, for a surah that has a map (content/map);
+            // the sequence above has its steps.
             lessonMap={lessonMap}
           />
         </div>
@@ -300,7 +306,7 @@ export default async function AyahPage({
                       lexeme={w.lemma_id ? getLexeme(w.lemma_id) : undefined}
                       concepts={w.concepts.flatMap((id) => {
                         const c = getConcept(id);
-                        return c ? [{ id: c.id, title: c.title, head: conceptHead[c.id], taught: taughtBefore[c.id] ?? null }] : [];
+                        return c ? [{ id: c.id, title: c.title, head: conceptHead[c.id], taught: taughtNote(w, c.id) }] : [];
                       })}
                       lookup={lookup}
                       listen={
@@ -385,16 +391,16 @@ export default async function AyahPage({
                     >
                       <div className="@container">
                         <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
-                          {introduced.map((c) => (
-                            <ConceptCard
-                              key={c.id}
-                              concept={c}
-                              labels={conceptLabels}
-                              surahs={SURAH_INDEX}
-                              wordAr={wordAr}
-                              compact
-                            />
-                          ))}
+                          {introduced.map((it) => {
+                            // A whole Konsep record: its own card. A step with its own text (a
+                            // part of a record, or no record): the same card from that text.
+                            const record = it.whole && it.concept ? getConcept(it.concept) : undefined;
+                            return record ? (
+                              <ConceptCard key={it.id} concept={record} labels={conceptLabels} surahs={SURAH_INDEX} wordAr={wordAr} compact />
+                            ) : (
+                              <StepCard key={it.id} taught={it} labels={{ more: tc("more"), sources: tw("sources") }} />
+                            );
+                          })}
                         </div>
                       </div>
                     </Deeper>

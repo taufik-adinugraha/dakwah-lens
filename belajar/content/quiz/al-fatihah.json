@@ -8,13 +8,7 @@
   "majrur": "majrur (مَجْرُور)",
   "mabni": "mabni (مَبْنِيّ)"
  },
- "labels": {
-  "fi'il amr": "fi'il amr (فِعْل أَمْر)",
-  "fi'il madhi": "fi'il madhi (فِعْل مَاضٍ)",
-  "fi'il mudhari'": "fi'il mudhari' (فِعْل مُضَارِع)",
-  "isim fa'il": "isim fa'il (اِسْم فَاعِل)",
-  "isim maf'ul": "isim maf'ul (اِسْم مَفْعُول)"
- },
+ "labels": {},
  "ayat": [
   {
    "ayah": 1,
@@ -461,47 +455,6 @@
        "why": "Akhirnya dhammah (ضَمَّة) dengan alasan yang sama seperti na‘budu (نَعْبُدُ): fi'il mudhari' (فِعْل مُضَارِع) tanpa huruf penashab (نَاصِب) atau penjazm (جَازِم)."
       }
      ]
-    },
-    {
-     "key": "wazn-factory",
-     "questions": [
-      {
-       "n": 1,
-       "lexeme": "abada",
-       "label": "fi'il mudhari'",
-       "options": [
-        "fi'il mudhari'",
-        "isim fa'il"
-       ]
-      },
-      {
-       "n": 2,
-       "lexeme": "istaana",
-       "label": "isim fa'il",
-       "options": [
-        "isim fa'il",
-        "fi'il mudhari'"
-       ]
-      },
-      {
-       "n": 3,
-       "lexeme": "abada",
-       "label": "isim fa'il",
-       "options": [
-        "isim fa'il",
-        "fi'il mudhari'"
-       ]
-      },
-      {
-       "n": 4,
-       "lexeme": "istaana",
-       "label": "fi'il mudhari'",
-       "options": [
-        "fi'il mudhari'",
-        "isim fa'il"
-       ]
-      }
-     ]
     }
    ]
   },
@@ -551,51 +504,6 @@
        "word": 3,
        "sign": "fathah (فَتْحَة)",
        "why": "Akhirnya fathah (فَتْحَة) karena menjadi sifat (نَعْت) bagi aṣ-ṣirāṭa (ٱلصِّرَٰطَ) yang manshub (مَنْصُوب)."
-      }
-     ]
-    },
-    {
-     "key": "wazn-factory",
-     "questions": [
-      {
-       "n": 1,
-       "lexeme": "hada",
-       "label": "fi'il amr",
-       "options": [
-        "fi'il amr",
-        "fi'il mudhari'",
-        "isim fa'il"
-       ]
-      },
-      {
-       "n": 2,
-       "lexeme": "mustaqim",
-       "label": "isim fa'il",
-       "options": [
-        "isim fa'il",
-        "fi'il mudhari'",
-        "fi'il amr"
-       ]
-      },
-      {
-       "n": 3,
-       "lexeme": "hada",
-       "label": "fi'il mudhari'",
-       "options": [
-        "fi'il mudhari'",
-        "fi'il amr",
-        "isim fa'il"
-       ]
-      },
-      {
-       "n": 4,
-       "lexeme": "mustaqim",
-       "label": "fi'il amr",
-       "options": [
-        "fi'il amr",
-        "fi'il mudhari'",
-        "isim fa'il"
-       ]
       }
      ]
     }
@@ -732,51 +640,6 @@
          "from": "1:1:2",
          "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
         }
-       ]
-      }
-     ]
-    },
-    {
-     "key": "wazn-factory",
-     "questions": [
-      {
-       "n": 1,
-       "lexeme": "anama",
-       "label": "fi'il madhi",
-       "options": [
-        "fi'il madhi",
-        "fi'il mudhari'",
-        "isim fa'il"
-       ]
-      },
-      {
-       "n": 2,
-       "lexeme": "maghdub",
-       "label": "isim maf'ul",
-       "options": [
-        "isim maf'ul",
-        "fi'il madhi",
-        "fi'il mudhari'"
-       ]
-      },
-      {
-       "n": 3,
-       "lexeme": "dall",
-       "label": "isim fa'il",
-       "options": [
-        "isim fa'il",
-        "fi'il madhi",
-        "fi'il mudhari'"
-       ]
-      },
-      {
-       "n": 4,
-       "lexeme": "anama",
-       "label": "isim fa'il",
-       "options": [
-        "isim fa'il",
-        "fi'il madhi",
-        "isim maf'ul"
        ]
       }
      ]

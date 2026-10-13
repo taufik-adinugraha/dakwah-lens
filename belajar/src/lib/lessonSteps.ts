@@ -25,7 +25,7 @@
  * imports only): scripts/autoplay-check.ts runs it under tsx without
  * node_modules.
  */
-import type { Ayah, Concept } from "@/content/schema";
+import type { Ayah } from "@/content/schema";
 
 export type LessonStep =
   | { kind: "recite_ayah"; id: string; caption: string }
@@ -245,7 +245,8 @@ export function splitCaption(text: string, max = MAX_CAPTION): string[] {
 
 export function buildLessonSteps(
   ayah: Ayah,
-  introduced: Concept[],
+  /** What the ayah's lesson teaches as "Konsep baru" (src/lib/curriculum.ts taughtAt). */
+  introduced: readonly { id: string; title: string; summary: string }[],
   texts: StepTexts,
 ): LessonStep[] {
   const steps: LessonStep[] = [

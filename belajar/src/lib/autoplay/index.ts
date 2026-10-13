@@ -5,7 +5,7 @@
  * Typical use (lesson page → client runner):
  *   const quiz = quizAyah(slug, a.ayah);   // content/quiz (src/lib/quiz-content.ts)
  *   const seq = buildAutoplaySequence({ slug, surahName, ayahCount, ayah: a,
- *     introduced: conceptsIntroducedIn(a.loc), exercises: availableExercises(quiz),
+ *     introduced: taughtAt(a), exercises: availableExercises(quiz),   // src/lib/curriculum.ts
  *     questions: questionNumbers(quiz), texts: ID_TEXTS, narration, shared,
  *     // the example beats (plan L20): lessonExamples({ ayah: a, introduced, compose, clips, wordAt })
  *     examples });
@@ -20,6 +20,7 @@ export * from "./ids";
 export * from "./timing";
 export * from "./exercises";
 export * from "./examples";
+export * from "./curriculum";
 export * from "./lessonMap";
 export * from "./narration";
 export * from "./texts";

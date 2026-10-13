@@ -39,7 +39,12 @@ Two kinds of plan:
       concept step's summary, as ", atau <term>" naming the thing just described ("kata keduanya,
       atau mudhaf ilaih"). A term only mentioned ("ia manshub") or only glossed after an
       Indonesian word ("pengganti (badal)", "objek (maf'ul bih)") is NOT taught (decision 6,
-      2026-10-11).
+      2026-10-11). Since the basic curriculum moved where a concept is taught (operator-approved
+      2026-10-13, plan L26: a "Konsep baru" line is said in the lesson the curriculum gives it),
+      a question written before it may need a term its ayah no longer teaches: such a question
+      is listed in authored/curriculum.pending.json `quiz` ("<slug>:<ayah>:<exercise>:<n>" → the
+      terms), and held both ways — an untaught term that is not listed fails, and a listed one
+      that is taught again fails as stale (curriculum.pending_problems). The list only shrinks.
 - MECHANICAL (every other surah: the Mu'awwidzat, hidden on the live site since 2026-10-10): the
   exercises as the components built them before, except that wrong options come only from the
   ayat studied so far within the surah (the one rule that is mechanical; no teaching is authored
@@ -63,6 +68,7 @@ import re
 import unicodedata
 from pathlib import Path
 
+import curriculum as CUR
 from common import AUTHORED_DIR, CONTENT_DIR, SURAHS
 
 QUIZ_DIR = CONTENT_DIR / "quiz"
@@ -71,6 +77,13 @@ QUIZ_VERSION = 1
 
 # The five exercises, in page order (mirrors src/components/exercises/guide.ts EXERCISE_KEYS).
 EXERCISE_KEYS = ("tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory")
+# What a lesson of the BASIC level asks (operator-approved 2026-10-13, kurikulum-dasar.md decision
+# 6: "All sharaf is 'tingkat lanjut' … The wazan badge and the wazn-factory exercise leave the
+# basic lessons"). Every lesson surah today is a unit of the basic curriculum, so no plan has the
+# wazan exercise: the authored Al-Fatihah plan lost its twelve questions, the mechanical plan no
+# longer makes any, and plan_problems refuses one. The exercise itself — its component, its
+# narration texts, its builder below — is kept for the next level.
+BASIC_EXERCISES = tuple(k for k in EXERCISE_KEYS if k != "wazn-factory")
 # The case states a beginner sorts and is asked "why" about (src/lib/cases.ts SORT_BINS).
 SORT_BINS = ("marfu", "manshub", "majrur", "mabni")
 # Case state → its term in the table.
@@ -527,7 +540,7 @@ def mechanical_plan(lesson: dict, library: dict) -> dict:
                 picked = seeded_shuffle(others, f"{lid}/{f['label']}")[:2]
                 labels = [f["label"]] + [next(o["label"] for o in forms if o["ar"] == x) for x in picked]
                 wazn.append({"lexeme": lid, "label": f["label"], "options": labels})
-        if len(wazn) >= 2:
+        if len(wazn) >= 2 and "wazn-factory" in BASIC_EXERCISES:
             plan["wazn-factory"] = wazn
         out[str(a["ayah"])] = plan
     return {"ayat": out}
@@ -764,14 +777,49 @@ def required(ex: dict, q: dict, lesson: dict, ayah: dict, terms: Terms, quiz: di
     return need
 
 
+def question_key(slug: str, ayah: int, exercise: str, n: int) -> str:
+    """How authored/curriculum.pending.json names a question: "<slug>:<ayah>:<exercise>:<n>"."""
+    return f"{slug}:{ayah}:{exercise}:{n}"
+
+
+def untaught_reasons(quiz: dict, lesson: dict, terms: Terms, manifest: dict | None) -> dict[str, dict[str, str]]:
+    """{question key: {term id: why the lesson has not taught it by that ayah}} — TAUGHT ⊇ REQUIRED
+    for every question of an AUTHORED plan (a mechanical one is not taught-checked); {} without
+    the narration manifest."""
+    if not quiz.get("authored") or manifest is None:
+        return {}
+    slug = lesson["slug"]
+    taught_at = taught(manifest, lesson, terms)
+    out: dict[str, dict[str, str]] = {}
+    for a in lesson["ayat"]:
+        n = a["ayah"]
+        for ex in ayah_plan(quiz, n):
+            for q in ex.get("questions") or []:
+                for tid, what in required(ex, q, lesson, a, terms, quiz).items():
+                    if tid in taught_at[n]:
+                        continue
+                    later = next((m for m in sorted(taught_at) if tid in taught_at[m]), None)
+                    out.setdefault(question_key(slug, n, ex["key"], q["n"]), {})[tid] = (
+                        f"{slug} {n} {ex['key']} q{q['n']}: needs {terms.by_id[tid]['latin']!r} ({what}), not taught by the end "
+                        f"of ayah {n}" + (f" (first taught in ayah {later})" if later else " (never taught)"))
+    return out
+
+
+def untaught(quiz: dict, lesson: dict, terms: Terms, manifest: dict | None) -> dict[str, list[str]]:
+    """{question key: [term id…]}: what build_narration.py --write-pending lists."""
+    return {key: list(why) for key, why in untaught_reasons(quiz, lesson, terms, manifest).items()}
+
+
 # ------------------------------------------------------------------ the checks
-def plan_problems(quiz: dict, lesson: dict, library: dict, terms: Terms, manifest: dict | None) -> list[str]:
-    """Every rule of the module docstring; the taught check needs the narration manifest."""
+def plan_problems(quiz: dict, lesson: dict, library: dict, terms: Terms, manifest: dict | None,
+                  pending: dict[str, list[str]] | None = None) -> list[str]:
+    """Every rule of the module docstring; the taught check needs the narration manifest.
+    `pending`: authored/curriculum.pending.json `quiz` (default: from disk) — the questions that
+    may still need an untaught term."""
     errs: list[str] = []
     slug = lesson["slug"]
     lex = {x["id"]: x for x in library["lexicon"]}
     authored = bool(quiz.get("authored"))
-    taught_at = taught(manifest, lesson, terms) if (authored and manifest is not None) else None
     for a in lesson["ayat"]:
         n = a["ayah"]
         words = a["words"]
@@ -786,6 +834,9 @@ def plan_problems(quiz: dict, lesson: dict, library: dict, terms: Terms, manifes
             where = f"{where0} {key}"
             if not qs:
                 errs.append(f"{where}: no questions")
+            if key not in BASIC_EXERCISES:
+                errs.append(f"{where}: a basic lesson does not ask the wazan exercise (decision 6 of the basic curriculum: "
+                            "all sharaf is tingkat lanjut)")
             if [q.get("n") for q in qs] != list(range(1, len(qs) + 1)):
                 errs.append(f"{where}: questions must be numbered 1, 2, …")
             if key == "tap-word":
@@ -852,12 +903,16 @@ def plan_problems(quiz: dict, lesson: dict, library: dict, terms: Terms, manifes
                         errs.append(f"{where} q{q['n']}: options {opts} must be two or more distinct forms of {q['lexeme']}")
                     elif len({forms[o] for o in opts}) != len(opts):
                         errs.append(f"{where} q{q['n']}: two options are the same Arabic form (two correct options)")
-            if taught_at is None:
-                continue
-            for q in qs:
-                for tid, what in required(ex, q, lesson, a, terms, quiz).items():
-                    if tid not in taught_at[n]:
-                        later = next((m for m in sorted(taught_at) if tid in taught_at[m]), None)
-                        errs.append(f"{where} q{q['n']}: needs {terms.by_id[tid]['latin']!r} ({what}), not taught by the end "
-                                    f"of ayah {n}" + (f" (first taught in ayah {later})" if later else " (never taught)"))
+    if not authored or manifest is None:
+        return errs
+    # TAUGHT ⊇ REQUIRED, and the list of questions that may still fail it, held both ways.
+    listed = {k: v for k, v in ((CUR.load_pending()["quiz"] if pending is None else pending) or {}).items()
+              if k.startswith(slug + ":")}
+    found = untaught_reasons(quiz, lesson, terms, manifest)
+    for key, why in found.items():
+        errs += [msg for tid, msg in why.items() if tid not in (listed.get(key) or [])]
+    for key, tids in listed.items():
+        for tid in tids if isinstance(tids, list) else []:
+            if tid not in (found.get(key) or {}):
+                errs.append(f"authored/curriculum.pending.json: quiz {key} no longer needs {tid!r} untaught (stale): remove it")
     return errs

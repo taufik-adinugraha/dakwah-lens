@@ -1,0 +1,40 @@
+/**
+ * The basic curriculum (content/curriculum.json, pipeline/build_curriculum.py), validated at BUILD
+ * time like the lesson content: the zod shape, then the derivation (./autoplay/curriculum.ts) —
+ * every ayah on disk is a lesson, and the lines and lists the file gives for it are the ones the
+ * lessons' own words give under the curriculum's steps. A mismatch fails `next build` instead of
+ * reaching a learner.
+ *
+ * WHERE a topic is taught comes from here (operator-approved 2026-10-13, plan L26). `taughtAt` is
+ * what library.conceptsIntroducedIn was until then (the Konsep records whose first example stood
+ * in the ayah): the "Konsep baru" items of the ayah's lesson — at most three, a whole record or a
+ * step's own text.
+ */
+import raw from "../../content/curriculum.json";
+
+import { CurriculumFile, type CurriculumFile as File } from "@/content/curriculum-schema";
+import type { Ayah } from "@/content/schema";
+
+import { curriculumProblems, taughtEarlier, taughtIn, type Taught } from "./autoplay/curriculum";
+import { SURAHS } from "./content";
+import { LIBRARY } from "./library";
+
+const parsed = CurriculumFile.safeParse(raw);
+if (!parsed.success) {
+  throw new Error(`content/curriculum.json does not match the schema:\n${JSON.stringify(parsed.error.issues.slice(0, 10), null, 2)}`);
+}
+const problems = curriculumProblems(parsed.data, SURAHS, LIBRARY.concepts);
+if (problems.length) throw new Error(`content/curriculum.json:\n${problems.slice(0, 10).join("\n")}`);
+
+export const CURRICULUM: File = parsed.data;
+
+/** The "Konsep baru" items of an ayah's lesson, in the order their lines are said. */
+export function taughtAt(ayah: Ayah): Taught[] {
+  return taughtIn(CURRICULUM, LIBRARY.concepts, ayah);
+}
+
+/** Where an EARLIER lesson taught what a Konsep tag on `word` shows, or null (the word card's
+ *  "sudah dipelajari di ayat N"; ./autoplay/curriculum.ts taughtEarlier). */
+export function taughtBefore(ayah: Ayah, word: Ayah["words"][number], record: string) {
+  return taughtEarlier(CURRICULUM, ayah, word, record);
+}

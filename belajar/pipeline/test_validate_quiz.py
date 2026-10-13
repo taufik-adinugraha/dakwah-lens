@@ -4,10 +4,12 @@ in a copy of the authored Al-Fatihah plan (then rebuilt, as build_quiz.py would)
 file, of the narration manifest or of the library — and asserts the guard fails with the expected
 message; the unmutated copies must pass. Faults the operator named (2026-10-10, rule 16) come first:
 a question on a case state not taught yet, a wrong option the lesson has not taught (or from an ayah
-not studied yet), a question with two correct options, a wazan quiz on a form never taught. Also
-unit-tests TAUGHT (a glossed term is not taught, decision 6 of 2026-10-11), the cause classes, the
-Arabic labels and the port of the components' seeded shuffle. Standard library only; run from
-belajar/pipeline:
+not studied yet), a question with two correct options, a wazan quiz on a form never taught. Since the basic
+curriculum (operator-approved 2026-10-13, plan L26): a wazan exercise in a basic lesson, and the
+list of questions that may still need an untaught term (authored/curriculum.pending.json `quiz`),
+held both ways. Also unit-tests TAUGHT (a glossed term is not taught, decision 6 of 2026-10-11),
+the cause classes, the Arabic labels and the port of the components' seeded shuffle. Standard
+library only; run from belajar/pipeline:
 
     python3 test_validate_quiz.py
 """
@@ -19,6 +21,7 @@ import sys
 import unittest
 
 import build_quiz as BQ
+import curriculum as CUR
 import quiz as Q
 import validate_quiz as VQ
 from common import CONTENT_DIR, SURAHS
@@ -31,9 +34,11 @@ AUTHORED = {sp.slug: Q.load_authored(sp.slug) for sp in SURAHS}
 QUIZZES = Q.load_all_content()
 MANIFESTS = {sp.slug: json.loads((CONTENT_DIR / "narration" / f"{sp.slug}.json").read_text(encoding="utf-8"))
              for sp in SURAHS}
+# The questions that may still need an untaught term (authored/curriculum.pending.json `quiz`).
+PENDING = CUR.load_pending()["quiz"]
 
 
-def run(authored=None, quizzes=None, manifests=None, library=None, *, rebuild=True):
+def run(authored=None, quizzes=None, manifests=None, library=None, *, rebuild=True, pending=None):
     """The guard over copies; with `rebuild`, the quiz files are built from the (mutated) plans first,
     as build_quiz.py would (so a plan fault is caught by the plan's own checks, not as a stale file)."""
     authored = copy.deepcopy(AUTHORED) if authored is None else authored
@@ -45,15 +50,44 @@ def run(authored=None, quizzes=None, manifests=None, library=None, *, rebuild=Tr
         return [f"build_quiz.py fails: {e}"]
     if quizzes is None:
         quizzes = copy.deepcopy(fresh) if rebuild else copy.deepcopy(QUIZZES)
-    return VQ.check(LESSONS, library, TERMS, quizzes, manifests, fresh=fresh)
+    return VQ.check(LESSONS, library, TERMS, quizzes, manifests, fresh=fresh,
+                    pending=copy.deepcopy(PENDING) if pending is None else pending)
 
 
-def plan(fn):
-    """A fault in the authored Al-Fatihah plan."""
+def plan(fn, lib=None):
+    """A fault in the authored Al-Fatihah plan (`lib`: and one in the library with it)."""
     def f():
         a = copy.deepcopy(AUTHORED)
         fn(a[SLUG]["ayat"])
-        return run(authored=a)
+        library_ = None
+        if lib is not None:
+            library_ = copy.deepcopy(LIBRARY)
+            lib(library_)
+        return run(authored=a, library=library_)
+    return f
+
+
+def listed(fn):
+    """A fault in authored/curriculum.pending.json `quiz`."""
+    def f():
+        p = copy.deepcopy(PENDING)
+        fn(p)
+        return run(pending=p)
+    return f
+
+
+# The wazan exercise left the basic lessons (decision 6, 2026-10-13), and the guard still knows its
+# rules: a fault in one is planted in a plan that asks it again (which the guard refuses as well).
+WAZN_5 = [{"lexeme": "abada", "label": "fi'il mudhari'", "options": ["isim fa'il"]},
+          {"lexeme": "istaana", "label": "isim fa'il", "options": ["fi'il mudhari'"]}]
+WAZN_7 = [{"lexeme": "anama", "label": "fi'il madhi", "options": ["fi'il mudhari'", "isim fa'il"]},
+          {"lexeme": "maghdub", "label": "isim maf'ul", "options": ["fi'il madhi", "fi'il mudhari'"]}]
+
+
+def with_wazn(n: int, questions: list[dict], then=lambda qs: None):
+    def f(ayat):
+        ayat[str(n)]["wazn-factory"] = copy.deepcopy(questions)
+        then(ayat[str(n)]["wazn-factory"])
     return f
 
 
@@ -85,9 +119,10 @@ def q_of(ayat, n, key, i):
     return ayat[str(n)][key][i]
 
 
-def drop_line(lid):
+def drop_line(*lids):
     def f(lines):
-        lines.pop(lid)
+        for lid in lids:
+            lines.pop(lid)
     return f
 
 
@@ -107,7 +142,7 @@ MUTATIONS = [
     ("… and its terms untaught (mabni at ayah 1)",
      plan(lambda a: q_of(a, 1, "why-harakat", 0)["distractors"].__setitem__(0, "1:5:1")), "needs 'mabni' (option from 1:5:1), not taught by the end of ayah 1 (first taught in ayah 5)"),
     ("a role option only glossed so far (badal at ayah 2)",
-     plan(lambda a: q_of(a, 2, "label-role", 0)["distractors"].__setitem__(2, "1:2:3")), "needs 'badal' (option from 1:2:3), not taught by the end of ayah 2 (first taught in ayah 7)"),
+     plan(lambda a: q_of(a, 2, "label-role", 0)["distractors"].__setitem__(2, "1:2:3")), "needs 'badal' (option from 1:2:3), not taught by the end of ayah 2 (never taught)"),
     ("two correct options: a role option sharing the answer's term (na't atau badal beside badal)",
      plan(lambda a: q_of(a, 7, "label-role", 0)["distractors"].__setitem__(1, "1:2:3")), "option from 1:2:3 shares ['badal'] with the answer"),
     ("two correct options: huruf jar + majrur beside khabar (jar-majrur)",
@@ -115,9 +150,13 @@ MUTATIONS = [
     ("two correct options: two reasons of the same cause (two na't)",
      plan(lambda a: q_of(a, 1, "why-harakat", 3)["distractors"].__setitem__(1, "1:1:3")), "two options give the same cause"),
     ("two correct options: two wazan forms with the same Arabic",
-     library(wazn_same_form), "two options are the same Arabic form"),
+     plan(with_wazn(7, WAZN_7), wazn_same_form), "two options are the same Arabic form"),
     ("a wazan form never taught (mashdar at ayah 5)",
-     plan(lambda a: q_of(a, 5, "wazn-factory", 0)["options"].append("mashdar")), "needs 'mashdar' (form label 'mashdar'), not taught by the end of ayah 5 (never taught)"),
+     plan(with_wazn(5, WAZN_5, lambda qs: qs[0]["options"].append("mashdar"))),
+     "needs 'mashdar' (form label 'mashdar'), not taught by the end of ayah 5 (never taught)"),
+    # Decision 6 of the basic curriculum (2026-10-13): all sharaf is tingkat lanjut.
+    ("the wazan exercise asked in a basic lesson (ayah 5)", plan(with_wazn(5, WAZN_5)),
+     "al-fatihah 5 wazn-factory: a basic lesson does not ask the wazan exercise"),
     ("a wazan quiz before its forms are taught (ayah 3)",
      plan(lambda a: a["3"].__setitem__("wazn-factory", [{"lexeme": "rahman", "label": "fi'il madhi", "options": ["fi'il mudhari'"]},
                                                          {"lexeme": "rahman", "label": "fi'il mudhari'", "options": ["fi'il madhi"]}])),
@@ -126,10 +165,14 @@ MUTATIONS = [
      plan(lambda a: a["5"].__setitem__("label-role", [{"word": 1, "distractors": ["1:2:1"]}, {"word": 2, "distractors": ["1:2:1"]}])),
      "needs \"maf'ul bih\" (option from 1:5:1), not taught by the end of ayah 5 (first taught in ayah 6)"),
     # The teaching the plan rests on.
-    ("the marfu' teaching line removed (al-ḥamdu, ayah 2)",
-     manifest(drop_line("al-fatihah:2:w1:compose:8")), "needs \"marfu'\" (the bin marfu), not taught by the end of ayah 2"),
-    ("the manshub teaching line removed (aṣ-ṣirāṭa, ayah 6)",
-     manifest(drop_line("al-fatihah:6:w2:compose:6")), "needs 'manshub' (the bin manshub), not taught by the end of ayah 6"),
+    # Each state is taught twice now: by its word's line ("… disebut marfu'") and by its own step of
+    # the curriculum ("Konsep baru: Marfu', dan tandanya: dhammah").
+    ("the marfu' teaching lines removed (al-ḥamdu and the step marfu', ayah 2)",
+     manifest(drop_line("al-fatihah:2:w1:compose:8", "al-fatihah:2:concept:marfu")),
+     "needs \"marfu'\" (the bin marfu), not taught by the end of ayah 2"),
+    ("the manshub teaching lines removed (aṣ-ṣirāṭa and the step manshub, ayah 6)",
+     manifest(drop_line("al-fatihah:6:w2:compose:6", "al-fatihah:6:concept:manshub")),
+     "needs 'manshub' (the bin manshub), not taught by the end of ayah 6"),
     # The structure rules.
     ("a wrong option from a later ayah, its term taught (yaumi at ayah 3)",
      plan(lambda a: q_of(a, 3, "why-harakat", 0)["distractors"].__setitem__(1, "1:4:2")), "option from 1:4:2, an ayah not studied yet"),
@@ -138,7 +181,7 @@ MUTATIONS = [
     ("a sort word outside the bins (mabni missing at ayah 5)",
      plan(lambda a: a["5"]["sort-case"]["bins"].remove("mabni")), "is mabni, not one of the bins"),
     ("a wazan lexeme of another ayah (hada at ayah 5)",
-     plan(lambda a: q_of(a, 5, "wazn-factory", 0).__setitem__("lexeme", "hada")), "hada is not the lemma of a word of this ayah"),
+     plan(with_wazn(5, WAZN_5, lambda qs: qs[0].__setitem__("lexeme", "hada"))), "hada is not the lemma of a word of this ayah"),
     ("a tap word without timing", plan(lambda a: a["1"]["tap-word"]["words"].append(9)), "build_quiz.py fails"),
     ("the quiz file edited by hand", quizfile(lambda q: q["ayat"][0]["exercises"][1]["questions"][0]["options"].pop()),
      "content/quiz/al-fatihah.json is out of date"),
@@ -146,6 +189,16 @@ MUTATIONS = [
      "narration line al-fatihah:2:ex:label-role:1:why missing"),
     ("an explanation line for no question", manifest(lambda ls: ls.__setitem__("al-fatihah:2:ex:label-role:9:why", ls["al-fatihah:2:ex:label-role:1:why"])),
      "al-fatihah:2:ex:label-role:9:why has no exercise or question in the quiz"),
+    # The questions the curriculum left with an untaught term (authored/curriculum.pending.json
+    # `quiz`), both ways: not listed → fails; listed and taught → stale.
+    ("a question that needs an untaught term and is not listed (the list emptied)", listed(lambda p: p.clear()),
+     "al-fatihah 1 why-harakat q1: needs 'mudhaf ilaih'"),
+    ("one term of a listed question taken off its entry", listed(lambda p: p["al-fatihah:1:why-harakat:1"].remove("naat")),
+     "al-fatihah 1 why-harakat q1: needs \"na't\""),
+    ("a stale entry: a question whose terms are all taught", listed(lambda p: p.__setitem__("al-fatihah:5:sort-case:1", ["mabni"])),
+     "quiz al-fatihah:5:sort-case:1 no longer needs 'mabni' untaught (stale): remove it"),
+    ("a stale term on a listed question", listed(lambda p: p["al-fatihah:1:why-harakat:1"].append("majrur")),
+     "quiz al-fatihah:1:why-harakat:1 no longer needs 'majrur' untaught (stale): remove it"),
 ]
 
 
@@ -161,7 +214,29 @@ class Taught(unittest.TestCase):
         self.assertNotIn("badal", self.t[2])      # "pengganti (badal)" in 2:structure
         self.assertNotIn("maful-bih", self.t[5])  # "objek (maf'ul bih)" in 5:structure
         self.assertNotIn("mashdar", self.t[7])    # "mashdar (kata benda perbuatan)" only
-        self.assertIn("badal", self.t[7])
+        # Badal is taught at An-Nas 2 now (decision 4 of the basic curriculum): no line of
+        # Al-Fatihah names it any more.
+        self.assertNotIn("badal", self.t[7])
+        self.assertIn("fiil-madhi", self.t[7])
+        self.assertNotIn("fiil-madhi", self.t[6])
+
+    def test_the_listed_questions_are_what_the_guard_finds(self):
+        # authored/curriculum.pending.json `quiz` is exactly what TAUGHT ⊇ REQUIRED fails on today
+        # (build_narration.py --write-pending writes it from the same function).
+        self.assertEqual(Q.untaught(QUIZZES[SLUG], LESSONS[SLUG], TERMS, MANIFESTS[SLUG]), PENDING)
+        for key in PENDING:
+            slug, ayah, exercise, n = key.split(":")
+            self.assertEqual(key, Q.question_key(slug, int(ayah), exercise, int(n)))
+        # A mechanical plan is not taught-checked, so none of its questions is listed.
+        self.assertTrue(all(k.startswith(SLUG + ":") for k in PENDING))
+
+    def test_no_wazan_exercise_in_a_basic_lesson(self):
+        # Decision 6 (2026-10-13): the authored plan has none, and the mechanical plans make none.
+        for slug, content in QUIZZES.items():
+            keys = {ex["key"] for a in content["ayat"] for ex in a["exercises"]}
+            self.assertNotIn("wazn-factory", keys, slug)
+            self.assertLessEqual(keys, set(Q.BASIC_EXERCISES), slug)
+        self.assertEqual(QUIZZES[SLUG]["labels"], {})
 
     def test_patterns(self):
         d = lambda part, text: {t for t, _ in Q.defined_terms(part, text, TERMS)}  # noqa: E731

@@ -78,17 +78,26 @@ const EN: AutoplayTexts = {
       next: "Click the marked button to continue.",
     },
   },
-  lessonMap: ({ new: fresh, review, later }) =>
-    [
-      fresh ? `This ayah has ${fresh} new ${fresh === 1 ? "thing" : "things"} to learn.` : "This ayah has nothing new.",
-      review ? `We repeat ${review} we have already learnt.` : "",
-      later ? `${later} more ${later === 1 ? "is" : "are"} explained later.` : "",
-      "The list is on the screen.",
-    ]
-      .filter(Boolean)
-      .join(" "),
-  learned: ({ new: fresh }) =>
-    fresh ? `In this ayah we have learnt ${fresh} new ${fresh === 1 ? "thing" : "things"}. The list is on the screen.` : "This ayah had nothing new.",
+  lessonMap: {
+    new: ({ new: fresh }) =>
+      fresh ? `This ayah has ${fresh} new ${fresh === 1 ? "thing" : "things"} to learn. The list is on the screen.` : "This ayah has nothing new.",
+    learnt: ({ learnt, here }) =>
+      `Before this ayah, we have learnt ${learnt} ${learnt === 1 ? "thing" : "things"}. ` +
+      (here ? `${here} of them ${here === 1 ? "comes" : "come"} up again in this ayah; the list is on the screen.` : "None of them comes up again in this ayah."),
+    later: ({ later, lanjut }) =>
+      [
+        later ? `${later} more ${later === 1 ? "thing is" : "things are"} in this ayah and explained later.` : "",
+        lanjut ? `${later ? "There" : "In this ayah there"} ${lanjut === 1 ? "is" : "are"}${later ? " also" : ""} ${lanjut} advanced ${lanjut === 1 ? "topic" : "topics"}, which the basic level does not cover.` : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
+  },
+  learned: ({ new: fresh, total, here }) =>
+    fresh
+      ? `In this ayah we learnt ${fresh} new ${fresh === 1 ? "thing" : "things"}. That makes ${total} learnt so far.`
+      : here
+        ? `This ayah had nothing new; it repeated ${here} ${here === 1 ? "thing" : "things"} we have already learnt.`
+        : "This ayah had nothing new.",
   recap: "Listen to the whole ayah once more, and recite along with the imam.",
   next: ({ ayah }) => `This ayah's lesson is complete. Next: ayah ${ayah}.`,
   done: ({ surah }) => `This ayah's lesson is complete. It is the last ayah of surah ${surah}.`,

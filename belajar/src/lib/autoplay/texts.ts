@@ -56,23 +56,32 @@ export const ID_TEXTS: AutoplayTexts = {
       next: "Klik tombol yang ditandai untuk melanjutkan.",
     },
   },
-  // The card beside the caption names the concepts (the narration's own line names a few of them).
-  lessonMap: ({ new: fresh, review, later }) =>
-    [
-      fresh ? `Di ayat ini ada ${fresh} hal baru.` : "Di ayat ini tidak ada hal baru.",
-      review ? `Kita mengulang ${review} hal yang sudah dipelajari.` : "",
-      later ? `Ada ${later} hal lagi yang baru dibahas nanti.` : "",
-      "Daftarnya ada di layar.",
-    ]
-      .filter(Boolean)
-      .join(" "),
-  learned: ({ new: fresh }) =>
-    fresh ? `Di ayat ini kita sudah mempelajari ${fresh} hal baru. Daftarnya ada di layar.` : "Di ayat ini tidak ada hal baru.",
+  // The card beside the caption names the steps (the narration's own lines name them, or a few of
+  // a long group); one caption per group of the card.
+  lessonMap: {
+    new: ({ new: fresh }) => (fresh ? `Di ayat ini ada ${fresh} hal baru. Daftarnya ada di layar.` : "Di ayat ini tidak ada hal baru."),
+    learnt: ({ learnt, here }) =>
+      `Sebelum ayat ini, kita sudah mempelajari ${learnt} hal. ` +
+      (here ? `Yang kita temui lagi di ayat ini ada ${here}; daftarnya ada di layar.` : "Tidak ada yang kita temui lagi di ayat ini."),
+    later: ({ later, lanjut }) =>
+      [
+        later ? `Ada ${later} hal lagi di ayat ini, tetapi baru kita bahas nanti.` : "",
+        lanjut ? `${later ? "Ada juga" : "Di ayat ini ada"} ${lanjut} hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.` : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
+  },
+  learned: ({ new: fresh, total, here }) =>
+    fresh
+      ? `Di ayat ini kita mempelajari ${fresh} hal baru. Dengan itu, sudah ${total} hal yang kita pelajari.`
+      : here
+        ? `Di ayat ini tidak ada hal baru; kita mengulang ${here} hal yang sudah kita pelajari.`
+        : "Di ayat ini tidak ada hal baru.",
   recap: "Dengarkan sekali lagi seluruh ayatnya, dan ikuti bacaan imam.",
   next: ({ ayah }) => `Pelajaran ayat ini selesai. Berikutnya, ayat ${ayah}.`,
   done: ({ surah }) => `Pelajaran ayat ini selesai. Ini ayat terakhir surah ${surah}.`,
   // Short on purpose: the card beside it shows the word, its transliteration and its meaning, and
-  // a beat lasts at least its caption's reading time (35 beats in Al-Fatihah).
+  // a beat lasts at least its caption's reading time (25 beats in Al-Fatihah).
   example: {
     word: ({ n, translit }) => `Contoh: kata ke-${n}, ${translit}.`,
     other: ({ translit, surah, ayah }) => `Contoh lain: ${translit}, di QS ${surah}:${ayah}.`,

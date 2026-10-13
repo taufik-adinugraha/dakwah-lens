@@ -7,22 +7,27 @@ import { type ComponentProps, createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
-import { LessonMapCard, type LessonMapCardKind } from "@/components/lesson/LessonMapCard";
+import { LessonMapCard, type LessonMapCardGroup } from "@/components/lesson/LessonMapCard";
 import { WordCard } from "@/components/lesson/WordCard";
 import {
   availableExercises,
   buildAutoplaySequence,
   createAutoplayState,
-  deriveLessonMap,
   hasArabicScript,
   lessonMapInputOf,
   lessonMapProblems,
   LINE_ID_RE,
+  MAP_ARABIC_GLOSS,
+  MAP_GROUPS,
+  MAP_HERE_FULL,
+  MAP_LATER_FULL,
+  mapHere,
+  mapLatinName,
+  mapOpening,
+  mapTotal,
   parseLineId,
-  presentConcepts,
   reduceAutoplay,
   type AutoplayEvent,
-  type LessonMapAyah,
   type LessonMapFile,
   type LessonMapInput,
   type NarrationManifest,
@@ -30,8 +35,8 @@ import {
 import { loadCheckInput, sequenceProblems } from "@/lib/autoplay/checks";
 import { composeInput } from "@/lib/compose-content";
 import { SURAHS } from "@/lib/content";
+import { CURRICULUM, taughtAt } from "@/lib/curriculum";
 import { captionSpans } from "@/lib/emphasis";
-import { conceptsIntroducedIn, LIBRARY } from "@/lib/library";
 import { lessonMapFor, lessonMapInput, MAPPED_SLUGS } from "@/lib/map-content";
 import { quizAyah } from "@/lib/quiz-content";
 
@@ -43,18 +48,20 @@ import { captionText, karaokeParts, stageCaption } from "./caption";
 import { narrationFor } from "./manifests";
 import { AUTOPLAY_TEXT_SETS } from "./texts";
 
-// THE LESSON MAP (operator 2026-10-13, docs/belajar-plan.md L23): "at the beginning of the ayat,
-// better to inform what concept we will learn in this ayat, also explain maybe we skip some concept
-// and will visit later in next ayat instead of explaining all concepts in 1 ayat. for example marfu'
-// also exist in ayat-1, but we skipt the lesson to be done in ayat2. so at the beginning we inform
-// what will be learnt, in the end recap what we've learnt" — "if some concept already done in
-// previous ayat, we say we repeat what we've learnt before".
+// THE LESSON MAP, version 2 (operator 2026-10-13, docs/belajar-plan.md L23: "at the beginning of
+// the ayat, better to inform what concept we will learn in this ayat, also explain maybe we skip
+// some concept and will visit later in next ayat … so at the beginning we inform what will be
+// learnt, in the end recap what we've learnt" — and, with the basic curriculum, L26: "so the
+// knowledge is accummulating and repeated"; "but separate new vs already knows concept, this is
+// what new, this is what we've learnt so far").
 //
-// What is new, repeated and taught later is DERIVED (src/lib/autoplay/lessonMap.ts; the pipeline's
-// twin is pipeline/lessonmap.py, whose file content/map/<slug>.json the page reads). Here: the
-// derivation pinned on Al-Fatihah, the file held to it, the names (the ones the "Konsep baru: …"
-// captions use), the two steps of the autoplay sequence, the per-surah switch, and the card.
-// That a browser DRAWS the cards is checked in CI (scripts/ci/screenshots.mjs lessonMapChecks).
+// What is new, learnt so far, taught later and next-level in an ayah is the CURRICULUM's
+// (curriculum.test.ts holds content/curriculum.json to the lessons); content/map/<slug>.json
+// carries those lists for a surah that is switched on, each step with its name. Here: the file
+// held to the curriculum, the names (the ones the "Konsep baru: …" captions use), the steps of the
+// autoplay sequence — ONE PER GROUP, in step with the narrator —, the per-surah switch, and the
+// card, one group at a time. That a browser DRAWS the cards is checked in CI
+// (scripts/ci/screenshots.mjs lessonMapChecks).
 
 // The word card links its concepts through the app's Link; no router is mounted in a unit test.
 vi.mock("@/i18n/navigation", () => ({
@@ -65,127 +72,70 @@ vi.mock("@/i18n/navigation", () => ({
 const BELAJAR = fileURLToPath(new URL("../../../", import.meta.url));
 const FATIHAH = SURAHS.find((s) => s.slug === "al-fatihah")!;
 const FILE = lessonMapFor("al-fatihah")!;
+const OPENING = MAP_GROUPS.map((g) => `map:${g}`);
 
-/** Al-Fatihah, measured on 2026-10-13: ayah → [new, review, later]. The sets and the counts are
- *  the operator's measurement; review and later are in the order they are taught. */
-const TABLE: Record<number, [string[], string[], string[]]> = {
-  1: [["kalimah-isim-fiil-huruf", "tanda-irab", "huruf-jar", "idhafah", "naat"], [], ["syibhul-jumlah"]],
-  2: [["jumlah-ismiyyah", "syibhul-jumlah", "jamak-mudzakkar-salim"], ["tanda-irab", "huruf-jar", "idhafah", "naat"], ["wazan-dan-tashrif", "badal"]],
-  3: [["wazan-dan-tashrif"], ["naat"], []],
-  4: [["isim-fail"], ["idhafah", "naat", "wazan-dan-tashrif"], []],
-  5: [["murab-mabni", "dhamir", "taqdim-maful", "fiil-mudhari", "jumlah-filiyyah", "athaf", "bab-istifal", "ilal"], ["kalimah-isim-fiil-huruf"], ["maful-bih"]],
-  6: [["fiil-amr", "maful-bih"], ["tanda-irab", "naat", "isim-fail", "dhamir", "bab-istifal", "ilal"], []],
+/** Al-Fatihah, measured on 2026-10-13 (the same table as pipeline/test_validate_map.py and
+ *  curriculum.test.ts): ayah → [new, the learnt steps that occur here, later, lanjut]. */
+const TABLE: Record<number, [string[], string[], string[], string[]]> = {
+  1: [["majrur", "huruf-jar"], ["kalimah"], ["alif-lam", "naat", "idhafah"], ["syibhul-jumlah"]],
+  2: [["jumlah-ismiyyah", "marfu", "jamak-mudzakkar-salim"], ["kalimah", "majrur", "huruf-jar"], ["alif-lam", "naat", "idhafah", "badal"], ["syibhul-jumlah", "wazan-dan-tashrif"]],
+  3: [["alif-lam", "naat"], ["kalimah", "majrur"], [], ["wazan-dan-tashrif"]],
+  4: [["idhafah"], ["kalimah", "majrur", "alif-lam", "naat"], [], ["wazan-dan-tashrif", "isim-fail"]],
+  5: [["dhamir", "fiil-mudhari", "murab-mabni"], ["kalimah", "marfu"], ["jumlah-filiyyah", "maful-bih", "athaf"], ["taqdim-maful", "bab-istifal", "ilal"]],
+  6: [["jumlah-filiyyah", "maful-bih", "manshub"], ["kalimah", "alif-lam", "naat", "dhamir"], ["fiil-amr"], ["isim-fail", "bab-istifal", "ilal"]],
   7: [
-    ["badal", "isim-maushul", "fiil-madhi", "bab-ifal", "isim-maful", "naib-fail"],
-    ["kalimah-isim-fiil-huruf", "huruf-jar", "idhafah", "jamak-mudzakkar-salim", "isim-fail", "murab-mabni", "dhamir", "jumlah-filiyyah", "athaf"],
-    [],
+    ["isim-maushul", "fiil-madhi", "athaf"],
+    ["kalimah", "majrur", "huruf-jar", "jamak-mudzakkar-salim", "alif-lam", "idhafah", "dhamir", "murab-mabni", "jumlah-filiyyah", "manshub"],
+    ["badal"],
+    ["isim-fail", "bab-ifal", "isim-maful", "naib-fail"],
   ],
 };
-/** Where each postponed concept is taught. */
-const LATER_AT: Record<string, number> = { "syibhul-jumlah": 2, "wazan-dan-tashrif": 3, badal: 7, "maful-bih": 6, marfu: 2 };
-/** The authored later items the file adds to the derivation (operator 2026-10-13: "in ayat-1, it
- *  mentions 'bentuk tertentu' but no explanation about marfu' itself, better to inform it will be
- *  learnt later"): ayah → topic ids, after the concepts taught in the same ayah. */
-const TOPICS: Record<number, string[]> = { 1: ["marfu"] };
-/** The file's table: the derivation plus the topics. */
-const FILE_TABLE: Record<number, [string[], string[], string[]]> = Object.fromEntries(
-  Object.entries(TABLE).map(([n, [fresh, review, later]]) => [n, [fresh, review, [...later, ...(TOPICS[Number(n)] ?? [])]]]),
-);
-
-const asTable = (ayat: readonly LessonMapAyah[]) => Object.fromEntries(ayat.map((a) => [a.ayah, [a.new, a.review, a.later]]));
-
-describe("the lesson map: what is new, repeated and taught later (derived)", () => {
-  it("Al-Fatihah: the table of 2026-10-13", () => {
-    const derived = deriveLessonMap(SURAHS, LIBRARY.concepts, 1);
-    expect(asTable(derived)).toEqual(TABLE);
-    expect(derived.map((a) => [a.new.length, a.review.length, a.later.length])).toEqual([
-      [5, 0, 1],
-      [3, 4, 2],
-      [1, 1, 0],
-      [1, 3, 0],
-      [8, 1, 1],
-      [2, 6, 0],
-      [6, 9, 0],
-    ]);
-    // 26 concepts are taught in the surah, each in exactly one ayah.
-    const all = derived.flatMap((a) => a.new);
-    expect(all).toHaveLength(26);
-    expect(new Set(all).size).toBe(26);
-  });
-
-  it("new(ayah) is the library's rule for the ayah's Konsep baru lines; every concept on a word is new, repeated or postponed", () => {
-    const rank = new Map(SURAHS.flatMap((s) => s.ayat).map((a, i) => [a.loc, i]));
-    const taught = new Map(LIBRARY.concepts.map((c) => [c.id, c.examples[0].loc.split(":").slice(0, 2).join(":")]));
-    for (const s of SURAHS) {
-      const derived = deriveLessonMap(SURAHS, LIBRARY.concepts, s.surah);
-      expect(derived.map((a) => a.ayah)).toEqual(s.ayat.map((a) => a.ayah));
-      s.ayat.forEach((a, i) => {
-        const d = derived[i];
-        expect(d.new, a.loc).toEqual(conceptsIntroducedIn(a.loc).map((c) => c.id));
-        const here = rank.get(a.loc)!;
-        for (const c of d.review) expect(rank.get(taught.get(c)!)!, `${a.loc} review ${c}`).toBeLessThan(here);
-        for (const c of d.later) expect(rank.get(taught.get(c)!)!, `${a.loc} later ${c}`).toBeGreaterThan(here);
-        const present = presentConcepts(a);
-        for (const c of [...d.review, ...d.later]) expect(present, `${a.loc} ${c}`).toContain(c);
-        // … each in exactly one group.
-        const grouped = [...d.new, ...d.review, ...d.later];
-        expect(new Set(grouped).size, a.loc).toBe(grouped.length);
-        for (const c of present) expect(grouped, `${a.loc} ${c}`).toContain(c);
-      });
-    }
-    // Across surahs: Al-Ikhlas repeats what Al-Fatihah taught.
-    expect(deriveLessonMap(SURAHS, LIBRARY.concepts, 112)[0].review).toContain("fiil-amr");
-  });
-
-  it("a structure group's concept counts as present (today each one is tagged on a word too)", () => {
-    for (const s of SURAHS) {
-      for (const a of s.ayat) {
-        const tagged = new Set(a.words.flatMap((w) => w.concepts));
-        for (const g of a.structure?.groups ?? []) if (g.concept) expect(tagged.has(g.concept), `${a.loc} ${g.concept}`).toBe(true);
-      }
-    }
-    const a = FATIHAH.ayat[2];
-    const extra = { ...a, structure: { ...a.structure!, groups: [...a.structure!.groups, { words: [1], label: "x", concept: "badal" }] } };
-    expect(presentConcepts(extra)).toEqual([...presentConcepts(a), "badal"]);
-    const moved = SURAHS.map((s) => ({ ayat: s.ayat.map((x) => (x.loc === a.loc ? extra : x)) }));
-    expect(deriveLessonMap(moved, LIBRARY.concepts, 1)[2].later).toEqual(["badal"]);
-  });
-});
+const LEARNT_BEFORE = [2, 4, 7, 9, 10, 13, 16];
+const asTable = (file: LessonMapFile) =>
+  Object.fromEntries(file.ayat.map((a) => [a.ayah, [a.new, a.learnt.filter((x) => x.here).map((x) => x.id), a.later, a.lanjut]]));
 
 describe("the lesson map file (content/map) and the per-surah switch", () => {
-  it("content/map/al-fatihah.json is the derivation (plus its authored later items), with where each is taught", () => {
-    expect(asTable(FILE.ayat)).toEqual(FILE_TABLE);
-    expect(lessonMapProblems(FILE, SURAHS, LIBRARY.concepts)).toEqual([]);
-    for (const [cid, ayah] of Object.entries(LATER_AT)) expect([FILE.concepts[cid].surah, FILE.concepts[cid].ayah]).toEqual([1, ayah]);
-    expect(Object.keys(FILE.concepts)).toHaveLength(27);
+  it("content/map/al-fatihah.json carries the curriculum's lists, each step named and placed as the curriculum has it", () => {
+    expect(asTable(FILE)).toEqual(TABLE);
+    expect(FILE.ayat.map((a) => a.learnt.length)).toEqual(LEARNT_BEFORE);
+    expect(lessonMapProblems(FILE, CURRICULUM)).toEqual([]);
+    for (const a of FILE.ayat) {
+      const lesson = CURRICULUM.lessons.find((l) => l.id === `1:${a.ayah}`)!;
+      expect({ new: a.new, learnt: a.learnt, later: a.later, lanjut: a.lanjut }, `ayah ${a.ayah}`).toEqual(lesson.map);
+    }
+    // 19 steps learnt by the end of the surah (two of them in the lesson with no ayah), and two
+    // more that Al-Fatihah shows and An-Nas teaches; nine next-level records, named and not taught.
+    expect(Object.keys(FILE.steps)).toHaveLength(21);
+    expect(Object.entries(FILE.steps).filter(([, s]) => !/^(?:0|1:\d)$/.test(s.lesson)).map(([sid, s]) => [sid, s.lesson])).toEqual([
+      ["fiil-amr", "114:1"],
+      ["badal", "114:2"],
+    ]);
+    expect(Object.keys(FILE.lanjut)).toEqual(["syibhul-jumlah", "wazan-dan-tashrif", "isim-fail", "taqdim-maful", "bab-istifal", "ilal", "bab-ifal", "isim-maful", "naib-fail"]);
+    // New and already-learnt are always apart (decision 9), and "learnt" is cumulative.
+    let before: string[] = [];
+    for (const a of FILE.ayat) {
+      const learnt = a.learnt.map((x) => x.id);
+      const every = [...a.new, ...learnt, ...a.later];
+      expect(new Set(every).size, `ayah ${a.ayah}`).toBe(every.length);
+      if (a.ayah > 1) expect(learnt, `ayah ${a.ayah}`).toEqual(before);
+      before = [...learnt, ...a.new];
+    }
   });
 
-  it("marfu' is shown in ayah 1 and taught in ayah 2: an authored later item, held to the line that names it", () => {
-    const c = FILE.concepts.marfu;
-    expect(c).toEqual({ name: "Marfu’ (مَرْفُوع)", latin: "Marfu'", from: "topic", note: "mengapa bentuk dasar berakhir dhammah (ضَمَّة)", surah: 1, ayah: 2, line: "al-fatihah:2:w1:compose:8" });
-    expect(LIBRARY.concepts.some((x) => x.id === "marfu")).toBe(false);
+  it("marfu' is a step of the curriculum now (it was an authored “later” item of ayah 1)", () => {
+    // Operator 2026-10-13: "in ayat-1, it mentions 'bentuk tertentu' but no explanation about
+    // marfu' itself, better to inform it will be learnt later".
+    expect(FILE.steps.marfu).toEqual({ name: "Marfu’ (مَرْفُوع)", latin: "Marfu'", lesson: "1:2" });
     const lines = narrationFor("al-fatihah")!.lines;
-    expect(lines[c.line!].display).toContain(`disebut ${c.name.toLowerCase()}`);
-    // Ayah 1 never names it — it only points ahead, where the learner wonders.
-    for (const [lid, l] of Object.entries(lines)) {
-      if (lid.startsWith("al-fatihah:1:") && !lid.endsWith(":map")) expect(l.display!.toLowerCase(), lid).not.toContain("marfu");
-    }
-    expect(lines["al-fatihah:1:w1:compose:3"].display).toMatch(/tanda bunyi u di atas huruf mim \(مُ\)\. Mengapa dhammah \(ضَمَّة\), kita pelajari di ayat kedua\.$/);
-    // In the lesson: one of ayah 1's two postponed things, with its note.
-    expect(lessonMapInput("al-fatihah", 1)!.later).toEqual([
-      { id: "syibhul-jumlah", name: FILE.concepts["syibhul-jumlah"].name, surah: 1, ayah: 2 },
-      { id: "marfu", name: c.name, surah: 1, ayah: 2, note: c.note },
-    ]);
-    // Refused: a topic listed as new or repeated, one not taught later, one without its line.
-    const fault = (fn: (f: LessonMapFile) => void) => {
-      const f = structuredClone(FILE) as LessonMapFile;
-      fn(f);
-      return lessonMapProblems(f, SURAHS, LIBRARY.concepts).join("\n");
-    };
-    expect(fault((f) => f.ayat[0].review.push(...f.ayat[0].later.splice(1)))).toContain("topic marfu is listed as review");
-    expect(fault((f) => f.ayat[1].later.push("marfu"))).toContain("topic marfu is taught in 1:2, which is not a later ayah");
-    expect(fault((f) => delete f.concepts.marfu.line)).toContain("topic marfu needs its note and a teaching line of ayah 2");
-    expect(fault((f) => (f.concepts.marfu.line = "al-fatihah:3:w1"))).toContain("topic marfu needs its note and a teaching line of ayah 2");
+    expect(lines["al-fatihah:2:concept:marfu"].display).toMatch(/^Konsep baru: Marfu’ \(مَرْفُوع\), dan tandanya: dhammah \(ضَمَّة\)\./);
+    // Ayah 1 has no marfu' word, so its map no longer lists it; no line of ayah 1 names the term,
+    // and the sentence that points ahead there stays (the curriculum teaches marfu' in ayah 2).
+    expect(FILE.ayat[0].later).not.toContain("marfu");
+    for (const [lid, l] of Object.entries(lines)) if (lid.startsWith("al-fatihah:1:")) expect(l.display!.toLowerCase(), lid).not.toContain("marfu");
+    expect(lines["al-fatihah:1:w1:compose:3"].display).toMatch(/Mengapa dhammah \(ضَمَّة\), kita pelajari di ayat kedua\.$/);
+    // From ayah 3 on it is learnt, and marked wherever a word is marfu' (the two verbs of ayah 5).
+    expect(lessonMapInput("al-fatihah", 3)!.learnt.find((x) => x.id === "marfu")).toMatchObject({ here: false });
+    expect(lessonMapInput("al-fatihah", 5)!.learnt.find((x) => x.id === "marfu")).toMatchObject({ here: true });
   });
 
   it("only a surah the pipeline switched on has a map: the files, the loader and the authored switches agree", () => {
@@ -214,67 +164,105 @@ describe("the lesson map file (content/map) and the per-surah switch", () => {
     }
   });
 
-  it("a file that lies about the lessons is refused (planted faults)", () => {
+  it("an ayah's map as the lesson takes it: names, what comes up again, where a postponed step is taught", () => {
+    const m = lessonMapInput("al-fatihah", 6)!;
+    expect(m.new.map((x) => x.name)).toEqual(["Jumlah fi’liyyah (جُمْلَة فِعْلِيَّة)", "Maf’ul bih (مَفْعُول بِه)", "Manshub (مَنْصُوب)"]);
+    expect(mapHere(m).map((x) => x.id)).toEqual(TABLE[6][1]);
+    expect(mapTotal(m)).toBe(16);
+    // Fi'il amr is taught in An-Nas 1: another surah.
+    expect(m.later).toEqual([{ id: "fiil-amr", name: FILE.steps["fiil-amr"].name, surah: 114, ayah: 1 }]);
+    expect(lessonMapInput("al-fatihah", 1)!.later.map((x) => [x.id, x.surah, x.ayah])).toEqual([
+      ["alif-lam", 1, 3],
+      ["naat", 1, 3],
+      ["idhafah", 1, 4],
+    ]);
+    expect(m.lanjut.map((x) => x.name)).toEqual(["Isim fa’il (اِسْم فَاعِل)", "Bab istif‘āl (اِسْتِفْعَال)", "I’lal (إِعْلَال)"]);
+    // Which opening groups an ayah has: what is new always; learnt once something was; later when
+    // a step is postponed or a next-level topic is there.
+    const made = (o: Partial<LessonMapInput>): LessonMapInput => ({ surah: 1, new: [], learnt: [], later: [], lanjut: [], ...o });
+    expect(mapOpening(made({}))).toEqual(["new"]);
+    expect(mapOpening(made({ learnt: [{ id: "a", name: "A", here: false }] }))).toEqual(["new", "learnt"]);
+    expect(mapOpening(made({ lanjut: [{ id: "x", name: "X" }] }))).toEqual(["new", "later"]);
+    expect(mapOpening(m)).toEqual(["new", "learnt", "later"]);
+    for (const a of FATIHAH.ayat) expect(mapOpening(lessonMapInput("al-fatihah", a.ayah)!), a.loc).toEqual(["new", "learnt", "later"]);
+    expect(mapLatinName("Mu’rab (مُعْرَب) dan mabni (مَبْنِيّ)")).toBe("Mu’rab dan mabni");
+    expect(mapLatinName("Tiga jenis kata")).toBe("Tiga jenis kata");
+  });
+
+  it("a file that lies about the curriculum is refused (planted faults)", () => {
     const fault = (fn: (f: LessonMapFile) => void) => {
       const f = structuredClone(FILE) as LessonMapFile;
       fn(f);
-      return lessonMapProblems(f, SURAHS, LIBRARY.concepts).join("\n");
+      return lessonMapProblems(f, CURRICULUM).join("\n");
     };
     const entry = (f: LessonMapFile, n: number) => f.ayat.find((a) => a.ayah === n)!;
-    // later ⊆ the ayah's concepts, and really taught later; review really taught earlier.
-    expect(fault((f) => entry(f, 1).later.push("badal"))).toContain("ayah 1: later");
-    expect(fault((f) => entry(f, 3).later.push(...entry(f, 3).review.splice(0)))).toMatch(/ayah 3: review[\s\S]*ayah 3: later/);
-    expect(fault((f) => entry(f, 1).review.push(...entry(f, 1).later.splice(0)))).toContain("ayah 1: review");
-    // new is the ayah's concept lines, in their order.
+    // new is the lesson's steps, in their order.
     expect(fault((f) => entry(f, 1).new.reverse())).toContain("ayah 1: new");
     expect(fault((f) => entry(f, 2).new.pop())).toContain("ayah 2: new");
-    // a concept of the ayah left out of every group; a record with the wrong ayah; a missing record.
-    expect(fault((f) => entry(f, 2).review.shift())).toContain("ayah 2: review");
-    expect(fault((f) => (f.concepts.naat.ayah = 2))).toContain("naat is taught in 1:1, not 1:2");
-    expect(fault((f) => delete f.concepts.ilal)).toContain("ilal is listed and has no record");
-    expect(fault((f) => f.ayat.pop())).toContain("not the lesson's ayat");
+    // learnt is the whole list so far, `here` exactly where the step occurs.
+    expect(fault((f) => entry(f, 5).learnt.shift())).toContain("ayah 5: learnt");
+    expect(fault((f) => (entry(f, 1).learnt[0].here = true))).toContain("ayah 1: learnt");
+    // later really later, learnt really earlier; a step in two groups.
+    expect(fault((f) => entry(f, 1).later.push("badal"))).toContain("ayah 1: later");
+    expect(fault((f) => entry(f, 1).learnt.push({ id: entry(f, 1).later.shift()!, here: true }))).toContain("learnt lists alif-lam, which is not taught earlier");
+    expect(fault((f) => entry(f, 3).later.push(entry(f, 3).learnt.pop()!.id))).toContain("later lists jamak-mudzakkar-salim, which is not taught later");
+    expect(fault((f) => entry(f, 3).later.push("naat"))).toContain("a step is listed twice");
+    expect(fault((f) => entry(f, 1).lanjut.push("hal"))).toContain("ayah 1: lanjut");
+    // the names tables
+    expect(fault((f) => (f.steps.naat.lesson = "1:1"))).toContain("step naat is not named and placed as the curriculum has it");
+    expect(fault((f) => (f.steps.naat.name = "Sifat"))).toContain("step naat is not named and placed as the curriculum has it");
+    expect(fault((f) => delete f.steps.badal)).toContain("badal is listed and has no record in steps");
+    expect(fault((f) => (f.steps.kana = { name: "Kana", latin: "Kana", lesson: "112:4" }))).toContain("kana has a record and no ayah lists it");
+    expect(fault((f) => delete f.lanjut.ilal)).toContain("next-level record ilal is listed and has no name");
+    expect(fault((f) => f.ayat.push({ ayah: 8, new: [], learnt: [], later: [], lanjut: [] }))).toContain("1:8 is no lesson of the curriculum");
+    expect(fault((f) => (f.version = 1))).toContain("version 1 is not 2");
   });
 });
 
-describe("a concept's name is the one its Konsep baru caption uses", () => {
-  it("every name is what src/lib/emphasis.ts emphasises as the concept's name in that caption", () => {
+describe("a step's name is the one its Konsep baru caption uses", () => {
+  it("every step taught in Al-Fatihah is named as src/lib/emphasis.ts emphasises the name in its own caption", () => {
     const lead = "Konsep baru: ";
-    for (const [cid, c] of Object.entries(FILE.concepts)) {
-      if (c.from === "topic") continue; // an authored later item: named by the line that teaches it
-      expect(c.from, cid).toBe("title"); // Al-Fatihah needs no explicit name
-      const slug = SURAHS.find((s) => s.surah === c.surah)!.slug;
-      const lines = narrationFor(slug)!.lines;
-      const line = lines[`${slug}:${c.ayah}:concept:${cid}`] ?? lines[`${slug}:${c.ayah}:concept:${cid}:a`];
-      const display = line.display!;
-      expect(display.startsWith(lead), cid).toBe(true);
-      const span = captionSpans(display).find((e) => e.kind === "term" && e.from === lead.length);
-      expect(span, `${cid}: “${display.slice(0, 60)}”`).toBeDefined();
-      expect(display.slice(span!.from, span!.to), cid).toBe(c.name);
-      // The prose form is the same name without its Arabic.
-      expect(hasArabicScript(c.latin), cid).toBe(false);
-      expect(c.latin.split(/\s+/).length, cid).toBeLessThanOrEqual(4);
+    const lines = narrationFor("al-fatihah")!.lines;
+    let checked = 0;
+    for (const a of FATIHAH.ayat) {
+      for (const t of taughtAt(a)) {
+        const s = FILE.steps[t.step];
+        const line = lines[`al-fatihah:${a.ayah}:concept:${t.id}`] ?? lines[`al-fatihah:${a.ayah}:concept:${t.id}:a`];
+        const display = line.display!;
+        expect(display.startsWith(lead), t.id).toBe(true);
+        const span = captionSpans(display).find((e) => e.kind === "term" && e.from === lead.length);
+        expect(span, `${t.id}: “${display.slice(0, 60)}”`).toBeDefined();
+        expect(display.slice(span!.from, span!.to), t.id).toBe(s.name);
+        // The prose form is the same name without its Arabic.
+        expect(hasArabicScript(s.latin), t.id).toBe(false);
+        expect(s.latin.split(/\s+/).length, t.id).toBeLessThanOrEqual(4);
+        checked++;
+      }
     }
+    // The 17 steps of the surah; the two of the lesson with no ayah have no caption yet.
+    expect(checked).toBe(17);
   });
 });
 
 describe("the lesson map in the autoplay sequence", () => {
-  it("Al-Fatihah: map right after the imam's recitation, learned right before the recap — one line each, no word marked", () => {
+  it("Al-Fatihah: one step per group right after the imam's recitation, learned right before the recap — one line each, no word marked", () => {
     for (const a of FATIHAH.ayat) {
       for (const locale of ["id", "en"] as const) {
         const seq = stageSequence(FATIHAH, a, locale);
         const ids = seq.steps.map((s) => s.id);
         const where = `al-fatihah ${a.ayah} (${locale})`;
-        expect(ids.slice(0, 3), where).toEqual(["intro", "recite", "map"]);
+        expect(ids.slice(0, 5), where).toEqual(["intro", "recite", ...OPENING]);
         // The harakat primer (ayah 1) comes after the map; else the first word does.
-        expect(ids[3], where).toBe(a.ayah === 1 ? "primer" : "w1:recite");
+        expect(ids[5], where).toBe(a.ayah === 1 ? "primer" : "w1:recite");
         expect(ids.slice(-3), where).toEqual(["learned", "recap", a.ayah === 7 ? "done" : "next"]);
         expect(ids.indexOf("learned"), where).toBeGreaterThan(Math.max(...seq.steps.flatMap((s, i) => (s.kind === "exercise" || s.kind === "structure" ? [i] : []))));
-        for (const kind of ["map", "learned"] as const) {
-          const step = seq.steps.find((s) => s.id === kind)!;
-          expect(step.kind, where).toBe(kind);
-          expect(step.lines, where).toEqual([`al-fatihah:${a.ayah}:${kind}`]);
+        const map = lessonMapInput("al-fatihah", a.ayah)!;
+        for (const sid of [...OPENING, "learned"]) {
+          const step = seq.steps.find((s) => s.id === sid)!;
+          expect(step.kind, where).toBe(sid === "learned" ? "learned" : "map");
+          expect(step.lines, where).toEqual([`al-fatihah:${a.ayah}:${sid}`]);
           expect(LINE_ID_RE.test(step.lines[0])).toBe(true);
-          expect(parseLineId(step.lines[0])).toMatchObject({ kind: "ayah", slug: "al-fatihah", ayah: a.ayah, part: kind });
+          expect(parseLineId(step.lines[0])).toMatchObject({ kind: "ayah", slug: "al-fatihah", ayah: a.ayah, part: sid, split: null });
           const [cue] = step.cues;
           expect([cue.highlight, cue.focus, cue.frame], where).toEqual([[], null, null]);
           expect(step.recite, where).toBeUndefined();
@@ -284,42 +272,71 @@ describe("the lesson map in the autoplay sequence", () => {
             expect(cue.display, where).toBe(narrationFor("al-fatihah")!.lines[step.lines[0]].display);
           } else {
             // An English page has no narration: the engine's own caption gives the counts, and
-            // the card names the concepts — no Arabic script in a caption without a manifest.
+            // the card names the steps — no Arabic script in a caption without a manifest.
             expect(cue.display, where).toBeNull();
             expect(hasArabicScript(cue.caption), where).toBe(false);
-            expect(cue.caption, where).toContain(String(TABLE[a.ayah][0].length));
           }
         }
-        const map = lessonMapInput("al-fatihah", a.ayah);
-        const ctx = { ayah: a, last: a.ayah === 7, exercises: availableExercises(quizAyah("al-fatihah", a.ayah)), introduced: conceptsIntroducedIn(a.loc), compose: composeInput("al-fatihah", a) };
+        if (locale === "en") {
+          const said = (sid: string) => seq.steps.find((s) => s.id === sid)!.cues[0].caption;
+          expect(said("map:new"), where).toContain(String(map.new.length));
+          expect(said("map:learnt"), where).toContain(String(map.learnt.length));
+          expect(said("map:learnt"), where).toContain(String(mapHere(map).length));
+          expect(said("map:later"), where).toContain(String(map.lanjut.length));
+          expect(said("learned"), where).toContain(String(mapTotal(map)));
+        }
+        const ctx = { ayah: a, last: a.ayah === 7, exercises: availableExercises(quizAyah("al-fatihah", a.ayah)), introduced: taughtAt(a), compose: composeInput("al-fatihah", a) };
         expect(sequenceProblems(seq, { ...ctx, map }), where).toEqual([]);
         // The engine's own check refuses a lesson whose steps and map disagree.
         expect(sequenceProblems(seq, ctx).join("\n"), where).toContain("a map step in a lesson without a lesson map");
+        // … and a group played in another order, or left out.
+        const swapped = structuredClone(seq);
+        [swapped.steps[2], swapped.steps[3]] = [swapped.steps[3], swapped.steps[2]];
+        expect(sequenceProblems(swapped, { ...ctx, map }).join("\n"), where).toContain("are not the steps right after the imam's ayah, one per group");
+        const dropped = structuredClone(seq);
+        dropped.steps.splice(3, 1);
+        expect(sequenceProblems(dropped, { ...ctx, map }).join("\n"), where).toContain("are not the steps right after the imam's ayah, one per group");
       }
     }
   });
 
   it("the engine's captions say how many, in every locale's set", () => {
     for (const [locale, texts] of Object.entries(AUTOPLAY_TEXT_SETS)) {
-      for (const counts of [{ new: 5, review: 0, later: 1 }, { new: 1, review: 3, later: 0 }, { new: 0, review: 2, later: 0 }]) {
-        const said = texts.lessonMap(counts);
-        expect(hasArabicScript(said), locale).toBe(false);
-        expect(said, locale).not.toMatch(/\b[A-Z]{2,}\b/);
-        for (const n of [counts.new, counts.review, counts.later]) if (n) expect(said, locale).toContain(String(n));
-        if (!counts.review) expect(said, locale).not.toMatch(/ulang|repeat/i);
+      const said = [
+        texts.lessonMap.new({ new: 3 }),
+        texts.lessonMap.new({ new: 0 }),
+        texts.lessonMap.learnt({ learnt: 16, here: 10 }),
+        texts.lessonMap.learnt({ learnt: 2, here: 0 }),
+        texts.lessonMap.later({ later: 3, lanjut: 1 }),
+        texts.lessonMap.later({ later: 0, lanjut: 2 }),
+        texts.lessonMap.later({ later: 1, lanjut: 0 }),
+        texts.learned({ new: 3, total: 19, here: 10 }),
+        texts.learned({ new: 0, total: 21, here: 6 }),
+        texts.learned({ new: 0, total: 21, here: 0 }),
+      ];
+      for (const s of said) {
+        expect(s.trim(), locale).not.toBe("");
+        expect(hasArabicScript(s), locale).toBe(false);
+        expect(s, locale).not.toMatch(/\b[A-Z]{2,}\b/);
       }
-      expect(texts.learned({ new: 3 })).toContain("3");
-      expect(texts.learned({ new: 0 })).not.toMatch(/\d/);
+      expect(said[0], locale).toContain("3");
+      expect(said[1], locale).not.toMatch(/\d/);
+      expect(said[2], locale).toMatch(/16[\s\S]*10/);
+      expect(said[3], locale).toContain("2");
+      expect(said[4], locale).toMatch(/3[\s\S]*1/);
+      expect(said[5], locale).toContain("2");
+      expect(said[7], locale).toMatch(/3[\s\S]*19/);
+      expect(said[8], locale).toContain("6");
+      expect(said[9], locale).not.toMatch(/\d/);
     }
   });
 
-  it("a lesson without a map has neither step; with one, only those two steps are added", () => {
+  it("a lesson without a map has none of the steps; with one, only those steps are added", () => {
     for (const s of SURAHS) {
       for (const a of s.ayat) {
         const seq = stageSequence(s, a, "id");
-        const kinds = seq.steps.map((x) => x.kind);
-        const mapped = s.slug === "al-fatihah";
-        expect(kinds.filter((k) => k === "map" || k === "learned"), `${s.slug} ${a.ayah}`).toEqual(mapped ? ["map", "learned"] : []);
+        const mapSteps = seq.steps.filter((x) => x.kind === "map" || x.kind === "learned").map((x) => x.id);
+        expect(mapSteps, `${s.slug} ${a.ayah}`).toEqual(s.slug === "al-fatihah" ? [...OPENING, "learned"] : []);
       }
     }
     // The same lesson with and without its map: the other steps are untouched, in the same order.
@@ -329,7 +346,7 @@ describe("the lesson map in the autoplay sequence", () => {
       surahName: FATIHAH.name_id,
       ayahCount: FATIHAH.ayat.length,
       ayah: a,
-      introduced: conceptsIntroducedIn(a.loc),
+      introduced: taughtAt(a),
       exercises: availableExercises(quizAyah("al-fatihah", a.ayah)),
       texts: AUTOPLAY_TEXT_SETS.id,
       narration: narrationFor("al-fatihah"),
@@ -338,39 +355,60 @@ describe("the lesson map in the autoplay sequence", () => {
     const withMap = buildAutoplaySequence({ ...base, map: lessonMapInput("al-fatihah", a.ayah) });
     expect(without.steps.some((s) => s.kind === "map" || s.kind === "learned")).toBe(false);
     expect(JSON.stringify(withMap.steps.filter((s) => s.kind !== "map" && s.kind !== "learned"))).toBe(JSON.stringify(without.steps));
-    // An empty map (nothing new, nothing repeated) still has its two steps: the switch is the map.
-    const empty: LessonMapInput = { surah: 1, new: [], review: [], later: [] };
-    expect(buildAutoplaySequence({ ...base, map: empty }).steps.filter((s) => s.kind === "map" || s.kind === "learned")).toHaveLength(2);
+    // An empty map (the very first lesson with nothing in it) still says what is new, and what it
+    // taught: the switch is the map. A group with nothing to say has no step.
+    const empty: LessonMapInput = { surah: 1, new: [], learnt: [], later: [], lanjut: [] };
+    expect(buildAutoplaySequence({ ...base, map: empty }).steps.filter((s) => s.kind === "map" || s.kind === "learned").map((s) => s.id)).toEqual(["map:new", "learned"]);
+    const noLater: LessonMapInput = { ...lessonMapInput("al-fatihah", a.ayah)!, later: [], lanjut: [] };
+    expect(buildAutoplaySequence({ ...base, map: noLater }).steps.filter((s) => s.kind === "map").map((s) => s.id)).toEqual(["map:new", "map:learnt"]);
   });
 
-  it("the lesson plays its map line and moves on to the next step by itself", () => {
+  it("the lesson plays its map lines one after another and moves on to the next step by itself", () => {
     const seq = stageSequence(FATIHAH, FATIHAH.ayat[1], "id");
     const send = (s: ReturnType<typeof createAutoplayState>, e: AutoplayEvent) => reduceAutoplay(seq, s, e);
     let s = send(createAutoplayState(seq), { type: "start", reason: "fresh" });
-    while (seq.steps[s.idx].id !== "map") s = send(s, { type: "next" });
-    // Not rendered yet: the caption is read at reading pace; rendered: narrated. Either way one
-    // activity for the line, then the step ends and the first word's step starts.
-    for (let guard = 0; guard < 20 && seq.steps[s.idx].id === "map"; guard++) {
+    while (seq.steps[s.idx].id !== "map:new") s = send(s, { type: "next" });
+    // Rendered: narrated; not rendered yet: the caption is read at reading pace. Either way one
+    // activity per line, each step ends by itself, and after the last the first word's step starts.
+    const seen: string[] = [];
+    for (let guard = 0; guard < 60 && seq.steps[s.idx].kind === "map"; guard++) {
       const a = s.activity;
       expect(a).not.toBeNull();
       if (!a) break;
+      if (seen.at(-1) !== seq.steps[s.idx].id) seen.push(seq.steps[s.idx].id);
       s = send(s, a.kind === "narrate" ? { type: "narration_end", token: a.token } : { type: "timer", token: a.token });
     }
+    expect(seen).toEqual(OPENING);
     expect(seq.steps[s.idx].id).toBe("w1:recite");
     expect(s.phase).not.toBe("paused");
+    // "Tunggu saya": each group waits for Lanjut, so the learner reads one card at a time.
+    let w = reduceAutoplay(seq, createAutoplayState(seq, { pace: "tunggu" }), { type: "start", pace: "tunggu", reason: "fresh" });
+    while (seq.steps[w.idx].id !== "map:new") w = reduceAutoplay(seq, w, { type: "next" });
+    for (let guard = 0; guard < 20 && w.phase !== "ready"; guard++) {
+      const a = w.activity;
+      if (!a) break;
+      w = reduceAutoplay(seq, w, a.kind === "narrate" ? { type: "narration_end", token: a.token } : { type: "timer", token: a.token });
+    }
+    expect([seq.steps[w.idx].id, w.phase]).toEqual(["map:new", "ready"]);
   });
 
-  it("Al-Fatihah's manifest has the two lines for every ayah, and no other surah's has any", () => {
+  it("Al-Fatihah's manifest has the four lines for every ayah, and no other surah's has any", () => {
+    const parts = [...OPENING, "learned"];
     for (const s of SURAHS) {
-      const lines = Object.keys(narrationFor(s.slug)!.lines).filter((l) => /:(?:map|learned)(?::[a-z])?$/.test(l));
-      expect(lines, s.slug).toEqual(s.slug === "al-fatihah" ? s.ayat.flatMap((a) => [`al-fatihah:${a.ayah}:map`, `al-fatihah:${a.ayah}:learned`]) : []);
+      const lines = Object.keys(narrationFor(s.slug)!.lines).filter((l) => /:(?:map:[a-z]+|learned)(?::[a-z])?$/.test(l));
+      expect(lines, s.slug).toEqual(s.slug === "al-fatihah" ? s.ayat.flatMap((a) => parts.map((p) => `al-fatihah:${a.ayah}:${p}`)) : []);
     }
+    // The one line of before the curriculum is no line id any more.
+    expect(LINE_ID_RE.test("al-fatihah:1:map")).toBe(false);
+    expect(LINE_ID_RE.test("al-fatihah:1:map:review")).toBe(false);
   });
 });
 
 describe("a lesson-map line's karaoke caption goes part by part (the card needs the room)", () => {
-  const a = FATIHAH.ayat[1];
-  const LINE = "al-fatihah:2:map";
+  // Ayah 1's line about what comes later: three postponed steps, each with its ayah, then the
+  // count of the next-level topics — longer than one caption part.
+  const a = FATIHAH.ayat[0];
+  const LINE = "al-fatihah:1:map:later";
   const real = narrationFor("al-fatihah")!;
   const display = real.lines[LINE].display!;
   /** The line as it is after its render: one file, one token per spoken word — a dictionary term
@@ -380,7 +418,7 @@ describe("a lesson-map line's karaoke caption goes part by part (the card needs 
     const out: string[] = [];
     for (const w of display.split(" ")) {
       // The Arabic in a term's bracket, and the words of the term before it, belong to one token.
-      const inTerm = out.length > 0 && /[(\u0600-\u06FF]/.test(out[out.length - 1]) && !out[out.length - 1].includes(")");
+      const inTerm = out.length > 0 && /[(؀-ۿ]/.test(out[out.length - 1]) && !out[out.length - 1].includes(")");
       const opens = w.startsWith("(");
       if (inTerm || opens) out[out.length - 1] += ` ${w}`;
       else out.push(w);
@@ -399,32 +437,33 @@ describe("a lesson-map line's karaoke caption goes part by part (the card needs 
     surahName: FATIHAH.name_id,
     ayahCount: FATIHAH.ayat.length,
     ayah: a,
-    introduced: conceptsIntroducedIn(a.loc),
+    introduced: taughtAt(a),
     exercises: availableExercises(quizAyah("al-fatihah", a.ayah)),
     texts: AUTOPLAY_TEXT_SETS.id,
     narration: rendered,
     map: lessonMapInput("al-fatihah", a.ayah),
   });
-  const step = seq.steps.find((s) => s.id === "map")!;
+  const step = seq.steps.find((s) => s.id === "map:later")!;
   const [cue] = step.cues;
   const words = cue.audio[0].words!;
-  /** The lesson on the map step, its line playing. */
+  /** The lesson on that step, its line playing. */
   const playing = () => {
     let s = reduceAutoplay(seq, createAutoplayState(seq), { type: "start", reason: "fresh" });
-    while (seq.steps[s.idx].id !== "map") s = reduceAutoplay(seq, s, { type: "next" });
+    while (seq.steps[s.idx].id !== "map:later") s = reduceAutoplay(seq, s, { type: "next" });
     expect(s.activity).toMatchObject({ kind: "narrate", line: LINE });
     return s;
   };
 
-  it("the line's words fall into its caption parts: three sentences, three parts, every word once", () => {
-    expect(cue.parts).toHaveLength(3);
+  it("the line's words fall into its caption parts: two sentences, two parts, every word once", () => {
+    // What is taught later, then the count of the next-level topics: one part each.
+    expect(cue.parts).toHaveLength(2);
     expect(cue.parts.every((p) => p.length <= 180)).toBe(true);
     expect(words.some(([t]) => t.split(" ").length > 1)).toBe(true); // a term of several words is one karaoke word
     const cut = karaokeParts(cue.parts, words)!;
     expect(cut).not.toBeNull();
     expect(cut.map(([from, to]) => words.slice(from, to).map(([t]) => t).join(" "))).toEqual(cue.parts);
     expect(cut[0][0]).toBe(0);
-    expect(cut[2][1]).toBe(words.length);
+    expect(cut[1][1]).toBe(words.length);
     // One part, or words that do not line up with the parts: the whole line, as before.
     expect(karaokeParts([cue.caption], words)).toBeNull();
     expect(karaokeParts(cue.parts, words.slice(1))).toBeNull();
@@ -453,8 +492,8 @@ describe("a lesson-map line's karaoke caption goes part by part (the card needs 
     expect(between).toMatchObject({ now: -1, said: to1 });
     // The file is through (the runner sets "all said"): the last part, every word said.
     const done = at(-1, Number.MAX_SAFE_INTEGER);
-    expect(captionText(done)).toBe(cue.parts[2]);
-    expect(done).toMatchObject({ now: -1, said: cut[2][1] - cut[2][0] });
+    expect(captionText(done)).toBe(cue.parts[1]);
+    expect(done).toMatchObject({ now: -1, said: cut[1][1] - cut[1][0] });
     // Each part carries its own words' emphasis slots, one per word.
     for (const c of [first, second, done]) if (c.kind === "karaoke") expect(c.emph).toHaveLength(c.words.length);
   });
@@ -475,150 +514,226 @@ describe("a lesson-map line's karaoke caption goes part by part (the card needs 
   });
 });
 
-describe("the lesson map's card", () => {
+describe("the lesson map's card: one group at a time", () => {
   const MSG = { id, en } as const;
   type Locale = keyof typeof MSG;
-  const card = (locale: Locale, map: LessonMapInput, kind: LessonMapCardKind) => {
+  const card = (locale: Locale, map: LessonMapInput, group: LessonMapCardGroup) => {
     const intl: ComponentProps<typeof NextIntlClientProvider> = {
       locale,
       messages: MSG[locale],
       timeZone: "Asia/Jakarta",
-      children: createElement(LessonMapCard, { map, kind }),
+      children: createElement(LessonMapCard, { map, group }),
     };
     return renderToStaticMarkup(createElement(NextIntlClientProvider, intl));
   };
-  /** The groups of a card's markup, in order: [group, its heading, [item id, its text]…]. */
+  const text = (html: string) => html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  /** The groups of a card's markup, in order: its heading, the count beside it, its items. */
   const groups = (html: string) =>
-    [...html.matchAll(/<div data-map-group="([a-z]+)"[^>]*>([\s\S]*?)<\/ul><\/div>/g)].map((m) => ({
-      group: m[1],
-      heading: /<h3[^>]*>([\s\S]*?)<\/h3>/.exec(m[2])![1].replace(/<[^>]+>/g, "").trim(),
-      items: [...m[2].matchAll(/<li data-map-item="([a-z0-9-]+)" data-map-ayah="([0-9:]+)"[^>]*>([\s\S]*?)<\/li>/g)].map((li) => ({
-        id: li[1],
-        ayah: li[2],
-        text: li[3].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim(),
-        where: /<span data-map-where[^>]*>([^<]*)<\/span>/.exec(li[3])?.[1] ?? null,
-        note: /<span data-map-note[^>]*>([\s\S]*?)<\/span><\/span><\/li>$/.exec(li[0])?.[1].replace(/<[^>]+>/g, "").trim() ?? null,
-        ticked: /<svg/.test(li[3]),
-      })),
-    }));
+    html
+      .split(/(?=<div data-map-group=")/)
+      .slice(1)
+      .map((part) => ({
+        group: /^<div data-map-group="([a-z]+)"/.exec(part)![1],
+        heading: text(/<h3[^>]*>([\s\S]*?)<\/h3>/.exec(part)![1]),
+        count: /<span data-map-count="true"[^>]*>([^<]*)<\/span>/.exec(part)?.[1].trim() ?? null,
+        items: [...part.matchAll(/<li data-map-item="([a-z0-9-]+)"(?: data-map-here="(true|false)")?[^>]*>([\s\S]*?)<\/li>/g)].map((li) => ({
+          id: li[1],
+          here: li[2] === undefined ? null : li[2] === "true",
+          text: text(li[3]),
+          where: /<span data-map-where[^>]*>([^<]*)<\/span>/.exec(li[3])?.[1] ?? null,
+          marked: /<svg/.test(li[3]),
+        })),
+        subs: [...part.matchAll(/<p data-map-sub="([a-z]+)"[^>]*>([^<]*)<\/p>/g)].map((m) => [m[1], m[2]]),
+        note: /<p data-map-note="true"[^>]*>([^<]*)<\/p>/.exec(part)?.[1] ?? null,
+        total: /<p data-map-total="true"[^>]*>([^<]*)<\/p>/.exec(part)?.[1] ?? null,
+      }));
+  const fill = (m: string, v: Record<string, string | number>) => Object.entries(v).reduce((t, [k, x]) => t.replace(`{${k}}`, String(x)), m);
 
-  it("the opening: Baru di ayat ini, Mengulang (each with its ayah), Nanti (each with its ayah) — every concept, by its name", () => {
+  it("“Baru di ayat ini”: the steps the lesson teaches, by their names — and nothing else on the card", () => {
     for (const a of FATIHAH.ayat) {
-      const map = lessonMapInput("al-fatihah", a.ayah)!;
-      const html = card("id", map, "map");
+      const html = card("id", lessonMapInput("al-fatihah", a.ayah)!, "new");
       expect(html).toContain('data-autoplay="lesson-map"');
-      expect(html).toContain('data-map="map"');
-      const [fresh, review, later] = FILE_TABLE[a.ayah];
+      expect(html).toContain('data-map="new"');
       const got = groups(html);
-      // A group with nothing in it is not drawn.
-      expect(got.map((g) => g.group), `ayah ${a.ayah}`).toEqual(["new", ...(review.length ? ["review"] : []), ...(later.length ? ["later"] : [])]);
-      const by = Object.fromEntries(got.map((g) => [g.group, g]));
-      expect(by.new.heading).toBe(id.Guided.map_new);
-      expect(by.new.items.map((i) => i.id)).toEqual(fresh);
-      for (const it of by.new.items) {
-        expect(it.text, it.id).toBe(FILE.concepts[it.id].name);
-        expect(it.where, it.id).toBeNull();
-      }
-      if (review.length) {
-        expect(by.review.heading).toBe(id.Guided.map_review);
-        expect(by.review.items.map((i) => i.id)).toEqual(review);
-        for (const it of by.review.items) {
-          const taught = FILE.concepts[it.id].ayah;
-          expect(taught, it.id).toBeLessThan(a.ayah);
-          expect(it.where, it.id).toBe(`dari ayat ${taught}`);
-          expect(it.text, it.id).toBe(`${FILE.concepts[it.id].name} dari ayat ${taught}`);
-        }
-      }
-      if (later.length) {
-        expect(by.later.heading).toBe(id.Guided.map_later);
-        expect(by.later.items.map((i) => i.id)).toEqual(later);
-        for (const it of by.later.items) {
-          expect(it.where, it.id).toBe(`di ayat ${LATER_AT[it.id]}`);
-          expect(LATER_AT[it.id], it.id).toBeGreaterThan(a.ayah);
-          // An authored later item says what is left open, on a row of its own; a concept has no note.
-          const note = FILE.concepts[it.id].note ?? null;
-          expect(it.note, it.id).toBe(note);
-          expect(it.text, it.id).toBe(`${FILE.concepts[it.id].name} di ayat ${LATER_AT[it.id]}${note ? ` ${note}` : ""}`);
-        }
-      }
+      expect(got.map((g) => g.group), `ayah ${a.ayah}`).toEqual(["new"]);
+      expect(got[0].heading).toBe(id.Guided.map_new);
+      expect(got[0].count).toBeNull();
+      expect(got[0].items.map((i) => i.id)).toEqual(TABLE[a.ayah][0]);
+      for (const it of got[0].items) expect([it.text, it.where, it.here], it.id).toEqual([FILE.steps[it.id].name, null, null]);
       // Every Arabic run is isolated, right to left (MixedText): nothing is typed here.
       for (const m of html.matchAll(/<bdi[^>]*>/g)) expect(m[0]).toMatch(/lang="ar" dir="rtl"/);
       expect(html.match(/<bdi/g)?.length ?? 0).toBeGreaterThan(0);
     }
   });
 
-  it("on a phone the repeated and the postponed groups show a count for their names; the new ones are always listed", () => {
-    /** Per group: the count beside its heading (null: none), and its list's classes. */
-    const compact = (html: string) =>
-      Object.fromEntries(
-        [...html.matchAll(/<div data-map-group="([a-z]+)"[^>]*>([\s\S]*?)<\/ul><\/div>/g)].map((m) => [
-          m[1],
-          {
-            count: /<span data-map-count="true" class="([^"]*)">([^<]*)<\/span>/.exec(m[2])?.slice(1, 3) ?? null,
-            list: /<ul class="([^"]*)">/.exec(m[2])![1].split(" "),
-          },
-        ]),
-      );
+  it("“Sudah kita pelajari”: the whole list so far with its count — what comes up again here first and marked, the rest muted (on a phone: one line with their count)", () => {
     for (const a of FATIHAH.ayat) {
-      const [, review, later] = FILE_TABLE[a.ayah];
-      const got = compact(card("id", lessonMapInput("al-fatihah", a.ayah)!, "map"));
-      // The new concepts: every name on every screen, no count.
-      expect(got.new.count, `ayah ${a.ayah}`).toBeNull();
-      expect(got.new.list).not.toContain("max-sm:sr-only");
-      for (const [group, ids] of [["review", review], ["later", later]] as const) {
-        if (!ids.length) continue;
-        // The count is the number of names, shown below sm only; the names leave the screen there
-        // and stay in the page (sr-only, never display:none).
-        expect(got[group].count, `ayah ${a.ayah} ${group}`).toEqual([expect.stringMatching(/(^| )sm:hidden( |$)/), `· ${ids.length} hal`]);
-        expect(got[group].list, `ayah ${a.ayah} ${group}`).toContain("max-sm:sr-only");
+      const map = lessonMapInput("al-fatihah", a.ayah)!;
+      const html = card("id", map, "learnt");
+      expect(html).toContain('data-map="learnt"');
+      const [g, ...more] = groups(html);
+      expect(more, `ayah ${a.ayah}`).toEqual([]);
+      expect([g.group, g.heading, g.count]).toEqual(["learnt", id.Guided.map_learnt, `(${fill(id.Guided.map_count, { n: map.learnt.length })})`]);
+      const here = TABLE[a.ayah][1];
+      const rest = map.learnt.filter((x) => !x.here).map((x) => x.id);
+      // Cumulative: every step learnt before this ayah is in the card, each once …
+      expect(g.items.map((i) => i.id).sort(), `ayah ${a.ayah}`).toEqual(map.learnt.map((x) => x.id).sort());
+      expect(g.items).toHaveLength(LEARNT_BEFORE[a.ayah - 1]);
+      // … the ones that come up again first, under their own line, then the others under theirs.
+      expect(g.items.map((i) => [i.id, i.here]), `ayah ${a.ayah}`).toEqual([...here.map((x) => [x, true]), ...rest.map((x) => [x, false])]);
+      expect(g.subs, `ayah ${a.ayah}`).toEqual([
+        ["here", fill(id.Guided.map_here, { n: here.length })],
+        ...(rest.length ? [["rest", fill(id.Guided.map_rest, { n: rest.length })]] : []),
+      ]);
+      const full = here.length <= MAP_HERE_FULL;
+      for (const it of g.items) {
+        const name = FILE.steps[it.id].name;
+        // Up to three that come up again: one per row, with their Arabic and a mark (never colour
+        // alone). More, and the ones that are not in this ayah: their Latin names in a flowing line.
+        if (it.here && full) expect([it.text, it.marked], it.id).toEqual([name, true]);
+        else expect(it.text.replace(/,$/, ""), it.id).toBe(mapLatinName(name));
       }
-      // The closing card lists what was learnt, on every screen.
-      const closing = compact(card("id", lessonMapInput("al-fatihah", a.ayah)!, "learned"));
-      expect(closing.learned.count).toBeNull();
-      expect(closing.learned.list).not.toContain("max-sm:sr-only");
+      // The names that are NOT in this ayah take no box on a phone (display none below sm), where
+      // the line with their count stands for them; the ones that are, are drawn on every screen.
+      const flows = [...html.matchAll(/<ul data-map-flow="true" class="([^"]*)">([\s\S]*?)<\/ul>/g)].map((m) => ({ cls: m[1].split(" "), here: m[2].includes('data-map-here="true"') }));
+      expect(flows.filter((f) => !f.here).map((f) => f.cls.includes("max-sm:hidden")), `ayah ${a.ayah}`).toEqual(rest.length ? [true] : []);
+      expect(flows.filter((f) => f.here).map((f) => f.cls.includes("max-sm:hidden")), `ayah ${a.ayah}`).toEqual(full ? [] : [false]);
     }
-    expect(compact(card("en", lessonMapInput("al-fatihah", 2)!, "map")).review.count?.[1]).toBe(`· ${FILE_TABLE[2][1].length} items`);
+    // Ayat 4, 6 and 7 repeat more than three steps (ayah 7: ten): a flowing line of their names.
+    expect(FATIHAH.ayat.filter((a) => mapHere(lessonMapInput("al-fatihah", a.ayah)!).length > MAP_HERE_FULL).map((a) => a.ayah)).toEqual([4, 6, 7]);
+    expect(MAP_HERE_FULL).toBe(3);
+    // No learnt step comes up again: said plainly.
+    const none: LessonMapInput = { surah: 1, new: [], learnt: [{ id: "naat", name: "Na’t (نَعْت)", here: false }], later: [], lanjut: [] };
+    expect(card("id", none, "learnt")).toContain(id.Guided.map_here_none);
   });
 
-  it("the closing: the new concepts, each with a tick, under Sudah dipelajari — nothing else", () => {
+  it("“Nanti” (each with its ayah) and “Tingkat lanjut” (counted, with the line that says they are not taught here; named from sm up)", () => {
     for (const a of FATIHAH.ayat) {
+      const map = lessonMapInput("al-fatihah", a.ayah)!;
+      const html = card("id", map, "later");
+      expect(html).toContain('data-map="later"');
+      const [, , later, lanjut] = TABLE[a.ayah];
+      const got = groups(html);
+      // A group with nothing in it is not drawn.
+      expect(got.map((g) => g.group), `ayah ${a.ayah}`).toEqual([...(later.length ? ["later"] : []), "lanjut"]);
+      const by = Object.fromEntries(got.map((g) => [g.group, g]));
+      if (later.length) {
+        expect([by.later.heading, by.later.count]).toEqual([id.Guided.map_later, null]);
+        expect(by.later.items.map((i) => i.id)).toEqual(later);
+        for (const it of by.later.items) {
+          const at = /^(\d+):(\d+)$/.exec(FILE.steps[it.id].lesson)!;
+          const where = at[1] === "1" ? `di ayat ${at[2]}` : `di QS ${at[1]}:${at[2]}`;
+          // Up to two: one per row, the name with its Arabic and where it is taught. More: one
+          // flowing line, each name (Latin) with its ayah.
+          if (later.length <= MAP_LATER_FULL) expect([it.where, it.text], it.id).toEqual([where, `${FILE.steps[it.id].name} ${where}`]);
+          else expect(it.text.replace(/,$/, ""), it.id).toBe(`${mapLatinName(FILE.steps[it.id].name)} ${where}`);
+        }
+      }
+      // The next level: its count beside the heading (what the narrator says of it, too), the line
+      // that says it is not taught here, and the names — muted, and not drawn on a phone.
+      expect([by.lanjut.heading, by.lanjut.count, by.lanjut.note]).toEqual([id.Guided.map_lanjut, `(${fill(id.Guided.map_count, { n: lanjut.length })})`, id.Guided.map_lanjut_note]);
+      expect(by.lanjut.items.map((i) => [i.id, i.text])).toEqual(lanjut.map((cid) => [cid, FILE.lanjut[cid].name]));
+      expect(html).toMatch(/<ul data-map-names="true" class="[^"]*max-sm:hidden[^"]*">/);
+      expect(html).toMatch(/<div data-map-group="lanjut"[^>]*>[\s\S]*?<h3 class="[^"]*text-ink-muted/);
+    }
+    // Fi'il amr, seen in ayah 6 and taught in An-Nas; ayah 1's three postponed steps in one line.
+    expect(groups(card("id", lessonMapInput("al-fatihah", 6)!, "later"))[0].items[0].where).toBe("di QS 114:1");
+    expect(groups(card("id", lessonMapInput("al-fatihah", 1)!, "later"))[0].items.map((i) => i.text)).toEqual(["Alif lam di ayat 3,", "Na’t di ayat 3,", "Idhafah di ayat 4"]);
+    expect(MAP_LATER_FULL).toBe(2);
+  });
+
+  it("the closing: the new steps, each with a tick, and the running total", () => {
+    FATIHAH.ayat.forEach((a, i) => {
       const html = card("id", lessonMapInput("al-fatihah", a.ayah)!, "learned");
       expect(html).toContain('data-map="learned"');
       const got = groups(html);
       expect(got.map((g) => g.group)).toEqual(["learned"]);
       expect(got[0].heading).toBe(id.Guided.map_learned);
-      expect(got[0].items.map((i) => i.id)).toEqual(TABLE[a.ayah][0]);
-      for (const it of got[0].items) {
-        expect(it.ticked, it.id).toBe(true);
-        expect(it.where, it.id).toBeNull();
-        expect(it.text, it.id).toBe(FILE.concepts[it.id].name);
+      expect(got[0].items.map((x) => x.id)).toEqual(TABLE[a.ayah][0]);
+      for (const it of got[0].items) expect([it.marked, it.where, it.text], it.id).toEqual([true, null, FILE.steps[it.id].name]);
+      expect(got[0].total).toBe(fill(id.Guided.map_total, { n: LEARNT_BEFORE[i] + TABLE[a.ayah][0].length }));
+    });
+  });
+
+  it("built for a phone's small room: at most three rows of names, nothing visually hidden, no separator that could start a line", () => {
+    // Measured in CI at 390×844 (base branch, 2026-10-13): about 270px above the caption panel at
+    // the normal text size; one heading with three names is about 265px.
+    for (const a of FATIHAH.ayat) {
+      const map = lessonMapInput("al-fatihah", a.ayah)!;
+      for (const g of [...MAP_GROUPS, "learned"] as const) {
+        const html = card("id", map, g);
+        const where = `ayah ${a.ayah} ${g}`;
+        // Rows (a name on a row of its own, with its Arabic) a phone draws: never more than three.
+        const phone = html.replace(/<ul[^>]*class="[^"]*max-sm:hidden[^"]*"[^>]*>[\s\S]*?<\/ul>/g, "");
+        const rowLists = [...phone.matchAll(/<ul class="[^"]*\bgrid\b[^"]*">([\s\S]*?)<\/ul>/g)];
+        const rows = rowLists.reduce((n, m) => n + (m[1].match(/<li /g)?.length ?? 0), 0);
+        expect(rows, where).toBeLessThanOrEqual(3);
+        // What a phone does not show is display none there — never a 1px box whose text the
+        // line-break check would still measure.
+        expect(html, where).not.toContain("sr-only");
+        // No separator: a count stands in brackets, one piece that does not wrap; a name in a
+        // flowing line carries its own comma.
+        expect(text(html), where).not.toMatch(/[·•—–]/);
+        for (const m of html.matchAll(/<span data-map-count="true" class="([^"]*)">([^<]*)<\/span>/g)) {
+          expect(m[1].split(" "), where).toContain("whitespace-nowrap");
+          expect(m[2].trim(), where).toMatch(/^\(\d+ hal\)$/);
+        }
+        expect(html, where).not.toMatch(/class="[^"]*flex-wrap[^"]*"[^>]*>\s*<h3/);
+        for (const li of html.matchAll(/<li data-map-item="[^"]*"[^>]*>([\s\S]*?)<\/li>/g)) expect(text(li[1]), where).not.toMatch(/^[,.;:!?)\]»”]/);
       }
     }
   });
 
-  it("the labels follow the locale; a concept of another surah is shown with its surah; an ayah with nothing new says so", () => {
-    const html = card("en", lessonMapInput("al-fatihah", 2)!, "map");
-    for (const label of [en.Guided.map_new, en.Guided.map_review, en.Guided.map_later, "from ayah 1", "in ayah 7"]) expect(html).toContain(label);
-    // Al-Ikhlas 2 as it would be with a map: nothing new, concepts repeated from Al-Fatihah.
-    const entry = deriveLessonMap(SURAHS, LIBRARY.concepts, 112)[1];
-    const item = (cid: string) => {
-      const [surah, ayah] = LIBRARY.concepts.find((c) => c.id === cid)!.examples[0].loc.split(":").map(Number);
-      return { id: cid, name: cid, surah, ayah };
-    };
-    const map: LessonMapInput = { surah: 112, new: entry.new.map(item), review: entry.review.map(item), later: entry.later.map(item) };
-    expect(map.new).toEqual([]);
-    const other = card("id", map, "map");
-    expect(other).toContain(id.Guided.map_none);
-    expect(groups(other).find((g) => g.group === "review")!.items.find((i) => i.id === "naat")!.where).toBe("dari QS 1:1");
-    expect(card("id", map, "learned")).toContain(id.Guided.map_none);
-    // Both message files carry every label the card uses.
+  it("the CI browser check exists, walks one step per group, and its constants are the app's", () => {
+    const ci = readFileSync(join(BELAJAR, "scripts/ci/screenshots.mjs"), "utf8");
+    expect(ci).toContain("async function lessonMapChecks(");
+    expect(ci).toContain("await lessonMapChecks(page, vp, narration)");
+    // What the card may list in full, and how a flowing line names a step: the app's own.
+    expect(ci).toContain(`const MAP_HERE_FULL = ${MAP_HERE_FULL};`);
+    expect(ci).toContain(`const MAP_LATER_FULL = ${MAP_LATER_FULL};`);
+    expect(ci).toContain(`const MAP_ARABIC_GLOSS = ${String(MAP_ARABIC_GLOSS)};`);
+    // It reaches each card by its step's name ("map:new" …, "learned"), as LessonStage names it
+    // (data-step = the step's id), and reads what a card must show from the built files.
+    for (const g of MAP_GROUPS) expect(stageSequence(FATIHAH, FATIHAH.ayat[0], "id").steps.map((x) => x.id)).toContain(`map:${g}`);
+    expect(ci).toContain("`map:${g}`");
+    expect(ci).toContain('read("content/map/al-fatihah.json")');
+    expect(ci).toContain('read("messages/id.json")');
+    // The step two ahead of a lesson's first (the look-ahead check) is the map's first group.
+    expect(ci).toContain(`const MAP_1 = "al-fatihah:1:map:${MAP_GROUPS[0]}";`);
+    // No expectation typed: no step or record id of the curriculum stands in the check.
+    const body = ci.slice(ci.indexOf("async function lessonMapChecks("), ci.indexOf("async function assertNotFoundShown("));
+    for (const sid of [...Object.keys(FILE.steps), ...Object.keys(FILE.lanjut)]) expect(body, sid).not.toMatch(new RegExp(`["'\`]${sid}["'\`]`));
+    // The CSP refuses eval: no waitForFunction call.
+    expect(body).not.toMatch(/\.waitForFunction\(/);
+  });
+
+  it("new and already-learnt are never on one card; the labels follow the locale; an ayah with nothing new says so", () => {
+    const map = lessonMapInput("al-fatihah", 2)!;
+    for (const g of [...MAP_GROUPS, "learned"] as const) {
+      const html = card("id", map, g);
+      const names = (ids: string[]) => ids.filter((sid) => html.includes(`data-map-item="${sid}"`));
+      const learnt = map.learnt.map((x) => x.id);
+      // The new steps are on the "new" card and the closing; the learnt ones on "learnt" alone.
+      expect(names(map.new.map((x) => x.id)).length > 0, g).toBe(g === "new" || g === "learned");
+      expect(names(learnt).length > 0, g).toBe(g === "learnt");
+    }
+    const english = [card("en", map, "new"), card("en", map, "learnt"), card("en", map, "later"), card("en", map, "learned")].join("\n");
+    for (const label of [en.Guided.map_new, en.Guided.map_learnt, en.Guided.map_later, en.Guided.map_lanjut, en.Guided.map_lanjut_note, en.Guided.map_learned, "in ayah 3", "in QS 114:2"]) {
+      expect(english).toContain(label);
+    }
+    const nothing: LessonMapInput = { ...map, new: [] };
+    expect(card("id", nothing, "new")).toContain(id.Guided.map_none);
+    expect(card("id", nothing, "learned")).toContain(id.Guided.map_none);
+    // Both message files carry every label the card uses, and none of the card of before.
     for (const k of Object.keys(id.Guided).filter((x) => x.startsWith("map_"))) expect(en.Guided, k).toHaveProperty(k);
+    for (const k of Object.keys(en.Guided).filter((x) => x.startsWith("map_"))) expect(id.Guided, k).toHaveProperty(k);
+    expect(id.Guided).not.toHaveProperty("map_review");
   });
 });
 
-describe("the word card marks a concept an earlier ayah taught (text only)", () => {
+describe("the word card marks a concept an earlier lesson taught (text only)", () => {
   const wordCard = (taught: string | null) => {
-    const w = FATIHAH.ayat[1].words[2]; // 1:2:3, a na't: taught in ayah 1
+    const w = FATIHAH.ayat[3].words[0]; // 1:4:1, a na't: taught in ayah 3
     const labels = { ...id.Word, sharaf: { heading: id.Word.sharaf_heading, forms_note: id.Word.sharaf_forms_note, ilal: id.Word.ilal, ilal_from: id.Word.ilal_from, ilal_to: id.Word.ilal_to } };
     const intl: ComponentProps<typeof NextIntlClientProvider> = {
       locale: "id",
@@ -629,19 +744,19 @@ describe("the word card marks a concept an earlier ayah taught (text only)", () 
     return renderToStaticMarkup(createElement(NextIntlClientProvider, intl));
   };
 
-  it("under its chip: “sudah dipelajari di ayat 1”; nothing for a concept that is new or taught later", () => {
-    const marked = wordCard(id.Word.concept_taught.replace("{n}", "1"));
-    expect(marked).toMatch(/<\/a><p data-concept-taught="naat"[^>]*>sudah dipelajari di ayat 1<\/p>/);
+  it("under its chip: “sudah dipelajari di ayat 3”; nothing for a concept that is new or taught later", () => {
+    const marked = wordCard(id.Word.concept_taught.replace("{n}", "3"));
+    expect(marked).toMatch(/<\/a><p data-concept-taught="naat"[^>]*>sudah dipelajari di ayat 3<\/p>/);
     expect(wordCard(null)).not.toContain("data-concept-taught");
-    // What the page marks: exactly the ayah's repeated concepts, each with the ayah that taught it.
-    for (const a of FATIHAH.ayat) {
-      const review = lessonMapInput("al-fatihah", a.ayah)!.review;
-      expect(review.map((it) => it.id)).toEqual(TABLE[a.ayah][1]);
-      for (const it of review) expect(it.ayah).toBeLessThan(a.ayah);
-      // … and every one of them is on a word of the ayah (so its mark has a chip to sit under).
-      const tagged = new Set(a.words.flatMap((w) => w.concepts));
-      for (const it of review) expect(tagged.has(it.id), `${a.loc} ${it.id}`).toBe(true);
-    }
     expect(en.Word.concept_taught).toContain("{n}");
+    // Which chips get the mark is the curriculum's (curriculum.test.ts taughtBefore): every learnt
+    // step of an ayah that comes up again and is a whole record has a tagged word to sit under.
+    for (const a of FATIHAH.ayat) {
+      const tagged = new Set(a.words.flatMap((w) => w.concepts));
+      for (const it of mapHere(lessonMapInput("al-fatihah", a.ayah)!)) {
+        const step = CURRICULUM.steps.find((s) => s.id === it.id)!;
+        if (step.concept && step.part === undefined && !step.occurs) expect(tagged.has(step.concept) || (a.structure?.groups ?? []).some((g) => g.concept === step.concept), `${a.loc} ${it.id}`).toBe(true);
+      }
+    }
   });
 });

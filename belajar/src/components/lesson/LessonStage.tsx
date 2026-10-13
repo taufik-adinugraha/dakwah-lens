@@ -31,14 +31,14 @@ import { TextSizeOptions } from "@/components/TextSizeSwitch";
 import type { ComposeFile } from "@/content/compose-schema";
 import type { RecitationSource } from "@/hooks/useSegmentPlayer";
 import { Link } from "@/i18n/navigation";
-import type { AutoplaySequence, LessonMapInput, StageExample } from "@/lib/autoplay";
+import { MAP_GROUPS, type AutoplaySequence, type LessonMapInput, type StageExample } from "@/lib/autoplay";
 import { glossSlot } from "@/lib/emphasis";
 import { PACES } from "@/lib/lessonSteps";
 import { ayahHref } from "@/lib/routes";
 
 import { MushafLine, type PlayerWord } from "./AyahPlayer";
 import { ExampleCard, type ExampleCardState } from "./ExampleCard";
-import { LessonMapCard } from "./LessonMapCard";
+import { LessonMapCard, type LessonMapCardGroup } from "./LessonMapCard";
 import { type StageCompose, WordComposition } from "./WordComposition";
 
 /**
@@ -207,13 +207,18 @@ function LoadingMark({ className }: { className?: string }) {
  * THE LESSON MAP (operator 2026-10-13: "at the beginning of the ayat, better to
  * inform what concept we will learn in this ayat … in the end recap what we've
  * learnt"; "if some concept already done in previous ayat, we say we repeat
- * what we've learnt before"; plan L23; src/lib/autoplay/lessonMap.ts): in a
- * surah that has one, the step after the imam's recitation ("map") says what
- * the ayah brings and the step before the recap ("learned") what it taught.
- * While either is on, its card sits in the word card's slot (LessonMapCard:
- * "Baru di ayat ini", "Mengulang" and "Nanti", each concept with its ayah; then
- * "Sudah dipelajari" with a tick per concept): the narrator names a few, the
- * card lists every one. No word of the mushaf line is marked meanwhile.
+ * what we've learnt before"; plan L23 — and, with the basic curriculum, "but
+ * separate new vs already knows concept, this is what new, this is what we've
+ * learnt so far"; plan L26; src/lib/autoplay/lessonMap.ts): in a surah that has
+ * one, the steps after the imam's recitation say what the ayah brings, ONE
+ * GROUP AT A TIME — "map:new" (what is new), "map:learnt" (everything learnt so
+ * far, what comes up again here marked) and "map:later" (what is taught later,
+ * and the next-level topics) — and the step before the recap ("learned") what
+ * it taught, with the running total. While one of them is on, its card sits in
+ * the word card's slot (LessonMapCard) and shows that step's group alone: new
+ * and already-learnt are never on screen together. The narrator names a few of
+ * a long group, the card lists every one. No word of the mushaf line is marked
+ * meanwhile.
  */
 export function LessonStage({
   seq,
@@ -251,7 +256,7 @@ export function LessonStage({
   examples?: Readonly<Record<string, StageExample>>;
   /** The marks an example can name with its sound (content/compose `marks`), if the surah has them. */
   marks?: ComposeFile["marks"] | null;
-  /** This ayah's lesson map (content/map: what is new, repeated, taught later), if the surah has one. */
+  /** This ayah's lesson map (content/map: what is new, learnt so far, taught later, next-level), if the surah has one. */
   lessonMap?: LessonMapInput | null;
 }) {
   const t = useTranslations("Guided");
@@ -318,8 +323,10 @@ export function LessonStage({
   const beat = live ? ap.example : null;
   const beatState: ExampleCardState | null = beat ? (beat.failed ? "failed" : beat.reciting ? "reciting" : "shown") : null;
   const beatDrawing = beat ? examples[beat.beat.id] : undefined;
-  // The lesson map's card (plan L23): on its two steps, in the word card's slot.
-  const mapKind = live && lessonMap && (step.kind === "map" || step.kind === "learned") ? step.kind : null;
+  // The lesson map's card (plan L23, L26), in the word card's slot: the one group of the step that
+  // is on — "map:new" / "map:learnt" / "map:later", or the closing.
+  const mapGroup: LessonMapCardGroup | null =
+    live && lessonMap ? (step.kind === "learned" ? "learned" : step.kind === "map" ? (MAP_GROUPS.find((g) => step.id === `map:${g}`) ?? null) : null) : null;
   const showMushaf = !started || (live && !spec);
   const spotGuides = spec ? state.guides.filter((g) => g.target.startsWith("exercise:")) : [];
   const skipGuide = view.showSkip ? state.guides.find((g) => g.target === "skip") : undefined;
@@ -717,8 +724,8 @@ export function LessonStage({
               />
             ) : beat && beatState && beatDrawing && beat.beat.of === "concept" ? (
               <ExampleCard id={beat.beat.id} example={beatDrawing} state={beatState} marks={marks} />
-            ) : mapKind && lessonMap ? (
-              <LessonMapCard map={lessonMap} kind={mapKind} />
+            ) : mapGroup && lessonMap ? (
+              <LessonMapCard map={lessonMap} group={mapGroup} />
             ) : focusWord ? (
               <div
                 data-guide="word-card"
