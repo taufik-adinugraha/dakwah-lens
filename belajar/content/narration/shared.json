@@ -486,7 +486,44 @@
       "text": "Pilih jenisnya: اِسْم, فِعْل, atau حَرْف.",
       "display": "Pilih jenisnya: isim (اِسْم), fi’il (فِعْل), atau huruf (حَرْف).",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/127bfc92002ada74.mp3",
+        "ms": 3553,
+        "sha256": "54fe516a3f40bf285b71161e70583b170d36c9e2691572ecf7e69a45a80d8b2e"
+      },
+      "tokens": [
+        {
+          "t": "Pilih",
+          "s": 0.0,
+          "e": 0.32
+        },
+        {
+          "t": "jenisnya:",
+          "s": 0.373,
+          "e": 0.96
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 1.2,
+          "e": 1.84
+        },
+        {
+          "t": "fi’il (فِعْل),",
+          "s": 2.08,
+          "e": 2.72
+        },
+        {
+          "t": "atau",
+          "s": 2.784,
+          "e": 3.04
+        },
+        {
+          "t": "huruf (حَرْف).",
+          "s": 3.08,
+          "e": 3.52
+        }
+      ]
     },
     "shared:ex:word-kind:reveal": {
       "text": "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi.",
