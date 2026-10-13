@@ -299,6 +299,7 @@ jobs:
                       /belajar/id/konsep/harakat /belajar/en/konsep/harakat /belajar/id/konsep/huruf-jar \
                       /belajar/id/quran /belajar/en/quran \
                       /belajar/id/quran/pengantar /belajar/en/quran/pengantar \
+                      /belajar/id/quran/kurikulum /belajar/en/quran/kurikulum \
                       /belajar/id/quran/al-fatihah /belajar/id/quran/al-fatihah/1 \
                       /belajar/id/quran/al-fatihah/7 /belajar/en/quran/al-fatihah/5; do
             code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
@@ -356,6 +357,17 @@ jobs:
           if grep -q 'data-intro-hint' <<<"$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/2)"; then echo "✗ Al-Fatihah 2 carries ayah 1's line about lesson zero"; exit 1; fi
           # Ayah chips on the track page: hub → track → ayah N is two taps.
           grep -q 'href="/belajar/id/quran/al-fatihah/7"' <<<"$track"
+          # The basic curriculum's page (operator, 2026-10-13: "we should also explain this
+          # curriculum in the page"; plan L30): the track links it; it links the lessons a visitor
+          # can reach (this container: Al-Fatihah), says "Belum tersedia" for the others, and says
+          # "klik", never "ketuk". What it lists against content/curriculum.json — every lesson
+          # once, in order, a link only into a published surah, none into a hidden one, rendered or
+          # in the RSC payload — is surahs-smoke.mjs's part (curriculumPage), in both containers.
+          grep -q 'href="/belajar/id/quran/kurikulum"' <<<"$track" || { echo "✗ the track page does not link the curriculum page"; exit 1; }
+          kur="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/kurikulum)"
+          grep -q 'href="/belajar/id/quran/al-fatihah/1"' <<<"$kur" || { echo "✗ the curriculum page does not link Al-Fatihah ayah 1"; exit 1; }
+          grep -q '>Belum tersedia<' <<<"$kur" || { echo "✗ the curriculum page marks no lesson as Belum tersedia"; exit 1; }
+          if grep -qiE '\b(ketuk|mengetuk|diketuk)\b' <<<"$kur"; then echo "✗ /belajar/id/quran/kurikulum: says ketuk (use klik)"; exit 1; fi
           # The lesson page carries the streamed recitation + the AI-assisted footer. ONE imam
           # everywhere and no reciter setting (operator, 2026-10-13: "better to use alafasy for
           # all? no need to give option to user to change"; plan L21): the page carries Mishary
@@ -509,9 +521,12 @@ jobs:
           # (id + en, every ayah; also as an RSC request, percent-encoded, TAB/LF/CR-mangled, and
           # through the pre-hub 308) answers the module's 404 with none of its ayat in the body;
           # the track page (id, en) shows each of them as a "Segera hadir" card that is no <a>
-          # and links nowhere into them; the hub's "Tersedia sekarang" names Al-Fatihah only; the
-          # concept and word pages show their places as plain text, never a link. Lists every
-          # problem, then fails the step after the restart check below.
+          # and links nowhere into them; the curriculum page (id, en; plan L30) lists every lesson
+          # of content/curriculum.json once, in order, links Al-Fatihah's ayat only, marks every
+          # other lesson "Belum tersedia" as plain text and links nowhere into a hidden surah (it
+          # does NAME them: the curriculum is theirs too); the hub's "Tersedia sekarang" names
+          # Al-Fatihah only; the concept and word pages show their places as plain text, never a
+          # link. Lists every problem, then fails the step after the restart check below.
           surahs_rc=0
           node belajar/scripts/ci/surahs-smoke.mjs --hidden || surahs_rc=$?
           # Migrations are idempotent across restarts.
@@ -532,7 +547,10 @@ jobs:
       # container starts like production (no BELAJAR_WARIS, no BELAJAR_SURAHS),
       # so the shots show what production shows: the hidden waris and Al-Ikhlas
       # addresses' 404, the Mu'awwidzat as "Segera hadir" cards (checked in the
-      # browser: no link, nothing to focus) and the end of Al-Fatihah's lesson
+      # browser: no link, nothing to focus), the curriculum page (plan L30;
+      # checked in the browser: only Al-Fatihah's lessons are links, every other
+      # lesson shows "Belum tersedia", nothing scrolls sideways at the largest
+      # text size) and the end of Al-Fatihah's lesson
       # (checked: "Al-Ikhlas segera hadir", no "Surah berikutnya", no move on).
       # The Ilmu Waris pages and the Mu'awwidzat lessons are shot in their
       # switch-on steps below. The
@@ -578,7 +596,7 @@ jobs:
       # Line breaks (operator, 2026-10-10: "make sure the line break is clean and easy to read,
       # sometime i see wrong line break especially for arabic words"). linebreaks.mjs measures
       # where Chromium REALLY breaks the lines of the real image: every page a learner reaches by
-      # its links (hub, track, each linked surah, every linked ayah closed and with every
+      # its links (hub, track, the curriculum page, each linked surah, every linked ayah closed and with every
       # disclosure open, Konsep and every concept, every Kosakata entry linked from those) and the
       # autoplay lesson step by step (Al-Fatihah 1 with the routed narration, so the karaoke
       # caption; 2 and 7 caption-only, 7 up to its end card; each kind of exercise answered once,
@@ -628,9 +646,11 @@ jobs:
       #   smoke (surahs-smoke.mjs): /belajar/api/surahs lists all four; every surah and ayah page
       #         answers 200, each ayah with the single "Mulai pelajaran" button and the one-click
       #         hint, "klik" never "ketuk"; the pre-hub URLs 308 into them; the track page has no
-      #         "Segera hadir" card and links every surah; the hub lists all four; the concept and
-      #         word pages link into each of them again;
-      #   screenshots (screenshots.mjs --surahs): the track, Al-Ikhlas 1, An-Nas 6, and the end of
+      #         "Segera hadir" card and links every surah; the curriculum page links every written
+      #         lesson (Ayat Kursi and the introduction stay "Belum tersedia"); the hub lists all
+      #         four; the concept and word pages link into each of them again;
+      #   screenshots (screenshots.mjs --surahs): the track, the curriculum page (checked in the
+      #         browser: every written lesson a link), Al-Ikhlas 1, An-Nas 6, and the end of
       #         Al-Fatihah offering "Surah berikutnya: Al-Ikhlas" (checked in the browser);
       #   line breaks (linebreaks.mjs --surahs): the check of the step above on this container,
       #         where the pages a learner reaches by links include every Mu'awwidzat surah and ayah

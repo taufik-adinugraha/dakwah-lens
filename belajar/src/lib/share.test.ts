@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { BRIDGES, MAIN_PAGES, mainSiteHref } from "./mainSite";
-import { ayahHref, hubHref, quranHref, SURAH_SLUGS } from "./routes";
+import { ayahHref, curriculumHref, hubHref, quranHref, SURAH_SLUGS } from "./routes";
 import { alternatesFor, lessonShareable, ogImageUrl, pageUrl, shareMetadata, shareUrl, whatsappHref } from "./share";
 
 // Brand, bridges to the main site and sharing (operator, 2026-10-10: "we hope this feature can
@@ -56,6 +56,9 @@ describe("sharing (lib/share.ts)", () => {
     expect(pageUrl("en", quranHref())).toBe("https://dakwah-lens.id/belajar/en/quran");
     expect(ogImageUrl("id", hubHref())).toBe("https://dakwah-lens.id/belajar/id/og");
     expect(ogImageUrl("id", quranHref())).toBe("https://dakwah-lens.id/belajar/id/quran/og");
+    // The curriculum page (plan L30): its address and its own card, in its own folder.
+    expect(pageUrl("en", curriculumHref())).toBe("https://dakwah-lens.id/belajar/en/quran/kurikulum");
+    expect(ogImageUrl("id", curriculumHref())).toBe("https://dakwah-lens.id/belajar/id/quran/kurikulum/og");
     expect(ogImageUrl("id", ayahHref("al-fatihah", 1))).toBe("https://dakwah-lens.id/belajar/id/quran/al-fatihah/1/og");
     const url = pageUrl("id", ayahHref("al-fatihah", 1));
     expect(shareUrl(url, "share")).toBe(`${url}?utm_source=share&utm_medium=share`);
@@ -89,6 +92,12 @@ describe("sharing (lib/share.ts)", () => {
     expect(read("src/app/[locale]/quran/[surah]/[ayah]/og/route.ts")).toMatch(/lessonShareable\(s\.slug\)/);
     // The track page's own path constant is the track's route.
     expect(/const TRACK_PATH = "([^"]+)"/.exec(read("src/app/[locale]/quran/page.tsx"))?.[1]).toBe(quranHref());
+    // The curriculum page takes its path from the route helper itself (canonical, og:url, card),
+    // and its card route is where ogImageUrl points.
+    const curriculum = read("src/app/[locale]/quran/kurikulum/page.tsx");
+    expect(curriculum).toContain("alternates: alternatesFor(locale, curriculumHref())");
+    expect(curriculum).toContain("path: curriculumHref(),");
+    expect(existsSync(join(BELAJAR, "src/app/[locale]", `${curriculumHref().slice(1)}/og/route.ts`))).toBe(true);
   });
 
   it("has the same message keys in both locales, every namespace", () => {

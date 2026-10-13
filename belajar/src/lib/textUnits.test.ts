@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { NextIntlClientProvider } from "next-intl";
+import { createTranslator, NextIntlClientProvider } from "next-intl";
 import { type ComponentProps, createElement, Fragment } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -13,8 +13,10 @@ import { TermText } from "@/components/library/TermText";
 
 import { measure } from "../../scripts/ci/linebreaks-measure.mjs";
 
+import { mapLatinName } from "./autoplay/lessonMap";
 import { caseLabelMarked } from "./cases";
 import { SURAHS, WORD_INFO } from "./content";
+import { CURRICULUM } from "./curriculum";
 import { captionSpans, emphasisSpans, partEmphasis, termEmphasis } from "./emphasis";
 import { LIBRARY, TERMS } from "./library";
 import { annotate, lessonLookup, prepareParts, Scope, soundsOf, termDisplay, titleParts, type Token } from "./terms";
@@ -47,10 +49,38 @@ const GLOSSARY = (readJson("pipeline/authored/pronunciation.json") as { terms: {
   .map((t) => t.display)
   .filter(hasArabic);
 
+/**
+ * What the curriculum page draws through MixedText that no file holds as shown (plan L30;
+ * src/components/curriculum/CurriculumOutline.tsx): every step's caption name ("Jamak mudzakkar
+ * salim (جَمْع مُذَكَّر سَالِم)"), its Latin name with the comma of a flowing line, the unit names,
+ * and the page's sentences with the file's names filled in (the surah names are hyphenated).
+ */
+const CURRICULUM_TEXTS: [string, string][] = (() => {
+  const out: [string, string][] = [];
+  for (const s of CURRICULUM.steps) {
+    out.push([`curriculum step ${s.id}`, s.name], [`curriculum step ${s.id} (flow)`, `${mapLatinName(s.name)},`]);
+  }
+  const readings = CURRICULUM.units.filter((u) => u.surah !== undefined).map((u) => u.name);
+  for (const u of CURRICULUM.units) out.push([`curriculum unit ${u.id}`, u.name]);
+  for (const locale of ["id", "en"] as const) {
+    const messages = readJson(`messages/${locale}.json`) as Parameters<typeof createTranslator>[0]["messages"];
+    const t = createTranslator({ locale, messages });
+    const list = new Intl.ListFormat(locale, { style: "long", type: "conjunction" }).format(readings);
+    out.push([`curriculum intro (${locale})`, t("Curriculum.intro_scope", { count: readings.length, list })]);
+    out.push([`curriculum track block (${locale})`, t("Quran.curriculum_body", { max: 3, last: readings.at(-1) ?? "" })]);
+    for (const unit of readings) {
+      out.push([`curriculum link ${unit} (${locale})`, t("Curriculum.open_ayah", { unit, n: 1 })]);
+      out.push([`curriculum link ${unit} segment (${locale})`, t("Curriculum.open_segment", { unit, n: 1 })]);
+    }
+  }
+  return out;
+})();
+
 /** Every string a page can render: lesson + library content, the quizzes (their reasons and roles
  *  are text built by pipeline/quiz.py: an item inside a bracket with its Arabic right after it, a
- *  phrase with one bracket), manifests, both message files. */
+ *  phrase with one bracket), manifests, both message files, the curriculum page's own texts. */
 const CORPUS: [string, string][] = [
+  ...CURRICULUM_TEXTS,
   ...["al-fatihah", "al-ikhlas", "al-falaq", "an-nas", "library"].flatMap((f) =>
     strings(readJson(`content/${f}.json`), f),
   ),

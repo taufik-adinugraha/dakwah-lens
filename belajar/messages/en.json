@@ -40,7 +40,34 @@
     "p2_title": "Sourced, not invented",
     "p2_body": "Every meaning, i'rab note and hadith is quoted from a named kitab or dataset, with its reference.",
     "p3_title": "AI-assisted, sourced from kitabs",
-    "p3_body": "Explanations are prepared with AI help from named kitabs. This is learning material, not a fatwa: check the references, and ask a teacher when in doubt."
+    "p3_body": "Explanations are prepared with AI help from named kitabs. This is learning material, not a fatwa: check the references, and ask a teacher when in doubt.",
+    "curriculum_heading": "The basic curriculum",
+    "curriculum_body": "The lessons build up step by step: at most {max} new things in each lesson, and what has been learnt is repeated whenever it comes up again. See the order, from the introduction lesson to {last}.",
+    "curriculum_link": "See the basic curriculum"
+  },
+  "Curriculum": {
+    "title": "The basic curriculum",
+    "description": "The basic Qur'anic Arabic lessons in order: what is new in each lesson, and what has been learnt by then.",
+    "intro_scope": "At the basic level, Qur'anic Arabic grammar is learnt through {count} readings: {list}. An introduction lesson comes first.",
+    "intro_pace": "The lessons go ayah by ayah; a long ayah is split into several parts. Each lesson teaches at most {max} new things, and what has been learnt is repeated whenever it comes up again in a later ayah. In all there are {lessons} lessons and {steps} things to learn.",
+    "intro_later": "Sharaf (word formation) and some advanced topics are not taught at this level. They are listed under “Advanced level” at the end of this page.",
+    "list_heading": "The lessons in order",
+    "list_help": "In each lesson, what is new is listed apart from what has already been learnt. An underlined name can be clicked: its explanation is on a Concept page. Lessons that are available can be opened from this page; the others are marked “not available yet”.",
+    "intro_unit": "Introduction",
+    "unit_meta": "{lessons, plural, one {# lesson} other {# lessons}}, {steps, plural, one {# new item} other {# new items}}",
+    "lesson_intro": "Introduction lesson",
+    "lesson_segment": "Part {n}",
+    "unavailable": "Not available yet",
+    "new_heading": "New in this lesson",
+    "review_heading": "Nothing new",
+    "review_body": "This lesson reviews what has been learnt.",
+    "again": "Coming up again in this ayah ({n}):",
+    "learnt": "Learnt so far: {n, plural, one {# item} other {# items}}",
+    "open_ayah": "Open the lesson on {unit}, ayah {n}",
+    "open_segment": "Open the lesson on {unit}, part {n}",
+    "open_intro": "Open the introduction lesson",
+    "next_heading": "Advanced level",
+    "next_body": "The {n} topics below are not taught at the basic level: all of sharaf (word formation) and some advanced nahwu topics. The basic lessons only name them; click a topic to read its explanation on its Concept page."
   },
   "Breadcrumb": {
     "label": "You are here",
@@ -81,7 +108,9 @@
     "lesson_title": "{surah} · Ayah {n}",
     "lesson_description": "“{translation}” Learn it word by word: meaning, root, and why each ending is read the way it is.",
     "image_alt": "Learn Qur'anic Arabic, from Dakwah-Lens",
-    "lesson_image_alt": "{surah} · Ayah {n}: transliteration and translation, Learn Qur'anic Arabic from Dakwah-Lens"
+    "lesson_image_alt": "{surah} · Ayah {n}: transliteration and translation, Learn Qur'anic Arabic from Dakwah-Lens",
+    "curriculum_title": "The basic curriculum",
+    "curriculum_body": "The basic lessons in order: what is new in each lesson, and what has been learnt by then."
   },
   "Credits": {
     "title": "Sources & licences",

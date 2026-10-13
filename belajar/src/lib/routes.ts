@@ -58,6 +58,41 @@ export function ayahHref(slug: string, ayah: number, wordLoc?: string) {
 /** DOM id of a word card, from its loc: "1:2:3" → "w-1-2-3". */
 export const wordAnchorId = (loc: string) => `w-${loc.replaceAll(":", "-")}`;
 
+/**
+ * The basic curriculum, explained: which lesson teaches what, in teaching order
+ * (docs/belajar-plan.md L30). A static segment beside [surah], so it wins over
+ * it; no surah slug may be "kurikulum" (src/lib/routes.test.ts).
+ */
+export const curriculumHref = () => `/${QURAN}/kurikulum`;
+
+/**
+ * The page of ONE lesson of the basic curriculum (content/curriculum.json
+ * `lessons`), or null: the lesson has no page. Every link the curriculum page
+ * draws to a lesson is built here, and nowhere else.
+ *
+ * - An ayah lesson of a surah that has lesson pages (`slug`): that ayah's page.
+ * - Lesson "0", the introduction with no ayah: NO ROUTE YET, so null, and the
+ *   curriculum page shows it as "belum tersedia". Once its route exists
+ *   (suggested: /quran/pengantar), return that path from the first line of
+ *   the function instead of null (give it a helper of its own beside
+ *   curriculumHref), and the curriculum page links it with no other change:
+ *   the introduction belongs to no surah, so no surah switch hides it. The
+ *   checks that hold lesson "0" to "not a link" then change with it:
+ *   routes.test.ts, curriculumOutline.test.ts and curriculum-page.test.ts,
+ *   and the `reachable` rule of scripts/ci/surahs-smoke.mjs (curriculumPage)
+ *   and scripts/ci/screenshots.mjs (curriculumCheck).
+ * - A segment of a long ayah ("2:255/3", Ayat Kursi): no route.
+ *
+ * WHETHER a lesson may be shown as a link is not decided here (this file stays
+ * free of imports): the caller asks lib/features.ts for the published surahs
+ * (src/lib/curriculumOutline.ts).
+ */
+export function lessonHref(lesson: { id: string; slug?: string; ayah?: number; segment?: number }): string | null {
+  if (lesson.id === "0") return null;
+  if (!lesson.slug || lesson.ayah === undefined || lesson.segment !== undefined) return null;
+  return ayahHref(lesson.slug, lesson.ayah);
+}
+
 /** The Ilmu Waris track's segment: /belajar/{locale}/waris/… (docs/waris-plan.md §9.1). */
 const WARIS = "waris";
 

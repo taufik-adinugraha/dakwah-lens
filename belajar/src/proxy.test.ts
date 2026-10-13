@@ -145,6 +145,11 @@ describe("proxy: only the surahs BELAJAR_SURAHS publishes (unset: Al-Fatihah onl
     expect(landing("/belajar/en/quran")).toBe("/belajar/en/quran");
     expect(landing("/belajar/id/quran/al-fatihah")).toBe("/belajar/id/quran/al-fatihah");
     expect(landing("/belajar/en/quran/al-fatihah/7")).toBe("/belajar/en/quran/al-fatihah/7");
+    // The curriculum page and its share card (plan L30): pages of the track, no surah's lesson.
+    // They name the hidden surahs as plain text and are never gated.
+    expect(landing("/belajar/id/quran/kurikulum")).toBe("/belajar/id/quran/kurikulum");
+    expect(landing("/belajar/en/quran/kurikulum")).toBe("/belajar/en/quran/kurikulum");
+    expect(landing("/belajar/id/quran/kurikulum/og")).toBe("/belajar/id/quran/kurikulum/og");
     // Not a lesson: the lesson routes' own 404 (dynamicParams = false), not the gate's.
     expect(landing("/belajar/id/quran/al-baqarah")).toBe("/belajar/id/quran/al-baqarah");
     expect(landing("/belajar/id/quran/al-ikhlasan")).toBe("/belajar/id/quran/al-ikhlasan");

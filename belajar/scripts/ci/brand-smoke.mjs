@@ -12,8 +12,9 @@
 //     on any page;
 //   - the bridges in the static HTML (hub, track, the two inside "Materi lengkap ayat ini") with the
 //     main-site addresses verified by page title (src/lib/mainSite.ts), written out here again;
-//   - og:* / twitter:* on the hub, the track and every published lesson: og:url = the canonical
-//     link, the image = the page's own /og card; the pages stay noindex;
+//   - og:* / twitter:* on the hub, the track, the curriculum page (plan L30) and every published
+//     lesson: og:url = the canonical link, the image = the page's own /og card; the pages stay
+//     noindex;
 //   - every card: 200, image/png, a real PNG of 1200×630; unknown lessons' cards 404; nothing
 //     hidden is shared: the waris address's 404 page carries no card and no share button, and
 //     where the image lists its published surahs (/belajar/api/surahs, BELAJAR_SURAHS) an
@@ -205,7 +206,12 @@ for (const locale of ["id", "en"]) {
   bridge(trackPath, track, "track", `${SITE}/${locale}/kitab?${utm("track")}`);
   shareButton(trackPath, track, `${SITE}${trackPath}`);
 
-  for (const card of [`${hubPath}/og`, `${trackPath}/og`]) if (await cardImage(card)) ok(`${card}: 1200×630 PNG`);
+  // The curriculum page: the same header and footer, og tags that name its own card.
+  const curriculumPath = `/belajar/${locale}/quran/kurikulum`;
+  const curriculum = await chrome(curriculumPath, locale);
+  await shareMeta(curriculumPath, curriculum, { card: `${curriculumPath}/og` });
+
+  for (const card of [`${hubPath}/og`, `${trackPath}/og`, `${curriculumPath}/og`]) if (await cardImage(card)) ok(`${card}: 1200×630 PNG`);
 
   // Every lesson: its og tags name its own card, and the card is drawn.
   let cards = 0;

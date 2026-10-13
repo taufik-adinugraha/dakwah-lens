@@ -40,7 +40,34 @@
     "p2_title": "Bersumber, bukan dikarang",
     "p2_body": "Setiap arti, i'rab, dan hadits dikutip dari kitab atau data yang disebut namanya, lengkap dengan rujukannya.",
     "p3_title": "Dibantu AI, bersumber kitab",
-    "p3_body": "Penjelasan disusun dengan bantuan AI dari kitab yang disebut namanya. Ini bahan belajar, bukan fatwa: periksa rujukannya, dan tanyakan kepada guru bila ragu."
+    "p3_body": "Penjelasan disusun dengan bantuan AI dari kitab yang disebut namanya. Ini bahan belajar, bukan fatwa: periksa rujukannya, dan tanyakan kepada guru bila ragu.",
+    "curriculum_heading": "Kurikulum tingkat dasar",
+    "curriculum_body": "Pelajaran disusun bertahap: paling banyak {max} hal baru di setiap pelajaran, dan yang sudah dipelajari diulang setiap kali muncul lagi. Lihat urutannya, dari pelajaran pengantar sampai {last}.",
+    "curriculum_link": "Lihat kurikulum tingkat dasar"
+  },
+  "Curriculum": {
+    "title": "Kurikulum tingkat dasar",
+    "description": "Urutan pelajaran tingkat dasar Bahasa Arab Al-Qur'an: yang baru di setiap pelajaran, dan yang sudah dipelajari sampai di situ.",
+    "intro_scope": "Di tingkat dasar, tata bahasa Arab Al-Qur'an dipelajari lewat {count} bacaan: {list}. Sebelum itu ada pelajaran pengantar.",
+    "intro_pace": "Pelajaran berjalan ayat demi ayat; ayat yang panjang dibagi menjadi beberapa penggalan. Setiap pelajaran mengajarkan paling banyak {max} hal baru, dan yang sudah dipelajari diulang setiap kali muncul lagi di ayat berikutnya. Seluruhnya ada {lessons} pelajaran dengan {steps} hal yang dipelajari.",
+    "intro_later": "Ilmu sharaf (perubahan bentuk kata) dan beberapa topik lanjutan belum diajarkan di tingkat ini. Daftarnya ada di bagian “Tingkat lanjut” di akhir halaman.",
+    "list_heading": "Urutan pelajaran",
+    "list_help": "Di setiap pelajaran, yang baru ditulis terpisah dari yang sudah dipelajari. Nama yang bergaris bawah bisa diklik: penjelasannya ada di halaman Konsep. Pelajaran yang sudah tersedia bisa dibuka dari halaman ini; yang lain bertanda “belum tersedia”.",
+    "intro_unit": "Pengantar",
+    "unit_meta": "{lessons} pelajaran, {steps} hal baru",
+    "lesson_intro": "Pelajaran pengantar",
+    "lesson_segment": "Penggalan {n}",
+    "unavailable": "Belum tersedia",
+    "new_heading": "Baru di pelajaran ini",
+    "review_heading": "Tidak ada hal baru",
+    "review_body": "Pelajaran ini mengulang yang sudah dipelajari.",
+    "again": "Yang muncul lagi di ayat ini ({n}):",
+    "learnt": "Sudah dipelajari sampai di sini: {n} hal",
+    "open_ayah": "Buka pelajaran {unit} ayat {n}",
+    "open_segment": "Buka pelajaran {unit} penggalan {n}",
+    "open_intro": "Buka pelajaran pengantar",
+    "next_heading": "Tingkat lanjut",
+    "next_body": "{n} topik berikut belum diajarkan di tingkat dasar: seluruh ilmu sharaf (perubahan bentuk kata) dan beberapa topik nahwu lanjutan. Di pelajaran tingkat dasar topik ini hanya disebut namanya; klik sebuah topik untuk membaca penjelasannya di halaman Konsep."
   },
   "Breadcrumb": {
     "label": "Anda berada di",
@@ -81,7 +108,9 @@
     "lesson_title": "{surah} · Ayat {n}",
     "lesson_description": "“{translation}” Pelajari kata demi kata: arti, akar kata, dan alasan harakat di akhirnya.",
     "image_alt": "Belajar Bahasa Arab Al-Qur'an, dari Dakwah-Lens",
-    "lesson_image_alt": "{surah} · Ayat {n}: transliterasi dan terjemahan, Belajar Bahasa Arab Al-Qur'an dari Dakwah-Lens"
+    "lesson_image_alt": "{surah} · Ayat {n}: transliterasi dan terjemahan, Belajar Bahasa Arab Al-Qur'an dari Dakwah-Lens",
+    "curriculum_title": "Kurikulum tingkat dasar",
+    "curriculum_body": "Urutan pelajaran tingkat dasar: yang baru di setiap pelajaran, dan yang sudah dipelajari sampai di situ."
   },
   "Credits": {
     "title": "Sumber & lisensi",
