@@ -43,10 +43,11 @@ const EMPHASIS_CLASS: Record<EmphasisKind, string> = {
 /**
  * A meaning inside a LABEL (emphasis="meaning": a word's role, a structure group, a quiz option, a
  * scholars' reading, a title): forest, at the label's own weight. Its “…” is the second cue there
- * (plan L22: quotes AND colour), so colour is still never the only one — and the label's words keep
- * their widths, so its line breaks stay the ones it had. Semibold made “permulaanku” a few pixels
- * wider than its line in a scholars' reading on a phone at the largest text size, and the "—" glued
- * after it started the next line (CI line breaks, 2026-10-13).
+ * (plan L22: quotes AND colour), so colour is still never the only one. Labels sit in the
+ * narrowest columns of the app (a quiz option; a scholars' reading, 202px at Sangat besar on a
+ * phone), where the “…” the rule added already widened one kept piece past its line (CI line
+ * breaks, 2026-10-13: "(“permulaanku”) —", since given a line break of its own in WordCard):
+ * semibold on top would widen every such piece again, so a label's words keep the widths they had.
  */
 const LABEL_MEANING_CLASS = "text-forest";
 
