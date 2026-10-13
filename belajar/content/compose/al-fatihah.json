@@ -578,7 +578,11 @@
         },
         {
           "frame": 2,
-          "say": "Di ayat ini akhirnya menjadi kasrah, bunyi i, karena kata ini menjadi mudhaf ilaih: kata yang artinya “nama” disandarkan kepadanya."
+          "say": "Di ayat ini akhirnya menjadi kasrah, bunyi i, karena kata yang artinya “nama” disandarkan kepadanya."
+        },
+        {
+          "frame": 2,
+          "say": "Susunan sandaran seperti ini kita pelajari di ayat keempat."
         }
       ],
       "sources": [
@@ -784,7 +788,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Bagian pertama adalah alif lam, penanda bahwa kata itu sudah tertentu."
+          "say": "Bagian pertama adalah alif lam. Gunanya kita pelajari di ayat ketiga."
         },
         {
           "frame": 1,
@@ -804,7 +808,11 @@
         },
         {
           "frame": 4,
-          "say": "Di sini akhirnya menjadi kasrah, bunyi i, karena kata ini sifat, atau na't, bagi kata kedua; sifat mengikuti akhiran kata yang disifatinya."
+          "say": "Di sini akhirnya menjadi kasrah, bunyi i, karena kata ini sifat bagi kata kedua; sifat mengikuti akhiran kata yang disifatinya."
+        },
+        {
+          "frame": 4,
+          "say": "Aturan sifat ini kita pelajari di ayat ketiga."
         }
       ],
       "sources": [
@@ -1465,7 +1473,7 @@
         },
         {
           "frame": 2,
-          "say": "Kata ini sifat, atau na't, bagi nama itu, seperti sifat-sifat di ayat pertama; sebagian ulama menyebutnya pengganti, dengan akhiran yang sama."
+          "say": "Kata ini sifat bagi nama itu, seperti sifat-sifat di ayat pertama; sebagian ulama menyebutnya pengganti, dengan akhiran yang sama."
         }
       ],
       "sources": [
@@ -1629,7 +1637,7 @@
         },
         {
           "frame": 3,
-          "say": "Kata ini menjadi mudhaf ilaih: kata ketiga, yang artinya “Tuhan”, disandarkan kepadanya, seperti di ayat pertama."
+          "say": "Kata ketiga, yang artinya “Tuhan”, disandarkan kepada kata ini, seperti di ayat pertama."
         },
         {
           "frame": 3,
@@ -1874,7 +1882,7 @@
         },
         {
           "frame": 2,
-          "say": "Sebabnya, kata ini sekali lagi menjadi sifat bagi nama Allah di ayat kedua, yang berakhir kasrah."
+          "say": "Sebabnya, kata ini sekali lagi menjadi sifat, atau na't, bagi nama Allah di ayat kedua, yang berakhir kasrah."
         },
         {
           "frame": 3,
@@ -5322,7 +5330,7 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:0e862a115e0d24c6875e237428017907247d9c82c3642a437ce3d181aa4f73ab",
+    "authored_compose": "authored/al-fatihah.compose.json sha256:3aea4d3823ebc9ca999db19f4bfa6bcfc060dc911e8dc05312ba507a1b254e7f",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }

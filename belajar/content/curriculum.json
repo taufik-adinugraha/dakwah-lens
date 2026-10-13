@@ -428,7 +428,9 @@
     {
      "line": "concept:jumlah-filiyyah",
      "step": "jumlah-filiyyah",
-     "words": []
+     "words": [
+      1
+     ]
     },
     {
      "line": "concept:maful-bih",
@@ -2660,8 +2662,8 @@
      },
      {
       "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
-      "ref": "bab Marfu'at al-Asma': mubtada' dan khabarnya termasuk yang marfu' (halaman cetak belum diverifikasi)",
-      "url": "https://shamela.ws/book/11371/8"
+      "ref": "hlm. 12, bab al-Mubtada' wal-Khabar: definisi (mubtada' adalah isim yang marfu')",
+      "url": "https://shamela.ws/book/11371/11"
      }
     ]
    },
@@ -2693,10 +2695,10 @@
    "line": "concept:alif-lam",
    "teach": {
     "title": "Alif lam, penanda isim yang tertentu",
-    "summary": "Alif lam hanya masuk pada isim, dan isim yang diawalinya menjadi tertentu, atau ma'rifah. Nama diri, seperti lafaz Allah, sudah ma'rifah tanpa alif lam.",
+    "summary": "Alif lam hanya masuk pada isim, dan isim yang diawalinya menjadi tertentu, atau ma'rifah. Nama diri, seperti nama Allah, sudah ma'rifah tanpa alif lam.",
     "marked": {
      "title": "Alif lam, penanda [[isim|isim]] yang tertentu",
-     "summary": "Alif lam hanya masuk pada [[isim|isim]], dan [[isim|isim]] yang diawalinya menjadi tertentu, atau [[ma'rifah|marifah]]. Nama diri, seperti lafaz Allah, sudah [[ma'rifah|marifah]] tanpa alif lam."
+     "summary": "Alif lam hanya masuk pada [[isim|isim]], dan [[isim|isim]] yang diawalinya menjadi tertentu, atau [[ma'rifah|marifah]]. Nama diri, seperti nama Allah, sudah [[ma'rifah|marifah]] tanpa alif lam."
     },
     "sources": [
      {
@@ -2952,8 +2954,8 @@
   {
    "id": "nafi-lam",
    "lesson": "112:3",
-   "name": "Lam nafi",
-   "latin": "Lam nafi",
+   "name": "Huruf nafi yang menjazmkan",
+   "latin": "Huruf nafi yang menjazmkan",
    "concept": "jazm-lam",
    "line": "concept:jazm-lam",
    "terms": [
@@ -3003,8 +3005,8 @@
   {
    "id": "la-nafi",
    "lesson": "2:255/2",
-   "name": "La nafi",
-   "latin": "La nafi",
+   "name": "Huruf nafi",
+   "latin": "Huruf nafi",
    "line": null,
    "terms": []
   },

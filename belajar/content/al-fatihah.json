@@ -1811,6 +1811,7 @@
           "concepts": [
             "dhamir",
             "fiil-amr",
+            "jumlah-filiyyah",
             "maful-bih"
           ],
           "role": "fi'il amr (doa) + maf'ul bih pertama (-nā); fa'il tersimpan: “Engkau”",
@@ -5136,7 +5137,7 @@
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
     "authored_words": "authored/al-fatihah.words.json sha256:192760f3b4e86c18a0843b1c3ec8a04c0043d891b208fd671df9518a859f4afa",
     "authored_structure": "authored/al-fatihah.structure.json sha256:7d24d7b529f20127dbf1b2f929180698fa3de5dcb57c701e87619090c4387dc9",
-    "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:656c8d94d0a68b81de3ab3c32608db99f9481e8e1b382c7c838bae61b636f960",
+    "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:f39f21abd48c0257e9c4733933ca744d46c0ecc36bd42499a14a7415436c47ee",
     "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:1181789ee65c1b2e800270475f1c6264576a0062f8d75290ee2f99af9d2adc5f",
     "pipeline": "belajar/pipeline/build_fatihah.py + facts.py (stdlib only, no LLM)"
   }

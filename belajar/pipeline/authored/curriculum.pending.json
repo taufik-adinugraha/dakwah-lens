@@ -1,12 +1,6 @@
 {
  "_comment": "TOLERATED FOR NOW: what the lessons written before the basic curriculum (authored/curriculum.json, operator-approved 2026-10-13; docs/belajar-research/kurikulum-dasar.md decision 7: 'No lesson line may use a term before the lesson that teaches it') still say too early. `lines`: narration line id -> the dictionary terms (authored/library.terms.json ids) its prose uses although their step is taught in a later lesson, or in none (tingkat lanjut). `quiz`: '<slug>:<ayah>:<exercise>:<question number>' -> the terms that question needs although the lesson has not TAUGHT them by that ayah (quiz.py, TAUGHT ⊇ REQUIRED: a term's lesson moved later). Held BOTH ways by build_narration.py / validate_narration.py (lines) and validate_quiz.py (quiz): a violation that is not listed here fails, and an entry that no longer violates fails as stale ('remove it'). NEVER add an entry by hand to make a new line pass: rewrite the line. This file only shrinks — `python3 build_narration.py --write-pending` rewrites it from what the checks find (use it to drop the entries a rewrite has cleared), and it must end as {\"lines\": {}, \"quiz\": {}}.",
  "lines": {
-  "al-fatihah:1:w2:compose:2": [
-   "mudhaf-ilaih"
-  ],
-  "al-fatihah:1:w3:compose:6": [
-   "naat"
-  ],
   "al-fatihah:1:structure": [
    "idhafah",
    "naat",
@@ -18,15 +12,6 @@
   ],
   "al-fatihah:1:ex:why-harakat:3:why": [
    "naat"
-  ],
-  "al-fatihah:2:w3:compose:3": [
-   "naat"
-  ],
-  "al-fatihah:2:w4:compose:5": [
-   "mudhaf-ilaih"
-  ],
-  "al-fatihah:2:concept:jamak-mudzakkar-salim": [
-   "nashab"
   ],
   "al-fatihah:2:structure": [
    "naat",
@@ -43,10 +28,6 @@
   ],
   "al-fatihah:3:structure": [
    "badal"
-  ],
-  "al-fatihah:5:concept:fiil-mudhari": [
-   "nashib",
-   "jazim"
   ],
   "al-fatihah:5:structure": [
    "athaf",
