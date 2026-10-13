@@ -315,6 +315,13 @@ def youtube_channels_ingest(self, limit: int = 50) -> dict[str, object]:
     }
 
 
+# The platforms the daily trending overlay fans its keywords out to.
+# X is PAUSED since 2026-10-13 at operator request ("we will also disable X
+# for now … only youtube and mainstream media"); the weekly X sweep is
+# commented out in celery_app.py the same day. Add "x" back here to resume.
+TRENDING_PLATFORMS: tuple[str, ...] = ("youtube",)
+
+
 @celery_app.task(name="api.workers.ingest.trending_ingest")
 def trending_ingest() -> dict[str, object]:
     """Fetch today's trending topics, filter for da'wah-relevance, and
@@ -330,7 +337,8 @@ def trending_ingest() -> dict[str, object]:
     its own time budget (the parent finishes in <1 min regardless of how
     many scrapes fan out).
 
-    Platforms scraped per keyword:
+    Platforms scraped per keyword (TRENDING_PLATFORMS; X is PAUSED since
+    2026-10-13, so only YouTube is dispatched today):
       • X — apidojo at $0.0004/item, 100 items/keyword. Budget at ~8
         keywords/day: ~$0.32/day ≈ $9.6/mo.
       • YouTube — unbounded `search.list` keyword search (free YouTube
@@ -376,9 +384,9 @@ def trending_ingest() -> dict[str, object]:
             await ingest_runs.finish_run(
                 run_id,
                 status="success",
-                items_stored=len(kw) * 2 if kw else 0,
+                items_stored=len(kw) * len(TRENDING_PLATFORMS) if kw else 0,
             )
-            return kw, len(kw) * 2 if kw else 0
+            return kw, len(kw) * len(TRENDING_PLATFORMS) if kw else 0
         except Exception as exc:
             await ingest_runs.finish_run(
                 run_id, status="failed", error=str(exc)
@@ -397,16 +405,19 @@ def trending_ingest() -> dict[str, object]:
 
     dispatched = 0
     for keyword in keywords:
-        run_ingest.delay(platform="x", query=keyword, limit=X_LIMIT)
-        run_ingest.delay(
-            platform="youtube",
-            query=keyword,
-            limit=YT_LIMIT,
-            youtube_search=True,
-        )
-        dispatched += 2
+        if "x" in TRENDING_PLATFORMS:
+            run_ingest.delay(platform="x", query=keyword, limit=X_LIMIT)
+            dispatched += 1
+        if "youtube" in TRENDING_PLATFORMS:
+            run_ingest.delay(
+                platform="youtube",
+                query=keyword,
+                limit=YT_LIMIT,
+                youtube_search=True,
+            )
+            dispatched += 1
 
-    platforms = ["x", "youtube"]
+    platforms = list(TRENDING_PLATFORMS)
     log.info(
         "trending_ingest.dispatched",
         keywords=keywords,

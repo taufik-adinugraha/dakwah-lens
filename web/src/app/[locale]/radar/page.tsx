@@ -152,9 +152,11 @@ export default async function InsightsExplorePage({
         </div>
       </section>
 
-      {/* Pipeline coverage notice (2026-06-11): TikTok + Instagram
-          ingest is paused due to per-item scraper cost. Mainstream RSS,
-          X, and YouTube remain active. Drop this banner when those
+      {/* Pipeline coverage notice. Since 2026-10-13 (operator: "we will
+          also disable X for now, and we need to show the info in the
+          web"): X, Instagram, TikTok and Facebook are not fetched; only
+          mainstream media and YouTube run (lib/ingest-status.ts). First
+          shown 2026-06-11 for TikTok + Instagram alone. Reword it as
           platforms come back online. */}
       <section className="pb-4 sm:pb-6">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">

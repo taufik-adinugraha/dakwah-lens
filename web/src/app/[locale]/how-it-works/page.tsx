@@ -1,7 +1,7 @@
 import { ForestWash } from "@/components/ForestWash";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowRight, ArrowUpRight, ExternalLink, GitBranch, ShieldCheck } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ExternalLink, GitBranch, Info, ShieldCheck } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { localeAlternates } from "@/lib/seo";
@@ -343,6 +343,25 @@ function SectionHeader({
 }
 
 /**
+ * What is fetched TODAY, said where the page describes the scrapers
+ * (operator 2026-10-13: "we will also disable X for now, and we need to
+ * show the info in the web"). The page documents every scraper that
+ * exists; this note says which of them run. Wording:
+ * HowItWorks.ingest_status_note; the facts: lib/ingest-status.ts.
+ */
+function IngestStatusNote({ t }: { t: T }) {
+  return (
+    <div
+      data-ingest-status=""
+      className="mt-6 flex max-w-2xl items-start gap-3 rounded-xl border border-hairline bg-paper-deep/60 px-4 py-3 text-sm text-ink-muted sm:px-5 sm:py-4"
+    >
+      <Info className="mt-0.5 h-4 w-4 shrink-0 text-ink-faint" />
+      <p className="leading-relaxed">{t("ingest_status_note")}</p>
+    </div>
+  );
+}
+
+/**
  * Numbered editorial stage list — shared by the three pipeline sections
  * (ingestion, insights briefing, on-demand brief). Fraunces tabular
  * indices + hairline dividers instead of the old step-badge card grid.
@@ -420,6 +439,7 @@ function IngestionPipeline({ t }: { t: T }) {
           title={t("ingest_title")}
           subtitle={t("ingest_subtitle")}
         />
+        <IngestStatusNote t={t} />
         <StageList stages={stages} />
 
         <p className="mt-6 max-w-2xl text-pretty text-xs leading-relaxed text-ink-faint">
@@ -516,6 +536,7 @@ function PlatformStrategy({ t }: { t: T }) {
           title={t("platforms_title")}
           subtitle={t("platforms_subtitle")}
         />
+        <IngestStatusNote t={t} />
         <div className="mt-10 grid gap-x-10 sm:grid-cols-2">
           {cards.map((c) => (
             <article key={c.title} className="border-t border-hairline py-6">

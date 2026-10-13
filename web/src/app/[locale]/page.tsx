@@ -15,6 +15,7 @@ import { DaleelMoment } from "@/components/landing/DaleelMoment";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { ForWhom } from "@/components/landing/ForWhom";
 import { Support } from "@/components/landing/Support";
+import { ACTIVE_SOCIAL_PLATFORMS } from "@/lib/ingest-status";
 import { getLandingInsights } from "@/lib/landing-data";
 import { formatPanggilan } from "@/lib/panggilan";
 import type { UserProfile } from "@/db/schema";
@@ -26,7 +27,6 @@ type Coverage = {
   postsAnalyzed30d: number;
 };
 
-const SOCIAL_PLATFORMS = ["x", "instagram", "tiktok", "youtube"] as const;
 
 async function getCoverage(): Promise<Coverage> {
   // Run the counts in parallel. Each hits an indexed column so the
@@ -52,7 +52,9 @@ async function getCoverage(): Promise<Coverage> {
   ]);
   return {
     outlets: outletRows[0]?.n ?? 0,
-    socialPlatforms: SOCIAL_PLATFORMS.length,
+    // The social platforms fetched TODAY (YouTube only since 2026-10-13),
+    // not every platform a scraper exists for: lib/ingest-status.ts.
+    socialPlatforms: ACTIVE_SOCIAL_PLATFORMS.length,
     postsAnalyzed30d: postRows[0]?.n ?? 0,
   };
 }

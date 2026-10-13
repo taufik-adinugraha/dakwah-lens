@@ -5,6 +5,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Flame,
+  Info,
   Newspaper,
   Radio,
   TrendingUp,
@@ -24,6 +25,7 @@ import {
   type PlatformKey,
 } from "@/data/drilldowns";
 import { routing } from "@/i18n/routing";
+import { isPausedPlatform } from "@/lib/ingest-status";
 import {
   getPlatformInsights,
   getTopEngagedPosts,
@@ -151,6 +153,25 @@ export default async function PlatformDrilldownPage({
   return (
     <>
       <Hero config={config} t={t} live={live} />
+      {/* A platform whose ingest is switched off says so under its hero
+          (operator 2026-10-13: X, Instagram, TikTok, Facebook are not
+          fetched; lib/ingest-status.ts). Its figures below are the last
+          data fetched, not a live feed. */}
+      {isPausedPlatform(platform) && (
+        <section className="pb-4 sm:pb-6" data-platform-paused={platform}>
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="flex items-start gap-3 rounded-xl border border-hairline bg-paper-deep/60 px-4 py-3 text-sm text-ink-muted sm:px-5 sm:py-4">
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-ink-faint" />
+              <p className="leading-relaxed">
+                <span className="font-semibold text-ink">
+                  {tInsights("platform_paused_title")}
+                </span>{" "}
+                {tInsights("platform_paused_body")}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
       {platform === "mainstream" && (
         <ScopePicker
           locale={locale}
