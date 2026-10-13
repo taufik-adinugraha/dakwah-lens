@@ -576,8 +576,9 @@ def mechanical_plan(lesson: dict, library: dict) -> dict:
 #                   what the lesson already says about the word, its `pos` ("huruf jar + isim":
 #                   POS_KIND), part by part: a disagreement stops the build;
 #   the explanation the kind and its plain meaning as the Kalimah record's own summary gives it
-#                   (kind_meanings; for the Name of Allah the kind alone: QAC_LAFAZ), then a
-#                   VISIBLE SIGN only where the data shows one and the
+#                   (kind_meanings; the kind alone for an isim that is no noun, proper noun or
+#                   adjective, and for the Name of Allah: `glossed`), then a VISIBLE SIGN only
+#                   where the data shows one and the
 #                   step that teaches it belongs to an EARLIER lesson (SIGNS). The two signs are
 #                   the matn's own signs of an isim (Ajurrumiyyah, Shamela 11371/1: «فالاسم
 #                   يُعرَفُ: بالخَفضِ، والتنوينِ، ودخولِ الألف واللام، وحروفِ الخَفضِ»); no other
@@ -605,10 +606,22 @@ QAC_KIND = {"N": "isim", "PN": "isim", "ADJ": "isim", "PRON": "isim", "DEM": "is
             "V": "fiil", "P": "huruf", "CONJ": "huruf", "NEG": "huruf"}
 # The article: no part of its own (build_surah.pos_label leaves it out of `pos` as well).
 QAC_ARTICLE = "DET"
-# The Name of Allah, as QAC lemmatises it (build_surah.pos_label: "isim 'alam (lafaz Allah)"). Its
-# explanation says the kind and stops there: the kind's general gloss ("nama benda, orang, atau
-# sifat") is not said in the sentence whose subject is the Name.
+# WHERE THE KIND'S PLAIN MEANING IS SAID (one rule, `glossed`). The Kalimah record glosses an isim
+# as "nama benda, orang, atau sifat": that covers a noun, a proper noun and an adjective (QAC N,
+# PN, ADJ) and nothing else. A pronoun, a relative or demonstrative, an adverb of time or place
+# (PRON, REL, DEM, T, LOC) is an isim too, but "Kata pertama adalah isim, yaitu nama benda, orang,
+# atau sifat" said of a pronoun would teach something the source does not say (main session
+# 2026-10-13): there the sentence says the kind and stops. So it does for the Name of Allah, as
+# QAC lemmatises it (build_surah.pos_label: "isim 'alam (lafaz Allah)"): the general gloss is
+# not said in a sentence whose subject is the Name. A fi'il and a huruf keep theirs ("kata
+# kerja", "kata tugas").
+ISIM_GLOSSED = ("N", "PN", "ADJ")
 QAC_LAFAZ = "LEM:{ll~ah"
+
+
+def glossed(kind: str, tag: str, lafaz: bool) -> bool:
+    """Does the explanation of a part say its kind's plain meaning (the rule above)?"""
+    return kind != "isim" or (tag in ISIM_GLOSSED and not lafaz)
 # The first word of a `pos` part (build_surah.pos_label: "huruf jar", "isim 'alam (lafaz Allah)",
 # "dhamir muttashil", "fi'il mudhari'", "zharaf zaman", "lam taukid", "fa' jawab") → kind.
 POS_KIND = {"isim": "isim", "dhamir": "isim", "mashdar": "isim", "zharaf": "isim", "fi'il": "fiil",
@@ -667,7 +680,7 @@ def word_parts(lesson: dict, w: dict) -> list[dict]:
                             "segments (`segments`: build_surah.py writes them for a word whose part the marked prose names)")
         bytes_ = ["".join(pieces[i] for i in g["segs"]) for g in groups]
     return [{"part": k, "of": len(groups), "ar": ar, "tag": g["tag"], "kind": QAC_KIND[g["tag"]], "article": g["article"],
-             "lafaz": g["lafaz"]} for k, (g, ar) in enumerate(zip(groups, bytes_), 1)]
+             "glossed": glossed(QAC_KIND[g["tag"]], g["tag"], g["lafaz"])} for k, (g, ar) in enumerate(zip(groups, bytes_), 1)]
 
 
 def sign_steps(cur: dict) -> dict[str, str | None]:
@@ -693,8 +706,8 @@ def warmup_questions(lesson: dict, ayah: dict, cur: dict) -> list[dict]:
             shows = {"jar": p["kind"] == "isim" and prev_tag == "P", "al": p["kind"] == "isim" and p["article"]}
             q = {"n": len(out) + 1, "ask": "kind", "word": i, "part": p["part"], "of": p["of"], "ar": p["ar"],
                  "kind": p["kind"], "signs": [sid for sid, _text in SIGNS if shows[sid] and sid in taught]}
-            if p["lafaz"]:
-                q["lafaz"] = True
+            if not p["glossed"]:
+                q["gloss"] = False
             out.append(q)
             prev_tag = p["tag"]
     return out
@@ -706,7 +719,7 @@ def warmup_marked(q: dict, terms: "Terms", meanings: dict[str, str]) -> str:
     kind, the kind's plain meaning, and its signs."""
     name = f"Kata {ordinal(q['word'])}" if q["of"] == 1 else f"Bagian {ordinal(q['part'])} kata {ordinal(q['word'])}"
     kind = terms.by_id[q["kind"]]
-    out = f"{name} adalah [[{kind['latin']}|{q['kind']}]]" + ("." if q.get("lafaz") else f", yaitu {meanings[q['kind']]}.")
+    out = f"{name} adalah [[{kind['latin']}|{q['kind']}]]" + ("." if q.get("gloss") is False else f", yaitu {meanings[q['kind']]}.")
     said = [text for sid, text in SIGNS if sid in (q.get("signs") or [])]
     if said:
         out += f" Tandanya: {' dan '.join(said)}."
@@ -1072,9 +1085,10 @@ def warmup_problems(ex: dict | None, lesson: dict, ayah: dict, library: dict, te
             errs.append(f"{at}: `ask` must be \"kind\" (the one kind of question the warm-up has today)")
         if q.get("kind") != w["kind"]:
             errs.append(f"{at}: the answer is {q.get('kind')!r}, and the word's QAC tag and its `pos` give {w['kind']!r}")
-        if q.get("lafaz") != w.get("lafaz"):
-            errs.append(f"{at}: `lafaz` (the Name of Allah: its explanation says the kind and no general gloss) is "
-                        f"{q.get('lafaz')!r}, and the word's QAC lemma gives {w.get('lafaz')!r}")
+        if q.get("gloss") != w.get("gloss"):
+            errs.append(f"{at}: `gloss` is {q.get('gloss')!r}, and the part's QAC tag gives {w.get('gloss')!r} — the kind's plain "
+                        "meaning is said of a noun, a proper noun or an adjective (N, PN, ADJ), a fi'il and a huruf; not of a "
+                        "pronoun, a relative, a demonstrative or an adverb, and not of the Name of Allah")
         if q.get("ar") != w["ar"] or q.get("of") != w["of"]:
             errs.append(f"{at}: shows {q.get('ar')!r} as part {q.get('part')} of {q.get('of')}; the lesson's bytes are {w['ar']!r}, of {w['of']}")
         if q.get("signs") != w["signs"]:

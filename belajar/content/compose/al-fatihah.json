@@ -227,7 +227,7 @@
       },
       {
         "frame": 5,
-        "say": "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf sin menandakan huruf mati, dibaca tanpa vokal."
+        "say": "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf sin disebut sukun: ia menandakan huruf mati, dibaca tanpa vokal."
       },
       {
         "frame": 5,
@@ -5331,7 +5331,7 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:54e88db816fef4d322434babcb15492ae982c7f214737474096c1390919773ff",
+    "authored_compose": "authored/al-fatihah.compose.json sha256:35dbb32acbef05c428a1ee19216cf56eddee359044e90e0159b6c3b3d564cd1b",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }

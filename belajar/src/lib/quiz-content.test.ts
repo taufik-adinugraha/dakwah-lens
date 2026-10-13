@@ -114,8 +114,9 @@ describe("the quiz and the word card show one text", () => {
     // the roles asked follow what each lesson has taught. 38 until, the same day, the explanation
     // shown after an answer became what the narrator says: a word's `why_basic` where it has one
     // (pipeline/quiz.py explained) — eight reasons of the card are then no quiz string (an option
-    // is still the word's `why`; pipeline/test_validate_quiz.py holds the `why_basic` ones).
-    expect(shared).toBe(30);
+    // is still the word's `why`; pipeline/test_validate_quiz.py holds the `why_basic` ones). 29
+    // since 1:7:2 has a `why_basic` too (it says "majrur" where the card says "jar").
+    expect(shared).toBe(29);
     expect(strings.join("\n")).not.toMatch(/mahall, \p{Script=Arabic}+ raf'/u);
     // The shared strings carry the forms of 2026-10-12, so the count is not 43 strings that have
     // no bracket to differ in: an item inside the text's bracket with its Arabic after one space,

@@ -25,7 +25,7 @@
        "say": ["Dhammah bentuknya seperti huruf wawu kecil di atas huruf; bunyinya u."]},
       {"stage": "mark", "marks": ["sukun", "shaddah"], "tiles": ["sin", "rra"],
        "say": [
-         "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf sin menandakan huruf mati, dibaca tanpa vokal.",
+         "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf sin disebut sukun: ia menandakan huruf mati, dibaca tanpa vokal.",
          "Tanda seperti huruf w kecil di atas huruf ra' menandakan huruf itu dibaca dobel."
        ]},
       {"stage": "mark", "marks": ["small_alif"], "tiles": ["maa"],

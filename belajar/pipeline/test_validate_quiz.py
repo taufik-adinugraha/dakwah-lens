@@ -306,8 +306,12 @@ MUTATIONS = [
      "al-fatihah 2 word-kind q3 (word 2, part 2 of 2): gives the sign(s) []; the data shows, and an earlier lesson taught, ['jar']"),
     ("the warm-up: its sentence edited by hand", quizfile(lambda q: warm(q, 5)["questions"][1].__setitem__("why", "Kata kedua adalah fi'il (فِعْل), tandanya huruf mudhara'ah.")),
      "al-fatihah 5 word-kind q2 (word 2): its explanation is not the sentence built from the data"),
-    ("the warm-up: the general gloss said of the Name", quizfile(lambda q: warm(q, 1)["questions"][2].pop("lafaz")),
-     "al-fatihah 1 word-kind q3 (word 2): `lafaz` (the Name of Allah: its explanation says the kind and no general gloss) is None"),
+    ("the warm-up: the general gloss said of the Name", quizfile(lambda q: warm(q, 1)["questions"][2].pop("gloss")),
+     "al-fatihah 1 word-kind q3 (word 2): `gloss` is None, and the part's QAC tag gives False"),
+    ("the warm-up: “nama benda, orang, atau sifat” said of a pronoun", quizfile(lambda q: warm(q, 5)["questions"][0].pop("gloss")),
+     "al-fatihah 5 word-kind q1 (word 1): `gloss` is None, and the part's QAC tag gives False"),
+    ("the warm-up: the gloss withheld from a noun", quizfile(lambda q: warm(q, 2)["questions"][3].__setitem__("gloss", False)),
+     "al-fatihah 2 word-kind q4 (word 3): `gloss` is False, and the part's QAC tag gives None"),
     ("the warm-up: authored in the plan", plan(lambda a: a["1"].__setitem__("word-kind", [{"word": 1, "kind": "isim"}])),
      "the plan lists 'word-kind' — the warm-up is derived"),
     ("the warm-up: missing from an ayah of a surah with a lesson map", quizfile(lambda q: q["ayat"][3]["exercises"].pop(0)),
@@ -341,11 +345,20 @@ class Taught(unittest.TestCase):
     def test_a_listed_question_passes_exactly_while_it_needs_the_term(self):
         # The list of tolerated questions is empty for Al-Fatihah (2026-10-13) and stays a list
         # the guard reads strictly: a planted question passes with its entry, and only with it.
-        # Since the explanation shown after an answer is held to TAUGHT (2026-10-13) the guard
-        # found three of Al-Fatihah 7 that name a term no line teaches — "sukun" (1:7:3, twice)
-        # and "jar" (1:7:2), from words without a `why_basic` — and they are listed until reworded.
-        self.assertEqual(sorted(k for k in PENDING if k.startswith(f"{SLUG}:")),
-                         ["al-fatihah:7:label-role:1", "al-fatihah:7:label-role:2", "al-fatihah:7:sort-case:2"])
+        # When the explanation shown after an answer joined TAUGHT (2026-10-13) the guard found
+        # three of Al-Fatihah 7 that named a term no line taught — "sukun" (1:7:3, twice) and "jar"
+        # (1:7:2). Cleared with content the same day, not with an exemption: the harakat primer of
+        # lesson zero now names sukun ("… disebut sukun": a teaching line of "ayah 0"), and 1:7:2
+        # has a `why_basic` that says majrur. The list is empty again.
+        self.assertEqual([k for k in PENDING if k.startswith(f"{SLUG}:")], [])
+        first = Q.taught_first(MANIFESTS[SLUG], LESSONS[SLUG], TERMS)
+        self.assertEqual(first["sukun"], (0, "al-fatihah:0:primer:6 (“disebut …”)"))
+        self.assertIn("sukun", self.t[1])
+        without = {**MANIFESTS[SLUG], "lines": {k: v for k, v in MANIFESTS[SLUG]["lines"].items() if k != "al-fatihah:0:primer:6"}}
+        self.assertNotIn("sukun", Q.taught_first(without, LESSONS[SLUG], TERMS))
+        self.assertTrue(any("needs 'sukun' (the explanation shown after the answer)" in e for e in run(manifests={**MANIFESTS, SLUG: without})))
+        self.assertNotIn("jar", TERMS.ids(next(q for a in QUIZZES[SLUG]["ayat"] if a["ayah"] == 7 for ex in a["exercises"]
+                                              if ex["key"] == "label-role" for q in ex["questions"] if q["n"] == 1)["why"]))
         # (rabbi's role is "na't atau badal": na't is taught in ayah 3, badal in An-Nas.)
         self.assertEqual(plan(badal_option, tolerated={BADAL_Q: ["naat", "badal"]})(), [])
         self.assertTrue(any("needs 'badal'" in e for e in plan(badal_option)()))
@@ -620,12 +633,34 @@ class Warmup(unittest.TestCase):
         self.assertEqual(why[(1, 1)], "Bagian pertama kata pertama adalah huruf (حَرْف), yaitu kata tugas.")
         self.assertEqual(why[(5, 2)], "Kata kedua adalah fi'il (فِعْل), yaitu kata kerja.")
         self.assertEqual(why[(4, 3)], "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.")
-        self.assertEqual(why[(7, 6)], "Bagian kedua kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: didahului huruf jar (حَرْف جَرّ).")
+        self.assertEqual(why[(7, 6)], "Bagian kedua kata keempat adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ).")
+        self.assertEqual(why[(7, 13)], "Kata kesembilan adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.")
         # The Name of Allah: the kind, and no general gloss in the sentence whose subject it is.
         self.assertEqual(why[(1, 3)], "Kata kedua adalah isim (اِسْم).")
         self.assertEqual(why[(2, 3)], "Bagian kedua kata kedua adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ).")
-        lafaz = [(n, q["n"]) for n in range(1, 8) for q in warm(self.q, n)["questions"] if q.get("lafaz")]
-        self.assertEqual(lafaz, [(1, 3), (2, 3)])
+        # ONE rule for where the gloss is said (quiz.glossed; main session 2026-10-13): an isim's
+        # "nama benda, orang, atau sifat" of a noun, a proper noun or an adjective only (QAC N, PN,
+        # ADJ) — not of a pronoun or a relative, which the Kalimah record's gloss does not cover,
+        # and not of the Name. A fi'il and a huruf always keep theirs.
+        bare = {(n, q["n"]): CUR.qac_tags(self.lesson["ayat"][n - 1]["words"][q["word"] - 1])
+                for n in range(1, 8) for q in warm(self.q, n)["questions"] if q.get("gloss") is False}
+        self.assertEqual(bare, {(1, 3): ["PN"], (2, 3): ["P", "PN"],                     # the Name
+                                (5, 1): ["PRON"], (5, 4): ["CONJ", "PRON"],              # iyyāka, twice
+                                (6, 2): ["V", "PRON"],                                   # -nā
+                                (7, 2): ["REL"], (7, 4): ["V", "PRON"],                  # allażīna; -ta
+                                (7, 6): ["P", "PRON"], (7, 10): ["P", "PRON"]})          # -him, twice
+        self.assertEqual(why[(5, 1)], "Kata pertama adalah isim (اِسْم).")
+        self.assertEqual(why[(7, 2)], "Kata kedua adalah isim (اِسْم).")
+        self.assertEqual(why[(7, 10)], "Bagian kedua kata ketujuh adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ).")
+        for n in range(1, 8):
+            for q in warm(self.q, n)["questions"]:
+                self.assertEqual("yaitu" in q["why"], q.get("gloss") is not False, (n, q["n"]))
+                self.assertIn(q.get("gloss"), (None, False))
+                if q["kind"] != "isim":
+                    self.assertIsNone(q.get("gloss"))
+        self.assertEqual([Q.glossed("isim", t, False) for t in ("N", "PN", "ADJ", "PRON", "REL", "DEM", "T", "LOC")],
+                         [True, True, True, False, False, False, False, False])
+        self.assertEqual([Q.glossed("isim", "PN", True), Q.glossed("fiil", "V", False), Q.glossed("huruf", "P", False)], [False, True, True])
         # What the narration says is the same sentence without its markup; a part is named by its
         # place, never by a Qur'anic word, and no sentence carries Arabic of its own.
         for n in range(1, 8):

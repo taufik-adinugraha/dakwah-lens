@@ -269,8 +269,8 @@
       ]
     },
     "al-fatihah:0:primer:6": {
-      "text": "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf سِين menandakan huruf mati, dibaca tanpa vokal.",
-      "display": "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf sin (سْ) menandakan huruf mati, dibaca tanpa vokal.",
+      "text": "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf سِين disebut سُكُون: ia menandakan huruf mati, dibaca tanpa vokal.",
+      "display": "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf sin (سْ) disebut sukun (سُكُون): ia menandakan huruf mati, dibaca tanpa vokal.",
       "highlight": [],
       "focus": null,
       "frame": 5
@@ -11469,8 +11469,8 @@
       "focus": null
     },
     "al-fatihah:5:ex:word-kind:1:why": {
-      "text": "Kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Kata pertama adalah اِسْم.",
+      "display": "Kata pertama adalah isim (اِسْم).",
       "highlight": [],
       "focus": null
     },
@@ -11487,8 +11487,8 @@
       "focus": null
     },
     "al-fatihah:5:ex:word-kind:4:why": {
-      "text": "Bagian kedua kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Bagian kedua kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Bagian kedua kata ketiga adalah اِسْم.",
+      "display": "Bagian kedua kata ketiga adalah isim (اِسْم).",
       "highlight": [],
       "focus": null
     },
@@ -14476,8 +14476,8 @@
       "focus": null
     },
     "al-fatihah:6:ex:word-kind:2:why": {
-      "text": "Bagian kedua kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Bagian kedua kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Bagian kedua kata pertama adalah اِسْم.",
+      "display": "Bagian kedua kata pertama adalah isim (اِسْم).",
       "highlight": [],
       "focus": null
     },
@@ -17749,8 +17749,8 @@
       "focus": null
     },
     "al-fatihah:7:ex:word-kind:2:why": {
-      "text": "Kata kedua adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Kata kedua adalah اِسْم.",
+      "display": "Kata kedua adalah isim (اِسْم).",
       "highlight": [],
       "focus": null
     },
@@ -17761,8 +17761,8 @@
       "focus": null
     },
     "al-fatihah:7:ex:word-kind:4:why": {
-      "text": "Bagian kedua kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Bagian kedua kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Bagian kedua kata ketiga adalah اِسْم.",
+      "display": "Bagian kedua kata ketiga adalah isim (اِسْم).",
       "highlight": [],
       "focus": null
     },
@@ -17773,8 +17773,8 @@
       "focus": null
     },
     "al-fatihah:7:ex:word-kind:6:why": {
-      "text": "Bagian kedua kata keempat adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: didahului حَرْف جَرّ.",
-      "display": "Bagian kedua kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: didahului huruf jar (حَرْف جَرّ).",
+      "text": "Bagian kedua kata keempat adalah اِسْم. Tandanya: didahului حَرْف جَرّ.",
+      "display": "Bagian kedua kata keempat adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ).",
       "highlight": [],
       "focus": null
     },
@@ -17797,8 +17797,8 @@
       "focus": null
     },
     "al-fatihah:7:ex:word-kind:10:why": {
-      "text": "Bagian kedua kata ketujuh adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: didahului حَرْف جَرّ.",
-      "display": "Bagian kedua kata ketujuh adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: didahului huruf jar (حَرْف جَرّ).",
+      "text": "Bagian kedua kata ketujuh adalah اِسْم. Tandanya: didahului حَرْف جَرّ.",
+      "display": "Bagian kedua kata ketujuh adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ).",
       "highlight": [],
       "focus": null
     },
@@ -24075,97 +24075,10 @@
       ]
     },
     "al-fatihah:7:ex:label-role:1:why": {
-      "text": "Perannya: اِسْم مَوْصُول. اِسْم مَوْصُول ini مَبْنِيّ, yaitu bentuknya tetap, dan berkedudukan جَرّ sebagai mudhof ilaih dari kata pertama.",
-      "display": "Perannya: isim maushul (اِسْم مَوْصُول). Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ), yaitu bentuknya tetap, dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari kata pertama.",
+      "text": "Perannya: اِسْم مَوْصُول. اِسْم مَوْصُول ini مَبْنِيّ, bentuknya tetap; kedudukannya مَجْرُور, karena kata pertama disandarkan kepadanya: ia mudhof ilaih.",
+      "display": "Perannya: isim maushul (اِسْم مَوْصُول). Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ), bentuknya tetap; kedudukannya majrur (مَجْرُور), karena kata pertama disandarkan kepadanya: ia mudhaf ilaih (مُضَاف إِلَيْه).",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0d0d0fda0c5ce224.mp3",
-        "ms": 9718,
-        "sha256": "82c1a29fa2688f8d71ef7eac615c8bb0e4167385f3e0ce86fcb5564addfed2b6"
-      },
-      "tokens": [
-        {
-          "t": "Perannya:",
-          "s": 0.0,
-          "e": 0.48
-        },
-        {
-          "t": "isim maushul (اِسْم مَوْصُول).",
-          "s": 0.6,
-          "e": 2.04
-        },
-        {
-          "t": "Isim maushul (اِسْم مَوْصُول)",
-          "s": 2.22,
-          "e": 3.04
-        },
-        {
-          "t": "ini",
-          "s": 3.1,
-          "e": 3.28
-        },
-        {
-          "t": "mabni (مَبْنِيّ),",
-          "s": 3.32,
-          "e": 4.08
-        },
-        {
-          "t": "yaitu",
-          "s": 4.16,
-          "e": 4.48
-        },
-        {
-          "t": "bentuknya",
-          "s": 4.544,
-          "e": 5.04
-        },
-        {
-          "t": "tetap,",
-          "s": 5.1,
-          "e": 5.52
-        },
-        {
-          "t": "dan",
-          "s": 5.62,
-          "e": 5.92
-        },
-        {
-          "t": "berkedudukan",
-          "s": 5.98,
-          "e": 6.64
-        },
-        {
-          "t": "jar (جَرّ)",
-          "s": 6.72,
-          "e": 7.28
-        },
-        {
-          "t": "sebagai",
-          "s": 7.32,
-          "e": 7.6
-        },
-        {
-          "t": "mudhaf ilaih (مُضَاف إِلَيْه)",
-          "s": 7.66,
-          "e": 8.68
-        },
-        {
-          "t": "dari",
-          "s": 8.72,
-          "e": 8.88
-        },
-        {
-          "t": "kata",
-          "s": 8.928,
-          "e": 9.12
-        },
-        {
-          "t": "pertama.",
-          "s": 9.168,
-          "e": 9.68
-        }
-      ]
+      "focus": null
     },
     "al-fatihah:7:ex:label-role:2:why": {
       "text": "Perannya: فِعْل مَاضٍ dan فَاعِل. فِعْل مَاضٍ ini مَبْنِيّ di atas سُكُون karena bersambung dengan dhomir akhiran, Engkau, pelakunya, dan kalimatnya menjadi صِلَة bagi kata kedua.",

@@ -62,7 +62,7 @@ python3 test_validate_narration.py # plants 197 faults in copies of the manifest
 python3 validate_map.py            # the lesson maps: new / learnt so far / later / next-level against the curriculum, the names against the captions
 python3 test_validate_map.py       # plants 39 faults (a step in the wrong group, one taught later listed as learnt, a learnt step left out, `here` on a step that does not occur, a name that says a Qur'anic word, …)
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah), or listed in authored/curriculum.pending.json; exit 1 on any failure
-python3 test_validate_quiz.py      # plants 51 faults (an untaught state, an untaught option, two correct options, an untaught question not listed, a listed one that is taught, the wazan exercise in a basic lesson; an explanation shown that names an untaught term; the warm-up: a pos that disagrees with the QAC tag, a part left out, a wrong answer, a sign before its lesson, an edited sentence), each must fail
+python3 test_validate_quiz.py      # plants 53 faults (an untaught state, an untaught option, two correct options, an untaught question not listed, a listed one that is taught, the wazan exercise in a basic lesson; an explanation shown that names an untaught term; the warm-up: a pos that disagrees with the QAC tag, a part left out, a wrong answer, a sign before its lesson, an edited sentence), each must fail
 python3 render_narration.py        # DRY RUN: characters and cost; never calls the API without --render --i-approve-spend
 python3 encode_narration.py --check # the delivered audio (64 kbps mono) on disk is what the manifests describe (add --reencode to encode the masters again and compare); needs ffmpeg and pipeline/out, so not in CI (see "Narasi", Delivery)
 ```
@@ -1091,8 +1091,9 @@ python3 build_narration.py --write-pending   # rewrite authored/curriculum.pendi
 Al-Fatihah. The same day Al-Fatihah was reworded and replanned (the structure told item by item,
 `why_basic`, the quiz plan): **no Al-Fatihah line is left**, and the quiz list was empty until
 the explanation shown after an answer joined the guard, which found three questions of
-Al-Fatihah 7 (see "Kuis"). What remains of the lines is the Mu'awwidzat's (hidden; rewritten
-when their lessons are): 39 lines, 58 uses —
+Al-Fatihah 7 — cleared the same day with content (see "Kuis"): **no Al-Fatihah entry is left**,
+lines or quiz. What remains is the Mu'awwidzat's lines (hidden; rewritten when their lessons
+are): 39 lines, 58 uses —
 Al-Ikhlas 1: 1, 3: 5; Al-Falaq 1: 5, 2: 1, 3: 5, 4: 5, 5: 8; An-Nas 1: 5, 5: 4 (16 of them found
 only by the term table's forms).
 
@@ -1124,7 +1125,10 @@ learnt" of things no lesson had taught, and the kalimah record's line was said n
   pengantar selesai. Berikutnya ayat pertama Surah Al-Fatihah; pelajaran berlanjut sendiri.", the
   words of an ayah's `next` line). Four primer lines were reworded for a lesson with no "ayat
   ini" (main session's texts: "Sebelum mulai, …", "Huruf pertama Surah Al-Fatihah …", "… di ayat
-  pertama surah itu.", "… pada kata ketiga ayat itu.").
+  pertama surah itu.", "… pada kata ketiga ayat itu."). The third of them (`primer:6`) also
+  NAMES sukun since the same day ("Tanda kecil di atas huruf sin disebut sukun: ia menandakan
+  huruf mati, …"): the harakat step owns the term, later lines say it, and until then no line
+  had named it (the quiz guard found it: "Kuis").
 - **The curriculum** marks lesson "0" as written when a primer is played there
   (`curriculum.zero_written`, `written`): its `lines` (the kalimah record's line, no word to
   light) and its `map` (`new`: harakat, kalimah; nothing learnt, postponed or next-level). The
@@ -1281,13 +1285,13 @@ four new "Konsep baru" texts, the seven closings that say the running total) and
 the rework on it — the structure told item by item (24 lines for 7), `why_basic` in the quiz
 explanations, the new quiz plan, the reworded compositions and "Konsep baru" texts, lesson zero
 (two new lines, four reworded primer lines) and the warm-up (44 lines: an introduction and one
-sentence per question) — Al-Fatihah has 402 lines, 271 with `audio`, and **131 without** (117
+sentence per question) — Al-Fatihah has 402 lines, 270 with `audio`, and **132 without** (120
 distinct texts: identical lines are rendered once — the label-role intro of ayat 2 and 6, and
 most of the warm-up's sentences, which are the same from ayah to ayah). A line that moved with
 its text kept its audio, under whatever id it has now (`build_narration.manifest`: a recorded
 file is named by its text, so a line without a recording under its own id takes the recording of
 any line that said exactly its text): the five primer lines that were not reworded, the kalimah
-record's line, the moved "Konsep baru" lines. The 131 play caption-only until rendered:
+record's line, the moved "Konsep baru" lines. The 132 play caption-only until rendered:
 
 | lesson | lines without audio |
 |---|---|
@@ -1298,14 +1302,14 @@ record's line, the moved "Konsep baru" lines. The 131 play caption-only until re
 | 4 (11) | the three `map:` lines, the warm-up (4), `structure:1`–`3`, `learned` |
 | 5 (18) | the three `map:` lines, the warm-up (6), `concept:fiil-mudhari`, `structure:1`–`3`, `ex:sort-case:1:why` … `4:why`, `learned` |
 | 6 (17) | the three `map:` lines, the warm-up (5), `concept:manshub`, `structure:1`–`3`, `ex:sort-case:1:why`, `ex:label-role:intro`, `ex:label-role:1:why`, `ex:label-role:2:why`, `learned` |
-| 7 (26) | the three `map:` lines, the warm-up (14), `structure:1`–`5`, `ex:sort-case:1:why`, `ex:sort-case:3:why`, `ex:label-role:3:why`, `learned` |
+| 7 (27) | the three `map:` lines, the warm-up (14), `structure:1`–`5`, `ex:sort-case:1:why`, `ex:sort-case:3:why`, `ex:label-role:1:why` (1:7:2's `why_basic`: its recording is of the older text), `ex:label-role:3:why`, `learned` |
 
 ("the warm-up (n)": `ex:word-kind:intro` and `ex:word-kind:1:why` … of that ayah.) One shared
 line is new too: `shared:ex:word-kind:options` (its `reveal` and `next` prompts say what the
 other exercises' say, and took their recordings).
 
-Dry run: 117 distinct texts, 14,625 characters, USD 1.17 for Al-Fatihah, and 1 text, 41
-characters for `shared` — 118 texts, 14,666 characters, about USD 1.17; none is refused (no
+Dry run: 120 distinct texts, 14,752 characters, USD 1.18 for Al-Fatihah, and 1 text, 41
+characters for `shared` — 121 texts, 14,793 characters, about USD 1.18; none is refused (no
 heavy letter without a respelling, no Latin term outside the dictionary). `--render` sends only the lines without
 `audio`, so the whole surah is the selection. In order, from `belajar/pipeline` (`OUT`: where the
 masters of record are, so the upload list sees every delivered file; without `--out` the files go
@@ -1314,7 +1318,7 @@ to `pipeline/out` of this checkout):
 ```bash
 OUT=/path/to/the/checkout/with/the/masters/belajar/pipeline/out
 
-# 0. What would be sent (no key read, nothing sent): must say 117 distinct texts, then 1.
+# 0. What would be sent (no key read, nothing sent): must say 120 distinct texts, then 1.
 python3 render_narration.py --surah al-fatihah
 python3 render_narration.py --surah shared
 # 1. Render (the one step that costs money) and deliver: the masters to $OUT/narration/kang-nandar/al-fatihah/<audio_name>.mp3
@@ -1837,10 +1841,13 @@ fixed the plan; `quiz.py`'s docstring has the rules.
   `authored/curriculum.pending.json` does not list (`quiz`: "<slug>:<ayah>:<exercise>:<n>" → the
   untaught terms) — and on a listed question that is taught by now. The 13 questions of
   Al-Fatihah went with the new plan (2026-10-13). REQUIRED then grew by the terms of **the
-  explanation shown after an answer** (below), and three questions of Al-Fatihah 7 are listed
-  for it: `7:sort-case:2` and `7:label-role:2` (the reason of 1:7:3 names "sukun", which no
-  line names: the primer says "huruf mati") and `7:label-role:1` (1:7:2's names "jar"). They
-  need a `why_basic` each; until then they are listed.
+  explanation shown after an answer** (below), which found three questions of Al-Fatihah 7:
+  `7:sort-case:2` and `7:label-role:2` (the reason of 1:7:3 names "sukun", which no line named:
+  the primer said "huruf mati") and `7:label-role:1` (1:7:2's named "jar"). Cleared with
+  content, not with an exemption: the harakat primer of lesson zero now NAMES sukun ("Tanda
+  kecil di atas huruf sin disebut sukun: …", `al-fatihah:0:primer:6` — lesson zero's lines are
+  "ayah 0" of that manifest, teaching lines like any other), and 1:7:2 has a `why_basic` that
+  says majrur. The list has no question.
 - **What the learner reads after answering is what the narrator says** (main session
   2026-10-13): a question's `why` in `content/quiz` is the word's `why_basic` where it has one
   (`quiz.py` `explained`; its terms with their Arabic from the table), else its `why`. Until
@@ -1875,14 +1882,21 @@ rules; it is **derived, never authored** (a plan that lists it stops the build).
   file shows it after the answer (`why`), the narration says it (`ex:word-kind:<n>:why`,
   `build_narration.ex_why`): the part by its place ("Kata kedua", "Bagian pertama kata pertama";
   never a Qur'anic word), its kind, the kind's plain meaning as the Kalimah record's own summary
-  gives it (`kind_meanings`: nothing typed), and a **visible sign** only where the data shows one
+  gives it (`kind_meanings`: nothing typed; where it is said: below), and a **visible sign** only where the data shows one
   and the step that teaches it belongs to an EARLIER lesson: "didahului huruf jar" (the part
   before it is a huruf jar; from Al-Fatihah 2 on) and "memakai alif lam" (it carries the
   article; from Al-Fatihah 4 on). These are the matn's own signs of an isim (Ajurrumiyyah,
   Shamela 11371/1: «فالاسم يُعرَفُ: بالخَفضِ، والتنوينِ، ودخولِ الألف واللام، وحروفِ الخَفضِ»);
-  no other sign is given, and none for a fi'il or a huruf. For the **Name of Allah** (QAC lemma
-  `{ll~ah`; 1:1:2, 1:2:2) the sentence says the kind and stops ("Kata kedua adalah isim."): the
-  general gloss "nama benda, orang, atau sifat" is not said in a sentence whose subject is the Name.
+  no other sign is given, and none for a fi'il or a huruf.
+- **Where the kind's plain meaning is said** (one rule, `quiz.glossed`; main session
+  2026-10-13): the Kalimah record glosses an isim as "nama benda, orang, atau sifat", which
+  covers a noun, a proper noun and an adjective (QAC N, PN, ADJ) and nothing else. For an isim
+  of another tag — PRON, REL, DEM, T, LOC — the sentence says the kind and stops ("Kata pertama
+  adalah isim."): said of a pronoun, the gloss would teach something the source does not say.
+  So it does for the **Name of Allah** (QAC lemma `{ll~ah`; 1:1:2, 1:2:2): the general gloss is
+  not said in a sentence whose subject is the Name. A fi'il and a huruf keep theirs. The
+  question carries `gloss: false` then: 9 of Al-Fatihah's 37 (the Name twice; iyyāka twice,
+  -nā, -ta, -him twice; allażīna).
 - **The introduction** (`build_narration.ex_intro`): "Latihan pemanasan, lima soal. Setiap soal
   menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: isim, fi'il,
   atau huruf." ("satu kata" alone in an ayah with no word of two parts). The prompt of its three

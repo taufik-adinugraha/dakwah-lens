@@ -138,15 +138,5 @@
    "jazim"
   ]
  },
- "quiz": {
-  "al-fatihah:7:sort-case:2": [
-   "sukun"
-  ],
-  "al-fatihah:7:label-role:1": [
-   "jar"
-  ],
-  "al-fatihah:7:label-role:2": [
-   "sukun"
-  ]
- }
+ "quiz": {}
 }

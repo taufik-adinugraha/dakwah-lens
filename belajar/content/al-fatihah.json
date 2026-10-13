@@ -2381,6 +2381,7 @@
             }
           ],
           "status": "draft",
+          "why_basic": "Isim maushul ini mabni, bentuknya tetap; kedudukannya majrur, karena kata pertama disandarkan kepadanya: ia mudhaf ilaih.",
           "marked": {
             "why": "[[Isim maushul|isim-maushul]] ini [[mabni|mabni]] (bentuknya tetap) dan berkedudukan [[jar|jar]] sebagai [[mudhaf ilaih|mudhaf-ilaih]] dari [[ṣirāṭa|q:1:7:1]].",
             "role": "[[isim maushul|isim-maushul]] ([[mudhaf ilaih|mudhaf-ilaih]])",
@@ -5332,7 +5333,7 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
-    "authored_words": "authored/al-fatihah.words.json sha256:e1487a7540b239185de944ab0e6218669e4d7bf370f4db9ac6bc192e79c141e2",
+    "authored_words": "authored/al-fatihah.words.json sha256:7483cc2d5ccafa8265d9354456b36c1db39b3bdc4696b9518a194800d5c02f7f",
     "authored_structure": "authored/al-fatihah.structure.json sha256:22cafd59cb62f2af6aa87cd0c6174e3d71ae4739c4afb5424853081b3859d849",
     "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:f39f21abd48c0257e9c4733933ca744d46c0ecc36bd42499a14a7415436c47ee",
     "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:1181789ee65c1b2e800270475f1c6264576a0062f8d75290ee2f99af9d2adc5f",

@@ -52,7 +52,7 @@
        "ar": "ٱللَّهِ",
        "kind": "isim",
        "signs": [],
-       "lafaz": true,
+       "gloss": false,
        "why": "Kata kedua adalah isim (اِسْم)."
       },
       {
@@ -141,7 +141,7 @@
        "signs": [
         "jar"
        ],
-       "lafaz": true,
+       "gloss": false,
        "why": "Bagian kedua kata kedua adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ)."
       },
       {
@@ -489,7 +489,8 @@
        "ar": "إِيَّاكَ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "gloss": false,
+       "why": "Kata pertama adalah isim (اِسْم)."
       },
       {
        "n": 2,
@@ -522,7 +523,8 @@
        "ar": "إِيَّاكَ",
        "kind": "isim",
        "signs": [],
-       "why": "Bagian kedua kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "gloss": false,
+       "why": "Bagian kedua kata ketiga adalah isim (اِسْم)."
       },
       {
        "n": 5,
@@ -620,7 +622,8 @@
        "ar": "نَا",
        "kind": "isim",
        "signs": [],
-       "why": "Bagian kedua kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "gloss": false,
+       "why": "Bagian kedua kata pertama adalah isim (اِسْم)."
       },
       {
        "n": 3,
@@ -775,7 +778,8 @@
        "ar": "ٱلَّذِينَ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "gloss": false,
+       "why": "Kata kedua adalah isim (اِسْم)."
       },
       {
        "n": 3,
@@ -797,7 +801,8 @@
        "ar": "تَ",
        "kind": "isim",
        "signs": [],
-       "why": "Bagian kedua kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "gloss": false,
+       "why": "Bagian kedua kata ketiga adalah isim (اِسْم)."
       },
       {
        "n": 5,
@@ -821,7 +826,8 @@
        "signs": [
         "jar"
        ],
-       "why": "Bagian kedua kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: didahului huruf jar (حَرْف جَرّ)."
+       "gloss": false,
+       "why": "Bagian kedua kata keempat adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ)."
       },
       {
        "n": 7,
@@ -869,7 +875,8 @@
        "signs": [
         "jar"
        ],
-       "why": "Bagian kedua kata ketujuh adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: didahului huruf jar (حَرْف جَرّ)."
+       "gloss": false,
+       "why": "Bagian kedua kata ketujuh adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ)."
       },
       {
        "n": 11,
@@ -949,7 +956,7 @@
       {
        "n": 1,
        "word": 2,
-       "why": "Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ, bentuknya tetap) dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari ṣirāṭa (صِرَٰطَ).",
+       "why": "Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ), bentuknya tetap; kedudukannya majrur (مَجْرُور), karena kata pertama disandarkan kepadanya: ia mudhaf ilaih (مُضَاف إِلَيْه).",
        "options": [
         {
          "from": "1:7:2",
