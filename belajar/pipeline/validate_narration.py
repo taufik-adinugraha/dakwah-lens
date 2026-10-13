@@ -15,7 +15,7 @@ What it enforces (README "Narasi" has the reasons):
   the ayah); `highlight` the word numbers of the ayah the stage highlights ([0] the whole ayah, []
   none); `focus` the word ("1:1:3") of the large word card, or null.
 - Ids follow the contract: "${slug}:${ayah}:${part}" with part in intro | recite | map:new |
-  map:learnt | map:later | primer:${k} | w${n} | w${n}:compose:${k} | structure | concept:${id} |
+  map:learnt | map:later | primer:${k} | w${n} | w${n}:compose:${k} | structure | structure:${k} | concept:${id} |
   ex:${exerciseKey}:${lineKey} | ex:${exerciseKey}:${n}:why | learned | recap | next | done, and
   "shared:${key}" in shared.json. A line longer than MAX_LINE is split into "<id>:a", "<id>:b", …
   (at least two parts, letters contiguous from a, never next to the unsplit id); a primer or
@@ -331,8 +331,7 @@ def expected_parts(lesson: dict, library: dict, compose: dict | None = None,
             if c:
                 parts += [f"w{i}:compose:{k}" for k in range(1, len(c.get("lines") or []) + 1)]
         parts += [t["line"] for t in taught_lines(a, curriculum)]
-        if a.get("structure"):
-            parts.append("structure")
+        parts += structure_parts(a)
         for ex in QUIZ.ayah_plan(quiz, a["ayah"]):
             parts += [f"ex:{ex['key']}:intro"] + [f"ex:{ex['key']}:{q['n']}:why" for q in ex["questions"]]
         parts += (["learned"] if mapped else []) + ["recap", "done" if a["ayah"] == last else "next"]
@@ -363,6 +362,29 @@ MAP_NAMED_MORE = 2  # of more REPEATED or POSTPONED ones, the narrator names thi
 
 COMPOSE_PART = re.compile(r"w([1-9]\d*):compose:([1-9]\d*)")
 PRIMER_PART = re.compile(r"primer:([1-9]\d*)")
+# The sentence structure told as SEPARATE items (operator 2026-10-13: "can we make this kind of
+# explanation in items: harfjar in one item, idhafah in next item etc, it's kind of confusing
+# which for which in this paragraph"): an ayah whose `structure` has `items` gets one line per
+# item, "structure:1" … "structure:n", INSTEAD of the one "structure" line built from its summary.
+# Each lights its item's words; the first opens with STRUCTURE_LEAD; none is ever split (one item,
+# one line, one step that "Ulangi" replays).
+STRUCTURE_ITEM = re.compile(r"structure:([1-9]\d*)")
+STRUCTURE_LEAD = "Sekarang susunan kalimatnya."
+
+
+def structure_items(ayah: dict | None) -> list[dict]:
+    """The narrated items of an ayah's structure ([{words, say}]); [] for an ayah told from its
+    summary (or with no structure at all)."""
+    items = ((ayah or {}).get("structure") or {}).get("items")
+    return list(items) if isinstance(items, list) else []
+
+
+def structure_parts(ayah: dict) -> list[str]:
+    """The structure lines of an ayah: one per item, or the one line of its summary, or none."""
+    items = structure_items(ayah)
+    if items:
+        return [f"structure:{k}" for k in range(1, len(items) + 1)]
+    return ["structure"] if ayah.get("structure") else []
 
 
 def line_frame(ayah: dict | None, part: str, compose: dict | None) -> int | None:
@@ -461,6 +483,12 @@ def line_view(ayah: dict | None, part: str, compose: dict | None = None,
     if part.startswith("concept:"):
         own = next((t for t in (taught_lines(ayah, curriculum) if curriculum else []) if t["line"] == part), None)
         return (list(own["words"]) if own else concept_words(ayah, part.split(":", 1)[1])), None
+    m = STRUCTURE_ITEM.fullmatch(part)
+    if m:
+        # The words the item is about, and no word card: the item is about how they fit together.
+        items = structure_items(ayah)
+        k = int(m.group(1))
+        return (list(items[k - 1]["words"]) if k <= len(items) else []), None
     return [], None
 
 
@@ -1138,7 +1166,7 @@ def held(text: str, lex: Lexicon) -> list[str]:
 # ------------------------------------------------------------------ checks
 SLUG_ID = re.compile(
     r"^(?P<slug>[a-z-]+):(?P<ayah>[1-9]\d*):(?P<part>intro|recite|map:(?:new|learnt|later)|primer:[1-9]\d*|w[1-9]\d*(?::compose:[1-9]\d*)?"
-    r"|structure|concept:[a-z0-9-]+|learned"
+    r"|structure(?::[1-9]\d*)?|concept:[a-z0-9-]+|learned"
     r"|ex:(?:" + "|".join(EXERCISE_KEYS) + r"):(?:[a-z][a-z_]+|[1-9]\d*:why)|recap|next|done)(?::(?P<split>[a-z]))?$"
 )
 SHARED_ID = re.compile(r"^shared:(?P<part>[a-z_]+(?::[a-z-]+:[a-z_]+)?)(?::(?P<split>[a-z]))?$")
@@ -1515,24 +1543,56 @@ def check_animation_line(lid: str, line: dict, ayah: dict | None, part: str, com
     return errs
 
 
-def authored(ayah: dict | None, part: str, compose: dict | None) -> bool:
+EX_WHY_PART = re.compile(r"ex:(why-harakat|sort-case|label-role):([1-9]\d*):why")
+
+
+def why_basic_word(ayah: dict | None, part: str, quiz: dict | None) -> dict | None:
+    """The word whose `why_basic` a line says (build_narration.said_why), or None: the word line
+    of a word that has one, or the explanation of a quiz question about such a word."""
+    if ayah is None:
+        return None
+    words = ayah["words"]
+    m = re.fullmatch(r"w([1-9]\d*)", part)
+    if m:
+        n = int(m.group(1))
+    else:
+        m = EX_WHY_PART.fullmatch(part)
+        if not m:
+            return None
+        ex = next((x for x in QUIZ.ayah_plan(quiz, ayah["ayah"]) if x["key"] == m.group(1)), None)
+        q = next((x for x in (ex or {}).get("questions") or [] if x["n"] == int(m.group(2))), None)
+        n = q.get("word") if q else None
+    w = words[n - 1] if isinstance(n, int) and 1 <= n <= len(words) else None
+    return w if w and w.get("why_basic") else None
+
+
+def authored(ayah: dict | None, part: str, compose: dict | None, quiz: dict | None = None) -> bool:
     """A line written to be rendered as it stands (operator 2026-10-10: these lines are voiced right
-    after they are written): a primer / compose line, or the word line of a composed word (its
-    gloss and the composition's lead)."""
+    after they are written): a primer / compose line, the word line of a composed word (its
+    gloss and the composition's lead), an item of the ayah's structure (2026-10-13: its `say`
+    is spoken as authored, like a composition's), or a line that says a word's `why_basic` (the
+    reason written for the narrator: a quiz explanation, the word line of a word without a
+    composition)."""
     if ayah is None:
         return False
     if animation_of(ayah, part, compose) is not None:
+        return True
+    k = STRUCTURE_ITEM.fullmatch(part)
+    if k:
+        return int(k.group(1)) <= len(structure_items(ayah))
+    if why_basic_word(ayah, part, quiz) is not None:
         return True
     m = re.fullmatch(r"w([1-9]\d*)", part)
     return bool(m) and int(m.group(1)) <= len(ayah["words"]) and \
         composition_of(compose, ayah["words"][int(m.group(1)) - 1]["loc"]) is not None
 
 
-def check_renderable(lid: str, line: dict, ayah: dict | None, part: str, compose: dict | None, lex: "Lexicon") -> list[str]:
+def check_renderable(lid: str, line: dict, ayah: dict | None, part: str, compose: dict | None, lex: "Lexicon",
+                     quiz: dict | None = None) -> list[str]:
     """An authored line, and any line with audio, says every Arabic term from the dictionary: no
     Latin grammar term or letter name (rule 1), no heavy letter + a without its respelling (rule 9)."""
     text = line.get("text")
-    if not isinstance(text, str) or not ("audio" in line or authored(ayah, part, compose)):
+    if not isinstance(text, str) or not ("audio" in line or authored(ayah, part, compose, quiz)):
         return []
     errs = [f"{lid}: says {w!r} in Latin, an Arabic term or letter name the pronunciation dictionary does not "
             "speak (rule 1: add it to pronunciation.json, or say it in plain Indonesian)" for w in latin_terms(text, lex)]
@@ -1605,9 +1665,11 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
         if m and (name == "shared" or ayah is not None):
             errs += check_view(lid, line, ayah, part, compose, curriculum)
             errs += check_animation_line(lid, line, ayah, part, compose, lex, bool(m.group("split")))
-            errs += check_renderable(lid, line, ayah, part, compose, lex)
+            errs += check_renderable(lid, line, ayah, part, compose, lex, quiz)
             if part in MAP_PARTS and m.group("split"):
                 errs.append(f"{lid}: a map / learned line is never split (one line with its card: name fewer concepts)")
+            if STRUCTURE_ITEM.fullmatch(part) and m.group("split"):
+                errs.append(f"{lid}: a structure item is never split (one item, one line: shorten its `say` or make it two items)")
         if "audio" in line:
             if voice is None:
                 errs.append(f"{lid}: audio present but the manifest names no voice")

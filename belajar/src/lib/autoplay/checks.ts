@@ -234,7 +234,7 @@ function rngOf(seed: number) {
 export function sequenceProblems(
   seq: AutoplaySequence,
   ctx: {
-    ayah: Pick<Ayah, "words">;
+    ayah: Pick<Ayah, "words" | "structure">;
     last: boolean;
     exercises: readonly ExerciseKey[];
     introduced: readonly { id: string }[];
@@ -322,6 +322,25 @@ export function sequenceProblems(
   if (JSON.stringify(concepts) !== JSON.stringify(ctx.introduced.map((c) => `concept:${c.id}`))) out.push("concept steps differ from the steps the curriculum teaches here");
   const ex = steps.filter((s) => s.kind === "exercise").map((s) => s.exercise?.key);
   if (JSON.stringify(ex) !== JSON.stringify([...ctx.exercises])) out.push(`exercise steps ${JSON.stringify(ex)} differ from the page's ${JSON.stringify(ctx.exercises)}`);
+  // The sentence structure (operator 2026-10-13): told item by item where the ayah has items —
+  // one step per item, in order, each about its item's words — else the one step of its summary.
+  const items = ctx.ayah.structure?.items ?? [];
+  const told = steps.filter((s) => s.kind === "structure");
+  const wantTold = items.length ? items.map((_, i) => `structure:${i + 1}`) : ctx.ayah.structure ? ["structure"] : [];
+  if (JSON.stringify(told.map((s) => s.id)) !== JSON.stringify(wantTold)) {
+    out.push(`structure steps ${JSON.stringify(told.map((s) => s.id))} are not ${items.length ? "the ayah's items, one step each, in order" : "the one step of its summary"} ${JSON.stringify(wantTold)}`);
+  } else {
+    told.forEach((s, i) => {
+      const it = items[i];
+      if (!it) {
+        if (s.item) out.push(`${s.id}: an item on the step of a structure told from its summary`);
+        return;
+      }
+      if (JSON.stringify(s.item) !== JSON.stringify({ n: i + 1, of: items.length, words: it.words })) out.push(`${s.id}: is not about item ${i + 1} of ${items.length} and its words ${JSON.stringify(it.words)}`);
+      if (s.cues.length !== 1 || JSON.stringify(s.cues[0].highlight) !== JSON.stringify(it.words) || s.cues[0].focus !== null) out.push(`${s.id}: its one line must light the item's words ${JSON.stringify(it.words)} and show no word card`);
+    });
+    if (told.length && order.lastIndexOf("structure") - order.indexOf("structure") !== told.length - 1) out.push("the structure's items are not said one after another");
+  }
   const structureAt = firstAfter("structure");
   const conceptAt = firstAfter("concept");
   // The lesson page's order (lessonSteps) and the narration's: the structure

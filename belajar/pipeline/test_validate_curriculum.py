@@ -451,12 +451,25 @@ class Curriculum(unittest.TestCase):
         self.assertEqual(step(CONTENT, "majrur")["name"], "Majrur (مَجْرُور)")
         self.assertEqual(step(CONTENT, "murab-mabni")["name"], "Mu’rab (مُعْرَب) dan mabni (مَبْنِيّ)")
         self.assertEqual(step(CONTENT, "kalimah")["name"], "Tiga jenis kata")
-        # Two names hold a Qur'anic word: listed, not refused, while no lesson map says them …
-        _errs, notes = VC.speech_problems(AUTHORED, LESSONS, LIBRARY, namer, SWITCHED)
-        self.assertEqual(sorted(n.split(" ")[1] for n in notes), ["la-nafi", "nafi-lam"])
-        # … and refused the day their surah is switched on.
-        errs, _notes = VC.speech_problems(AUTHORED, LESSONS, LIBRARY, namer, ["al-fatihah", "al-ikhlas"])
+        # No name holds a Qur'anic word (2026-10-13: "Lam nafi" and "Lā nafi" were renamed "Huruf
+        # nafi yang menjazmkan" and "Huruf nafi") …
+        errs, notes = VC.speech_problems(AUTHORED, LESSONS, LIBRARY, namer, SWITCHED)
+        self.assertEqual((errs, notes), ([], []))
+        # … and the rule still reads one. PLANTED: the old name on its step. Listed, not refused,
+        # while no lesson map says it …
+        named = copy.deepcopy(AUTHORED)
+        step(named, "nafi-lam")["name"] = "Lam nafi"
+        errs, notes = VC.speech_problems(named, LESSONS, LIBRARY, namer, SWITCHED)
+        self.assertEqual(errs, [])
+        self.assertEqual([n.split(" ")[1] for n in notes], ["nafi-lam"])
+        self.assertIn("names the Qur'anic word(s) ['Lam']", notes[0])
+        # … and refused the day its surah is switched on.
+        errs, _notes = VC.speech_problems(named, LESSONS, LIBRARY, namer, ["al-fatihah", "al-ikhlas"])
         self.assertTrue(any("steps[nafi-lam] name: names the Qur'anic word(s) ['Lam']" in e for e in errs), errs)
+        # A step of a surah that IS switched on, so named: refused at once.
+        step(named, "naat")["name"] = "Sifat seperti rabbi"
+        errs, _notes = VC.speech_problems(named, LESSONS, LIBRARY, namer, SWITCHED)
+        self.assertTrue(any("steps[naat] name: names the Qur'anic word(s)" in e for e in errs), errs)
 
     def test_a_steps_own_text(self):
         t = step(CONTENT, "alif-lam")["teach"]

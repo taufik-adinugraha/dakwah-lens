@@ -39,6 +39,7 @@ import { ayahHref } from "@/lib/routes";
 import { MushafLine, type PlayerWord } from "./AyahPlayer";
 import { ExampleCard, type ExampleCardState } from "./ExampleCard";
 import { LessonMapCard, type LessonMapCardGroup } from "./LessonMapCard";
+import { StructureItemCard } from "./StructureItemCard";
 import { type StageCompose, WordComposition } from "./WordComposition";
 
 /**
@@ -329,6 +330,9 @@ export function LessonStage({
   // is on — "map:new" / "map:learnt" / "map:later", or the closing.
   const mapGroup: LessonMapCardGroup | null =
     live && lessonMap ? (step.kind === "learned" ? "learned" : step.kind === "map" ? (MAP_GROUPS.find((g) => step.id === `map:${g}`) ?? null) : null) : null;
+  // One item of the sentence structure (operator 2026-10-13): the words it is about, in the word
+  // card's slot, while the mushaf line marks them (the item's line lights them).
+  const itemWords = live && step.kind === "structure" && step.item ? words.filter((w) => step.item?.words.includes(w.index)) : null;
   const showMushaf = !started || (live && !spec);
   const spotGuides = spec ? state.guides.filter((g) => g.target.startsWith("exercise:")) : [];
   const skipGuide = view.showSkip ? state.guides.find((g) => g.target === "skip") : undefined;
@@ -728,6 +732,8 @@ export function LessonStage({
               <ExampleCard id={beat.beat.id} example={beatDrawing} state={beatState} marks={marks} />
             ) : mapGroup && lessonMap ? (
               <LessonMapCard map={lessonMap} group={mapGroup} />
+            ) : itemWords && step.item ? (
+              <StructureItemCard n={step.item.n} total={step.item.of} words={itemWords} />
             ) : focusWord ? (
               <div
                 data-guide="word-card"

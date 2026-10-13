@@ -97,7 +97,7 @@ STATE_TERM = {"marfu": "marfu", "manshub": "manshub", "majrur": "majrur", "mabni
 SAME_CAUSE = {"jar-majrur": "huruf-jar", "isim-majrur": "majrur"}
 # The parts of an ayah's narration that TEACH (played before its exercises): line ids
 # "<slug>:<ayah>:<part>"; exercise lines, the recap and next/done teach nothing.
-TEACHING_PART = re.compile(r"intro|recite|primer:\d+|w\d+(?::compose:\d+)?|structure|concept:[a-z0-9-]+")
+TEACHING_PART = re.compile(r"intro|recite|primer:\d+|w\d+(?::compose:\d+)?|structure(?::\d+)?|concept:[a-z0-9-]+")
 CONCEPT_LEAD = "Konsep baru:"
 APOS = "'‘’ʼʿ`´"
 _APOS = re.compile(f"[{APOS}]")

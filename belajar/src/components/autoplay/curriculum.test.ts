@@ -212,11 +212,25 @@ describe("what an ayah's lesson teaches as “Konsep baru” (taughtAt: what con
     // Every record example is kept, each once.
     const all = LIBRARY.concepts.find((c) => c.id === "naat")!.examples.map((e) => e.loc);
     expect([...naat.examples.map((e) => e.loc)].sort()).toEqual([...all].sort());
-    // Jumlah fi'liyyah is taught in ayah 6, and no word of ayah 6 is tagged with it: its line lights
-    // no word, and its first example is not a word of the ayah (the lesson lists that as a gap).
+    // Jumlah fi'liyyah is taught in ayah 6; its first example is na‘budu of ayah 5, and ihdinā
+    // (1:6:1) is tagged with it since 2026-10-13: its line lights that word and shows it first.
     const jf = taughtAt(FATIHAH.ayat[5]).find((t) => t.id === "jumlah-filiyyah")!;
-    expect(jf.words).toEqual([]);
-    expect(jf.examples[0].loc.startsWith("1:6:")).toBe(false);
+    expect(LIBRARY.concepts.find((c) => c.id === "jumlah-filiyyah")!.examples[0].loc).toBe("1:5:2");
+    expect(jf.words).toEqual([1]);
+    expect(jf.examples[0].loc).toBe("1:6:1");
+    // PLANTED: the same step where no word of the ayah is tagged with it and the record has no
+    // example there (what ayah 6 was until then). Its line lights no word, and its first example
+    // is not a word of the ayah — which the lesson then lists as a rule without a beat.
+    const six = FATIHAH.ayat[5];
+    const bare = { ...six, words: six.words.map((w) => ({ ...w, concepts: (w.concepts ?? []).filter((c) => c !== "jumlah-filiyyah") })) };
+    const file = {
+      ...CURRICULUM,
+      lessons: CURRICULUM.lessons.map((l) => (l.id === "1:6" ? { ...l, lines: (l.lines ?? []).map((x) => (x.step === "jumlah-filiyyah" ? { ...x, words: [] } : x)) } : l)),
+    };
+    const records = LIBRARY.concepts.map((c) => (c.id === "jumlah-filiyyah" ? { ...c, examples: c.examples.filter((e) => !e.loc.startsWith("1:6:")) } : c));
+    const gap = taughtIn(file, records, bare).find((t) => t.id === "jumlah-filiyyah")!;
+    expect(gap.words).toEqual([]);
+    expect(gap.examples[0].loc).toBe("1:5:2");
   });
 
   it("the other surahs follow mechanically: fi'il amr and badal in An-Nas, nothing where the curriculum teaches nothing", () => {

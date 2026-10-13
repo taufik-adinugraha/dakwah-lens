@@ -33,91 +33,6 @@
        "word": 4
       }
      ]
-    },
-    {
-     "key": "why-harakat",
-     "questions": [
-      {
-       "n": 1,
-       "word": 1,
-       "sign": "kasrah (كَسْرَة)",
-       "why": "Akhirnya kasrah (كَسْرَة) karena kata ism (ٱسْمُ, nama) didahului huruf jar (حَرْف جَرّ) bi- (بِ, dengan).",
-       "options": [
-        {
-         "from": "1:1:1",
-         "text": "Akhirnya kasrah (كَسْرَة) karena kata ism (ٱسْمُ, nama) didahului huruf jar (حَرْف جَرّ) bi- (بِ, dengan)."
-        },
-        {
-         "from": "1:1:2",
-         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi (سْمِ)."
-        },
-        {
-         "from": "1:1:3",
-         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat (na't نَعْت) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya."
-        }
-       ]
-      },
-      {
-       "n": 2,
-       "word": 2,
-       "sign": "kasrah (كَسْرَة)",
-       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi (سْمِ).",
-       "options": [
-        {
-         "from": "1:1:2",
-         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi (سْمِ)."
-        },
-        {
-         "from": "1:1:1",
-         "text": "Akhirnya kasrah (كَسْرَة) karena kata ism (ٱسْمُ, nama) didahului huruf jar (حَرْف جَرّ) bi- (بِ, dengan)."
-        },
-        {
-         "from": "1:1:3",
-         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat (na't نَعْت) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya."
-        }
-       ]
-      },
-      {
-       "n": 3,
-       "word": 3,
-       "sign": "kasrah (كَسْرَة)",
-       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat (na't نَعْت) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya.",
-       "options": [
-        {
-         "from": "1:1:3",
-         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat (na't نَعْت) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya."
-        },
-        {
-         "from": "1:1:1",
-         "text": "Akhirnya kasrah (كَسْرَة) karena kata ism (ٱسْمُ, nama) didahului huruf jar (حَرْف جَرّ) bi- (بِ, dengan)."
-        },
-        {
-         "from": "1:1:2",
-         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi (سْمِ)."
-        }
-       ]
-      },
-      {
-       "n": 4,
-       "word": 4,
-       "sign": "kasrah (كَسْرَة)",
-       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat (نَعْت) kedua bagi lafaz Allah, sehingga ikut majrur (مَجْرُور).",
-       "options": [
-        {
-         "from": "1:1:4",
-         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat (نَعْت) kedua bagi lafaz Allah, sehingga ikut majrur (مَجْرُور)."
-        },
-        {
-         "from": "1:1:1",
-         "text": "Akhirnya kasrah (كَسْرَة) karena kata ism (ٱسْمُ, nama) didahului huruf jar (حَرْف جَرّ) bi- (بِ, dengan)."
-        },
-        {
-         "from": "1:1:2",
-         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi (سْمِ)."
-        }
-       ]
-      }
-     ]
     }
    ]
   },
@@ -189,12 +104,8 @@
          "text": "khabar (خَبَر, jar-majrur جَارّ وَمَجْرُور)"
         },
         {
-         "from": "1:1:2",
-         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
-        },
-        {
-         "from": "1:1:3",
-         "text": "na't (نَعْت, sifat)"
+         "from": "1:1:1",
+         "text": "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور)"
         }
        ]
       },
@@ -210,37 +121,6 @@
         {
          "from": "1:2:1",
          "text": "mubtada' (مُبْتَدَأ)"
-        },
-        {
-         "from": "1:1:2",
-         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
-        },
-        {
-         "from": "1:1:3",
-         "text": "na't (نَعْت, sifat)"
-        }
-       ]
-      },
-      {
-       "n": 3,
-       "word": 4,
-       "why": "Majrur (مَجْرُور) dengan tanda ya' (ي) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dan termasuk kata yang disamakan (mulhaq مُلْحَق) dengan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
-       "options": [
-        {
-         "from": "1:2:4",
-         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
-        },
-        {
-         "from": "1:2:1",
-         "text": "mubtada' (مُبْتَدَأ)"
-        },
-        {
-         "from": "1:2:2",
-         "text": "khabar (خَبَر, jar-majrur جَارّ وَمَجْرُور)"
-        },
-        {
-         "from": "1:1:3",
-         "text": "na't (نَعْت, sifat)"
         }
        ]
       }
@@ -282,8 +162,8 @@
          "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) li- (لِ); jar-majrur (جَارّ وَمَجْرُور) ini bergantung pada khabar (خَبَر) yang tidak disebut (misalnya “tetap”)."
         },
         {
-         "from": "1:1:2",
-         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi (سْمِ)."
+         "from": "1:2:1",
+         "text": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ, pokok kalimat)."
         }
        ]
       },
@@ -506,6 +386,57 @@
        "why": "Akhirnya fathah (فَتْحَة) karena menjadi sifat (نَعْت) bagi aṣ-ṣirāṭa (ٱلصِّرَٰطَ) yang manshub (مَنْصُوب)."
       }
      ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 2,
+       "why": "Akhirnya fathah (فَتْحَة) karena menjadi objek kedua (maf'ul bih kedua) dari ihdi (ٱهْدِ).",
+       "options": [
+        {
+         "from": "1:6:2",
+         "text": "maf'ul bih (مَفْعُول بِه) kedua"
+        },
+        {
+         "from": "1:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        },
+        {
+         "from": "1:4:2",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "1:6:3",
+         "text": "na't (نَعْت, sifat)"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 3,
+       "why": "Akhirnya fathah (فَتْحَة) karena menjadi sifat (نَعْت) bagi aṣ-ṣirāṭa (ٱلصِّرَٰطَ) yang manshub (مَنْصُوب).",
+       "options": [
+        {
+         "from": "1:6:3",
+         "text": "na't (نَعْت, sifat)"
+        },
+        {
+         "from": "1:6:2",
+         "text": "maf'ul bih (مَفْعُول بِه) kedua"
+        },
+        {
+         "from": "1:4:2",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "1:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        }
+       ]
+      }
+     ]
     }
    ]
   },
@@ -552,29 +483,6 @@
      "questions": [
       {
        "n": 1,
-       "word": 1,
-       "why": "Akhirnya fathah (فَتْحَة) karena menjadi badal (بَدَل, pengganti) dari aṣ-ṣirāṭa (ٱلصِّرَٰطَ) di ayat 6 yang manshub (مَنْصُوب).",
-       "options": [
-        {
-         "from": "1:7:1",
-         "text": "badal (بَدَل)"
-        },
-        {
-         "from": "1:7:2",
-         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih مُضَاف إِلَيْه)"
-        },
-        {
-         "from": "1:2:1",
-         "text": "mubtada' (مُبْتَدَأ)"
-        },
-        {
-         "from": "1:7:3",
-         "text": "fi'il madhi (فِعْل مَاضٍ) + fa'il (فَاعِل, -ta تَ); bersama ‘alaihim (عَلَيْهِمْ) menjadi shilah (صِلَة)"
-        }
-       ]
-      },
-      {
-       "n": 2,
        "word": 2,
        "why": "Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ, bentuknya tetap) dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari ṣirāṭa (صِرَٰطَ).",
        "options": [
@@ -583,31 +491,27 @@
          "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih مُضَاف إِلَيْه)"
         },
         {
-         "from": "1:7:1",
-         "text": "badal (بَدَل)"
-        },
-        {
-         "from": "1:7:7",
-         "text": "na'ib fa'il (نَائِب فَاعِل, jar-majrur جَارّ وَمَجْرُور)"
+         "from": "1:7:3",
+         "text": "fi'il madhi (فِعْل مَاضٍ) + fa'il (فَاعِل, -ta تَ); bersama ‘alaihim (عَلَيْهِمْ) menjadi shilah (صِلَة)"
         },
         {
          "from": "1:2:2",
          "text": "khabar (خَبَر, jar-majrur جَارّ وَمَجْرُور)"
+        },
+        {
+         "from": "1:6:2",
+         "text": "maf'ul bih (مَفْعُول بِه) kedua"
         }
        ]
       },
       {
-       "n": 3,
+       "n": 2,
        "word": 3,
        "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) karena bersambung dengan dhamir (ضَمِير) -ta (تَ, “Engkau”, pelakunya), dan kalimatnya menjadi shilah (صِلَة) bagi allażīna (ٱلَّذِينَ).",
        "options": [
         {
          "from": "1:7:3",
          "text": "fi'il madhi (فِعْل مَاضٍ) + fa'il (فَاعِل, -ta تَ); bersama ‘alaihim (عَلَيْهِمْ) menjadi shilah (صِلَة)"
-        },
-        {
-         "from": "1:7:1",
-         "text": "badal (بَدَل)"
         },
         {
          "from": "1:7:2",
@@ -620,25 +524,25 @@
        ]
       },
       {
-       "n": 4,
-       "word": 7,
-       "why": "‘Alā (عَلَىٰ) adalah huruf jar (حَرْف جَرّ) dan -him (هِمْ) kata ganti mabni (مَبْنِيّ) yang dijarkan olehnya, sedangkan kedudukan rafa' (رَفْع, mahall raf') di kartu ini milik frasa jar-majrur (جَارّ وَمَجْرُور) ‘alaihim (عَلَيْهِمْ) secara utuh sebagai na'ib fa'il (نَائِب فَاعِل, pengganti pelaku) bagi al-magḍūbi (ٱلْمَغْضُوبِ), karena al-magḍūb adalah isim maf'ul (اِسْم مَفْعُول).",
+       "n": 3,
+       "word": 6,
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari gairi (غَيْرِ).",
        "options": [
         {
-         "from": "1:7:7",
-         "text": "na'ib fa'il (نَائِب فَاعِل, jar-majrur جَارّ وَمَجْرُور)"
-        },
-        {
-         "from": "1:7:1",
-         "text": "badal (بَدَل)"
-        },
-        {
-         "from": "1:7:2",
-         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih مُضَاف إِلَيْه)"
-        },
-        {
-         "from": "1:1:2",
+         "from": "1:7:6",
          "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "1:6:2",
+         "text": "maf'ul bih (مَفْعُول بِه) kedua"
+        },
+        {
+         "from": "1:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        },
+        {
+         "from": "1:6:3",
+         "text": "na't (نَعْت, sifat)"
         }
        ]
       }

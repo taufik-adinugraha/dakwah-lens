@@ -328,9 +328,17 @@ class LessonMap(unittest.TestCase):
         with self.assertRaises(LM.MapError) as e:
             BM.build_all(LESSONS, LIBRARY, LEX, {**AUTHORED, "an-nas": {"slug": "an-nas", "names": {}}}, CURRICULUM)
         self.assertIn("an-nas 5: step jamak-taksir is new here and has no text to teach it", str(e.exception))
-        # Al-Ikhlas: a step's name holds a Qur'anic word ("Lam nafi": lam is its first word of ayah 3).
+        # Al-Ikhlas: majzum, the fourth part of the i'rab record, has no text yet.
         with self.assertRaises(LM.MapError) as e:
             BM.build_all(LESSONS, LIBRARY, LEX, {**AUTHORED, "al-ikhlas": {"slug": "al-ikhlas", "names": {}}}, CURRICULUM)
+        self.assertIn("al-ikhlas 3: step majzum is new here and has no text to teach it", str(e.exception))
+        # … and a step's name that holds a Qur'anic word is refused before that. PLANTED: the name
+        # the step had until 2026-10-13 ("Lam nafi": lam is the first word of ayah 3; it is "Huruf
+        # nafi yang menjazmkan" now).
+        named = copy.deepcopy(CURRICULUM)
+        next(x for x in named["steps"] if x["id"] == "nafi-lam")["latin"] = "Lam nafi"
+        with self.assertRaises(LM.MapError) as e:
+            BM.build_all(LESSONS, LIBRARY, LEX, {**AUTHORED, "al-ikhlas": {"slug": "al-ikhlas", "names": {}}}, named)
         self.assertIn("al-ikhlas: step nafi-lam is named “Lam nafi”, which the narrator cannot say", str(e.exception))
         # Al-Fatihah's own map is untouched by another switch.
         self.assertEqual(BM.build_all(LESSONS, LIBRARY, LEX, copy.deepcopy(AUTHORED), CURRICULUM)[SLUG], CONTENTS[SLUG])

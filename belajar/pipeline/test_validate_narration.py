@@ -188,7 +188,14 @@ W = "al-fatihah:2:w1"
 W11 = "al-fatihah:1:w1:compose:4"   # "… dhommah menjadi كَسْرَة …"
 WBA = "al-fatihah:1:w1:compose:1"   # "… huruf بَاء, yang artinya dengan."
 C1 = "al-fatihah:1:w1:compose:3"
+# The structure told item by item (operator 2026-10-13): ayah 1's first two items.
+S11, S12 = "al-fatihah:1:structure:1", "al-fatihah:1:structure:2"
 LAM3 = "al-fatihah:1:w3:compose:3"  # "huruf lam (ل)": the bare lam of the frame's ٱلرَّحْمَٰن
+
+
+# The line after the last of word 2's composition in Al-Fatihah 1, however many it has (three
+# since its second `say` was split in two, 2026-10-13).
+PAST_W2 = f"al-fatihah:1:w2:compose:{len(COMPOSE['al-fatihah']['words']['1:1:2']['lines']) + 1}"
 
 
 def compose_say(loc, k, text):
@@ -196,6 +203,45 @@ def compose_say(loc, k, text):
     def f(_m, _l, _x, cp, *_):
         cp["al-fatihah"]["words"][loc]["lines"][k - 1]["say"] = text
     return f
+
+
+def item_say(ayah, k, text):
+    """The k-th structure item's `say` changed in the lesson content (the narration then lags)."""
+    def f(_m, ls, *_):
+        ls["al-fatihah"]["ayat"][ayah - 1]["structure"]["items"][k - 1]["say"] = text
+    return f
+
+
+def item_words(ayah, k, words):
+    def f(_m, ls, *_):
+        ls["al-fatihah"]["ayat"][ayah - 1]["structure"]["items"][k - 1]["words"] = words
+    return f
+
+
+def no_items(ayah):
+    """An ayah of Al-Fatihah told from its summary again (its items taken out of the content)."""
+    def f(_m, ls, *_):
+        del ls["al-fatihah"]["ayat"][ayah - 1]["structure"]["items"]
+    return f
+
+
+def why_basic(loc, text):
+    """A word's `why_basic` changed (None: taken away) in the lesson content."""
+    def f(_m, ls, *_):
+        a, w = (int(x) for x in loc.split(":")[1:])
+        word = ls["al-fatihah"]["ayat"][a - 1]["words"][w - 1]
+        if text is None:
+            del word["why_basic"]
+        else:
+            word["why_basic"] = text
+    return f
+
+
+def split_item(m, *_):
+    lines = m["al-fatihah"]["lines"]
+    old = lines.pop(S12)
+    lines[S12 + ":a"] = dict(old)
+    lines[S12 + ":b"] = dict(old)
 
 
 def drop_frame(lid):
@@ -297,6 +343,26 @@ def in_pending(fn):
     return f
 
 
+def listed(lid, terms):
+    """The list of what is tolerated for now says `lid` uses `terms` too early."""
+    return in_pending(lambda p: p.__setitem__(lid, list(terms)))
+
+
+def then(*faults):
+    """Several changes as ONE planted fault (a use, and the list's entry for it)."""
+    def f(*args):
+        for fault in faults:
+            fault(*args)
+    return f
+
+
+# A sentence that names a term before its lesson, as (caption, speech) for `more`: idhafah is
+# taught in ayah 4, badal in An-Nas 2, isim fa'il at the next level.
+EARLY = ("Ini idhafah (إِضَافَة).", "Ini idhofah.")
+EARLY_TWO = ("Ini idhafah (إِضَافَة) dan badal (بَدَل).", "Ini idhofah dan بَدَل.")
+NEXT_LEVEL = ("Ini isim fa’il (اِسْم فَاعِل).", "Ini اِسْم فَاعِل.")
+
+
 def map_entry(mp, ayah):
     return next(a for a in mp["ayat"] if a["ayah"] == ayah)
 
@@ -395,7 +461,9 @@ MUTATIONS = [
     ("Arabic that is not a dictionary term", append_text(W, " Ini مُسْتَتِر."),
      "not a pronunciation-dictionary term"),
     ("Qur'anic word in Arabic script", append_text(W, " Lalu بِسْمِ."), "Qur'anic word 'بِسْمِ' (Arabic script)"),
-    ("heavy-letter term spoken from Arabic", replace_in("al-fatihah:1:w2:compose:2", "text", "mudhof ilaih", "مُضَاف إِلَيْه"),
+    # In the line of the lesson that teaches the term (the idhafah "Konsep baru" line of ayah 4):
+    # until 2026-10-13 a word line of ayah 1 said it, three lessons early.
+    ("heavy-letter term spoken from Arabic", replace_in("al-fatihah:4:concept:idhafah", "text", "mudhof ilaih", "مُضَاف إِلَيْه"),
      "not a pronunciation-dictionary term"),
     ("grammar term left in Latin", replace_in(W11, "text", "كَسْرَة", "kasrah"),
      "'kasrah' must be spoken from the pronunciation dictionary"),
@@ -441,8 +509,7 @@ MUTATIONS = [
     ("shared line with a highlight", set_field("shared:correct", "highlight", [0]), "not what the stage shows"),
     # --- word composition and the harakat primer (narration rule 14, 2026-10-10)
     ("compose line missing", drop(C1), f"missing line {C1}"),
-    ("compose line past the frames' says", add("al-fatihah:1:w2:compose:3", "Lagi."),
-     "unexpected line al-fatihah:1:w2:compose:3"),
+    ("compose line past the frames' says", add(PAST_W2, "Lagi."), f"unexpected line {PAST_W2}"),
     ("primer line missing", drop("al-fatihah:1:primer:2"), "missing line al-fatihah:1:primer:2"),
     ("primer on an ayah the primer does not open", add("al-fatihah:2:primer:1", "Harakat."),
      "unexpected line al-fatihah:2:primer:1"),
@@ -460,6 +527,40 @@ MUTATIONS = [
      compose_say("1:1:1", 1, "Bagian pertama adalah huruf jar yang artinya “dengan”."), "out of date"),
     ("Qur'anic word in a composition's say",
      compose_say("1:1:1", 1, "Bagian pertama adalah bi- dan ismi."), "names the Qur'anic word(s)"),
+    # --- the sentence structure as separate items (operator 2026-10-13: "can we make this kind of
+    # explanation in items: harfjar in one item, idhafah in next item etc, it's kind of confusing
+    # which for which in this paragraph"): one line per item, its words lit, spoken as authored
+    ("a structure item's line missing", drop(S12), "missing line al-fatihah:1:structure:2"),
+    ("the one structure line beside the items", add("al-fatihah:1:structure", "Sekarang susunan kalimatnya."),
+     "unexpected line al-fatihah:1:structure"),
+    ("one item too many", add("al-fatihah:3:structure:3", "Keduanya berakhir sama."), "unexpected line al-fatihah:3:structure:3"),
+    ("an item lighting the whole ayah, as the one line did", set_field(S12, "highlight", [0]), "not what the stage shows"),
+    ("an item lighting another item's words", set_field(S12, "highlight", [2, 3, 4]), "not what the stage shows"),
+    ("an item with a word card", set_field(S12, "focus", "1:1:2"), "not what the stage shows"),
+    ("a structure item split", split_item, "a structure item is never split"),
+    ("the lead said before a later item", both(S12, "Kata yang artinya", "Sekarang susunan kalimatnya. Kata yang artinya"), "out of date"),
+    ("an item changed in the content, narration stale", item_say(1, 2, "Kata pertama disandarkan kepada kata kedua."), "out of date"),
+    ("an item's words changed in the content, narration stale", item_words(1, 2, [1, 2, 3]), "out of date"),
+    ("the items taken out of the content: the ayah is told from its summary", no_items(4), "missing line al-fatihah:4:structure"),
+    ("Qur'anic word in an item's say", item_say(1, 1, "Kata pertama, bismi, diawali huruf jar."), "names the Qur'anic word(s)"),
+    ("an item with a Latin term the dictionary does not speak", both(S11, "Gabungan seperti ini", "Fa'il-nya tersirat. Gabungan seperti ini"),
+     "says \"Fa'il\" in Latin"),
+    # --- `why_basic` (2026-10-13): a word's reason in the lesson's own vocabulary, said by the
+    # quiz explanations in place of `why`; held to the term check, the strict rule and rule 1
+    ("a why_basic changed in the content, narration stale",
+     why_basic("1:5:1", "Dhamir ini mabni: akhirnya selalu fathah, apa pun kedudukannya."), "out of date"),
+    # Without it the explanation says the card's `why` again — and with it the term the card names.
+    ("a why_basic taken away: the card's why is said again, with its term", why_basic("1:7:1", None),
+     "al-fatihah:7:ex:sort-case:1:why: uses the term 'badal' before the lesson that teaches it (taught in 114:2)"),
+    ("a why_basic that names a term taught later",
+     why_basic("1:7:1", "Akhirnya fathah karena menjadi badal bagi kata yang artinya “jalan” di ayat keenam."),
+     "al-fatihah:7:ex:sort-case:1:why: uses the term 'badal' before the lesson that teaches it (taught in 114:2)"),
+    ("a why_basic that names a next-level term",
+     why_basic("1:5:2", "Akhirnya dhammah karena fi'il mudhari' ini tidak didahului penashab; pelakunya tersirat."),
+     "uses the term 'nashib' before the lesson that teaches it (taught in tingkat lanjut)"),
+    ("Qur'anic word in a why_basic", why_basic("1:5:1", "Dhamir iyyāka ini mabni: akhirnya tetap fathah."), "names the Qur'anic word(s)"),
+    ("a why_basic with a Latin term the dictionary does not speak",
+     both("al-fatihah:6:ex:sort-case:1:why", "fa’il (فَاعِل) kata ini", "fa'il-nya", "فَاعِل kata ini", "fa'il-nya"), "says \"fa'il\" in Latin"),
     # --- Arabic terms said in Latin (rule 1) and the dictionary's approvals (review 2026-10-10)
     ("a compose line with a Latin grammar term (mubtada')", append_text(C1, " Kata ini mubtada'."),
      "says \"mubtada'\" in Latin"),
@@ -575,19 +676,22 @@ MUTATIONS = [
      "missing line al-fatihah:3:concept:idhafah"),
     ("a step's own text changed in the curriculum, narration stale",
      in_cur(lambda cur: cur_step(cur, "marfu")["teach"].__setitem__("summary", "Keadaan kedua.")), "out of date"),
-    # --- no term before its lesson (decision 7), and the list tolerated for now, both ways
-    ("a term before its lesson that is not listed (the list emptied)", in_pending(lambda p: p.clear()),
-     "al-fatihah:1:w2:compose:2: uses the term 'mudhaf-ilaih' before the lesson that teaches it (taught in 1:4)"),
-    ("a next-level term that is not listed", in_pending(lambda p: p.pop("al-fatihah:5:concept:fiil-mudhari")),
-     "al-fatihah:5:concept:fiil-mudhari: uses the term 'nashib' before the lesson that teaches it (taught in tingkat lanjut)"),
-    ("one term of a listed line taken off its entry", in_pending(lambda p: p["al-fatihah:1:structure"].remove("naat")),
-     "al-fatihah:1:structure: uses the term 'naat' before the lesson that teaches it (taught in 1:3)"),
-    ("a stale entry: a line that says nothing too early", in_pending(lambda p: p.__setitem__("al-fatihah:1:w1", ["idhafah"])),
-     "al-fatihah:1:w1 no longer uses 'idhafah' too early (stale): remove it"),
-    ("a stale term on a listed line", in_pending(lambda p: p["al-fatihah:1:structure"].append("badal")),
-     "al-fatihah:1:structure no longer uses 'badal' too early (stale): remove it"),
-    ("a term planted in a line before its lesson", more("al-fatihah:2:w1", "Ini idhafah (إِضَافَة).", "Ini idhofah."),
+    # --- no term before its lesson (decision 7), and the list tolerated for now, both ways. Each
+    # fault PLANTS its use (and its entry of the list): the real list only shrinks as the lessons
+    # are reworded, down to empty, and a fault that needed one of its entries would go with it
+    # (2026-10-13: the Al-Fatihah entries these cases stood on were reworded away).
+    ("a term planted in a line before its lesson", more(W, *EARLY),
      "al-fatihah:2:w1: uses the term 'idhafah' before the lesson that teaches it (taught in 1:4)"),
+    ("a next-level term planted in a line", more(W, *NEXT_LEVEL),
+     "al-fatihah:2:w1: uses the term 'isim-fail' before the lesson that teaches it (taught in tingkat lanjut)"),
+    ("two terms planted, one of them listed", then(more(W, *EARLY_TWO), listed(W, ["idhafah"])),
+     "al-fatihah:2:w1: uses the term 'badal' before the lesson that teaches it (taught in 114:2)"),
+    ("a stale entry: a line that says nothing too early", listed("al-fatihah:1:w1", ["idhafah"]),
+     "al-fatihah:1:w1 no longer uses 'idhafah' too early (stale): remove it"),
+    ("a stale term on a listed line", then(more(W, *EARLY), listed(W, ["idhafah", "badal"])),
+     "al-fatihah:2:w1 no longer uses 'badal' too early (stale): remove it"),
+    ("an entry for a line that does not exist", listed("al-fatihah:2:w99", ["idhafah"]),
+     "al-fatihah:2:w99 no longer uses 'idhafah' too early (stale): remove it"),
     ("map:later naming a term that is none of the steps it announces", more(T1, "Juga badal (بَدَل).", "Juga بَدَل."),
      "al-fatihah:1:map:later: uses the term 'badal' before the lesson that teaches it (taught in 114:2)"),
     ("the exemption of map:later claimed by another line",
@@ -826,7 +930,7 @@ class LessonMapLines(unittest.TestCase):
         self.assertEqual(fatihah["al-fatihah:1:concept:majrur"]["highlight"], [1, 2, 3, 4])
         self.assertEqual(fatihah["al-fatihah:3:concept:alif-lam"]["highlight"], [1, 2])
         self.assertTrue(fatihah["al-fatihah:3:concept:alif-lam"]["display"].startswith("Konsep baru: Alif lam (ال), penanda isim (اِسْم) yang tertentu."))
-        self.assertIn("lafaz “Allah” di ayat dua, sudah ma’rifah (مَعْرِفَة) tanpa alif lam (ال).", fatihah["al-fatihah:3:concept:alif-lam"]["display"])
+        self.assertIn("seperti nama Allah subhanahu wa ta'ala, sudah ma’rifah (مَعْرِفَة) tanpa alif lam (ال).", fatihah["al-fatihah:3:concept:alif-lam"]["display"])
         # The lesson with no ayah is not built yet: the kalimah record's line is said nowhere, and
         # the harakat primer stays where it is, in ayah 1.
         self.assertNotIn("concept:kalimah-isim-fiil-huruf", said)
@@ -842,8 +946,12 @@ class LessonMapLines(unittest.TestCase):
         # A new line's text is new: no audio (the steps with their own text, the map's lines).
         for lid in ("al-fatihah:1:concept:majrur", "al-fatihah:2:concept:marfu", "al-fatihah:1:map:new", "al-fatihah:1:learned"):
             self.assertNotIn("audio", lines[lid], lid)
-        # … and every word line kept its own.
-        self.assertTrue(all("audio" in ln for lid, ln in lines.items() if re.fullmatch(r"al-fatihah:\d:w\d(?::compose:\d+)?", lid)))
+        # … and a word line whose text did not change kept its own: word 1 of ayah 1 (the karaoke
+        # check's line), and most of the 170-odd word and composition lines — the ones reworded
+        # since (2026-10-13: no term before its lesson) wait for a render, like any new text.
+        self.assertIn("audio", lines["al-fatihah:1:w1"])
+        word_lines = [ln for lid, ln in lines.items() if re.fullmatch(r"al-fatihah:\d:w\d(?::compose:\d+)?", lid)]
+        self.assertGreater(sum("audio" in ln for ln in word_lines), 0.9 * len(word_lines))
         text = "Konsep baru: نَعْت, yaitu sifat."
         aud = {"url": V.delivery_url(VOICE, "x", text, SHA), "ms": 2000, "sha256": SHA}
         old = {"version": 2, "voice": dict(VOICE), "lines": {
@@ -1880,12 +1988,16 @@ class SpeechAndRender(unittest.TestCase):
 
 
 def main() -> int:
+    # `--only <text>`: while iterating, the planted faults whose name holds <text> and the unit
+    # tests whose id does (the whole run plants every fault and takes minutes). CI runs it bare.
+    only = sys.argv[sys.argv.index("--only") + 1] if "--only" in sys.argv[1:-1] else None
+    chosen = [m for m in MUTATIONS if only is None or only in m[0]]
     width = max(len(n) for n, _, _ in MUTATIONS)
     failed = 0
     base = run_check(copy.deepcopy(MANIFESTS), copy.deepcopy(LESSONS), copy.deepcopy(LEXDATA))
     print(f"{'unmutated copies':{width}s}  {'PASS' if not base else 'FAIL'}" + (f"  {base[:3]}" if base else ""))
     failed += bool(base)
-    for name, mutate, expect in MUTATIONS:
+    for name, mutate, expect in chosen:
         m, ls, lx, cp = copy.deepcopy(MANIFESTS), copy.deepcopy(LESSONS), copy.deepcopy(LEXDATA), copy.deepcopy(COMPOSE)
         mp, cur, pend = copy.deepcopy(LESSONMAP), copy.deepcopy(CURRICULUM), copy.deepcopy(PENDING)
         mutate(m, ls, lx, cp, mp, cur, pend)
@@ -1896,10 +2008,10 @@ def main() -> int:
     suite = unittest.TestSuite()
     loader = unittest.defaultTestLoader
     for cls in (NarrationValidation, LessonMapLines, Dictionary, WordPlaces, SpeechAndRender):
-        suite.addTests(loader.loadTestsFromTestCase(cls))
+        suite.addTests(t for t in loader.loadTestsFromTestCase(cls) if only is None or only in t.id())
     res = unittest.TextTestRunner(verbosity=1, stream=sys.stdout).run(suite)
-    print(f"\n{len(MUTATIONS)} planted faults, {len(MUTATIONS) - failed + bool(base)} caught"
-          if not base else "\nunmutated copies fail")
+    print(f"\n{len(chosen)} planted faults{'' if only is None else f' of {len(MUTATIONS)} (--only {only})'}, "
+          f"{len(chosen) - failed + bool(base)} caught" if not base else "\nunmutated copies fail")
     return 1 if failed or not res.wasSuccessful() else 0
 
 

@@ -20,7 +20,7 @@
  * the autoplay build (and by pipeline/build_narration.py + validate_narration.py):
  *   "${slug}:${ayah}:${part}"   part ∈ intro | recite | map:new | map:learnt |
  *                                      map:later | primer:${k} | w${n} |
- *                                      w${n}:compose:${k} | structure |
+ *                                      w${n}:compose:${k} | structure | structure:${k} |
  *                                      concept:${id} |
  *                                      ex:${exerciseKey}:intro |
  *                                      ex:${exerciseKey}:${n}:why |
@@ -368,6 +368,10 @@ export type AutoplayStep = {
   exercise?: ExerciseSpec;
   /** The step's example beats, each after the cue it names (operator 2026-10-12, plan L20). */
   examples?: ExampleBeat[];
+  /** A structure step that tells ONE item of the ayah's structure (operator 2026-10-13: "can we
+   *  make this kind of explanation in items"): which item of how many, and the words (1-based)
+   *  it is about — what its line lights and the stage shows. */
+  item?: { n: number; of: number; words: number[] };
 };
 
 /** Where the learner goes when the ayah's sequence ends. */
@@ -407,6 +411,8 @@ export type AutoplayTexts = {
   /** Opens a word's explanation; the content's "why" sentence follows. */
   meaning: (a: { n: number; translit: string; gloss: string }) => string;
   structure: (summary: string) => string;
+  /** The first ITEM of a structure told item by item (the others are said as they stand). */
+  structureItems: (item: string) => string;
   /** A structure summary with no sentence free of Arabic script. */
   structureBrief: string;
   concept: (title: string, summary: string) => string;

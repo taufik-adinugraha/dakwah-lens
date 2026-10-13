@@ -984,7 +984,10 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
             }
           }
         }
-        expect(lines).toBeGreaterThan(2000);
+        // Not vacuous. The number follows what is rendered: 2,244 lines played from a copy when
+        // every Al-Fatihah line had its voice; 1,896 on 2026-10-13, with the lines whose text is
+        // new (the lesson map's, the structure told item by item) waiting for their render.
+        expect(lines).toBeGreaterThan(1500);
         // A second fetch of a file is rare: only those few repeated lines (24 of 2,244 lines played,
         // 2026-10-13) — and `force-cache` answers it from the browser's HTTP cache.
         expect(refetched).toBeLessThan(lines / 50);
@@ -1135,7 +1138,30 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
 
   it("the next file of this step is what the lesson plays next in it — never a part of a split line already played", () => {
     let split = 0;
-    for (const { ayah, seq } of fatihah) {
+    // PLANTED: a voiced line in two files. No line of Al-Fatihah is split any more (its only
+    // long lines were the structure paragraphs, told item by item since 2026-10-13), and the rule
+    // must hold for the surahs whose long lines will be: ayah 2 with its first voiced concept
+    // line cut in two.
+    const two = fatihah[1];
+    const cut = two.seq.steps.findIndex((st) => st.kind === "concept" && st.cues[0]?.audio.length === 1);
+    expect(cut).toBeGreaterThan(-1);
+    const planted = {
+      ayah: two.ayah,
+      seq: {
+        ...two.seq,
+        steps: two.seq.steps.map((st, i) => {
+          if (i !== cut) return st;
+          const [whole] = st.cues[0].audio;
+          const half = Math.floor(whole.ms / 2);
+          const parts = [
+            { ...whole, id: `${whole.id}:a`, url: whole.url.replace(/\.mp3$/, "-a.mp3"), ms: half, words: undefined },
+            { ...whole, id: `${whole.id}:b`, url: whole.url.replace(/\.mp3$/, "-b.mp3"), ms: whole.ms - half, words: undefined },
+          ];
+          return { ...st, cues: [{ ...st.cues[0], audio: parts }, ...st.cues.slice(1)] };
+        }),
+      },
+    };
+    for (const { ayah, seq } of [...fatihah, planted]) {
       for (const pace of PACES) {
         const run = walk(seq, { type: "start", reason: "fresh" }, pace, "skip");
         run.forEach((s, k) => {

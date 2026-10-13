@@ -18,6 +18,8 @@ export const ID_TEXTS: AutoplayTexts = {
   wordIntro: ({ n, translit }) => `Kata ke-${n}: ${translit}. Dengarkan imam membacanya.`,
   meaning: ({ n, gloss }) => `Kata ke-${n} artinya “${gloss}”.`,
   structure: (summary) => `Susunan kalimat ayat ini: ${summary}`,
+  // As the narration opens it (pipeline/validate_narration.py STRUCTURE_LEAD).
+  structureItems: (item) => `Sekarang susunan kalimatnya. ${item}`,
   structureBrief: "Susunan kalimat ayat ini dijelaskan di bagian Pelajari lebih dalam.",
   concept: (title, summary) => `Konsep baru — ${title}: ${summary}`,
   conceptBrief: (title) => `Konsep baru — ${title}. Penjelasannya ada di bagian Pelajari lebih dalam.`,

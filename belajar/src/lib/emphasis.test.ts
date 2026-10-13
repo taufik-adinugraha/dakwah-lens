@@ -379,12 +379,15 @@ describe("emphasisSpans: what a text emphasises", () => {
       ["meaning", "“bagi”"],
       ["meaning", "“Dia”"],
     ]);
-    // The real one the operator's example comes from: the gloss “dengan” and the answer.
-    const why = CAPTIONS.find(([where]) => where === "al-fatihah al-fatihah:1:ex:why-harakat:1:why")![1];
-    expect(why).toMatch(/yang artinya “dengan”.*Jadi, kata ini majrur \(مَجْرُور\)\.$/u);
-    expect(shown(why)).toEqual([
-      ["meaning", "“dengan”"],
-      ["term", "majrur (مَجْرُور)"],
+    // A real one: a gloss after "yang artinya" and the answer. (The operator's example was ayah
+    // 1's first why-harakat question, “dengan”; ayah 1 asks no reason since 2026-10-13 — no wrong
+    // option is taught by then — so this is the same kind of line in ayah 2.)
+    const why = CAPTIONS.find(([where]) => where === "al-fatihah al-fatihah:2:ex:sort-case:2:why")![1];
+    expect(why).toMatch(/yang artinya “bagi”.*Jadi, kata ini majrur \(مَجْرُور\)\.$/u);
+    expect(shown(why).filter(([kind]) => kind === "term")).toEqual([["term", "majrur (مَجْرُور)"]]);
+    expect(shown(why).filter(([kind]) => kind === "meaning").slice(0, 2)).toEqual([
+      ["meaning", "“bagi”"],
+      ["meaning", "“tetap”"],
     ]);
     // No term named in a reason ("disebut …") and no sound ("bunyi i") beside an answer.
     expect(shown("Jadi, kata ini majrur (مَجْرُور). Kata seperti ini disebut isim (اِسْم), bunyi i, yang artinya “nama”.")).toEqual([
@@ -901,7 +904,9 @@ describe("alignEmphasis: the karaoke words take the display's emphasis", () => {
           expect(ok, `${slug} ${id}: "${t}" emphasised as ${kinds[i]}`).toBe(true);
         });
       }
-    expect(lines).toBeGreaterThan(300);
-    expect(spans).toBeGreaterThan(200);
+    // Not vacuous; the numbers follow what is rendered (344 lines when every Al-Fatihah line had
+    // its voice, 294 on 2026-10-13 with the reworded lessons waiting for their render).
+    expect(lines).toBeGreaterThan(250);
+    expect(spans).toBeGreaterThan(150);
   });
 });

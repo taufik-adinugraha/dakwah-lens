@@ -211,25 +211,28 @@ describe("autoplay sequence", () => {
   });
 
   it("attaches audio only from same-origin narration paths, and plays a split line part by part", () => {
-    const plain = seqFor("al-fatihah", 2);
+    // Al-Ikhlas: its structure is still ONE line built from the summary, which a long text
+    // splits (an item of a structure told item by item — Al-Fatihah since 2026-10-13 — is never
+    // split: pipeline/validate_narration.py).
+    const plain = seqFor("al-ikhlas", 2);
     const { narration, shared } = withAudio(plain);
-    const st = narration.lines["al-fatihah:2:structure"];
-    delete narration.lines["al-fatihah:2:structure"];
-    narration.lines["al-fatihah:2:structure:a"] = { text: "a", audio: { ...st.audio!, url: "/belajar/media/narration/uji/a.mp3", ms: 1000 } };
-    narration.lines["al-fatihah:2:structure:b"] = { text: "b", audio: { ...st.audio!, url: "/belajar/media/narration/uji/b.mp3", ms: 3000 } };
-    narration.lines["al-fatihah:2:recap"].audio = { url: "https://cdn.example.com/x.mp3", ms: 900, sha256: "a".repeat(64) };
-    const seq = seqFor("al-fatihah", 2, { narration, shared });
+    const st = narration.lines["al-ikhlas:2:structure"];
+    delete narration.lines["al-ikhlas:2:structure"];
+    narration.lines["al-ikhlas:2:structure:a"] = { text: "a", audio: { ...st.audio!, url: "/belajar/media/narration/uji/a.mp3", ms: 1000 } };
+    narration.lines["al-ikhlas:2:structure:b"] = { text: "b", audio: { ...st.audio!, url: "/belajar/media/narration/uji/b.mp3", ms: 3000 } };
+    narration.lines["al-ikhlas:2:recap"].audio = { url: "https://cdn.example.com/x.mp3", ms: 900, sha256: "a".repeat(64) };
+    const seq = seqFor("al-ikhlas", 2, { narration, shared });
     expect(seq.steps.find((s) => s.id === "recap")?.cues[0].audio).toEqual([]);
     const structure = seq.steps.find((s) => s.id === "structure")?.cues[0];
-    expect(structure?.audio.map((a) => a.id)).toEqual(["al-fatihah:2:structure:a", "al-fatihah:2:structure:b"]);
+    expect(structure?.audio.map((a) => a.id)).toEqual(["al-ikhlas:2:structure:a", "al-ikhlas:2:structure:b"]);
     expect(structure?.spoken).toBe("a b");
     expect(plain.steps[0].cues[0].spoken).toBeNull();
 
     const r = runner(seq);
     r.send({ type: "start", reason: "continue", from: firstIdx(seq, "structure") });
-    expect(r.s.activity).toMatchObject({ kind: "narrate", file: "al-fatihah:2:structure:a", offsetMs: 0, totalMs: 4000 });
+    expect(r.s.activity).toMatchObject({ kind: "narrate", file: "al-ikhlas:2:structure:a", offsetMs: 0, totalMs: 4000 });
     r.send(end(r.s.activity!));
-    expect(r.s.activity).toMatchObject({ kind: "narrate", file: "al-fatihah:2:structure:b", offsetMs: 1000, totalMs: 4000 });
+    expect(r.s.activity).toMatchObject({ kind: "narrate", file: "al-ikhlas:2:structure:b", offsetMs: 1000, totalMs: 4000 });
     r.send(end(r.s.activity!));
     expect(r.s.activity).toMatchObject({ kind: "wait", ms: settleAfterNarrationMs("biasa") });
   });
@@ -769,7 +772,10 @@ describe("word places", () => {
   it("rings the words the structure line names, from the real manifest", () => {
     const narration = input.manifests["al-fatihah"] as NarrationManifest;
     const seq = seqFor("al-fatihah", 4, { narration });
-    const at = firstIdx(seq, "structure");
+    // The second item of ayah 4's structure: "… kata pertama disandarkan kepada kata kedua, dan
+    // kata kedua disandarkan kepada kata ketiga …" (the structure is told item by item since
+    // 2026-10-13; until then one line named the three).
+    const at = seq.steps.findIndex((x) => x.id === "structure:2");
     expect(seq.steps[at].cues[0].refs).toEqual([1, 2, 3]);
     const r = runner(seq);
     r.send({ type: "start", from: at, reason: "continue" });
@@ -924,9 +930,12 @@ describe("narration ids and the spoken-text guard", () => {
 
 describe("replay (↺ Ulangi langkah ini)", () => {
   it("plays the current step again from its start, also from a pause, and plays on", () => {
-    const seq = seqFor("al-fatihah", 2);
+    // Al-Ikhlas 1: a structure told in ONE long line, whose caption has several parts (an item
+    // of Al-Fatihah's, told item by item since 2026-10-13, is one short part).
+    const seq = seqFor("al-ikhlas", 1);
     const r = runner(seq);
     const at = firstIdx(seq, "structure");
+    expect(seq.steps[at].cues[0].parts.length).toBeGreaterThan(1);
     r.send({ type: "start", from: at, reason: "continue" });
     const first = r.s.activity;
     expect(first?.kind).toBe("read");

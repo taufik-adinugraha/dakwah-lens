@@ -725,15 +725,28 @@ def ex_intro(ex: dict, terms: Q.Terms) -> str:
     }[key]
 
 
+def said_why(w: dict, san: Sanitiser, S: int, A: int, i: int, where: str) -> str:
+    """Why a word ends as it does, as the narrator SAYS it: the word's `why_basic` when it has one
+    — the reason in the lesson's own vocabulary (2026-10-13, decision 7 of the basic curriculum:
+    "No lesson line may use a term before the lesson that teaches it"), authored to be spoken as
+    it stands, so held to the strict rule like a composition's `say` (a Qur'anic word in it stops
+    the build; nothing is mapped to a place) — else its `why`, the reference text of its card,
+    sanitised as before."""
+    if w.get("why_basic"):
+        return san.prose(w["why_basic"], S, A, i, strict=f"{where} (why_basic of {w['loc']})")
+    return san.prose(w["why"], S, A, i)
+
+
 def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.Terms, S: int) -> str:
     """The ONE short line that explains a question's correct answer, said after "Benar." and after
     "Ini jawabannya." (operator 2026-10-10: "give narration/voice only for the correct answer, to
     give auditory explanation"; decision 2 of 2026-10-11: new short lines from the word's existing
     sourced fields only, never a new claim):
       tap-word      the word's place and gloss;
-      why / sort    the word's `why`, then its case state when the why does not name it ("Jadi,
-                    kata ini marfu'.": the state the sort bin and the badge show);
-      label-role    the word's `role`, then its `why`;
+      why / sort    the word's `why` — its `why_basic` when it has one (said_why) —, then its case
+                    state when the why does not name it ("Jadi, kata ini marfu'.": the state the
+                    sort bin and the badge show);
+      label-role    the word's `role`, then its `why` (or `why_basic`);
       wazn-factory  the form's label with its Konsep card's title ("fi'il mudhari', yaitu kata
                     kerja sekarang dan akan datang"), without the Arabic form (not a dictionary term).
     """
@@ -750,7 +763,7 @@ def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.T
     w = a["words"][i - 1]
     if key == "tap-word":
         return f"Itu kata {ordinal(i)}, yang artinya “{V.fold(w['gloss'])}”."
-    why = san.prose(w["why"], S, A, i)
+    why = said_why(w, san, S, A, i, f"{a['loc']} ex:{key}:{q['n']}:why")
     if key == "label-role":
         # The role's head (before its brackets or its ";"): the why says the rest ("khabar
         # (jar-majrur)" spoken "khabar, atau jar-majrur" would mean "or").
@@ -888,7 +901,7 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
             comp = V.composition_of(compose, w["loc"])
             gloss = f"Kata {ordinal(i)} artinya: “{V.fold(w['gloss'])}”."
             if comp is None:
-                add(f"w{i}", f"{gloss} {san.prose(w['why'], S, A, i)}")
+                add(f"w{i}", f"{gloss} {said_why(w, san, S, A, i, f'{base}:w{i}')}")
                 continue
             # The frames say the why part by part (rule 14): the word line is the gloss and the lead.
             lead = san.prose(comp["lead"], S, A, i, strict=f"{base}:w{i} lead") if comp.get("lead") else ""
@@ -902,8 +915,15 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
             # The title starts with a capital: validate_narration._sentence_start shows a term
             # spoken from Arabic script right after TITLE_LEAD capitalised, as the caption does.
             add(t["line"], f"{V.TITLE_LEAD} {_cap(san.prose(title, S, A))}. {san.prose(summary, S, A)}")
-        if a.get("structure"):
-            add("structure", f"Sekarang susunan kalimatnya. {san.prose(a['structure']['summary'], S, A)}")
+        # The sentence structure: item by item where the ayah has items (each spoken as authored,
+        # like a composition's `say`: strict — no Qur'anic word to map to a place), else the one
+        # line of its summary.
+        items = V.structure_items(a)
+        for k, it in enumerate(items, 1):
+            said = san.prose(it["say"], S, A, strict=f"{base}:structure:{k}")
+            add(f"structure:{k}", f"{V.STRUCTURE_LEAD} {said}" if k == 1 else said)
+        if a.get("structure") and not items:
+            add("structure", f"{V.STRUCTURE_LEAD} {san.prose(a['structure']['summary'], S, A)}")
         # The exercises of content/quiz/<slug>.json (build_quiz.py): each one's introduction, then
         # one explanation line per question, "ex:<key>:<n>:why".
         for ex in Q.ayah_plan(quiz, A):
@@ -985,6 +1005,9 @@ def build_all(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = N
             if part in V.MAP_PARTS and len(parts) > 1:
                 errs.append(f"{lid}: a map / learned line is one line, and this one is longer than {V.MAX_LINE} spoken "
                             "characters (name fewer steps)")
+            if V.STRUCTURE_ITEM.fullmatch(part) and len(parts) > 1:
+                errs.append(f"{lid}: a structure item is one line, and this one is longer than {V.MAX_LINE} spoken "
+                            "characters (shorten its `say` or make it two items; it is not split here)")
             ids_ = [lid] if len(parts) == 1 else [f"{lid}:{chr(ord('a') + i)}" for i in range(len(parts))]
             for pid, piece in zip(ids_, parts):
                 text, display = sp.spoken(piece), sp.shown(piece, focus_ar)

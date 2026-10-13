@@ -147,6 +147,9 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     if (part === "intro" || part === "recite" || part === "structure" || part === "recap") return every;
     const w = explained(part);
     if (w !== null) return [w];
+    // An item of the structure: the words it is about.
+    const item = /^structure:([1-9][0-9]*)$/.exec(part);
+    if (item) return (ayah.structure?.items?.[Number(item[1]) - 1]?.words ?? []).filter((x) => x >= 1 && x <= words);
     if (part.startsWith("concept:")) {
       const id = part.slice("concept:".length);
       const own = input.introduced.find((c) => c.id === id)?.words;
@@ -346,7 +349,26 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     }
   }
 
-  if (ayah.structure) {
+  // The sentence structure. Told ITEM BY ITEM where the ayah has items (operator 2026-10-13: "can
+  // we make this kind of explanation in items: harfjar in one item, idhafah in next item etc, it's
+  // kind of confusing which for which in this paragraph"): one step per item, so "↺ Ulangi"
+  // replays that item and "Tunggu saya" waits after each; its line lights the item's words and
+  // the stage shows them (LessonStage). Else the one line of its summary, the whole ayah lit.
+  const items = ayah.structure?.items ?? [];
+  items.forEach((it, i) => {
+    const k = i + 1;
+    const own = stripArabic(it.say);
+    steps.push(
+      step({
+        id: `structure:${k}`,
+        kind: "structure",
+        cues: [cue(p(`structure:${k}`), k === 1 ? texts.structureItems(own) : own, [line])],
+        guides: [line],
+        item: { n: k, of: items.length, words: [...it.words] },
+      }),
+    );
+  });
+  if (ayah.structure && !items.length) {
     const summary = latinSentences(ayah.structure.summary);
     const caption = summary ? texts.structure(summary) : texts.structureBrief;
     steps.push(step({ id: "structure", kind: "structure", cues: [cue(p("structure"), caption, [line])], guides: [line] }));

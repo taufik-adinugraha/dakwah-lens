@@ -337,7 +337,9 @@
     "map_later_surah": "in QS {surah}:{ayah}",
     "map_learned_label": "What this ayah has taught",
     "map_learned": "Just learnt",
-    "map_total": "{n} learnt so far."
+    "map_total": "{n} learnt so far.",
+    "structure_item_label": "Sentence structure: the words being explained",
+    "structure_item": "Sentence structure ({n} of {total})"
   },
   "Compose": {
     "word_n": "Word {n}",

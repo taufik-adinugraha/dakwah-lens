@@ -83,6 +83,12 @@ export const Word = z.object({
   }),
   /** ONE plain Indonesian sentence: why the word ends the way it does. */
   why: z.string().min(10),
+  /** The same reason in the LESSON'S OWN vocabulary — only terms taught by then (the basic
+   *  curriculum, 2026-10-13: "No lesson line may use a term before the lesson that teaches it")
+   *  — for the lines the narrator says: a quiz question's explanation, the word line of a word
+   *  without a composition. Narrated only: the word's card shows `why`, the full reference
+   *  text, so this has no marked twin. Absent: `why` is said as it is. */
+  why_basic: z.string().min(20).optional(),
   /** Lexicon entry for this word's lemma (shared across surahs). */
   lemma_id: z.string().regex(/^[a-z0-9-]+$/).nullable().default(null),
   /** Nahwu-sharaf concepts this word illustrates (Konsep library ids). */
@@ -155,6 +161,16 @@ export const Ayah = z.object({
           }),
         )
         .default([]),
+      /** The same analysis as SEPARATE narrated items, in the order they are said (operator
+       *  2026-10-13: "can we make this kind of explanation in items: harfjar in one item,
+       *  idhafah in next item etc, it's kind of confusing which for which in this paragraph"):
+       *  `words` the 1-based indices the item is about (lit while it is said; one is enough),
+       *  `say` plain prose spoken as it stands. An ayah with items is narrated item by item
+       *  ("structure:1" …) instead of from `summary`, which stays the page's reference text. */
+      items: z
+        .array(z.object({ words: z.array(z.number().int().positive()).min(1), say: z.string().min(20) }))
+        .min(1)
+        .optional(),
       sources: z.array(SourceRef).min(1),
       status: ReviewStatus,
       /** `type`, `summary` and each group's label with their markup kept (a marked lesson). */

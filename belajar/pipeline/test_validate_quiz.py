@@ -54,8 +54,9 @@ def run(authored=None, quizzes=None, manifests=None, library=None, *, rebuild=Tr
                     pending=copy.deepcopy(PENDING) if pending is None else pending)
 
 
-def plan(fn, lib=None):
-    """A fault in the authored Al-Fatihah plan (`lib`: and one in the library with it)."""
+def plan(fn, lib=None, tolerated=None):
+    """A fault in the authored Al-Fatihah plan (`lib`: and one in the library with it;
+    `tolerated`: and these entries in authored/curriculum.pending.json `quiz`)."""
     def f():
         a = copy.deepcopy(AUTHORED)
         fn(a[SLUG]["ayat"])
@@ -63,8 +64,23 @@ def plan(fn, lib=None):
         if lib is not None:
             library_ = copy.deepcopy(LIBRARY)
             lib(library_)
-        return run(authored=a, library=library_)
+        pending = None
+        if tolerated is not None:
+            pending = copy.deepcopy(PENDING)
+            pending.update(copy.deepcopy(tolerated))
+        return run(authored=a, library=library_, pending=pending)
     return f
+
+
+def badal_option(ayat):
+    """PLANTED: a question that needs a term no lesson of Al-Fatihah teaches — ayah 2's first role
+    question with the role of rabbi (1:2:3, "na't atau badal") among its wrong options. The plan
+    itself has no such question since 2026-10-13 (the list of tolerated questions is empty for
+    Al-Fatihah), so the faults about that list plant their own."""
+    q_of(ayat, 2, "label-role", 0)["distractors"][1] = "1:2:3"
+
+
+BADAL_Q = "al-fatihah:2:label-role:1"
 
 
 def listed(fn):
@@ -137,18 +153,20 @@ MUTATIONS = [
     # The operator's four (2026-10-10).
     ("a sort bin of a state not taught yet (manshub at ayah 2)",
      plan(lambda a: a["2"]["sort-case"]["bins"].append("manshub")), "needs 'manshub' (the bin manshub), not taught by the end of ayah 2 (first taught in ayah 6)"),
-    ("a why option from a later ayah, its state untaught (iyyāka at ayah 1)",
-     plan(lambda a: q_of(a, 1, "why-harakat", 0)["distractors"].__setitem__(0, "1:5:1")), "option from 1:5:1, an ayah not studied yet"),
-    ("… and its terms untaught (mabni at ayah 1)",
-     plan(lambda a: q_of(a, 1, "why-harakat", 0)["distractors"].__setitem__(0, "1:5:1")), "needs 'mabni' (option from 1:5:1), not taught by the end of ayah 1 (first taught in ayah 5)"),
-    ("a role option only glossed so far (badal at ayah 2)",
-     plan(lambda a: q_of(a, 2, "label-role", 0)["distractors"].__setitem__(2, "1:2:3")), "needs 'badal' (option from 1:2:3), not taught by the end of ayah 2 (never taught)"),
-    ("two correct options: a role option sharing the answer's term (na't atau badal beside badal)",
-     plan(lambda a: q_of(a, 7, "label-role", 0)["distractors"].__setitem__(1, "1:2:3")), "option from 1:2:3 shares ['badal'] with the answer"),
+    ("a why option from a later ayah, its state untaught (iyyāka at ayah 3)",
+     plan(lambda a: q_of(a, 3, "why-harakat", 0)["distractors"].__setitem__(0, "1:5:1")), "option from 1:5:1, an ayah not studied yet"),
+    ("… and its terms untaught (mabni at ayah 3)",
+     plan(lambda a: q_of(a, 3, "why-harakat", 0)["distractors"].__setitem__(0, "1:5:1")), "needs 'mabni' (option from 1:5:1), not taught by the end of ayah 3 (first taught in ayah 5)"),
+    ("a role option only glossed so far (badal at ayah 2)", plan(badal_option),
+     "needs 'badal' (option from 1:2:3), not taught by the end of ayah 2 (never taught)"),
+    # The fault the plan of 2026-10-13 itself had, and the builder refused: an‘amta (fi'il madhi +
+    # fa'il) with na‘budu's role among the wrong options.
+    ("two correct options: a role option sharing the answer's term (a second fi'il with its fa'il)",
+     plan(lambda a: q_of(a, 7, "label-role", 1)["distractors"].append("1:5:2")), "option from 1:5:2 shares ['fail'] with the answer"),
     ("two correct options: huruf jar + majrur beside khabar (jar-majrur)",
-     plan(lambda a: q_of(a, 2, "label-role", 1)["distractors"].__setitem__(2, "1:1:1")), "option from 1:1:1 shares ['huruf-jar'] with the answer"),
-    ("two correct options: two reasons of the same cause (two na't)",
-     plan(lambda a: q_of(a, 1, "why-harakat", 3)["distractors"].__setitem__(1, "1:1:3")), "two options give the same cause"),
+     plan(lambda a: q_of(a, 2, "label-role", 1)["distractors"].append("1:1:1")), "option from 1:1:1 shares ['huruf-jar'] with the answer"),
+    ("two correct options: two reasons of the same cause (two mudhaf ilaih)",
+     plan(lambda a: q_of(a, 4, "why-harakat", 0)["distractors"].__setitem__(1, "1:4:3")), "two options give the same cause"),
     ("two correct options: two wazan forms with the same Arabic",
      plan(with_wazn(7, WAZN_7), wazn_same_form), "two options are the same Arabic form"),
     ("a wazan form never taught (mashdar at ayah 5)",
@@ -183,22 +201,23 @@ MUTATIONS = [
     ("a wazan lexeme of another ayah (hada at ayah 5)",
      plan(with_wazn(5, WAZN_5, lambda qs: qs[0].__setitem__("lexeme", "hada"))), "hada is not the lemma of a word of this ayah"),
     ("a tap word without timing", plan(lambda a: a["1"]["tap-word"]["words"].append(9)), "build_quiz.py fails"),
-    ("the quiz file edited by hand", quizfile(lambda q: q["ayat"][0]["exercises"][1]["questions"][0]["options"].pop()),
+    ("the quiz file edited by hand", quizfile(lambda q: q["ayat"][1]["exercises"][2]["questions"][0]["options"].pop()),
      "content/quiz/al-fatihah.json is out of date"),
     ("an explanation line missing", manifest(drop_line("al-fatihah:2:ex:label-role:1:why")),
      "narration line al-fatihah:2:ex:label-role:1:why missing"),
     ("an explanation line for no question", manifest(lambda ls: ls.__setitem__("al-fatihah:2:ex:label-role:9:why", ls["al-fatihah:2:ex:label-role:1:why"])),
      "al-fatihah:2:ex:label-role:9:why has no exercise or question in the quiz"),
-    # The questions the curriculum left with an untaught term (authored/curriculum.pending.json
-    # `quiz`), both ways: not listed → fails; listed and taught → stale.
-    ("a question that needs an untaught term and is not listed (the list emptied)", listed(lambda p: p.clear()),
-     "al-fatihah 1 why-harakat q1: needs 'mudhaf ilaih'"),
-    ("one term of a listed question taken off its entry", listed(lambda p: p["al-fatihah:1:why-harakat:1"].remove("naat")),
-     "al-fatihah 1 why-harakat q1: needs \"na't\""),
+    # A question with an untaught term passes only while authored/curriculum.pending.json `quiz`
+    # lists it, both ways: not listed → fails (the badal fault above); listed without that term →
+    # fails; listed with a term it does not need, or for a question that needs none → stale.
+    ("a question listed, but not with the term it needs", plan(badal_option, tolerated={BADAL_Q: ["naat"]}),
+     "al-fatihah 2 label-role q1: needs 'badal'"),
+    ("a stale term on a listed question", plan(badal_option, tolerated={BADAL_Q: ["badal", "majrur"]}),
+     f"quiz {BADAL_Q} no longer needs 'majrur' untaught (stale): remove it"),
     ("a stale entry: a question whose terms are all taught", listed(lambda p: p.__setitem__("al-fatihah:5:sort-case:1", ["mabni"])),
      "quiz al-fatihah:5:sort-case:1 no longer needs 'mabni' untaught (stale): remove it"),
-    ("a stale term on a listed question", listed(lambda p: p["al-fatihah:1:why-harakat:1"].append("majrur")),
-     "quiz al-fatihah:1:why-harakat:1 no longer needs 'majrur' untaught (stale): remove it"),
+    ("an entry for a question the plan does not ask", listed(lambda p: p.__setitem__("al-fatihah:1:why-harakat:1", ["naat"])),
+     "quiz al-fatihah:1:why-harakat:1 no longer needs 'naat' untaught (stale): remove it"),
 ]
 
 
@@ -209,6 +228,26 @@ class Taught(unittest.TestCase):
     def test_states_where_the_lesson_names_them(self):
         first = {tid: min(n for n in self.t if tid in self.t[n]) for tid in ("majrur", "marfu", "mabni", "manshub")}
         self.assertEqual(first, {"majrur": 1, "marfu": 2, "mabni": 5, "manshub": 6})
+
+    def test_a_listed_question_passes_exactly_while_it_needs_the_term(self):
+        # The list of tolerated questions is empty for Al-Fatihah (2026-10-13) and stays a list
+        # the guard reads strictly: a planted question passes with its entry, and only with it.
+        self.assertEqual([k for k in PENDING if k.startswith(f"{SLUG}:")], [])
+        # (rabbi's role is "na't atau badal": na't is taught in ayah 3, badal in An-Nas.)
+        self.assertEqual(plan(badal_option, tolerated={BADAL_Q: ["naat", "badal"]})(), [])
+        self.assertTrue(any("needs 'badal'" in e for e in plan(badal_option)()))
+        self.assertTrue(any("needs 'badal'" in e for e in plan(badal_option, tolerated={})()))
+
+    def test_a_structure_item_teaches_as_the_structure_line_did(self):
+        # The structure told item by item (2026-10-13): its lines are teaching lines like the one
+        # `structure` line. Ayah 1's first item ends "Gabungan seperti ini disebut jar-majrur."
+        self.assertTrue(Q.TEACHING_PART.fullmatch("structure:1") and Q.TEACHING_PART.fullmatch("structure:12"))
+        self.assertIsNone(Q.TEACHING_PART.fullmatch("structure:"))
+        self.assertIn("disebut jar-majrur", MANIFESTS[SLUG]["lines"]["al-fatihah:1:structure:1"]["display"])
+        self.assertIn("jar-majrur", self.t[1])
+        # Without that line the term is not taught by ayah 1.
+        lines = {k: v for k, v in MANIFESTS[SLUG]["lines"].items() if k != "al-fatihah:1:structure:1"}
+        self.assertNotIn("jar-majrur", Q.taught({**MANIFESTS[SLUG], "lines": lines}, LESSONS[SLUG], TERMS)[1])
 
     def test_glossed_or_mentioned_is_not_taught(self):
         self.assertNotIn("badal", self.t[2])      # "pengganti (badal)" in 2:structure

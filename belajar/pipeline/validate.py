@@ -4,7 +4,8 @@ surah registered in common.SURAHS: al-fatihah, al-ikhlas, al-falaq, an-nas) and 
 library.json. Exit 1 on any failure.
 
 Checks (per lesson unless said otherwise)
-  0. Lessons: content/ holds exactly library.json plus one <slug>.json per registered surah that
+  0. Lessons: content/ holds exactly library.json and curriculum.json (the basic curriculum:
+     validate_curriculum.py's) plus one <slug>.json per registered surah that
      has authored input (al-fatihah always); no unregistered file, no authored surah left unbuilt,
      no lesson without its authored files; slug, surah number, name_id and name_ar (Tanzil
      metadata) match the registry.
@@ -95,6 +96,12 @@ from common import (ARABIC_RUN, CONTENT_DIR, CONTENT_TS, PIPELINE, ROUTES_TS, SC
 # Paths the checks read; test_validate.py points them at temporary copies.
 LESSON_DIR = CONTENT_DIR
 LIBRARY = CONTENT_DIR / "library.json"
+# The files beside the lessons in content/ that are no lesson: the shared library, and the basic
+# curriculum (content/curriculum.json, 2026-10-13: build_curriculum.py writes it and
+# validate_curriculum.py checks it; until this line this validator took it for a surah nobody
+# registered — found on the first run with the corpus cache after it was added, CI running
+# neither).
+NOT_LESSONS = {LIBRARY.name, "curriculum.json"}
 CONTENT_TS_PATH = CONTENT_TS
 ROUTES_TS_PATH = ROUTES_TS
 AUTHORED = PIPELINE / "authored"
@@ -719,6 +726,14 @@ def check_library(lib: dict, lessons: list[dict], stems: list, raw: str) -> list
                 if "concept" in g and g["concept"] not in con:
                     fail(f"{where}.groups[{i}]: concept {g['concept']!r} is not a concept id")
                 prose.append((f"{where}.groups[{i}].label", g.get("label", "")))
+            # The narrated items (2026-10-13), where an ayah has them: each about words of this ayah.
+            for i, it in enumerate(st.get("items") or []):
+                idx = it.get("words", [])
+                if not idx or idx != sorted(set(idx)) or not all(isinstance(k, int) and 1 <= k <= n for k in idx):
+                    fail(f"{where}.items[{i}]: words {idx} must be ascending, unique indices within 1..{n}")
+                if "[[" in it.get("say", ""):
+                    fail(f"{where}.items[{i}].say carries markup: it is spoken as it stands")
+                prose.append((f"{where}.items[{i}].say", it.get("say", "")))
             prose += [(f"{where}.type", st.get("type", "")), (f"{where}.summary", st.get("summary", ""))]
         for w in ay.get("words", []):
             wp = f"word {w['loc']}"
@@ -787,7 +802,7 @@ def check_one_imam_pins(I: dict) -> None:
 
 def lesson_paths() -> dict[str, Path]:
     """Check 0: slug -> lesson file, in mushaf order."""
-    found = {f.stem: f for f in sorted(LESSON_DIR.glob("*.json")) if f.name != LIBRARY.name}
+    found = {f.stem: f for f in sorted(LESSON_DIR.glob("*.json")) if f.name not in NOT_LESSONS}
     for slug in sorted(set(found) - set(SURAH_BY_SLUG)):
         fail(f"content/{slug}.json is not a surah registered in common.SURAHS (the app would not load it)")
     for spec in SURAHS:
@@ -869,6 +884,11 @@ def check_lesson(spec, data: dict, ctx: dict) -> tuple[list[tuple[str, str]], se
                 check_prose(wd[fld], raw, f"{wp}.{fld}")
             skb_words.update(wd["translit"].split())
             prose += [(f"{wp}.why", wd["why"]), (f"{wp}.gloss", wd["gloss"])]
+            # The reason as the narrator says it (2026-10-13), where a word has one: plain prose.
+            if "why_basic" in wd:
+                if "[[" in wd["why_basic"]:
+                    fail(f"{wp}.why_basic carries markup: it is spoken as it stands")
+                prose.append((f"{wp}.why_basic", wd["why_basic"]))
             for i, ik in enumerate(wd.get("ikhtilaf", [])):
                 if len(ik["options"]) < 2:
                     fail(f"{wp}.ikhtilaf[{i}]: fewer than 2 options")

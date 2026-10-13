@@ -42,6 +42,7 @@ const EN: AutoplayTexts = {
   wordIntro: ({ n, translit }) => `Word ${n}: ${translit}. Listen to the imam recite it.`,
   meaning: ({ n, gloss }) => `Word ${n} means “${gloss}”.`,
   structure: (summary) => `How this ayah's sentence is built: ${summary}`,
+  structureItems: (item) => `Now how its sentence is built. ${item}`,
   structureBrief: "How this ayah's sentence is built is explained under Learn more.",
   concept: (title, summary) => `New concept — ${title}: ${summary}`,
   conceptBrief: (title) => `New concept — ${title}. It is explained under Learn more.`,
