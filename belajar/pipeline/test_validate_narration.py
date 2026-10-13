@@ -680,19 +680,39 @@ class LessonMapLines(unittest.TestCase):
         self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=maps), [])
 
     def test_rendered_map_lines_pass(self):
-        # After the render each of the 14 lines carries the delivered file's audio and its tokens:
-        # the validator accepts them, and a rebuild keeps them (the text did not change).
+        # With the delivered file's audio and its tokens on each of the 14 lines, the validator
+        # accepts them and a rebuild keeps them (the text did not change). Since the render of
+        # 2026-10-13 the manifest on disk carries the real ones; a line still without audio (a
+        # surah whose map is built before its render) gets a stand-in here, so this holds in both
+        # states. It used to assert the lines had NO audio on disk, a fact about the day it was
+        # written: the first CI run after the render failed on exactly that.
         m = copy.deepcopy(MANIFESTS)
         man = m["al-fatihah"]
+        seen = 0
         for lid, ln in man["lines"].items():
             if lid.endswith((":map", ":learned")):
-                self.assertNotIn("audio", ln)
-                ln["audio"] = {"url": V.delivery_url(man["voice"], "al-fatihah", ln["text"], SHA), "ms": len(ln["text"]) * 50 + 500, "sha256": SHA}
-                ln["tokens"] = fake_tokens(ln["text"])
+                seen += 1
+                if "audio" not in ln:
+                    ln["audio"] = {"url": V.delivery_url(man["voice"], "al-fatihah", ln["text"], SHA), "ms": len(ln["text"]) * 50 + 500, "sha256": SHA}
+                    ln["tokens"] = fake_tokens(ln["text"])
+        self.assertEqual(seen, 14)
         self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=LESSONMAP), [])
         rebuilt = B.manifest(B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, V.load_quiz(), LESSONMAP)["al-fatihah"], man, LEX, FORMS,
                              V.letters_for("al-fatihah", LESSONS, FORMS, COMPOSE, LIBRARY))
         self.assertEqual(B.dump(rebuilt), B.dump(man))
+
+    def test_unrendered_map_lines_pass(self):
+        # The same 14 lines BEFORE a render — no audio, no tokens — are caption-only by design and
+        # still valid, whatever the manifest on disk holds today.
+        m = copy.deepcopy(MANIFESTS)
+        stripped = 0
+        for lid, ln in m["al-fatihah"]["lines"].items():
+            if lid.endswith((":map", ":learned")):
+                stripped += 1
+                ln.pop("audio", None)
+                ln.pop("tokens", None)
+        self.assertEqual(stripped, 14)
+        self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=LESSONMAP), [])
 
 
 class Dictionary(unittest.TestCase):
