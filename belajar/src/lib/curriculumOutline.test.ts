@@ -94,7 +94,7 @@ describe("curriculumOutline: content/curriculum.json as the curriculum page list
     // A part of the i'rab record links to that record's page; the harakat step to the Harakat page.
     for (const s of CURRICULUM.steps.filter((x) => x.part !== undefined)) expect(page(s.id), s.id).toBe(s.concept);
     for (const s of CURRICULUM.steps.filter((x) => x.basics !== undefined)) expect(page(s.id), s.id).toBe(s.basics);
-    expect(CURRICULUM.steps.some((x) => x.concept === undefined && x.basics === undefined)).toBe(true);
+    for (const s of CURRICULUM.steps.filter((x) => x.concept === undefined && x.basics === undefined)) expect(page(s.id), s.id).toBeNull();
     // A record without a page is never linked (no dead link, whatever the file names).
     const none = curriculumOutline(CURRICULUM, { published: new Set(DEFAULT_SURAHS), pages: new Set() });
     expect(none.units.flatMap((u) => u.lessons).flatMap((l) => l.new).every((s) => s.page === null)).toBe(true);
@@ -172,9 +172,9 @@ describe("curriculumOutline: which lessons are links (BELAJAR_SURAHS, the track 
       for (const l of all.filter((x) => x.kind !== "ayah")) expect(l.href, l.id).toBeNull();
       for (const l of all) if (!CURRICULUM.lessons.find((x) => x.id === l.id)!.map) expect(l.href, l.id).toBeNull();
     }
-    // A unit with no lesson pages (Ayat Kursi has no slug) cannot be published by the switch.
+    // A unit with no lesson pages (no slug: Ayat Kursi while it is not written) cannot be
+    // published by the switch.
     const noPages = CURRICULUM.units.filter((u) => u.surah !== undefined && u.slug === undefined);
-    expect(noPages.length).toBeGreaterThan(0);
     for (const u of outline(SURAH_SLUGS).units.filter((x) => noPages.some((n) => n.id === x.id))) expect(u.lessons.every((l) => l.href === null), u.id).toBe(true);
   });
 

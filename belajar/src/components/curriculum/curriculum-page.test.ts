@@ -168,9 +168,10 @@ describe("the curriculum page lists the file: every lesson once, in order, with 
         expect(visible(learnt!).trim(), b.id).toBe(tr("learnt", { n: l.after }));
         expect(stepItems(learnt!), b.id).toEqual([]);
       }
-      // The met-again list is shown somewhere, and left out somewhere (not vacuous).
-      expect(html.match(/<ul data-again=""/g)?.length).toBe(CURRICULUM.lessons.filter((l) => l.steps.length === 0 && l.map?.learnt.some((x) => x.here)).length);
-      expect(CURRICULUM.lessons.some((l) => l.steps.length === 0 && !l.map)).toBe(true);
+      // The met-again list is drawn exactly where a review lesson is written (not vacuous).
+      const reviews = CURRICULUM.lessons.filter((l) => l.steps.length === 0 && l.map?.learnt.some((x) => x.here)).length;
+      expect(reviews).toBeGreaterThan(0);
+      expect(html.match(/<ul data-again=""/g)?.length).toBe(reviews);
     });
   }
 
@@ -195,6 +196,10 @@ describe("the curriculum page lists the file: every lesson once, in order, with 
       expect(html).toContain(t(locale)("intro_pace", { max, lessons: CURRICULUM.lessons.length, steps: CURRICULUM.steps.length }));
       expect(html).toContain(MSG[locale].Curriculum.intro_later);
       expect(html).toContain(MSG[locale].Curriculum.list_help);
+      // What those sentences say of the file: an ayah split into segments, a lesson with no ayah
+      // first, sharaf left for the next level (curriculumOutline.test.ts holds the last one).
+      expect(CURRICULUM.lessons.some((l) => l.segment !== undefined)).toBe(true);
+      expect(CURRICULUM.lessons[0].surah).toBeUndefined();
       for (const name of readings) expect(list).toContain(name);
     }
     // The sentences hold no digit of their own: every number is a placeholder.
@@ -356,8 +361,9 @@ describe("the closing: what is left for the next level", () => {
         expect(i.links[0].text.startsWith(c.title.split(" (")[0]), i.id).toBe(true);
       }
       expect([...next.matchAll(/<section data-next-level="([^"]+)"/g)].map((m) => m[1])).toEqual(["sharaf", "nahwu"]);
+      // Two sentences, the count from the file, then the list.
       expect(visible(next)).toContain(t(locale)("next_body", { n: CURRICULUM.lanjut.length }));
-      expect(visible(next)).toContain(MSG[locale].Curriculum.next_hint);
+      expect(MSG[locale].Curriculum.next_body.split(/(?<=\.)\s+/)).toHaveLength(2);
     }
   });
 });
@@ -375,7 +381,7 @@ describe("what the page may not say", () => {
       }
     }
     expect(MSG.id.Curriculum.list_help).toMatch(/\bdiklik\b/);
-    expect(MSG.id.Curriculum.next_hint).toMatch(/^Klik\b/);
+    expect(MSG.id.Curriculum.next_body).toMatch(/\bklik\b/);
   });
 
   it("the page carries no AI label of its own (the layout's footer has the one label), and no share card names a surah", async () => {

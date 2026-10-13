@@ -49,7 +49,7 @@
     "title": "The basic curriculum",
     "description": "The basic Qur'anic Arabic lessons in order: what is new in each lesson, and what has been learnt by then.",
     "intro_scope": "At the basic level, Qur'anic Arabic grammar is learnt through {count} readings: {list}. An introduction lesson comes first.",
-    "intro_pace": "The lessons go ayah by ayah. Each lesson teaches at most {max} new things, and what has been learnt is repeated whenever it comes up again in a later ayah. In all there are {lessons} lessons and {steps} things to learn.",
+    "intro_pace": "The lessons go ayah by ayah; a long ayah is split into several parts. Each lesson teaches at most {max} new things, and what has been learnt is repeated whenever it comes up again in a later ayah. In all there are {lessons} lessons and {steps} things to learn.",
     "intro_later": "Sharaf (word formation) and some advanced topics are not taught at this level. They are listed under “Advanced level” at the end of this page.",
     "list_heading": "The lessons in order",
     "list_help": "In each lesson, what is new is listed apart from what has already been learnt. An underlined name can be clicked: its explanation is on a Concept page. Lessons that are available can be opened from this page; the others are marked “not available yet”.",
@@ -67,8 +67,7 @@
     "open_segment": "Open the lesson on {unit}, part {n}",
     "open_intro": "Open the introduction lesson",
     "next_heading": "Advanced level",
-    "next_body": "The {n} topics below are not taught at the basic level: all of sharaf (word formation) and some advanced nahwu topics. The basic lessons only name them.",
-    "next_hint": "Click a topic to read its explanation on its Concept page."
+    "next_body": "The {n} topics below are not taught at the basic level: all of sharaf (word formation) and some advanced nahwu topics. The basic lessons only name them; click a topic to read its explanation on its Concept page."
   },
   "Breadcrumb": {
     "label": "You are here",

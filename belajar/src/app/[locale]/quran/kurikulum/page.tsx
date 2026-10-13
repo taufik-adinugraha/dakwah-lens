@@ -123,9 +123,6 @@ export default async function CurriculumPage({ params }: PageProps<"/[locale]/qu
             <p className="mt-3 max-w-prose text-pretty text-base text-ink">
               <MixedText text={t("next_body", { n: nextLevel.length })} />
             </p>
-            <p className="mt-2 max-w-prose text-pretty text-base text-ink-muted">
-              <MixedText text={t("next_hint")} />
-            </p>
             <NextLevelList groups={groups} />
           </section>
         )}

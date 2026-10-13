@@ -65,7 +65,11 @@ export const curriculumHref = () => `/${QURAN}/kurikulum`;
  *   (suggested: /quran/pengantar), return that path from the first line of
  *   the function instead of null (give it a helper of its own beside
  *   curriculumHref), and the curriculum page links it with no other change:
- *   the introduction belongs to no surah, so no surah switch hides it.
+ *   the introduction belongs to no surah, so no surah switch hides it. The
+ *   checks that hold lesson "0" to "not a link" then change with it:
+ *   routes.test.ts, curriculumOutline.test.ts and curriculum-page.test.ts,
+ *   and the `reachable` rule of scripts/ci/surahs-smoke.mjs (curriculumPage)
+ *   and scripts/ci/screenshots.mjs (curriculumCheck).
  * - A segment of a long ayah ("2:255/3", Ayat Kursi): no route.
  *
  * WHETHER a lesson may be shown as a link is not decided here (this file stays

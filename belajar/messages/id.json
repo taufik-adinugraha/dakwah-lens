@@ -49,7 +49,7 @@
     "title": "Kurikulum tingkat dasar",
     "description": "Urutan pelajaran tingkat dasar Bahasa Arab Al-Qur'an: yang baru di setiap pelajaran, dan yang sudah dipelajari sampai di situ.",
     "intro_scope": "Di tingkat dasar, tata bahasa Arab Al-Qur'an dipelajari lewat {count} bacaan: {list}. Sebelum itu ada pelajaran pengantar.",
-    "intro_pace": "Pelajaran berjalan ayat demi ayat. Setiap pelajaran mengajarkan paling banyak {max} hal baru, dan yang sudah dipelajari diulang setiap kali muncul lagi di ayat berikutnya. Seluruhnya ada {lessons} pelajaran dengan {steps} hal yang dipelajari.",
+    "intro_pace": "Pelajaran berjalan ayat demi ayat; ayat yang panjang dibagi menjadi beberapa penggalan. Setiap pelajaran mengajarkan paling banyak {max} hal baru, dan yang sudah dipelajari diulang setiap kali muncul lagi di ayat berikutnya. Seluruhnya ada {lessons} pelajaran dengan {steps} hal yang dipelajari.",
     "intro_later": "Ilmu sharaf (perubahan bentuk kata) dan beberapa topik lanjutan belum diajarkan di tingkat ini. Daftarnya ada di bagian “Tingkat lanjut” di akhir halaman.",
     "list_heading": "Urutan pelajaran",
     "list_help": "Di setiap pelajaran, yang baru ditulis terpisah dari yang sudah dipelajari. Nama yang bergaris bawah bisa diklik: penjelasannya ada di halaman Konsep. Pelajaran yang sudah tersedia bisa dibuka dari halaman ini; yang lain bertanda “belum tersedia”.",
@@ -67,8 +67,7 @@
     "open_segment": "Buka pelajaran {unit} penggalan {n}",
     "open_intro": "Buka pelajaran pengantar",
     "next_heading": "Tingkat lanjut",
-    "next_body": "{n} topik berikut belum diajarkan di tingkat dasar: seluruh ilmu sharaf (perubahan bentuk kata) dan beberapa topik nahwu lanjutan. Di pelajaran tingkat dasar, topik ini hanya disebut namanya.",
-    "next_hint": "Klik sebuah topik untuk membaca penjelasannya di halaman Konsep."
+    "next_body": "{n} topik berikut belum diajarkan di tingkat dasar: seluruh ilmu sharaf (perubahan bentuk kata) dan beberapa topik nahwu lanjutan. Di pelajaran tingkat dasar topik ini hanya disebut namanya; klik sebuah topik untuk membaca penjelasannya di halaman Konsep."
   },
   "Breadcrumb": {
     "label": "Anda berada di",

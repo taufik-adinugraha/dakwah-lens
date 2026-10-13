@@ -162,8 +162,10 @@ function GroupLabel({ icon, tone, children }: { icon: ReactNode; tone: string; c
   );
 }
 
-/** The link cue of a step's name: its Latin words underlined and forest, its Arabic forest. */
-const STEP_LINK = (name: string): Overlay[] => [{ from: 0, to: name.length, wrap: (words) => <span className="link-text">{words}</span>, arabic: "text-forest" }];
+/** The link cue of a step's name, as overlays on MixedText's own pieces (they only style: the
+ *  pieces and their line breaks stay those of the name): its Latin words underlined and forest,
+ *  its Arabic forest and never underlined. */
+const linkCue = (name: string): Overlay[] => [{ from: 0, to: name.length, wrap: (words) => <span className="link-text">{words}</span>, arabic: "text-forest" }];
 
 /** One new step: a dot and its name as the lesson's card shows it; a link when it has a Konsep page. */
 function NewStep({ step }: { step: OutlineStep }) {
@@ -172,7 +174,7 @@ function NewStep({ step }: { step: OutlineStep }) {
       <span aria-hidden className="h-1.5 w-1.5 shrink-0 -translate-y-[0.3em] rounded-full bg-forest" />
       {step.page ? (
         <Link href={conceptHref(step.page)} className="min-w-0 flex-1 py-2 text-forest">
-          <MixedText text={step.name} overlays={STEP_LINK(step.name)} />
+          <MixedText text={step.name} overlays={linkCue(step.name)} />
         </Link>
       ) : (
         <span className="min-w-0 flex-1 py-2">
