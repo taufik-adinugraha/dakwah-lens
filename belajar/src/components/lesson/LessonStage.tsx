@@ -101,6 +101,8 @@ function BarSpotLabel({ label, align = "center" }: { label: string; align?: "cen
 /** Ring of a spotlit control in the controls bar (thick, with a white gap;
  *  never colour alone — the label above names it). */
 const BAR_RING = "ring-4 ring-forest ring-offset-4 ring-offset-white";
+/** The pause / continue button's icon: whole or not drawn, never squeezed (the button's comment). */
+const MIDDLE_ICON = "hidden h-5 w-5 shrink-0 @[8.5rem]:block";
 
 /** The loading mark (operator 2026-10-11, narration rule 19): a turning ring, or with reduced
  *  motion a still dot (senior-ux §3.8). Never the only cue: the words beside it say what loads. */
@@ -925,7 +927,9 @@ export function LessonStage({
             {/* Phones, row 1: play / pause 3 : replay 2 (the replay a little wider than its word
                 needs, operator 2026-10-11). From sm the row dissolves into the 4-column grid. */}
             <div className="grid grid-cols-[3fr_2fr] items-center gap-3 sm:contents">
-              <div className="relative min-w-0 sm:order-2">
+              {/* A size container: the button's icon is drawn only where the button has room for it
+                  beside its longest label (below). */}
+              <div className="@container relative min-w-0 sm:order-2">
                 {lanjutGuide && <BarSpotLabel label={lanjutGuide.label} />}
                 <button
                   ref={focusOnMount}
@@ -935,17 +939,21 @@ export function LessonStage({
                   data-guide={middle === "lanjut" ? "lanjut" : undefined}
                   onClick={onMiddle}
                   // Almost no side padding on a phone (the label is centred in a wide pill either
-                  // way): paused at the largest text size "Lanjutkan" needs 122px beside its icon,
-                  // and the default padding left 75px, 0.5rem a side still only 118px (the
-                  // line-break check, once it measured a paused lesson: CI 2026-10-13, twice).
+                  // way), and the icon only from 8.5rem of button: paused at the largest text size
+                  // the button is 6.6rem wide and "Lanjutkan" alone takes 5.7rem of it. With the
+                  // default padding the label stuck out of the button; with less padding it fitted
+                  // only because the icon, free to shrink, was squeezed to a dot (the line-break
+                  // check once it measured a paused lesson, then its screenshots: CI 2026-10-13).
+                  // Icon, gap, label and padding need 8rem, so from 8.5rem the icon is whole
+                  // (shrink-0), and below it the label stands alone.
                   className={clsx("btn-primary w-full min-h-14! px-1! sm:px-6!", lanjutGuide && BAR_RING)}
                 >
                   {middle === "pause" ? (
-                    <Pause aria-hidden className="h-5 w-5" />
+                    <Pause aria-hidden className={MIDDLE_ICON} />
                   ) : middle === "lanjut" ? (
-                    <ChevronRight aria-hidden className="h-5 w-5" />
+                    <ChevronRight aria-hidden className={MIDDLE_ICON} />
                   ) : (
-                    <Play aria-hidden className="h-5 w-5" />
+                    <Play aria-hidden className={MIDDLE_ICON} />
                   )}
                   {middleLabel}
                 </button>
