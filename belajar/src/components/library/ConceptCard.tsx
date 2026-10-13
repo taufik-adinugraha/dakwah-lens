@@ -146,7 +146,8 @@ export function ConceptCard({
             : "font-display text-xl font-medium text-ink"
         }
       >
-        <TermText tokens={title.tokens} />
+        {/* A title's gloss ("sandaran kata: “nama Allah”") is a meaning like any other (plan L22). */}
+        <TermText tokens={title.tokens} emphasis="meaning" />
       </Title>
       <Headword head={title.head} className={page ? "mt-2 text-ar-lg" : "mt-1 text-ar-sm"} />
       <p className={`max-w-prose text-pretty text-ink ${page ? "mt-4 text-lg" : "mt-2 text-base"}`}>

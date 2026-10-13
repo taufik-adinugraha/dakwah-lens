@@ -380,7 +380,7 @@
         "sources": [
           {
             "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
-            "ref": "jil. 10, hlm. 616 (al-I'rab: qul fi'il amr, fa'il-nya tersimpan, 'engkau, wahai Muhammad'; dua pendapat tentang huwa: dhamir sya'n yang dijelaskan oleh kalimat sesudahnya sebagai khabar, atau kata ganti yang kembali kepada yang dipahami dari konteks; aḥadun badal, khabar bagi 'Dia' yang tersirat, atau khabar kedua; kutipan az-Zamakhsyari tentang dhamir sya'n)",
+            "ref": "jil. 10, hlm. 616 (al-I'rab: qul fi'il amr, fa'il-nya tersimpan, “engkau, wahai Muhammad”; dua pendapat tentang huwa: dhamir sya'n yang dijelaskan oleh kalimat sesudahnya sebagai khabar, atau kata ganti yang kembali kepada yang dipahami dari konteks; aḥadun badal, khabar bagi “Dia” yang tersirat, atau khabar kedua; kutipan az-Zamakhsyari tentang dhamir sya'n)",
             "url": "https://shamela.ws/book/2163/5774"
           },
           {
@@ -410,7 +410,7 @@
           },
           {
             "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
-            "ref": "hlm. 538 (kalimat menempati kedudukan maf'ul dalam tiga bab; yang pertama bab hikayah dengan qaul, yaitu kalimat yang diucapkan sesudah kata 'berkata')",
+            "ref": "hlm. 538 (kalimat menempati kedudukan maf'ul dalam tiga bab; yang pertama bab hikayah dengan qaul, yaitu kalimat yang diucapkan sesudah kata “berkata”)",
             "url": "https://shamela.ws/book/6972/526"
           },
           {
@@ -1313,7 +1313,7 @@
             },
             {
               "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
-              "ref": "jil. 15, hlm. 426 (ash-Sharf: kufuwan isim bermakna 'yang sepadan', wazannya fu‘ul dengan dua dhammah, dan wawu-nya keringanan dari hamzah; Shamela 22916/5918)",
+              "ref": "jil. 15, hlm. 426 (ash-Sharf: kufuwan isim bermakna “yang sepadan”, wazannya fu‘ul dengan dua dhammah, dan wawu-nya keringanan dari hamzah; Shamela 22916/5918)",
               "url": "https://tafsir.app/aljadwal/112/4"
             },
             {
@@ -1489,7 +1489,7 @@
           },
           {
             "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
-            "ref": "jil. 10, hlm. 618 (lanjutan Abu Hayyan: makna ayat 'tidak ada seorang pun yang setara bagi-Nya'; nukilan Ibnul Munayyir tentang tujuan meniadakan kesetaraan dari Dzat Allah)",
+            "ref": "jil. 10, hlm. 618 (lanjutan Abu Hayyan: makna ayat “tidak ada seorang pun yang setara bagi-Nya”; nukilan Ibnul Munayyir tentang tujuan meniadakan kesetaraan dari Dzat Allah)",
             "url": "https://shamela.ws/book/2163/5776"
           },
           {
@@ -2355,8 +2355,8 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:2fd5eac590213d9871c53009094487eefbdc8f42a507533d0003ef793a2459a7",
-    "authored_words": "authored/al-ikhlas.words.json sha256:bbc136701c07758ce7f536439a4451aa510524417994d0d17cf076a78f141345",
-    "authored_structure": "authored/al-ikhlas.structure.json sha256:3c03d8420b26e56e5c580bda5238952c405ba3f4bd2334dc04f8b174e47cbcef",
+    "authored_words": "authored/al-ikhlas.words.json sha256:abf019b92d6e901244fa3282a90a2540eff630da87cff1539d98b9662eb63f06",
+    "authored_structure": "authored/al-ikhlas.structure.json sha256:0cdd54684db7ccb6fdf36f3bd6a80cc3b2aba22097b4b0069bcce0ae5ee0b83f",
     "authored_concepts_map": "authored/al-ikhlas.concepts-map.json sha256:8a7af5814b68825851e4408b44fa4540f7c863f7c8c71bef337850e6e882c6db",
     "authored_facts": "authored/al-ikhlas.facts.generated.json sha256:5bd6e65b4b923e483fd069ed3e6d358d0ebf27e76c295552d3860654a442f260",
     "authored_hadith": "authored/al-ikhlas.hadith.json sha256:99395777b2bea9402220223ab49f99469a88973dd846ce9ecd4c16fdeef30317",

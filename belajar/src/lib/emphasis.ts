@@ -2,8 +2,14 @@
  * What a text emphasises (operator, 2026-10-11: "we can also use bold text or different color to
  * highlight the meanings or important things"; narration rule 18). Restrained — emphasis
  * everywhere is noise — so only three things, found in the text as it is shown:
- * - meaning: the gloss after "artinya" / "yang artinya" (also "maknanya", "bermakna", "berarti",
- *   "makna") when it is quoted, the quotes included: "artinya: “dengan nama”";
+ * - meaning: an Indonesian gloss given inside a sentence, the quotes included. ALWAYS in “…” and
+ *   always emphasised, with no exceptions (operator 2026-10-13, plan L22: "sometimes found this:
+ *   yang artinya “dengan” (which is correct), some sentence dont use “ and without color"): the
+ *   quoted gloss after "artinya" / "yang artinya" (also "maknanya", "bermakna", "berarti",
+ *   "makna"), "artinya: “dengan nama”", and any “…” quotation of at most SHORT_WORDS words with no
+ *   cue before it, "pelakunya tersirat, yaitu “aku”", "idhafah (“nama Allah”)" — unless it is one
+ *   of the things a short quotation also is (notGloss below: an ayah's translation, a kitab's
+ *   wording, a term or a control being named, a word mentioned as a word, Arabic);
  * - term: the term being taught where it is named or given as the answer: "disebut marfu’
  *   (مَرْفُوع)", "Jadi, kata ini majrur (مَجْرُور)", "ulama menyebutnya syibhul jumlah (…)", a
  *   concept caption's name ("Konsep baru: Dhamir (ضَمِير) sya'n (…)"), and a quiz explanation's
@@ -19,12 +25,13 @@
  * brackets, an aside ("rafa' (رَفْع, katanya disebut marfu' مَرْفُوع)"), nor an author's name for
  * it ("Darwisy menyebutnya zaidah"): the term a text teaches is named in its own sentence.
  *
- * How much (review 2026-10-11, restraint): a text that gives a quiz answer ("Perannya: …",
- * "Jadi, kata ini …") emphasises the answer alone, its other glosses being the reasons; a stage
- * caption (captionSpans) its first meaning, the later ones mostly naming other words ("frasa yang
- * artinya “dari kejahatan” di ayat dua"); a page a learner reads (Konsep, Materi lengkap) every
- * gloss, since each glosses an example word — at most PAGE_SPANS in one paragraph (pinned by
- * emphasis.test.ts).
+ * How much: every meaning, wherever it is shown — a page a learner reads (Konsep, Materi lengkap),
+ * a stage caption and its karaoke words, a quiz explanation (L22; until 2026-10-13 a caption
+ * emphasised its first meaning only and a quiz explanation none, which is how the same gloss came
+ * to be forest in one sentence and plain in the next). What stays restrained (review 2026-10-11)
+ * is the rest: a text that gives a quiz answer ("Perannya: …", "Jadi, kata ini …") emphasises that
+ * answer and its meanings, never the terms and sounds of its reasons. At most PAGE_SPANS in one
+ * paragraph (pinned by emphasis.test.ts).
  */
 import { termDisplay, type Token } from "./terms";
 import { ARABIC_RUN, hasArabic, joinUnits, textUnits } from "./textUnits";
@@ -34,13 +41,65 @@ export type EmphasisKind = "meaning" | "term" | "sound";
 export type Emphasis = { from: number; to: number; kind: EmphasisKind };
 
 /** The most spans one paragraph of a reading page carries (emphasis.test.ts holds every
- *  paragraph to it; idhafah's first paragraph, seven example glosses and its term, is the most). */
+ *  paragraph to it). Fi'il mudhari's second paragraph is the most: the pronoun each prefix stands
+ *  for — “aku”, “kami”, “dia”, “engkau”, “dia” — and the lesson verbs' own three, eight one-word
+ *  glosses that read as the list they are. Before L22 (2026-10-13) it was idhafah's first
+ *  paragraph, six example glosses and its term; counting the short quotations added none there. */
 export const PAGE_SPANS = 8;
 
 /** A gloss after one of these, quoted right after it ("artinya: “…”", "yang artinya ‘…’"). */
 const MEANING = /(?<!\p{L})(?:yang\s+)?(?:artinya|maknanya|bermakna|berarti|makna)\s*:?\s+/gu;
 /** Longer than this, a quotation after "artinya" is no gloss (a sentence, a translation). */
 const GLOSS_WORDS = 12;
+/** With no cue before it, a “…” quotation of at most this many words is a meaning (L22); a longer
+ *  one is a sentence quoted — a kitab's wording, a translation — and stays plain. */
+export const SHORT_WORDS = 5;
+/**
+ * What a short quotation comes right after when it is NOT a meaning (read off every such
+ * quotation of the content; emphasis.test.ts lists the ones left plain):
+ * - an ayah's translation: "Terjemahannya: “Raja manusia.”" (whatever its length);
+ * - a term named: "Karena itu disebut “menyerupai kalimat”", "dinamai lam doa “karena adab”";
+ * - a kitab's wording cited: "Ibnu Ajurrum menyebutnya “majzum”", "Darwisy menyebut i'rab-nya
+ *   “jelas”" (up to CITED_GAP words between, none past a comma: "al-Jadwal menyebut gāsiq isim
+ *   fa'il dari gasaqa, “menjadi gelap”" glosses gasaqa; and not "… dengan kata “bisikan”", the
+ *   word it is named with, a gloss), "Darwisy memberi alasannya: “karena ia isim maf'ul”", and
+ *   an author or a kitab right before it, "(al-Jadwal: “mengikutinya dalam jar”)", "al-Mujtaba
+ *   “zharaf murni”";
+ * - the Name mentioned as a word: "lafaz “Allah” di ayat dua";
+ * - a control named: "klik “Tunjukkan jawaban”", "tombol “Aa”", "Buka “Materi lengkap ayat ini”",
+ *   "kartu “Tahukah Anda?”" — and in the English captions "click the marked “Show the answer”",
+ *   "the “Aa” button";
+ * - what is heard, in Latin letters: "terdengar “bismillāhi”", "you hear “…”".
+ * Tested on the text before the quotation with TermText's Arabic taken out ("menyebut iyyāka
+ * (إِيَّاكَ) “objek …”" on a Konsep page is "menyebut iyyāka “objek …”" in the lesson).
+ */
+const CITED_GAP = 3;
+/** An author or a kitab by name: the article before a capital ("al-Jadwal", "as-Samin",
+ *  "az-Zamakhsyari" — a transliterated word never has one, pipeline/validate.py), "Ibnu …",
+ *  "Abu …", and the two the lessons cite by one bare name. */
+const AUTHOR = String.raw`(?:(?:Ibnu|Abu)\s+\p{Lu}[\p{L}\p{M}'’‘-]*|Darwisy|Sibawaih|a[a-zṣḍṭẓżṡ]{1,2}-\p{Lu}[\p{L}\p{M}'’‘-]*)`;
+const NOT_GLOSS_AFTER: readonly RegExp[] = [
+  /(?<!\p{L})Terjemahannya:\s+$/u,
+  /(?<!\p{L})(?:disebut|dinamakan|istilah(?:nya)?)(?:\s+juga)?\s+$/u,
+  new RegExp(String.raw`(?<!\p{L})(?:menyebut(?:nya|kan)?|menamai(?:nya)?|menamakan(?:nya)?|dinamai)(?:\s+(?!kata\s)[^\s,;:.()“”]+){0,${CITED_GAP}}:?\s+$`, "u"),
+  /(?<!\p{L})alasannya:\s+$/u,
+  new RegExp(String.raw`(?:^|[\s(])${AUTHOR}:?\s+$`, "u"),
+  /(?<!\p{L})lafaz\s+$/u,
+  /(?<!\p{L})(?:[Kk]lik|tombol|[Bb]uka|kartu|[Cc]lick(?:\s+the\s+marked)?|[Oo]pen)\s+$/u,
+  /(?<!\p{L})(?:terdengar|hear)\s+$/u,
+];
+/** … and what it is followed by: the word is being defined, not given as a meaning (“Tambahan”
+ *  dalam istilah nahwu berarti …), or it names a control (the “Aa” button). */
+const NOT_GLOSS_BEFORE = /^\s+(?:dalam\s+istilah|berarti|artinya|bermakna|maknanya|button|cards?)(?!\p{L})/u;
+/** A quotation that ends its own sentence is a sentence quoted, not a gloss: a translation
+ *  (“Raja manusia.”), a question (“apa kedudukannya?”). An elision ends none: “yang banyak …”,
+ *  “yang ...”. */
+const SENTENCE_END = /(?<!\.\.)[.?!]$/u;
+/** TermText's Arabic for a word of the prose: its bracket ("iyyāka (إِيَّاكَ)", "kasrah (كَسْرَة,
+ *  tanda bunyi i)"), or the bare run inside the prose's own bracket ("(dalam keadaan jar جَرّ)"). */
+const SHOWN_ARABIC = new RegExp(String.raw`\s*\((?:${ARABIC_RUN.source})[^()]*\)|\s+(?:${ARABIC_RUN.source})`, "gu");
+/** As far back as a quotation's lead is read. */
+const LEAD_CHARS = 160;
 /** A second gloss right after the first: "bermakna “sangat” atau “sering melakukan”". */
 const CHAIN = /^(?:, | atau | dan )/u;
 /** The term after these is being named ("disebut marfu’ (مَرْفُوع)"; "ulama menyebutnya", the
@@ -120,6 +179,15 @@ function gloss(text: string, at: number): number | null {
   return close + 1;
 }
 
+/** Whether the “…” quotation of `text` at [open, close] (no cue before it) is anything but a
+ *  meaning: empty, Arabic, longer than SHORT_WORDS, a sentence, or one of NOT_GLOSS_AFTER. */
+function notGloss(text: string, open: number, close: number): boolean {
+  const inner = text.slice(open + 1, close).trim();
+  if (!inner || hasArabic(inner) || inner.split(/\s+/u).length > SHORT_WORDS || SENTENCE_END.test(inner)) return true;
+  const before = text.slice(Math.max(0, open - LEAD_CHARS), open).replace(SHOWN_ARABIC, "");
+  return NOT_GLOSS_AFTER.some((re) => re.test(before)) || NOT_GLOSS_BEFORE.test(text.slice(close + 1));
+}
+
 /** The units textUnits cuts `text` into, each with the offset of every part. */
 function unitsOf(text: string) {
   const out: { parts: { text: string; arabic: boolean; at: number }[] }[] = [];
@@ -191,6 +259,12 @@ function find(text: string, terms = true): Found {
       at = end + chain[0].length;
     }
     if (group.length) found.meanings.push(group);
+  }
+  // A short quotation with no cue before it (L22), each a group of its own.
+  for (const [open, close] of quotes) {
+    if (open < 0 || close >= text.length) continue; // half a quotation (a caption part)
+    if (found.meanings.some((g) => g.some((e) => e.from <= open && close < e.to))) continue;
+    if (!notGloss(text, open, close)) found.meanings.push([{ from: open, to: close + 1, kind: "meaning" }]);
   }
 
   if (terms) {
@@ -266,11 +340,34 @@ function disjoint(...lists: Emphasis[][]): Emphasis[] {
   return out.sort((a, b) => a.from - b.from);
 }
 
-/** What a found text emphasises: a quiz answer alone, else its meanings (all, or the first gloss
- *  and its chain), terms and sounds — a meaning winning over a term or a sound it overlaps. */
-function chosen(f: Found, meanings: "all" | "first"): Emphasis[] {
-  if (f.answers.length) return disjoint(f.answers);
-  return disjoint(meanings === "all" ? f.meanings.flat() : (f.meanings[0] ?? []), f.terms, f.sounds);
+/** `spans` without the stretches `holes` (sorted) cover: an answer around a gloss keeps both,
+ *  the gloss as a meaning ("Perannya: fi'il amr (fa'il tersimpan: “engkau”)."). What is left of
+ *  the answer is its words, without the spaces around the gloss; a rest with no word (")") is none. */
+function around(text: string, spans: Emphasis[], holes: Emphasis[]): Emphasis[] {
+  const piece = (s: Emphasis, from: number, to: number): Emphasis[] => {
+    const part = text.slice(from, to);
+    if (!LETTER.test(part)) return [];
+    return [{ ...s, from: from + (part.length - part.trimStart().length), to: to - (part.length - part.trimEnd().length) }];
+  };
+  return spans.flatMap((s) => {
+    const out: Emphasis[] = [];
+    let from = s.from;
+    for (const h of holes) {
+      if (h.to <= from || h.from >= s.to) continue;
+      if (h.from > from) out.push(...piece(s, from, h.from));
+      from = Math.max(from, h.to);
+    }
+    if (from < s.to) out.push(...piece(s, from, s.to));
+    return out;
+  });
+}
+
+/** What a found text emphasises: every meaning (L22), and beside them a quiz answer alone, else
+ *  the terms and sounds — a meaning winning over a term, an answer or a sound it overlaps. */
+function chosen(text: string, f: Found): Emphasis[] {
+  const meanings = disjoint(f.meanings.flat());
+  if (f.answers.length) return disjoint(meanings, around(text, disjoint(f.answers), meanings));
+  return disjoint(meanings, f.terms, f.sounds);
 }
 
 /**
@@ -279,13 +376,24 @@ function chosen(f: Found, meanings: "all" | "first"): Emphasis[] {
  * given by the surface itself, glossSlot).
  */
 export function emphasisSpans(text: string): Emphasis[] {
-  return chosen(find(text), "all");
+  return chosen(text, find(text));
 }
 
-/** A stage caption's emphasis (text and karaoke): its first meaning, its terms and sounds, or a
- *  quiz answer alone — of the whole line, so a caption part shows its slice (partEmphasis). */
+/** A stage caption's emphasis (text and karaoke): what a page emphasises, every meaning of it
+ *  (L22; its first one only until 2026-10-13) — of the whole line, so a caption part shows its
+ *  slice (partEmphasis). */
 export function captionSpans(text: string): Emphasis[] {
-  return chosen(find(text), "first");
+  return emphasisSpans(text);
+}
+
+/**
+ * The meanings of `text` alone, for a text that is a label more than a sentence — a word's role
+ * ("fi'il amr (fa'il tersimpan: “engkau”)"), a structure group ("idhafah (“nama Allah”)"), a
+ * quiz option, a scholars' reading, an i'lal rule: a gloss inside it is quoted and forest like
+ * every other (L22), and nothing else of it is emphasised.
+ */
+export function meaningSpans(text: string): Emphasis[] {
+  return disjoint(find(text, false).meanings.flat());
 }
 
 /** Part `k` of a caption cut into `parts` (splitCaption: the line is the parts joined by
@@ -322,15 +430,15 @@ export function termEmphasis(tokens: readonly Token[]): Emphasis[] {
     const to = from + t.surface.length + (own ? t.term.ar!.length + 3 : 0);
     if (!quotes.some(([o, c]) => from > o && to <= c + 1)) found.terms.push({ from, to, kind: "term" });
   }
-  return chosen(found, "all");
+  return chosen(text, found);
 }
 
 /**
  * Kosakata's lead: the core meaning a lexeme's text opens with ("di dalam; pada.", "nama: kata
  * yang …", "ada, terjadi; dan sebagai kata kerja penghubung, “adalah”.") up to its first ":" or
- * "." outside brackets and quotes — the page's one meaning in forest, not a sub-example's gloss
- * further on (review 2026-10-11). A bracket of a citation or a place ("(ar-Raghib: …)",
- * "(2:235)") ends it before; longer than LEAD_WORDS, none.
+ * "." outside brackets and quotes — the page's own meaning, a label with no quotes of its own. A
+ * bracket of a citation or a place ("(ar-Raghib: …)", "(2:235)") ends it before; longer than
+ * LEAD_WORDS, none. The glosses further on in the text are meanings like any other (leadSpans).
  */
 export function leadMeaning(text: string): Emphasis[] {
   let depth = 0;
@@ -357,6 +465,15 @@ export function leadMeaning(text: string): Emphasis[] {
   const lead = text.slice(0, to);
   if (!lead || hasArabic(lead) || lead.split(/\s+/u).length > LEAD_WORDS) return [];
   return [{ from: 0, to, kind: "meaning" }];
+}
+
+/**
+ * What a Kosakata meaning emphasises: its lead (leadMeaning) and every gloss quoted after it
+ * ("berarti “pada buhul-buhul”, dan fī ṣudūri (114:5) “ke dalam dada”"; L22 — until 2026-10-13 the
+ * lead alone, the glosses after it quoted and plain).
+ */
+export function leadSpans(text: string): Emphasis[] {
+  return disjoint(leadMeaning(text), meaningSpans(text));
 }
 
 /**

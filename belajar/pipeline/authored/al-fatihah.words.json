@@ -44,8 +44,8 @@
         {
           "point": "[[Bismi|q:1:1:1]] bergantung pada kata yang tersirat; yang mana? (Darwisy menilai kedua pendapat ini baik)",
           "options": [
-            "Kata kerja tersirat seperti abtadi’u ('aku memulai'), sehingga [[jar-majrur]] ini berkedudukan [[nashab]] — Darwisy; an-Nahhas menisbatkan pendapat ini kepada al-Farra' (Kufah)",
-            "[[Khabar]] tersirat bagi [[mubtada']] tersirat ibtidā’ī ('permulaanku') — al-Jadwal, al-Mujtaba, Darwisy; an-Nahhas menisbatkannya kepada ulama Bashrah"
+            "Kata kerja tersirat seperti abtadi’u (“aku memulai”), sehingga [[jar-majrur]] ini berkedudukan [[nashab]] — Darwisy; an-Nahhas menisbatkan pendapat ini kepada al-Farra' (Kufah)",
+            "[[Khabar]] tersirat bagi [[mubtada']] tersirat ibtidā’ī (“permulaanku”) — al-Jadwal, al-Mujtaba, Darwisy; an-Nahhas menisbatkannya kepada ulama Bashrah"
           ]
         }
       ],
@@ -112,7 +112,7 @@
       "gloss": "bagi Allah",
       "wazn": null,
       "case": { "state": "majrur", "sign": "[[kasrah]]" },
-      "why": "Akhirnya [[kasrah]] karena didahului [[huruf jar]] [[li-|q:1:2:2/1]]; [[jar-majrur]] ini bergantung pada [[khabar]] yang tidak disebut (misalnya 'tetap').",
+      "why": "Akhirnya [[kasrah]] karena didahului [[huruf jar]] [[li-|q:1:2:2/1]]; [[jar-majrur]] ini bergantung pada [[khabar]] yang tidak disebut (misalnya “tetap”).",
       "ikhtilaf": [
         {
           "point": "Makna huruf [[lam|q:1:2:2#1]] pada [[lillāhi|q:1:2:2]]",
@@ -236,7 +236,7 @@
       "gloss": "hanya kepada Engkau",
       "wazn": null,
       "case": { "state": "mabni", "sign": "[[fathah]]", "mahall": "mahall nashb" },
-      "why": "Kata ganti ini [[mabni]] di atas [[fathah]] (akhirnya tetap) dan berkedudukan [[nashab]] sebagai objek yang didahulukan, sehingga bermakna 'hanya kepada-Mu'.",
+      "why": "Kata ganti ini [[mabni]] di atas [[fathah]] (akhirnya tetap) dan berkedudukan [[nashab]] sebagai objek yang didahulukan, sehingga bermakna “hanya kepada-Mu”.",
       "ikhtilaf": [
         {
           "point": "Bagian mana dari [[iyyāka|q:1:5:1]] yang [[mabni]]?",
@@ -253,7 +253,7 @@
       "gloss": "kami menyembah",
       "wazn": "نَفْعُلُ",
       "case": { "state": "marfu", "sign": "[[dhammah]]" },
-      "why": "Akhirnya [[dhammah]] karena [[fi'il mudhari']] ini tidak didahului huruf [[penashab]] atau [[penjazm]]; pelakunya tersirat, yaitu 'kami'.",
+      "why": "Akhirnya [[dhammah]] karena [[fi'il mudhari']] ini tidak didahului huruf [[penashab]] atau [[penjazm]]; pelakunya tersirat, yaitu “kami”.",
       "ikhtilaf": [],
       "src": [["D"], ["J"]]
     },
@@ -262,7 +262,7 @@
       "gloss": "dan hanya kepada Engkau",
       "wazn": null,
       "case": { "state": "mabni", "sign": "[[fathah]]", "mahall": "mahall nashb" },
-      "why": "[[Wawu|q:1:5:3#1]] adalah [[huruf 'athaf]], dan [[iyyāka|q:1:5:3/2]] ([[mabni]] di atas [[fathah]], berkedudukan [[nashab]]) diulang sebagai objek yang didahulukan bagi [[nasta‘īnu|q:1:5:4]] agar makna 'hanya' melekat pada kedua perbuatan.",
+      "why": "[[Wawu|q:1:5:3#1]] adalah [[huruf 'athaf]], dan [[iyyāka|q:1:5:3/2]] ([[mabni]] di atas [[fathah]], berkedudukan [[nashab]]) diulang sebagai objek yang didahulukan bagi [[nasta‘īnu|q:1:5:4]] agar makna “hanya” melekat pada kedua perbuatan.",
       "ikhtilaf": [
         {
           "point": "Bagian mana dari [[iyyāka|q:1:5:3/2]] yang [[mabni]]?",
@@ -289,7 +289,7 @@
       "gloss": "tunjukilah kami",
       "wazn": "افْعِنا",
       "case": { "state": "mabni", "sign": "dibuangnya [[huruf 'illah]] (ya')" },
-      "why": "[[Fi'il amr]] yang bermakna doa ini [[mabni]] dengan dibuangnya huruf ya' di akhir; pelakunya tersirat ('Engkau'), dan [[-nā|q:1:6:1/2]] ('kami') adalah objeknya.",
+      "why": "[[Fi'il amr]] yang bermakna doa ini [[mabni]] dengan dibuangnya huruf ya' di akhir; pelakunya tersirat (“Engkau”), dan [[-nā|q:1:6:1/2]], yang artinya “kami”, adalah objeknya.",
       "ikhtilaf": [],
       "src": [["D"], ["J"]],
       "review_notes": ["al-Mujtaba QS 1:6 tidak membahas mengapa ihdinā mabni, jadi tidak dikutip untuk kata ini.", "Lampiran A mengosongkan wazan; al-Jadwal menulis 'wazan ihdina: if'ina' (افعنا), dipakai di sini persis seperti di laporan riset §2."]
@@ -353,7 +353,7 @@
       "gloss": "telah Engkau beri nikmat",
       "wazn": "أَفْعَلْتَ",
       "case": { "state": "mabni", "sign": "[[sukun]]" },
-      "why": "[[Fi'il madhi]] ini [[mabni]] di atas [[sukun]] karena bersambung dengan [[dhamir]] [[-ta|q:1:7:3/2]] ('Engkau', pelakunya), dan kalimatnya menjadi [[shilah]] bagi [[allażīna|q:1:7:2]].",
+      "why": "[[Fi'il madhi]] ini [[mabni]] di atas [[sukun]] karena bersambung dengan [[dhamir]] [[-ta|q:1:7:3/2]] (“Engkau”, pelakunya), dan kalimatnya menjadi [[shilah]] bagi [[allażīna|q:1:7:2]].",
       "ikhtilaf": [],
       "src": [["D"], ["J"]],
       "review_notes": ["Gloss Quran.com (Indonesia) 'diberi nikmat' menghilangkan 'Engkau'; gloss ini sengaja memuat 'Engkau'."]
@@ -363,7 +363,7 @@
       "gloss": "kepada mereka",
       "wazn": null,
       "case": { "state": "mabni", "sign": "—", "mahall": "mahall nashb" },
-      "why": "[[‘Alā|q:2:5:2]] adalah [[huruf jar]] dan [[-him|q:1:7:4/2]] ('mereka') kata ganti [[mabni]] yang dijarkan olehnya, sedangkan kedudukan [[nashab]] ([[mahall]] [[nashb|nashab]]) di kartu ini milik frasa [[jar-majrur]] [[‘alaihim|q:1:7:4]] secara utuh, yang bergantung pada [[an‘amta|q:1:7:3]] (as-Samin: [[manshub]] al-mahall).",
+      "why": "[[‘Alā|q:2:5:2]] adalah [[huruf jar]] dan [[-him|q:1:7:4/2]], yang artinya “mereka”, kata ganti [[mabni]] yang dijarkan olehnya, sedangkan kedudukan [[nashab]] ([[mahall]] [[nashb|nashab]]) di kartu ini milik frasa [[jar-majrur]] [[‘alaihim|q:1:7:4]] secara utuh, yang bergantung pada [[an‘amta|q:1:7:3]] (as-Samin: [[manshub]] al-mahall).",
       "ikhtilaf": [],
       "src": [["D"], ["J"], ["S"]],
       "review_notes": [
@@ -415,7 +415,7 @@
       "gloss": "dan bukan pula",
       "wazn": null,
       "case": { "state": "none", "sign": "—" },
-      "why": "[[Wawu|q:1:7:8#1]] adalah [[huruf 'athaf]], dan [[lā|q:1:7:8/2]] di sini tambahan untuk menegaskan makna 'bukan' yang sudah ada pada [[gairi|q:1:7:5]].",
+      "why": "[[Wawu|q:1:7:8#1]] adalah [[huruf 'athaf]], dan [[lā|q:1:7:8/2]] di sini tambahan untuk menegaskan makna “bukan” yang sudah ada pada [[gairi|q:1:7:5]].",
       "ikhtilaf": [],
       "src": [["D"], ["J"], ["M"]]
     },

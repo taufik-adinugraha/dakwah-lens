@@ -200,9 +200,9 @@ describe("stage caption", () => {
     expect(stageCaption(seq, at, null)).toMatchObject({ kind: "karaoke", emph: [null, null, null, "meaning", "meaning"] });
   });
 
-  it("text caption: its part's slice of the whole line's emphasis — the line's first meaning, never a part's own", () => {
-    // Review 2026-10-11: a caption emphasises its first meaning; a later part shown alone must
-    // not pick a "first" of its own.
+  it("text caption: its part's slice of the whole line's emphasis — every meaning of the line, each in its part", () => {
+    // A caption emphasises every meaning (operator 2026-10-13, plan L22; its first one only until
+    // then, so the last part here showed its sound and left “bagi” plain).
     const long = `Kata pertama artinya: “dengan nama”. ${"Kalimat penjelas yang cukup panjang untuk dipotong. ".repeat(4)}Huruf lam (لِ) yang artinya “bagi”, bunyinya i.`;
     const seq = contractSequence({}, { "shared:start": { text: long, display: long, audio: { ...AUDIO, ms: 8000 } } });
     const s = run(seq, createAutoplayState(seq), { type: "start" });
@@ -214,10 +214,13 @@ describe("stage caption", () => {
     if (first.kind !== "text" || last.kind !== "text") throw new Error("not text");
     expect(first.emphasis.map((e) => first.text.slice(e.from, e.to))).toEqual(["“dengan nama”"]);
     expect(last.text).toBe(parts[parts.length - 1]);
-    expect(last.emphasis.map((e) => [e.kind, last.text.slice(e.from, e.to)])).toEqual([["sound", "i"]]);
+    expect(last.emphasis.map((e) => [e.kind, last.text.slice(e.from, e.to)])).toEqual([
+      ["meaning", "“bagi”"],
+      ["sound", "i"],
+    ]);
     // CaptionView draws exactly those.
     const html = renderToStaticMarkup(createElement(CaptionView, { caption: last }));
-    expect([...html.matchAll(/data-emph="(\w+)"/g)].map((m) => m[1])).toEqual(["sound"]);
+    expect([...html.matchAll(/data-emph="(\w+)"/g)].map((m) => m[1])).toEqual(["meaning", "sound"]);
   });
 
   it("CaptionView: an emphasised word keeps its weight in every state; the word being said has no forest inside", () => {

@@ -1059,9 +1059,13 @@
       "id": "naat",
       "latin": "na't",
       "forms": [
-        "na't"
+        "na't",
+        "sifat"
       ],
       "group": "istilah",
+      "ambiguous_forms": [
+        "sifat"
+      ],
       "ar": "نَعْت",
       "attest": [
         {
@@ -1089,15 +1093,12 @@
       ]
     },
     {
-      "id": "sifat",
-      "latin": "sifat",
+      "id": "shifah",
+      "latin": "shifah",
       "forms": [
-        "sifat"
+        "shifah"
       ],
       "group": "istilah",
-      "ambiguous_forms": [
-        "sifat"
-      ],
       "ar": "صِفَة",
       "attest": [
         {

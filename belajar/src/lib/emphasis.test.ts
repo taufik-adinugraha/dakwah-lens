@@ -4,20 +4,55 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { alignEmphasis, captionSpans, emphasisSpans, glossSlot, leadMeaning, PAGE_SPANS, partEmphasis, termEmphasis, type Emphasis, type EmphasisKind } from "./emphasis";
+import {
+  alignEmphasis,
+  captionSpans,
+  emphasisSpans,
+  glossSlot,
+  leadMeaning,
+  leadSpans,
+  meaningSpans,
+  PAGE_SPANS,
+  partEmphasis,
+  SHORT_WORDS,
+  termEmphasis,
+  type Emphasis,
+  type EmphasisKind,
+} from "./emphasis";
+import { AUTOPLAY_TEXT_SETS } from "@/components/autoplay/texts";
 import { splitCaption } from "./lessonSteps";
 import { getBasic, LIBRARY, partsFor, TERMS } from "./library";
 import { WORD_INFO } from "./content";
-import { annotate, prepareParts, Scope, soundsOf, termDisplay, titleParts, type Token } from "./terms";
+import { annotate, markedTokens, prepareParts, Scope, soundsOf, termDisplay, titleParts, type Token } from "./terms";
 import { hasArabic } from "./textUnits";
 
 // Emphasis (operator, 2026-10-11: "we can also use bold text or different color to highlight the
 // meanings or important things"; narration rule 18): which stretches a text emphasises, over the
 // strings the module really shows — every Al-Fatihah caption, every quiz explanation, every Konsep
 // text — and how the karaoke words take them.
+//
+// Meanings (operator 2026-10-13, plan L22: "sometimes found this: yang artinya “dengan” (which is
+// correct), some sentence dont use “ and without color. should we just use color without ", or
+// what?" — both, always): a meaning inside a sentence is in “…” AND emphasised, wherever it is
+// shown. So this file also holds the content to it: no gloss in straight quotes after a cue word,
+// and every short quotation the rule leaves plain is listed here with its reason (PLAIN).
 
 const BELAJAR = fileURLToPath(new URL("../../", import.meta.url));
 const readJson = (rel: string): unknown => JSON.parse(readFileSync(join(BELAJAR, rel), "utf8"));
+
+/** A caption template's slot: "{gloss}" for `gloss`, "{x}" for the argument itself. */
+const SLOT: unknown = new Proxy(
+  {},
+  { get: (_t, key) => (key === Symbol.toPrimitive ? () => "{x}" : typeof key === "symbol" ? undefined : `{${key}}`) },
+);
+/** Every caption a text set can give (src/components/autoplay/texts.ts: the captions of lines
+ *  without a narration display text): its strings, and its templates with their slots named. */
+function captionTexts(value: unknown, where: string, out: [string, string][] = []): [string, string][] {
+  if (typeof value === "string") out.push([where, value]);
+  else if (typeof value === "function") out.push([where, String((value as (...slots: unknown[]) => unknown)(SLOT, SLOT))]);
+  else if (value && typeof value === "object") for (const [k, v] of Object.entries(value)) captionTexts(v, `${where}.${k}`, out);
+  return out;
+}
 
 /** Every string in a JSON value, with where it came from. */
 function strings(value: unknown, where: string, out: [string, string][] = []): [string, string][] {
@@ -98,7 +133,12 @@ function problems(s: string): string[] {
   return out;
 }
 
-/** What a meaning, a term and a sound must come right after (no false positive). */
+/** A meaning with no cue before it: one whole “…” quotation of at most SHORT_WORDS words, none of
+ *  them Arabic, that does not end its own sentence (a translation, a question). */
+const shortGloss = (g: string) =>
+  /^“[^“”]+”$/u.test(g) && !hasArabic(g) && g.slice(1, -1).trim().split(/\s+/u).length <= SHORT_WORDS && !/(?<!\.\.)[.?!]”$/u.test(g);
+
+/** What a meaning (after a cue word), a term and a sound must come right after (no false positive). */
 const AFTER: Record<EmphasisKind, RegExp> = {
   meaning: /(?:artinya|maknanya|bermakna|berarti|makna)\s*:?\s+$|[”'’](?:, | atau | dan )$/u,
   term: /(?:disebut|dinamakan|ulama menyebutnya|Jadi, kata ini|Perannya:)\s+[“‘'(·]*$|Konsep baru(?::| —)\s+$/u,
@@ -117,7 +157,10 @@ describe("emphasisSpans: what a text emphasises", () => {
       ["meaning", "“sering melakukan”"],
     ]);
     expect(shown("bukan ayat Al-Qur'an; artinya 'kabulkanlah'. Darwisy menyebutnya sunnah")).toEqual([["meaning", "'kabulkanlah'"]]);
+    // Straight quotes are only read right after the cue word (the content has none any more: the
+    // guard below); in “…”, the same gloss is a meaning wherever it stands (L22).
     expect(shown("sehingga maknanya menjadi 'hanya kepada-Mu' (Darwisy)")).toEqual([]);
+    expect(shown("sehingga maknanya menjadi “hanya kepada-Mu” (Darwisy)")).toEqual([["meaning", "“hanya kepada-Mu”"]]);
     expect(shown("nasta‘īnu, sehingga maknanya “hanya kepada-Mu”. Pelaku (fa'il) kedua kata kerja")).toEqual([["meaning", "“hanya kepada-Mu”"]]);
     // A gloss with a bracket inside it; the apostrophe of fi'il never closes a straight-quoted one.
     expect(shown("artinya: “(makhluk) yang”")).toEqual([["meaning", "“(makhluk) yang”"]]);
@@ -204,9 +247,7 @@ describe("emphasisSpans: what a text emphasises", () => {
       "Ayat pertama Surah Al-Fatihah. Terjemahannya: “Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.” Ayat ini terdiri dari empat kata.",
       "al-Jadwal menyebutnya “mabni di atas kasrah, dalam kedudukan jar”. Bunyi",
       "«قُلْ أَعُوذُ بِرَبِّ» (katakanlah: aku berlindung kepada Tuhan)",
-      // Not after a trigger, or unquoted.
-      "ini bergantung pada khabar (خَبَر) yang tidak disebut (misalnya “tetap”).",
-      "Pelakunya tersirat, yaitu “engkau”.",
+      // A word being defined, not given as a meaning; an unquoted sense.
       "“Tanpa tambahan” dalam istilah nahwu berarti tidak diperlukan untuk susunan kalimat",
       "keduanya baru bermakna utuh bersama kata sesudahnya.",
       "aṣ-ṣamad berwazan fa‘al bermakna maf‘ūl, yaitu yang dituju",
@@ -257,7 +298,7 @@ describe("emphasisSpans: what a text emphasises", () => {
     expect(bad).toEqual([]);
   });
 
-  it("never emphasises anything but what follows its trigger (every Al-Fatihah caption, quiz explanation, Konsep text)", () => {
+  it("never emphasises anything but what follows its trigger, or a short quotation (every Al-Fatihah caption, quiz explanation, Konsep text)", () => {
     const KONSEP_DRAWN = KONSEP_TOKENS.map(([where, t]) => [where, termDisplay(t).text, termEmphasis(t)] as const);
     const sets = {
       FATIHAH: FATIHAH.map(([where, s]) => [where, s, captionSpans(s)] as const),
@@ -267,16 +308,25 @@ describe("emphasisSpans: what a text emphasises", () => {
     for (const [name, set] of Object.entries(sets)) {
       expect(set.length, name).toBeGreaterThan(30);
       let n = 0;
+      let uncued = 0;
       const bad = set.flatMap(([where, s, spans]) =>
         spans.flatMap((e) => {
           n++;
-          // A "Perannya:" answer runs on past its first word; a chained gloss follows another.
+          // A "Perannya:" answer runs on past its first word (and past a gloss inside it, which
+          // cuts it in two); a chained gloss follows another.
           const before = s.slice(Math.max(0, e.from - 60), e.from);
-          return AFTER[e.kind].test(before) ? [] : [`${where}: ${e.kind} "${s.slice(e.from, e.to)}" after "…${before.slice(-30)}"`];
+          const text = s.slice(e.from, e.to);
+          if (AFTER[e.kind].test(before)) return [];
+          if (e.kind === "term" && /Perannya: [^.]*”\s*$/u.test(s.slice(0, e.from))) return [];
+          // With no cue before it (L22): a whole short quotation, and nothing else.
+          if (e.kind === "meaning" && shortGloss(text) && ++uncued) return [];
+          return [`${where}: ${e.kind} "${text}" after "…${before.slice(-30)}"`];
         }),
       );
       expect(bad, name).toEqual([]);
       expect(n, name).toBeGreaterThan(30);
+      // Every set has them: “kami”, “Engkau” (pelakunya tersirat), “nama Allah” (idhafah).
+      expect(uncued, name).toBeGreaterThan(10);
     }
     // Sounds are one letter each.
     for (const [where, s] of ALL)
@@ -289,9 +339,9 @@ describe("emphasisSpans: what a text emphasises", () => {
     let terms = 0;
     let roles = 0;
     for (const [where, s] of CAPTIONS) {
-      // A quiz explanation's glosses are its answer's reasons (the next test): not emphasised.
-      const answered = /Perannya: |Jadi, kata ini /u.test(s);
-      for (const m of answered ? [] : s.matchAll(/artinya:? (?=“)/gu)) {
+      // In a quiz explanation too (L22: until 2026-10-13 its glosses were left plain beside the
+      // answer, 37 of the 361 quoted glosses after "artinya" in the captions).
+      for (const m of s.matchAll(/artinya:? (?=“)/gu)) {
         meanings++;
         expect(has(s, "meaning", (m.index ?? 0) + m[0].length), `${where}: ${s.slice(m.index ?? 0, (m.index ?? 0) + 40)}`).toBe(true);
       }
@@ -304,61 +354,314 @@ describe("emphasisSpans: what a text emphasises", () => {
         expect(has(s, "term", (m.index ?? 0) + m[0].length), `${where}: ${s.slice(m.index ?? 0, (m.index ?? 0) + 60)}`).toBe(true);
       }
     }
-    expect(meanings).toBeGreaterThan(300);
+    expect(meanings).toBeGreaterThan(350);
     expect(terms).toBeGreaterThan(60);
     expect(roles).toBeGreaterThan(60);
   });
 
-  it("a quiz answer alone: its reasons' glosses and terms are not emphasised beside it", () => {
-    // Review 2026-10-11: "Perannya: …" answers the question; three forest glosses after it made it
-    // one bold thing among four.
+  it("a quiz explanation: its answer AND its meanings, never the terms and sounds of its reasons", () => {
+    // Review 2026-10-11 kept the answer alone ("three forest glosses after it made it one bold
+    // thing among four"); operator 2026-10-13 (L22): a meaning is always emphasised — the answer
+    // is bold in ink, the glosses bold in forest, and they read apart.
     expect(
       shown("Perannya: huruf jar (حَرْف جَرّ) + majrur (مَجْرُور). Huruf lam (لِ) yang artinya “bagi”, adalah huruf jar (حَرْف جَرّ) dan akhiran, yang artinya “Dia”"),
-    ).toEqual([["term", "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور)"]]);
+    ).toEqual([
+      ["term", "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور)"],
+      ["meaning", "“bagi”"],
+      ["meaning", "“Dia”"],
+    ]);
+    // The real one the operator's example comes from: the gloss “dengan” and the answer.
+    const why = CAPTIONS.find(([where]) => where === "al-fatihah al-fatihah:1:ex:why-harakat:1:why")![1];
+    expect(why).toMatch(/yang artinya “dengan”.*Jadi, kata ini majrur \(مَجْرُور\)\.$/u);
+    expect(shown(why)).toEqual([
+      ["meaning", "“dengan”"],
+      ["term", "majrur (مَجْرُور)"],
+    ]);
+    // No term named in a reason ("disebut …") and no sound ("bunyi i") beside an answer.
+    expect(shown("Jadi, kata ini majrur (مَجْرُور). Kata seperti ini disebut isim (اِسْم), bunyi i, yang artinya “nama”.")).toEqual([
+      ["term", "majrur (مَجْرُور)"],
+      ["meaning", "“nama”"],
+    ]);
+    // A gloss inside the answer itself cuts it in two: both stay, the gloss as a meaning.
+    expect(shown("Perannya: fi'il amr (fa'il tersimpan: “engkau”). Kata ini mabni.")).toEqual([
+      ["term", "fi'il amr (fa'il tersimpan:"],
+      ["meaning", "“engkau”"],
+    ]);
+    expect(shown("Perannya: fi'il amr; fa'il tersimpan: “engkau” (Nabi Muhammad). Kata ini mabni.")).toEqual([
+      ["term", "fi'il amr; fa'il tersimpan:"],
+      ["meaning", "“engkau”"],
+      ["term", "(Nabi Muhammad)"],
+    ]);
     let answered = 0;
+    let glossed = 0;
     for (const [where, s] of QUIZ) {
       const spans = emphasisSpans(s);
       if (!/Perannya: |Jadi, kata ini /u.test(s) || !spans.length) continue;
       answered++;
+      const terms = spans.filter((e) => e.kind === "term");
+      expect(terms.length, where).toBeGreaterThan(0);
       for (const e of spans) {
-        expect(e.kind, where).toBe("term");
-        expect(s.slice(0, e.from), where).toMatch(/(?:Perannya:|Jadi, kata ini) $/u);
+        expect(e.kind, where).not.toBe("sound");
+        if (e.kind === "meaning") glossed++;
+        // Every term is the answer (or the rest of one a gloss cut).
+        else expect(s.slice(0, e.from), where).toMatch(/(?:Perannya:|Jadi, kata ini) $|Perannya: [^.]*”\s*$/u);
       }
+      // …and every meaning the text has is there.
+      expect(spans.filter((e) => e.kind === "meaning"), where).toEqual(meaningSpans(s));
     }
     expect(answered).toBeGreaterThan(100);
+    // 61 glosses in 52 of the 133 narrated explanations that give an answer: plain until L22.
+    expect(glossed).toBeGreaterThan(50);
   });
 });
 
-describe("captionSpans: a stage caption emphasises its first meaning", () => {
-  it("keeps the first gloss (and the ones chained to it), every term and sound", () => {
+describe("meanings (plan L22): always in “…”, always emphasised", () => {
+  const meanings = (s: string) => meaningSpans(s).map((e) => s.slice(e.from, e.to));
+
+  it("a short quotation with no cue word is a meaning", () => {
+    expect(meanings("Kata kerja ini mabni; pelakunya tersirat, yaitu “aku”.")).toEqual(["“aku”"]);
+    expect(meanings("ismi → Allāhi: idhafah (“nama Allah”)")).toEqual(["“nama Allah”"]);
+    expect(meanings("fi'il mudhari' (fa'il tersimpan: “kami”)")).toEqual(["“kami”"]);
+    expect(meanings("dari gaḍiba “marah”; maknanya lengkap bersama ‘alaihim (“atas mereka”).")).toEqual(["“marah”", "“atas mereka”"]);
+    expect(meanings("Dhamir adalah kata ganti seperti “kami”, “Engkau”, dan “mereka”;")).toEqual(["“kami”", "“Engkau”", "“mereka”"]);
+    // Five words, the most; an elision is no sentence end; an English caption's gloss too.
+    expect(meanings("allażīna + shilah an‘amta ‘alaihim (“yang telah Engkau beri nikmat”)")).toEqual(["“yang telah Engkau beri nikmat”"]);
+    expect(meanings("bentuk mubalaghah (“yang banyak …”) dari isim fa'il")).toEqual(["“yang banyak …”"]);
+    expect(meanings("Isim fa'il (kata pelaku: “yang ...”)")).toEqual(["“yang ...”"]);
+    expect(meanings("Word 2 means “Allah”.")).toEqual(["“Allah”"]);
+    // On a Konsep page the word before it shows its Arabic: the same gloss.
+    expect(meanings("seperti qul (قُلْ) “katakanlah”; bila diucapkan hamba")).toEqual(["“katakanlah”"]);
+  });
+
+  it("…unless it is a translation, a kitab's wording, a named term or control, a word mentioned, Arabic, or long", () => {
+    for (const s of [
+      // An ayah's translation, whatever its length (and any quotation that ends its own sentence).
+      "Ayat kedua Surah An-Nas. Terjemahannya: “Raja manusia.” Ayat ini terdiri dari dua kata.",
+      "Terjemahannya: “Raja manusia” — ayat ini terdiri dari dua kata.",
+      "pertanyaannya bukan “mengapa akhirnya berubah?”, melainkan “apa kedudukannya?”.",
+      // A kitab's wording cited: by "menyebut(nya)", with up to three words between; by its reason;
+      // by the author's or the kitab's name right before it.
+      "Fi'il amr mabni. Ibnu Ajurrum menyebutnya “majzum”, dan Ahmad Zaini Dahlan",
+      "sama dengan ayat 3, dan Darwisy menyebut i'rab-nya “jelas”: frasa ini",
+      "Darwisy menyebut iyyāka (إِيَّاكَ) “objek yang didahulukan untuk pengkhususan”, dan",
+      "ad-Da'as menyebut na'ib fa'il-nya tersimpan: “Dia tidak diperanakkan”.",
+      "Darwisy memberi alasannya: “karena ia isim maf'ul” (juga al-Jadwal)",
+      "ikut majrur dengan kasrah (al-Jadwal: “mengikutinya dalam jar”). Di ayat 6",
+      "yang lepas dari makna syarat, dan al-Mujtaba “zharaf murni”.",
+      // A term named.
+      "berupa satu kata. Karena itu disebut “menyerupai kalimat”.",
+      "lam itu dinamai lam doa “karena adab”. As-Samin menukil",
+      // A word mentioned as a word: the Name, a word being defined.
+      "adalah dua sifat lagi bagi lafaz “Allah” di ayat dua, maka keduanya",
+      "yang sudah ada pada gairi. “Tambahan” dalam istilah nahwu berarti tidak diperlukan",
+      // A control named, and what is heard, in both caption languages.
+      "Coba pilih lagi, atau klik “Tunjukkan jawaban” yang ditandai.",
+      "kapan saja lewat tombol “Aa” di bagian atas halaman.",
+      "Ingin membaca lebih banyak? Buka “Materi lengkap ayat ini” di bawah pelajaran",
+      "Bersama kata sebelumnya terdengar “bismillāhi”, karena alif di awalnya tidak dibaca.",
+      "Try again, or click the marked “Show the answer”.",
+      "To continue without this practice, click “Skip practice”.",
+      "at any time with the “Aa” button at the top of the page.",
+      "With the word before it you hear “bismillāhi”, because its first alif is not read.",
+      // Arabic inside; six words (SHORT_WORDS is five); empty.
+      "Ibnu Ajurrum pun berkata “majzum (مَجْزُوم)” di babnya",
+      "allażī + shilah yuwaswisu fī ṣudūri an-nāsi (“yang membisikkan ke dalam dada manusia”)",
+      "kira-kira “”",
+    ])
+      expect(meanings(s), s).toEqual([]);
+    expect(SHORT_WORDS).toBe(5);
+    // What the exclusions do NOT reach: a gloss a comma away from "menyebut", the word a thing is
+    // named with, a gloss after an example's "misalnya".
+    expect(meanings("al-Jadwal menyebut gāsiq isim fa'il dari gasaqa, “menjadi gelap”")).toEqual(["“menjadi gelap”"]);
+    expect(meanings("yang dimaksud setan, dinamai dengan kata “bisikan” seakan ia bisikan itu sendiri")).toEqual(["“bisikan”"]);
+    expect(meanings("bergantung pada khabar (خَبَر) yang tidak disebut (misalnya “tetap”).")).toEqual(["“tetap”"]);
+    // After a cue word the limit is the old one (GLOSS_WORDS, twelve): a longer gloss is one still.
+    expect(meanings("sehingga maknanya “tidak ada seorang pun yang setara bagi-Nya” (Abu Hayyan)")).toEqual(["“tidak ada seorang pun yang setara bagi-Nya”"]);
+    expect(meanings("sehingga maksudnya “tidak ada seorang pun yang setara bagi-Nya” (Abu Hayyan)")).toEqual([]);
+  });
+
+  /**
+   * Every “…” quotation of the module that has a meaning's shape (shortGloss) and is NOT emphasised,
+   * by what it is — read one by one on 2026-10-13. A new one must be put here with its reason, or
+   * the rule (src/lib/emphasis.ts NOT_GLOSS_AFTER) changed so that it is a meaning.
+   */
+  const PLAIN: Record<string, string[]> = {
+    "a kitab's wording": [
+      "“jelas”",
+      "“mengikutinya dalam jar”",
+      "“majzum”",
+      "“fi'il amr yang bermakna doa”",
+      "“bermakna doa”",
+      "“maf'ul yang tidak disebut pelakunya”",
+      "“objek yang didahulukan untuk pengkhususan”",
+      "“karena ia isim maf'ul”",
+      "“Dia tidak diperanakkan”",
+      "“karena kasih dan kelembutan”",
+      "“untuk sekadar keterangan waktu”",
+      "“zharaf murni”",
+    ],
+    "a term named": ["“menyerupai kalimat”", "“karena adab”"],
+    "a word mentioned": ["“Allah”", "“Tambahan”"],
+    "a control or what is heard (messages and fallback captions, id and en)": [
+      "“Mulai pelajaran”",
+      "“Materi lengkap ayat ini”",
+      "“Coba lagi”",
+      "“Lanjutkan”",
+      "“Aa”",
+      "“Tunjukkan jawaban”",
+      "“Lewati latihan”",
+      "“{heard}”",
+      "“Start the lesson”",
+      "“Full material for this ayah”",
+      "“Try again”",
+      "“Resume”",
+      "“Show the answer”",
+      "“Skip practice”",
+    ],
+  };
+
+  /**
+   * …and every other quotation left plain that is not an ayah's translation after "Terjemahannya:"
+   * (22 captions): too long for a meaning with no cue word, a sentence, or with Arabic in it.
+   */
+  const PLAIN_LONGER: Record<string, string[]> = {
+    // Real glosses, plain only because they have more than SHORT_WORDS words and no cue word
+    // before them ("maksudnya", a bracket, a colon). Known and left so on 2026-10-13: longer
+    // quotations are mostly sentences quoted, and a rule cannot tell these from them.
+    "a gloss of six or seven words": [
+      "“tidak ada seorang pun yang setara bagi-Nya”",
+      "“aku berlindung kepada Tuhan yang menguasai subuh”",
+      "“aku berlindung … pada waktu itu”",
+      "“aku berlindung kepada Allah dari ini pada waktu itu”",
+      "“yang membisikkan ke dalam dada manusia”",
+      "“orang-orang yang telah Engkau beri nikmat”",
+      "“jalan orang-orang yang telah Engkau beri nikmat”",
+    ],
+    "a kitab's wording (as the lesson has it, and as a Konsep page draws it with its terms' Arabic)": [
+      "“mabni di atas kasrah, dalam kedudukan jar”",
+      "“mabni di atas kasrah, dalam kedudukan jar (جَرّ)”",
+      "“mabni di atas fathah, dalam kedudukan jar”",
+      "“mabni di atas fathah فَتْحَة, tanda bunyi a di atas huruf, dalam kedudukan jar”",
+      "“mengikutinya dalam jar جَرّ”",
+      "“majzum (مَجْزُوم)”",
+      "“maf'ul (مَفْعُول) yang tidak disebut pelakunya”",
+    ],
+    "a title, a question, a card's name": [
+      "“Terjemahan Berbahasa Indonesia - Kementerian Agama”",
+      "“mengapa akhirnya berubah?”",
+      "“apa kedudukannya?”",
+      "“Tahukah Anda?”",
+      "“Did you know?”",
+    ],
+  };
+
+  it("over every string of the module: a short quotation is a meaning, or one of the listed ones", () => {
+    // A marked twin ("[[majzum|majzum]]") as the page draws it, with the Arabic of its terms and
+    // words; the raw markup is never shown.
+    const drawn = (marked: string) => termDisplay(annotate(marked, new Scope(), TERMS)).text;
+    const texts: (readonly [string, string])[] = [
+      ...ALL.map(([where, t]) => [where, /\.marked\./u.test(where) ? drawn(t) : t] as const),
+      ...captionTexts(AUTOPLAY_TEXT_SETS.id, "texts/id"),
+      ...captionTexts(AUTOPLAY_TEXT_SETS.en, "texts/en"),
+    ];
+    expect(texts.filter(([where]) => /\.marked\./u.test(where)).length).toBeGreaterThan(600);
+    // The templates are there with their slots: the English caption's gloss is a meaning too.
+    expect(texts.map(([, t]) => t)).toEqual(expect.arrayContaining(["Kata ke-{n} artinya “{gloss}”.", "Word {n} means “{gloss}”."]));
+    expect(meaningSpans("Word {n} means “{gloss}”.")).toHaveLength(1);
+    const plain = new Map<string, string>();
+    const longer = new Map<string, string>();
+    let coloured = 0;
+    let translations = 0;
+    for (const [where, s] of texts) {
+      const spans = meaningSpans(s);
+      for (const m of s.matchAll(/“[^“”]*”/gu)) {
+        const from = m.index ?? 0;
+        if (spans.some((e) => e.from <= from && from + m[0].length <= e.to)) coloured++;
+        else if (/Terjemahannya:\s+$/u.test(s.slice(0, from))) translations++;
+        else if (shortGloss(m[0])) plain.set(m[0], plain.get(m[0]) ?? where);
+        else longer.set(m[0], longer.get(m[0]) ?? where);
+      }
+    }
+    for (const [found, pinned] of [
+      [plain, PLAIN],
+      [longer, PLAIN_LONGER],
+    ] as const) {
+      const listed = Object.values(pinned).flat();
+      expect(new Set(listed).size).toBe(listed.length);
+      expect([...found].filter(([q]) => !listed.includes(q)).map(([q, where]) => `${q} in ${where}`)).toEqual([]);
+      expect(listed.filter((q) => !found.has(q))).toEqual([]);
+    }
+    // One per lesson ayah: the intro caption's translation.
+    expect(translations).toBe(22);
+    // Against those — 16 short quotations of the lessons and the library, 14 controls of the
+    // messages, 19 longer ones, 22 translations — the emphasised ones, over every string, its twin
+    // and the captions (1,555 on 2026-10-13).
+    expect(coloured).toBeGreaterThan(1200);
+  });
+
+  it("the content has no meaning in straight single quotes after a cue word (it is “…”)", () => {
+    // 'kabulkanlah', 'hanya kepada-Mu', 'marah' … were made “…” on 2026-10-13 (pipeline/authored,
+    // facts.py). What a learner reads: captions, quiz, Konsep, every content string — the
+    // references too.
+    const STRAIGHT = /(?<!\p{L})(?:yang\s+)?(?:artinya|maknanya|bermakna|berarti|makna)\s*:?\s+['‘](?=\S)[^'‘’]*/gu;
+    /** Not an Indonesian gloss: al-Mishbah's Arabic particle, in Latin letters, in a reference. */
+    const NOT_A_GLOSS = ["bermakna 'illa"];
+    const found = [...CAPTIONS, ...QUIZ, ...KONSEP, ...CONTENT].flatMap(([where, s]) =>
+      [...s.matchAll(STRAIGHT)].filter((m) => !NOT_A_GLOSS.includes(m[0])).map((m) => `${where}: ${m[0]}`),
+    );
+    expect(found).toEqual([]);
+    // The check sees one when there is one.
+    expect("bukan ayat Al-Qur'an; artinya 'kabulkanlah'.".match(STRAIGHT)).toEqual(["artinya 'kabulkanlah"]);
+    expect("sehingga bermakna ‘hanya kepada-Mu’.".match(STRAIGHT)).toEqual(["bermakna ‘hanya kepada-Mu"]);
+    // …and the transliteration's own apostrophes are none: "makna 'illah" does not occur, and a
+    // cue word is followed by a letter or “ everywhere else.
+    expect("fi'il amr yang bermakna doa, artinya “tunjukilah”".match(STRAIGHT)).toBeNull();
+  });
+});
+
+describe("captionSpans: a stage caption emphasises every meaning", () => {
+  it("two meanings in one caption: both (L22; the first alone until 2026-10-13)", () => {
+    const concept = CAPTIONS.find(([where]) => where === "al-fatihah al-fatihah:1:concept:huruf-jar")![1];
+    expect(concept).toContain("huruf ba’ (بِ) yang artinya “dengan”, dan huruf lam (لِ) yang artinya “bagi”");
+    expect(captionSpans(concept).filter((e) => e.kind === "meaning").map((e) => concept.slice(e.from, e.to))).toEqual(["“dengan”", "“bagi”"]);
     const s = "Kata ketiga artinya: “bagi-Nya”. Huruf lam (لَّ) yang artinya “bagi”, adalah huruf jar (حَرْف جَرّ) dan akhiran, yang artinya “Dia”; sehingga bermakna “setara bagi-Nya”.";
-    expect(emphasisSpans(s)).toHaveLength(4);
-    expect(captionSpans(s).map((e) => s.slice(e.from, e.to))).toEqual(["“bagi-Nya”"]);
+    expect(captionSpans(s).map((e) => s.slice(e.from, e.to))).toEqual(["“bagi-Nya”", "“bagi”", "“Dia”", "“setara bagi-Nya”"]);
     const chain = "Shighat mubalaghah ialah bentuk yang bermakna “sangat” atau “sering melakukan”, seperti naffas yang artinya “yang banyak meniup”;";
-    expect(captionSpans(chain).map((e) => chain.slice(e.from, e.to))).toEqual(["“sangat”", "“sering melakukan”"]);
-    const concept = CAPTIONS.find(([where]) => where.endsWith(":concept:isim-maushul"))![1];
-    expect(captionSpans(concept).map((e) => [e.kind, concept.slice(e.from, e.to)])).toEqual([
+    expect(captionSpans(chain).map((e) => chain.slice(e.from, e.to))).toEqual(["“sangat”", "“sering melakukan”", "“yang banyak meniup”"]);
+    // The caption with the most: four words glossed and two terms named, each its own.
+    const maushul = CAPTIONS.find(([where]) => where.endsWith(":concept:isim-maushul"))![1];
+    expect(captionSpans(maushul).map((e) => [e.kind, maushul.slice(e.from, e.to)])).toEqual([
       ["term", "Isim maushul (اِسْم مَوْصُول)"],
       ["meaning", "“yang”"],
+      ["meaning", "“orang-orang yang”"],
+      ["meaning", "“yang”"],
+      ["meaning", "“apa yang”"],
       ["term", "shilah (صِلَة)"],
     ]);
   });
 
-  it("over every caption: a subset of the text's emphasis, at most one meaning group, a quiz answer alone", () => {
-    let fewer = 0;
+  it("over every caption: what a page emphasises; every gloss after “artinya”; at most six", () => {
+    let several = 0;
+    let most = 0;
     for (const [where, s] of CAPTIONS) {
-      const all = emphasisSpans(s);
       const cap = captionSpans(s);
-      for (const e of cap) expect(all, where).toContainEqual(e);
+      expect(cap, where).toEqual(emphasisSpans(s));
       const meanings = cap.filter((e) => e.kind === "meaning");
-      const first = all.find((e) => e.kind === "meaning");
-      if (meanings.length) expect(meanings[0], where).toEqual(first);
-      // Glosses after the first only as its chain: “…” atau “…”.
-      for (let i = 1; i < meanings.length; i++) expect(s.slice(meanings[i - 1].to, meanings[i].from), where).toMatch(/^(?:, | atau | dan )$/u);
-      expect(cap.length, where).toBeLessThanOrEqual(4);
-      if (cap.length < all.length) fewer++;
+      if (meanings.length > 1) several++;
+      most = Math.max(most, cap.length);
     }
-    expect(fewer).toBeGreaterThan(30);
+    // 79 captions gloss more than one word; until L22 each showed its first gloss alone (with a
+    // second only when chained to it, “…” atau “…”), and 181 of the captions' 450 glosses were plain.
+    expect(several).toBeGreaterThan(70);
+    // Isim maushul's caption above (was 4: one meaning group and three terms). What is on screen at
+    // once is less: a text caption shows a part (≤ 180 characters), and no part carries more than
+    // four.
+    expect(most).toBe(6);
+    const perPart = CAPTIONS.flatMap(([, s]) => {
+      const parts = splitCaption(s);
+      return parts.map((_, k) => partEmphasis(parts, k).length);
+    });
+    expect(Math.max(...perPart)).toBeLessThanOrEqual(4);
   });
 
   it("a caption part shows its slice of the whole line's emphasis", () => {
@@ -367,10 +670,16 @@ describe("captionSpans: a stage caption emphasises its first meaning", () => {
     expect(parts.length).toBeGreaterThan(1);
     const per = parts.map((p, k) => partEmphasis(parts, k).map((e) => [e.kind, p.slice(e.from, e.to)]));
     expect(per[0]).toEqual([["meaning", "“dengan nama”"]]);
-    // The last part's gloss is not its caption's first: shown alone it would be.
-    expect(emphasisSpans(parts[parts.length - 1]).some((e) => e.kind === "meaning")).toBe(true);
-    expect(per[per.length - 1]).toEqual([["sound", "i"]]);
+    expect(per[per.length - 1]).toEqual([
+      ["meaning", "“bagi”"],
+      ["sound", "i"],
+    ]);
     expect(partEmphasis(parts, parts.length)).toEqual([]);
+    // Of the WHOLE line, not of the part alone: a translation cut in two parts is one quotation
+    // still, and what it comes after is in the part before.
+    const cut = ["Ayat kedua. Terjemahannya:", "“Raja manusia”, lalu kata pertama yang artinya “raja”."];
+    expect(emphasisSpans(cut[1]).map((e) => cut[1].slice(e.from, e.to))).toEqual(["“Raja manusia”", "“raja”"]);
+    expect(partEmphasis(cut, 1).map((e) => cut[1].slice(e.from, e.to))).toEqual(["“raja”"]);
   });
 });
 
@@ -430,13 +739,36 @@ describe("termEmphasis: TermText's terms from its tokens", () => {
   it("a reading page's paragraph carries at most PAGE_SPANS (every gloss of its examples)", () => {
     // Operator 2026-10-11 asked for the meanings highlighted; on a page a learner reads, each
     // gloss is an example word's meaning, so all stay (review 2026-10-11: restraint, pinned here).
-    const most = Math.max(...KONSEP_TOKENS.map(([, t]) => termEmphasis(t).length));
-    expect(most).toBeLessThanOrEqual(PAGE_SPANS);
-    expect(most).toBeGreaterThan(4);
+    const per = KONSEP_TOKENS.map(([where, t]) => [where, termEmphasis(t)] as const);
+    const most = Math.max(...per.map(([, e]) => e.length));
+    // Eight, and exactly PAGE_SPANS: fi'il mudhari's second paragraph, the pronoun each prefix
+    // stands for (“aku”, “kami”, “dia”, “engkau”, “dia”) and the lesson verbs' own (“kami”, “aku”,
+    // “ia”) — one-word glosses with no cue word, so plain until L22. Read as the list it is; a
+    // ninth would be one more than any paragraph has needed, so PAGE_SPANS stays where it was.
+    expect(most).toBe(PAGE_SPANS);
+    const fullest = per.filter(([, e]) => e.length === most).map(([where]) => where);
+    expect(fullest).toEqual(["konsep fiil-mudhari[2]"]);
+    expect(per.find(([where]) => where === fullest[0])![1].every((e) => e.kind === "meaning")).toBe(true);
     // Materi lengkap and the quiz feedback: word cards' why, summaries, facts, composition notes.
     const read = CONTENT.filter(([where]) => /\.(?:why|summary|body|note)$/u.test(where));
     expect(read.length).toBeGreaterThan(300);
     for (const [where, s] of read) expect(emphasisSpans(s).length, where).toBeLessThanOrEqual(PAGE_SPANS);
+    // …and the labels and the Kosakata prose that show their meanings since L22 (meaningSpans: a
+    // word's role, a structure group, a scholars' reading, a quiz option, an i'lal rule, a root's
+    // meaning; leadSpans: a Kosakata meaning).
+    const labels = [
+      ...CONTENT.filter(([where]) => /\.(?:role|label|point|rule)$|\.options\[\d+\](?:\.text)?$|^library\.roots\[\d+\]\.meaning$/u.test(where)),
+      ...readdirSync(join(BELAJAR, "content/quiz")).flatMap((f) => strings(readJson(`content/quiz/${f}`), f).filter(([where]) => where.endsWith(".text"))),
+    ];
+    expect(labels.length).toBeGreaterThan(500);
+    let glossed = 0;
+    for (const [where, s] of labels) {
+      const n = meaningSpans(s).length;
+      expect(n, where).toBeLessThanOrEqual(PAGE_SPANS);
+      if (n) glossed++;
+    }
+    // "fa'il tersimpan: “kami”", "idhafah (“nama Allah”)", "abtadi’u (“aku memulai”)" …
+    expect(glossed).toBeGreaterThan(150);
   });
 });
 
@@ -454,14 +786,32 @@ describe("leadMeaning: a Kosakata page's core meaning", () => {
     expect(lead("satu dua tiga empat lima enam tujuh delapan sembilan sepuluh sebelas dua belas tiga belas.")).toEqual([]);
   });
 
-  it("every lexeme has one, and it is the page's only emphasis", () => {
+  it("every lexeme has one; the page emphasises it and the glosses quoted after it (leadSpans)", () => {
     expect(LIBRARY.lexicon.length).toBeGreaterThan(40);
+    let after = 0;
     for (const l of LIBRARY.lexicon) {
       const spans = leadMeaning(l.meaning);
       expect(spans, l.id).toHaveLength(1);
       expect(spans[0].from, l.id).toBe(0);
       expect(l.meaning.slice(spans[0].to), l.id).toMatch(/^(?:$|[:.]| \()/u);
+      // The text the page draws (its marked twin, with the Arabic of its terms and words): the
+      // lead first, then every meaning of the text, none of them inside the lead.
+      const marked = markedTokens(l.marked?.meaning, new Scope(), TERMS);
+      const drawn = marked ? termDisplay(marked).text : l.meaning;
+      const page = leadSpans(drawn);
+      expect(page[0], l.id).toMatchObject({ from: 0, kind: "meaning" });
+      expect(page.length, l.id).toBeLessThanOrEqual(PAGE_SPANS);
+      const rest = page.slice(1);
+      expect(rest, l.id).toEqual(meaningSpans(drawn).filter((e) => e.from >= page[0].to));
+      for (const e of rest) expect(drawn.slice(e.from, e.to), l.id).toMatch(/^“[^“”]+”$/u);
+      after += rest.length;
     }
+    // Until L22 the lead alone was forest and these stood quoted and plain (review 2026-10-11:
+    // "the page's one meaning"); a meaning is always emphasised now: "fī ṣudūri (114:5) “ke dalam
+    // dada”", "gaḍiba “marah”".
+    expect(after).toBeGreaterThan(45);
+    const fi = LIBRARY.lexicon.find((l) => l.id === "fi")!;
+    expect(leadSpans(fi.meaning).map((e) => fi.meaning.slice(e.from, e.to))).toEqual(expect.arrayContaining(["di dalam; pada", "“pada buhul-buhul”", "“ke dalam dada”"]));
   });
 });
 
@@ -499,8 +849,18 @@ describe("alignEmphasis: the karaoke words take the display's emphasis", () => {
         "seperti", "abtadi’u (أَبْتَدِئُ)", "yang", "artinya", "aku", "memulai,", "pendapat", "ulama", "Kufah,", "sehingga",
       ]),
     ).toEqual([null, null, null, null, "meaning", "meaning", null, null, null, null]);
-    // A word said that the display does not have is never emphasised.
-    expect(alignEmphasis("yang tidak disebut (misalnya “tetap”).", ["yang", "tidak", "disebut,", "misalnya", "tetap."])).toEqual([null, null, null, null, null]);
+    // A gloss with no cue word reaches its word as well (L22: plain until 2026-10-13).
+    expect(alignEmphasis("yang tidak disebut (misalnya “tetap”).", ["yang", "tidak", "disebut,", "misalnya", "tetap."])).toEqual([null, null, null, null, "meaning"]);
+    // Two meanings in one line: each reaches its own word, and nothing between them.
+    expect(
+      alignEmphasis("huruf ba’ (بِ) yang artinya “dengan”, dan huruf lam (لِ) yang artinya “bagi”;", [
+        "huruf", "ba’ (بِ)", "yang", "artinya", "dengan,", "dan", "huruf", "lam (لِ)", "yang", "artinya", "bagi;",
+      ]),
+    ).toEqual([null, null, null, null, "meaning", null, null, null, null, null, "meaning"]);
+    // An answer and its gloss: the term bold, the meaning forest.
+    expect(
+      alignEmphasis("yang artinya “dengan”. Jadi, kata ini majrur (مَجْرُور).", ["yang", "artinya", "dengan.", "Jadi,", "kata", "ini", "majrur (مَجْرُور)."]),
+    ).toEqual([null, null, "meaning", null, null, null, "term"]);
     expect(alignEmphasis("Bunyinya a, i, dan u.", ["Bunyinya", "a,", "i,", "dan", "u."])).toEqual([null, "sound", "sound", null, "sound"]);
     expect(alignEmphasis("Tidak ada apa-apa di sini.", ["Tidak", "ada"])).toEqual([null, null]);
   });

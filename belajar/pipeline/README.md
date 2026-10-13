@@ -352,7 +352,20 @@ surah-1 words are byte-identical to the Tanzil 1.1 tokens used here (checked by 
 validator). The mālik card counts LEM:ma`lik with POS N (3 forms: māliki 1:4, mālika 3:26,
 mālikūna 36:71); Mālik in 43:77 is a different QAC lemma (ma`lik2, PN) and is not counted. `build_surah.py al-fatihah` prints every recomputed figure that differs from the plan.
 Facts that are citations rather than counts (seven ayat per ad-Dani/Ibn Kathir; 4:69 per Ibn
-Kathir; āmīn per al-Mujtaba and Darwisy) say so in `method`.
+Kathir; āmīn per al-Mujtaba and Darwisy; "Na't atau shifah?", below) say so in `method`.
+
+**The aside "Na't atau shifah?"** (`naat-atau-shifah`, operator 2026-10-13: "then we need
+explanation about na't vs shifah, just intermezo"; shown with ayat 1, 3 and 6; not a count, no
+narration line, no quiz question, no concept record). It says only what three pinned Shamela
+pages say (`sources.json` `shamela_istilah`, read in `cache/shamela`): Ibnu Ajurrum's chapter is
+"باب النَّعتِ" and his na't follows the word it describes "في رَفعِهِ، ونصبِهِ، وخفضِهِ، وتعريفِهِ،
+وتنكيرِهِ" (11371/15, hlm. 14); Darwisy writes "(المستقيم) صفة للصراط" and, on the same page,
+"(غير) بدل من الضمير في عليهم أو من الذين أو نعت للذين" (2163/12, jil. 1 hlm. 15); as-Samin, on the
+same gairi, writes "وتكون صفة … متى اجتمع البدل والوصف قُدِّم الوصف" (9057/67, jil. 1 hlm. 74).
+Left out for lack of a pinned source: which school of grammar prefers which word (the
+attribution of na't to Kufah and shifah / washf to Bashrah), and the dictionary meaning of the
+two words. Ibnu Hisyam's page (6970/16, Syarh Qathr an-Nada hlm. 28: "حذف الموصوف وصفته") only
+attests the spelling صِفَة in another discussion (ni'ma and bi'sa) and is not cited by the aside.
 
 Al-Mu'awwidzat facts and hadith come from `facts_muawwidzat.py` (its docstring gives the rules).
 The lesson's `data_versions.pipeline` names `build_surah.py` plus the script in the
@@ -734,6 +747,37 @@ beginners, words explained by their parts).
   rendered MP3 went stale. Two other summaries (fi'il amr, isim maushul) keep their bare quotes:
   the narration already says "kata yang artinya …" for a word of another ayah, and a written
   "yang artinya" would be spoken twice.
+- **The role is always na't (2026-10-13, plan L25).** Operator: "in quiz of ayat 1 (the last
+  question) it says ‘sifat’ , you write shifah in arabic instead of na’t, which one is correct?
+  because in other explanations its written as na't". The table had two terms for one role, `naat`
+  (na't, نَعْت) and `sifat` (sifat, صِفَة), and an author's `[[sifat]]` drew "sifat (صِفَة)" on the
+  word cards, the structure, the Konsep pages and, built into the files, the quiz. Now the
+  Indonesian word "sifat" is a form of `naat` itself (`forms`, and `ambiguous_forms`: still an
+  ordinary word an author marks only where it names the role), so `[[sifat]]` draws "sifat (نَعْت)"
+  at its first use in a text and stays bare once na't has been shown ("sifat (na't نَعْت) …, dan
+  sifat mengikuti …"); no prose changed, so no narration did. صِفَة stays in the table as the term
+  `shifah`, the other name of the same thing: only the aside "Na't atau shifah?" marks it
+  (see "Facts"). `quiz.SAME_CAUSE` lost its "sifat" alias, and `src/lib/terms.test.ts` fails if
+  صِفَة is shown beside "sifat" in any quiz string or drawn marked field, or if `shifah` is marked
+  anywhere but that aside.
+- **A meaning is written in “…” (2026-10-13, plan L22).** Operator: "sometimes found this: yang
+  artinya “dengan” (which is correct), some sentence dont use “ and without color". Every
+  Indonesian gloss inside a sentence is in curly double quotes, in every authored file and in
+  `facts.py` — after a cue word ("artinya “kabulkanlah”", "bermakna “ibadah”", "berarti “turun” dan
+  “datang”") and without one ("gaḍiba “marah”", "(“atas mereka”)") — never in straight quotes and
+  never bare: the app emphasises what is quoted (`src/lib/emphasis.ts`: a quotation after a cue
+  word, and any “…” of at most five words that is not a translation, a kitab's wording, a named
+  term or a word mentioned), and `src/lib/emphasis.test.ts` fails on a gloss in straight quotes
+  after a cue word and lists every quotation left plain. Straight single quotes stay for what is
+  not an Indonesian gloss: a transliteration's apostrophes ('Athaf, ya'), a kitab's own phrase in
+  Latin letters ('wa huwa babun wahidun'), a title ('Order of Genitive and Noun'), a kitab's
+  verdict in a reference ('keduanya baik'). The 89 glosses changed that day (45 from straight
+  quotes, 27 that had none, 17 in source references) changed no narration: `build_narration.py`
+  already turned a straight-quoted gloss into “…” (`quotes_to_typographic`), so every manifest
+  line is byte-identical. Where a gloss follows a Qur'anic word, rule 4 applies ("…, yang artinya
+  “kami”, …": words 1:6:1 and 1:7:4); word 1:7:3 keeps its bracket ("-ta (“Engkau”, pelakunya)"),
+  whose wording is recorded narration, and is listed in `terms.BARE_QUOTE_OK`. A gloss in plain
+  brackets after a transliteration ("samā’ (langit)") was left as it is.
 - **Glosses and the other static pages (2026-10-12).** Operator, on /konsep/idhafah: "better
   provide example, not only the translation 'nama Allah', but also write in arabic 'bismillah'
   … check also other parts", and on ‘alaihim's word card: "better to write the arabic words, not
