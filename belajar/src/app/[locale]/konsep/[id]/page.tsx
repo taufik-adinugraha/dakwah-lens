@@ -51,6 +51,7 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
   await visibleSurahs();
   const t = await getTranslations("Concept");
   const tw = await getTranslations("Word");
+  const tc = await getTranslations("Clip");
   const relatedIds = (basic ?? concept)!.related;
   const related = relatedIds.flatMap((r) => {
     const c = getConcept(r);
@@ -77,6 +78,8 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
                 sound: t("sign_sound"),
                 example: t("sign_example"),
                 from: t("sign_from"),
+                credit: tc("credit"),
+                waqf: tc("waqf_note"),
                 sources: tw("sources"),
               }}
             />
@@ -104,13 +107,14 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
   );
 }
 
-/** The Harakat page: what each sign looks like, its sound, an example letter from the ayat. */
+/** The Harakat page: what each sign looks like, its sound, an example letter from the ayat and the
+ *  imam reciting the word it is cut from. */
 function BasicArticle({
   basic,
   labels,
 }: {
   basic: Basic;
-  labels: { dasar: string; signs: string; sound: string; example: string; from: string; sources: string };
+  labels: { dasar: string; signs: string; sound: string; example: string; from: string; credit: string; waqf: string; sources: string };
 }) {
   // Its own subject: no "tanda bunyi … " reminders and no links back to itself.
   const sc = new Scope(false);
@@ -135,10 +139,12 @@ function BasicArticle({
         <h2 id="signs" className="sr-only">
           {labels.signs}
         </h2>
+        {/* Each sign's example word with the imam's voice (operator 2026-10-12). */}
         <HarakatChart
           signs={signs}
           words={WORD_INFO}
-          labels={{ sound: labels.sound, example: labels.example, from: labels.from }}
+          clips={LIBRARY.clips}
+          labels={{ sound: labels.sound, example: labels.example, from: labels.from, credit: labels.credit, waqf: labels.waqf }}
         />
       </section>
       <div className="mt-6 max-w-prose space-y-4 text-pretty text-base text-ink">

@@ -1,5 +1,5 @@
 {
-  "_comment": "Dasar membaca (foundation pages before the grammar) for the Konsep library. Operator 2026-10-10: \"expect also people dont understand what is kasrah, dhommah, and fathah\" — the Harakat page is the first item of /konsep and every first use of a harakah term on a Konsep page links here (pipeline/terms.py, src/lib/terms.ts). Prose uses the same [[…]] markup as library.concepts.json; build_library.py strips it into the plain fields and keeps the marked text. NO Arabic is typed here: each sign's example letter is a letter q-ref into the pinned Tanzil text (\"q:1:1:1#1\" = the first letter of بِسْمِ with its mark), and the sign shown alone on its dotted circle is cut from that letter by the app (src/lib/terms.ts signMarks; vitest checks the cut is exactly the named mark). Sound values and the doubled letter of tasydid follow the Indonesian transliteration standard the module already uses (SKB 158/1987); the names of the signs are the kitab's (Ajurrumiyyah, Qathr an-Nada); the shapes are plain didactic description. Status draft (pipeline state; there is no human review step, plan L11).",
+  "_comment": "Dasar membaca (foundation pages before the grammar) for the Konsep library. Operator 2026-10-10: \"expect also people dont understand what is kasrah, dhommah, and fathah\" — the Harakat page is the first item of /konsep and every first use of a harakah term on a Konsep page links here (pipeline/terms.py, src/lib/terms.ts). Prose uses the same [[…]] markup as library.concepts.json; build_library.py strips it into the plain fields and keeps the marked text. NO Arabic is typed here: each sign's example letter is a letter q-ref into the pinned Tanzil text (\"q:1:1:1#1\" = the first letter of بِسْمِ with its mark), and the sign shown alone on its dotted circle is cut from that letter by the app (src/lib/terms.ts signMarks; vitest checks the cut is exactly the named mark). Sound values and the doubled letter of tasydid follow the Indonesian transliteration standard the module already uses (SKB 158/1987); the names of the signs are the kitab's (Ajurrumiyyah, Qathr an-Nada); the shapes are plain didactic description. Status draft (pipeline state; there is no human review step, plan L11). Each card also plays the imam reciting its example's word (plan L19), so an example is a place where the sign is HEARD (pipeline/clips.py sign_heard_problems, review 2026-10-12): a sign on its word's last letter never uses an ayah's last word (the imam stops there, waqf, and the final harakah or tanwin is not pronounced), and a tanwin's word is followed in its ayah by an izhar letter (hamzah, ha', 'ain, ha, ghain, kha), which keeps its n clearly heard, as kufuwan aḥad (112:4) and gāsiqin iżā (113:3) do. The tanwin dhammah card first used aḥadun of 112:1, the ayah's last word, heard \"aḥad\"; it now uses salāmun of QS 97:5 (word 1 of 5, \"salāmun hiya\": followed by ha', the ayah's first word so no other word runs into it, a clean quran-align alignment, a word every learner already knows, a short surah of Juz 'Amma). Also considered, all with a clean alignment: nārun ḥāmiyah 101:11 (the shortest, a 2-word ayah), salāmun ‘alā Ibrāhīm 37:109, ‘ażābun alīm 2:10 (word 8 of 12, mid-recitation in a long ayah). A sign whose word is outside the lessons carries `translit`, checked against its Tanzil bytes as a parts tile's is; a lesson word brings its own.",
   "basics": [
     {
       "id": "harakat",
@@ -59,14 +59,15 @@
         },
         {
           "term": "tanwin",
-          "example": "q:112:1:4#3",
+          "example": "q:97:5:1#3",
+          "translit": "salāmun",
           "marks": [
             "dhammatain"
           ],
           "sound": "-un",
           "place": "di akhir kata, di atas huruf",
           "shape": "dua dhammah",
-          "reading": "d + un"
+          "reading": "m + un"
         },
         {
           "term": "tanwin",
@@ -124,7 +125,7 @@
         },
         {
           "kitab": "Tanzil Quran Text (Uthmani) 1.1",
-          "ref": "huruf contoh: QS 1:1 kata 1 (ba' berkasrah, sin bersukun), QS 1:5 kata 2 (nun berfathah), QS 1:2 kata 1 (dal berdhammah) dan kata 3 (ba' bertasydid), QS 112:1 kata 4 (tanwin dhammah), QS 112:4 kata 4 (tanwin fathah), QS 113:3 kata 3 (tanwin kasrah); QS 113:2 kata 1 dan QS 112:4 kata 2 (nun tanpa tanda sukun)",
+          "ref": "huruf contoh: QS 1:1 kata 1 (ba' berkasrah, sin bersukun), QS 1:5 kata 2 (nun berfathah), QS 1:2 kata 1 (dal berdhammah) dan kata 3 (ba' bertasydid), QS 97:5 kata 1 (tanwin dhammah), QS 112:4 kata 4 (tanwin fathah), QS 113:3 kata 3 (tanwin kasrah); QS 113:2 kata 1 dan QS 112:4 kata 2 (nun tanpa tanda sukun)",
           "url": "https://tanzil.net/download/"
         },
         {

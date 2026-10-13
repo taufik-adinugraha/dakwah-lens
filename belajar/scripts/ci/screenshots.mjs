@@ -815,6 +815,243 @@ async function konsepChecks(page, vp) {
   await page.goto("about:blank");
 }
 
+/** How late, at most, the player may stop a clip after its word's end (the element's own clock
+ *  where it was paused): a timer set for the end, so normally a few ms; the next word starts
+ *  10 ms on. Never early. */
+const STOP_LATE_S = 0.15;
+
+/**
+ * The imam's voice beside every example (operator 2026-10-12: "in explanation … provide example +
+ * additional voice … each explanation should be followed by examples (visual + voice)"; "not only
+ * for harakah, but also for all rules"), on a concept page (idhafah: its example rows), the
+ * Harakat page (its sign cards) and a page with parts diagrams (huruf jar), in the real browser:
+ *   1. every example row / sign card / diagram shown carries a voice button ([data-clip]: a real
+ *      <button>, at least 48px tall, its aria-label naming the word, idle), each naming an
+ *      example of content/library.json `clips`; the page asks the reciters' host for nothing
+ *      while it loads and sits there;
+ *   1b. what is HEARD is said where it differs from what is written (review 2026-10-12): every
+ *      note ([data-clip-note]) is the description of exactly one button (aria-describedby) and
+ *      has the right words — a "waqf" note only on a clip that ends its ayah (`last`), a "washal"
+ *      note on the tile played with the word before it, naming what is heard ("tabārakasmu") —
+ *      and a note that is shown is real text at a reading size (≥ 16px), inside the screen, under
+ *      its button's line. The page's expected notes are on it (idhafah: its ayah-final rows;
+ *      Harakat: none, no sign's word ends its ayah; huruf jar: the two washal tiles);
+ *   2. pressing one (the longest clip, so it still plays at step 3) asks EveryAyah for that
+ *      example's ayah file and no other, and the button says it plays (data-state "playing");
+ *   3. pressing a second example's button, of another ayah, while the first STILL plays (checked
+ *      just before the press): the first is back to idle at once (the page's one element left
+ *      it), the second plays and its file is asked for, and nothing else;
+ *   4. the second stops by itself AT ITS WORD'S END. It is a clip that does not end its ayah, so
+ *      the file goes on after it and only the player's own stop can end it; the element's clock
+ *      at the moment the player paused it (HTMLMediaElement.prototype.pause, wrapped in the page
+ *      for this check) is within [end, end + STOP_LATE_S]. (Before 2026-10-13 the second clip was
+ *      an ayah's last word: the file's own end made the button idle, so this step could not fail.)
+ * The reciters' host is reached through the real CDN and only observed (watchRecitations); every
+ * page call is a locator / page.evaluate (never waitForFunction: the CSP refuses its eval). Fails
+ * the job otherwise.
+ */
+async function clipChecks(page, vp) {
+  const lib = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "library.json"), "utf8"));
+  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8"));
+  const idhafah = lib.concepts.find((c) => c.id === "idhafah");
+  const hurufJar = lib.concepts.find((c) => c.id === "huruf-jar");
+  const signs = lib.basics.flatMap((b) => b.signs);
+  if (!idhafah || !hurufJar || !signs.length || !lib.clips) throw new Error("content/library.json has no idhafah, no huruf-jar, no Harakat signs or no clips");
+  // The diagrams a concept page shows outside "Lihat N kata lainnya" (ConceptCard PARTS_SHOWN = 2).
+  const washal = lib.parts
+    .filter((p) => p.concepts.includes("huruf-jar"))
+    .slice(0, 2)
+    .flatMap((p) => p.tiles.flatMap((t) => (t.washal ? [t.washal] : [])));
+  if (!washal.length) throw new Error("content/library.json: no parts tile shown on huruf-jar is played with the word before it (washal)");
+  const signWord = (sg) => sg.example.slice(2).split("#")[0];
+  // [page, how many voice buttons it shows outside a closed disclosure (at least), what they are,
+  //  the notes it must carry: {kind: at least how many, anywhere on the page}, the clip to press
+  //  second when it is shown (its stop is the one measured)]
+  const pages = [
+    [
+      "/belajar/id/konsep/idhafah",
+      Math.min(6, idhafah.examples.length),
+      "example rows",
+      { waqf: idhafah.examples.slice(0, 6).filter((e) => lib.clips[e.loc]?.last).length ? 1 : 0, washal: 0 },
+      null,
+    ],
+    // No sign's word ends its ayah (pipeline/clips.py), so no card carries the waqf line; the
+    // tanwin dhammah card's word (outside the lessons) is the one whose stop is measured.
+    ["/belajar/id/konsep/harakat", signs.length, "sign cards", { waqf: 0, washal: 0 }, signWord(signs.find((sg) => sg.translit) ?? signs[0])],
+    ["/belajar/id/konsep/huruf-jar", Math.min(6, hurufJar.examples.length) + 2, "example rows and diagram words", { waqf: 0, washal: washal.length }, washal[0].run],
+  ];
+  const buttons = page.locator("main button[data-clip]");
+  for (const [urlPath, atLeast, what, wantNotes, pressSecond] of pages) {
+    const watch = watchRecitations(page, new Set(["everyayah.com"]));
+    const fail = (m) => {
+      throw new Error(`${vp} ${urlPath}: example voices — ${m}`);
+    };
+    try {
+      await page.goto(BASE + urlPath, { waitUntil: "networkidle" });
+      await page.evaluate(() => document.fonts.ready);
+      await page.waitForTimeout(600);
+      // For step 4: the element's clock at every pause() from here on, in this document only.
+      await page.evaluate(() => {
+        const calls = [];
+        window.__clipPauses = calls;
+        const pause = HTMLMediaElement.prototype.pause;
+        HTMLMediaElement.prototype.pause = function (...args) {
+          if (calls.length < 500) calls.push({ src: this.currentSrc || this.getAttribute("src") || "", t: this.currentTime, wasPaused: this.paused });
+          return pause.apply(this, args);
+        };
+      });
+      // 1. The buttons as drawn, before any press.
+      const all = await buttons.evaluateAll((els) =>
+        els.map((el, i) => {
+          const r = el.getBoundingClientRect();
+          return {
+            i,
+            loc: el.getAttribute("data-clip"),
+            tag: el.tagName,
+            type: el.getAttribute("type"),
+            label: el.getAttribute("aria-label") ?? "",
+            describedBy: (el.getAttribute("aria-describedby") ?? "").split(" ").filter(Boolean),
+            state: el.getAttribute("data-state"),
+            height: r.height,
+            bottom: r.bottom,
+            visible: r.width > 0 && r.height > 0 && !el.closest("details:not([open])"),
+          };
+        }),
+      );
+      const shown = all.filter((b) => b.visible);
+      if (shown.length < atLeast) fail(`${shown.length} voice buttons shown, expected at least ${atLeast} (${what})`);
+      for (const b of shown) {
+        if (!lib.clips[b.loc]) fail(`button ${b.i} names ${b.loc}, which has no clip in content/library.json`);
+        if (b.tag !== "BUTTON" || b.type !== "button") fail(`${b.loc}: not a <button type="button">`);
+        if (b.height < 47.5) fail(`${b.loc}: ${b.height}px tall (< 48px)`);
+        const prefix = msgs.Clip.play_label.replace("{word}", "");
+        if (!b.label.startsWith(prefix) || b.label.length <= prefix.length) fail(`${b.loc}: aria-label “${b.label}” does not name its word`);
+        if (b.state !== "idle") fail(`${b.loc} says "${b.state}" before any press`);
+      }
+      if (watch.seen.length) fail(`the reciters' host was asked before a press: ${watch.list()}`);
+
+      // 1b. What is heard, said beside the button where it differs from what is written.
+      const notes = await page.locator("main [data-clip-note]").evaluateAll((els) =>
+        els.map((el) => {
+          const r = el.getBoundingClientRect();
+          return {
+            id: el.id,
+            kind: el.getAttribute("data-clip-note"),
+            text: (el.textContent ?? "").replace(/\s+/g, " ").trim(),
+            fontPx: parseFloat(getComputedStyle(el).fontSize),
+            top: r.top,
+            left: r.left,
+            right: r.right,
+            visible: r.width > 0 && r.height > 0 && !el.closest("details:not([open])"),
+          };
+        }),
+      );
+      const width = page.viewportSize().width;
+      for (const n of notes) {
+        const owners = all.filter((b) => b.describedBy.includes(n.id));
+        if (!n.id || owners.length !== 1) fail(`the note “${n.text}” (#${n.id}) describes ${owners.length} buttons, not exactly one`);
+        const [b] = owners;
+        const clip = lib.clips[b.loc];
+        if (n.kind === "waqf") {
+          if (!clip?.last) fail(`${b.loc} carries the waqf note, but its clip does not end its ayah (library.json clips: no \`last\`)`);
+          if (n.text !== msgs.Clip.waqf_note) fail(`${b.loc}: the waqf note says “${n.text}”, not “${msgs.Clip.waqf_note}”`);
+        } else if (n.kind === "washal") {
+          const w = lib.parts.flatMap((p) => p.tiles).find((t) => t.washal?.run === b.loc)?.washal;
+          if (!w) fail(`${b.loc} carries the washal note, but no parts tile plays that run`);
+          const want = msgs.Clip.washal_note.replace("{heard}", w.heard);
+          if (n.text !== want) fail(`${b.loc}: the washal note says “${n.text}”, not “${want}”`);
+          if (!b.label.endsWith(w.heard)) fail(`${b.loc}: the button is named “${b.label}”, not by what is heard (${w.heard})`);
+        } else fail(`a note of an unknown kind "${n.kind}" beside ${b.loc}`);
+        if (!n.visible) continue;
+        if (n.fontPx < 15.5) fail(`${b.loc}: its ${n.kind} note is set at ${n.fontPx}px (< 16px)`);
+        if (n.left < -1 || n.right > width + 1) fail(`${b.loc}: its ${n.kind} note sticks out of the screen (${Math.round(n.left)}–${Math.round(n.right)} of ${width})`);
+        if (b.visible && n.top < b.bottom - 1) fail(`${b.loc}: its ${n.kind} note is not under the button's line (note top ${Math.round(n.top)}, button bottom ${Math.round(b.bottom)})`);
+      }
+      for (const kind of ["waqf", "washal"]) {
+        const have = notes.filter((n) => n.kind === kind);
+        if (have.filter((n) => n.visible).length < wantNotes[kind]) {
+          fail(`${have.filter((n) => n.visible).length} ${kind} note(s) shown, expected at least ${wantNotes[kind]}`);
+        }
+      }
+      // every button of a clip that does NOT end its ayah, and is no washal run, has no note at all
+      const washalRuns = new Set(lib.parts.flatMap((p) => p.tiles.flatMap((t) => (t.washal ? [t.washal.run] : []))));
+      for (const b of all) {
+        if (b.describedBy.length && !lib.clips[b.loc]?.last && !washalRuns.has(b.loc)) fail(`${b.loc} has a note (${b.describedBy.join(" ")}) though nothing differs in what is heard`);
+      }
+      await page.screenshot({ path: `shots/${vp}-suara-contoh-${urlPath.split("/").pop()}.png`, fullPage: true });
+
+      // 2. Which two: the SECOND is a clip that does not end its ayah (so only the player's stop
+      // ends it; the page's preferred one when it is shown), the FIRST the longest clip of
+      // another ayah's file (so it still plays when the second is pressed).
+      const ms = (b) => lib.clips[b.loc].end - lib.clips[b.loc].start;
+      const midAyah = shown.filter((b) => !lib.clips[b.loc].last);
+      const second = midAyah.find((b) => b.loc === pressSecond) ?? midAyah.find((b) => shown.some((x) => lib.clips[x.loc].url !== lib.clips[b.loc].url));
+      if (!second) fail("no example shown that does not end its ayah: the stop at a word's end cannot be measured");
+      if (pressSecond && second.loc !== pressSecond) fail(`${pressSecond} is not among the buttons shown (pressed second on this page)`);
+      const first = shown.filter((b) => lib.clips[b.loc].url !== lib.clips[second.loc].url).sort((x, y) => ms(y) - ms(x))[0];
+      if (!first) fail("no two examples of different ayat to press");
+      const fileA = lib.clips[first.loc].url;
+      const fileB = lib.clips[second.loc].url;
+      const btnA = buttons.nth(first.i);
+      const btnB = buttons.nth(second.i);
+      await btnA.click();
+      if (!(await until(page, async () => watch.requested(fileA) > 0, 15_000))) {
+        fail(`pressing ${first.loc} did not ask for ${recordingName(fileA)} (asked: ${watch.list()})`);
+      }
+      const stateA = await btnA.getAttribute("data-state");
+      if (stateA !== "playing") fail(`after its press ${first.loc} says "${stateA}", not "playing" (${recordingName(fileA)} → ${watch.answered.get(fileA) ?? "no answer yet"})`);
+      if (watch.seen.some((u) => u !== fileA)) fail(`the press asked for other files too: ${watch.list()}`);
+
+      // 3. A second press, on another example, stops the first — which must still be playing,
+      // or the press would prove nothing.
+      const beforeB = await btnA.getAttribute("data-state");
+      if (beforeB !== "playing") fail(`${first.loc} says "${beforeB}" just before ${second.loc} is pressed: it no longer plays, so the press cannot show that it stops the first`);
+      await btnB.click();
+      const states = async () => [await btnA.getAttribute("data-state"), await btnB.getAttribute("data-state")];
+      await until(page, async () => (await states()).join() === "idle,playing", 2_000);
+      const [aAfter, bAfter] = await states();
+      if (aAfter !== "idle") fail(`after pressing ${second.loc}, ${first.loc} still says "${aAfter}" (two voices at once)`);
+      if (bAfter !== "playing") fail(`after its press ${second.loc} says "${bAfter}", not "playing"`);
+      if (!(await until(page, async () => watch.requested(fileB) > 0, 15_000))) {
+        fail(`pressing ${second.loc} did not ask for ${recordingName(fileB)} (asked: ${watch.list()})`);
+      }
+      const others = watch.seen.filter((u) => u !== fileA && u !== fileB);
+      if (others.length) fail(`the presses asked for other files too: ${others.join(", ")}`);
+      const playingNow = await buttons.evaluateAll((els) => els.filter((el) => el.getAttribute("data-state") === "playing").length);
+      if (playingNow > 1) fail(`${playingNow} buttons say "playing" at once`);
+
+      // 4. It stops by itself, at its word's end: the element's clock where the player paused it.
+      const ended = await until(page, async () => (await btnB.getAttribute("data-state")) !== "playing", 15_000 + ms(second));
+      const endState = await btnB.getAttribute("data-state");
+      if (!ended || endState !== "idle") {
+        fail(`${second.loc} did not end by itself at its word's end (says "${endState}"; ${recordingName(fileB)} → ${watch.answered.get(fileB) ?? "no answer yet"})`);
+      }
+      const pauses = await page.evaluate(() => window.__clipPauses ?? null);
+      if (!pauses) fail("the pause recorder is gone from the page (it navigated?)");
+      const stop = pauses.filter((c) => c.src === fileB && !c.wasPaused).pop();
+      const end = lib.clips[second.loc].end / 1000;
+      if (!stop) {
+        fail(`${second.loc} went idle, but the player never paused ${recordingName(fileB)} while it played: the file ran to its own end, past the word (pauses: ${JSON.stringify(pauses)})`);
+      }
+      if (stop.t < end - 0.001 || stop.t > end + STOP_LATE_S) {
+        fail(`${second.loc} was stopped at ${stop.t.toFixed(3)} s of ${recordingName(fileB)}; its word ends at ${end.toFixed(3)} s (allowed: ${end.toFixed(3)}–${(end + STOP_LATE_S).toFixed(3)} s)`);
+      }
+      console.log(
+        `  ${vp}: example voices ok on ${urlPath} (${shown.length} buttons, none asked before a press; ${notes.length} heard-notes: ` +
+          `${notes.filter((n) => n.kind === "waqf").length} waqf, ${notes.filter((n) => n.kind === "washal").length} washal; ${first.loc} → ${recordingName(fileA)} ` +
+          `${watch.answered.get(fileA) ?? "?"}, still playing when stopped by ${second.loc} → ${recordingName(fileB)} ${watch.answered.get(fileB) ?? "?"}, ` +
+          `which the player stopped at ${stop.t.toFixed(3)} s, ${Math.round((stop.t - end) * 1000)} ms after its word's end at ${end.toFixed(3)} s)`,
+      );
+    } catch (err) {
+      await page.screenshot({ path: `shots/${vp}-suara-contoh-FAILED.png` }).catch(() => {});
+      throw err;
+    } finally {
+      watch.stop();
+    }
+  }
+  await page.goto("about:blank");
+}
+
 /**
  * What a learner must see while the narrator explains a word, checked on the real page in the
  * viewport (not the screenshot's stage crop): the whole caption on screen and above the controls,
@@ -1862,6 +2099,7 @@ try {
       console.log(`shot ${vp}-${name} (${href})`);
     }
     await konsepChecks(page, vp);
+    await clipChecks(page, vp);
     await menuShots(page, vp);
     await headerShots(page, vp);
     await footerCheck(page, vp);

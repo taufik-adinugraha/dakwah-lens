@@ -63,6 +63,27 @@ SHORT_WARN_MS = 200
 errors: list[str] = []
 warnings: list[str] = []
 
+
+def everyayah_url(reciter: str, s: int, a: int) -> str:
+    """The streamed file of one ayah on EveryAyah ({SSS}{AAA}.mp3; never re-hosted, plan §6.2).
+    The lessons' Recitation.url and the Konsep examples' clips (clips.py) are both this."""
+    return f"https://everyayah.com/data/{reciter}/{s:03d}{a:03d}.mp3"
+
+
+def word_segments(entry: dict) -> tuple[list[list[int]], list[tuple[int, int]]]:
+    """One quran-align entry's segments [wordStart0, wordEndExclusive0, startMs, endMs] as the
+    lessons ship them, [wordIndex1, startMs, endMs] (word index = the Tanzil token index of
+    common.lesson_ayah, which QAC 0.4 and quran-align both number without the surah-heading
+    basmalah), and the (first, last) 1-based words of every segment that spans more than one word:
+    those words have no timing of their own and are left out."""
+    out, joined = [], []
+    for ws, we, s_ms, e_ms in entry["segments"]:
+        if we - ws != 1:
+            joined.append((ws + 1, we))
+            continue
+        out.append([ws + 1, int(s_ms), int(e_ms)])
+    return out, joined
+
 # ---------------------------------------------------------------- marked lesson prose
 # Operator 2026-10-12, on a word card in "Materi lengkap ayat ini" (Al-Fatihah 7, ‘alaihim): "here
 # also better to write the arabic words, not only the transliteration" — and on the Konsep pages
@@ -549,17 +570,14 @@ def build(spec: SurahSpec) -> int:
             if not e:
                 errors.append(f"quran-align {reciter}: no entry for {S}:{a}")
                 continue
-            segs_out = []
-            for ws, we, s_ms, e_ms in e["segments"]:
-                if we - ws != 1:
-                    errors.append(f"{reciter} {S}:{a}: segment covers words {ws + 1}..{we} together; "
-                                  f"cannot give per-word timing")
-                    continue
-                segs_out.append([ws + 1, int(s_ms), int(e_ms)])
+            segs_out, joined = word_segments(e)
+            for first, last in joined:
+                errors.append(f"{reciter} {S}:{a}: segment covers words {first}..{last} together; "
+                              f"cannot give per-word timing")
             probe = I[probe_key]["files"].get(f"{S:03d}{a:03d}.mp3", {})
             check_segments(reciter, S, a, segs_out, len(tokens), probe.get("duration_ms"), e.get("stats", {}))
             recitation.append({"reciter": reciter,
-                               "url": f"https://everyayah.com/data/{reciter}/{S:03d}{a:03d}.mp3",
+                               "url": everyayah_url(reciter, S, a),
                                "segments": segs_out, "credit": credit})
 
         ayah = {

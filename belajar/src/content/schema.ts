@@ -259,10 +259,16 @@ export const Term = z.object({
 export type Term = z.infer<typeof Term>;
 
 /** One sign on the Harakat page: its name (Term), sound and place, and the example letter as an
- *  ayah writes it (a letter q-ref into the Tanzil text: "q:1:1:1#1" = بِ). */
+ *  ayah writes it (a letter q-ref into the Tanzil text: "q:1:1:1#1" = بِ). The card also plays the
+ *  imam reciting the example's word, so the example is a place where the sign is HEARD
+ *  (pipeline/clips.py: never the last letter of an ayah's last word; a tanwin before an izhar
+ *  letter). */
 export const HarakahSign = z.object({
   term: z.string().regex(/^[a-z0-9-]+$/),
   example: z.string().min(5),
+  /** The transliteration of the example's word when it is not a lesson word (سَلَٰمٌ of QS 97:5,
+   *  "salāmun"; checked against its Tanzil bytes by the build). A lesson word brings its own. */
+  translit: z.string().min(1).optional(),
   /** The marks of that letter this sign is about (رَبِّ's second letter carries shaddah + kasrah). */
   marks: z.array(z.enum(["fathah", "kasrah", "dhammah", "sukun", "fathatain", "kasratain", "dhammatain", "shaddah"])).min(1),
   sound: z.string().min(1),
@@ -308,6 +314,18 @@ export const WordParts = z.object({
         /** Marked: "[[huruf jar]]", "[[isim]], bentuk dasar". */
         label: z.string().min(3),
         gloss: z.string().min(1),
+        /** Only on a whole-word tile that starts with hamzat washal (ٱ) and is not its ayah's first
+         *  word: mid-recitation the imam does not read that alif ("ismu" cut from tabāraka-smu plays
+         *  "smu"), so the tile plays the run with the word before it (`run`, a clip key) and says
+         *  what is heard: `before` + the tile's transliteration without its first vowel
+         *  ("tabāraka" + "smu"). Derived by the build (pipeline/clips.py washal_of). */
+        washal: z
+          .object({
+            run: z.string().regex(/^\d{1,3}:\d{1,3}:\d{1,3}-\d{1,3}$/),
+            before: z.string().min(1),
+            heard: z.string().min(2),
+          })
+          .optional(),
       }),
     )
     .min(2),
@@ -388,6 +406,25 @@ export const Root = z.object({
 });
 export type Root = z.infer<typeof Root>;
 
+/**
+ * The imam's voice of one example a static page shows (operator 2026-10-12: "each explanation
+ * should be followed by examples (visual + voice)"): Mishary Alafasy's recording of the ayah,
+ * streamed from EveryAyah (never stored here), and the word's place in it, [start, end) in ms,
+ * from the pinned quran-align timings the lessons use. The browser seeks to `start` and stops at
+ * `end` (src/hooks/useClipPlayer.ts). Built by pipeline/build_library.py (clips.py), checked by
+ * pipeline/validate_clips.py.
+ */
+export const Clip = z.object({
+  url: z.string().url().regex(/^https:\/\/everyayah\.com\/data\/Alafasy_128kbps\/\d{6}\.mp3$/),
+  start: z.number().int().nonnegative(),
+  end: z.number().int().positive(),
+  /** true (never false) when the clip's word is its ayah's last, from the ayah's word count: the
+   *  imam stops there (waqf), so a final harakah or tanwin is not pronounced, and the page says so
+   *  beside the button (src/lib/heard.ts). */
+  last: z.boolean().optional(),
+});
+export type Clip = z.infer<typeof Clip>;
+
 export const Library = z.object({
   concepts: z.array(Concept),
   lexicon: z.array(Lexeme),
@@ -402,6 +439,11 @@ export const Library = z.object({
   quran: z.record(z.string(), z.string()).default({}),
   /** QAC 0.4 segments of each lesson word a part names; joined they are the word. */
   segments: z.record(z.string(), z.array(z.string().min(1))).default({}),
+  /** The imam's voice of every example the static pages show, keyed by the word's location
+   *  ("5:23:6"; a run "55:78:1-2"): concept examples, each Harakat sign's word, each parts
+   *  diagram's word and its whole-word tiles (src/lib/clips.ts clipKey; a tile with `washal`
+   *  plays its run). */
+  clips: z.record(z.string().regex(/^\d{1,3}:\d{1,3}:\d{1,3}(?:-\d{1,3})?$/), Clip).default({}),
   data_versions: z.record(z.string(), z.string()),
 });
 export type Library = z.infer<typeof Library>;

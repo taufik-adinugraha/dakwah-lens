@@ -1,8 +1,12 @@
 import { ArrowDown, ArrowRight, Plus } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
 
-import { letters, type PartsChange, type PreparedParts } from "@/lib/terms";
+import { type Clip, clipFor, clipKey } from "@/lib/clips";
+import { hasWaqfNote } from "@/lib/heard";
+import { letters, type PartsChange, type PreparedParts, soundAfterSign } from "@/lib/terms";
 
+import { ClipButton } from "./ClipButton";
+import { ClipNote, clipNoteId } from "./ClipNote";
 import { MarkCircle } from "./MarkCircle";
 import { MixedText } from "./MixedText";
 import { TermText } from "./TermText";
@@ -15,6 +19,11 @@ export type WordPartsLabels = {
   change: (c: PartsChange) => string;
   /** "tidak ditulis" (a letter of a part the word does not write) */
   notWritten: string;
+  /** Under a voice button whose word ends its ayah: "Di akhir ayat imam berhenti (waqaf), …". */
+  waqf: string;
+  /** Under the voice of a tile played with the word before it: "Di tengah bacaan, alif di awal
+   *  kata ini tidak dibaca: bersama kata sebelumnya terdengar “tabārakasmu”." */
+  washal: (heard: string) => string;
 };
 
 /**
@@ -28,8 +37,37 @@ export type WordPartsLabels = {
  * is an alif or the lam right after al-'s alif, so cutting them out of the tile changes no other
  * letter's shape. Each change is named by where it is, shown on dotted circles with its names and
  * sounds, then the steps (which give each part's meaning with "yang artinya").
+ *
+ * The imam's voice (operator 2026-10-12: "ismu (read by voice + show visual) when combined with
+ * harf jar, it becomes ismi (read by voice + visual)"): a tile that is a whole word — the part's
+ * bentuk dasar as an ayah writes it, ٱسْمُ of QS 55:78 — carries "▶ Dengarkan" with that word's
+ * recitation, and so does the joined word (بِسْمِ, the ayah's own); a part that is only a piece of
+ * a word (bi-, -hum) has none, since no imam recites it alone (pipeline/clips.py). `clips`:
+ * library.json's (src/lib/clips.ts), played by the page's ClipPlayerProvider.
+ *
+ * What is HEARD (review 2026-10-12): ٱسْمُ cut alone from tabāraka-smu played "smu", because in
+ * mid-recitation its hamzat washal is not read — the very thing step 3 of the diagram explains
+ * ("Alif di awal ismu adalah hamzah washal: ia hanya dibaca bila bacaan dimulai dari kata itu").
+ * Such a tile (library.json `washal`, derived by the build: its word starts with ٱ and is not its
+ * ayah's first) plays the run with the word before it, its button names what is heard
+ * ("tabārakasmu") and one line under it says so. A word that ends its ayah would get the waqf
+ * line the example rows have (the build lets no base-form tile be one). `scope`: the page's
+ * concept id, for the notes' ids.
  */
-export function WordParts({ data, labels }: { data: PreparedParts; labels: WordPartsLabels }) {
+export function WordParts({
+  data,
+  labels,
+  clips = {},
+  scope = "parts",
+}: {
+  data: PreparedParts;
+  labels: WordPartsLabels;
+  clips?: Readonly<Record<string, Clip>>;
+  scope?: string;
+}) {
+  const wordClip = clipFor(clips, data.loc);
+  const here = `${scope}-parts-${data.loc}`;
+  const wordWaqfId = hasWaqfNote(wordClip, data.word.ar) ? clipNoteId(here, "word") : undefined;
   return (
     <figure className="rounded-2xl border-[1.5px] border-teal-line bg-paper p-4 sm:p-6">
       <div role="group" aria-label={labels.parts} className="flex flex-col items-center gap-2">
@@ -37,14 +75,32 @@ export function WordParts({ data, labels }: { data: PreparedParts; labels: WordP
           {data.tiles.map((t, i) => (
             <Fragment key={i}>
               {i > 0 ? <Plus aria-hidden className="h-6 w-6 shrink-0 text-ink-soft" /> : null}
-              <Tile ar={t.ar} dropped={t.dropped} translit={t.translit} notWritten={labels.notWritten}>
+              <Tile
+                ar={t.ar}
+                dropped={t.dropped}
+                translit={t.translit}
+                notWritten={labels.notWritten}
+                voice={tileVoice(clips, t, clipNoteId(here, `tile-${i + 1}`), labels)}
+              >
                 <TermText tokens={t.label} links={false} />
               </Tile>
             </Fragment>
           ))}
         </div>
         <ArrowDown aria-hidden className="h-7 w-7 shrink-0 text-forest" />
-        <Tile ar={data.word.ar} translit={data.word.translit} result />
+        <Tile
+          ar={data.word.ar}
+          translit={data.word.translit}
+          result
+          voice={
+            wordClip ? (
+              <>
+                <ClipButton loc={data.loc} clip={wordClip} word={data.word.translit} noteId={wordWaqfId} className="justify-center" />
+                {wordWaqfId ? <ClipNote id={wordWaqfId} kind="waqf" text={labels.waqf} icon={false} className={TILE_NOTE} /> : null}
+              </>
+            ) : null
+          }
+        />
       </div>
       <p className="mt-3 text-center text-base text-ink-muted">
         <span className="whitespace-nowrap">{data.tiles.map((t) => t.translit).join(" + ")}</span>{" "}
@@ -81,12 +137,42 @@ export function WordParts({ data, labels }: { data: PreparedParts; labels: WordP
   );
 }
 
+/** A note under a tile's button: left-aligned lines in the centred tile, never wider than a
+ *  short paragraph (the tile grows with it, up to its row), at the size of the tile's label. */
+const TILE_NOTE = "mt-2 max-w-[19rem] text-left text-sm";
+
+/** The voice of a tile: its clip's button, or null for a part of a word (no clip). A tile with
+ *  `washal` plays its run (the word before it + the word), is named by what is heard, and says so
+ *  under the button. */
+function tileVoice(
+  clips: Readonly<Record<string, Clip>>,
+  t: PreparedParts["tiles"][number],
+  id: string,
+  labels: WordPartsLabels,
+): ReactNode {
+  // Already a clip key (a word, or the run "55:78:1-2"): looked up as it is.
+  const key = t.washal?.run ?? clipKey(t.q);
+  const clip = key ? (clips[key] ?? null) : null;
+  if (!clip || !key) return null;
+  const washalId = t.washal ? `${id}-washal` : null;
+  const waqfId = hasWaqfNote(clip, t.ar) ? `${id}-waqf` : null;
+  const notes = [washalId, waqfId].filter(Boolean).join(" ");
+  return (
+    <>
+      <ClipButton loc={key} clip={clip} word={t.washal?.heard ?? t.translit} noteId={notes || undefined} className="justify-center" />
+      {t.washal && washalId ? <ClipNote id={washalId} kind="washal" text={labels.washal(t.washal.heard)} icon={false} className={TILE_NOTE} /> : null}
+      {waqfId ? <ClipNote id={waqfId} kind="waqf" text={labels.waqf} icon={false} className={TILE_NOTE} /> : null}
+    </>
+  );
+}
+
 function Tile({
   ar,
   dropped = [],
   translit,
   result = false,
   notWritten,
+  voice = null,
   children,
 }: {
   ar: string;
@@ -94,6 +180,9 @@ function Tile({
   translit: string;
   result?: boolean;
   notWritten?: string;
+  /** The imam's voice of the tile's word (ClipButton) and, when what is heard differs from what
+   *  is written, the line that says so (ClipNote), under it. */
+  voice?: ReactNode;
   children?: ReactNode;
 }) {
   const ls = letters(ar);
@@ -120,6 +209,7 @@ function Tile({
       <span className="text-base font-semibold text-ink">{translit}</span>
       {children ? <span className="text-sm text-ink-muted">{children}</span> : null}
       {dropped.length && notWritten ? <span className="sr-only">{notWritten}</span> : null}
+      {voice ? <div className="mt-2 mb-1 flex max-w-full flex-col items-center">{voice}</div> : null}
     </div>
   );
 }
@@ -133,7 +223,10 @@ function Tile({
 function ChangeMark({ c, side }: { c: PartsChange; side: "from" | "to" }) {
   const mark = side === "from" ? c.from : c.to;
   const term = side === "from" ? c.fromTerm : c.toTerm;
-  const sound = side === "from" ? c.fromSound : c.toSound;
+  // The sign on the circle IS the vowel: no Latin "a", "i", "u" after it (operator 2026-10-12:
+  // "better not use 'a', 'i', 'u', but use harakat symbols"). A sound said in words stays, e.g.
+  // sukun's "mati, tanpa vokal" — decided by the mark's term (terms.ts soundAfterSign).
+  const sound = soundAfterSign(term, side === "from" ? c.fromSound : c.toSound);
   const name = side === "from" ? c.fromName : c.toName;
   const head = [c.kind === "letter" && name ? name : "", term ? `${term.latin}${term.ar ? ` (${term.ar})` : ""}` : ""]
     .filter(Boolean)
