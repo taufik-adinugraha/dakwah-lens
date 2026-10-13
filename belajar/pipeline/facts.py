@@ -312,7 +312,7 @@ def compute_facts(C: Corpus) -> tuple[list[dict], list[dict]]:
         "akar-rhm", f"Keluarga kata {rl}: {len(h_rhm)} kali",
         f"Kata-kata dari akar {rl}, misalnya raḥmah, raḥmān, dan raḥīm, muncul {kali(len(h_rhm), rhm_refs, True)} "
         f"({n_lem_rhm} lemma). Ini hitungan satu keluarga kata, bukan satu kata; tidak semuanya "
-        f"berarti 'kasih sayang' secara langsung (mis. arḥām: rahim/kerabat).",
+        f"berarti “kasih sayang” secara langsung (mis. arḥām: rahim/kerabat).",
         rhm_refs,
         f"{QAC_BASIS}: jumlah segmen STEM dengan ROOT:{root_rhm} (akar kata 1:1:3); ayat dihitung sekali walau "
         f"memuat lebih dari satu kata seakar.",
@@ -467,7 +467,7 @@ def compute_facts(C: Corpus) -> tuple[list[dict], list[dict]]:
         "iyyaka", "Iyyāka hanya di Al-Fatihah",
         f"Bentuk {q([fat[5][0]])} (kata ganti orang kedua tunggal; dalam tata bahasa Arab berbentuk mudzakkar) "
         f"hanya muncul di {refs_text(sorted(set(iy_refs)))}, dan di sana {len(h_2ms)} kali. Kata ganti yang sama "
-        f"dengan akhiran lain (untuk 'aku', 'dia', 'kalian', dan seterusnya) muncul {len(h_iyya) - len(h_2ms)} kali "
+        f"dengan akhiran lain (untuk “aku”, “dia”, “kalian”, dan seterusnya) muncul {len(h_iyya) - len(h_2ms)} kali "
         f"di tempat lain, sehingga seluruhnya {kali(len(h_iyya), uniq_refs((g.s, g.a) for g in h_iyya))}.",
         uniq_refs((g.s, g.a) for g in h_iyya),
         f"{QAC_BASIS}: semua segmen STEM dengan LEM:{lem_iyya} ({len(h_iyya)} kali); yang bertanda {pers} hanya di "
@@ -600,7 +600,7 @@ def compute_facts(C: Corpus) -> tuple[list[dict], list[dict]]:
     F.append(fact(
         "amin-bukan-ayat", "Āmīn bukan bagian Al-Qur'an",
         "Ucapan āmīn setelah membaca Al-Fatihah bukan bagian dari Al-Fatihah dan bukan ayat Al-Qur'an; artinya "
-        "'kabulkanlah'. Darwisy menyebutnya sunnah diucapkan sesudah Al-Fatihah.",
+        "“kabulkanlah”. Darwisy menyebutnya sunnah diucapkan sesudah Al-Fatihah.",
         ["1:7"],
         "Bukan hitungan; dikutip dari al-Mujtaba dan Darwisy (pembahasan QS 1:7).",
         [{"kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
@@ -608,5 +608,38 @@ def compute_facts(C: Corpus) -> tuple[list[dict], list[dict]]:
          {"kitab": DARWISY,
           "ref": "jil. 1, hlm. 20 (bagian al-Fawa'id, QS 1:7)",
           "url": "https://tafsir.app/iraab-aldarweesh/1/7"}]))
+
+    # 21. Na't or shifah: an aside (operator 2026-10-13: "then we need explanation about na't vs
+    # shifah, just intermezo", after the quiz showed صِفَة beside "sifat" where every explanation
+    # says na't). Not a count and not a lesson step. Every claim is read off a pinned Shamela page
+    # (sources.json shamela_istilah): 11371/15 "باب النَّعتِ / النَّعتُ: تابِعٌ للمنعوت في رَفعِهِ،
+    # ونصبِهِ، وخفضِهِ، وتعريفِهِ، وتنكيرِهِ"; 2163/12 "(المستقيم) صفة للصراط" and "(غير) بدل من الضمير
+    # في عليهم أو من الذين أو نعت للذين"; 9057/67 "وتكون صفة لقوله {الصراط المستقيم} … لأنه متى اجتمع
+    # البدل والوصف قُدِّم الوصف … حيث جعلنا «غير» صفة". Which school says which word (Kufah / Bashrah)
+    # is NOT said: no pinned page states it.
+    F.append(fact(
+        "naat-atau-shifah", "Na't atau shifah?",
+        "Na't dan shifah adalah dua nama untuk hal yang sama: kata yang menerangkan kata benda sebelumnya dan "
+        "mengikuti akhirannya. Pelajaran ini memakai na't, kata yang dipakai Ibnu Ajurrum: babnya berjudul Bab "
+        "an-Na't. Kitab lain memakai shifah atau washf: Darwisy menyebut al-mustaqīma di ayat 6 shifah bagi "
+        "aṣ-ṣirāṭa dan, di halaman yang sama, menyebut gairi di ayat 7 boleh menjadi na't bagi allażīna; as-Samin, "
+        "membahas gairi yang sama, memakai kata shifah dan washf. Jadi bila Anda menjumpai shifah di buku lain, "
+        "yang dimaksud adalah na't yang sama.",
+        ["1:1", "1:3", "1:6"],
+        "Bukan hitungan; dikutip dari Matn al-Ajurrumiyyah (Bab an-Na't), dari Darwisy (i'rab QS 1:6 dan 1:7) "
+        "dan dari as-Samin (QS 1:7).",
+        [{"kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+          "ref": "hlm. 14, Bab an-Na't: na't mengikuti kata yang disifatinya dalam rafa', nashab, khafdh (jar), "
+                 "ma'rifah dan nakirah",
+          "url": "https://shamela.ws/book/11371/15"},
+         {"kitab": DARWISY,
+          "ref": "jil. 1, hlm. 15 (al-I'rab QS 1:6-1:7: al-mustaqīma shifah bagi aṣ-ṣirāṭa; gairi badal dari "
+                 "dhamir pada ‘alaihim atau dari allażīna, atau na't bagi allażīna)",
+          "url": "https://shamela.ws/book/2163/12"},
+         {"kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad "
+                   "al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 74 (QS 1:7: gairi sebagai shifah; bila badal dan washf berkumpul, washf "
+                 "didahulukan)",
+          "url": "https://shamela.ws/book/9057/67"}]))
 
     return F, cmp

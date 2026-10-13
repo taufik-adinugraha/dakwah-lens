@@ -36,7 +36,9 @@ function cardText(rec: { title: string; summary: string; marked?: { title: strin
  * (operator 2026-10-10: Arabic with every term, beginners first, less clutter, the module's
  * forest glow): ONE reading column; first "Mulai di sini", the Harakat page on the lesson
  * stage's card; then Nahwu and Sharaf, each concept one whole-card link with its Arabic
- * headword and the arrow every whole-card link in the module carries. Nothing inside a card is
+ * headword and the arrow every whole-card link in the module carries. A gloss quoted in a
+ * title or a summary ("sandaran kata: “nama Allah”") is forest like every meaning (operator
+ * 2026-10-13, plan L22); nothing else of a card is emphasised. Nothing inside a card is
  * a link (a harakah term's link lives on the concept page).
  */
 export default async function ConceptIndex({ params }: PageProps<"/[locale]/konsep">) {
@@ -74,12 +76,12 @@ export default async function ConceptIndex({ params }: PageProps<"/[locale]/kons
                       <span className="text-sm font-semibold text-forest">{t("dasar")}</span>
                       <span className="mt-1 flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
                         <span className="font-display text-2xl font-medium text-ink">
-                          <TermText tokens={c.title} links={false} />
+                          <TermText tokens={c.title} links={false} emphasis="meaning" />
                         </span>
                         <Headword head={c.head} className="text-ar-lg" />
                       </span>
                       <span className="mt-2 block max-w-prose text-base text-ink">
-                        <TermText tokens={c.summary} links={false} />
+                        <TermText tokens={c.summary} links={false} emphasis="meaning" />
                       </span>
                       <span className="mt-4 flex flex-wrap items-center justify-between gap-3">
                         <span className="flex gap-2">
@@ -116,12 +118,12 @@ export default async function ConceptIndex({ params }: PageProps<"/[locale]/kons
                       <Link href={conceptHref(concept.id)} className="glow-card block p-5">
                         <span className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
                           <span className="font-display text-lg font-medium text-ink">
-                            <TermText tokens={c.title} links={false} />
+                            <TermText tokens={c.title} links={false} emphasis="meaning" />
                           </span>
                           <Headword head={c.head} className="text-ar-sm" />
                         </span>
                         <span className="mt-1 block text-pretty text-base text-ink-muted">
-                          <TermText tokens={c.summary} links={false} />
+                          <TermText tokens={c.summary} links={false} emphasis="meaning" />
                         </span>
                         {/* The card is a link: the arrow says so, as on the hub and track cards. */}
                         <span className="mt-2 flex justify-end">

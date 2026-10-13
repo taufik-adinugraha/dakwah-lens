@@ -34,6 +34,7 @@ import validate_narration as V
 
 MANIFESTS, LESSONS, LIBRARY = V.load_all()
 COMPOSE = V.load_compose()
+LESSONMAP = V.load_map()
 LEXDATA = json.loads(V.PRONUNCIATION_JSON.read_text(encoding="utf-8"))
 LEX = V.Lexicon(LEXDATA)
 FORMS = V.Forms(LESSONS)
@@ -41,8 +42,9 @@ SHA = "a" * 64
 VOICE = {"id": "v123", "name": "Suara Uji", "model": "eleven_v3"}
 
 
-def run_check(m, ls, lx, cp=None):
-    return V.check(m, ls, LIBRARY, lex=V.Lexicon(lx), compose=COMPOSE if cp is None else cp)
+def run_check(m, ls, lx, cp=None, mp=None):
+    return V.check(m, ls, LIBRARY, lex=V.Lexicon(lx), compose=COMPOSE if cp is None else cp,
+                   lessonmap=LESSONMAP if mp is None else mp)
 
 
 def name_of(lid):
@@ -184,7 +186,7 @@ LAM3 = "al-fatihah:1:w3:compose:3"  # "huruf lam (ل)": the bare lam of the fram
 
 def compose_say(loc, k, text):
     """A composition's k-th `say` changed in the content (the narration then lags behind it)."""
-    def f(_m, _l, _x, cp):
+    def f(_m, _l, _x, cp, *_):
         cp["al-fatihah"]["words"][loc]["lines"][k - 1]["say"] = text
     return f
 
@@ -240,7 +242,50 @@ def bad_token_text(ln):
     ln["tokens"][0]["t"] = "Kalimat"
 
 
-# (name, mutation(manifests, lessons, pronunciation data), substring the failure message must contain)
+# --- the lesson map's two lines (operator 2026-10-13, plan L23)
+M1, M2, M3, M5 = (f"al-fatihah:{n}:map" for n in (1, 2, 3, 5))
+
+
+def both(lid, old, new, old_said=None, new_said=None):
+    """The same change in a line's caption and in its spoken text (so that only what the line SAYS
+    is at fault, not a caption that differs from the speech)."""
+    def f(m, *_):
+        ln = line(m, lid)
+        said_old, said_new = (old if old_said is None else old_said), (new if new_said is None else new_said)
+        assert old in ln["display"] and said_old in ln["text"], f"{lid} has no {old!r} / {said_old!r}"
+        ln["display"] = ln["display"].replace(old, new, 1)
+        ln["text"] = ln["text"].replace(said_old, said_new, 1)
+    return f
+
+
+def in_map(fn):
+    """A fault in the lesson map itself (content/map/al-fatihah.json)."""
+    def f(_m, _l, _x, _c, mp):
+        fn(mp["al-fatihah"])
+    return f
+
+
+def map_entry(mp, ayah):
+    return next(a for a in mp["ayat"] if a["ayah"] == ayah)
+
+
+def first_sentence_only(lid):
+    def f(m, *_):
+        ln = line(m, lid)
+        for k in ("text", "display"):
+            ln[k] = ln[k].split(". ")[0] + "."
+    return f
+
+
+def split_map(m, *_):
+    lines = m["al-fatihah"]["lines"]
+    old = lines.pop(M2)
+    lines[M2 + ":a"] = dict(old)
+    lines[M2 + ":b"] = dict(old)
+
+
+# (name, mutation(manifests, lessons, pronunciation data, compositions, lesson maps), substring the
+# failure message must contain)
 MUTATIONS = [
     ("empty text", set_text(W, ""), "empty text"),
     ("Arabic script", append_text(W, " Lafaznya الله."), "Arabic script"),
@@ -402,6 +447,66 @@ MUTATIONS = [
      "Qur'anic word 'nastangin' (another spelling"),
     ("the doubled lam not as the frame pins it", replace_in(W79, "display", f"lam ({LAM79})", f"lam ({LAM79_BARE})"),
      f"the letter as in the ayah is {LAM79}"),
+    # --- the lesson map (plan L23): "map" after the imam's recitation, "learned" before the recap
+    ("map line missing", drop(M1), f"missing line {M1}"),
+    ("learned line missing", drop("al-fatihah:7:learned"), "missing line al-fatihah:7:learned"),
+    ("a map line in a surah without a lesson map", add("al-ikhlas:1:map", "Di ayat ini ada tiga hal baru."),
+     "unexpected line al-ikhlas:1:map"),
+    ("the surah's map switched off, its lines left behind", lambda _m, _l, _x, _c, mp: mp.pop("al-fatihah"),
+     f"unexpected line {M1}"),
+    ("a map line split", split_map, "a map / learned line is never split"),
+    ("a map line that highlights the ayah", set_field(M1, "highlight", [0]), "not what the stage shows for this step"),
+    ("the count of new concepts", both(M2, "tiga hal baru", "empat hal baru"), "says empat new concept(s), the lesson map has 3"),
+    ("a new concept not named", both(M2, ", syibhul jumlah (شِبْه الجُمْلَة)", "", ", شِبْه الجُمْلَة", ""),
+     "names ['jumlah-ismiyyah', 'jamak-mudzakkar-salim'] as new concept(s); the lesson map gives"),
+    ("a repeated concept named as new", both(M3, "wazan (وَزْن) dan tashrif (تَصْرِيف)", "na’t (نَعْت)", "وَزْن dan تَصْرِيف", "نَعْت"),
+     "names ['naat'] as new concept(s); the lesson map gives ['wazan-dan-tashrif']"),
+    ("a name that is no concept of the map", both("al-fatihah:4:map", "isim fa’il (اِسْم فَاعِل)", "isim (اِسْم)", "اِسْم فَاعِل", "اِسْم"),
+     "are not a list of the map's concept names"),
+    ("“di antaranya” where every new concept is named", both(M2, "tiga hal baru: ", "tiga hal baru, di antaranya "),
+     "“di antaranya” is said exactly when more than 3"),
+    ("the repeated concepts left out", first_sentence_only(M3),
+     "1 sentence(s); the lesson map has new concepts, repeated ones: 2"),
+    ("the count of repeated concepts", both(M2, "empat hal yang sudah", "lima hal yang sudah"),
+     "says lima repeated concept(s), the lesson map has 4"),
+    ("a repeated concept the map does not list",
+     both("al-fatihah:6:map", "serta na’t (نَعْت)", "serta badal (بَدَل)", "serta نَعْت", "serta بَدَل"),
+     "names ['tanda-irab', 'badal'] as repeated concept(s); the lesson map gives ['tanda-irab', 'naat']"),
+    ("a postponed concept, the wrong ayah", both(M1, "di ayat kedua", "di ayat ketiga"),
+     "says the postponed concepts are taught in ayah 3; the lesson map says ayah 2"),
+    ("one of two postponed concepts, the wrong ayah", both(M2, "di ayat ketujuh", "di ayat keenam"),
+     "says badal is taught in ayah 6; the lesson map says ayah 7"),
+    ("the postponed concepts left out", lambda m, *_: [line(m, M5).__setitem__(k, ". ".join(line(m, M5)[k].split(". ")[:2]) + ".")
+                                                       for k in ("text", "display")],
+     "2 sentence(s); the lesson map has new concepts, repeated ones, postponed ones: 3"),
+    ("the closing's count of new concepts", both("al-fatihah:7:learned", "enam hal baru", "lima hal baru"),
+     "al-fatihah:7:learned: says lima new concept(s), the lesson map has 6"),
+    ("the closing names the new concepts in another order",
+     both("al-fatihah:6:learned", "fi’il amr (فِعْل أَمْر) dan maf’ul bih (مَفْعُول بِه)", "maf’ul bih (مَفْعُول بِه) dan fi’il amr (فِعْل أَمْر)",
+          "فِعْل أَمْر dan مَفْعُول بِه", "مَفْعُول بِه dan فِعْل أَمْر"),
+     "al-fatihah:6:learned: names ['maful-bih', 'fiil-amr'] as new concept(s)"),
+    ("the opening names other new concepts than the closing",
+     both(M3, "satu hal baru: wazan (وَزْن) dan tashrif (تَصْرِيف)", "satu hal baru: na’t (نَعْت)", "satu hal baru: وَزْن dan تَصْرِيف",
+          "satu hal baru: نَعْت"),
+     "al-fatihah:3:learned: names ['wazan-dan-tashrif'], not the new concepts the ayah's map line names (['naat'])"),
+    ("the map's new concepts are not the ayah's concept lines", in_map(lambda mp: map_entry(mp, 3)["new"].clear()),
+     "the lesson map's new concepts [] are not this ayah's concept lines ['wazan-dan-tashrif']"),
+    ("a concept named otherwise than its own caption", in_map(lambda mp: mp["concepts"]["naat"].__setitem__("name", "Sifat (نَعْت)")),
+     "naat is named “Sifat (نَعْت)”, and its own caption does not open with that name"),
+    ("the map names a postponed concept the ayah does not carry", in_map(lambda mp: map_entry(mp, 3)["later"].append("badal")),
+     "later lists badal, which no word or structure group of the ayah carries"),
+    # --- an authored later item (operator 2026-10-13: marfu', shown in ayah 1, taught in ayah 2)
+    ("the authored later item left out of the map line",
+     both(M1, " dan marfu’ (مَرْفُوع)", "", " dan مَرْفُوع", ""),
+     "names ['syibhul-jumlah'] as postponed concept(s); the lesson map gives ['syibhul-jumlah', 'marfu']"),
+    ("the line that teaches an authored later item no longer names it",
+     both("al-fatihah:2:w1:compose:8", "disebut marfu’", "berakhiran marfu’", "disebut مَرْفُوع", "berakhiran مَرْفُوع"),
+     "its teaching line al-fatihah:2:w1:compose:8 does not name “Marfu’ (مَرْفُوع)”"),
+    ("an authored later item pointing at a line that is not there",
+     in_map(lambda mp: mp["concepts"]["marfu"].__setitem__("line", "al-fatihah:2:w1:compose:99")),
+     "its teaching line al-fatihah:2:w1:compose:99 is not in the narration"),
+    ("lesson map changed, narration stale", in_map(lambda mp: mp["concepts"]["naat"].__setitem__("latin", "Sifat pengikut")),
+     "out of date"),
 ]
 
 
@@ -415,8 +520,9 @@ class NarrationValidation(unittest.TestCase):
     def test_compose_lines_follow_the_frames(self):
         lines = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE)["al-fatihah"]
         ids = [lid for lid in lines if lid.startswith("al-fatihah:1:")]
-        # recite → the primer → each word: its gloss line, then its frames' lines (rule 14)
-        self.assertEqual(ids[1:3], ["al-fatihah:1:recite", "al-fatihah:1:primer:1"])
+        # recite → what the ayah brings (the lesson map, plan L23) → the primer → each word: its
+        # gloss line, then its frames' lines (rule 14)
+        self.assertEqual(ids[1:4], ["al-fatihah:1:recite", "al-fatihah:1:map", "al-fatihah:1:primer:1"])
         w1 = ids.index("al-fatihah:1:w1")
         self.assertEqual(ids[w1 + 1], "al-fatihah:1:w1:compose:1")
         comp = COMPOSE["al-fatihah"]["words"]["1:1:1"]
@@ -435,8 +541,9 @@ class NarrationValidation(unittest.TestCase):
         for name, mutate, expect in MUTATIONS:
             with self.subTest(name):
                 m, ls, lx, cp = copy.deepcopy(MANIFESTS), copy.deepcopy(LESSONS), copy.deepcopy(LEXDATA), copy.deepcopy(COMPOSE)
-                mutate(m, ls, lx, cp)
-                errs = run_check(m, ls, lx, cp)
+                mp = copy.deepcopy(LESSONMAP)
+                mutate(m, ls, lx, cp, mp)
+                errs = run_check(m, ls, lx, cp, mp)
                 self.assertTrue(any(expect in e for e in errs), f"{name}: expected {expect!r} in {errs[:5]}")
 
     def test_good_audio_passes(self):
@@ -465,6 +572,147 @@ class NarrationValidation(unittest.TestCase):
         for text in spoken:
             with self.subTest(text):
                 self.assertEqual(V.check_spoken("t", text, FORMS, LEX), [])
+
+
+class LessonMapLines(unittest.TestCase):
+    """The lesson map's two lines per ayah (operator 2026-10-13, plan L23): what they say, that a
+    surah gets them only with its map file, and that a render of them is accepted."""
+
+    C = {  # a made-up map's concepts: names as lessonmap stores them, where each is taught
+        "a": {"name": "Na’t (نَعْت)", "latin": "Na't", "from": "title", "surah": 1, "ayah": 1},
+        "b": {"name": "Badal (بَدَل)", "latin": "Badal", "from": "title", "surah": 1, "ayah": 7},
+        "c": {"name": "Wazan (وَزْن) dan tashrif (تَصْرِيف)", "latin": "Wazan dan tashrif", "from": "title", "surah": 1, "ayah": 3},
+        "d": {"name": "Idhafah (إِضَافَة)", "latin": "Idhafah", "from": "title", "surah": 1, "ayah": 3},
+        "e": {"name": "Hal", "latin": "Hal", "from": "title", "surah": 114, "ayah": 6},
+    }
+
+    def test_wording(self):
+        o = lambda new=(), review=(), later=(): B.map_opening({"new": list(new), "review": list(review), "later": list(later)}, self.C, 1)  # noqa: E731
+        c = lambda new=(), review=(): B.map_closing({"new": list(new), "review": list(review), "later": []}, self.C)  # noqa: E731
+        # the singular, and a name with a "dan" of its own
+        self.assertEqual(o("c"), "Di ayat ini ada satu hal baru: wazan dan tashrif.")
+        self.assertEqual(o("ab"), "Di ayat ini ada dua hal baru: na't dan badal.")
+        self.assertEqual(o("abd"), "Di ayat ini ada tiga hal baru: na't, badal, dan idhafah.")
+        self.assertEqual(o("ac"), "Di ayat ini ada dua hal baru: na't, serta wazan dan tashrif.")
+        # more than three: three are named
+        self.assertEqual(o("abdc"), "Di ayat ini ada empat hal baru, di antaranya na't, badal, dan idhafah.")
+        # repeated concepts: "juga" only beside new ones; more than three: two are named
+        self.assertEqual(o("a", "b"), "Di ayat ini ada satu hal baru: na't. Kita juga mengulang satu hal yang sudah kita pelajari: badal.")
+        self.assertEqual(o((), "abdc"), "Di ayat ini tidak ada hal baru. Kita mengulang empat hal yang sudah kita pelajari, "
+                                        "di antaranya na't dan badal.")
+        # postponed concepts: one ayah, two ayat, another surah, more than three
+        self.assertTrue(o("a", (), "b").endswith("Ada satu hal lagi di ayat ini, yaitu badal, tetapi baru kita bahas di ayat ketujuh."))
+        self.assertTrue(o("a", (), "cd").endswith("Ada dua hal lagi di ayat ini, yaitu wazan dan tashrif, serta idhafah, tetapi baru "
+                                                  "kita bahas di ayat ketiga."))
+        self.assertTrue(o("a", (), "bd").endswith("Ada dua hal lagi di ayat ini, tetapi baru kita bahas nanti: badal di ayat ketujuh "
+                                                  "dan idhafah di ayat ketiga."))
+        self.assertTrue(o("a", (), "be").endswith("Ada dua hal lagi di ayat ini, yaitu badal dan hal, tetapi baru kita bahas nanti."))
+        self.assertTrue(o((), (), "abcd").endswith("Ada empat hal lagi di ayat ini, di antaranya na't dan badal, tetapi baru kita bahas nanti."))
+        # the closing
+        self.assertEqual(c("ab"), "Di ayat ini kita sudah mempelajari dua hal baru: na't dan badal.")
+        self.assertEqual(c("abdc"), "Di ayat ini kita sudah mempelajari empat hal baru, di antaranya na't, badal, dan idhafah.")
+        self.assertEqual(c((), "ab"), "Di ayat ini tidak ada hal baru; kita mengulang dua hal yang sudah kita pelajari.")
+        self.assertEqual(c(), "Di ayat ini tidak ada hal baru.")
+
+    def test_counts_and_names_read_back(self):
+        for n in (0, 1, 9, 10, 11, 12, 19, 20, 21, 40, 99):
+            self.assertEqual(V.count_value(B.num_id(n)), n)
+        self.assertIsNone(V.count_value("banyak"))
+        known = {V._low(c["name"]): cid for cid, c in self.C.items()}
+        self.assertEqual(V.named_concepts("na’t (نَعْت), serta wazan (وَزْن) dan tashrif (تَصْرِيف)", known), [("a", None), ("c", None)])
+        self.assertEqual(V.named_concepts("badal (بَدَل) di ayat ketujuh dan idhafah (إِضَافَة) di ayat ketiga", known, places=True),
+                         [("b", 7), ("d", 3)])
+        self.assertIsNone(V.named_concepts("na’t (نَعْت) dan sifat", known))
+
+    def test_al_fatihah_lines(self):
+        lines = MANIFESTS["al-fatihah"]["lines"]
+        ids = [lid for lid in lines if lid.endswith((":map", ":learned"))]
+        self.assertEqual(ids, [f"al-fatihah:{n}:{p}" for n in range(1, 8) for p in ("map", "learned")])
+        for lid in ids:
+            with self.subTest(lid):
+                ln = lines[lid]
+                self.assertEqual((ln["highlight"], ln["focus"]), ([], None))
+                self.assertNotIn("frame", ln)
+                self.assertLessEqual(len(ln["text"]), V.MAX_LINE)
+                self.assertEqual(V.held(ln["text"], LEX), [], "every Al-Fatihah map line is renderable")
+        # Where each sits: right after the imam's recitation, right before the recap.
+        order = [lid for lid in lines if lid.startswith("al-fatihah:2:")]
+        self.assertEqual(order[order.index("al-fatihah:2:recite") + 1], "al-fatihah:2:map")
+        self.assertEqual(order[order.index("al-fatihah:2:recap") - 1], "al-fatihah:2:learned")
+        # Ayah 1 postpones a Konsep (syibhul jumlah) and an authored item (marfu'), both to ayah 2.
+        self.assertEqual(lines["al-fatihah:1:map"]["display"],
+                         "Di ayat ini ada lima hal baru, di antaranya tiga jenis kalimah (كَلِمَة), i’rab (إِعْرَاب) dan tandanya, "
+                         "serta huruf jar (حَرْف جَرّ). Ada dua hal lagi di ayat ini, yaitu syibhul jumlah (شِبْه الجُمْلَة) dan "
+                         "marfu’ (مَرْفُوع), tetapi baru kita bahas di ayat kedua.")
+
+    def test_only_a_surah_with_a_map_gets_the_lines(self):
+        quiz = V.load_quiz()
+        without = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, {})
+        with_map = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, LESSONMAP)
+        is_map = lambda lid: lid.split(":")[2] in V.MAP_PARTS if lid.count(":") >= 2 and not lid.startswith("shared:") else False  # noqa: E731
+        for name in with_map:
+            added = [lid for lid in with_map[name] if lid not in without[name]]
+            self.assertEqual(len(added), 14 if name == "al-fatihah" else 0, name)
+            self.assertTrue(all(is_map(lid) for lid in added))
+            # … and every other line is what it was without the map, in the same order.
+            self.assertEqual({k: v for k, v in with_map[name].items() if k not in added}, without[name], name)
+            self.assertEqual([k for k in with_map[name] if k not in added], list(without[name]), name)
+
+    def test_another_surah_switched_on(self):
+        # Al-Ikhlas with a map of its own (two of its concepts need an explicit name): its eight
+        # lines are built, repeat Al-Fatihah's concepts, and pass the validator; no other surah moves.
+        import build_map as BM
+        import lessonmap as LM
+        authored = {"al-fatihah": LM.load_authored("al-fatihah"),
+                    "al-ikhlas": {"slug": "al-ikhlas", "names": {"jazm-lam": "Huruf nafi dan jazm"}}}
+        maps = BM.build_all(LESSONS, LIBRARY, LEX, authored)
+        self.assertEqual(maps["al-fatihah"], LESSONMAP["al-fatihah"])
+        self.assertEqual(maps["al-ikhlas"]["concepts"]["jazm-lam"]["from"], "authored")
+        self.assertEqual((maps["al-ikhlas"]["concepts"]["fiil-amr"]["surah"], maps["al-ikhlas"]["concepts"]["fiil-amr"]["ayah"]), (1, 6))
+        quiz = V.load_quiz()
+        built = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, maps)
+        new = [lid for lid in built["al-ikhlas"] if lid not in MANIFESTS["al-ikhlas"]["lines"]]
+        self.assertEqual(new, [f"al-ikhlas:{n}:{p}" for n in range(1, 5) for p in ("map", "learned")])
+        self.assertEqual(built["al-ikhlas"]["al-ikhlas:2:map"]["display"].split(". ")[0], "Di ayat ini tidak ada hal baru")
+        self.assertEqual(built["al-fatihah"], B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, LESSONMAP)["al-fatihah"])
+        m = copy.deepcopy(MANIFESTS)
+        m["al-ikhlas"] = B.manifest(built["al-ikhlas"], m["al-ikhlas"], LEX, FORMS)
+        self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=maps), [])
+
+    def test_rendered_map_lines_pass(self):
+        # With the delivered file's audio and its tokens on each of the 14 lines, the validator
+        # accepts them and a rebuild keeps them (the text did not change). Since the render of
+        # 2026-10-13 the manifest on disk carries the real ones; a line still without audio (a
+        # surah whose map is built before its render) gets a stand-in here, so this holds in both
+        # states. It used to assert the lines had NO audio on disk, a fact about the day it was
+        # written: the first CI run after the render failed on exactly that.
+        m = copy.deepcopy(MANIFESTS)
+        man = m["al-fatihah"]
+        seen = 0
+        for lid, ln in man["lines"].items():
+            if lid.endswith((":map", ":learned")):
+                seen += 1
+                if "audio" not in ln:
+                    ln["audio"] = {"url": V.delivery_url(man["voice"], "al-fatihah", ln["text"], SHA), "ms": len(ln["text"]) * 50 + 500, "sha256": SHA}
+                    ln["tokens"] = fake_tokens(ln["text"])
+        self.assertEqual(seen, 14)
+        self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=LESSONMAP), [])
+        rebuilt = B.manifest(B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, V.load_quiz(), LESSONMAP)["al-fatihah"], man, LEX, FORMS,
+                             V.letters_for("al-fatihah", LESSONS, FORMS, COMPOSE, LIBRARY))
+        self.assertEqual(B.dump(rebuilt), B.dump(man))
+
+    def test_unrendered_map_lines_pass(self):
+        # The same 14 lines BEFORE a render — no audio, no tokens — are caption-only by design and
+        # still valid, whatever the manifest on disk holds today.
+        m = copy.deepcopy(MANIFESTS)
+        stripped = 0
+        for lid, ln in m["al-fatihah"]["lines"].items():
+            if lid.endswith((":map", ":learned")):
+                stripped += 1
+                ln.pop("audio", None)
+                ln.pop("tokens", None)
+        self.assertEqual(stripped, 14)
+        self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=LESSONMAP), [])
 
 
 class Dictionary(unittest.TestCase):
@@ -1390,14 +1638,15 @@ def main() -> int:
     failed += bool(base)
     for name, mutate, expect in MUTATIONS:
         m, ls, lx, cp = copy.deepcopy(MANIFESTS), copy.deepcopy(LESSONS), copy.deepcopy(LEXDATA), copy.deepcopy(COMPOSE)
-        mutate(m, ls, lx, cp)
-        errs = run_check(m, ls, lx, cp)
+        mp = copy.deepcopy(LESSONMAP)
+        mutate(m, ls, lx, cp, mp)
+        errs = run_check(m, ls, lx, cp, mp)
         hit = next((e for e in errs if expect in e), None)
         failed += hit is None
         print(f"{name:{width}s}  {'caught' if hit else 'MISSED'}  {hit or errs[:2]}")
     suite = unittest.TestSuite()
     loader = unittest.defaultTestLoader
-    for cls in (NarrationValidation, Dictionary, WordPlaces, SpeechAndRender):
+    for cls in (NarrationValidation, LessonMapLines, Dictionary, WordPlaces, SpeechAndRender):
         suite.addTests(loader.loadTestsFromTestCase(cls))
     res = unittest.TextTestRunner(verbosity=1, stream=sys.stdout).run(suite)
     print(f"\n{len(MUTATIONS)} planted faults, {len(MUTATIONS) - failed + bool(base)} caught"

@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { leadMeaning, termEmphasis } from "@/lib/emphasis";
+import { leadSpans, meaningSpans, termEmphasis } from "@/lib/emphasis";
 import { conceptHref } from "@/lib/routes";
 import { type HeadTerm, termDisplay, type Token } from "@/lib/terms";
 
@@ -31,11 +31,13 @@ export const HARAKAT_PAGE = "harakat";
  * Qur'anic words is a quotation with nothing glued to it, wrapping right to left in its own box
  * when it is wider than a phone's line.
  *
- * `emphasis` (prose only, never a title or a label; operator 2026-10-11): the meanings after
- * "yang artinya" and the harakah sounds of the text termDisplay builds, and the term tokens
- * named ("disebut marfu’ (مَرْفُوع)", "perubahan itu disebut i'rab" where the title already showed
- * its Arabic), bold (src/lib/emphasis.ts termEmphasis) — after TermText's own styles, so a term's
- * or a Qur'anic word's colour stays as it is and a bold harakah term stays inside its link.
+ * `emphasis` (operator 2026-10-11): on prose, `true` — the meanings and the harakah sounds of the
+ * text termDisplay builds, and the term tokens named ("disebut marfu’ (مَرْفُوع)", "perubahan itu
+ * disebut i'rab" where the title already showed its Arabic), bold (src/lib/emphasis.ts
+ * termEmphasis); on a title or a label, `"meaning"` — its quoted glosses alone ("Idhafah (sandaran
+ * kata: “nama Allah”)", "fa'il tersimpan: “kami”"), forest like every meaning (operator
+ * 2026-10-13, plan L22); on a Kosakata meaning, `"lead"`. After TermText's own styles, so a
+ * term's or a Qur'anic word's colour stays as it is and a bold harakah term stays inside its link.
  */
 export function TermText({
   tokens,
@@ -44,8 +46,9 @@ export function TermText({
 }: {
   tokens: Token[];
   links?: boolean;
-  /** true: termEmphasis; "lead": a Kosakata meaning's lead (leadMeaning, of the text drawn). */
-  emphasis?: boolean | "lead";
+  /** true: termEmphasis; "meaning": the text's meanings alone (meaningSpans); "lead": a Kosakata
+   *  meaning's lead and the glosses after it (leadSpans) — of the text drawn. */
+  emphasis?: boolean | "lead" | "meaning";
 }) {
   const { text, marks } = termDisplay(tokens);
   const overlays = marks.flatMap((m): Overlay[] =>
@@ -65,8 +68,9 @@ export function TermText({
           ]
         : [],
   );
-  const spans = emphasis === "lead" ? leadMeaning(text) : emphasis ? termEmphasis(tokens) : undefined;
-  return <MixedText text={text} overlays={overlays} emphasis={spans} />;
+  const spans =
+    emphasis === "lead" ? leadSpans(text) : emphasis === "meaning" ? meaningSpans(text) : emphasis ? termEmphasis(tokens) : undefined;
+  return <MixedText text={text} overlays={overlays} emphasis={spans} label={emphasis === "meaning"} />;
 }
 
 /**
@@ -84,10 +88,10 @@ export function Prose({
   tokens: Token[] | null;
   plain: string;
   links?: boolean;
-  emphasis?: boolean | "lead";
+  emphasis?: boolean | "lead" | "meaning";
 }) {
   if (tokens) return <TermText tokens={tokens} links={links} emphasis={emphasis} />;
-  const spans = emphasis === "lead" ? leadMeaning(plain) : emphasis ? true : undefined;
+  const spans = emphasis === "lead" ? leadSpans(plain) : emphasis === "meaning" ? "meaning" : emphasis ? true : undefined;
   return <MixedText text={plain} emphasis={spans} />;
 }
 

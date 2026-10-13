@@ -134,7 +134,9 @@ function WhyHarakatRound({
                   optionKey={opt}
                 >
                   <span>
-                    <MixedText text={item.text.get(opt) ?? ""} />
+                    {/* A gloss inside a reason ("huruf jar bi- (“dengan”)") is forest in every
+                        option, right or wrong: it marks a meaning, never the answer (plan L22). */}
+                    <MixedText text={item.text.get(opt) ?? ""} emphasis="meaning" />
                   </span>
                 </OptionButton>
               </li>

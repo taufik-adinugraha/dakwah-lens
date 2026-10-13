@@ -3,14 +3,22 @@
  * written per ayah), in the order a learner meets it:
  *
  *   intro → recite_ayah (imam, whole ayah; mushaf words follow the imam)
+ *   → map (only in a surah with a lesson map, content/map/${slug}.json: what
+ *     this ayah brings — the concepts that are new, the ones repeated from
+ *     earlier ayat, the ones present but taught later — one line, with its
+ *     card on the stage; operator 2026-10-13, plan L23, lessonMap.ts)
  *   → primer (the harakat primer, when content/compose opens this ayah with
  *     it: each mark on a dotted circle, its sound, an example from the ayah)
- *   → for every word: recite_word (imam, that word) + explain (w${n}: the
- *     gloss and the word's why — or, when the word has a composition, the
- *     gloss and the composition's lead) + compose (w${n}:compose, only for a
+ *   → for every word: recite_word (imam, that word — the one time he says
+ *     it, but for the ayah's last word: operator 2026-10-13, plan L24) +
+ *     explain (w${n}: the gloss and the word's why — or, when the word has a
+ *     composition, the gloss and its lead) + compose (w${n}:compose, only for a
  *     word with a composition: one line per sentence of its frames, the
- *     animation in the word card's slot, then the imam recites the word
- *     again; operator 2026-10-10, narration rule 14)
+ *     animation in the word card's slot, the last line over the joined word;
+ *     operator 2026-10-10, narration rule 14) — then straight to the next
+ *     word. The ayah's LAST word alone is recited once more, at the end of its
+ *     composition: its last line says the imam stops on it and what is not
+ *     heard there (composition.ts STOP_NOTE), and no next word follows
  *   → concept (each concept FIRST introduced in this ayah), each followed by
  *     its example step (the concept's example in this ayah, recited by the
  *     imam; operator 2026-10-12, plan L20, examples.ts) → structure
@@ -20,6 +28,8 @@
  *     content/quiz/<slug>.json decides them, and each question's correct
  *     answer has its explanation line, said after "Benar." or "Ini
  *     jawabannya.": operator 2026-10-10)
+ *   → learned (with a lesson map: the new concepts this ayah taught, one
+ *     line, with its card)
  *   → recap (imam again) → next (to ayah + 1) | done (end of the surah)
  *
  * Every step carries its narration line ids (contract in types.ts), the
@@ -32,8 +42,7 @@
  * EXAMPLE BEATS (operator 2026-10-12: "each explanation should be followed by
  * examples (visual + voice)"; which ones: examples.ts lessonExamples) ride on
  * the steps: a compose step's bentuk dasar after the last line of its `base`
- * frame, a word's own recitation after the line that explains its harakah,
- * and a concept's example(s) as an "example" step right after the concept
+ * frame, and a concept's example(s) as an "example" step right after the concept
  * step. A beat has a caption (AutoplayTexts.example) and what the imam
  * recites; no narration line, so no manifest and no render knows of it.
  */
@@ -43,6 +52,7 @@ import type { ComposeInput } from "../composition";
 import { latinSentences, splitCaption, stripArabic } from "../lessonSteps";
 import type { ExampleInput } from "./examples";
 import { canonicalExercises, exerciseProgressId } from "./exercises";
+import type { LessonMapInput } from "./lessonMap";
 import { explainLineId, lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
 import { lineDisplay, lineMarks, lineSegments, lineText, wordRefs } from "./narration";
 import {
@@ -84,6 +94,9 @@ export type SequenceInput = {
   compose?: ComposeInput | null;
   /** This ayah's example beats (examples.ts lessonExamples), when it has any. */
   examples?: readonly ExampleInput[] | null;
+  /** This ayah's lesson map (lessonMap.ts lessonMapInputOf), when its surah has one: then the
+   *  sequence gets its "map" and "learned" steps (plan L23). */
+  map?: LessonMapInput | null;
 };
 
 /** Concepts whose FIRST example lies in `ayahLoc` ("1:2"). Same rule as
@@ -225,6 +238,14 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     }),
   );
 
+  // What this ayah brings, before its words (plan L23): the card on the stage lists the concepts,
+  // so the engine's own caption (a page without narration) gives their counts only.
+  const map = input.map ?? null;
+  if (map) {
+    const counts = { new: map.new.length, review: map.review.length, later: map.later.length };
+    steps.push(step({ id: "map", kind: "map", cues: [cue(p("map"), texts.lessonMap(counts))], guides: [] }));
+  }
+
   const primer = input.compose?.primer;
   if (primer && primer.lines.length) {
     steps.push(
@@ -267,9 +288,6 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
         guides: [card, wordGuide],
         word: wn,
         loc: w.loc,
-        // A word without a composition: the imam recites it again once its line has explained
-        // its harakah (a word with one is recited at the end of its composition step).
-        ...withBeats(comp && comp.lines.length ? [] : beatsOf(`w${wn}`, () => 0)),
       }),
     );
     if (comp && comp.lines.length) {
@@ -281,12 +299,12 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
           id: `w${wn}:compose`,
           kind: "compose",
           cues,
-          // While the imam recites the joined word (after the frames).
-          caption: clean(stripArabic(texts.wordIntro(a))),
           guides: [card, wordGuide],
           word: wn,
           loc: w.loc,
-          recite: { target: "word", word: wn },
+          // The ayah's last word, after the line that says the imam stops on it: recited once
+          // more, that line still the caption. No other composition ends with the imam (L24).
+          ...(comp.stop ? { recite: { target: "word" as const, word: wn } } : {}),
           frames: comp.frames,
           ...withBeats(
             beatsOf(`w${wn}:compose`, (e) => {
@@ -359,6 +377,11 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
         exercise: { key, progressId: exerciseProgressId(lessonKey, key), parts, lead, promptCue, guides, explain },
       }),
     );
+  }
+
+  // … and what it taught, before the imam recites the ayah once more.
+  if (map) {
+    steps.push(step({ id: "learned", kind: "learned", cues: [cue(p("learned"), texts.learned({ new: map.new.length }))], guides: [] }));
   }
 
   steps.push(

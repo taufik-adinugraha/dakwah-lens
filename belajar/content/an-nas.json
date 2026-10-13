@@ -997,7 +997,7 @@
               "point": "Apa arti kata al-waswās di sini?",
               "options": [
                 "nama bagi yang membisikkan (pembisik) — al-Jadwal",
-                "kata benda yang bermakna bisikan (al-waswasah), lalu dipakai untuk setan seakan-akan ia bisikan itu sendiri, karena membisik adalah pekerjaannya; atau yang dimaksud “pemilik bisikan” — az-Zamakhsyari, dinukil Darwisy dan as-Samin"
+                "kata benda yang bermakna “bisikan” (al-waswasah), lalu dipakai untuk setan seakan-akan ia bisikan itu sendiri, karena membisik adalah pekerjaannya; atau yang dimaksud “pemilik bisikan” — az-Zamakhsyari, dinukil Darwisy dan as-Samin"
               ]
             }
           ],
@@ -1091,7 +1091,7 @@
             },
             {
               "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
-              "ref": "jil. 15, hlm. 430 (QS 114, bagian ash-Sharf: al-khannās bentuk mubalaghah dari isim fa'il khanasa, 'bersembunyi, menghilang'; Shamela 22916/5922)",
+              "ref": "jil. 15, hlm. 430 (QS 114, bagian ash-Sharf: al-khannās bentuk mubalaghah dari isim fa'il khanasa, “bersembunyi, menghilang”; Shamela 22916/5922)",
               "url": "https://tafsir.app/aljadwal/114/4"
             },
             {
@@ -2819,7 +2819,7 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:c2ad413ccfcc97d833774096a916bf5b4ba2dfad6f107f851ba1129103cacd00",
-    "authored_words": "authored/an-nas.words.json sha256:97b826e21f12f63bac6fbe9f097b3efca375c6005e5f04401aec386d1779a84d",
+    "authored_words": "authored/an-nas.words.json sha256:4ef1c5caf827de8e704b7e8581e5bfbb3fe0adabc56b7a2a04c14190ddc71dc8",
     "authored_structure": "authored/an-nas.structure.json sha256:7ca6490b3e02bac7aa3ef6b4918fe513609d6d235bbd242f5cac4aaf3c3e2de8",
     "authored_concepts_map": "authored/an-nas.concepts-map.json sha256:247e8cec628d4004061730ffc68423641f3eb088dccf494b9aeeb18cc02433e6",
     "authored_facts": "authored/an-nas.facts.generated.json sha256:2916189ff7df55717be9e386d12fafd9e8399fcd6486ab07fbd6ef5bceb82fff",

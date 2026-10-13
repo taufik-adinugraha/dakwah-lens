@@ -66,8 +66,8 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
           <p className="text-sm font-semibold text-forest">{t("eyebrow")}</p>
           <h1 className="mt-1 font-display text-3xl font-medium">{lex.translit}</h1>
           <p className="mt-1 max-w-prose text-base text-ink-muted">
-            {/* The core meaning it opens with, in forest (operator 2026-10-11; review: the one
-                meaning the page stresses, not a sub-example's gloss further on). */}
+            {/* The core meaning it opens with, in forest (operator 2026-10-11), and every gloss
+                quoted after it (operator 2026-10-13, plan L22: a meaning is always forest). */}
             <Prose tokens={meaning} plain={lex.meaning} emphasis="lead" />
           </p>
         </div>
@@ -107,6 +107,7 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
                 <Prose
                   tokens={rootMeaning ? [{ kind: "text", text: "(" }, ...rootMeaning, { kind: "text", text: ")" }] : null}
                   plain={`(${root.meaning})`}
+                  emphasis="meaning"
                 />
               </span>
             ) : null}

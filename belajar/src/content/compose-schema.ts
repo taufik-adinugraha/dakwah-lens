@@ -67,7 +67,9 @@ export const ComposeFrame = z.object({
   from: z.union([z.string().min(1), z.array(z.string().min(1)).min(2)]).optional(),
   to: z.string().min(1).optional(),
   cause: z.string().min(1).optional(),
-  /** A short Indonesian note on screen (≤ 60 characters). */
+  /** A short Indonesian note on screen (≤ 60 characters). One note is read by the lesson: "imam
+   *  berhenti di sini", on the last frame of an ayah's last word — the imam then recites that
+   *  word once more (src/lib/composition.ts STOP_NOTE; refused on any other frame). */
   note: z.string().min(1).max(60).optional(),
   silent: z.array(z.number().int()).optional(),
   chips: z.array(ComposeChip).optional(),
@@ -112,8 +114,9 @@ export type Primer = z.infer<typeof Primer>;
  * (`loc`), the clip key the lesson plays (`key`: that word, or — a word that starts with hamzat
  * washal mid-ayah — the run with the word before it, with `washal` saying what is heard) and the
  * clip itself, [start, end) of that ayah's streamed recording. Unvoiced: why — "own" (the base
- * form is the lesson word itself, recited at the end of its step), "unattested" (no word of the
- * Qur'an has those bytes), "unheard" (none of its places is heard as shown).
+ * form is the lesson word itself, which the imam recites when its step opens; until 2026-10-13,
+ * plan L24, again at the end of its step, as an ayah's last word still is), "unattested" (no
+ * word of the Qur'an has those bytes), "unheard" (none of its places is heard as shown).
  */
 export const ComposeExample = z.union([
   z

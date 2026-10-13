@@ -289,6 +289,15 @@ export function composeFileProblems(file: ComposeFile, words: ReadonlyMap<string
     const w = words.get(loc);
     if (!w || c.loc !== loc || c.ar !== w) out.push(`compose/${file.slug} ${loc}: not the lesson word's own bytes`);
     out.push(...unitProblems(c, words, `compose/${file.slug} ${loc}`, w ?? null));
+    // The stop note makes the lesson recite the word once more (STOP_NOTE): only on the last
+    // frame of an ayah's last word, with a line of its own.
+    const [surah, ayah, n] = loc.split(":").map(Number);
+    c.frames.forEach((f, i) => {
+      if (f.note !== STOP_NOTE) return;
+      if (i !== c.frames.length - 1 || words.has(`${surah}:${ayah}:${n + 1}`) || !endsOnStop(c)) {
+        out.push(`compose/${file.slug} ${loc}: frame ${i + 1} carries the stop note ("${STOP_NOTE}") but is not the last frame, said over by the last line, of its ayah's last word`);
+      }
+    });
   }
   return out;
 }
@@ -303,9 +312,25 @@ export type ComposeUnitInput = { frames: number; lines: readonly ComposeLineInpu
 export type ComposeInput = {
   /** The harakat primer opening this ayah, if it does. */
   primer: ComposeUnitInput | null;
-  /** By word loc ("1:1:1"). */
-  words: Readonly<Record<string, ComposeUnitInput & { lead?: string }>>;
+  /** By word loc ("1:1:1"). `stop`: the ayah's last word, whose composition ends on the frame
+   *  that says the imam stops on it (endsOnStop). */
+  words: Readonly<Record<string, ComposeUnitInput & { lead?: string; stop?: true }>>;
 };
+
+/**
+ * The note of the frame on which the imam stops: the last frame of the composition of an ayah's
+ * LAST word (content/compose, "whole", the word as the ayah writes it), whose line says what is
+ * heard there ("Ini kata terakhir ayat, dan imam berhenti padanya, jadi kasrah ini hanya terlihat
+ * dalam tulisan, tidak terdengar."). The autoplay lesson lets the imam recite that word once more
+ * right after that line (operator 2026-10-13, plan L24: the one word recited twice) — so the note
+ * is load-bearing: composeFileProblems refuses it anywhere else.
+ */
+export const STOP_NOTE = "imam berhenti di sini";
+
+/** Does this composition end on the stop frame, its last line said over it? */
+export function endsOnStop(c: Pick<Composition, "frames" | "lines">): boolean {
+  return c.frames[c.frames.length - 1]?.note === STOP_NOTE && c.lines[c.lines.length - 1]?.frame === c.frames.length;
+}
 
 const unitInput = (u: Composition | Primer): ComposeUnitInput => ({
   frames: u.frames.length,
@@ -315,10 +340,13 @@ const unitInput = (u: Composition | Primer): ComposeUnitInput => ({
 /** The sequence input for one ayah of a surah's composition file. */
 export function composeInputFor(file: ComposeFile | null | undefined, ayah: { ayah: number; words: readonly { loc: string }[] }): ComposeInput | null {
   if (!file) return null;
-  const words: Record<string, ComposeUnitInput & { lead?: string }> = {};
+  const words: Record<string, ComposeUnitInput & { lead?: string; stop?: true }> = {};
+  const lastLoc = ayah.words[ayah.words.length - 1]?.loc;
   for (const w of ayah.words) {
     const c = file.words[w.loc];
-    if (c) words[w.loc] = c.lead ? { ...unitInput(c), lead: c.lead } : unitInput(c);
+    if (!c) continue;
+    words[w.loc] = c.lead ? { ...unitInput(c), lead: c.lead } : unitInput(c);
+    if (w.loc === lastLoc && endsOnStop(c)) words[w.loc].stop = true;
   }
   const primer = file.primer && file.primer.ayah === ayah.ayah ? unitInput(file.primer) : null;
   return primer || Object.keys(words).length ? { primer, words } : null;

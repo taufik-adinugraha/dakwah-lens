@@ -22,8 +22,8 @@ Exit 1 on any failure. Standard library only. What it enforces (compose.py has t
   draft, Indonesian notes/labels without Arabic script.
 - THE IMAM'S VOICE OF EACH BENTUK DASAR (`examples`; operator 2026-10-12, plan L20; compose.py):
   every `base` frame has exactly one entry and no other frame has one. An entry without a voice
-  says why, truly: "own" (the base form is the lesson word itself, recited at the end of its
-  step), "unattested" (no word of the Qur'an has those bytes) or "unheard". A voiced entry names
+  says why, truly: "own" (the base form is the lesson word itself, recited when its step
+  opens), "unattested" (no word of the Qur'an has those bytes) or "unheard". A voiced entry names
   a place whose bytes are the base form's (the place the form quotes, when it quotes one), HEARD
   as shown: never an ayah's last word (waqf), and a word that starts with hamzat washal mid-ayah
   is played with the word before it, `washal` exactly as derived. Its clip is checked as the

@@ -1,0 +1,14 @@
+{
+  "_comment": "The lesson map of Al-Fatihah (operator 2026-10-13, docs/belajar-plan.md L23: 'at the beginning of the ayat, better to inform what concept we will learn in this ayat … in the end recap what we've learnt'; 'if some concept already done in previous ayat, we say we repeat what we've learnt before'). THIS FILE IS THE PER-SURAH SWITCH: a surah that has authored/<slug>.map.json gets content/map/<slug>.json (build_map.py), two narration lines per ayah (':map' after the imam's recitation, ':learned' before the recap; build_narration.py) and their card on the stage; a surah without it gets none of these and its narration manifest is untouched. Which concepts are new, repeated or taught later is derived from the words' concept tags and each concept's first example (lessonmap.py), never typed here. `names`: concept id -> an explicit short name (prose, at most four words, no Qur'anic word), ONLY for a concept whose 'Konsep baru: …' caption title opens with no clean name; build_map.py stops and names the concept when one is needed. Al-Fatihah needs none: every one of its 26 concepts is named as its caption already names it. `later`: things an ayah shows without explaining that are NOT a Konsep, so the derivation cannot see them (operator 2026-10-13: 'in ayat-1, it mentions \"bentuk tertentu\" but no explanation about marfu' itself, better to inform it will be learnt later'; he means the 'bentuk dasar' lines): {ayah: where it is left unexplained, id: a new id, name: a short name (spoken in the ayah's map line), note: what the learner is left wondering (shown on the card, never spoken), line: the narration line that TEACHES it}. The line must exist, lie in a later ayah and really name the thing ('disebut …' / '… adalah'): the validators refuse a pointer to something no line teaches. Ayah 1 shows that a noun's base form ends in dhammah (1:w1:compose:3, whose last sentence now says so too) and the state is first named in ayah 2: 'Kata yang akhirnya dhammah … disebut marfu’'.",
+  "slug": "al-fatihah",
+  "names": {},
+  "later": [
+    {
+      "ayah": 1,
+      "id": "marfu",
+      "name": "Marfu'",
+      "note": "mengapa bentuk dasar berakhir dhammah",
+      "line": "al-fatihah:2:w1:compose:8"
+    }
+  ]
+}

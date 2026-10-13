@@ -15,13 +15,22 @@
  *   engine's caption part — the display text when the manifest has one —
  *   which the machine times by reading pace.
  * A karaoke caption carries each word's emphasis (operator 2026-10-11,
- * narration rule 18: the meaning after "yang artinya", the term taught, a
- * harakah's sound), found in the line's display text and matched to its
- * words (src/lib/emphasis.ts alignEmphasis) here in the browser: the
- * manifest, the narration and the audio stay as they are. A text caption
- * carries its part's slice of the whole line's emphasis (partEmphasis): a
- * caption emphasises its first meaning, or a quiz answer alone (review
- * 2026-10-11), and a part shown alone must not pick a "first" of its own.
+ * narration rule 18: its meanings, the term taught, a harakah's sound),
+ * found in the line's display text and matched to its words
+ * (src/lib/emphasis.ts alignEmphasis) here in the browser: the manifest,
+ * the narration and the audio stay as they are. A text caption carries its
+ * part's slice of the whole line's emphasis (partEmphasis): a caption
+ * emphasises every meaning of its line (operator 2026-10-13, plan L22; its
+ * first one only until then), a quiz explanation its answer and its
+ * meanings; and what a quotation comes after ("Terjemahannya:") may stand in
+ * the part before, so a part is never read alone.
+ *
+ * A LESSON-MAP line (operator 2026-10-13, plan L23: what an ayah brings, what
+ * it taught) is a list read beside its card, and on a phone the card needs
+ * the room: its karaoke caption shows ONE ≤180-character part at a time —
+ * the part with the word being said, its words lit as on any karaoke caption
+ * (karaokeParts) — as a text caption does, instead of the whole line (ayah
+ * 2's opening is three sentences, a dozen rows on a 390px screen).
  *
  * The mushaf line and the word card (stageMarks): the words the line on
  * screen highlights (the whole ayah for the intro, the recitation lead,
@@ -32,8 +41,11 @@
  *
  * The animation in the word card's slot (stageFrame, operator 2026-10-10,
  * narration rule 14): on a primer or compose step, the frame the line on
- * screen is said over; while the imam recites the joined word after the
- * lines (and in his settle pause), the last frame, "recited".
+ * screen is said over. The last line is said over the last frame — the joined
+ * word — which stays to the step's end. The imam does not recite the word
+ * again there (operator 2026-10-13, plan L24: he said it when its step
+ * opened) — except an ayah's last word, after the line that says he stops on
+ * it: while he recites it (and in his settle pause), the last frame, "recited".
  *
  * An example beat (stageExample; operator 2026-10-12, plan L20: "each
  * explanation should be followed by examples (visual + voice)"): which beat
@@ -53,6 +65,7 @@
  * exercise's own status box says those).
  */
 import {
+  parseLineId,
   partAt,
   viewAutoplay,
   withoutArabic,
@@ -188,6 +201,37 @@ function karaokeEmphasis(cue: Cue): (EmphasisKind | null)[][] {
   return per;
 }
 
+/** The words of a caption text: what a karaoke word's text is counted in (a dictionary term is
+ *  one karaoke word of several: "huruf jar (حَرْف جَرّ),"). */
+const wordCount = (text: string) => text.split(/\s+/u).filter(Boolean).length;
+
+/**
+ * The karaoke words of each caption part of a line, as [from, to) into `words` — or null when
+ * the line is one part, or its words do not line up with its parts (a karaoke word across two
+ * parts, another count of words): then the whole line is shown, as before. The parts are the
+ * cue's own (splitCaption of its display, ≤180 characters, cut at sentence and clause ends); the
+ * karaoke words are that display word for word (the pipeline checks a line's tokens join to it).
+ */
+export function karaokeParts(parts: readonly string[], words: readonly KaraokeWord[]): [number, number][] | null {
+  if (parts.length < 2) return null;
+  const out: [number, number][] = [];
+  let w = 0;
+  for (const part of parts) {
+    const from = w;
+    let left = wordCount(part);
+    while (left > 0 && w < words.length) left -= wordCount(words[w++][0]);
+    if (left !== 0 || w === from) return null;
+    out.push([from, w]);
+  }
+  return w === words.length ? out : null;
+}
+
+/** Is `line` a lesson-map line ("…:map", "…:learned"), whose karaoke caption goes part by part? */
+const byParts = (line: string) => {
+  const id = parseLineId(line);
+  return id?.kind === "ayah" && (id.part === "map" || id.part === "learned");
+};
+
 export function stageCaption(
   seq: AutoplaySequence,
   state: AutoplayState,
@@ -214,6 +258,21 @@ export function stageCaption(
       pos = voice;
     }
     const emph = karaokeEmphasis(cue)[cue.audio.indexOf(seg)] ?? seg.words.map(() => null);
+    // A lesson-map line (one file): the part with the word being said — the first before any
+    // word, the last once all are said — with the karaoke position counted inside it.
+    const cut = byParts(cue.line) && cue.audio.length === 1 ? karaokeParts(cue.parts, seg.words) : null;
+    if (cut) {
+      const at = pos.now >= 0 ? pos.now : Math.min(pos.said, seg.words.length) - 1;
+      const [from, to] = cut.find(([a, b]) => at >= a && at < b) ?? cut[0];
+      return {
+        kind: "karaoke",
+        words: seg.words.slice(from, to),
+        emph: emph.slice(from, to),
+        now: pos.now >= from && pos.now < to ? pos.now - from : -1,
+        said: Math.max(0, Math.min(pos.said, to) - from),
+        voiced: true,
+      };
+    }
     return { kind: "karaoke", words: seg.words, emph, now: pos.now, said: pos.said, voiced: true };
   }
   const parts = cue.display !== null ? cue.parts : splitCaption(cue.spoken ?? cue.caption);
@@ -254,15 +313,15 @@ export function stageMarks(seq: AutoplaySequence, state: AutoplayState): { marke
   // A word step is about its word, the imam reciting it or not.
   if (step.kind === "recite_word" && step.word) return { marked: [step.word], focus: step.word };
   // An example beat: its word when it is this ayah's (lit as the imam recites it), else the word
-  // the step explains. The word card stays for a word's own recitation after its line; a
-  // concept's example has a card of its own (LessonStage), a bentuk dasar its composition.
+  // the step explains. A concept's example has a card of its own (LessonStage), a bentuk dasar
+  // its composition.
   const ex = stageExample(seq, state);
   if (ex) {
     const word = ex.beat.word ?? step.word ?? null;
-    return { marked: word === null ? [] : [word], focus: ex.beat.of === "word" || ex.beat.of === "base" ? (step.word ?? null) : null };
+    return { marked: word === null ? [] : [word], focus: ex.beat.of === "base" ? (step.word ?? null) : null };
   }
   // The imam recites the ayah (and its settle pause): his current word only.
-  // A compose step's recitation is its own word, the composition on screen.
+  // A compose step's recitation (the ayah's last word) is its own word, the composition on screen.
   const here = state.plan[state.at];
   if (state.activity?.kind === "recite" || (here?.t === "settle" && here.after === "recite")) {
     return step.kind === "compose" && step.word ? { marked: [step.word], focus: step.word } : none;
@@ -280,15 +339,18 @@ export function stageMarks(seq: AutoplaySequence, state: AutoplayState): { marke
 }
 
 /** The animation on screen: which step's frames, which frame (1-based), and
- *  whether the imam is reciting the result. */
+ *  whether the imam is reciting the result (the composition of an ayah's last
+ *  word, after its last line; no other step: plan L24). */
 export type StageFrame = { step: "primer" | "compose"; word: number | null; frame: number; recited: boolean };
 
 /**
  * The frame of a primer / compose step to show (null on any other step,
  * before the start and after the end). It follows the plan: the line being
  * said (or the one a shared line like "Kita lanjutkan." comes before), the
- * line that just ended while its settle pause runs, the last frame
- * ("recited") while the imam recites the joined word and after. A step shown
+ * line that just ended while its settle pause runs, and the last frame — a
+ * word's joined form — once the step's lines are through ("Tunggu saya"
+ * waiting for Lanjut): "recited" while the imam recites it and after, on the
+ * one composition that ends with him (an ayah's last word). A step shown
  * paused before its first line shows its first frame.
  */
 export function stageFrame(seq: AutoplaySequence, state: AutoplayState): StageFrame | null {
@@ -310,7 +372,7 @@ export function stageFrame(seq: AutoplaySequence, state: AutoplayState): StageFr
     const a = plan[i];
     return a?.t === "recite" || a?.t === "gap" || (a?.t === "settle" && a.after === "recite");
   };
-  if (state.at >= plan.length) return { step: step.kind, word, frame: last, recited: step.kind === "compose" };
+  if (state.at >= plan.length) return { step: step.kind, word, frame: last, recited: step.recite !== undefined };
   if (reciting(state.at)) return { step: step.kind, word, frame: last, recited: true };
   const here = frameAt(state.at);
   if (here !== null) return { step: step.kind, word, frame: here, recited: false };
@@ -324,6 +386,8 @@ export function stageFrame(seq: AutoplaySequence, state: AutoplayState): StageFr
   for (let i = state.at + 1; i < plan.length; i++) {
     const f = frameAt(i);
     if (f !== null) return { step: step.kind, word, frame: f, recited: false };
+    // "Kita lanjutkan." before the imam's word (resumed there): the joined word, not yet recited.
+    if (reciting(i)) return { step: step.kind, word, frame: last, recited: false };
   }
   return { step: step.kind, word, frame: 1, recited: false };
 }

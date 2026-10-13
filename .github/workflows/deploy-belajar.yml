@@ -108,6 +108,21 @@ jobs:
       - name: Ayah popup — validator planted-fault tests (corpus-free)
         run: python3 pipeline/test_validate_ayat.py --no-corpus
 
+      # The lesson map (operator 2026-10-13, plan L23: an ayah opens by saying what is new, what it
+      # repeats and what it only teaches later, and closes by saying what it taught): per surah
+      # switched on (pipeline/authored/<slug>.map.json; Al-Fatihah), content/map/<slug>.json equals
+      # a fresh build; new is the ayah's concept lines, review really taught earlier, later really
+      # taught later and on the ayah's words; every name is the one its caption opens with; an
+      # authored later item (marfu' in ayah 1) points at a line that exists, in a later ayah, and
+      # names it. What the two narration lines say against the map is the narration validator's
+      # part, below. Stdlib only, no network.
+      - name: Lesson map — up to date
+        run: python3 pipeline/build_map.py --check
+      - name: Lesson map — validate
+        run: python3 pipeline/validate_map.py
+      - name: Lesson map — planted-fault tests
+        run: python3 pipeline/test_validate_map.py
+
       - name: Narration — manifests up to date
         run: python3 pipeline/build_narration.py --check
       - name: Narration — validate manifests

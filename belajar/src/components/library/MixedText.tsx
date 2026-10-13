@@ -1,6 +1,6 @@
 import { Fragment, type ReactNode } from "react";
 
-import { emphasisSpans, type Emphasis, type EmphasisKind } from "@/lib/emphasis";
+import { emphasisSpans, meaningSpans, type Emphasis, type EmphasisKind } from "@/lib/emphasis";
 import { joinUnits, rtlRuns, textUnits, type Seg, type UnitPart } from "@/lib/textUnits";
 
 /**
@@ -40,12 +40,24 @@ const EMPHASIS_CLASS: Record<EmphasisKind, string> = {
   sound: "font-semibold",
 };
 
-/** An emphasis as an overlay: its Latin in a `data-emph` span, a term's Arabic in forest. */
-const emphasisOverlay = (e: Emphasis): Overlay => ({
+/**
+ * A meaning inside a LABEL (emphasis="meaning": a word's role, a structure group, a quiz option, a
+ * scholars' reading, a title): forest, at the label's own weight. Its “…” is the second cue there
+ * (plan L22: quotes AND colour), so colour is still never the only one. Labels sit in the
+ * narrowest columns of the app (a quiz option; a scholars' reading, 202px at Sangat besar on a
+ * phone), where the “…” the rule added already widened one kept piece past its line (CI line
+ * breaks, 2026-10-13: "(“permulaanku”) —", since given a line break of its own in WordCard):
+ * semibold on top would widen every such piece again, so a label's words keep the widths they had.
+ */
+const LABEL_MEANING_CLASS = "text-forest";
+
+/** An emphasis as an overlay: its Latin in a `data-emph` span, a term's Arabic in forest. `label`:
+ *  inside a label (LABEL_MEANING_CLASS). */
+const emphasisOverlay = (e: Emphasis, label = false): Overlay => ({
   from: e.from,
   to: e.to,
   wrap: (children) => (
-    <span data-emph={e.kind} className={EMPHASIS_CLASS[e.kind]}>
+    <span data-emph={e.kind} className={label && e.kind === "meaning" ? LABEL_MEANING_CLASS : EMPHASIS_CLASS[e.kind]}>
       {children}
     </span>
   ),
@@ -207,24 +219,32 @@ function Pieces({ text, at = 0, ov = [] }: { text: string; at?: number; ov?: Ove
  *
  * `emphasis` (operator 2026-10-11: "we can also use bold text or different
  * color to highlight the meanings or important things"): `true` emphasises
- * what the text itself names (src/lib/emphasis.ts: the meaning after "yang
- * artinya", the term being taught, a harakah's sound) — opt-in, on prose a
- * learner reads, never on titles, buttons, chips, references or quiz options;
- * a list of spans emphasises a known slot (a word card's gloss, glossSlot).
- * Drawn as overlays after `overlays`, so the pieces and their breaks stay
- * those of the text alone.
+ * what the text itself names (src/lib/emphasis.ts: its meanings, the term
+ * being taught, a harakah's sound) — opt-in, on prose a learner reads;
+ * `"meaning"` its meanings alone, for a text that is a label more than a
+ * sentence (a word's role, a structure group, a quiz option, a concept's
+ * title): a gloss inside any of them is quoted and forest like every other
+ * (operator 2026-10-13, plan L22), and nothing else of a label is
+ * emphasised. Never on buttons, link chips or references. A list of spans
+ * emphasises a known slot (a word card's gloss, glossSlot). Drawn as
+ * overlays after `overlays`, so the pieces and their breaks stay those of
+ * the text alone.
  */
 export function MixedText({
   text,
   overlays,
   emphasis,
+  label = emphasis === "meaning",
 }: {
   text: string;
   overlays?: readonly Overlay[];
-  emphasis?: true | readonly Emphasis[];
+  emphasis?: true | "meaning" | readonly Emphasis[];
+  /** The spans are a label's meanings (TermText passes its own spans for emphasis="meaning"):
+   *  drawn at the label's weight (LABEL_MEANING_CLASS). Default: true for emphasis="meaning". */
+  label?: boolean;
 }) {
-  const spans = emphasis === true ? emphasisSpans(text) : (emphasis ?? []);
-  const ov = spans.length ? [...(overlays ?? []), ...spans.map(emphasisOverlay)] : overlays;
+  const spans = emphasis === true ? emphasisSpans(text) : emphasis === "meaning" ? meaningSpans(text) : (emphasis ?? []);
+  const ov = spans.length ? [...(overlays ?? []), ...spans.map((e) => emphasisOverlay(e, label))] : overlays;
   return <Pieces text={text} ov={ov} />;
 }
 

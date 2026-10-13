@@ -20,6 +20,7 @@ export * from "./ids";
 export * from "./timing";
 export * from "./exercises";
 export * from "./examples";
+export * from "./lessonMap";
 export * from "./narration";
 export * from "./texts";
 export * from "./sequence";

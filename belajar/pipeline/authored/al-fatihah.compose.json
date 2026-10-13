@@ -57,7 +57,7 @@
            "Bagian kedua adalah sebuah isim, atau kata benda, yang artinya “nama”."
          ]},
         {"stage": "base", "tiles": ["bi", "ismu"], "focus": "ismu",
-         "say": ["Dalam bentuk dasarnya, kata benda ini berakhir dengan dhammah, tanda bunyi u di atas huruf mim."]},
+         "say": ["Dalam bentuk dasarnya, kata benda ini berakhir dengan dhammah, tanda bunyi u di atas huruf mim. Mengapa dhammah, kita pelajari di ayat kedua."]},
         {"stage": "change", "tiles": ["bi", "ismi"], "from": "ismu", "to": "ismi", "cause": "bi",
          "say": [
            "Karena didahului huruf jar, akhirnya berubah: dhammah menjadi kasrah, tanda bunyi i di bawah huruf.",

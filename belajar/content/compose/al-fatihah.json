@@ -440,7 +440,7 @@
         },
         {
           "frame": 2,
-          "say": "Dalam bentuk dasarnya, kata benda ini berakhir dengan dhammah, tanda bunyi u di atas huruf mim."
+          "say": "Dalam bentuk dasarnya, kata benda ini berakhir dengan dhammah, tanda bunyi u di atas huruf mim. Mengapa dhammah, kita pelajari di ayat kedua."
         },
         {
           "frame": 3,
@@ -5322,7 +5322,7 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:2d2c0211f670b8dafbfd208faa39c4500c13d6041719c23bfd1c0fe03d38d153",
+    "authored_compose": "authored/al-fatihah.compose.json sha256:0e862a115e0d24c6875e237428017907247d9c82c3642a437ce3d181aa4f73ab",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }

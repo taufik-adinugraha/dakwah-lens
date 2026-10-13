@@ -20,6 +20,7 @@ import {
 import { composeInput } from "@/lib/compose-content";
 import { SURAHS } from "@/lib/content";
 import { conceptsIntroducedIn } from "@/lib/library";
+import { lessonMapInput } from "@/lib/map-content";
 import { quizAyah } from "@/lib/quiz-content";
 import { SURAH_SLUGS } from "@/lib/routes";
 
@@ -86,6 +87,8 @@ describe("autoplay stage: what the lesson page ships", () => {
             compose: composeInput(s.slug, a),
             // The example beats too (plan L20): the imam and a caption, no narration.
             examples: lessonExamplesFor(s, a).examples,
+            // The lesson map's two steps, in a surah that has one (plan L23).
+            map: lessonMapInput(s.slug, a.ayah),
           });
           expect(JSON.stringify(seq)).toBe(JSON.stringify(direct));
           // Every line the Indonesian stage can speak has its manifest text
@@ -375,6 +378,31 @@ describe("autoplay stage: messages and markers", () => {
     const comp = read("src/components/lesson/WordComposition.tsx");
     for (const marker of ['data-autoplay="composition"', 'data-guide="word-card"', "data-compose-frame", "data-compose-stage"]) expect(comp).toContain(marker);
     expect(read("scripts/ci/screenshots.mjs")).toContain('[data-autoplay="composition"]');
+    // What the browser checks of plan L24 (operator 2026-10-13) find — they cannot be run on a
+    // laptop, so their selectors are pinned here. The joined word's frame is found by its word and
+    // frame number and read from the tiles of the frame on screen (screenshots.mjs composeShots).
+    // Word 1's composition ends there, with no "recited" mark; only the ayah's last word (word 4)
+    // is recited once more, and that is where the check waits for the mark.
+    for (const marker of ["data-compose-word", "data-compose-layer", "data-compose-tile", "data-recited"]) expect(comp).toContain(marker);
+    for (const marker of ["data-mode=", "data-step=", "data-line="]) expect(stage).toContain(marker);
+    const composeCheck = read("scripts/ci/screenshots.mjs");
+    expect(composeCheck).toContain('await advanceTo(`[data-compose-word="1"][data-compose-frame="${lastFrame}"]`);');
+    expect(composeCheck).not.toMatch(/advanceTo\(['"`]\[data-recited/);
+    expect(composeCheck).toContain('await advanceTo(`[data-compose-word="${lastWord}"][data-recited="true"]`);');
+    // The line-break walk measures a word's opening step and a concept's example step PAUSED
+    // (they last about 1.5 s and 3 s now): it finds the opening step by its id and the lesson's
+    // Jeda / Lanjutkan control by its mode.
+    const walk = read("scripts/ci/linebreaks.mjs");
+    expect(walk).toContain(`const MIDDLE = '[data-autoplay="middle"]';`);
+    expect(walk).toContain('getAttribute("data-mode")');
+    const opening = /const WORD_RECITE_STEP = \/(.+)\/;/.exec(walk)?.[1];
+    expect(opening).toBeTruthy();
+    const isOpening = new RegExp(opening ?? "$^");
+    for (const s of SURAHS) {
+      for (const a of s.ayat) {
+        for (const st of stageSequence(s, a, "id").steps) expect([st.id, isOpening.test(st.id)]).toEqual([st.id, st.kind === "recite_word"]);
+      }
+    }
     const header = read("src/components/HeaderControls.tsx");
     for (const marker of ["data-header-menu-toggle", "data-header-menu=", "data-text-size-toggle"]) expect(header).toContain(marker);
     const shots = read("scripts/ci/screenshots.mjs");

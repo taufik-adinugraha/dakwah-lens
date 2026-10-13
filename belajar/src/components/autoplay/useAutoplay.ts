@@ -429,7 +429,10 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
       };
     }
 
-    // The imam: ends when the audio has ended AND minMs has passed.
+    // The imam: ends when the audio has ended AND minMs has passed. minMs is a caption's reading
+    // time where the machine asks for one — a caption-only lesson, an example beat — and 0 for a
+    // word the narrator explains next: that step ends with the imam's word (operator 2026-10-13,
+    // plan L24; it used to hold every word for its caption, five to ten seconds of silence).
     const quiz = activity.target === "word" && activity.inExercise === true;
     let live = true;
     let heard = false;
@@ -473,8 +476,8 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
       reciteLiveRef.current = true;
       ownerRef.current = token;
       if (activity.target === "word") {
-        // No timing for this word in the recording: the step lasts its
-        // reading time only.
+        // No timing for this word in the recording: the activity lasts its
+        // minimum only (a caption's reading time; none where a voice follows).
         if (!p.playWord(activity.word)) heard = true;
       } else if (activity.resume) {
         p.playAll();

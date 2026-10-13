@@ -22,6 +22,7 @@ import { availableExercises, buildAutoplaySequence, lessonExamples, questionNumb
 import { composeFor, composeInput } from "@/lib/compose-content";
 import { SURAHS } from "@/lib/content";
 import { conceptsIntroducedIn, LIBRARY } from "@/lib/library";
+import { lessonMapInput } from "@/lib/map-content";
 import { quizAyah } from "@/lib/quiz-content";
 
 import { narrationFor, SHARED_NARRATION } from "./manifests";
@@ -65,5 +66,9 @@ export function stageSequence(s: SurahContent, a: Ayah, locale: string): Autopla
     // the words' Indonesian explanations.
     compose: composeInput(s.slug, a),
     examples: lessonExamplesFor(s, a).examples,
+    // The lesson map (operator 2026-10-13, plan L23): in a surah that has one (content/map), what
+    // the ayah brings is said after the imam's recitation and what it taught before the recap; on
+    // every locale — the card lists the concepts, the caption follows the narration when there is one.
+    map: lessonMapInput(s.slug, a.ayah),
   });
 }

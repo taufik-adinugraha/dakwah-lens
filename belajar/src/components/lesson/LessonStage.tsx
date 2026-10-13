@@ -31,13 +31,14 @@ import { TextSizeOptions } from "@/components/TextSizeSwitch";
 import type { ComposeFile } from "@/content/compose-schema";
 import type { RecitationSource } from "@/hooks/useSegmentPlayer";
 import { Link } from "@/i18n/navigation";
-import type { AutoplaySequence, StageExample } from "@/lib/autoplay";
+import type { AutoplaySequence, LessonMapInput, StageExample } from "@/lib/autoplay";
 import { glossSlot } from "@/lib/emphasis";
 import { PACES } from "@/lib/lessonSteps";
 import { ayahHref } from "@/lib/routes";
 
 import { MushafLine, type PlayerWord } from "./AyahPlayer";
 import { ExampleCard, type ExampleCardState } from "./ExampleCard";
+import { LessonMapCard } from "./LessonMapCard";
 import { type StageCompose, WordComposition } from "./WordComposition";
 
 /**
@@ -100,6 +101,8 @@ function BarSpotLabel({ label, align = "center" }: { label: string; align?: "cen
 /** Ring of a spotlit control in the controls bar (thick, with a white gap;
  *  never colour alone — the label above names it). */
 const BAR_RING = "ring-4 ring-forest ring-offset-4 ring-offset-white";
+/** The pause / continue button's icon: whole or not drawn, never squeezed (the button's comment). */
+const MIDDLE_ICON = "hidden h-5 w-5 shrink-0 @[8.5rem]:block";
 
 /** The loading mark (operator 2026-10-11, narration rule 19): a turning ring, or with reduced
  *  motion a still dot (senior-ux §3.8). Never the only cue: the words beside it say what loads. */
@@ -191,15 +194,28 @@ function LoadingMark({ className }: { className?: string }) {
  * slot (ExampleCard: "Contoh", the word big, its transliteration and meaning)
  * and the IMAM recites it, the mushaf line lighting it; in a word's
  * composition, when the bentuk dasar is ringed, the imam recites that base
- * form from where it stands in the Qur'an (its tile filled as he does), and
- * the joined word at the end as before — "ismu (read by voice + show visual)
- * … becomes ismi (read by voice + visual)". The beat's caption, in the bottom
+ * form from where it stands in the Qur'an (its tile filled as he does) — "ismu
+ * (read by voice + show visual) … becomes ismi (read by voice + visual)": the
+ * joined word is the lesson's own, recited when its step opens and not again at
+ * the end, except an ayah's last word, after the line that says the imam stops
+ * on it (operator 2026-10-13, plan L24). The beat's caption, in the bottom
  * panel, says what is shown and what is heard ("Contoh: ismu, di QS 55:78 … :
  * bersama kata sebelumnya terdengar “tabārakasmu”."); the narrator says
  * nothing. A clip that takes long shows "Memuat bacaan imam…" like any
  * recitation; one that does not come is given up after a few seconds — the
  * example stays a moment with "Suara contoh ini belum bisa diputar." and the
  * lesson goes on by itself (never a dead stop).
+ *
+ * THE LESSON MAP (operator 2026-10-13: "at the beginning of the ayat, better to
+ * inform what concept we will learn in this ayat … in the end recap what we've
+ * learnt"; "if some concept already done in previous ayat, we say we repeat
+ * what we've learnt before"; plan L23; src/lib/autoplay/lessonMap.ts): in a
+ * surah that has one, the step after the imam's recitation ("map") says what
+ * the ayah brings and the step before the recap ("learned") what it taught.
+ * While either is on, its card sits in the word card's slot (LessonMapCard:
+ * "Baru di ayat ini", "Mengulang" and "Nanti", each concept with its ayah; then
+ * "Sudah dipelajari" with a tick per concept): the narrator names a few, the
+ * card lists every one. No word of the mushaf line is marked meanwhile.
  */
 export function LessonStage({
   seq,
@@ -214,6 +230,7 @@ export function LessonStage({
   compose = null,
   examples = {},
   marks = null,
+  lessonMap = null,
 }: {
   seq: AutoplaySequence;
   /** Page title, also the lock-screen title (Media Session). */
@@ -236,6 +253,8 @@ export function LessonStage({
   examples?: Readonly<Record<string, StageExample>>;
   /** The marks an example can name with its sound (content/compose `marks`), if the surah has them. */
   marks?: ComposeFile["marks"] | null;
+  /** This ayah's lesson map (content/map: what is new, repeated, taught later), if the surah has one. */
+  lessonMap?: LessonMapInput | null;
 }) {
   const t = useTranslations("Guided");
   const tp = useTranslations("Player");
@@ -301,6 +320,8 @@ export function LessonStage({
   const beat = live ? ap.example : null;
   const beatState: ExampleCardState | null = beat ? (beat.failed ? "failed" : beat.reciting ? "reciting" : "shown") : null;
   const beatDrawing = beat ? examples[beat.beat.id] : undefined;
+  // The lesson map's card (plan L23): on its two steps, in the word card's slot.
+  const mapKind = live && lessonMap && (step.kind === "map" || step.kind === "learned") ? step.kind : null;
   const showMushaf = !started || (live && !spec);
   const spotGuides = spec ? state.guides.filter((g) => g.target.startsWith("exercise:")) : [];
   const skipGuide = view.showSkip ? state.guides.find((g) => g.target === "skip") : undefined;
@@ -698,6 +719,8 @@ export function LessonStage({
               />
             ) : beat && beatState && beatDrawing && beat.beat.of === "concept" ? (
               <ExampleCard id={beat.beat.id} example={beatDrawing} state={beatState} marks={marks} />
+            ) : mapKind && lessonMap ? (
+              <LessonMapCard map={lessonMap} kind={mapKind} />
             ) : focusWord ? (
               <div
                 data-guide="word-card"
@@ -897,7 +920,9 @@ export function LessonStage({
             {/* Phones, row 1: play / pause 3 : replay 2 (the replay a little wider than its word
                 needs, operator 2026-10-11). From sm the row dissolves into the 4-column grid. */}
             <div className="grid grid-cols-[3fr_2fr] items-center gap-3 sm:contents">
-              <div className="relative min-w-0 sm:order-2">
+              {/* A size container: the button's icon is drawn only where the button has room for it
+                  beside its longest label (below). */}
+              <div className="@container relative min-w-0 sm:order-2">
                 {lanjutGuide && <BarSpotLabel label={lanjutGuide.label} />}
                 <button
                   ref={focusOnMount}
@@ -906,14 +931,22 @@ export function LessonStage({
                   data-mode={middle}
                   data-guide={middle === "lanjut" ? "lanjut" : undefined}
                   onClick={onMiddle}
-                  className={clsx("btn-primary w-full min-h-14!", lanjutGuide && BAR_RING)}
+                  // Almost no side padding on a phone (the label is centred in a wide pill either
+                  // way), and the icon only from 8.5rem of button: paused at the largest text size
+                  // the button is 6.6rem wide and "Lanjutkan" alone takes 5.7rem of it. With the
+                  // default padding the label stuck out of the button; with less padding it fitted
+                  // only because the icon, free to shrink, was squeezed to a dot (the line-break
+                  // check once it measured a paused lesson, then its screenshots: CI 2026-10-13).
+                  // Icon, gap, label and padding need 8rem, so from 8.5rem the icon is whole
+                  // (shrink-0), and below it the label stands alone.
+                  className={clsx("btn-primary w-full min-h-14! px-1! sm:px-6!", lanjutGuide && BAR_RING)}
                 >
                   {middle === "pause" ? (
-                    <Pause aria-hidden className="h-5 w-5" />
+                    <Pause aria-hidden className={MIDDLE_ICON} />
                   ) : middle === "lanjut" ? (
-                    <ChevronRight aria-hidden className="h-5 w-5" />
+                    <ChevronRight aria-hidden className={MIDDLE_ICON} />
                   ) : (
-                    <Play aria-hidden className="h-5 w-5" />
+                    <Play aria-hidden className={MIDDLE_ICON} />
                   )}
                   {middleLabel}
                 </button>

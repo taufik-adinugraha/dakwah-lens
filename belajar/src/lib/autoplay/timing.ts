@@ -3,8 +3,25 @@
  * pace (captionMs, senior-ux §3.5: 10 / 6 characters per second after a
  * settle time, no upper cap); with audio it follows the audio and adds a
  * short settle pause. "Tunggu saya" never moves on by itself (WCAG 2.2.1).
+ *
+ * WHAT THE IMAM'S WORD WAITS FOR (operator 2026-10-13: "why there is rather long
+ * pause when reciting verses word by word? loading issue?"; plan L24). It was
+ * no loading: every recitation of one word was held for the reading time of
+ * the caption under it, a rule from before the narration had a voice — a
+ * one-second word, then five to ten seconds of silence. Now:
+ *  - a word's opening step ("w${n}:recite") in a narrated lesson lasts as long
+ *    as the imam's word and the pause after him: its caption only names the
+ *    word the card shows, and the narrator speaks next. Where the word's line
+ *    has no voice (a caption-only lesson, or its audio failed this visit) the
+ *    caption is all the learner has, and keeps its reading time (readMs);
+ *  - the ayah's last word, recited once more after the last line of its
+ *    composition, lasts as long as the imam's word and the pause after him in
+ *    every lesson: that line stays the caption, so nothing new is to be read;
+ *  - an example beat's caption is text the narrator never says, so it keeps a
+ *    reading time — the reading alone (exampleReadMs): no settle for the eyes
+ *    and no five-second floor.
  */
-import { captionMs, type AutoPace, type Pace } from "../lessonSteps";
+import { captionMs, readingMs, type AutoPace, type Pace } from "../lessonSteps";
 
 /** Reading pace used for a timed caption under any pace setting. "Tunggu
  *  saya" holds narration captions for "Lanjut", but the short lines that are
@@ -14,6 +31,23 @@ export const readPace = (pace: Pace): AutoPace => (pace === "pelan" ? "pelan" : 
 /** How long a caption stays when no narration audio plays it. */
 export function readMs(text: string, pace: Pace): number {
   return captionMs(text, readPace(pace));
+}
+
+/**
+ * How long an example beat's card stays at least, from the moment it appears (the imam's clip
+ * plays inside that time; the pause after him follows): its caption's reading time at the lesson's
+ * reading pace, 10 characters a second at Biasa and 6 at Pelan (senior-ux §3.5), and nothing more.
+ * The captions come in two lengths (measured over the four surahs, 2026-10-13): a label of 23–32
+ * characters beside a card that already shows the word ("Contoh: kata ke-1, bismi.": 2.5 s at
+ * Biasa, 4.2 s at Pelan; captionMs held it 5.0 s and 7.2 s), and a label with a note on what is
+ * heard, 97–112 characters (a waqf or hamzat-washal note: 9.7–11.2 s at Biasa, 16.2–18.7 s at
+ * Pelan; it was 12.2–13.7 s and 19.2–21.7 s). Never shorter than the clip and the pause after it:
+ * the runner ends a recitation only once its sound has ended as well. "Tunggu saya" reads at
+ * Biasa wherever it is timed at all (readPace); the machine gives it no minimum (it waits for
+ * "Lanjut" at the step's end).
+ */
+export function exampleReadMs(text: string, pace: Pace): number {
+  return readingMs(text, readPace(pace));
 }
 
 /** Pause after a narration line ends, before the next thing starts. */

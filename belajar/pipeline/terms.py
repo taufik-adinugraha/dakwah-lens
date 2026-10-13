@@ -665,6 +665,12 @@ BARE_QUOTE_OK = {
     "structure[1:4].groups[0].label",
     "structure[1:6].summary",
     "structure[1:7].groups[2].label",
+    # Recorded too (al-fatihah:7:ex:sort-case:2:why, :ex:label-role:3:why say "akhiran, Engkau,
+    # pelakunya,"): its gloss was in straight quotes, which this check never saw; made “…” with
+    # every other meaning (plan L22, 2026-10-13), the words unchanged. Named as build_surah.py and
+    # as validate_terms.py name a word's field.
+    "words[1:7:3].why",
+    "content/al-fatihah.json words[1:7:3].why",
 }
 _BARE_QUOTE = re.compile(r"\[\[[^\[\]|]+\|q:[^\[\]]+\]\],? \(?“")
 _BERARTI = re.compile(r"\[\[[^\[\]|]+\|q:[^\[\]]+\]\],? \(?berarti\b", re.I)

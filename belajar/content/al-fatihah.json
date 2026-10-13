@@ -40,8 +40,8 @@
             {
               "point": "Bismi bergantung pada kata yang tersirat; yang mana? (Darwisy menilai kedua pendapat ini baik)",
               "options": [
-                "Kata kerja tersirat seperti abtadi’u ('aku memulai'), sehingga jar-majrur ini berkedudukan nashab — Darwisy; an-Nahhas menisbatkan pendapat ini kepada al-Farra' (Kufah)",
-                "Khabar tersirat bagi mubtada' tersirat ibtidā’ī ('permulaanku') — al-Jadwal, al-Mujtaba, Darwisy; an-Nahhas menisbatkannya kepada ulama Bashrah"
+                "Kata kerja tersirat seperti abtadi’u (“aku memulai”), sehingga jar-majrur ini berkedudukan nashab — Darwisy; an-Nahhas menisbatkan pendapat ini kepada al-Farra' (Kufah)",
+                "Khabar tersirat bagi mubtada' tersirat ibtidā’ī (“permulaanku”) — al-Jadwal, al-Mujtaba, Darwisy; an-Nahhas menisbatkannya kepada ulama Bashrah"
               ]
             }
           ],
@@ -86,8 +86,8 @@
               {
                 "point": "[[Bismi|q:1:1:1]] bergantung pada kata yang tersirat; yang mana? (Darwisy menilai kedua pendapat ini baik)",
                 "options": [
-                  "Kata kerja tersirat seperti abtadi’u ('aku memulai'), sehingga [[jar-majrur|jar-majrur]] ini berkedudukan [[nashab|nashab]] — Darwisy; an-Nahhas menisbatkan pendapat ini kepada al-Farra' (Kufah)",
-                  "[[Khabar|khabar]] tersirat bagi [[mubtada'|mubtada]] tersirat ibtidā’ī ('permulaanku') — al-Jadwal, al-Mujtaba, Darwisy; an-Nahhas menisbatkannya kepada ulama Bashrah"
+                  "Kata kerja tersirat seperti abtadi’u (“aku memulai”), sehingga [[jar-majrur|jar-majrur]] ini berkedudukan [[nashab|nashab]] — Darwisy; an-Nahhas menisbatkan pendapat ini kepada al-Farra' (Kufah)",
+                  "[[Khabar|khabar]] tersirat bagi [[mubtada'|mubtada]] tersirat ibtidā’ī (“permulaanku”) — al-Jadwal, al-Mujtaba, Darwisy; an-Nahhas menisbatkannya kepada ulama Bashrah"
                 ]
               }
             ]
@@ -255,7 +255,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "Akhirnya [[kasrah|kasrah]] karena menjadi [[sifat|sifat]] kedua bagi lafaz Allah, sehingga ikut [[majrur|majrur]].",
+            "why": "Akhirnya [[kasrah|kasrah]] karena menjadi [[sifat|naat]] kedua bagi lafaz Allah, sehingga ikut [[majrur|majrur]].",
             "role": "[[na't|naat]] (sifat) kedua",
             "sign": "[[kasrah|kasrah]]",
             "wazn": "فَعِيل",
@@ -348,7 +348,7 @@
           },
           {
             "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
-            "ref": "QS 1:1 (menurut al-Farra' kedudukannya nashab dengan makna 'aku memulai'; menurut ulama Bashrah rafa' dengan makna 'permulaanku'; halaman cetak belum diverifikasi)",
+            "ref": "QS 1:1 (menurut al-Farra' kedudukannya nashab dengan makna “aku memulai”; menurut ulama Bashrah rafa' dengan makna “permulaanku”; halaman cetak belum diverifikasi)",
             "url": "https://tafsir.app/iraab-alnahas/1/1"
           },
           {
@@ -358,7 +358,7 @@
           },
           {
             "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
-            "ref": "hlm. 495–496 (al-Bab ats-Tsani, contoh kedelapan: jumlah basmalah ismiyyah bila diperkirakan ibtidā’ī, pendapat Bashrah; fi'liyyah bila diperkirakan 'aku memulai', pendapat Kufah)",
+            "ref": "hlm. 495–496 (al-Bab ats-Tsani, contoh kedelapan: jumlah basmalah ismiyyah bila diperkirakan ibtidā’ī, pendapat Bashrah; fi'liyyah bila diperkirakan “aku memulai”, pendapat Kufah)",
             "url": "https://shamela.ws/book/6972/483"
           },
           {
@@ -508,7 +508,7 @@
             "state": "majrur",
             "sign": "kasrah"
           },
-          "why": "Akhirnya kasrah karena didahului huruf jar li-; jar-majrur ini bergantung pada khabar yang tidak disebut (misalnya 'tetap').",
+          "why": "Akhirnya kasrah karena didahului huruf jar li-; jar-majrur ini bergantung pada khabar yang tidak disebut (misalnya “tetap”).",
           "lemma_id": "allah",
           "concepts": [
             "huruf-jar",
@@ -558,7 +558,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "Akhirnya [[kasrah|kasrah]] karena didahului [[huruf jar|huruf-jar]] [[li-|q:1:2:2/1]]; [[jar-majrur|jar-majrur]] ini bergantung pada [[khabar|khabar]] yang tidak disebut (misalnya 'tetap').",
+            "why": "Akhirnya [[kasrah|kasrah]] karena didahului [[huruf jar|huruf-jar]] [[li-|q:1:2:2/1]]; [[jar-majrur|jar-majrur]] ini bergantung pada [[khabar|khabar]] yang tidak disebut (misalnya “tetap”).",
             "role": "[[khabar|khabar]] ([[jar-majrur|jar-majrur]])",
             "sign": "[[kasrah|kasrah]]",
             "ikhtilaf": [
@@ -824,7 +824,7 @@
           },
           {
             "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
-            "ref": "QS 1:2 (khabar yang dibuang diperkirakan 'tetap' atau 'wajib'; rabbi na't, dalam catatan: atau badal; jumlah ini ibtida'iyyah, tidak punya kedudukan i'rab; halaman cetak belum diverifikasi)",
+            "ref": "QS 1:2 (khabar yang dibuang diperkirakan “tetap” atau “wajib”; rabbi na't, dalam catatan: atau badal; jumlah ini ibtida'iyyah, tidak punya kedudukan i'rab; halaman cetak belum diverifikasi)",
             "url": "https://tafsir.app/aljadwal/1/2"
           },
           {
@@ -929,7 +929,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "Akhirnya [[kasrah|kasrah]] karena sekali lagi menjadi [[sifat|sifat]] bagi lafaz Allah yang [[majrur|majrur]].",
+            "why": "Akhirnya [[kasrah|kasrah]] karena sekali lagi menjadi [[sifat|naat]] bagi lafaz Allah yang [[majrur|majrur]].",
             "role": "[[na't|naat]] (sifat)",
             "sign": "[[kasrah|kasrah]]",
             "wazn": "فَعْلان",
@@ -1001,7 +1001,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "Akhirnya [[kasrah|kasrah]] karena menjadi [[sifat|sifat]] berikutnya bagi lafaz Allah yang [[majrur|majrur]].",
+            "why": "Akhirnya [[kasrah|kasrah]] karena menjadi [[sifat|naat]] berikutnya bagi lafaz Allah yang [[majrur|majrur]].",
             "role": "[[na't|naat]] (sifat)",
             "sign": "[[kasrah|kasrah]]",
             "wazn": "فَعِيل",
@@ -1080,7 +1080,7 @@
         "status": "draft",
         "marked": {
           "type": "lanjutan jumlah ayat 2 ([[na't|naat]])",
-          "summary": "Ayat ini bukan kalimat baru: [[ar-raḥmāni|q:1:3:1]] dan [[ar-raḥīmi|q:1:3:2]] adalah dua [[sifat|sifat]] lagi bagi lafaz Allah di ayat 2, maka keduanya ikut [[majrur|majrur]] (berakhiran [[kasrah|kasrah]]). Al-Jadwal dan as-Samin juga membolehkan keduanya dibaca sebagai [[badal|badal]].",
+          "summary": "Ayat ini bukan kalimat baru: [[ar-raḥmāni|q:1:3:1]] dan [[ar-raḥīmi|q:1:3:2]] adalah dua [[sifat|naat]] lagi bagi lafaz Allah di ayat 2, maka keduanya ikut [[majrur|majrur]] (berakhiran [[kasrah|kasrah]]). Al-Jadwal dan as-Samin juga membolehkan keduanya dibaca sebagai [[badal|badal]].",
           "groups": [
             "[[ar-raḥmāni|q:1:3:1]], [[ar-raḥīmi|q:1:3:2]]: dua [[na't|naat]] bagi lafaz Allah di ayat 2"
           ]
@@ -1157,7 +1157,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "Akhirnya [[kasrah|kasrah]] karena menjadi [[sifat|sifat]] keempat bagi lafaz Allah.",
+            "why": "Akhirnya [[kasrah|kasrah]] karena menjadi [[sifat|naat]] keempat bagi lafaz Allah.",
             "role": "[[na't|naat]] (sifat)",
             "sign": "[[kasrah|kasrah]]",
             "wazn": "فَاعِل",
@@ -1364,7 +1364,7 @@
         "status": "draft",
         "marked": {
           "type": "lanjutan jumlah ayat 2 ([[na't|naat]] + rangkaian [[idhafah|idhafah]])",
-          "summary": "Ayat ini masih melanjutkan ayat 2: [[māliki|q:1:4:1]] adalah [[sifat|sifat]] berikutnya bagi lafaz Allah (Darwisy menyebutnya [[sifat|sifat]] keempat), lalu ia disandarkan kepada [[yaumi|q:1:4:2]], dan [[yaumi|q:1:4:2]] disandarkan kepada [[ad-dīni|q:1:4:3]]. Inilah rangkaian [[idhafah|idhafah]] tiga kata: [[yaumi|q:1:4:2]] dan [[ad-dīni|q:1:4:3]] sama-sama [[mudhaf ilaih|mudhaf-ilaih]], maka keduanya berakhiran [[kasrah|kasrah]].",
+          "summary": "Ayat ini masih melanjutkan ayat 2: [[māliki|q:1:4:1]] adalah [[sifat|naat]] berikutnya bagi lafaz Allah (Darwisy menyebutnya [[sifat|naat]] keempat), lalu ia disandarkan kepada [[yaumi|q:1:4:2]], dan [[yaumi|q:1:4:2]] disandarkan kepada [[ad-dīni|q:1:4:3]]. Inilah rangkaian [[idhafah|idhafah]] tiga kata: [[yaumi|q:1:4:2]] dan [[ad-dīni|q:1:4:3]] sama-sama [[mudhaf ilaih|mudhaf-ilaih]], maka keduanya berakhiran [[kasrah|kasrah]].",
           "groups": [
             "rangkaian [[idhafah|idhafah]]: [[māliki|q:1:4:1]] → [[yaumi|q:1:4:2]] → [[ad-dīni|q:1:4:3]] (“Pemilik hari pembalasan”)"
           ]
@@ -1392,7 +1392,7 @@
             "sign": "fathah",
             "mahall": "mahall nashb"
           },
-          "why": "Kata ganti ini mabni di atas fathah (akhirnya tetap) dan berkedudukan nashab sebagai objek yang didahulukan, sehingga bermakna 'hanya kepada-Mu'.",
+          "why": "Kata ganti ini mabni di atas fathah (akhirnya tetap) dan berkedudukan nashab sebagai objek yang didahulukan, sehingga bermakna “hanya kepada-Mu”.",
           "lemma_id": "iyya",
           "concepts": [
             "murab-mabni",
@@ -1439,7 +1439,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "Kata ganti ini [[mabni|mabni]] di atas [[fathah|fathah]] (akhirnya tetap) dan berkedudukan [[nashab|nashab]] sebagai objek yang didahulukan, sehingga bermakna 'hanya kepada-Mu'.",
+            "why": "Kata ganti ini [[mabni|mabni]] di atas [[fathah|fathah]] (akhirnya tetap) dan berkedudukan [[nashab|nashab]] sebagai objek yang didahulukan, sehingga bermakna “hanya kepada-Mu”.",
             "role": "[[maf'ul bih|maful-bih]] (didahulukan)",
             "sign": "[[fathah|fathah]]",
             "ikhtilaf": [
@@ -1470,7 +1470,7 @@
             "state": "marfu",
             "sign": "dhammah"
           },
-          "why": "Akhirnya dhammah karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya tersirat, yaitu 'kami'.",
+          "why": "Akhirnya dhammah karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya tersirat, yaitu “kami”.",
           "lemma_id": "abada",
           "concepts": [
             "kalimah-isim-fiil-huruf",
@@ -1509,7 +1509,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "Akhirnya [[dhammah|dhammah]] karena [[fi'il mudhari'|fiil-mudhari]] ini tidak didahului huruf [[penashab|nashib]] atau [[penjazm|jazim]]; pelakunya tersirat, yaitu 'kami'.",
+            "why": "Akhirnya [[dhammah|dhammah]] karena [[fi'il mudhari'|fiil-mudhari]] ini tidak didahului huruf [[penashab|nashib]] atau [[penjazm|jazim]]; pelakunya tersirat, yaitu “kami”.",
             "role": "[[fi'il mudhari'|fiil-mudhari]] ([[fa'il|fail]] tersimpan: “kami”)",
             "sign": "[[dhammah|dhammah]]",
             "wazn": "نَفْعُلُ",
@@ -1530,7 +1530,7 @@
             "sign": "fathah",
             "mahall": "mahall nashb"
           },
-          "why": "Wawu adalah huruf 'athaf, dan iyyāka (mabni di atas fathah, berkedudukan nashab) diulang sebagai objek yang didahulukan bagi nasta‘īnu agar makna 'hanya' melekat pada kedua perbuatan.",
+          "why": "Wawu adalah huruf 'athaf, dan iyyāka (mabni di atas fathah, berkedudukan nashab) diulang sebagai objek yang didahulukan bagi nasta‘īnu agar makna “hanya” melekat pada kedua perbuatan.",
           "lemma_id": "iyya",
           "concepts": [
             "dhamir",
@@ -1576,7 +1576,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "[[Wawu|q:1:5:3#1]] adalah [[huruf 'athaf|huruf-athaf]], dan [[iyyāka|q:1:5:3/2]] ([[mabni|mabni]] di atas [[fathah|fathah]], berkedudukan [[nashab|nashab]]) diulang sebagai objek yang didahulukan bagi [[nasta‘īnu|q:1:5:4]] agar makna 'hanya' melekat pada kedua perbuatan.",
+            "why": "[[Wawu|q:1:5:3#1]] adalah [[huruf 'athaf|huruf-athaf]], dan [[iyyāka|q:1:5:3/2]] ([[mabni|mabni]] di atas [[fathah|fathah]], berkedudukan [[nashab|nashab]]) diulang sebagai objek yang didahulukan bagi [[nasta‘īnu|q:1:5:4]] agar makna “hanya” melekat pada kedua perbuatan.",
             "role": "[[huruf 'athaf|huruf-athaf]] + [[maf'ul bih|maful-bih]] (didahulukan)",
             "sign": "[[fathah|fathah]]",
             "ikhtilaf": [
@@ -1727,7 +1727,7 @@
         "sources": [
           {
             "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
-            "ref": "jil. 1, hlm. 14 (iyyāka dhamir munfashil, mahall nashb, maf'ul bih yang didahulukan untuk pengkhususan; na‘budu fi'il mudhari', pelakunya tersimpan, 'kami'; wa iyyāka nasta‘īnu di-'athaf-kan pada iyyāka na‘budu)",
+            "ref": "jil. 1, hlm. 14 (iyyāka dhamir munfashil, mahall nashb, maf'ul bih yang didahulukan untuk pengkhususan; na‘budu fi'il mudhari', pelakunya tersimpan, “kami”; wa iyyāka nasta‘īnu di-'athaf-kan pada iyyāka na‘budu)",
             "url": "https://tafsir.app/iraab-aldarweesh/1/5"
           },
           {
@@ -1806,7 +1806,7 @@
             "state": "mabni",
             "sign": "dibuangnya huruf 'illah (ya')"
           },
-          "why": "Fi'il amr yang bermakna doa ini mabni dengan dibuangnya huruf ya' di akhir; pelakunya tersirat ('Engkau'), dan -nā ('kami') adalah objeknya.",
+          "why": "Fi'il amr yang bermakna doa ini mabni dengan dibuangnya huruf ya' di akhir; pelakunya tersirat (“Engkau”), dan -nā, yang artinya “kami”, adalah objeknya.",
           "lemma_id": "hada",
           "concepts": [
             "dhamir",
@@ -1844,7 +1844,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "[[Fi'il amr|fiil-amr]] yang bermakna doa ini [[mabni|mabni]] dengan dibuangnya huruf ya' di akhir; pelakunya tersirat ('Engkau'), dan [[-nā|q:1:6:1/2]] ('kami') adalah objeknya.",
+            "why": "[[Fi'il amr|fiil-amr]] yang bermakna doa ini [[mabni|mabni]] dengan dibuangnya huruf ya' di akhir; pelakunya tersirat (“Engkau”), dan [[-nā|q:1:6:1/2]], yang artinya “kami”, adalah objeknya.",
             "role": "[[fi'il amr|fiil-amr]] (doa) + [[maf'ul bih|maful-bih]] pertama ([[-nā|q:1:6:1/2]]); [[fa'il|fail]] tersimpan: “Engkau”",
             "sign": "dibuangnya [[huruf 'illah|huruf-illah]] (ya')",
             "wazn": "افْعِنا",
@@ -1978,7 +1978,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "Akhirnya [[fathah|fathah]] karena menjadi [[sifat|sifat]] bagi [[aṣ-ṣirāṭa|q:1:6:2]] yang [[manshub|manshub]].",
+            "why": "Akhirnya [[fathah|fathah]] karena menjadi [[sifat|naat]] bagi [[aṣ-ṣirāṭa|q:1:6:2]] yang [[manshub|manshub]].",
             "role": "[[na't|naat]] (sifat)",
             "sign": "[[fathah|fathah]]",
             "wazn": "مُسْتَفْعِل",
@@ -2042,7 +2042,7 @@
         "sources": [
           {
             "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
-            "ref": "jil. 1, hlm. 14 (ihdinā fi'il amr bermakna doa; -nā maf'ul bih; pelakunya tersimpan, 'Engkau'; aṣ-ṣirāṭa maf'ul bih kedua)",
+            "ref": "jil. 1, hlm. 14 (ihdinā fi'il amr bermakna doa; -nā maf'ul bih; pelakunya tersimpan, “Engkau”; aṣ-ṣirāṭa maf'ul bih kedua)",
             "url": "https://tafsir.app/iraab-aldarweesh/1/6"
           },
           {
@@ -2067,7 +2067,7 @@
           },
           {
             "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
-            "ref": "QS 1:6 (pelaku tersimpan, 'Engkau'; -nā maf'ul pertama; aṣ-ṣirāṭa maf'ul kedua; al-mustaqīma sifatnya; halaman cetak belum diverifikasi)",
+            "ref": "QS 1:6 (pelaku tersimpan, “Engkau”; -nā maf'ul pertama; aṣ-ṣirāṭa maf'ul kedua; al-mustaqīma sifatnya; halaman cetak belum diverifikasi)",
             "url": "https://tafsir.app/aldur-almasoon/1/6"
           },
           {
@@ -2249,7 +2249,7 @@
             "state": "mabni",
             "sign": "sukun"
           },
-          "why": "Fi'il madhi ini mabni di atas sukun karena bersambung dengan dhamir -ta ('Engkau', pelakunya), dan kalimatnya menjadi shilah bagi allażīna.",
+          "why": "Fi'il madhi ini mabni di atas sukun karena bersambung dengan dhamir -ta (“Engkau”, pelakunya), dan kalimatnya menjadi shilah bagi allażīna.",
           "lemma_id": "anama",
           "concepts": [
             "dhamir",
@@ -2288,7 +2288,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "[[Fi'il madhi|fiil-madhi]] ini [[mabni|mabni]] di atas [[sukun|sukun]] karena bersambung dengan [[dhamir|dhamir]] [[-ta|q:1:7:3/2]] ('Engkau', pelakunya), dan kalimatnya menjadi [[shilah|shilah]] bagi [[allażīna|q:1:7:2]].",
+            "why": "[[Fi'il madhi|fiil-madhi]] ini [[mabni|mabni]] di atas [[sukun|sukun]] karena bersambung dengan [[dhamir|dhamir]] [[-ta|q:1:7:3/2]] (“Engkau”, pelakunya), dan kalimatnya menjadi [[shilah|shilah]] bagi [[allażīna|q:1:7:2]].",
             "role": "[[fi'il madhi|fiil-madhi]] + [[fa'il|fail]] ([[-ta|q:1:7:3/2]]); bersama [[‘alaihim|q:1:7:4]] menjadi [[shilah|shilah]]",
             "sign": "[[sukun|sukun]]",
             "wazn": "أَفْعَلْتَ",
@@ -2309,7 +2309,7 @@
             "sign": "—",
             "mahall": "mahall nashb"
           },
-          "why": "‘Alā adalah huruf jar dan -him ('mereka') kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan nashab (mahall nashb) di kartu ini milik frasa jar-majrur ‘alaihim secara utuh, yang bergantung pada an‘amta (as-Samin: manshub al-mahall).",
+          "why": "‘Alā adalah huruf jar dan -him, yang artinya “mereka”, kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan nashab (mahall nashb) di kartu ini milik frasa jar-majrur ‘alaihim secara utuh, yang bergantung pada an‘amta (as-Samin: manshub al-mahall).",
           "lemma_id": "ala",
           "concepts": [
             "huruf-jar",
@@ -2347,7 +2347,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "[[‘Alā|q:2:5:2]] adalah [[huruf jar|huruf-jar]] dan [[-him|q:1:7:4/2]] ('mereka') kata ganti [[mabni|mabni]] yang dijarkan olehnya, sedangkan kedudukan [[nashab|nashab]] ([[mahall|mahall]] [[nashb|nashab]]) di kartu ini milik frasa [[jar-majrur|jar-majrur]] [[‘alaihim|q:1:7:4]] secara utuh, yang bergantung pada [[an‘amta|q:1:7:3]] (as-Samin: [[manshub|manshub]] al-mahall).",
+            "why": "[[‘Alā|q:2:5:2]] adalah [[huruf jar|huruf-jar]] dan [[-him|q:1:7:4/2]], yang artinya “mereka”, kata ganti [[mabni|mabni]] yang dijarkan olehnya, sedangkan kedudukan [[nashab|nashab]] ([[mahall|mahall]] [[nashb|nashab]]) di kartu ini milik frasa [[jar-majrur|jar-majrur]] [[‘alaihim|q:1:7:4]] secara utuh, yang bergantung pada [[an‘amta|q:1:7:3]] (as-Samin: [[manshub|manshub]] al-mahall).",
             "role": "[[huruf jar|huruf-jar]] + [[majrur|majrur]] (terkait [[an‘amta|q:1:7:3]])",
             "ikhtilaf": []
           }
@@ -2430,7 +2430,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "Akhirnya [[kasrah|kasrah]] karena menjadi [[badal|badal]] dari [[allażīna|q:1:7:2]] yang berkedudukan [[jar|jar]] (sebagian ulama menjadikannya [[sifat|sifat]]).",
+            "why": "Akhirnya [[kasrah|kasrah]] karena menjadi [[badal|badal]] dari [[allażīna|q:1:7:2]] yang berkedudukan [[jar|jar]] (sebagian ulama menjadikannya [[sifat|naat]]).",
             "role": "[[badal|badal]]",
             "sign": "[[kasrah|kasrah]]",
             "ikhtilaf": [
@@ -2572,7 +2572,7 @@
             "state": "none",
             "sign": "—"
           },
-          "why": "Wawu adalah huruf 'athaf, dan lā di sini tambahan untuk menegaskan makna 'bukan' yang sudah ada pada gairi.",
+          "why": "Wawu adalah huruf 'athaf, dan lā di sini tambahan untuk menegaskan makna “bukan” yang sudah ada pada gairi.",
           "lemma_id": "la",
           "concepts": [
             "kalimah-isim-fiil-huruf",
@@ -2609,7 +2609,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "[[Wawu|q:1:7:8#1]] adalah [[huruf 'athaf|huruf-athaf]], dan [[lā|q:1:7:8/2]] di sini tambahan untuk menegaskan makna 'bukan' yang sudah ada pada [[gairi|q:1:7:5]].",
+            "why": "[[Wawu|q:1:7:8#1]] adalah [[huruf 'athaf|huruf-athaf]], dan [[lā|q:1:7:8/2]] di sini tambahan untuk menegaskan makna “bukan” yang sudah ada pada [[gairi|q:1:7:5]].",
             "role": "[[huruf 'athaf|huruf-athaf]] + [[lā|q:1:7:8/2]] penegas (tambahan)",
             "ikhtilaf": []
           }
@@ -2862,7 +2862,7 @@
         "status": "draft",
         "marked": {
           "type": "lanjutan jumlah ayat 6 ([[badal|badal]]), memuat [[jumlah|jumlah]] [[shilah|shilah]]",
-          "summary": "Kata [[ṣirāṭa|q:1:7:1]] adalah pengganti ([[badal|badal]]) yang menjelaskan [[aṣ-ṣirāṭa|q:1:6:2]] di ayat 6; ia disandarkan kepada [[allażīna|q:1:7:2]], kata sambung “yang” ([[isim maushul|isim-maushul]]) yang diterangkan oleh anak kalimat ([[shilah|shilah]]) [[an‘amta ‘alaihim|q:1:7:3-4]]. Berikutnya [[gairi al-magḍūbi ‘alaihim|q:1:7:5-7]] menjadi [[badal|badal]] dari [[allażīna|q:1:7:2]] (sebagian ulama menjadikannya [[sifat|sifat]]), dengan [[‘alaihim|q:1:7:7]] sebagai pengganti pelaku ([[na'ib fa'il|naib-fail]]) bagi [[al-magḍūbi|q:1:7:6]], lalu [[aḍ-ḍāllīna|q:1:7:9]] disambung dengan [[wa lā|q:1:7:8]], dan [[lā|q:1:7:8/2]] di situ menegaskan makna “bukan”.",
+          "summary": "Kata [[ṣirāṭa|q:1:7:1]] adalah pengganti ([[badal|badal]]) yang menjelaskan [[aṣ-ṣirāṭa|q:1:6:2]] di ayat 6; ia disandarkan kepada [[allażīna|q:1:7:2]], kata sambung “yang” ([[isim maushul|isim-maushul]]) yang diterangkan oleh anak kalimat ([[shilah|shilah]]) [[an‘amta ‘alaihim|q:1:7:3-4]]. Berikutnya [[gairi al-magḍūbi ‘alaihim|q:1:7:5-7]] menjadi [[badal|badal]] dari [[allażīna|q:1:7:2]] (sebagian ulama menjadikannya [[sifat|naat]]), dengan [[‘alaihim|q:1:7:7]] sebagai pengganti pelaku ([[na'ib fa'il|naib-fail]]) bagi [[al-magḍūbi|q:1:7:6]], lalu [[aḍ-ḍāllīna|q:1:7:9]] disambung dengan [[wa lā|q:1:7:8]], dan [[lā|q:1:7:8/2]] di situ menegaskan makna “bukan”.",
           "groups": [
             "[[ṣirāṭa allażīna an‘amta ‘alaihim|q:1:7:1-4]]: [[badal|badal]] yang menjelaskan [[aṣ-ṣirāṭa|q:1:6:2]] di ayat 6",
             "[[ṣirāṭa|q:1:7:1]] → [[allażīna|q:1:7:2]]: [[idhafah|idhafah]] (“jalan orang-orang yang …”)",
@@ -3277,7 +3277,7 @@
     {
       "id": "akar-rhm",
       "title": "Keluarga kata ر ح م: 339 kali",
-      "body": "Kata-kata dari akar ر ح م, misalnya raḥmah, raḥmān, dan raḥīm, muncul 339 kali dalam 313 ayat Al-Qur'an (9 lemma). Ini hitungan satu keluarga kata, bukan satu kata; tidak semuanya berarti 'kasih sayang' secara langsung (mis. arḥām: rahim/kerabat).",
+      "body": "Kata-kata dari akar ر ح م, misalnya raḥmah, raḥmān, dan raḥīm, muncul 339 kali dalam 313 ayat Al-Qur'an (9 lemma). Ini hitungan satu keluarga kata, bukan satu kata; tidak semuanya berarti “kasih sayang” secara langsung (mis. arḥām: rahim/kerabat).",
       "locations": [
         "1:1",
         "1:3",
@@ -3604,7 +3604,7 @@
       "status": "draft",
       "marked": {
         "title": "Keluarga kata ر ح م: 339 kali",
-        "body": "Kata-kata dari akar ر ح م, misalnya raḥmah, raḥmān, dan raḥīm, muncul 339 kali dalam 313 ayat Al-Qur'an (9 lemma). Ini hitungan satu keluarga kata, bukan satu kata; tidak semuanya berarti 'kasih sayang' secara langsung (mis. arḥām: rahim/kerabat).",
+        "body": "Kata-kata dari akar ر ح م, misalnya raḥmah, raḥmān, dan raḥīm, muncul 339 kali dalam 313 ayat Al-Qur'an (9 lemma). Ini hitungan satu keluarga kata, bukan satu kata; tidak semuanya berarti “kasih sayang” secara langsung (mis. arḥām: rahim/kerabat).",
         "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): jumlah segmen STEM dengan ROOT:rHm (akar kata 1:1:3); ayat dihitung sekali walau memuat lebih dari satu kata seakar."
       }
     },
@@ -4690,7 +4690,7 @@
     {
       "id": "iyyaka",
       "title": "Iyyāka hanya di Al-Fatihah",
-      "body": "Bentuk «إِيَّاكَ» (kata ganti orang kedua tunggal; dalam tata bahasa Arab berbentuk mudzakkar) hanya muncul di 1:5, dan di sana 2 kali. Kata ganti yang sama dengan akhiran lain (untuk 'aku', 'dia', 'kalian', dan seterusnya) muncul 22 kali di tempat lain, sehingga seluruhnya 24 kali dalam 23 ayat.",
+      "body": "Bentuk «إِيَّاكَ» (kata ganti orang kedua tunggal; dalam tata bahasa Arab berbentuk mudzakkar) hanya muncul di 1:5, dan di sana 2 kali. Kata ganti yang sama dengan akhiran lain (untuk “aku”, “dia”, “kalian”, dan seterusnya) muncul 22 kali di tempat lain, sehingga seluruhnya 24 kali dalam 23 ayat.",
       "locations": [
         "1:5",
         "2:40",
@@ -4732,7 +4732,7 @@
       "status": "draft",
       "marked": {
         "title": "[[Iyyāka|q:1:5:1]] hanya di Al-Fatihah",
-        "body": "Bentuk «إِيَّاكَ» (kata ganti orang kedua tunggal; dalam tata bahasa Arab berbentuk mudzakkar) hanya muncul di 1:5, dan di sana 2 kali. Kata ganti yang sama dengan akhiran lain (untuk 'aku', 'dia', 'kalian', dan seterusnya) muncul 22 kali di tempat lain, sehingga seluruhnya 24 kali dalam 23 ayat.",
+        "body": "Bentuk «إِيَّاكَ» (kata ganti orang kedua tunggal; dalam tata bahasa Arab berbentuk mudzakkar) hanya muncul di 1:5, dan di sana 2 kali. Kata ganti yang sama dengan akhiran lain (untuk “aku”, “dia”, “kalian”, dan seterusnya) muncul 22 kali di tempat lain, sehingga seluruhnya 24 kali dalam 23 ayat.",
         "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): semua segmen STEM dengan LEM:<iy~aA (24 kali); yang bertanda 2MS hanya di 1:5. Dicek ulang di Tanzil: token [[iyyāka|q:1:5:1]] (boleh berawalan wa-/fa-) muncul 2 kali."
       }
     },
@@ -4963,7 +4963,7 @@
     {
       "id": "amin-bukan-ayat",
       "title": "Āmīn bukan bagian Al-Qur'an",
-      "body": "Ucapan āmīn setelah membaca Al-Fatihah bukan bagian dari Al-Fatihah dan bukan ayat Al-Qur'an; artinya 'kabulkanlah'. Darwisy menyebutnya sunnah diucapkan sesudah Al-Fatihah.",
+      "body": "Ucapan āmīn setelah membaca Al-Fatihah bukan bagian dari Al-Fatihah dan bukan ayat Al-Qur'an; artinya “kabulkanlah”. Darwisy menyebutnya sunnah diucapkan sesudah Al-Fatihah.",
       "locations": [
         "1:7"
       ],
@@ -4983,8 +4983,42 @@
       "status": "draft",
       "marked": {
         "title": "Āmīn bukan bagian Al-Qur'an",
-        "body": "Ucapan āmīn setelah membaca Al-Fatihah bukan bagian dari Al-Fatihah dan bukan ayat Al-Qur'an; artinya 'kabulkanlah'. Darwisy menyebutnya sunnah diucapkan sesudah Al-Fatihah.",
+        "body": "Ucapan āmīn setelah membaca Al-Fatihah bukan bagian dari Al-Fatihah dan bukan ayat Al-Qur'an; artinya “kabulkanlah”. Darwisy menyebutnya sunnah diucapkan sesudah Al-Fatihah.",
         "method": "Bukan hitungan; dikutip dari al-Mujtaba dan Darwisy (pembahasan QS 1:7)."
+      }
+    },
+    {
+      "id": "naat-atau-shifah",
+      "title": "Na't atau shifah?",
+      "body": "Na't dan shifah adalah dua nama untuk hal yang sama: kata yang menerangkan kata benda sebelumnya dan mengikuti akhirannya. Pelajaran ini memakai na't, kata yang dipakai Ibnu Ajurrum: babnya berjudul Bab an-Na't. Kitab lain memakai shifah atau washf: Darwisy menyebut al-mustaqīma di ayat 6 shifah bagi aṣ-ṣirāṭa dan, di halaman yang sama, menyebut gairi di ayat 7 boleh menjadi na't bagi allażīna; as-Samin, membahas gairi yang sama, memakai kata shifah dan washf. Jadi bila Anda menjumpai shifah di buku lain, yang dimaksud adalah na't yang sama.",
+      "locations": [
+        "1:1",
+        "1:3",
+        "1:6"
+      ],
+      "method": "Bukan hitungan; dikutip dari Matn al-Ajurrumiyyah (Bab an-Na't), dari Darwisy (i'rab QS 1:6 dan 1:7) dan dari as-Samin (QS 1:7).",
+      "sources": [
+        {
+          "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+          "ref": "hlm. 14, Bab an-Na't: na't mengikuti kata yang disifatinya dalam rafa', nashab, khafdh (jar), ma'rifah dan nakirah",
+          "url": "https://shamela.ws/book/11371/15"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 1, hlm. 15 (al-I'rab QS 1:6-1:7: al-mustaqīma shifah bagi aṣ-ṣirāṭa; gairi badal dari dhamir pada ‘alaihim atau dari allażīna, atau na't bagi allażīna)",
+          "url": "https://shamela.ws/book/2163/12"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 74 (QS 1:7: gairi sebagai shifah; bila badal dan washf berkumpul, washf didahulukan)",
+          "url": "https://shamela.ws/book/9057/67"
+        }
+      ],
+      "status": "draft",
+      "marked": {
+        "title": "[[Na't|naat]] atau [[shifah|shifah]]?",
+        "body": "[[Na't|naat]] dan [[shifah|shifah]] adalah dua nama untuk hal yang sama: kata yang menerangkan kata benda sebelumnya dan mengikuti akhirannya. Pelajaran ini memakai [[na't|naat]], kata yang dipakai Ibnu Ajurrum: babnya berjudul Bab an-Na't. Kitab lain memakai [[shifah|shifah]] atau washf: Darwisy menyebut [[al-mustaqīma|q:1:6:3]] di ayat 6 [[shifah|shifah]] bagi [[aṣ-ṣirāṭa|q:1:6:2]] dan, di halaman yang sama, menyebut [[gairi|q:1:7:5]] di ayat 7 boleh menjadi [[na't|naat]] bagi [[allażīna|q:1:7:2]]; as-Samin, membahas [[gairi|q:1:7:5]] yang sama, memakai kata [[shifah|shifah]] dan washf. Jadi bila Anda menjumpai [[shifah|shifah]] di buku lain, yang dimaksud adalah [[na't|naat]] yang sama.",
+        "method": "Bukan hitungan; dikutip dari Matn al-Ajurrumiyyah (Bab an-Na't), dari Darwisy ([[i'rab|irab]] QS 1:6 dan 1:7) dan dari as-Samin (QS 1:7)."
       }
     }
   ],
@@ -5100,10 +5134,10 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
-    "authored_words": "authored/al-fatihah.words.json sha256:da89efdc7759bde444bf41930ca91a8515e5bca1713dcc03f75ff33ba60d49c4",
-    "authored_structure": "authored/al-fatihah.structure.json sha256:d5f5d06071f57afd240cd62d782903d72b2fe6c028e216ea253b218be1727e33",
+    "authored_words": "authored/al-fatihah.words.json sha256:192760f3b4e86c18a0843b1c3ec8a04c0043d891b208fd671df9518a859f4afa",
+    "authored_structure": "authored/al-fatihah.structure.json sha256:7d24d7b529f20127dbf1b2f929180698fa3de5dcb57c701e87619090c4387dc9",
     "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:656c8d94d0a68b81de3ab3c32608db99f9481e8e1b382c7c838bae61b636f960",
-    "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:7c512319fea82ac63b6af3b36d449670655a4d069b31218b1501dc7e1e73d330",
+    "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:1181789ee65c1b2e800270475f1c6264576a0062f8d75290ee2f99af9d2adc5f",
     "pipeline": "belajar/pipeline/build_fatihah.py + facts.py (stdlib only, no LLM)"
   }
 }
