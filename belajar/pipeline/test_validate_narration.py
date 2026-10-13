@@ -1042,9 +1042,14 @@ class LessonMapLines(unittest.TestCase):
         for lid in ("al-fatihah:3:concept:naat", "al-fatihah:4:concept:idhafah", "al-fatihah:6:concept:jumlah-filiyyah",
                     "al-fatihah:7:concept:athaf"):
             self.assertIn("audio", lines[lid], lid)
-        # A new line's text is new: no audio (the steps with their own text, the map's lines).
+        # A new line's text is new: it has no audio of anyone else's text (the steps with their
+        # own text, the map's lines). Before its render it has none; after it (2026-10-14: the
+        # rework's 132 lines) it has its OWN, named by its text; this holds in both states. That
+        # a changed text drops the old audio is what the next test plants (the mechanism).
         for lid in ("al-fatihah:1:concept:majrur", "al-fatihah:2:concept:marfu", "al-fatihah:1:map:new", "al-fatihah:1:learned"):
-            self.assertNotIn("audio", lines[lid], lid)
+            audio = lines[lid].get("audio")
+            if audio is not None:
+                self.assertEqual(audio["url"], V.delivery_url(MANIFESTS["al-fatihah"]["voice"], "al-fatihah", lines[lid]["text"], audio["sha256"]), lid)
         # … and a word line whose text did not change kept its own: word 1 of ayah 1 (the karaoke
         # check's line), and most of the 170-odd word and composition lines — the ones reworded
         # since (2026-10-13: no term before its lesson) wait for a render, like any new text.
