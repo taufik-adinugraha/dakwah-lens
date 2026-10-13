@@ -56,6 +56,18 @@ export const ID_TEXTS: AutoplayTexts = {
       next: "Klik tombol yang ditandai untuk melanjutkan.",
     },
   },
+  // The card beside the caption names the concepts (the narration's own line names a few of them).
+  lessonMap: ({ new: fresh, review, later }) =>
+    [
+      fresh ? `Di ayat ini ada ${fresh} hal baru.` : "Di ayat ini tidak ada hal baru.",
+      review ? `Kita mengulang ${review} hal yang sudah dipelajari.` : "",
+      later ? `Ada ${later} hal lagi yang baru dibahas nanti.` : "",
+      "Daftarnya ada di layar.",
+    ]
+      .filter(Boolean)
+      .join(" "),
+  learned: ({ new: fresh }) =>
+    fresh ? `Di ayat ini kita sudah mempelajari ${fresh} hal baru. Daftarnya ada di layar.` : "Di ayat ini tidak ada hal baru.",
   recap: "Dengarkan sekali lagi seluruh ayatnya, dan ikuti bacaan imam.",
   next: ({ ayah }) => `Pelajaran ayat ini selesai. Berikutnya, ayat ${ayah}.`,
   done: ({ surah }) => `Pelajaran ayat ini selesai. Ini ayat terakhir surah ${surah}.`,

@@ -1182,7 +1182,7 @@ const KARAOKE = { slug: "al-fatihah", step: "w1", line: "al-fatihah:1:w1" };
  * word 1 — the KARAOKE caption (the narrator's current word filled forest, words said in ink,
  * words to come muted) under the large WORD CARD (the word's Arabic · transliteration · "yang
  * artinya …"), the mushaf words numbered with word 1 marked. "Berikutnya ›" jumps whole steps up to
- * the step named "w1" on the stage (toStep: intro → the ayah → the harakat primer → the imam says
+ * the step named "w1" on the stage (toStep: intro → the ayah → what the ayah brings → the harakat primer → the imam says
  * word 1 → its explanation, whatever steps come between), then "↺ Ulangi langkah ini" plays the
  * explanation from its start — the replay control, and a start that holds even when the imam's
  * stream paused the lesson on the way — and the caption must be that line (data-line) with half
@@ -1801,9 +1801,10 @@ function lineFiles(lines, id) {
  * other checks), its remembered place cleared. The narration is answered in the browser
  * (narrationRoute): every request is recorded with its kind ("media": an audio element; "fetch":
  * the page's fetch() ahead) and its times; every fetch() is held back AHEAD_HOLD_MS, so that two
- * made at once would overlap; one file's fetch() is made to fail (503: the first line of the
- * harakat primer); and the check holds back two of the PLAYER's own loads (a slow connection for
- * that file). navigator.wakeLock is the recorder above.
+ * made at once would overlap; one file's fetch() is made to fail (503: the lesson map's line,
+ * "al-fatihah:1:map", the step two ahead of the first since 2026-10-13, plan L23 — the harakat
+ * primer came there before it); and the check holds back two of the PLAYER's own loads (a slow
+ * connection for that file). navigator.wakeLock is the recorder above.
  *   1. A page view alone, AHEAD_IDLE_MS after load: no fetch() of narration at all, nothing but
  *      the idle warm of the first line ("shared:start", by the narration player's preload
  *      element), and no wake lock asked for.
@@ -1816,7 +1817,7 @@ function lineFiles(lines, id) {
  *      time (AHEAD_SETTLE_MS, the app's PREFETCH_SETTLE_MS).
  *   4. While the lesson is still on its first step ("intro": the opening line, then the intro
  *      line, ~36 s): the page fetches the next line of this step (the intro line), then the next
- *      step's (the ayah: "al-fatihah:1:recite"), then the step after's (the harakat primer) —
+ *      step's (the ayah: "al-fatihah:1:recite"), then the step after's (the lesson map's line) —
  *      ONE AT A TIME (each fetch() starts after the previous was answered); each file once;
  *      nothing but those (never a later step's, never another ayah's); and NO audio element asks
  *      for any of them (the preload element downloads nothing the page fetches: no file twice)
@@ -1827,12 +1828,12 @@ function lineFiles(lines, id) {
  *      all — the page's fetch. The player made none: an object URL never reaches the network.
  *      No loading status either.
  *   6. A FILE THE PAGE COULD NOT FETCH PLAYS FROM THE NETWORK, AND A STALLED LINE STOPS NEW
- *      FETCHES: "Berikutnya ›" twice, to the primer, whose first line's fetch() failed in 4 and
- *      whose own load is now held back AHEAD_STALL_MS. The player asks the network for it (never
+ *      FETCHES: "Berikutnya ›" twice, to the lesson map's step, whose line's fetch() failed in 4
+ *      and whose own load is now held back AHEAD_STALL_MS. The player asks the network for it (never
  *      silence: its karaoke caption runs once it is answered), "Memuat suara narator…" shows
  *      meanwhile as it always did, and from that request until it was answered plus the settle
- *      time NO fetch() starts — though one is due (the step two ahead of the primer), and comes
- *      right after.
+ *      time NO fetch() starts — though one is due (the step after it, the harakat primer), and
+ *      comes right after.
  *   7. The wake lock through the lesson's life: the browser dropping it while the page is visible
  *      (held since "Mulai") → asked for again at once; "Jeda" releases it; "Lanjutkan" asks again;
  *      dropped again right after that grant → NOT asked again (no loop with a browser that drops
@@ -1871,24 +1872,24 @@ async function aheadChecks(page, vp, index) {
   const shared = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "narration", "shared.json"), "utf8")).lines ?? {};
   const lines = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "narration", "al-fatihah.json"), "utf8")).lines ?? {};
   const INTRO = "al-fatihah:1:intro";
-  const PRIMER_1 = "al-fatihah:1:primer:1";
+  // The one line of the step two ahead of the first: what the ayah brings (plan L23).
+  const MAP_1 = "al-fatihah:1:map";
   const startUrl = lineFiles(shared, "shared:start")[0];
   const introFiles = lineFiles(lines, INTRO);
   const reciteFiles = lineFiles(lines, "al-fatihah:1:recite");
-  // The primer's lines, a split one ("…:primer:3:a", ":b") by its own id.
-  const primerIds = [...new Set(Object.keys(lines).flatMap((id) => /^(al-fatihah:1:primer:\d+)(?::[a-z])?$/.exec(id)?.[1] ?? []))];
-  const primerFiles = [...new Set(primerIds.flatMap((id) => lineFiles(lines, id)))];
-  const [intro1, recite1, primer1] = [introFiles[0], reciteFiles[0], lineFiles(lines, PRIMER_1)[0]];
-  const [introLine, primerLine] = [await narratedLine("al-fatihah", INTRO), await narratedLine("al-fatihah", PRIMER_1)];
-  if (!startUrl || !intro1 || !recite1 || !primer1 || !introLine.voiced || !primerLine.voiced) {
+  const mapFiles = lineFiles(lines, MAP_1);
+  const [intro1, recite1, map1] = [introFiles[0], reciteFiles[0], mapFiles[0]];
+  const [introLine, mapLine] = [await narratedLine("al-fatihah", INTRO), await narratedLine("al-fatihah", MAP_1)];
+  if (!startUrl || !intro1 || !recite1 || !map1 || !introLine.voiced || !mapLine.voiced) {
     throw new Error(
-      `${vp}: look-ahead check — Al-Fatihah 1's opening lines have no rendered narration (shared:start ${!!startUrl}, intro ${introFiles.length}, recite ${!!recite1}, primer:1 ${!!primer1}; ` +
-        `word timings: intro ${introLine.voiced}, primer:1 ${primerLine.voiced})`,
+      `${vp}: look-ahead check — Al-Fatihah 1's opening lines have no rendered narration (shared:start ${!!startUrl}, intro ${introFiles.length}, recite ${!!recite1}, map ${!!map1}; ` +
+        `word timings: intro ${introLine.voiced}, map ${mapLine.voiced}). A line whose text is new has neither until it is rendered: ` +
+        "pipeline/render_narration.py (pipeline/README.md, “Peta pelajaran”), commit the manifest, and run again.",
     );
   }
   /** What the page may fetch while the lesson is on "intro": the rest of that step (the intro
    *  line) and the next two steps' files. */
-  const ahead = new Set([...introFiles, ...reciteFiles, ...primerFiles]);
+  const ahead = new Set([...introFiles, ...reciteFiles, ...mapFiles]);
   const short = (p) => p.split("/").slice(-2).join("/");
 
   const pg = await page.context().newPage();
@@ -1896,8 +1897,8 @@ async function aheadChecks(page, vp, index) {
   const served = [];
   const timeline = [];
   const delays = new Map();
-  // The page's copy of the primer's first line cannot be made (step 6).
-  const failFetch = new Set([primer1]);
+  // The page's copy of the lesson map's line cannot be made (step 6).
+  const failFetch = new Set([map1]);
   const handler = narrationRoute(index, served, { delays, timeline, holdFetchMs: AHEAD_HOLD_MS, failFetch });
   await pg.route(isNarration, handler);
   const stage = pg.locator('[data-autoplay="stage"]');
@@ -1955,10 +1956,10 @@ async function aheadChecks(page, vp, index) {
       const at = await stage.getAttribute("data-step");
       if (at !== "intro") throw new Error(`${vp}: ${what} only once the lesson was on step "${at}", not while it is still on its first step ("intro")`);
     };
-    if (!(await until(pg, () => fetches(mark2).some((e) => e.path === primer1), 25_000))) {
-      throw new Error(`${vp}: 25 s after "Mulai" the primer's first line (${short(primer1)}) was not fetched ahead (fetches: ${fetches(mark2).map((e) => short(e.path)).join(", ") || "none"})`);
+    if (!(await until(pg, () => fetches(mark2).some((e) => e.path === map1), 25_000))) {
+      throw new Error(`${vp}: 25 s after "Mulai" the lesson map's line (${short(map1)}) was not fetched ahead (fetches: ${fetches(mark2).map((e) => short(e.path)).join(", ") || "none"})`);
     }
-    await onIntro(`${short(primer1)} was fetched`);
+    await onIntro(`${short(map1)} was fetched`);
     const load = opening();
     const firstFetch = fetches(mark2)[0];
     const held = (load.end ?? Date.now()) - load.start;
@@ -1994,7 +1995,7 @@ async function aheadChecks(page, vp, index) {
     if (order[0] !== intro1) problems.push(`the first fetched is ${short(order[0] ?? "(none)")}, not the next line of this step ${short(intro1)}`);
     if (!order.includes(recite1)) problems.push(`the next step's first line ${short(recite1)} was not fetched`);
     else if (order.indexOf(recite1) < order.lastIndexOf(introFiles.at(-1))) problems.push(`${short(recite1)} was fetched before this step's own ${short(introFiles.at(-1))}`);
-    if (order.indexOf(primer1) < order.indexOf(recite1)) problems.push(`${short(primer1)} was fetched before ${short(recite1)}`);
+    if (order.indexOf(map1) < order.indexOf(recite1)) problems.push(`${short(map1)} was fetched before ${short(recite1)}`);
     if (new Set(order).size !== order.length) problems.push("a file was fetched twice");
     const outside = order.filter((p) => !ahead.has(p));
     if (outside.length) problems.push(`fetched beyond this step and the next two: ${outside.map(short).join(", ")}`);
@@ -2010,7 +2011,7 @@ async function aheadChecks(page, vp, index) {
     console.log(
       `  ahead 4/9: on step "intro", ${got.length} file(s) fetched ahead, one at a time (held ${AHEAD_HOLD_MS} ms each): ` +
         got.map((e) => `${short(e.path)} ${rel(e.start)}–${rel(e.end)} ms`).join(", ") +
-        ` — this step's next line, the next step's, then the primer's; nothing past them, and no audio element asked for any of them`,
+        ` — this step's next line, the next step's, then the lesson map's; nothing past them, and no audio element asked for any of them`,
     );
 
     // 5. The intro line, reached by the lesson itself, plays from the page's copy.
@@ -2035,23 +2036,23 @@ async function aheadChecks(page, vp, index) {
     console.log(`  ahead 5/9: the intro line plays (karaoke ${saidThen} → ${saidNow} word(s) said) and ${short(intro1)} had one request in all, the page's fetch at ${rel(asked[0].start)} ms: played from the copy, no second download`);
 
     // 6. A file the page could not fetch: from the network; while it loads, no new fetch.
-    const failed = timeline.slice(mark2).filter((e) => e.path === primer1);
-    if (failed.length !== 1 || failed[0].type !== "fetch") throw new Error(`${vp}: ${short(primer1)} (its fetch() answered 503) was requested ${failed.length} time(s) before its step (${failed.map((e) => e.type).join(", ")}): expected the one failed fetch, not tried again`);
-    delays.set(primer1, AHEAD_STALL_MS);
+    const failed = timeline.slice(mark2).filter((e) => e.path === map1);
+    if (failed.length !== 1 || failed[0].type !== "fetch") throw new Error(`${vp}: ${short(map1)} (its fetch() answered 503) was requested ${failed.length} time(s) before its step (${failed.map((e) => e.type).join(", ")}): expected the one failed fetch, not tried again`);
+    delays.set(map1, AHEAD_STALL_MS);
     const mark6 = timeline.length;
     await forward.click(); // the ayah ("recite")
-    await forward.click(); // the harakat primer
-    if (!(await until(pg, async () => (await stage.getAttribute("data-step")) === "primer", 5_000))) {
-      throw new Error(`${vp}: two "Berikutnya ›" from the first step did not reach the primer (on "${await stage.getAttribute("data-step")}")`);
+    await forward.click(); // what the ayah brings ("map")
+    if (!(await until(pg, async () => (await stage.getAttribute("data-step")) === "map", 5_000))) {
+      throw new Error(`${vp}: two "Berikutnya ›" from the first step did not reach the lesson map's step (on "${await stage.getAttribute("data-step")}")`);
     }
-    const stream = () => timeline.slice(mark6).find((e) => e.path === primer1 && e.type === "media");
+    const stream = () => timeline.slice(mark6).find((e) => e.path === map1 && e.type === "media");
     if (!(await until(pg, () => !!stream(), 3_000))) {
-      throw new Error(`${vp}: on the primer, whose first line the page could not fetch, the player did not ask the network for ${short(primer1)} within 3 s (requests since: ${timeline.slice(mark6).map((e) => `${short(e.path)} ${e.type}`).join(", ") || "none"})`);
+      throw new Error(`${vp}: on the lesson map's step, whose line the page could not fetch, the player did not ask the network for ${short(map1)} within 3 s (requests since: ${timeline.slice(mark6).map((e) => `${short(e.path)} ${e.type}`).join(", ") || "none"})`);
     }
     try {
       await status.waitFor({ state: "visible", timeout: 2_000 });
     } catch {
-      throw new Error(`${vp}: the primer's first line is loading from the network (held back ${AHEAD_STALL_MS} ms) and no loading status shows`);
+      throw new Error(`${vp}: the lesson map's line is loading from the network (held back ${AHEAD_STALL_MS} ms) and no loading status shows`);
     }
     const [text, kind] = [(await status.innerText()).replace(/\s+/g, " ").trim(), await status.getAttribute("data-kind")];
     if (text !== msgs.loading_narration || kind !== "narration") throw new Error(`${vp}: the loading status says “${text}” (data-kind ${kind}), expected “${msgs.loading_narration}” (narration)`);
@@ -2060,30 +2061,30 @@ async function aheadChecks(page, vp, index) {
     // arrived (CI 2026-10-13: it showed 822 ms into the 4 s hold, and the check took the hold for
     // broken).
     if (!(await until(pg, () => stream().end !== null, AHEAD_STALL_MS + 10_000))) {
-      throw new Error(`${vp}: the primer's first line, held back ${AHEAD_STALL_MS} ms, was never answered (${Date.now() - stream().start} ms on)`);
+      throw new Error(`${vp}: the lesson map's line, held back ${AHEAD_STALL_MS} ms, was never answered (${Date.now() - stream().start} ms on)`);
     }
-    delays.delete(primer1);
-    const primerSaid = () => caption(PRIMER_1).locator('[data-karaoke="said"]').count();
-    const saidAtAnswer = await primerSaid();
-    if (!(await until(pg, async () => (await primerSaid()) > saidAtAnswer, 10_000))) {
-      throw new Error(`${vp}: the primer's first line never played from the network after its fetch ahead had failed (${saidAtAnswer} word(s) said 10 s after its load was answered; line on screen: ${await pg.locator('[data-autoplay="caption"]').first().getAttribute("data-line").catch(() => null)})`);
+    delays.delete(map1);
+    const mapSaid = () => caption(MAP_1).locator('[data-karaoke="said"]').count();
+    const saidAtAnswer = await mapSaid();
+    if (!(await until(pg, async () => (await mapSaid()) > saidAtAnswer, 10_000))) {
+      throw new Error(`${vp}: the lesson map's line never played from the network after its fetch ahead had failed (${saidAtAnswer} word(s) said 10 s after its load was answered; line on screen: ${await pg.locator('[data-autoplay="caption"]').first().getAttribute("data-line").catch(() => null)})`);
     }
     const line = stream();
     const stalled = line.end - line.start;
-    if (stalled < AHEAD_STALL_MS - AHEAD_SLACK_MS) throw new Error(`${vp}: the primer's first line was answered after ${stalled} ms, not held back ${AHEAD_STALL_MS} ms: the check cannot show the stall`);
+    if (stalled < AHEAD_STALL_MS - AHEAD_SLACK_MS) throw new Error(`${vp}: the lesson map's line was answered after ${stalled} ms, not held back ${AHEAD_STALL_MS} ms: the check cannot show the stall`);
     const since = timeline.slice(timeline.indexOf(line) + 1).filter((e) => e.type === "fetch");
     const during = since.filter((e) => e.start < line.end + AHEAD_SETTLE_MS - AHEAD_SLACK_MS);
     if (during.length) {
-      throw new Error(`${vp}: while the primer's first line was loading (${rel(line.start)}–${rel(line.end)} ms), the page started fetching ahead: ${during.map((e) => `${short(e.path)} at ${rel(e.start)} ms`).join(", ")}`);
+      throw new Error(`${vp}: while the lesson map's line was loading (${rel(line.start)}–${rel(line.end)} ms), the page started fetching ahead: ${during.map((e) => `${short(e.path)} at ${rel(e.start)} ms`).join(", ")}`);
     }
     const fetchesAfter = () => timeline.slice(timeline.indexOf(line) + 1).filter((e) => e.type === "fetch");
     if (!(await until(pg, () => fetchesAfter().length > 0, 10_000))) {
-      throw new Error(`${vp}: 10 s after the stalled line played, nothing more was fetched ahead — with nothing due, the wait above shows no closed gate (the step two ahead of the primer has narration: was it fetched before? ${timeline.slice(mark2, mark6).map((e) => short(e.path)).join(", ")})`);
+      throw new Error(`${vp}: 10 s after the stalled line played, nothing more was fetched ahead — with nothing due, the wait above shows no closed gate (the step after it, the harakat primer, has narration: was it fetched before? ${timeline.slice(mark2, mark6).map((e) => short(e.path)).join(", ")})`);
     }
     const next = fetchesAfter()[0];
-    if ((await status.count()) > 0) throw new Error(`${vp}: the loading status is still there while the primer's first line plays`);
+    if ((await status.count()) > 0) throw new Error(`${vp}: the loading status is still there while the lesson map's line plays`);
     console.log(
-      `  ahead 6/9: ${short(primer1)} (fetch() failed) played from the network, “${text}” shown while it loaded (held back ${stalled} ms, ${rel(line.start)}–${rel(line.end)} ms); ` +
+      `  ahead 6/9: ${short(map1)} (fetch() failed) played from the network, “${text}” shown while it loaded (held back ${stalled} ms, ${rel(line.start)}–${rel(line.end)} ms); ` +
         `no fetch() meanwhile, the next one (${short(next.path)}) ${next.start - line.end} ms after it was answered`,
     );
 
@@ -2368,7 +2369,7 @@ async function composeShots(page, vp, index) {
     await page.locator('[data-autoplay="start"]').click();
     await settleScroll(page);
     const replay = page.locator('[data-autoplay="replay"]');
-    // intro → the ayah → the harakat primer (Biasa: "Berikutnya ›" jumps whole steps)
+    // intro → the ayah → what the ayah brings → the harakat primer (Biasa: "Berikutnya ›" jumps whole steps)
     await toStep(page, vp, "primer");
     await setPace("Tunggu saya");
     await replay.click();
@@ -2814,6 +2815,178 @@ async function quizVoiceCheck(page, vp, index) {
 }
 
 /**
+ * The lesson map's two cards (operator 2026-10-13: "at the beginning of the ayat, better to inform
+ * what concept we will learn in this ayat, also explain maybe we skip some concept and will visit
+ * later in next ayat … so at the beginning we inform what will be learnt, in the end recap what
+ * we've learnt"; "if some concept already done in previous ayat, we say we repeat what we've learnt
+ * before"; docs/belajar-plan.md L23), on Al-Fatihah 1 and 2, each one's remembered place cleared,
+ * the narration answered in the browser (narrationRoute). What a card must show is read from
+ * content/map/al-fatihah.json and messages/id.json, never typed here. Per ayah:
+ *   1. THE OPENING comes right after the imam's ayah: from the step "recite" (reached by name,
+ *      paused), one "Berikutnya ›" lands on the step "map". Its card
+ *      ([data-autoplay="lesson-map"][data-map="map"]) is on the stage with exactly the map's
+ *      groups, in order — "Baru di ayat ini" always, "Mengulang" and "Nanti" only when the ayah has
+ *      such concepts (ayah 1: new and later; ayah 2: all three) — each under its heading, each
+ *      concept in the file's order under the name the file gives, each repeated concept with the
+ *      ayah that taught it ("dari ayat 1"), each postponed one with the ayah that will ("di ayat
+ *      2"), and an authored later item with its note (ayah 1: marfu', "mengapa bentuk dasar
+ *      berakhir dhammah"). "↺ Ulangi" plays the step: the caption is that step's line (data-line
+ *      "al-fatihah:N:map") and says what the manifest shows for it.
+ *   2. THE CLOSING comes right before the recap: on the step "learned" (by name) the card
+ *      ([data-map="learned"]) has one group, "Sudah dipelajari", the ayah's new concepts in order,
+ *      each with a tick and none with an ayah; its caption is "al-fatihah:N:learned"; and one
+ *      "Berikutnya ›" from there lands on "recap".
+ *   3. NOTHING STICKS OUT SIDEWAYS, on either card: the card lies within the screen's width, does
+ *      not scroll sideways, and the page does not either.
+ * Whether the whole card is in view above the bottom panel is MEASURED and reported, not failed: a
+ * card with many concepts is taller than the room a phone leaves above the caption (its first
+ * group, the new concepts, is what stays in view; the rest is reached by scrolling the page). A
+ * warning on the run's summary gives the numbers — look at the viewport shots.
+ * Works rendered or not: a map line without audio yet is shown at reading pace (caption-only).
+ * Shots: each card (stage; on a phone also the viewport). Fails the job on 1–3.
+ */
+async function lessonMapChecks(page, vp, index) {
+  const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
+  const msgs = (await read("messages/id.json")).Guided;
+  const map = await read("content/map/al-fatihah.json");
+  const lines = (await read("content/narration/al-fatihah.json")).lines ?? {};
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const stage = page.locator('[data-autoplay="stage"]');
+  const middle = page.locator('[data-autoplay="middle"]');
+  const replay = page.locator('[data-autoplay="replay"]');
+  const next = page.locator('[data-autoplay="next"]');
+  const fail = (m) => {
+    throw new Error(`${vp}: lesson map — ${m}`);
+  };
+  const fill = (message, values) => Object.entries(values).reduce((text, [k, v]) => text.replace(`{${k}}`, String(v)), message);
+  /** Where a repeated ("review") or postponed ("later") concept is taught, as the card says it. */
+  const whereOf = (group, id) => {
+    const c = map.concepts[id];
+    return c.surah === map.surah ? fill(msgs[`map_${group}_ayah`], { n: c.ayah }) : fill(msgs[`map_${group}_surah`], { surah: c.surah, ayah: c.ayah });
+  };
+  const item = (group, id) => {
+    const c = map.concepts[id];
+    const where = group === "review" || group === "later" ? whereOf(group, id) : null;
+    return { id, text: [c.name, where, c.note].filter(Boolean).join(" "), where, note: c.note ?? null, tick: group === "learned" };
+  };
+  /** The groups a card of `entry` must show, in order. */
+  const expected = (entry, kind) =>
+    kind === "learned"
+      ? [{ group: "learned", heading: msgs.map_learned, items: entry.new.map((id) => item("learned", id)) }]
+      : [
+          { group: "new", heading: msgs.map_new, items: entry.new.map((id) => item("new", id)) },
+          ...(entry.review.length ? [{ group: "review", heading: msgs.map_review, items: entry.review.map((id) => item("review", id)) }] : []),
+          ...(entry.later.length ? [{ group: "later", heading: msgs.map_later, items: entry.later.map((id) => item("later", id)) }] : []),
+        ];
+  /** The card on the stage as the browser drew it: its groups, its box, whether anything scrolls sideways. */
+  const readCard = (kind) =>
+    stage.locator(`[data-autoplay="lesson-map"][data-map="${kind}"]`).first().evaluate((el) => {
+      const text = (n) => (n?.textContent ?? "").replace(/\s+/g, " ").trim();
+      const r = el.getBoundingClientRect();
+      return {
+        groups: [...el.querySelectorAll("[data-map-group]")].map((g) => ({
+          group: g.getAttribute("data-map-group"),
+          heading: text(g.querySelector("h3")),
+          items: [...g.querySelectorAll("[data-map-item]")].map((li) => ({
+            id: li.getAttribute("data-map-item"),
+            text: text(li),
+            where: li.querySelector("[data-map-where]") ? text(li.querySelector("[data-map-where]")) : null,
+            note: li.querySelector("[data-map-note]") ? text(li.querySelector("[data-map-note]")) : null,
+            tick: !!li.querySelector("svg"),
+          })),
+        })),
+        box: { left: r.left, right: r.right, top: r.top, bottom: r.bottom },
+        scrollsSideways: el.scrollWidth > el.clientWidth + 1,
+        pageScrollsSideways: document.documentElement.scrollWidth > window.innerWidth + 1,
+        width: window.innerWidth,
+      };
+    });
+  /** One card, checked and shot: `kind` "map" | "learned" on the step of that name. */
+  const check = async (ayah, entry, kind) => {
+    const what = `Al-Fatihah ${ayah}, ${kind === "map" ? "the opening" : "the closing"}`;
+    const card = stage.locator(`[data-autoplay="lesson-map"][data-map="${kind}"]`);
+    await card.first().waitFor({ state: "visible", timeout: 5_000 }).catch(() => fail(`${what}: on the step "${kind}" no card shows`));
+    if ((await card.count()) !== 1) fail(`${what}: ${await card.count()} cards on the stage`);
+    // The step's line, played from its start: the caption is that line, and says what the manifest shows.
+    const id = `al-fatihah:${ayah}:${kind}`;
+    const line = lines[id];
+    if (!line?.display) fail(`${what}: content/narration/al-fatihah.json has no line ${id}`);
+    await replay.click();
+    const caption = page.locator(`[data-autoplay="caption"][data-line="${id}"]`);
+    await caption.first().waitFor({ state: "attached", timeout: 10_000 }).catch(() => fail(`${what}: "↺ Ulangi" did not put the line ${id} on the caption`));
+    const head = line.display.split(/\s*[(؀-ۿ]/u)[0].slice(0, 40);
+    if (!(await until(page, async () => (await caption.first().innerText()).replace(/\s+/g, " ").includes(head), 10_000))) {
+      fail(`${what}: the caption “${(await caption.first().innerText()).replace(/\s+/g, " ").slice(0, 80)}” does not say “${head}”`);
+    }
+    // Held there while it is measured (a step that ends would take its card with it).
+    if ((await middle.getAttribute("data-mode").catch(() => null)) === "pause") await middle.click();
+    await page.waitForTimeout(500);
+    if ((await stage.getAttribute("data-step")) !== kind) fail(`${what}: the lesson left the step "${kind}" for "${await stage.getAttribute("data-step")}" while it was measured`);
+    const got = await readCard(kind);
+    const want = expected(entry, kind);
+    if (JSON.stringify(got.groups) !== JSON.stringify(want)) {
+      fail(`${what}: the card shows ${JSON.stringify(got.groups)}, expected ${JSON.stringify(want)} (content/map/al-fatihah.json, messages/id.json)`);
+    }
+    const sideways = [];
+    if (got.box.left < -1 || got.box.right > got.width + 1) sideways.push(`the card ${Math.round(got.box.left)}–${Math.round(got.box.right)} is wider than the screen (${got.width})`);
+    if (got.scrollsSideways) sideways.push("the card scrolls sideways");
+    if (got.pageScrollsSideways) sideways.push("the page scrolls sideways");
+    if (sideways.length) fail(`${what}: ${sideways.join("; ")}`);
+    const panel = await page.locator('[data-autoplay="panel"]').first().boundingBox();
+    const panelBox = panel ? { top: panel.y, bottom: panel.y + panel.height } : null;
+    const inView = !!panelBox && got.box.top >= 0 && got.box.bottom <= panelBox.top + 1;
+    const n = got.groups.reduce((sum, g) => sum + g.items.length, 0);
+    console.log(`  lesson map ${ayah} ${kind}: ${got.groups.map((g) => `${g.heading} (${g.items.length})`).join(" · ")}; card ${fmt(got.box)} · panel ${panelBox ? fmt(panelBox) : "—"}${inView ? "" : " — NOT wholly in view"}`);
+    if (!inView) {
+      console.log(
+        `::warning title=Belajar lesson map card not wholly in view::${vp}: ${what}: the card (${n} concepts) is at ${fmt(got.box)} and the bottom panel at ${panelBox ? fmt(panelBox) : "—"} ` +
+          `(viewport ${page.viewportSize().height} high): part of it is reached only by scrolling. See shots/${vp}-autoplay-ayah${ayah}-${kind}${vp === "phone" ? "-viewport" : ""}.png`,
+      );
+    }
+    await stage.screenshot({ path: `shots/${vp}-autoplay-ayah${ayah}-${kind}.png` });
+    console.log(`shot ${vp}-autoplay-ayah${ayah}-${kind}`);
+    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-autoplay-ayah${ayah}-${kind}-viewport.png` });
+  };
+  try {
+    for (const ayah of [1, 2]) {
+      const entry = map.ayat.find((a) => a.ayah === ayah);
+      if (!entry) fail(`content/map/al-fatihah.json has no ayah ${ayah}`);
+      await page.goto(BASE + `/belajar/id/quran/al-fatihah/${ayah}`, { waitUntil: "networkidle" });
+      // The earlier checks left a remembered place on these ayat ("Lanjutkan dari langkah N").
+      await page.evaluate((key) => localStorage.removeItem(key), `belajar:v1:autoplay:al-fatihah/${ayah}`);
+      await page.reload({ waitUntil: "networkidle" });
+      await page.evaluate(() => document.fonts.ready);
+      await page.locator('[data-autoplay="start"]').click();
+      await settleScroll(page);
+      // 1. Right after the imam's ayah.
+      await toStep(page, vp, "recite");
+      await next.click();
+      if (!(await until(page, async () => (await stage.getAttribute("data-step")) === "map", 5_000))) {
+        fail(`Al-Fatihah ${ayah}: the step after the imam's ayah is "${await stage.getAttribute("data-step")}", not the lesson map's ("map")`);
+      }
+      await check(ayah, entry, "map");
+      // 2. Right before the recap.
+      await toStep(page, vp, "learned");
+      await check(ayah, entry, "learned");
+      await next.click();
+      if (!(await until(page, async () => (await stage.getAttribute("data-step")) === "recap", 5_000))) {
+        fail(`Al-Fatihah ${ayah}: the step after "learned" is "${await stage.getAttribute("data-step")}", not the recap`);
+      }
+    }
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-autoplay-lesson-map-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the lesson map check (Al-Fatihah 1 and 2) failed`);
+    console.error(`  narration requests answered: ${served.length}`);
+    throw err;
+  } finally {
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
+/**
  * A hidden address shows the module's own 404 in the browser: answered 404, and the page drawn is
  * src/app/[locale]/not-found.tsx ([data-not-found]) with its title (messages/id.json, never typed
  * here) visible inside <main>. The server HTML carries that page only in the RSC payload (Next
@@ -2890,6 +3063,7 @@ try {
     await composeShots(page, vp, narration);
     await exampleChecks(page, vp, narration);
     await quizVoiceCheck(page, vp, narration);
+    await lessonMapChecks(page, vp, narration);
     // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).
     await composeFitSweep(page, vp, "normal", [1], units);
     await composeFitSweep(page, vp, "besar", [1], units);

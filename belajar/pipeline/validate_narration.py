@@ -14,19 +14,34 @@ What it enforces (README "Narasi" has the reasons):
   sent to the voice; `display` the caption (dictionary terms in their display form, letters as in
   the ayah); `highlight` the word numbers of the ayah the stage highlights ([0] the whole ayah, []
   none); `focus` the word ("1:1:3") of the large word card, or null.
-- Ids follow the contract: "${slug}:${ayah}:${part}" with part in intro | recite | primer:${k} |
+- Ids follow the contract: "${slug}:${ayah}:${part}" with part in intro | recite | map | primer:${k} |
   w${n} | w${n}:compose:${k} | structure | concept:${conceptId} | ex:${exerciseKey}:${lineKey} |
-  ex:${exerciseKey}:${n}:why | recap | next | done, and "shared:${key}" in shared.json. A line longer than MAX_LINE is split
+  ex:${exerciseKey}:${n}:why | learned | recap | next | done, and "shared:${key}" in shared.json. A line longer than MAX_LINE is split
   into "<id>:a", "<id>:b", … (at least two parts, letters contiguous from a, never next to the
-  unsplit id); a primer or compose line is never split (one line per animation frame's sentence).
-- Coverage: every ayah has intro, recite, primer:1…k when content/compose/<slug>.json opens the
+  unsplit id); a primer or compose line is never split (one line per animation frame's sentence),
+  nor a map or learned line (one line with its card).
+- Coverage: every ayah has intro, recite, map when the surah has a lesson map
+  (content/map/<slug>.json), primer:1…k when content/compose/<slug>.json opens the
   ayah with the harakat primer, one w${n} per word followed by w${n}:compose:1…k when the word has
   a composition (one per `say` of its frames), structure, concept:${id} for each Konsep whose
   first example is in that ayah, ex:${key}:intro for each exercise of the ayah's quiz
   (content/quiz/<slug>.json, build_quiz.py) and ex:${key}:${n}:why for each of its questions (the
   explanation of the correct answer, said after "Benar." / "Ini jawabannya."; operator 2026-10-10),
-  recap, and next (or done on the last ayah). Nothing else. shared.json holds SHARED_KEYS plus
+  learned when the surah has a lesson map, recap, and next (or done on the last ayah). Nothing
+  else. shared.json holds SHARED_KEYS plus
   ex:${key}:${part} for every guide part of every exercise (mirrors src/components/exercises/guide.ts).
+- The lesson map (operator 2026-10-13, plan L23: "at the beginning we inform what will be learnt,
+  in the end recap what we've learnt"; lessonmap.py; map_problems below): in a surah with
+  content/map/<slug>.json, an ayah's "map" line says how many concepts are NEW and names them —
+  all of them up to MAP_ALL, else the first MAP_NAMED_NEW after "di antaranya" — and they are the
+  concepts of that ayah's concept:* lines, in that order, each named as its "Konsep baru: …"
+  caption names it; how many are REPEATED from an earlier ayah (the sentence is left out when
+  there are none) and how many are present but taught LATER, each with the ayah that will teach
+  it; and nothing else: a concept named there that the map does not list in that group fails. The
+  "learned" line says the same count of new concepts and names the same ones as the "map" line.
+  The map file itself is held to the lessons and the library (lessonmap.problems: later ⊆ the
+  ayah's concepts and really introduced later, review really introduced earlier, every concept
+  of the ayah in exactly one group). A surah without a map file has neither line.
 - Word composition and the harakat primer (operator 2026-10-10, narration rule 14; compose.py):
   a primer / compose line carries `frame`, the 1-based frame of its animation shown while it
   plays (no other line has one); its caption fits beside the animation on a phone (≤
@@ -121,6 +136,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import compose as COMPOSE
+import lessonmap as LESSONMAP
 import quiz as QUIZ
 from common import AUTHORED_DIR, BELAJAR, CONTENT_DIR, SURAHS, normalise
 
@@ -216,6 +232,13 @@ def load_quiz() -> dict[str, dict]:
     return QUIZ.load_all_content()
 
 
+def load_map() -> dict[str, dict]:
+    """content/map/<slug>.json of every lesson surah that has one (build_map.py, lessonmap.py): the
+    lesson map — per ayah, the Konsep that are new, repeated or taught later (plan L23). A surah
+    without one has no "map" / "learned" line."""
+    return LESSONMAP.load_all_content()
+
+
 def _quiz_of(ayah: dict, quiz: dict[str, dict] | None) -> dict | None:
     surah = int(str(ayah["loc"]).split(":")[0])
     slug = next((sp.slug for sp in SURAHS if sp.surah == surah), None)
@@ -250,15 +273,17 @@ def composition_of(compose: dict | None, loc: str) -> dict | None:
 
 
 def expected_parts(lesson: dict, library: dict, compose: dict | None = None,
-                   quiz: dict | None = None) -> dict[int, list[str]]:
+                   quiz: dict | None = None, lessonmap: dict | None = None) -> dict[int, list[str]]:
     """Part names each ayah's narration must have, in lesson order. `compose`: the surah's
     content/compose/<slug>.json (the primer and the word compositions), or None; `quiz`: its
-    content/quiz/<slug>.json (default: from disk)."""
+    content/quiz/<slug>.json (default: from disk); `lessonmap`: its content/map/<slug>.json (the
+    lesson map, plan L23), or None: then no "map" / "learned" part."""
     quiz = quiz if quiz is not None else QUIZ.load_content(lesson["slug"])
     out: dict[int, list[str]] = {}
     last = lesson["ayat"][-1]["ayah"]
     for a in lesson["ayat"]:
-        parts = ["intro", "recite"]
+        mapped = LESSONMAP.ayah_entry(lessonmap, a["ayah"]) is not None
+        parts = ["intro", "recite"] + (["map"] if mapped else [])
         p = primer_of(compose, a["ayah"])
         if p:
             parts += [f"primer:{k}" for k in range(1, len(p.get("lines") or []) + 1)]
@@ -272,7 +297,7 @@ def expected_parts(lesson: dict, library: dict, compose: dict | None = None,
             parts.append("structure")
         for ex in QUIZ.ayah_plan(quiz, a["ayah"]):
             parts += [f"ex:{ex['key']}:intro"] + [f"ex:{ex['key']}:{q['n']}:why" for q in ex["questions"]]
-        parts += ["recap", "done" if a["ayah"] == last else "next"]
+        parts += (["learned"] if mapped else []) + ["recap", "done" if a["ayah"] == last else "next"]
         out[a["ayah"]] = parts
     return out
 
@@ -282,6 +307,16 @@ def expected_shared() -> list[str]:
 
 
 WHOLE_AYAH = [0]
+
+# ------------------------------------------------------------------ the lesson map's two lines
+# Operator 2026-10-13 (plan L23): an ayah opens by saying what it brings ("map", right after the
+# imam's recitation) and closes by saying what it taught ("learned", right before the recap). The
+# card on the stage lists every concept; the narrator names a few (build_narration.map_opening /
+# map_closing write the lines, map_problems below reads them back against content/map).
+MAP_PARTS = ("map", "learned")
+MAP_ALL = 3         # a group of up to this many concepts is named whole
+MAP_NAMED_NEW = 3   # of more NEW concepts, the narrator names this many ("di antaranya …")
+MAP_NAMED_MORE = 2  # … and this many of more REPEATED or POSTPONED ones
 
 
 COMPOSE_PART = re.compile(r"w([1-9]\d*):compose:([1-9]\d*)")
@@ -719,6 +754,13 @@ def _cap(s: str) -> str:
     return s[:i] + s[i:i + 1].upper() + s[i + 1:]
 
 
+def _low(s: str) -> str:
+    """The first letter in lower case, after a leading 'ain apostrophe too: a concept's name inside
+    a sentence ("‘Athaf (عَطْف)" → "‘athaf (عَطْف)")."""
+    i = 1 if s[:1] in APOS and s[1:2].isalpha() else 0
+    return s[:i] + s[i:i + 1].lower() + s[i + 1:]
+
+
 def _capitalised(s: str) -> bool:
     """Does `s` start with a capital (after a leading 'ain apostrophe)?"""
     i = 1 if s[:1] in APOS and s[1:2].isalpha() else 0
@@ -1048,8 +1090,8 @@ def held(text: str, lex: Lexicon) -> list[str]:
 
 # ------------------------------------------------------------------ checks
 SLUG_ID = re.compile(
-    r"^(?P<slug>[a-z-]+):(?P<ayah>[1-9]\d*):(?P<part>intro|recite|primer:[1-9]\d*|w[1-9]\d*(?::compose:[1-9]\d*)?"
-    r"|structure|concept:[a-z0-9-]+"
+    r"^(?P<slug>[a-z-]+):(?P<ayah>[1-9]\d*):(?P<part>intro|recite|map|primer:[1-9]\d*|w[1-9]\d*(?::compose:[1-9]\d*)?"
+    r"|structure|concept:[a-z0-9-]+|learned"
     r"|ex:(?:" + "|".join(EXERCISE_KEYS) + r"):(?:[a-z][a-z_]+|[1-9]\d*:why)|recap|next|done)(?::(?P<split>[a-z]))?$"
 )
 SHARED_ID = re.compile(r"^shared:(?P<part>[a-z_]+(?::[a-z-]+:[a-z_]+)?)(?::(?P<split>[a-z]))?$")
@@ -1475,7 +1517,7 @@ def check_view(lid: str, line: dict, ayah: dict | None, part: str, compose: dict
 
 
 def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: dict, lex: Lexicon,
-                   compose: dict | None = None, quiz: dict | None = None) -> list[str]:
+                   compose: dict | None = None, quiz: dict | None = None, lessonmap: dict | None = None) -> list[str]:
     errs: list[str] = []
     if not isinstance(man, dict) or set(man) != {"version", "voice", "lines"}:
         return [f"{name}: manifest must be exactly {{version, voice, lines}}"]
@@ -1514,6 +1556,8 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
             errs += check_view(lid, line, ayah, part, compose)
             errs += check_animation_line(lid, line, ayah, part, compose, lex, bool(m.group("split")))
             errs += check_renderable(lid, line, ayah, part, compose, lex)
+            if part in MAP_PARTS and m.group("split"):
+                errs.append(f"{lid}: a map / learned line is never split (one line with its card: name fewer concepts)")
         if "audio" in line:
             if voice is None:
                 errs.append(f"{lid}: audio present but the manifest names no voice")
@@ -1537,13 +1581,15 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
         for lid in sorted(have - want):
             errs.append(f"shared: unexpected line {lid}")
     elif lesson is not None:
-        want = {f"{slug}:{n}:{p}" for n, parts in expected_parts(lesson, library, compose, quiz).items() for p in parts}
+        want = {f"{slug}:{n}:{p}" for n, parts in expected_parts(lesson, library, compose, quiz, lessonmap).items() for p in parts}
         have = set(groups)
         for lid in sorted(want - have):
             errs.append(f"{name}: missing line {lid}")
         for lid in sorted(have - want):
             errs.append(f"{name}: unexpected line {lid}")
         errs += check_content(name, lines, lesson, lex)
+        if lessonmap is not None:
+            errs += map_problems(name, lines, lesson, lessonmap)
     return errs
 
 
@@ -1586,6 +1632,210 @@ def check_content(name: str, lines: dict, lesson: dict, lex: Lexicon) -> list[st
     return errs
 
 
+# ------------------------------------------------------------------ what the map's two lines say
+_UNIT = {w: i for i, w in enumerate(("nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan",
+                                    "sepuluh", "sebelas"))}
+
+
+def count_value(words: str) -> int | None:
+    """A count as the narration writes it (build_narration.num_id), 0 – 99: "tiga" → 3, "dua belas"
+    → 12, "dua puluh satu" → 21; None for anything else."""
+    t = words.split()
+    if len(t) == 1:
+        return _UNIT.get(t[0])
+    if len(t) == 2 and t[1] == "belas" and 2 <= _UNIT.get(t[0], 0) <= 9:
+        return _UNIT[t[0]] + 10
+    if len(t) in (2, 3) and t[1] == "puluh" and 2 <= _UNIT.get(t[0], 0) <= 9 and (len(t) == 2 or 1 <= _UNIT.get(t[2], 0) <= 9):
+        return _UNIT[t[0]] * 10 + (_UNIT[t[2]] if len(t) == 3 else 0)
+    return None
+
+
+_MAP_JOIN = re.compile(r", serta |, dan | serta | dan |, ")
+_MAP_PLACE = re.compile(rf" di ayat ({ORDINAL})")
+_MAP_NEW = re.compile(r"^Di ayat ini ada (?P<n>[a-z ]+?) hal baru(?P<some>, di antaranya|:) (?P<list>.+)\.$")
+_MAP_REVIEW = re.compile(r"^Kita (?P<also>juga )?mengulang (?P<n>[a-z ]+?) hal yang sudah kita pelajari"
+                         r"(?P<some>, di antaranya|:) (?P<list>.+)\.$")
+_MAP_LATER = re.compile(rf"^Ada (?P<n>[a-z ]+?) hal lagi di ayat ini, (?P<some>di antaranya|yaitu) (?P<list>.+), tetapi baru kita "
+                        rf"bahas (?:di ayat (?P<ayah>{ORDINAL})|nanti)\.$")
+_MAP_LATER_EACH = re.compile(r"^Ada (?P<n>[a-z ]+?) hal lagi di ayat ini, tetapi baru kita bahas nanti: (?P<list>.+)\.$")
+_MAP_LEARNED = re.compile(r"^Di ayat ini kita sudah mempelajari (?P<n>[a-z ]+?) hal baru(?P<some>, di antaranya|:) (?P<list>.+)\.$")
+_MAP_NONE = "Di ayat ini tidak ada hal baru."
+_MAP_NONE_REVIEW = re.compile(r"^Di ayat ini tidak ada hal baru; kita mengulang (?P<n>[a-z ]+?) hal yang sudah kita pelajari\.$")
+
+
+def named_concepts(text: str, known: dict[str, str], *, places: bool = False) -> list[tuple[str, int | None]] | None:
+    """The concepts a list of names gives, in order: [(id, the ayah said after it or None)]. `known`:
+    name as shown inside a sentence → concept id. The longest name at each place counts ("dhamir
+    (ضَمِير) sya’n" before "dhamir (ضَمِير)"), so a name with a "dan" of its own is one name. None
+    when the text is not such a list (a name the map does not have, a stray word)."""
+    names = sorted(known, key=len, reverse=True)
+    out: list[tuple[str, int | None]] = []
+    at = 0
+    while True:
+        hit = next((n for n in names if text.startswith(n, at)), None)
+        if hit is None:
+            return None
+        at += len(hit)
+        ayah = None
+        m = _MAP_PLACE.match(text, at) if places else None
+        if m:
+            ayah = ordinal_value(m.group(1))
+            at = m.end()
+        out.append((known[hit], ayah))
+        if at == len(text):
+            return out
+        j = _MAP_JOIN.match(text, at)
+        if not j:
+            return None
+        at = j.end()
+
+
+def _map_group(lid: str, what: str, m: re.Match, want: list[str], named_n: int, known: dict[str, str]) -> tuple[list[str], list[str]]:
+    """One sentence of a map / learned line against its group of the map: the count, how many are
+    named, and which. Returns (problems, the ids it names)."""
+    errs = []
+    n = count_value(m.group("n"))
+    if n != len(want):
+        errs.append(f"{lid}: says {m.group('n')} {what}, the lesson map has {len(want)}")
+    got = named_concepts(m.group("list"), known)
+    if got is None:
+        return errs + [f"{lid}: its {what} are not a list of the map's concept names (“{m.group('list')}”)"], []
+    ids = [cid for cid, _a in got]
+    expect = want if len(want) <= MAP_ALL else want[:named_n]
+    if ids != expect:
+        errs.append(f"{lid}: names {ids} as {what}; the lesson map gives {expect}")
+    if (m.group("some") == ", di antaranya" or m.group("some") == "di antaranya") != (len(want) > MAP_ALL):
+        errs.append(f"{lid}: “di antaranya” is said exactly when more than {MAP_ALL} {what} are not all named")
+    return errs, ids
+
+
+def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict) -> list[str]:
+    """The "map" and "learned" lines of every ayah of a surah with a lesson map, read back from
+    their captions against content/map/<slug>.json (module docstring, "The lesson map"). The
+    captions say what is spoken (check_display), so the spoken text is held to the same."""
+    errs: list[str] = []
+    concepts = lessonmap.get("concepts") if isinstance(lessonmap, dict) else None
+    if not isinstance(concepts, dict) or not all(isinstance(c, dict) and isinstance(c.get("name"), str) for c in concepts.values()):
+        return [f"{name}: content/map/{name}.json has no concept names"]
+    known = {_low(c["name"]): cid for cid, c in concepts.items()}
+    surah = lesson["surah"]
+    # An authored later item (a topic) is taught by the line it names: that line must name it.
+    errs += LESSONMAP.topic_problems(lessonmap, lines)
+    for a in lesson["ayat"]:
+        entry = LESSONMAP.ayah_entry(lessonmap, a["ayah"])
+        if entry is None:
+            continue
+        base = f"{lesson['slug']}:{a['ayah']}"
+        new, review, later = (list(entry.get(g) or []) for g in LESSONMAP.GROUPS)
+        if any(cid not in concepts for cid in new + review + later):
+            errs.append(f"{base}: the lesson map lists a concept it has no name for")
+            continue
+        # The new concepts are the ones this ayah's "Konsep baru" lines introduce, named alike.
+        said = list(dict.fromkeys(re.sub(r":[a-z]$", "", lid)[len(base) + len(":concept:"):]
+                                  for lid in lines if lid.startswith(f"{base}:concept:")))
+        if said != new:
+            errs.append(f"{base}:map: the lesson map's new concepts {new} are not this ayah's concept lines {said}")
+        for cid in new:
+            c = concepts[cid]
+            shown = _field_of(lines, f"{base}:concept:{cid}", "display")
+            head = f"{TITLE_LEAD} {c['name']}"
+            if c.get("from") == "title" and shown and not (shown.startswith(head) and re.match(r"(?:$|[,.:;]| \()", shown[len(head):])):
+                errs.append(f"{base}:map: {cid} is named “{c['name']}”, and its own caption does not open with that name "
+                            f"(“{shown[:60]}”)")
+        # --- the opening
+        lid = f"{base}:map"
+        shown = _field_of(lines, lid, "display")
+        named_new: list[str] | None = None
+        if shown:
+            sentences = re.split(r"(?<=\.) ", shown)
+            want = 1 + bool(review) + bool(later)
+            if len(sentences) != want:
+                errs.append(f"{lid}: {len(sentences)} sentence(s); the lesson map has new concepts"
+                            f"{', repeated ones' if review else ''}{', postponed ones' if later else ''}: {want}")
+            first = sentences[0]
+            m = _MAP_NEW.match(first)
+            if not new:
+                named_new = []
+                if first != _MAP_NONE:
+                    errs.append(f"{lid}: the lesson map has no new concept here, and the line does not say so")
+            elif not m:
+                errs.append(f"{lid}: does not open by saying how many concepts are new, and which")
+            else:
+                e, named_new = _map_group(lid, "new concept(s)", m, new, MAP_NAMED_NEW, known)
+                errs += e
+            rest = sentences[1:]
+            if review:
+                m = _MAP_REVIEW.match(rest[0]) if rest else None
+                if not m:
+                    errs.append(f"{lid}: does not say which concepts are repeated from earlier ayat ({len(review)} in the lesson map)")
+                else:
+                    errs += _map_group(lid, "repeated concept(s)", m, review, MAP_NAMED_MORE, known)[0]
+                    if bool(m.group("also")) != bool(new):
+                        errs.append(f"{lid}: “juga” is said exactly when the ayah has new concepts as well")
+                rest = rest[1:]
+            if later:
+                errs += _map_later(lid, rest[0] if rest else "", later, concepts, known, surah)
+                rest = rest[1:]
+            if rest and len(sentences) == want:
+                errs.append(f"{lid}: says more than the lesson map (“{rest[0][:60]}”)")
+        # --- the closing: the same new concepts
+        lid = f"{base}:learned"
+        shown = _field_of(lines, lid, "display")
+        if shown:
+            m = _MAP_LEARNED.match(shown)
+            if not new:
+                r = _MAP_NONE_REVIEW.match(shown)
+                if not (shown == _MAP_NONE and not review) and not (r and review and count_value(r.group("n")) == len(review)):
+                    errs.append(f"{lid}: the lesson map has no new concept here, and the line does not say so")
+            elif not m:
+                errs.append(f"{lid}: does not say how many new concepts the ayah taught, and which")
+            else:
+                e, ids = _map_group(lid, "new concept(s)", m, new, MAP_NAMED_NEW, known)
+                errs += e
+                if named_new is not None and not e and ids != named_new:
+                    errs.append(f"{lid}: names {ids}, not the new concepts the ayah's map line names ({named_new})")
+    return errs
+
+
+def _map_later(lid: str, sentence: str, later: list[str], concepts: dict, known: dict[str, str], surah: int) -> list[str]:
+    """The sentence about the concepts present here and taught later: their count, their names,
+    and for each the ayah that teaches it (of this surah; a concept of another surah has none)."""
+    what = "postponed concept(s)"
+    where = [concepts[c]["ayah"] if concepts[c].get("surah") == surah else None for c in later]
+    each = _MAP_LATER_EACH.match(sentence)
+    m = _MAP_LATER.match(sentence)
+    if each:
+        errs = []
+        if count_value(each.group("n")) != len(later):
+            errs.append(f"{lid}: says {each.group('n')} {what}, the lesson map has {len(later)}")
+        got = named_concepts(each.group("list"), known, places=True)
+        if got is None:
+            return errs + [f"{lid}: its {what} are not a list of the map's concept names, each with its ayah"]
+        if [cid for cid, _a in got] != later:
+            errs.append(f"{lid}: names {[cid for cid, _a in got]} as {what}; the lesson map gives {later}")
+        else:
+            for (cid, ayah), want in zip(got, where):
+                if ayah != want:
+                    errs.append(f"{lid}: says {cid} is taught in ayah {ayah}; the lesson map says "
+                                f"{'ayah ' + str(want) if want else 'another surah'}")
+        if len(later) > MAP_ALL or None in where or len(set(where)) == 1:
+            errs.append(f"{lid}: gives each postponed concept its own ayah, which is said only for up to {MAP_ALL} "
+                        "concepts taught in different ayat of this surah")
+        return errs
+    if not m:
+        return [f"{lid}: does not say which concepts are in this ayah but taught later ({len(later)} in the lesson map)"]
+    errs, _ids = _map_group(lid, what, m, later, MAP_NAMED_MORE, known)
+    said = ordinal_value(m.group("ayah")) if m.group("ayah") else None
+    one = where[0] if len(later) <= MAP_ALL and None not in where and len(set(where)) == 1 else None
+    if said != one:
+        if said is not None:
+            errs.append(f"{lid}: says the postponed concepts are taught in ayah {said}; the lesson map says "
+                        f"{'ayah ' + str(one) if one else ', '.join(str(w) for w in where)}")
+        elif len(later) <= MAP_ALL and None not in where:
+            errs.append(f"{lid}: does not say where the postponed concepts are taught (ayah {', '.join(str(w) for w in where)})")
+    return errs
+
+
 def check_guide_ts() -> list[str]:
     """EXERCISE_KEYS / EXERCISE_GUIDE_PARTS above must match src/components/exercises/guide.ts."""
     if not GUIDE_TS.exists():
@@ -1607,20 +1857,22 @@ _BUILDS: dict[str, dict | str] = {}
 
 
 def check_build(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, lex: Lexicon,
-                compose: dict[str, dict] | None = None, quiz: dict[str, dict] | None = None) -> list[str]:
+                compose: dict[str, dict] | None = None, quiz: dict[str, dict] | None = None,
+                lessonmap: dict[str, dict] | None = None) -> list[str]:
     """Every line equals a fresh build (text, display, highlight, focus, frame), and nothing else is there."""
     import build_narration as B  # local import: build_narration imports this module
 
     errs = []
-    # The build depends only on the lessons, the library, the compositions, the quizzes and the
-    # dictionary (not on the manifests): one build per distinct input (the mutation tests check many
-    # manifest copies against one).
+    # The build depends only on the lessons, the library, the compositions, the quizzes, the lesson
+    # maps and the dictionary (not on the manifests): one build per distinct input (the mutation
+    # tests check many manifest copies against one).
     quiz = load_quiz() if quiz is None else quiz
-    key = hashlib.sha256(json.dumps([lessons, library, compose or {}, quiz, [(t.term, t.speak, t.display) for t in lex.terms]],
+    lessonmap = load_map() if lessonmap is None else lessonmap
+    key = hashlib.sha256(json.dumps([lessons, library, compose or {}, quiz, lessonmap, [(t.term, t.speak, t.display) for t in lex.terms]],
                                     sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
     if key not in _BUILDS:
         try:
-            _BUILDS[key] = B.build_lines(lessons, library, lex, compose or {}, quiz)
+            _BUILDS[key] = B.build_lines(lessons, library, lex, compose or {}, quiz, lessonmap)
         except SystemExit as e:
             _BUILDS[key] = f"build_narration.py fails: {e}"
     want = _BUILDS[key]
@@ -1663,12 +1915,16 @@ def letters_for(name: str, lessons: dict[str, dict], forms: Forms, compose: dict
 
 def check(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, *, build: bool = True,
           lex: Lexicon | None = None, compose: dict[str, dict] | None = None,
-          quiz: dict[str, dict] | None = None) -> list[str]:
+          quiz: dict[str, dict] | None = None, lessonmap: dict[str, dict] | None = None) -> list[str]:
     forms = Forms(lessons)
     lex = lex or load_lexicon()
     compose = load_compose() if compose is None else compose
     quiz = load_quiz() if quiz is None else quiz
+    lessonmap = load_map() if lessonmap is None else lessonmap
     errs: list[str] = lex.problems(forms)
+    # The lesson maps are held to the lessons and the library before their lines are read back.
+    for slug, mp in lessonmap.items():
+        errs += LESSONMAP.problems(mp, lessons, library) if slug in lessons else [f"map/{slug}: a lesson map for a surah without a lesson"]
     for sp in SURAHS:
         if sp.slug in lessons and sp.slug not in manifests:
             errs.append(f"{sp.slug}: narration manifest missing")
@@ -1678,10 +1934,11 @@ def check(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, *
         if name != "shared" and name not in lessons:
             errs.append(f"{name}: narration manifest for a surah without a lesson")
             continue
-        errs += check_manifest(name, man, forms, lessons.get(name), library, lex, compose.get(name), quiz.get(name))
+        errs += check_manifest(name, man, forms, lessons.get(name), library, lex, compose.get(name), quiz.get(name),
+                               lessonmap.get(name))
     errs += check_guide_ts()
     if build:
-        errs += check_build(manifests, lessons, library, lex, compose, quiz)
+        errs += check_build(manifests, lessons, library, lex, compose, quiz, lessonmap)
     return errs
 
 

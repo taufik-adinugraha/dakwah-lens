@@ -3,6 +3,10 @@
  * written per ayah), in the order a learner meets it:
  *
  *   intro → recite_ayah (imam, whole ayah; mushaf words follow the imam)
+ *   → map (only in a surah with a lesson map, content/map/${slug}.json: what
+ *     this ayah brings — the concepts that are new, the ones repeated from
+ *     earlier ayat, the ones present but taught later — one line, with its
+ *     card on the stage; operator 2026-10-13, plan L23, lessonMap.ts)
  *   → primer (the harakat primer, when content/compose opens this ayah with
  *     it: each mark on a dotted circle, its sound, an example from the ayah)
  *   → for every word: recite_word (imam, that word) + explain (w${n}: the
@@ -20,6 +24,8 @@
  *     content/quiz/<slug>.json decides them, and each question's correct
  *     answer has its explanation line, said after "Benar." or "Ini
  *     jawabannya.": operator 2026-10-10)
+ *   → learned (with a lesson map: the new concepts this ayah taught, one
+ *     line, with its card)
  *   → recap (imam again) → next (to ayah + 1) | done (end of the surah)
  *
  * Every step carries its narration line ids (contract in types.ts), the
@@ -43,6 +49,7 @@ import type { ComposeInput } from "../composition";
 import { latinSentences, splitCaption, stripArabic } from "../lessonSteps";
 import type { ExampleInput } from "./examples";
 import { canonicalExercises, exerciseProgressId } from "./exercises";
+import type { LessonMapInput } from "./lessonMap";
 import { explainLineId, lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
 import { lineDisplay, lineMarks, lineSegments, lineText, wordRefs } from "./narration";
 import {
@@ -84,6 +91,9 @@ export type SequenceInput = {
   compose?: ComposeInput | null;
   /** This ayah's example beats (examples.ts lessonExamples), when it has any. */
   examples?: readonly ExampleInput[] | null;
+  /** This ayah's lesson map (lessonMap.ts lessonMapInputOf), when its surah has one: then the
+   *  sequence gets its "map" and "learned" steps (plan L23). */
+  map?: LessonMapInput | null;
 };
 
 /** Concepts whose FIRST example lies in `ayahLoc` ("1:2"). Same rule as
@@ -225,6 +235,14 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     }),
   );
 
+  // What this ayah brings, before its words (plan L23): the card on the stage lists the concepts,
+  // so the engine's own caption (a page without narration) gives their counts only.
+  const map = input.map ?? null;
+  if (map) {
+    const counts = { new: map.new.length, review: map.review.length, later: map.later.length };
+    steps.push(step({ id: "map", kind: "map", cues: [cue(p("map"), texts.lessonMap(counts))], guides: [] }));
+  }
+
   const primer = input.compose?.primer;
   if (primer && primer.lines.length) {
     steps.push(
@@ -359,6 +377,11 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
         exercise: { key, progressId: exerciseProgressId(lessonKey, key), parts, lead, promptCue, guides, explain },
       }),
     );
+  }
+
+  // … and what it taught, before the imam recites the ayah once more.
+  if (map) {
+    steps.push(step({ id: "learned", kind: "learned", cues: [cue(p("learned"), texts.learned({ new: map.new.length }))], guides: [] }));
   }
 
   steps.push(

@@ -77,8 +77,10 @@ export function WordCard({
   /** The lemma's shared Kosakata entry (tashrif, i'lal), when present. */
   lexeme?: Lexeme;
   /** Concepts this word illustrates (Konsep library), resolved by the page, with the Arabic
-   *  headword of each title. */
-  concepts?: { id: string; title: string; head?: string | null }[];
+   *  headword of each title — and, for a concept an earlier ayah already taught, `taught`: the
+   *  short line shown under its chip, "sudah dipelajari di ayat 1" (the lesson map, plan L23;
+   *  only in a surah that has one). Text only: nothing here is spoken. */
+  concepts?: { id: string; title: string; head?: string | null; taught?: string | null }[];
   /** Optional play control for this word (a labelled "Dengar" button),
    *  supplied by a client parent that owns the player; shown beside
    *  "Kata ke-N". The card itself has no audio. */
@@ -230,6 +232,12 @@ export function WordCard({
                           </bdi>
                         ) : null}
                       </Link>
+                      {/* Under its chip, in the flow: it wraps with the column, never beside the chip. */}
+                      {c.taught ? (
+                        <p data-concept-taught={c.id} className="mt-1 px-4 text-sm text-ink-muted">
+                          {c.taught}
+                        </p>
+                      ) : null}
                     </li>
                   ))}
                   {lexeme ? (

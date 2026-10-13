@@ -159,6 +159,8 @@
     "no_root": "tidak berakar (huruf/kata ganti)",
     "role": "Peran dalam kalimat",
     "concepts": "Konsep tata bahasa",
+    "concept_taught": "sudah dipelajari di ayat {n}",
+    "concept_taught_surah": "sudah dipelajari di QS {surah}:{ayah}",
     "lemma": "Lihat kata dasarnya",
     "sharaf_heading": "Lihat asal-usul bentuk kata (sharaf)",
     "sharaf_forms_note": "Bentuk-bentuk kata (tashrif), bukan kutipan ayat.",
@@ -319,7 +321,18 @@
     "example_tag": "Contoh",
     "example_place": "QS {surah}:{ayah}",
     "example_ending": "akhirnya",
-    "example_failed": "Suara contoh ini belum bisa diputar. Pelajaran berlanjut sendiri."
+    "example_failed": "Suara contoh ini belum bisa diputar. Pelajaran berlanjut sendiri.",
+    "map_label": "Isi pelajaran ayat ini",
+    "map_new": "Baru di ayat ini",
+    "map_review": "Mengulang",
+    "map_later": "Nanti",
+    "map_none": "Tidak ada hal baru.",
+    "map_review_ayah": "dari ayat {n}",
+    "map_review_surah": "dari QS {surah}:{ayah}",
+    "map_later_ayah": "di ayat {n}",
+    "map_later_surah": "di QS {surah}:{ayah}",
+    "map_learned_label": "Yang sudah dipelajari di ayat ini",
+    "map_learned": "Sudah dipelajari"
   },
   "Compose": {
     "word_n": "Kata ke-{n}",

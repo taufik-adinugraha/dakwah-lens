@@ -46,6 +46,13 @@ has are then spoken from it.
 the whole ayah ([0]) for intro/recite/structure/recap, word n (and its word card) for w${n}, the
 words tagged with the concept and the words of its structure groups for concept:${id}.
 
+The lesson map (operator 2026-10-13, plan L23; lessonmap.py, content/map/<slug>.json, written by
+build_map.py before this runs): in a surah that has one, every ayah gets "map" right after
+"recite" — what it brings: the new concepts, the ones repeated from earlier ayat, the ones present
+but taught later — and "learned" right before "recap": what it taught. Built from the map's names
+(map_opening / map_closing below), read back by validate_narration.map_problems. A surah without a
+map file gets neither, and its manifest is unchanged.
+
 Word composition and the harakat primer (operator 2026-10-10, narration rule 14; compose.py,
 content/compose/<slug>.json): the ayah that opens with the primer gets "primer:${k}" lines after
 "recite", one per `say` of the primer's frames; a word with a composition gets, after its w${n}
@@ -65,6 +72,7 @@ import json
 import re
 import sys
 
+import lessonmap as LM
 import quiz as Q
 import validate_narration as V
 from common import SURAHS
@@ -730,11 +738,81 @@ def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.T
     return why
 
 
+# ------------------------------------------------------------------ the lesson map (plan L23)
+# Operator 2026-10-13: "at the beginning of the ayat, better to inform what concept we will learn in
+# this ayat, also explain maybe we skip some concept and will visit later in next ayat … so at the
+# beginning we inform what will be learnt, in the end recap what we've learnt"; "if some concept
+# already done in previous ayat, we say we repeat what we've learnt before". Two lines per ayah of a
+# surah with content/map/<slug>.json (lessonmap.py): "map" after the imam's recitation, "learned"
+# before the recap. The narrator NAMES at most MAP_NAMED_NEW new concepts and MAP_NAMED_MORE of the
+# repeated or postponed ones when there are more than MAP_ALL (then "di antaranya …"); the card on
+# the stage lists every one. validate_narration.map_problems reads the lines back against the map.
+MAP_ALL = V.MAP_ALL
+MAP_NAMED_NEW = V.MAP_NAMED_NEW
+MAP_NAMED_MORE = V.MAP_NAMED_MORE
+
+
+def _names(names: list[str]) -> str:
+    """A list of concept names inside a sentence: "a", "a dan b", "a, b, dan c" — and "serta" for
+    the last join, after a comma, when a name has a "dan" of its own ("i'rab dan tandanya, serta
+    huruf jar"), so the ear can tell the names apart."""
+    if not any(" dan " in n for n in names):
+        return _list_id(names)
+    return ", ".join(names[:-1]) + (", serta " if len(names) > 1 else "") + names[-1]
+
+
+def map_opening(entry: dict, concepts: dict, surah: int) -> str:
+    """What this ayah brings: the new concepts, the ones repeated from earlier ayat (left out when
+    there are none), the ones present but taught later (the same), each group with its count."""
+    low = lambda cid: V._low(concepts[cid]["latin"])  # noqa: E731
+    new, review, later = entry["new"], entry["review"], entry["later"]
+    out = []
+    if not new:
+        out.append("Di ayat ini tidak ada hal baru.")
+    elif len(new) <= MAP_ALL:
+        out.append(f"Di ayat ini ada {num_id(len(new))} hal baru: {_names([low(c) for c in new])}.")
+    else:
+        out.append(f"Di ayat ini ada {num_id(len(new))} hal baru, di antaranya {_names([low(c) for c in new[:MAP_NAMED_NEW]])}.")
+    if review:
+        lead = f"Kita {'juga ' if new else ''}mengulang {num_id(len(review))} hal yang sudah kita pelajari"
+        if len(review) <= MAP_ALL:
+            out.append(f"{lead}: {_names([low(c) for c in review])}.")
+        else:
+            out.append(f"{lead}, di antaranya {_names([low(c) for c in review[:MAP_NAMED_MORE]])}.")
+    if later:
+        lead = f"Ada {num_id(len(later))} hal lagi di ayat ini"
+        # Where each will be taught: an ayah of this surah, which the line names; None: another surah.
+        here = [concepts[c]["ayah"] if concepts[c]["surah"] == surah else None for c in later]
+        if len(later) > MAP_ALL:
+            out.append(f"{lead}, di antaranya {_names([low(c) for c in later[:MAP_NAMED_MORE]])}, tetapi baru kita bahas nanti.")
+        elif None in here:
+            out.append(f"{lead}, yaitu {_names([low(c) for c in later])}, tetapi baru kita bahas nanti.")
+        elif len(set(here)) == 1:
+            out.append(f"{lead}, yaitu {_names([low(c) for c in later])}, tetapi baru kita bahas di ayat {ordinal(here[0])}.")
+        else:
+            out.append(f"{lead}, tetapi baru kita bahas nanti: "
+                       f"{_names([f'{low(c)} di ayat {ordinal(a)}' for c, a in zip(later, here)])}.")
+    return " ".join(out)
+
+
+def map_closing(entry: dict, concepts: dict) -> str:
+    """What this ayah taught: its new concepts, named as the opening named them."""
+    low = lambda cid: V._low(concepts[cid]["latin"])  # noqa: E731
+    new, review = entry["new"], entry["review"]
+    if not new:
+        return ("Di ayat ini tidak ada hal baru; kita mengulang "
+                f"{num_id(len(review))} hal yang sudah kita pelajari." if review else "Di ayat ini tidak ada hal baru.")
+    if len(new) <= MAP_ALL:
+        return f"Di ayat ini kita sudah mempelajari {num_id(len(new))} hal baru: {_names([low(c) for c in new])}."
+    return (f"Di ayat ini kita sudah mempelajari {num_id(len(new))} hal baru, di antaranya "
+            f"{_names([low(c) for c in new[:MAP_NAMED_NEW]])}.")
+
+
 Line = tuple[str, str, dict | None, str]  # id, prose, ayah (None for shared lines), part
 
 
 def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | None = None,
-                quiz: dict | None = None, terms: Q.Terms | None = None) -> list[Line]:
+                quiz: dict | None = None, terms: Q.Terms | None = None, lessonmap: dict | None = None) -> list[Line]:
     slug, S, name = lesson["slug"], lesson["surah"], lesson["name_id"]
     last = lesson["ayat"][-1]["ayah"]
     out: list[Line] = []
@@ -748,6 +826,10 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
         add("intro", f"Ayat {ordinal(A)} Surah {name}. Terjemahannya: “{V.fold(tr)}” Ayat ini terdiri "
                      f"dari {num_id(n_words)} kata, dan kita akan mempelajarinya satu per satu.")
         add("recite", f"Sekarang dengarkan imam membacakan ayat {ordinal(A)}.")
+        # The lesson map (plan L23), for a surah that has one: what this ayah brings, before its words.
+        mapped = LM.ayah_entry(lessonmap, A)
+        if mapped is not None:
+            add("map", map_opening(mapped, lessonmap["concepts"], S))
         primer = V.primer_of(compose, A)
         for k, ln in enumerate((primer or {}).get("lines") or [], 1):
             add(f"primer:{k}", san.prose(ln["say"], S, A, strict=f"{base}:primer:{k}"))
@@ -775,6 +857,9 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
             add(f"ex:{ex['key']}:intro", ex_intro(ex, terms))
             for q in ex["questions"]:
                 add(f"ex:{ex['key']}:{q['n']}:why", ex_why(ex, q, a, library, san, terms, S))
+        # … and what it taught, before the imam recites the ayah once more.
+        if mapped is not None:
+            add("learned", map_closing(mapped, lessonmap["concepts"]))
         add("recap", f"Dengarkan sekali lagi seluruh ayat {ordinal(A)} dibacakan imam.")
         if A == last:
             add("done", f"Pelajaran ayat {ordinal(A)} selesai. Ini ayat terakhir Surah {name}.")
@@ -794,14 +879,17 @@ def shared_lines() -> list[Line]:
 
 
 def build_lines(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = None,
-                compose: dict[str, dict] | None = None, quiz: dict[str, dict] | None = None) -> dict[str, dict[str, dict]]:
+                compose: dict[str, dict] | None = None, quiz: dict[str, dict] | None = None,
+                lessonmap: dict[str, dict] | None = None) -> dict[str, dict[str, dict]]:
     """manifest name → {id: {text, display, highlight, focus, frame?}}, in lesson order
     (deterministic). `compose`: content/compose/<slug>.json by slug, `quiz`: content/quiz/<slug>.json
-    by slug (both default: from disk). Stops, writing nothing, if a line fails a validate_narration
-    check (a new mention or term the rules above do not cover)."""
+    by slug, `lessonmap`: content/map/<slug>.json by slug (all default: from disk). Stops, writing
+    nothing, if a line fails a validate_narration check (a new mention or term the rules above do
+    not cover)."""
     lex = lex or V.load_lexicon()
     compose = V.load_compose() if compose is None else compose
     quiz = V.load_quiz() if quiz is None else quiz
+    lessonmap = V.load_map() if lessonmap is None else lessonmap
     terms = Q.Terms(Q.load_terms())
     san = Sanitiser(lessons)
     sp = Speech(lex)
@@ -812,7 +900,8 @@ def build_lines(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None =
     raw: dict[str, list[Line]] = {}
     for spec in SURAHS:
         if spec.slug in lessons:
-            raw[spec.slug] = surah_lines(lessons[spec.slug], library, san, compose.get(spec.slug), quiz.get(spec.slug), terms)
+            raw[spec.slug] = surah_lines(lessons[spec.slug], library, san, compose.get(spec.slug), quiz.get(spec.slug), terms,
+                                         lessonmap.get(spec.slug))
     raw["shared"] = shared_lines()
     out: dict[str, dict[str, dict]] = {}
     for name, rows in raw.items():
@@ -824,6 +913,9 @@ def build_lines(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None =
             frame = V.line_frame(ayah, part, comp)
             focus_ar = V.line_letters(ayah, part, focus, forms, comp, library)
             parts = split_line(sp.mark(prose), measure=lambda x: len(sp.spoken(x)))
+            if part in V.MAP_PARTS and len(parts) > 1:
+                errs.append(f"{lid}: a map / learned line is one line, and this one is longer than {V.MAX_LINE} spoken "
+                            "characters (name fewer concepts)")
             ids = [lid] if len(parts) == 1 else [f"{lid}:{chr(ord('a') + i)}" for i in range(len(parts))]
             for pid, marked in zip(ids, parts):
                 text, display = sp.spoken(marked), sp.shown(marked, focus_ar)

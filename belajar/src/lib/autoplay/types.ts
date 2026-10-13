@@ -18,13 +18,17 @@
  *
  * Narration lines are keyed by the step-id contract shared by every part of
  * the autoplay build (and by pipeline/build_narration.py + validate_narration.py):
- *   "${slug}:${ayah}:${part}"   part ∈ intro | recite | primer:${k} | w${n} |
+ *   "${slug}:${ayah}:${part}"   part ∈ intro | recite | map | primer:${k} | w${n} |
  *                                      w${n}:compose:${k} | structure |
  *                                      concept:${conceptId} |
  *                                      ex:${exerciseKey}:intro |
  *                                      ex:${exerciseKey}:${n}:why |
- *                                      recap | next | done
- *   (primer:${k}: the k-th line of the harakat primer that opens an ayah;
+ *                                      learned | recap | next | done
+ *   (map / learned: the lesson map's two lines, only in a surah that has one —
+ *    what this ayah brings, said right after the imam's recitation, and what
+ *    it taught, said right before the recap; operator 2026-10-13, plan L23,
+ *    content/map/${slug}.json, lessonMap.ts;
+ *    primer:${k}: the k-th line of the harakat primer that opens an ayah;
  *    w${n}:compose:${k}: the k-th line of word n's composition — both play
  *    over an animation frame, the manifest's `frame`; operator 2026-10-10,
  *    narration rule 14, content/compose/${slug}.json; ex:${key}:${n}:why:
@@ -283,6 +287,9 @@ export type ExampleBeat = {
 export type StepKind =
   | "intro"
   | "recite_ayah"
+  /** The lesson map's opening (plan L23): what this ayah brings — the concepts that are new, the
+   *  ones repeated from earlier ayat, the ones present but taught later — with its card. */
+  | "map"
   /** The harakat primer (fathah a, kasrah i, dhammah u, …) opening an ayah. */
   | "primer"
   | "recite_word"
@@ -295,6 +302,8 @@ export type StepKind =
   /** The example(s) of the concept just introduced: no narration line, the imam only. */
   | "example"
   | "exercise"
+  /** The lesson map's closing (plan L23): the new concepts this ayah taught, with its card. */
+  | "learned"
   | "recap"
   | "next"
   | "done";
@@ -392,6 +401,11 @@ export type AutoplayTexts = {
   conceptBrief: (title: string) => string;
   /** Per exercise: its introduction and the prompt for each control. */
   exercise: Record<ExerciseKey, { intro: string } & Partial<Record<GuidePart, string>>>;
+  /** The lesson map's opening without a narration display text (plan L23): how many concepts
+   *  are new, repeated and taught later. The card beside it names them, so the caption does not. */
+  lessonMap: (a: { new: number; review: number; later: number }) => string;
+  /** … and its closing: how many new concepts the ayah taught. */
+  learned: (a: { new: number }) => string;
   recap: string;
   next: (a: { ayah: number }) => string;
   done: (a: { surah: string }) => string;

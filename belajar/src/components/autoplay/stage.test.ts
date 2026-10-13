@@ -20,6 +20,7 @@ import {
 import { composeInput } from "@/lib/compose-content";
 import { SURAHS } from "@/lib/content";
 import { conceptsIntroducedIn } from "@/lib/library";
+import { lessonMapInput } from "@/lib/map-content";
 import { quizAyah } from "@/lib/quiz-content";
 import { SURAH_SLUGS } from "@/lib/routes";
 
@@ -86,6 +87,8 @@ describe("autoplay stage: what the lesson page ships", () => {
             compose: composeInput(s.slug, a),
             // The example beats too (plan L20): the imam and a caption, no narration.
             examples: lessonExamplesFor(s, a).examples,
+            // The lesson map's two steps, in a surah that has one (plan L23).
+            map: lessonMapInput(s.slug, a.ayah),
           });
           expect(JSON.stringify(seq)).toBe(JSON.stringify(direct));
           // Every line the Indonesian stage can speak has its manifest text

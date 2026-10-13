@@ -23,6 +23,13 @@
  * caption emphasises its first meaning, or a quiz answer alone (review
  * 2026-10-11), and a part shown alone must not pick a "first" of its own.
  *
+ * A LESSON-MAP line (operator 2026-10-13, plan L23: what an ayah brings, what
+ * it taught) is a list read beside its card, and on a phone the card needs
+ * the room: its karaoke caption shows ONE ≤180-character part at a time —
+ * the part with the word being said, its words lit as on any karaoke caption
+ * (karaokeParts) — as a text caption does, instead of the whole line (ayah
+ * 2's opening is three sentences, a dozen rows on a 390px screen).
+ *
  * The mushaf line and the word card (stageMarks): the words the line on
  * screen highlights (the whole ayah for the intro, the recitation lead,
  * the structure and the recap; the word explained; a concept's words), and
@@ -53,6 +60,7 @@
  * exercise's own status box says those).
  */
 import {
+  parseLineId,
   partAt,
   viewAutoplay,
   withoutArabic,
@@ -188,6 +196,37 @@ function karaokeEmphasis(cue: Cue): (EmphasisKind | null)[][] {
   return per;
 }
 
+/** The words of a caption text: what a karaoke word's text is counted in (a dictionary term is
+ *  one karaoke word of several: "huruf jar (حَرْف جَرّ),"). */
+const wordCount = (text: string) => text.split(/\s+/u).filter(Boolean).length;
+
+/**
+ * The karaoke words of each caption part of a line, as [from, to) into `words` — or null when
+ * the line is one part, or its words do not line up with its parts (a karaoke word across two
+ * parts, another count of words): then the whole line is shown, as before. The parts are the
+ * cue's own (splitCaption of its display, ≤180 characters, cut at sentence and clause ends); the
+ * karaoke words are that display word for word (the pipeline checks a line's tokens join to it).
+ */
+export function karaokeParts(parts: readonly string[], words: readonly KaraokeWord[]): [number, number][] | null {
+  if (parts.length < 2) return null;
+  const out: [number, number][] = [];
+  let w = 0;
+  for (const part of parts) {
+    const from = w;
+    let left = wordCount(part);
+    while (left > 0 && w < words.length) left -= wordCount(words[w++][0]);
+    if (left !== 0 || w === from) return null;
+    out.push([from, w]);
+  }
+  return w === words.length ? out : null;
+}
+
+/** Is `line` a lesson-map line ("…:map", "…:learned"), whose karaoke caption goes part by part? */
+const byParts = (line: string) => {
+  const id = parseLineId(line);
+  return id?.kind === "ayah" && (id.part === "map" || id.part === "learned");
+};
+
 export function stageCaption(
   seq: AutoplaySequence,
   state: AutoplayState,
@@ -214,6 +253,21 @@ export function stageCaption(
       pos = voice;
     }
     const emph = karaokeEmphasis(cue)[cue.audio.indexOf(seg)] ?? seg.words.map(() => null);
+    // A lesson-map line (one file): the part with the word being said — the first before any
+    // word, the last once all are said — with the karaoke position counted inside it.
+    const cut = byParts(cue.line) && cue.audio.length === 1 ? karaokeParts(cue.parts, seg.words) : null;
+    if (cut) {
+      const at = pos.now >= 0 ? pos.now : Math.min(pos.said, seg.words.length) - 1;
+      const [from, to] = cut.find(([a, b]) => at >= a && at < b) ?? cut[0];
+      return {
+        kind: "karaoke",
+        words: seg.words.slice(from, to),
+        emph: emph.slice(from, to),
+        now: pos.now >= from && pos.now < to ? pos.now - from : -1,
+        said: Math.max(0, Math.min(pos.said, to) - from),
+        voiced: true,
+      };
+    }
     return { kind: "karaoke", words: seg.words, emph, now: pos.now, said: pos.said, voiced: true };
   }
   const parts = cue.display !== null ? cue.parts : splitCaption(cue.spoken ?? cue.caption);

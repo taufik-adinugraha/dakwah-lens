@@ -29,6 +29,7 @@ import { composeFor } from "@/lib/compose-content";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
 import { stageExamples } from "@/lib/autoplay";
 import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY, TERMS } from "@/lib/library";
+import { lessonMapInput } from "@/lib/map-content";
 import { quizAyah } from "@/lib/quiz-content";
 import { planOf } from "@/lib/quiz-plan";
 import { ayahHref, surahHref } from "@/lib/routes";
@@ -209,6 +210,15 @@ export default async function AyahPage({
     sources: tw("sources"),
   };
   const hasDeeper = !!a.structure || introduced.length > 0 || !!a.tafsir || facts.length > 0;
+  // The lesson map of this ayah (operator 2026-10-13, plan L23), for a surah that has one: the
+  // stage's two cards, and on a word card the mark under a concept an earlier ayah already taught.
+  const lessonMap = lessonMapInput(s.slug, a.ayah);
+  const taughtBefore = Object.fromEntries(
+    (lessonMap?.review ?? []).map((it) => [
+      it.id,
+      it.surah === s.surah ? tw("concept_taught", { n: it.ayah }) : tw("concept_taught_surah", { surah: it.surah, ayah: it.ayah }),
+    ]),
+  );
 
   // Through MixedText (line breaks, operator 2026-10-10): the quotes and a
   // footnote mark stay on their word ("pembalasan.[1]”"), "orang-orang" and
@@ -261,6 +271,9 @@ export default async function AyahPage({
             compose={compose && (compose.primer || Object.keys(compose.words).length) ? compose : null}
             examples={examples}
             marks={composeFile?.marks ?? null}
+            // The lesson map's card (operator 2026-10-13, plan L23): what this ayah brings and what
+            // it taught, for a surah that has a map (content/map); the sequence above has its steps.
+            lessonMap={lessonMap}
           />
         </div>
 
@@ -287,7 +300,7 @@ export default async function AyahPage({
                       lexeme={w.lemma_id ? getLexeme(w.lemma_id) : undefined}
                       concepts={w.concepts.flatMap((id) => {
                         const c = getConcept(id);
-                        return c ? [{ id: c.id, title: c.title, head: conceptHead[c.id] }] : [];
+                        return c ? [{ id: c.id, title: c.title, head: conceptHead[c.id], taught: taughtBefore[c.id] ?? null }] : [];
                       })}
                       lookup={lookup}
                       listen={

@@ -78,6 +78,17 @@ const EN: AutoplayTexts = {
       next: "Click the marked button to continue.",
     },
   },
+  lessonMap: ({ new: fresh, review, later }) =>
+    [
+      fresh ? `This ayah has ${fresh} new ${fresh === 1 ? "thing" : "things"} to learn.` : "This ayah has nothing new.",
+      review ? `We repeat ${review} we have already learnt.` : "",
+      later ? `${later} more ${later === 1 ? "is" : "are"} explained later.` : "",
+      "The list is on the screen.",
+    ]
+      .filter(Boolean)
+      .join(" "),
+  learned: ({ new: fresh }) =>
+    fresh ? `In this ayah we have learnt ${fresh} new ${fresh === 1 ? "thing" : "things"}. The list is on the screen.` : "This ayah had nothing new.",
   recap: "Listen to the whole ayah once more, and recite along with the imam.",
   next: ({ ayah }) => `This ayah's lesson is complete. Next: ayah ${ayah}.`,
   done: ({ surah }) => `This ayah's lesson is complete. It is the last ayah of surah ${surah}.`,

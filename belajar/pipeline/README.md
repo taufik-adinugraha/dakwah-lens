@@ -52,9 +52,12 @@ python3 test_validate_terms.py     # plants 54 faults (retyped term, unmarked te
 python3 validate_clips.py          # the imam's voice of every Konsep example: library.json `clips` (CI: --no-corpus); see "Suara contoh"
 python3 test_validate_clips.py     # plants 58 faults (an example with no voice, an unwanted clip, another ayah's or reciter's file, a word's timing off by one in a lesson or outside the lessons, an implausible length, a Harakat sign that is not heard where its example is, an ayah's last word without `last`, a hamzat-washal tile played alone, a fixture that drifted, a stale pin, …) (CI: --no-corpus)
 python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Kuis"); before the narration, which reads them
+python3 build_map.py               # the lesson maps ../content/map/*.json, for the surahs switched on (see "Peta pelajaran"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
-python3 test_validate_narration.py # plants 105 faults in copies of the manifests, the dictionary and the compositions, each must fail
+python3 test_validate_narration.py # plants 132 faults in copies of the manifests, the dictionary, the compositions and the lesson maps, each must fail
+python3 validate_map.py            # the lesson maps: new / review / later against the lessons, the names against the captions, an authored later item against the line that teaches it
+python3 test_validate_map.py       # plants 41 faults (a concept in the wrong group, one taught later listed as repeated, a pointer to a line that does not name the thing, …)
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah); exit 1 on any failure
 python3 test_validate_quiz.py      # plants 21 faults (an untaught state, an untaught option, two correct options, …), each must fail
 python3 render_narration.py        # DRY RUN: characters and cost; never calls the API without --render --i-approve-spend
@@ -126,6 +129,11 @@ a machine whose cache predates them). `cache/` is git-ignored.
 | `test_validate_narration.py` | 6 | Mutation tests for `validate_narration.py` + unit tests of the speech text, dictionary rendering, tokens, numbers and render request |
 | `render_narration.py` | 4 | ElevenLabs renderer with word timings (`/with-timestamps`; dry run by default; spends only with `--render --i-approve-spend`); keeps the 128 kbps render as the master and delivers it through `encode_narration.deliver` |
 | `encode_narration.py` | 4 | The delivery encode: each master → 64 kbps mono MP3 with ffmpeg (fixed flags, same bytes every run), named by its text, format and bytes; writes the manifests' `audio {url, ms, sha256}`; refuses a drift over 80 ms or a karaoke token that no longer fits |
+| `authored/<slug>.map.json` | 3 | The per-surah switch of the lesson map (Al-Fatihah only), with the little that cannot be derived: explicit concept names where a caption title gives none, and authored "later" items (marfu' in ayah 1) with the line that teaches each |
+| `lessonmap.py` | — | The lesson map's rules: what is new / repeated / taught later per ayah (derived), the name cut, authored later items, the file format and its checks |
+| `build_map.py` | 2 | Writes `belajar/content/map/<slug>.json` for the surahs switched on (names through the narration's sanitiser and dictionary); `--show` prints the table |
+| `validate_map.py` | 6 | The lesson map checks: every rule on its own, the names against the "Konsep baru" captions, an authored later item against its teaching line, equality with a fresh build |
+| `test_validate_map.py` | 6 | Planted-fault tests for the lesson map + the Al-Fatihah table pinned |
 | `authored/<slug>.quiz.json` | 3 | Hand-authored quiz plan (Al-Fatihah): per ayah the exercises kept, each question's word and the words whose reason / role are its wrong options, the sort bins, the wazan forms (see "Kuis") |
 | `quiz.py` | — | The quiz plan: resolving an authored plan (the mechanical one without it), the Arabic of its labels from the term table, TAUGHT (from the narration) and REQUIRED (per question), and every rule |
 | `build_quiz.py` | 2 | Writes `belajar/content/quiz/<slug>.json`; `--show <slug> <ayah>` prints one ayah's questions |
@@ -905,6 +913,125 @@ narrator and nothing is rendered; `content/narration/*.json` did not change.
   word); that iOS Safari lets the example player sound after the one "Mulai" tap and across the
   hand-off.
 
+## Peta pelajaran (the lesson map: what an ayah brings, what it taught)
+
+Operator, 2026-10-13 (plan L23): "at the beginning of the ayat, better to inform what concept we
+will learn in this ayat, also explain maybe we skip some concept and will visit later in next ayat
+instead of explaining all concepts in 1 ayat … so at the beginning we inform what will be learnt, in
+the end recap what we've learnt"; "if some concept already done in previous ayat, we say we repeat
+what we've learnt before"; and "in ayat-1, it mentions 'bentuk tertentu' but no explanation about
+marfu' itself, better to inform it will be learnt later".
+
+**Derived, not authored** (`lessonmap.py`). Per ayah: `new` = the Konsep whose first example is in
+that ayah, in the library's order (the ayah's `concept:*` lines); `review` = on the ayah's words
+(`words[].concepts`, and `structure.groups[].concept`: today every group's concept is tagged on a
+word too), first taught in an EARLIER ayah of the lessons; `later` = on its words, first taught in
+a LATER ayah. review and later are in the order taught. Al-Fatihah:
+
+| ayat | new | review | later |
+|---|---|---|---|
+| 1 | 5 | 0 | 1 + marfu' (authored) → ayat 2 |
+| 2 | 3 | 4 | 2 (ayat 3, ayat 7) |
+| 3 | 1 | 1 | 0 |
+| 4 | 1 | 3 | 0 |
+| 5 | 8 | 1 | 1 (ayat 6) |
+| 6 | 2 | 6 | 0 |
+| 7 | 6 | 9 | 0 |
+
+**The switch and the authored part** (`authored/<slug>.map.json`; Al-Fatihah only). The file's
+existence switches a surah on: `build_map.py` then writes `content/map/<slug>.json`,
+`build_narration.py` adds the two lines per ayah, the app shows the two cards. A surah without it
+gets none of this and its manifest does not change by a byte. The file holds only what cannot be
+derived:
+
+- `names`: concept id → an explicit short name, ONLY where the concept's "Konsep baru: …" caption
+  title opens with no clean name. A concept is called by the name its caption opens with
+  (`lessonmap.cut_name`, the prose twin of `src/lib/emphasis.ts` `conceptName`: its words up to
+  the title's `,` `:` `.` `;` or the ` (` of its gloss, at most four) — "Huruf jar (حَرْف جَرّ)",
+  "I’rab (إِعْرَاب) dan tandanya", "Tiga jenis kalimah (كَلِمَة)". The build stops and names the
+  concept when a title gives none ("Lam: menafikan dan menjazmkan …", a title that names a Qur'anic
+  word: `jazm-lam` and `zharaf-idza` will need one when their surahs are switched on). Al-Fatihah
+  needs none.
+- `later`: an AUTHORED later item (a topic) for something an ayah shows without explaining that is
+  no Konsep: `{ayah, id, name, note, line}` — a short name (spoken), what is left open (on the
+  card only) and the narration line that TEACHES it. Al-Fatihah 1: marfu', "mengapa bentuk dasar
+  berakhir dhammah", taught by `al-fatihah:2:w1:compose:8` ("… disebut marfu’ (مَرْفُوع)."). The
+  line must exist, lie in a later ayah and NAME the thing ("disebut …" / "… adalah"; a mention
+  does not count): a pointer to something no line teaches is refused. (Checked 2026-10-13: the
+  "sudah tertentu" of `1:w3:compose:1` — definiteness, ma'rifah / nakirah — is named and taught by
+  NO line of any lesson, so it has no pointer; it needs a lesson line first.)
+
+**File** (`content/map/<slug>.json`, version 1): `concepts` (every concept or topic the ayat list:
+`name` its caption form, `latin` the prose, `from` title | authored | topic, `surah` / `ayah` where
+it is taught, a topic's `note` and `line`) and `ayat` (`{ayah, new, review, later}`, ids). Read by
+the narration build and validator, by the page (`src/lib/map-content.ts`: zod, then the derivation
+again in TypeScript — a file that disagrees with the lessons fails `next build`) and by the engine
+checks. It is data to reuse: a surah's end review is the union of its ayat's `new`.
+
+**The two lines** (`build_narration.map_opening` / `map_closing`; ids `${slug}:${ayah}:map` right
+after `recite`, `${slug}:${ayah}:learned` right before `recap`; highlight `[]`, no word card; never
+split). Up to three concepts of a group are all named; of more, three new ones or two repeated /
+postponed ones after "di antaranya"; a name with a "dan" of its own is joined by ", serta":
+
+- "Di ayat ini ada lima hal baru, di antaranya A, B, serta C." / "… ada satu hal baru: A."
+- "Kita juga mengulang empat hal yang sudah kita pelajari, di antaranya X dan Y." (left out when
+  nothing is repeated)
+- "Ada satu hal lagi di ayat ini, yaitu Z, tetapi baru kita bahas di ayat kedua." — several taught
+  in different ayat: "…, tetapi baru kita bahas nanti: Z di ayat ketiga, serta W di ayat ketujuh."
+  (left out when nothing is postponed)
+- closing: "Di ayat ini kita sudah mempelajari tiga hal baru: A, B, dan C."
+
+`validate_narration.map_problems` reads the lines back from their captions: the counts, which
+concepts are named (parsed against the map's names, the longest name first), that the new ones are
+the ayah's `concept:*` lines and are named as their own captions name them, each postponed one's
+ayah, that the closing names what the opening named, and that an authored item's teaching line
+still names it.
+
+**On the stage.** A card in the word card's slot (`LessonMapCard.tsx`): "Baru di ayat ini",
+"Mengulang" (each "dari ayat N"), "Nanti" (each "di ayat N"; an authored item with its note), then
+"Sudah dipelajari" with a tick per concept. The karaoke caption of these two lines goes one
+≤180-character part at a time (`caption.ts karaokeParts`), so the card keeps room on a phone. On a
+word's card (Materi lengkap) a concept an earlier ayah taught says "sudah dipelajari di ayat N".
+
+```bash
+python3 build_map.py            # write content/map/*.json (after build_surah / build_library, BEFORE build_narration)
+python3 build_map.py --check    # exit 1 if a file differs from a fresh build
+python3 build_map.py --show     # the table and every name
+python3 validate_map.py         # the rules, each on its own; the names against the captions; a fresh build
+python3 test_validate_map.py    # 41 planted faults
+```
+
+**Rendering the lines (2026-10-13: prepared, NOT rendered).** The build added 14 lines to
+Al-Fatihah and changed one (`al-fatihah:1:w1:compose:3`, which now ends "Mengapa dhammah, kita
+pelajari di ayat kedua."); the other 338 Al-Fatihah lines kept `text`, `audio` and `tokens` byte
+for byte, and the other four manifests are byte-identical. Those 15 lines carry no `audio`: they
+play caption-only until rendered. Dry run: 15 distinct texts, 2,222 characters, USD 0.18. In
+order, from `belajar/pipeline` (`OUT`: where the masters of record are, so the upload list sees
+every delivered file; without `--out` the files go to `pipeline/out` of this checkout):
+
+```bash
+OUT=/path/to/the/checkout/with/the/masters/belajar/pipeline/out
+ONLY="--only al-fatihah:1:w1:compose:3"; for n in 1 2 3 4 5 6 7; do ONLY="$ONLY --only al-fatihah:${n}:map --only al-fatihah:${n}:learned"; done   # bash
+
+# 0. What would be sent (no key read, nothing sent): must say 15 distinct texts.
+python3 render_narration.py $ONLY
+# 1. Render (the one step that costs money) and deliver: 15 masters to $OUT/narration/kang-nandar/al-fatihah/<audio_name>.mp3
+#    (+ .json alignment), 15 delivered files to $OUT/delivery/kang-nandar/al-fatihah/<delivery_name>.mp3; the manifest
+#    gets each line's audio {url, ms, sha256} and tokens.
+python3 render_narration.py --render --i-approve-spend --voice-id aK834gEOxQEtviMPgurT --voice-name "Kang Nandar" \
+    --env-file /path/to/dakwah-lens/.env --out "$OUT" $ONLY
+# 2. The manifests are what the build gives, and valid (353 of 353 Al-Fatihah lines with audio).
+python3 build_narration.py --check && python3 validate_narration.py
+# 3. Every delivered file is on this machine as described; write the upload list.
+python3 encode_narration.py --check --out "$OUT" --list "$OUT/delivery/files.txt"
+# 4. Upload the listed files, check each as served ("Before a deploy", steps 3 and 4), commit the manifest, push.
+```
+
+Until then: `scripts/ci/screenshots.mjs` `aheadChecks` (phone) stops at its first line — it follows
+the lesson map's line of ayah 1 as the file fetched two steps ahead and needs it rendered. Every
+pipeline check, the vitest suite and the other browser checks pass rendered or not (a line without
+audio is caption-only by design).
+
 ## Narasi (guided-lesson narration)
 
 The autoplay lesson ("Mulai" once, then no clicks except exercise answers) speaks an Indonesian
@@ -944,6 +1071,7 @@ in lesson order:
 |---|---|---|---|
 | `intro` | every ayah | which ayah, its translation (QuranEnc, in quotes on the caption), how many words | `[0]` |
 | `recite` | every ayah | one line before the imam recites the ayah | `[0]` |
+| `map` | every ayah of a surah with a lesson map (`content/map/<slug>.json`; "Peta pelajaran") | what the ayah brings: how many concepts are new (named), repeated, and present but taught later (named, with the ayah) | `[]`, focus `null` (its card is on the stage) |
 | `primer:${k}` | the ayah the harakat primer opens (Al-Fatihah 1) | the k-th sentence of the primer's frames | the words whose letters its frame shows as they are (بِ: `[1]`), focus `null` |
 | `w${n}` | every word | "Kata ke-n artinya: “gloss”." + the word's `why`, sanitised — or, when the word has a composition, + its `lead` ("Kata ini terdiri dari dua bagian."), since the frames say the why part by part | `[n]`, focus = that word |
 | `w${n}:compose:${k}` | a word with a composition | the k-th sentence of its frames (strict: no Qur'anic word, spoken as authored) | `[n]`, focus = that word (the animation takes the card's place) |
@@ -951,6 +1079,7 @@ in lesson order:
 | `structure` | every ayah with `structure` | the structure summary, sanitised | `[0]` |
 | `ex:${key}:intro` | each exercise of the ayah's quiz (`content/quiz/<slug>.json`) | what the exercise is, how many questions, the case groups of a sort, the form names of a wazan quiz | `[0]` for `tap-word`, else `[]` |
 | `ex:${key}:${n}:why` | each question n of those exercises | the ONE short explanation of the correct answer, said after "Benar." and after "Ini jawabannya." (operator 2026-10-10): tap — the word's place and gloss; why / sort — the word's `why` (+ "Jadi, kata ini <state>." when it does not name the state); role — "Perannya: <role head>." + the `why`; wazan — "Itu bentuk <label>" + its Konsep card's title. Only sourced fields, sanitised like every line | `[]` |
+| `learned` | every ayah of a surah with a lesson map | what the ayah taught: its new concepts, as the `map` line named them | `[]`, focus `null` |
 | `recap` | every ayah | before the imam recites the ayah again | `[0]` |
 | `next` / `done` | `next` on every ayah but the last, `done` on the last | | `[]` |
 
@@ -1118,7 +1247,10 @@ and tokens (with audio only, in time order, within the clip, joined by
 spaces equal to `Lexicon.render_display(text)`); and that the manifests equal a fresh build (no
 hand edits; edit the templates, the dictionary or the lesson content instead). None of this needs
 an audio file: CI has neither the masters nor the delivered files, and checks the manifests alone.
-`test_validate_narration.py` plants 105 faults (one per rule; 28 of them came with format 2: the
+`test_validate_narration.py` plants 132 faults (one per rule; 27 of them came with the lesson map,
+2026-10-13: a missing or stray map line, a wrong count, a concept named in the wrong group, a
+postponed concept's wrong ayah, a closing that names other concepts, an authored later item whose
+line no longer names it; 28 came with format 2: the
 dictionary, captions, tokens, content-addressed audio, copy rules and the stage view; 14 with the
 compositions: primer/compose coverage, `frame`, caption length beside the animation, tile
 syllables, splits, letter shapes, strict prose; 3 with the delivery format, 2026-10-11: a url
