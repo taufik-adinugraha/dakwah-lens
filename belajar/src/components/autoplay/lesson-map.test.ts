@@ -9,6 +9,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { LessonMapCard, type LessonMapCardGroup } from "@/components/lesson/LessonMapCard";
 import { WordCard } from "@/components/lesson/WordCard";
+import { introHref } from "@/lib/routes";
 import {
   availableExercises,
   buildAutoplaySequence,
@@ -252,9 +253,10 @@ describe("the lesson map in the autoplay sequence", () => {
         const ids = seq.steps.map((s) => s.id);
         const where = `al-fatihah ${a.ayah} (${locale})`;
         expect(ids.slice(0, 5), where).toEqual(["intro", "recite", ...OPENING]);
-        // The first word comes after the map (in ayah 1 the harakat primer stood between them
-        // until 2026-10-13: it is lesson zero's now).
-        expect(ids[5], where).toBe("w1:recite");
+        // After the map: the warm-up that opens the lesson (operator 2026-10-13: "in every ayat
+        // we identify first each words fall into which category"), then the first word (in ayah 1
+        // the harakat primer stood there until 2026-10-13: it is lesson zero's now).
+        expect(ids.slice(5, 7), where).toEqual(["ex:word-kind", "w1:recite"]);
         expect(ids, where).not.toContain("primer");
         expect(ids.slice(-3), where).toEqual(["learned", "recap", a.ayah === 7 ? "done" : "next"]);
         expect(ids.indexOf("learned"), where).toBeGreaterThan(Math.max(...seq.steps.flatMap((s, i) => (s.kind === "exercise" || s.kind === "structure" ? [i] : []))));
@@ -371,7 +373,8 @@ describe("the lesson map in the autoplay sequence", () => {
     let s = send(createAutoplayState(seq), { type: "start", reason: "fresh" });
     while (seq.steps[s.idx].id !== "map:new") s = send(s, { type: "next" });
     // Rendered: narrated; not rendered yet: the caption is read at reading pace. Either way one
-    // activity per line, each step ends by itself, and after the last the first word's step starts.
+    // activity per line, each step ends by itself, and after the last the lesson goes on: to the
+    // warm-up that opens it (operator 2026-10-13), which stands before the first word.
     const seen: string[] = [];
     for (let guard = 0; guard < 60 && seq.steps[s.idx].kind === "map"; guard++) {
       const a = s.activity;
@@ -381,7 +384,8 @@ describe("the lesson map in the autoplay sequence", () => {
       s = send(s, a.kind === "narrate" ? { type: "narration_end", token: a.token } : { type: "timer", token: a.token });
     }
     expect(seen).toEqual(OPENING);
-    expect(seq.steps[s.idx].id).toBe("w1:recite");
+    expect(seq.steps[s.idx].id).toBe("ex:word-kind");
+    expect(seq.steps[s.idx + 1].id).toBe("w1:recite");
     expect(s.phase).not.toBe("paused");
     // "Tunggu saya": each group waits for Lanjut, so the learner reads one card at a time.
     let w = reduceAutoplay(seq, createAutoplayState(seq, { pace: "tunggu" }), { type: "start", pace: "tunggu", reason: "fresh" });
@@ -506,7 +510,12 @@ describe("a lesson-map line's karaoke caption goes part by part (the card needs 
     expect(other).toBeDefined();
     const line = other!.cues[0];
     let s = reduceAutoplay(seq, createAutoplayState(seq), { type: "start", reason: "fresh" });
-    while (seq.steps[s.idx].id !== other!.id) s = reduceAutoplay(seq, s, { type: "next" });
+    // A bounded walk (a step that is gone must fail, not spin); an exercise on the way — the
+    // warm-up opens the lesson — is left with "Lewati latihan", as a learner would.
+    for (let k = 0; k < 4 * seq.steps.length && seq.steps[s.idx].id !== other!.id; k++) {
+      s = reduceAutoplay(seq, s, seq.steps[s.idx].kind === "exercise" ? { type: "skip" } : { type: "next" });
+    }
+    expect(seq.steps[s.idx].id).toBe(other!.id);
     const act = s.activity!;
     if (act.kind !== "narrate") throw new Error("not narrating");
     expect(act.line).toBe(line.line);
@@ -734,14 +743,14 @@ describe("the lesson map's card: one group at a time", () => {
 });
 
 describe("the word card marks a concept an earlier lesson taught (text only)", () => {
-  const wordCard = (taught: string | null) => {
+  const wordCard = (taught: string | null, taughtHref: string | null = null) => {
     const w = FATIHAH.ayat[3].words[0]; // 1:4:1, a na't: taught in ayah 3
     const labels = { ...id.Word, sharaf: { heading: id.Word.sharaf_heading, forms_note: id.Word.sharaf_forms_note, ilal: id.Word.ilal, ilal_from: id.Word.ilal_from, ilal_to: id.Word.ilal_to } };
     const intl: ComponentProps<typeof NextIntlClientProvider> = {
       locale: "id",
       messages: id,
       timeZone: "Asia/Jakarta",
-      children: createElement(WordCard, { word: w, labels, concepts: [{ id: "naat", title: "Na't (sifat yang mengikuti)", head: null, taught }] }),
+      children: createElement(WordCard, { word: w, labels, concepts: [{ id: "naat", title: "Na't (sifat yang mengikuti)", head: null, taught, taughtHref }] }),
     };
     return renderToStaticMarkup(createElement(NextIntlClientProvider, intl));
   };
@@ -751,6 +760,13 @@ describe("the word card marks a concept an earlier lesson taught (text only)", (
     expect(marked).toMatch(/<\/a><p data-concept-taught="naat"[^>]*>sudah dipelajari di ayat 3<\/p>/);
     expect(wordCard(null)).not.toContain("data-concept-taught");
     expect(en.Word.concept_taught).toContain("{n}");
+    // A step of lesson zero: "sudah dipelajari di Pengantar", a link to that lesson (the page gives
+    // the address: routes.ts introHref, in the surah that hosts lesson zero) — underlined, a row
+    // of the module's link height; without an address the same words as plain text.
+    const zero = wordCard(id.Word.concept_taught_intro, introHref());
+    expect(zero).toMatch(/<\/a><p data-concept-taught="naat"[^>]*><a href="\/quran\/pengantar" class="link-text inline-flex min-h-12 items-center">sudah dipelajari di Pengantar<\/a><\/p>/);
+    expect(wordCard(id.Word.concept_taught_intro)).toMatch(/<p data-concept-taught="naat"[^>]*>sudah dipelajari di Pengantar<\/p>/);
+    expect(en.Word.concept_taught_intro).toBe("learnt in the Introduction");
     // Which chips get the mark is the curriculum's (curriculum.test.ts taughtBefore): every learnt
     // step of an ayah that comes up again and is a whole record has a tagged word to sit under.
     for (const a of FATIHAH.ayat) {

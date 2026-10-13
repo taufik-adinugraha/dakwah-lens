@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { StructureItemCard } from "@/components/lesson/StructureItemCard";
-import { createAutoplayState, LINE_ID_RE, parseLineId, reduceAutoplay, type AutoplayEvent, type AutoplayState } from "@/lib/autoplay";
+import { createAutoplayState, LINE_ID_RE, OPENING_EXERCISES, parseLineId, reduceAutoplay, type AutoplayEvent, type AutoplayState } from "@/lib/autoplay";
 import { sequenceProblems } from "@/lib/autoplay/checks";
 import { SURAHS } from "@/lib/content";
 import { MAX_CAPTION } from "@/lib/lessonSteps";
@@ -65,12 +65,14 @@ describe("the structure of an ayah, told item by item", () => {
 
   it("the items come after the new concepts and before the exercises, one after another", () => {
     for (const a of FATIHAH.ayat) {
-      const kinds = stageSequence(FATIHAH, a, "id").steps.map((s) => s.kind);
+      const steps = stageSequence(FATIHAH, a, "id").steps;
+      const kinds = steps.map((s) => s.kind);
       const first = kinds.indexOf("structure");
       const last = kinds.lastIndexOf("structure");
       expect(kinds.slice(first, last + 1).every((k) => k === "structure"), `ayah ${a.ayah}`).toBe(true);
       expect(Math.max(kinds.lastIndexOf("concept"), kinds.lastIndexOf("example")), `ayah ${a.ayah}`).toBeLessThan(first);
-      const exercise = kinds.indexOf("exercise");
+      // (the warm-up opens the lesson, before its words: types.ts OPENING_EXERCISES)
+      const exercise = steps.findIndex((s) => s.kind === "exercise" && !OPENING_EXERCISES.includes(s.exercise!.key));
       if (exercise !== -1) expect(last, `ayah ${a.ayah}`).toBeLessThan(exercise);
     }
   });

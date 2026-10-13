@@ -256,8 +256,11 @@ describe("where it is linked", () => {
     const track = read("src/app/[locale]/quran/page.tsx");
     expect(track.indexOf("<IntroCard")).toBeGreaterThan(-1);
     expect(track.indexOf("<IntroCard")).toBeLessThan(track.indexOf("{SURAHS.map((s) => {"));
-    // … only while the surah that hosts it is published.
-    expect(track).toContain("ZERO_HOST && published.has(ZERO_HOST.slug)");
+    // … only while the surah that hosts it is published: the ONE rule (lib/curriculum.ts
+    // introOpen), which the curriculum page asks for its row too (curriculumOutline.test.ts).
+    expect(track).toContain("{introOpen(published) && (");
+    expect(read("src/lib/curriculum.ts")).toContain("return ZERO_HOST !== null && published.has(ZERO_HOST.slug);");
+    expect(read("src/app/[locale]/quran/kurikulum/page.tsx")).toContain("intro: introOpen(published)");
     const surah = read("src/app/[locale]/quran/[surah]/page.tsx");
     expect(surah.indexOf("<IntroCard")).toBeGreaterThan(-1);
     expect(surah.indexOf("<IntroCard")).toBeLessThan(surah.indexOf("{s.ayat.map((a) => ("));
@@ -296,7 +299,14 @@ describe("the CI scripts know its page", () => {
     expect(ci).toContain(`const INTRO_PATH = "/belajar/id${introHref()}";`);
     expect(ci).toContain("[INTRO_PATH, false],");
     expect(ci).toContain('pages.push(["pengantar", INTRO_PATH]);');
-    expect(ci).toContain("if (p === INTRO_PATH) intro = true;\n      else if (SURAH_PATH.test(p)) surahs.push(p);");
+    // The harvest of the track's links: lesson zero's address has a surah's shape, so it is taken
+    // out BEFORE the surah test, in the same if-chain (other pages of the track that are no surah
+    // — the curriculum page — may stand between the two; nothing else may), and never joins the
+    // surahs.
+    const chain = /if \(p === INTRO_PATH\) intro = true;\n((?:\s*else if \([^\n]*\) [^\n]*;\n)*?)\s*else if \(SURAH_PATH\.test\(p\)\) surahs\.push\(p\);/.exec(ci);
+    expect(chain, "the lesson-zero branch does not stand before the surah branch of one if-chain").not.toBeNull();
+    expect(chain![1]).not.toMatch(/surahs\.push|INTRO_PATH/);
+    expect(ci.match(/surahs\.push\(/g)).toHaveLength(1);
     expect(ci).toContain("the track does not link lesson zero");
   });
 });

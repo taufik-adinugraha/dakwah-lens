@@ -43,7 +43,7 @@ import { taughtIn, type CurriculumFile } from "./curriculum";
 import { buildAutoplaySequence, sequenceLineIds } from "./sequence";
 import { ID_TEXTS } from "./texts";
 import { advanceHoldMs, exampleReadMs, partAt, readMs, settleAfterNarrationMs, settleAfterReciteMs, WORD_REPEAT_GAP_MS } from "./timing";
-import { SHARED_KEYS, type AutoplaySequence, type NarrationManifest, type Pace } from "./types";
+import { OPENING_EXERCISES, SHARED_KEYS, type AutoplaySequence, type NarrationManifest, type Pace } from "./types";
 
 const CONTENT = fileURLToPath(new URL("../../../content/", import.meta.url));
 const { input, errors: loadErrors } = loadCheckInput((rel) => {
@@ -54,7 +54,15 @@ const quizOf = (slug: string, n: number) => quizAyahOf(input.quiz?.[slug], n);
 /** What an ayah's lesson teaches as "Konsep baru": the curriculum's steps (plan L26). */
 const taught = (ayah: Parameters<typeof taughtIn>[2]) => taughtIn(input.curriculum as CurriculumFile, input.concepts, ayah);
 
-/** One ayah's sequence, caption-only unless manifests are given. */
+/** The exercises of an ayah as these tests play them: what FOLLOWS its explanations. The warm-up
+ *  that opens a lesson (types.ts OPENING_EXERCISES, operator 2026-10-13) is left out here — this
+ *  file pins the machine on the steps of a lesson by their place (the first word right after
+ *  the imam's ayah, the first exercise "Dengar dan klik") — and has its own file, with the real
+ *  sequences: src/components/autoplay/warm-up.test.ts. runAutoplayChecks (below) drives every
+ *  lesson WITH its warm-up. */
+const exercisesAfter = (slug: string, n: number) => availableExercises(quizOf(slug, n)).filter((k) => !OPENING_EXERCISES.includes(k));
+
+/** One ayah's sequence, caption-only unless manifests are given (without its warm-up: exercisesAfter). */
 function seqFor(
   slug: string,
   n: number,
@@ -69,7 +77,7 @@ function seqFor(
     ayahCount: surah.ayat.length,
     ayah,
     introduced: taught(ayah),
-    exercises: availableExercises(quizOf(slug, n)),
+    exercises: exercisesAfter(slug, n),
     questions: questionNumbers(quizOf(slug, n)),
     texts: ID_TEXTS,
     narration: m.narration ?? null,
@@ -508,7 +516,7 @@ describe("a word's opening step: as long as the imam's word when the narrator ex
   it("the engine's own check refuses a step that recites a word again (checks.ts sequenceProblems)", () => {
     const ayah = input.surahs.find((s) => s.slug === "al-fatihah")?.ayat[1];
     if (!ayah) throw new Error("no Al-Fatihah 2");
-    const ctx = { ayah, last: false, exercises: availableExercises(quizOf("al-fatihah", 2)), introduced: taught(ayah), compose: null };
+    const ctx = { ayah, last: false, exercises: exercisesAfter("al-fatihah", 2), introduced: taught(ayah), compose: null };
     expect(sequenceProblems(plain, ctx)).toEqual([]);
     // What every composition step did until 2026-10-13, planted on a word's explanation.
     const again = structuredClone(plain);

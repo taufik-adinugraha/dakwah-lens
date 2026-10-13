@@ -9,7 +9,7 @@ import { MainSiteBridge } from "@/components/MainSiteBridge";
 import { ShareButton } from "@/components/ShareButton";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
-import { CURRICULUM, ZERO_HOST } from "@/lib/curriculum";
+import { CURRICULUM, introOpen } from "@/lib/curriculum";
 import { visibleSurahs } from "@/lib/features";
 import { ayahHref, curriculumHref, surahHref } from "@/lib/routes";
 import { pageUrl, shareMetadata } from "@/lib/share";
@@ -117,7 +117,7 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
           </h2>
           <ul className="mt-3 space-y-4">
             {/* Lesson zero first (2026-10-13): the lesson with no ayah that opens the course. */}
-            {ZERO_HOST && published.has(ZERO_HOST.slug) && (
+            {introOpen(published) && (
               <li>
                 <IntroCard eyebrow={ti("eyebrow")} title={ti("title")} hint={ti("card_hint")} cta={ti("card_cta")} />
               </li>

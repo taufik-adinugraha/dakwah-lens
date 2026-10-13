@@ -47,6 +47,12 @@ const EN: AutoplayTexts = {
   concept: (title, summary) => `New concept — ${title}: ${summary}`,
   conceptBrief: (title) => `New concept — ${title}. It is explained under Learn more.`,
   exercise: {
+    "word-kind": {
+      intro: "Warm-up: isim, fi'il, or huruf? Guess the kind of each word of this ayah first.",
+      options: "Click one of the marked kinds.",
+      reveal: "Try again, or click the marked “Show the answer”.",
+      next: "Click the marked button to continue.",
+    },
     "tap-word": {
       intro: "Practice: Listen and click. The imam recites one word of this ayah, then you click that word.",
       play: "Listen to the imam recite one word of this ayah.",

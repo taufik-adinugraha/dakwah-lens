@@ -769,8 +769,9 @@ async function comingSoonCheck(page, vp) {
  * curriculum in the page"; plan L30), against content/curriculum.json: every lesson of the file
  * is listed once, in its order; a lesson visitors can reach — a written ayah of a published surah
  * (`surahsOn`: every surah with lesson pages; else all but HIDDEN_SURAHS) — has ONE link into the
- * track, to that ayah; every other lesson (a hidden surah's, Ayat Kursi's segments, the
- * introduction, which has no route yet: src/lib/routes.ts lessonHref) has no link into the track
+ * track, to that ayah — and so has the introduction (lesson "0"), to INTRO, while it is written
+ * and the surah that hosts it (Al-Fatihah, never hidden in these runs) is published; every other
+ * lesson (a hidden surah's, Ayat Kursi's segments) has no link into the track
  * and shows the words "Belum tersedia" (messages/id.json, never typed here) in a label that is
  * VISIBLE and has nothing to click or focus. As production shows it, no link on the page leads
  * into a hidden surah. And at the largest text size nothing makes the page scroll sideways (the
@@ -783,9 +784,12 @@ async function curriculumCheck(page, vp, surahsOn) {
   const mark = msgs.Curriculum?.unavailable;
   if (!mark) throw new Error("messages/id.json has no Curriculum.unavailable");
   const slugOf = Object.fromEntries(file.units.map((u) => [u.id, u.slug ?? null]));
+  // Lesson zero's host: the surah whose harakat primer is played there (src/lib/curriculum.ts ZERO_HOST).
+  const zeroHost = (await Promise.all(Object.values(slugOf).filter(Boolean).map(async (slug) => [slug, JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", `${slug}.json`), "utf8").catch(() => "null"))]))).find(([, c]) => c?.primer?.lesson === "0")?.[0] ?? null;
+  const on = (slug) => !!slug && (surahsOn || !HIDDEN_SURAHS.includes(slug));
   const reachable = (l) => {
-    const slug = slugOf[l.unit];
-    return !!slug && (surahsOn || !HIDDEN_SURAHS.includes(slug)) && l.ayah !== undefined && l.segment === undefined && !!l.map;
+    if (l.id === "0") return !!l.map && on(zeroHost);
+    return on(slugOf[l.unit]) && l.ayah !== undefined && l.segment === undefined && !!l.map;
   };
   await page.goto(BASE + CURRICULUM, { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
@@ -809,7 +813,7 @@ async function curriculumCheck(page, vp, surahsOn) {
     const r = rows.find((x) => x.id === l.id);
     if (!r) continue;
     if (reachable(l)) {
-      const href = `/belajar/id/quran/${slugOf[l.unit]}/${l.ayah}`;
+      const href = l.id === "0" ? INTRO : `/belajar/id/quran/${slugOf[l.unit]}/${l.ayah}`;
       if (JSON.stringify(r.links) !== JSON.stringify([href])) problems.push(`${l.id}: links ${JSON.stringify(r.links)}, expected [${href}]`);
       else linked++;
       if (r.status !== null) problems.push(`${l.id}: a lesson that can be opened says "${r.status}"`);
@@ -3122,6 +3126,130 @@ async function quizVoiceCheck(page, vp, index) {
 }
 
 /**
+ * THE WARM-UP, "isim, fi'il, atau huruf?" (operator 2026-10-13: "i think it's better in every ayat
+ * we identify first each words fall into which category: ismu, fi'il or harf. it's kind of
+ * exercise, kind of warming up"; plan L31), on Al-Fatihah 2 — a word of one part, then a word of
+ * two (a huruf jar and the Name), its remembered place cleared, the narration answered in the
+ * browser. Everything expected is read from content/quiz/al-fatihah.json, never typed:
+ *   1. it is the exercise the lesson reaches FIRST, by "Berikutnya ›" from the start, on the step
+ *      "ex:word-kind", and no word has been explained yet (no step "w1" was passed);
+ *   2. question 1 shows its word as ONE piece, the lesson's bytes, in the thick frame
+ *      ([data-asked]), and three answers in the lessons' order, each with its Arabic term;
+ *   3. a wrong pick shows no explanation; the right pick shows the question's sentence
+ *      (content/quiz `why`), the one the narrator says;
+ *   4. the lesson goes on to the next question BY ITSELF, and a word of two parts shows both
+ *      pieces, the one asked in the frame, in the ayah's reading order;
+ *   5. "Lewati latihan" leaves it for the first word.
+ * Shot at question 1 (and the viewport on the phone). Fails the job otherwise.
+ */
+async function wordKindChecks(page, vp, index) {
+  const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
+  const quiz = await read("content/quiz/al-fatihah.json");
+  const warm = quiz.ayat.find((a) => a.ayah === 2).exercises.find((e) => e.key === "word-kind");
+  if (!warm) throw new Error("content/quiz/al-fatihah.json: ayah 2 has no warm-up (word-kind)");
+  const [q1] = warm.questions;
+  const part = warm.questions.find((q) => q.of > 1);
+  if (!part || q1.of !== 1) throw new Error("the warm-up of Al-Fatihah 2 no longer opens with a word of one part and has a word of two: pick another ayah for this check");
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const stage = page.locator('[data-autoplay="stage"]');
+  const exercise = page.locator('[data-autoplay="exercise"] [data-exercise="word-kind"]');
+  const next = page.locator('[data-autoplay="next"]');
+  const option = (kind) => exercise.locator(`[data-option="${kind}"]`);
+  /** The Latin start of a sentence, up to its first Arabic (what innerText surely holds). */
+  const head = (text) => text.split(/\s*[(\u0600-\u06FF]/u)[0].slice(0, 40);
+  const pieces = () =>
+    exercise.locator("[data-kind-piece]").evaluateAll((els) => els.map((e) => ({ part: Number(e.getAttribute("data-kind-piece")), asked: e.getAttribute("data-asked") === "true", ar: e.textContent ?? "", x: e.getBoundingClientRect().left })));
+  try {
+    await page.goto(BASE + AYAH_2, { waitUntil: "networkidle" });
+    // The earlier checks left a remembered place on this ayah ("Lanjutkan dari langkah N").
+    await page.evaluate((key) => localStorage.removeItem(key), "belajar:v1:autoplay:al-fatihah/2");
+    await page.reload({ waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('[data-autoplay="start"]').click();
+    await settleScroll(page);
+    // 1. The first exercise the lesson reaches, before any word.
+    const passed = [];
+    for (let i = 0; i < 20 && !(await exercise.isVisible()); i++) {
+      const at = await stage.getAttribute("data-step");
+      if (at && passed.at(-1) !== at) passed.push(at);
+      if (at?.startsWith("ex:") && at !== "ex:word-kind") break;
+      await next.click();
+      await page.waitForTimeout(250);
+    }
+    await exercise.waitFor({ state: "visible", timeout: 10_000 }).catch(() => {
+      throw new Error(`${vp}: the warm-up never came up from the start of Al-Fatihah 2 (passed: ${passed.join(" → ")})`);
+    });
+    if ((await stage.getAttribute("data-step")) !== "ex:word-kind") throw new Error(`${vp}: the warm-up is on the step "${await stage.getAttribute("data-step")}", not "ex:word-kind"`);
+    if (passed.some((s) => /^w\d/.test(s))) throw new Error(`${vp}: the warm-up came after a word's step (passed: ${passed.join(" → ")}); it opens the lesson`);
+    // 2. Question 1: one piece, the lesson's bytes, framed; three answers with their Arabic.
+    const first = await pieces();
+    if (JSON.stringify(first.map((p) => [p.part, p.asked, p.ar])) !== JSON.stringify([[1, true, q1.ar]])) {
+      throw new Error(`${vp}: question 1 shows ${JSON.stringify(first)}, expected the one piece ${q1.ar} in the frame`);
+    }
+    const kinds = Object.keys(quiz.kinds);
+    const shown = await exercise.locator("[data-option]").evaluateAll((els) => els.map((e) => [e.getAttribute("data-option"), e.textContent ?? ""]));
+    if (JSON.stringify(shown.map((o) => o[0])) !== JSON.stringify(kinds)) throw new Error(`${vp}: the warm-up offers ${JSON.stringify(shown.map((o) => o[0]))}, expected ${JSON.stringify(kinds)}`);
+    for (const [kind, text] of shown) {
+      const ar = /\(([^()]+)\)/.exec(quiz.kinds[kind])?.[1];
+      if (!ar || !text.includes(ar)) throw new Error(`${vp}: the answer "${kind}" does not show its Arabic term (${quiz.kinds[kind]}): “${text}”`);
+    }
+    await stage.screenshot({ path: `shots/${vp}-warm-up.png` });
+    console.log(`shot ${vp}-warm-up`);
+    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-warm-up-viewport.png` });
+    // The exercise waits once its introduction and its options prompt are through (caption-only
+    // until they are rendered: read at reading pace): answer then, as quizVoiceCheck does.
+    const caption = page.locator('[data-autoplay="caption"]');
+    for (let i = 0; i < 400 && (await caption.first().getAttribute("data-line").catch(() => null)) !== "shared:ex:word-kind:options"; i++) {
+      await page.waitForTimeout(150);
+    }
+    await page.waitForTimeout(3_000);
+    // 3. A wrong pick: no explanation. The right one: the question's sentence.
+    const wrong = kinds.find((k) => k !== q1.kind);
+    await option(wrong).click();
+    await page.waitForTimeout(600);
+    if ((await exercise.innerText()).includes(head(q1.why))) throw new Error(`${vp}: a wrong pick (${wrong}) already shows the explanation`);
+    await option(q1.kind).click();
+    if (!(await until(page, async () => (await exercise.innerText()).includes(head(q1.why)), 5_000))) {
+      throw new Error(`${vp}: the right pick (${q1.kind}) does not show the question's sentence (“${head(q1.why)}…”)`);
+    }
+    // 4. On by itself, question by question, to the word of two parts (answered right each time).
+    for (const q of warm.questions.slice(1)) {
+      const here = exercise.locator(`[data-kind-word="${q.word}"][data-kind-part="${q.part}"]`);
+      if (!(await here.waitFor({ state: "attached", timeout: 60_000 }).then(() => true, () => false))) {
+        throw new Error(`${vp}: 60 s after the answer the warm-up had not gone on to question ${q.n} (word ${q.word}, part ${q.part}) by itself`);
+      }
+      if (q.n === part.n) {
+        const both = await pieces();
+        const want = warm.questions.filter((x) => x.word === q.word).map((x) => [x.part, x.part === q.part, x.ar]);
+        if (JSON.stringify(both.map((p) => [p.part, p.asked, p.ar])) !== JSON.stringify(want)) throw new Error(`${vp}: question ${q.n} shows ${JSON.stringify(both)}, expected the pieces ${JSON.stringify(want)}`);
+        // The ayah's reading order: the first part to the RIGHT of the second.
+        if (!(both[0].x > both[1].x)) throw new Error(`${vp}: the parts of word ${q.word} are not drawn right to left (${both.map((p) => Math.round(p.x)).join(", ")})`);
+        await stage.screenshot({ path: `shots/${vp}-warm-up-part.png` });
+        console.log(`shot ${vp}-warm-up-part`);
+        break;
+      }
+      await option(q.kind).click();
+    }
+    // 5. "Lewati latihan": on to the first word.
+    await next.click();
+    if (!(await until(page, async () => /^w1(?::|$)/.test((await stage.getAttribute("data-step")) ?? ""), 8_000))) {
+      throw new Error(`${vp}: "Lewati latihan" on the warm-up led to "${await stage.getAttribute("data-step")}", not to the first word`);
+    }
+    console.log(`  warm-up: first exercise of Al-Fatihah 2 (${warm.questions.length} questions), before its first word; passed ${passed.join(" → ")}`);
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-warm-up-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the warm-up check on Al-Fatihah 2 failed`);
+    console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
+    throw err;
+  } finally {
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
+/**
  * The lesson map's cards (operator 2026-10-13: "at the beginning of the ayat, better to inform
  * what concept we will learn in this ayat, also explain maybe we skip some concept and will visit
  * later in next ayat … so at the beginning we inform what will be learnt, in the end recap what
@@ -3642,6 +3770,7 @@ try {
     await composeShots(page, vp, narration);
     await exampleChecks(page, vp, narration);
     await quizVoiceCheck(page, vp, narration);
+    await wordKindChecks(page, vp, narration);
     await lessonMapChecks(page, vp, narration);
     await introChecks(page, vp, narration);
     // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).

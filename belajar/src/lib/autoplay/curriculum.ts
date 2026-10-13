@@ -346,22 +346,25 @@ export function taughtIn(file: Pick<CurriculumFile, "lessons" | "steps">, concep
 /**
  * The step that TAUGHT what a Konsep tag on a word shows, when an EARLIER lesson did: the whole
  * record's step, or — for a record that arrives in parts (i'rab) — the part this word shows (its
- * i'rab state). null: taught in this lesson or later, a next-level record, or a step of lesson
- * zero (the lesson with no ayah: there is no ayah to point at, and the card's sentence names
- * one). For the word card's "sudah dipelajari di ayat N" under a concept chip.
+ * i'rab state). An ayah (`surah`, `ayah`), or `zero`: lesson zero, the lesson with no ayah (the
+ * three kinds of word; only while it is written, i.e. the built file carries its lists). null:
+ * taught in this lesson or later, a next-level record, or a lesson with no page. For the word
+ * card's "sudah dipelajari di ayat N" / "… di Pengantar" under a concept chip.
  */
+export type TaughtEarlier = { step: string; surah: number; ayah: number; zero?: undefined } | { step: string; zero: true };
 export function taughtEarlier(
   file: Pick<CurriculumFile, "lessons" | "steps">,
   ayah: Pick<CurriculumAyah, "surah" | "ayah">,
   word: Pick<CurriculumWord, "case">,
   record: string,
-): { step: string; surah: number; ayah: number } | null {
+): TaughtEarlier | null {
   const rank = lessonRanks(file);
   const here = rank.get(ayahLessonId(ayah.surah, ayah.ayah));
   if (here === undefined) return null;
   const steps = file.steps.filter((s) => s.concept === record);
   const step = steps.find((s) => s.part === undefined) ?? steps.find((s) => s.occurs?.case !== undefined && s.occurs.case === word.case.state);
-  const at = step ? lessonAyah(step.lesson) : null;
-  if (!step || !at || (rank.get(step.lesson) ?? here) >= here) return null;
-  return { step: step.id, ...at };
+  if (!step || (rank.get(step.lesson) ?? here) >= here) return null;
+  if (step.lesson === LESSON_ZERO) return file.lessons.find((l) => l.id === LESSON_ZERO)?.map ? { step: step.id, zero: true } : null;
+  const at = lessonAyah(step.lesson);
+  return at ? { step: step.id, ...at } : null;
 }

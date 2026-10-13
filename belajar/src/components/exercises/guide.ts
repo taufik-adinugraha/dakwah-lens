@@ -13,9 +13,10 @@
  * ExerciseShell.tsx.
  */
 
-/** The five exercises, by the key used in targets and narration line ids
+/** The exercises — the warm-up that opens a lesson ("word-kind": isim, fi'il, or huruf?), then
+ *  the five that follow its explanations — by the key used in targets and narration line ids
  *  (`${slug}:${ayah}:ex:${key}:${lineKey}`). */
-export const EXERCISE_KEYS = ["tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory"] as const;
+export const EXERCISE_KEYS = ["word-kind", "tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory"] as const;
 export type ExerciseKey = (typeof EXERCISE_KEYS)[number];
 
 /**
@@ -32,6 +33,7 @@ export type GuidePart = (typeof GUIDE_PARTS)[number];
 
 /** The parts each exercise can point at, in the order a question meets them. */
 export const EXERCISE_GUIDE_PARTS: Readonly<Record<ExerciseKey, readonly GuidePart[]>> = {
+  "word-kind": ["options", "reveal", "next"],
   "tap-word": ["play", "options", "reveal", "next"],
   "why-harakat": ["options", "reveal", "next"],
   "sort-case": ["words", "bins", "reveal"],
@@ -112,7 +114,7 @@ type ChoiceState = {
   canReveal: boolean;
 };
 
-/** Kenapa harakat, Tebak peran, Bentuk kata: options → (reveal) → next. */
+/** Pemanasan, Kenapa harakat, Tebak peran, Bentuk kata: options → (reveal) → next. */
 export function choiceGuidePart(s: ChoiceState): GuidePart | null {
   if (s.finished) return null;
   if (s.settled) return "next";

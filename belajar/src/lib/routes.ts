@@ -71,16 +71,14 @@ export const curriculumHref = () => `/${QURAN}/kurikulum`;
  * draws to a lesson is built here, and nowhere else.
  *
  * - An ayah lesson of a surah that has lesson pages (`slug`): that ayah's page.
- * - Lesson "0", the introduction with no ayah: NO ROUTE YET, so null, and the
- *   curriculum page shows it as "belum tersedia". Once its route exists
- *   (suggested: /quran/pengantar), return that path from the first line of
- *   the function instead of null (give it a helper of its own beside
- *   curriculumHref), and the curriculum page links it with no other change:
- *   the introduction belongs to no surah, so no surah switch hides it. The
- *   checks that hold lesson "0" to "not a link" then change with it:
- *   routes.test.ts, curriculumOutline.test.ts and curriculum-page.test.ts,
- *   and the `reachable` rule of scripts/ci/surahs-smoke.mjs (curriculumPage)
- *   and scripts/ci/screenshots.mjs (curriculumCheck).
+ * - Lesson "0", the introduction with no ayah: its own page (introHref,
+ *   /quran/pengantar; 2026-10-13). It belongs to no surah, but it is played
+ *   from the surah that hosts it, so it may be SHOWN as a link only while it
+ *   is written and that surah is published — one rule, lib/curriculum.ts
+ *   introOpen, which the track page's card and the curriculum page both ask.
+ *   The same rule is held by routes.test.ts, curriculumOutline.test.ts and
+ *   curriculum-page.test.ts, and by `reachable` in scripts/ci/surahs-smoke.mjs
+ *   (curriculumPage) and scripts/ci/screenshots.mjs (curriculumCheck).
  * - A segment of a long ayah ("2:255/3", Ayat Kursi): no route.
  *
  * WHETHER a lesson may be shown as a link is not decided here (this file stays
@@ -88,7 +86,7 @@ export const curriculumHref = () => `/${QURAN}/kurikulum`;
  * (src/lib/curriculumOutline.ts).
  */
 export function lessonHref(lesson: { id: string; slug?: string; ayah?: number; segment?: number }): string | null {
-  if (lesson.id === "0") return null;
+  if (lesson.id === "0") return introHref();
   if (!lesson.slug || lesson.ayah === undefined || lesson.segment !== undefined) return null;
   return ayahHref(lesson.slug, lesson.ayah);
 }

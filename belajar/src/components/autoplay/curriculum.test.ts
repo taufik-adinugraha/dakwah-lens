@@ -303,10 +303,18 @@ describe("a word card: a concept an earlier lesson taught, and no wazan at the b
     expect(at("1:2:4", "tanda-irab")).toEqual({ step: "majrur", surah: 1, ayah: 1 });
     expect(at("1:2:1", "tanda-irab")).toBeNull();
     expect(at("1:6:2", "tanda-irab")).toBeNull(); // manshub: this lesson's
-    // A next-level record is never "already learnt"; nor is a step of the lesson with no ayah
-    // (the card's sentence names an ayah, and lesson zero has none to point at).
+    // A next-level record is never "already learnt".
     expect(at("1:3:1", "wazan-dan-tashrif")).toBeNull();
-    expect(at("1:5:2", "kalimah-isim-fiil-huruf")).toBeNull();
+    // A step of the lesson with no ayah was learnt in lesson zero ("sudah dipelajari di
+    // Pengantar", main session 2026-10-13): no ayah to name, so `zero` — from the first ayah on,
+    // in every surah, and only while lesson zero is written (the built file carries its lists).
+    const kalimah = CURRICULUM.steps.find((s) => s.concept === "kalimah-isim-fiil-huruf")!;
+    expect(kalimah.lesson).toBe("0");
+    expect(at("1:5:2", "kalimah-isim-fiil-huruf")).toEqual({ step: kalimah.id, zero: true });
+    expect(at("1:1:1", "kalimah-isim-fiil-huruf")).toEqual({ step: kalimah.id, zero: true });
+    expect(at("114:1:1", "kalimah-isim-fiil-huruf")).toEqual({ step: kalimah.id, zero: true });
+    const unwritten = { ...CURRICULUM, lessons: CURRICULUM.lessons.map((l) => (l.id === "0" ? { ...l, map: undefined, lines: undefined } : l)) };
+    expect(taughtEarlier(unwritten, ...w("1:5:2"), "kalimah-isim-fiil-huruf")).toBeNull();
     // Across surahs, in the curriculum's order: An-Nas repeats Al-Fatihah, Al-Falaq repeats An-Nas.
     expect(at("114:1:2", "fiil-mudhari")).toEqual({ step: "fiil-mudhari", surah: 1, ayah: 5 });
     expect(at("113:1:1", "fiil-amr")).toEqual({ step: "fiil-amr", surah: 114, ayah: 1 });

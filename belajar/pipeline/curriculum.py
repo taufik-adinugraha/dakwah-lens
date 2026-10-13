@@ -240,15 +240,22 @@ def teachable(step: dict) -> bool:
 
 
 # ------------------------------------------------------------------ where a step occurs
-def qac_tags(word: dict) -> list[str]:
-    """The QAC 0.4 segment tags of a lesson word, in order (DET, N, P, V, PRON …): the first field
-    of each segment in the QAC line of its `sources`. [] for a word without that line."""
+def qac_segments(word: dict) -> list[list[str]]:
+    """The QAC 0.4 segments of a lesson word, in order, each as its fields ("P|PREFIX|bi+" →
+    ["P", "PREFIX", "bi+"]): the QAC line build_surah.py writes into the word's `sources`. [] for
+    a word without that line."""
     for src in word.get("sources") or []:
         if isinstance(src, dict) and str(src.get("kitab", "")).startswith(QAC_KITAB):
             m = _QAC_LINE.search(str(src.get("ref", "")))
             if m:
-                return [seg.split("|", 1)[0] for seg in m.group(1).split(" + ")]
+                return [seg.split("|") for seg in m.group(1).split(" + ")]
     return []
+
+
+def qac_tags(word: dict) -> list[str]:
+    """The QAC 0.4 segment tags of a lesson word, in order (DET, N, P, V, PRON …): the first field
+    of each segment in the QAC line of its `sources`. [] for a word without that line."""
+    return [seg[0] for seg in qac_segments(word)]
 
 
 def record_words(ayah: dict, record: str) -> list[int]:
@@ -389,11 +396,13 @@ def term_home(cur: dict, term: str) -> str | None:
     return step["lesson"] if step else NEXT_LEVEL
 
 
-def too_early(cur: dict, lesson_id: str, terms: list[str], *, allowed: set[str] | frozenset[str] = frozenset()) -> list[str]:
+def too_early(cur: dict, lesson_id: str, terms: list[str], *, allowed: set[str] | frozenset[str] = frozenset(),
+              before: bool = False) -> list[str]:
     """The terms of `terms` a line of lesson `lesson_id` may not use yet (decision 7): owned by a
     step of a later lesson, or by no step (the next level). In order of first use, each once.
     `allowed`: the terms this one line may name all the same (the steps a "taught later" line
-    announces)."""
+    announces). `before`: the line is said BEFORE the lesson teaches anything (the warm-up that
+    opens it), so a term of this very lesson is too early as well — only earlier lessons count."""
     rank = ranks(cur)
     here = rank.get(lesson_id)
     out: list[str] = []
@@ -403,7 +412,7 @@ def too_early(cur: dict, lesson_id: str, terms: list[str], *, allowed: set[str] 
         home = term_home(cur, t)
         if home is None:
             continue
-        if home == NEXT_LEVEL or here is None or rank[home] > here:
+        if home == NEXT_LEVEL or here is None or rank[home] > here or (before and rank[home] == here):
             out.append(t)
     return out
 
@@ -421,7 +430,9 @@ PENDING_COMMENT = (
     "teaches it') still say too early. `lines`: narration line id -> the dictionary terms (authored/library.terms.json ids) "
     "its prose uses although their step is taught in a later lesson, or in none (tingkat lanjut). `quiz`: "
     "'<slug>:<ayah>:<exercise>:<question number>' -> the terms that question needs although the lesson has not TAUGHT them "
-    "by that ayah (quiz.py, TAUGHT ⊇ REQUIRED: a term's lesson moved later). Held BOTH ways by build_narration.py / "
+    "by that ayah (quiz.py, TAUGHT ⊇ REQUIRED: a term's lesson moved later — or, since the explanation shown after an "
+    "answer joined REQUIRED on 2026-10-13, a term that explanation names and no line teaches: give the word a `why_basic`). "
+    "Held BOTH ways by build_narration.py / "
     "validate_narration.py (lines) and validate_quiz.py (quiz): a violation that is not listed here fails, and an entry "
     "that no longer violates fails as stale ('remove it'). NEVER add an entry by hand to make a new line pass: rewrite the "
     "line. This file only shrinks — `python3 build_narration.py --write-pending` rewrites it from what the checks find "

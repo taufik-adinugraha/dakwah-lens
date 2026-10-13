@@ -30,6 +30,17 @@ if (!parsed.success) {
  *  does, and lesson zero has no page. */
 export const ZERO_HOST = SURAHS.find((s) => hostsZero(composeFor(s.slug))) ?? null;
 
+/**
+ * May lesson zero be SHOWN as a link? The one rule (operator-approved gate of 2026-10-13: its
+ * card on the track page, its row on the curriculum page): it is written — a surah hosts it —
+ * and that surah is one visitors can reach (`published`: lib/features.ts visibleSurahs()). Its
+ * narration, its frames and the lesson it hands over to are all that surah's, so with the surah
+ * hidden a link to it would open a lesson that leads into a 404.
+ */
+export function introOpen(published: ReadonlySet<string>): boolean {
+  return ZERO_HOST !== null && published.has(ZERO_HOST.slug);
+}
+
 const problems = curriculumProblems(parsed.data, SURAHS, LIBRARY.concepts, ZERO_HOST !== null);
 if (problems.length) throw new Error(`content/curriculum.json:\n${problems.slice(0, 10).join("\n")}`);
 
@@ -46,8 +57,9 @@ export function taughtInZero(): Taught[] {
   return ZERO_HOST ? taughtIn(CURRICULUM, LIBRARY.concepts, zeroAyah(ZERO_HOST.surah)) : [];
 }
 
-/** Where an EARLIER lesson taught what a Konsep tag on `word` shows, or null (the word card's
- *  "sudah dipelajari di ayat N"; ./autoplay/curriculum.ts taughtEarlier). */
+/** Where an EARLIER lesson taught what a Konsep tag on `word` shows — an ayah, or lesson zero —
+ *  or null (the word card's "sudah dipelajari di ayat N" / "… di Pengantar";
+ *  ./autoplay/curriculum.ts taughtEarlier). */
 export function taughtBefore(ayah: Ayah, word: Ayah["words"][number], record: string) {
   return taughtEarlier(CURRICULUM, ayah, word, record);
 }

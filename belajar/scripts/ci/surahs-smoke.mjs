@@ -45,6 +45,14 @@ const SURAH = Object.fromEntries(await Promise.all(SLUGS.map(async (slug) => [sl
 const BY_NUMBER = Object.fromEntries(SLUGS.map((slug) => [SURAH[slug].surah, slug]));
 const LIBRARY = await readJson("content/library.json");
 const CURRICULUM = await readJson("content/curriculum.json");
+// LESSON ZERO ("Pengantar", src/lib/routes.ts introHref): the surah that hosts it is the one whose
+// harakat primer is played there (content/compose/<slug>.json `primer.lesson` "0"; src/lib/
+// curriculum.ts ZERO_HOST), and its page may be linked only while that surah is published
+// (introOpen: the one gate of its card on the track page and its row on the curriculum page).
+const INTRO_SEGMENT = /export const INTRO_SEGMENT = "([^"]+)"/.exec(routesSrc)?.[1];
+if (!INTRO_SEGMENT) fail("setup", "could not read INTRO_SEGMENT from src/lib/routes.ts");
+const ZERO_HOST =
+  (await Promise.all(SLUGS.map(async (slug) => [slug, await readJson(`content/compose/${slug}.json`).catch(() => null)]))).find(([, c]) => c?.primer?.lesson === "0")?.[0] ?? null;
 const MSG = { id: await readJson("messages/id.json"), en: await readJson("messages/en.json") };
 const fmt = (template, values) => template.replace(/\{(\w+)\}/g, (all, k) => (k in values ? String(values[k]) : all));
 
@@ -168,9 +176,10 @@ for (const slug of SLUGS) {
  *   - every lesson of content/curriculum.json is listed once, in the file's order (the page marks
  *     each one data-lesson, with data-available);
  *   - a lesson is available exactly when it is a written ayah (the built file carries its derived
- *     lists) of a published surah, and then the page links that ayah's lesson page; lesson "0"
- *     (the introduction: no route yet, src/lib/routes.ts lessonHref), the segments of Ayat Kursi
- *     and every lesson of a hidden surah are not available;
+ *     lists) of a published surah, and then the page links that ayah's lesson page — or lesson
+ *     "0" (the introduction) while it is written and the surah that hosts it is published, and
+ *     then the page links /quran/pengantar; the segments of Ayat Kursi and every lesson of a
+ *     hidden surah are not available;
  *   - "Belum tersedia" (messages, Curriculum.unavailable) is in the visible text once per lesson
  *     that is not available: the state is said in words;
  *   - the page links nowhere into a hidden surah (noLinkInto: the server HTML and the RSC payload),
@@ -179,6 +188,7 @@ for (const slug of SLUGS) {
 async function curriculumPage(published, hidden) {
   const slugOf = Object.fromEntries(CURRICULUM.units.map((u) => [u.id, u.slug ?? null]));
   const reachable = (l) => {
+    if (l.id === "0") return !!l.map && ZERO_HOST !== null && published.includes(ZERO_HOST);
     const slug = slugOf[l.unit];
     return !!slug && published.includes(slug) && l.ayah !== undefined && l.segment === undefined && !!l.map;
   };
@@ -202,7 +212,7 @@ async function curriculumPage(published, hidden) {
       const open = reachable(l);
       if (row.available !== open) fail(path, `lesson ${l.id} is ${row.available ? "available" : "not available"}, expected ${open ? "a link" : "plain text"}`);
       if (!open) continue;
-      const href = `href="/belajar/${locale}/quran/${slugOf[l.unit]}/${l.ayah}"`;
+      const href = l.id === "0" ? `href="/belajar/${locale}/quran/${INTRO_SEGMENT}"` : `href="/belajar/${locale}/quran/${slugOf[l.unit]}/${l.ayah}"`;
       if (html.includes(href)) linked++;
       else fail(path, `no link to lesson ${l.id} (${href})`);
     }

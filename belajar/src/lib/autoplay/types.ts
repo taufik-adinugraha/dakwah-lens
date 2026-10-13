@@ -75,10 +75,20 @@ export type { Pace };
 
 // ───────────────────────────── Exercises ─────────────────────────────
 
-/** The five exercises, in the order the lesson page renders them. Mirrors
- *  EXERCISE_KEYS in components/exercises/guide.ts (parity-tested). */
-export const EXERCISE_KEYS = ["tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory"] as const;
+/** The exercises, in the order the lesson page renders them: the warm-up that opens a lesson,
+ *  then the five that follow its explanations. Mirrors EXERCISE_KEYS in
+ *  components/exercises/guide.ts (parity-tested) and pipeline/quiz.py. */
+export const EXERCISE_KEYS = ["word-kind", "tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory"] as const;
 export type ExerciseKey = (typeof EXERCISE_KEYS)[number];
+
+/**
+ * The exercises a lesson asks BEFORE its words, right after what the ayah brings (the lesson
+ * map's steps): the warm-up "isim, fi'il, or huruf?" (operator 2026-10-13: "i think it's better
+ * in every ayat we identify first each words fall into which category: ismu, fi'il or harf. it's
+ * kind of exercise, kind of warming up"). Every other exercise follows the structure. Mirrors
+ * pipeline/quiz.py OPENING_EXERCISES.
+ */
+export const OPENING_EXERCISES: readonly ExerciseKey[] = ["word-kind"];
 
 /** The control inside an exercise the learner should use next. Mirrors
  *  GUIDE_PARTS in components/exercises/guide.ts (parity-tested). */
@@ -89,6 +99,7 @@ export type GuidePart = (typeof GUIDE_PARTS)[number];
  *  them (the first is where a fresh exercise starts). Mirrors
  *  EXERCISE_GUIDE_PARTS in components/exercises/guide.ts (parity-tested). */
 export const PARTS_OF: Readonly<Record<ExerciseKey, readonly GuidePart[]>> = {
+  "word-kind": ["options", "reveal", "next"],
   "tap-word": ["play", "options", "reveal", "next"],
   "why-harakat": ["options", "reveal", "next"],
   "sort-case": ["words", "bins", "reveal"],

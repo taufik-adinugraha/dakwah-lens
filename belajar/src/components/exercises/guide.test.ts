@@ -18,6 +18,7 @@ import {
 } from "./guide";
 
 const FILES: Record<ExerciseKey, string> = {
+  "word-kind": "WordKind.tsx",
   "tap-word": "TapWord.tsx",
   "why-harakat": "WhyHarakat.tsx",
   "sort-case": "SortCase.tsx",

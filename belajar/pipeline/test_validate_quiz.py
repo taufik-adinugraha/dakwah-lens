@@ -7,7 +7,11 @@ a question on a case state not taught yet, a wrong option the lesson has not tau
 not studied yet), a question with two correct options, a wazan quiz on a form never taught. Since the basic
 curriculum (operator-approved 2026-10-13, plan L26): a wazan exercise in a basic lesson, and the
 list of questions that may still need an untaught term (authored/curriculum.pending.json `quiz`),
-held both ways. Also unit-tests TAUGHT (a glossed term is not taught, decision 6 of 2026-10-11),
+held both ways. Since the same day: the explanation shown after an answer is what the narrator
+says (a word's `why_basic`) and its terms are held to TAUGHT; and the WARM-UP that opens every
+ayah of a surah with a lesson map ("isim, fi'il, atau huruf?"), derived from the QAC tags — a
+disagreement with the lesson's `pos`, a part left out, a wrong answer, a sign before its lesson,
+an edited sentence. Also unit-tests TAUGHT (a glossed term is not taught, decision 6 of 2026-10-11),
 the cause classes, the Arabic labels and the port of the components' seeded shuffle. Standard
 library only; run from belajar/pipeline:
 
@@ -38,20 +42,69 @@ MANIFESTS = {sp.slug: json.loads((CONTENT_DIR / "narration" / f"{sp.slug}.json")
 PENDING = CUR.load_pending()["quiz"]
 
 
-def run(authored=None, quizzes=None, manifests=None, library=None, *, rebuild=True, pending=None):
+# The curriculum and the surahs whose lesson map is switched on: what the warm-up is derived with.
+CURRICULUM = CUR.load_content()
+MAPPED = {sp.slug for sp in SURAHS if Q.has_map(sp.slug)}
+
+
+def run(authored=None, quizzes=None, manifests=None, library=None, *, rebuild=True, pending=None, lessons=None,
+        mapped=None, built_mapped=None):
     """The guard over copies; with `rebuild`, the quiz files are built from the (mutated) plans first,
-    as build_quiz.py would (so a plan fault is caught by the plan's own checks, not as a stale file)."""
+    as build_quiz.py would (so a plan fault is caught by the plan's own checks, not as a stale file).
+    `lessons`: mutated lesson content; `mapped`: the surahs with a lesson map as the guard sees
+    them, `built_mapped`: as the files on disk were built (default: the same)."""
     authored = copy.deepcopy(AUTHORED) if authored is None else authored
     library = LIBRARY if library is None else library
+    lessons = LESSONS if lessons is None else lessons
+    mapped = MAPPED if mapped is None else mapped
     manifests = copy.deepcopy(MANIFESTS) if manifests is None else manifests
     try:
-        fresh = BQ.build_all(LESSONS, library, TERMS, authored)
+        fresh = BQ.build_all(lessons, library, TERMS, authored, curriculum=CURRICULUM, mapped=mapped)
+        if quizzes is None and built_mapped is not None:
+            quizzes = BQ.build_all(lessons, library, TERMS, authored, curriculum=CURRICULUM, mapped=built_mapped)
     except Q.QuizError as e:
         return [f"build_quiz.py fails: {e}"]
     if quizzes is None:
         quizzes = copy.deepcopy(fresh) if rebuild else copy.deepcopy(QUIZZES)
-    return VQ.check(LESSONS, library, TERMS, quizzes, manifests, fresh=fresh,
-                    pending=copy.deepcopy(PENDING) if pending is None else pending)
+    return VQ.check(lessons, library, TERMS, quizzes, manifests, fresh=fresh,
+                    pending=copy.deepcopy(PENDING) if pending is None else pending, curriculum=CURRICULUM, mapped=mapped)
+
+
+def lesson(fn):
+    """A fault in the Al-Fatihah lesson content (content/al-fatihah.json), then rebuilt."""
+    def f():
+        ls = copy.deepcopy(LESSONS)
+        fn(ls[SLUG])
+        return run(lessons=ls)
+    return f
+
+
+def word(lsn: dict, loc: str) -> dict:
+    return Q.word_at(lsn, loc)
+
+
+def qac_tag(loc: str, old: str, new: str):
+    """PLANTED: another tag on one QAC segment of a word (the QAC line in its `sources`)."""
+    def f(lsn):
+        src = next(s for s in word(lsn, loc)["sources"] if s["kitab"].startswith(CUR.QAC_KITAB))
+        assert old in src["ref"], (loc, old)
+        src["ref"] = src["ref"].replace(old, new, 1)
+    return f
+
+
+def huruf_jar_taught_in_ayah_2(lines: dict) -> None:
+    """PLANTED: no line of ayah 1 names or defines "huruf jar" any more; a teaching line of ayah 2
+    defines it instead — taught by the END of ayah 2, so not before its warm-up."""
+    for lid, _part, _text in [(lid, part, text) for a, lid, part, text in Q.teaching_lines({"lines": lines}, SLUG)
+                              if a == 1 and any(tid == "huruf-jar" for tid, _how in Q.defined_terms(part, text, TERMS))]:
+        for k in [k for k in lines if k == lid or k.startswith(lid + ":")]:
+            lines.pop(k)
+    lines["al-fatihah:2:concept:marfu"]["display"] += " Huruf jar adalah kata depan."
+
+
+def warm(q: dict, n: int) -> dict:
+    """The warm-up of ayah n in a built quiz file."""
+    return next(ex for ex in q["ayat"][n - 1]["exercises"] if ex["key"] == Q.WARMUP)
 
 
 def plan(fn, lib=None, tolerated=None):
@@ -201,7 +254,7 @@ MUTATIONS = [
     ("a wazan lexeme of another ayah (hada at ayah 5)",
      plan(with_wazn(5, WAZN_5, lambda qs: qs[0].__setitem__("lexeme", "hada"))), "hada is not the lemma of a word of this ayah"),
     ("a tap word without timing", plan(lambda a: a["1"]["tap-word"]["words"].append(9)), "build_quiz.py fails"),
-    ("the quiz file edited by hand", quizfile(lambda q: q["ayat"][1]["exercises"][2]["questions"][0]["options"].pop()),
+    ("the quiz file edited by hand", quizfile(lambda q: q["ayat"][1]["exercises"][3]["questions"][0]["options"].pop()),
      "content/quiz/al-fatihah.json is out of date"),
     ("an explanation line missing", manifest(drop_line("al-fatihah:2:ex:label-role:1:why")),
      "narration line al-fatihah:2:ex:label-role:1:why missing"),
@@ -218,6 +271,62 @@ MUTATIONS = [
      "quiz al-fatihah:5:sort-case:1 no longer needs 'mabni' untaught (stale): remove it"),
     ("an entry for a question the plan does not ask", listed(lambda p: p.__setitem__("al-fatihah:1:why-harakat:1", ["naat"])),
      "quiz al-fatihah:1:why-harakat:1 no longer needs 'naat' untaught (stale): remove it"),
+    # What the learner READS after answering is what the narrator SAYS (main session 2026-10-13):
+    # the explanation shown is the word's `why_basic`, and its terms are held to TAUGHT.
+    ("a why_basic that names a term no lesson taught, read on screen after the answer (badal at ayah 2)",
+     lesson(lambda lsn: word(lsn, "1:2:2").__setitem__("why_basic", word(lsn, "1:2:2")["why_basic"] + " Kata ini badal.")),
+     "al-fatihah 2 sort-case q2: needs 'badal' (the explanation shown after the answer), not taught by the end of ayah 2 (never taught)"),
+    ("… and a term of a later lesson (manshub at ayah 2)",
+     lesson(lambda lsn: word(lsn, "1:2:2").__setitem__("why_basic", "Akhirnya kasrah karena didahului huruf jar; kata ini tidak manshub.")),
+     "needs 'manshub' (the explanation shown after the answer), not taught by the end of ayah 2 (first taught in ayah 6)"),
+    # THE WARM-UP (operator 2026-10-13): derived, and it must agree with what the lesson says.
+    ("the warm-up: the lesson's pos disagrees with the QAC tag (a fi'il the lesson calls an isim)",
+     lesson(lambda lsn: word(lsn, "1:5:2").__setitem__("pos", "isim")),
+     "build_quiz.py fails: 1:5:2: the lesson says this word is 'isim' (['isim']), its QAC line says ['V'] (['fiil'])"),
+    ("the warm-up: the lesson's pos has one part more than the QAC line",
+     lesson(lambda lsn: word(lsn, "1:4:2").__setitem__("pos", "huruf jar + isim")), "build_quiz.py fails: 1:4:2: the lesson says this word is 'huruf jar + isim'"),
+    ("the warm-up: a QAC tag with no kind", lesson(qac_tag("1:7:8", "NEG|STEM", "XYZ|STEM")), "QAC tag 'XYZ' has no kind in quiz.QAC_KIND"),
+    ("the warm-up: a word with no QAC line", lesson(lambda lsn: word(lsn, "1:3:1").__setitem__("sources", [])), "1:3:1: no QAC line in its sources"),
+    ("the warm-up: a compound word whose parts the lesson does not carry",
+     lesson(lambda lsn: lsn["segments"].pop("1:1:1")), "1:1:1: a word of 2 parts, and the lesson content does not carry its 2 QAC segments"),
+    ("the warm-up: the lesson's parts are not the word", lesson(lambda lsn: lsn["segments"].__setitem__("1:1:1", list(reversed(lsn["segments"]["1:1:1"])))),
+     "1:1:1: a word of 2 parts, and the lesson content does not carry"),
+    ("the warm-up: a part left out", quizfile(lambda q: warm(q, 1)["questions"].pop(1)), "every part of every word is asked once, in order"),
+    ("the warm-up: a part asked twice", quizfile(lambda q: warm(q, 3)["questions"].append(copy.deepcopy(warm(q, 3)["questions"][0]))),
+     "al-fatihah 3 word-kind: asks the parts [(1, 1), (2, 1), (1, 1)]"),
+    ("the warm-up: a wrong answer (a huruf jar called a fi'il)", quizfile(lambda q: warm(q, 1)["questions"][0].__setitem__("kind", "fiil")),
+     "al-fatihah 1 word-kind q1 (word 1, part 1 of 2): the answer is 'fiil', and the word's QAC tag and its `pos` give 'huruf'"),
+    ("the warm-up: typed Arabic instead of the lesson's bytes", quizfile(lambda q: warm(q, 1)["questions"][1].__setitem__("ar", "اسم")),
+     "al-fatihah 1 word-kind q2 (word 1, part 2 of 2): shows 'اسم' as part 2 of 2"),
+    ("the warm-up: a sign before the lesson that teaches it (alif lam at ayah 2)", quizfile(lambda q: warm(q, 2)["questions"][0].__setitem__("signs", ["al"])),
+     "al-fatihah 2 word-kind q1 (word 1): gives the sign(s) ['al']; the data shows, and an earlier lesson taught, []"),
+    ("the warm-up: a sign the data does not show (a huruf jar before a fi'il)", quizfile(lambda q: warm(q, 5)["questions"][1].__setitem__("signs", ["jar"])),
+     "al-fatihah 5 word-kind q2 (word 2): gives the sign(s) ['jar']"),
+    ("the warm-up: a sign left out (didahului huruf jar at ayah 2)", quizfile(lambda q: warm(q, 2)["questions"][2].__setitem__("signs", [])),
+     "al-fatihah 2 word-kind q3 (word 2, part 2 of 2): gives the sign(s) []; the data shows, and an earlier lesson taught, ['jar']"),
+    ("the warm-up: its sentence edited by hand", quizfile(lambda q: warm(q, 5)["questions"][1].__setitem__("why", "Kata kedua adalah fi'il (فِعْل), tandanya huruf mudhara'ah.")),
+     "al-fatihah 5 word-kind q2 (word 2): its explanation is not the sentence built from the data"),
+    ("the warm-up: the general gloss said of the Name", quizfile(lambda q: warm(q, 1)["questions"][2].pop("lafaz")),
+     "al-fatihah 1 word-kind q3 (word 2): `lafaz` (the Name of Allah: its explanation says the kind and no general gloss) is None"),
+    ("the warm-up: authored in the plan", plan(lambda a: a["1"].__setitem__("word-kind", [{"word": 1, "kind": "isim"}])),
+     "the plan lists 'word-kind' — the warm-up is derived"),
+    ("the warm-up: missing from an ayah of a surah with a lesson map", quizfile(lambda q: q["ayat"][3]["exercises"].pop(0)),
+     "al-fatihah 4 word-kind: missing — every ayah lesson of a surah with a lesson map opens with the warm-up"),
+    ("the warm-up: in a surah whose lesson map is not switched on", lambda: run(mapped=set(), built_mapped=MAPPED),
+     "al-fatihah 1 word-kind: a warm-up in a surah whose lesson map is not switched on"),
+    ("the warm-up: not first in page order", quizfile(lambda q: q["ayat"][0]["exercises"].reverse()), "are not in page order"),
+    ("the warm-up: its three answers without their labels", quizfile(lambda q: q.__setitem__("kinds", {})), "`kinds` must be the three answers of the warm-up"),
+    ("the warm-up: the Kalimah record no longer gives the three kinds their meanings",
+     library(lambda lib: next(c for c in lib["concepts"] if c["id"] == Q.KALIMAH_RECORD).__setitem__("summary", "Kata Arab ada tiga jenis.")),
+     "no longer gives the three kinds their meanings"),
+    # It opens the lesson: what it asks must have been taught by EARLIER lessons (lesson zero's
+    # lines are "ayah 0"), never by this one.
+    ("the warm-up: the three kinds not taught before the first ayah (lesson zero's line removed)",
+     manifest(drop_line("al-fatihah:0:concept:kalimah-isim-fiil-huruf")),
+     "al-fatihah 1 word-kind q1: needs 'isim' (the three answers offered), not taught before ayah 1 (the warm-up opens the lesson)"),
+    ("the warm-up: a sign's term taught only by this very lesson (huruf jar moved to ayah 2)",
+     manifest(huruf_jar_taught_in_ayah_2),
+     "al-fatihah 2 word-kind q3: needs 'huruf jar' (the explanation shown after the answer), not taught before ayah 2 (the warm-up opens the lesson)"),
 ]
 
 
@@ -232,7 +341,11 @@ class Taught(unittest.TestCase):
     def test_a_listed_question_passes_exactly_while_it_needs_the_term(self):
         # The list of tolerated questions is empty for Al-Fatihah (2026-10-13) and stays a list
         # the guard reads strictly: a planted question passes with its entry, and only with it.
-        self.assertEqual([k for k in PENDING if k.startswith(f"{SLUG}:")], [])
+        # Since the explanation shown after an answer is held to TAUGHT (2026-10-13) the guard
+        # found three of Al-Fatihah 7 that name a term no line teaches — "sukun" (1:7:3, twice)
+        # and "jar" (1:7:2), from words without a `why_basic` — and they are listed until reworded.
+        self.assertEqual(sorted(k for k in PENDING if k.startswith(f"{SLUG}:")),
+                         ["al-fatihah:7:label-role:1", "al-fatihah:7:label-role:2", "al-fatihah:7:sort-case:2"])
         # (rabbi's role is "na't atau badal": na't is taught in ayah 3, badal in An-Nas.)
         self.assertEqual(plan(badal_option, tolerated={BADAL_Q: ["naat", "badal"]})(), [])
         self.assertTrue(any("needs 'badal'" in e for e in plan(badal_option)()))
@@ -423,6 +536,142 @@ class Twin(unittest.TestCase):
         self.assertEqual(Q.seeded_shuffle(list(range(1, 11)), "113:5:3/x"), [1, 5, 2, 3, 4, 6, 9, 10, 8, 7])
 
 
+class Warmup(unittest.TestCase):
+    """The warm-up as built for Al-Fatihah, and the rules it is derived by."""
+
+    def setUp(self):
+        self.q = QUIZZES[SLUG]
+        self.lesson = LESSONS[SLUG]
+
+    def test_every_part_of_every_word_once_in_order(self):
+        total = 0
+        for a in self.lesson["ayat"]:
+            qs = warm(self.q, a["ayah"])["questions"]
+            self.assertEqual([q["n"] for q in qs], list(range(1, len(qs) + 1)))
+            want = [(i, p["part"]) for i, w in enumerate(a["words"], 1) for p in Q.word_parts(self.lesson, w)]
+            self.assertEqual([(q["word"], q["part"]) for q in qs], want, a["loc"])
+            # A word's parts, joined, are the word as the lesson writes it.
+            for i, w in enumerate(a["words"], 1):
+                self.assertEqual("".join(q["ar"] for q in qs if q["word"] == i), w["ar"], w["loc"])
+            total += len(qs)
+        # 29 words, 8 of them of two parts (operator's lesson: "dengan" + "nama" are two questions).
+        words = [w for a in self.lesson["ayat"] for w in a["words"]]
+        self.assertEqual((len(words), sum(1 for w in words if " + " in w["pos"]), total), (29, 8, 37))
+        self.assertEqual([len(warm(self.q, n)["questions"]) for n in range(1, 8)], [5, 5, 2, 3, 5, 4, 13])
+        # The warm-up is the FIRST exercise of every ayah, and only a mapped surah has it.
+        for a in self.q["ayat"]:
+            self.assertEqual(a["exercises"][0]["key"], Q.WARMUP)
+        for slug, quiz in QUIZZES.items():
+            if slug not in MAPPED:
+                self.assertFalse(any(ex["key"] == Q.WARMUP for a in quiz["ayat"] for ex in a["exercises"]), slug)
+                self.assertEqual(quiz["kinds"], {})
+        self.assertEqual(self.q["kinds"], {"isim": "isim (اِسْم)", "fiil": "fi'il (فِعْل)", "huruf": "huruf (حَرْف)"})
+
+    def test_the_answer_is_the_qac_tag_and_agrees_with_pos(self):
+        for a in self.lesson["ayat"]:
+            for q in warm(self.q, a["ayah"])["questions"]:
+                w = a["words"][q["word"] - 1]
+                said = w["pos"].split(" + ")[q["part"] - 1]
+                self.assertEqual(q["kind"], Q.POS_KIND[said.split(" ")[0]], f"{w['loc']} {said}")
+                tags = [t for t in CUR.qac_tags(w) if t != Q.QAC_ARTICLE]
+                self.assertEqual(q["kind"], Q.QAC_KIND[tags[q["part"] - 1]], w["loc"])
+        kinds = [q["kind"] for n in range(1, 8) for q in warm(self.q, n)["questions"]]
+        self.assertEqual({k: kinds.count(k) for k in Q.KINDS}, {"isim": 26, "fiil": 4, "huruf": 7})
+        # The article is no part of its own, and it stays with the part it stands on: a huruf
+        # 'athaf + an isim with alif lam (An-Nas 6, wan-nās) is two parts, the second with it.
+        nas = LESSONS["an-nas"]
+        w = Q.word_at(nas, "114:6:3")
+        self.assertEqual(CUR.qac_tags(w), ["CONJ", "DET", "N"])
+        ar = w["ar"]
+        parts = Q.word_parts({**nas, "segments": {"114:6:3": [ar[:2], ar[2:5], ar[5:]]}}, w)
+        self.assertEqual([(p["kind"], p["article"], p["ar"]) for p in parts], [("huruf", False, ar[:2]), ("isim", True, ar[2:])])
+        # Without the lesson's own parts a compound word cannot be asked (nothing is cut here).
+        with self.assertRaisesRegex(Q.QuizError, "does not carry its 3 QAC segments"):
+            Q.word_parts(nas, w)
+
+    def test_a_sign_only_where_the_data_shows_it_and_an_earlier_lesson_taught_it(self):
+        signs = {(n, q["n"]): q["signs"] for n in range(1, 8) for q in warm(self.q, n)["questions"] if q["signs"]}
+        # "didahului huruf jar": huruf jar is taught in ayah 1, so from ayah 2 on (lillāhi; 'alaihim twice).
+        # "memakai alif lam": taught in ayah 3, so from ayah 4 on (ad-dīn; aṣ-ṣirāṭ, al-mustaqīm; al-magḍūb, aḍ-ḍāllīn).
+        self.assertEqual(signs, {(2, 3): ["jar"], (4, 3): ["al"], (6, 3): ["al"], (6, 4): ["al"], (7, 6): ["jar"], (7, 8): ["al"],
+                                 (7, 10): ["jar"], (7, 13): ["al"]})
+        self.assertEqual(Q.sign_steps(CURRICULUM), {"jar": "1:1", "al": "1:3"})
+        # The data shows both in earlier ayat too (bismi in ayah 1, ar-raḥmān in ayat 1 and 3,
+        # al-ḥamdu in ayah 2): not said there, their lesson has not come.
+        self.assertEqual(warm(self.q, 1)["questions"][1]["signs"], [])
+        self.assertEqual([q["signs"] for q in warm(self.q, 3)["questions"]], [[], []])
+        # Never for a fi'il or a huruf, and no sign but the two.
+        for n in range(1, 8):
+            for q in warm(self.q, n)["questions"]:
+                self.assertTrue(set(q["signs"]) <= {"jar", "al"})
+                if q["kind"] != "isim":
+                    self.assertEqual(q["signs"], [])
+        # An ayah of a lesson the curriculum does not have gets no sign at all.
+        other = {**self.lesson, "surah": 99}
+        self.assertTrue(all(q["signs"] == [] for q in Q.warmup_questions(other, self.lesson["ayat"][6], CURRICULUM)))
+
+    def test_one_sentence_built_from_the_data(self):
+        meanings = Q.kind_meanings(LIBRARY)
+        self.assertEqual(meanings, {"isim": "nama benda, orang, atau sifat", "fiil": "kata kerja", "huruf": "kata tugas"})
+        record = next(c for c in LIBRARY["concepts"] if c["id"] == Q.KALIMAH_RECORD)
+        for text in meanings.values():
+            self.assertIn(f"({text})", record["summary"])
+        why = {(n, q["n"]): q["why"] for n in range(1, 8) for q in warm(self.q, n)["questions"]}
+        self.assertEqual(why[(1, 1)], "Bagian pertama kata pertama adalah huruf (حَرْف), yaitu kata tugas.")
+        self.assertEqual(why[(5, 2)], "Kata kedua adalah fi'il (فِعْل), yaitu kata kerja.")
+        self.assertEqual(why[(4, 3)], "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.")
+        self.assertEqual(why[(7, 6)], "Bagian kedua kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: didahului huruf jar (حَرْف جَرّ).")
+        # The Name of Allah: the kind, and no general gloss in the sentence whose subject it is.
+        self.assertEqual(why[(1, 3)], "Kata kedua adalah isim (اِسْم).")
+        self.assertEqual(why[(2, 3)], "Bagian kedua kata kedua adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ).")
+        lafaz = [(n, q["n"]) for n in range(1, 8) for q in warm(self.q, n)["questions"] if q.get("lafaz")]
+        self.assertEqual(lafaz, [(1, 3), (2, 3)])
+        # What the narration says is the same sentence without its markup; a part is named by its
+        # place, never by a Qur'anic word, and no sentence carries Arabic of its own.
+        for n in range(1, 8):
+            for q in warm(self.q, n)["questions"]:
+                prose = Q.warmup_prose(q, TERMS, meanings)
+                self.assertNotRegex(prose, r"[\[\]|]|[\u0600-\u06ff]")
+                self.assertEqual(q["why"], TERMS.annotate_marked(Q.warmup_marked(q, TERMS, meanings), {}))
+                self.assertTrue(prose.startswith(("Kata ", "Bagian ")), prose)
+                shown = MANIFESTS[SLUG]["lines"][f"{SLUG}:{n}:ex:{Q.WARMUP}:{q['n']}:why"]["display"]
+                self.assertEqual(shown.replace("’", "'"), q["why"].replace("alif lam", "alif lam (ال)"), (n, q["n"]))
+
+    def test_what_it_needs_was_taught_by_earlier_lessons(self):
+        first = Q.taught_first(MANIFESTS[SLUG], self.lesson, TERMS)
+        # The three kinds: lesson zero, whose lines are "ayah 0" of the surah that hosts it.
+        self.assertEqual({k: first[k][0] for k in Q.KINDS}, {"isim": 0, "fiil": 0, "huruf": 0})
+        self.assertEqual(first["huruf-jar"][0], 1)
+        ex = warm(self.q, 2)
+        need = Q.required(ex, ex["questions"][2], self.lesson, self.lesson["ayat"][1], TERMS, self.q)
+        self.assertEqual(set(need), {"isim", "fiil", "huruf", "huruf-jar"})
+        self.assertEqual(need["huruf-jar"], "the explanation shown after the answer")
+        self.assertEqual(Q.untaught(self.q, self.lesson, TERMS, MANIFESTS[SLUG]).keys() & {k for k in [f"{SLUG}:{n}:{Q.WARMUP}:{q['n']}" for n in range(1, 8) for q in warm(self.q, n)["questions"]]}, set())
+
+    def test_the_explanation_shown_is_what_the_narrator_says(self):
+        # A word with a `why_basic`: the screen shows it (its terms with their Arabic), not the
+        # reference `why`; a word without one still shows its `why`. The OPTIONS stay the `why`.
+        by = {(a["ayah"], ex["key"], q["n"]): q for a in self.q["ayat"] for ex in a["exercises"] for q in ex["questions"]}
+        basic = Q.word_at(self.lesson, "1:2:4")
+        self.assertTrue(basic.get("why_basic"))
+        self.assertEqual(by[(2, "sort-case", 3)]["why"], TERMS.annotate(basic["why_basic"]))
+        self.assertNotIn("mudhaf ilaih", by[(2, "sort-case", 3)]["why"])
+        self.assertIn("mudhaf ilaih", basic["why"])
+        plain = Q.word_at(self.lesson, "1:4:1")
+        self.assertFalse(plain.get("why_basic"))
+        self.assertEqual(by[(4, "why-harakat", 1)]["why"], by[(4, "why-harakat", 1)]["options"][0]["text"])
+        with_basic = Q.word_at(self.lesson, "1:2:2")
+        q = by[(2, "label-role", 2)]
+        self.assertEqual(q["word"], 2)
+        self.assertEqual(q["why"], TERMS.annotate(with_basic["why_basic"]))
+        # And every word that has one is shown with it wherever it is asked.
+        for (n, key, _k), q in by.items():
+            if key in ("why-harakat", "sort-case", "label-role"):
+                w = self.lesson["ayat"][n - 1]["words"][q["word"] - 1]
+                if w.get("why_basic"):
+                    self.assertEqual(q["why"], TERMS.annotate(w["why_basic"]), w["loc"])
+
+
 def main() -> int:
     width = max(len(n) for n, *_ in MUTATIONS)
     base = run(rebuild=False)
@@ -434,7 +683,7 @@ def main() -> int:
         failed += hit is None
         print(f"{name:{width}s}  {'caught' if hit else 'MISSED'}  {hit or errs[:3]}")
     suite = unittest.TestSuite()
-    for cls in (Taught, Pieces, Twin):
+    for cls in (Taught, Pieces, Twin, Warmup):
         suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(cls))
     res = unittest.TextTestRunner(verbosity=1, stream=sys.stdout).run(suite)
     caught = len(MUTATIONS) - (failed - bool(base))

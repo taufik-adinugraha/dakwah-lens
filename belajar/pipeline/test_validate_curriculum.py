@@ -426,6 +426,13 @@ class Curriculum(unittest.TestCase):
         self.assertEqual(CUR.too_early(AUTHORED, "1:4", uses), ["wazan"])          # the next level never arrives
         self.assertEqual(CUR.too_early(AUTHORED, "114:1", uses), ["wazan"])        # a later SURAH in teaching order
         self.assertEqual(CUR.too_early(AUTHORED, "1:1", uses, allowed={"naat"}), ["mudhaf-ilaih", "wazan"])
+        # A line said BEFORE the lesson teaches anything (the warm-up that opens it, 2026-10-13):
+        # a term of this very lesson is too early as well; an earlier lesson's is not.
+        self.assertEqual(CUR.term_home(AUTHORED, "naat"), "1:3")
+        self.assertEqual(CUR.too_early(AUTHORED, "1:3", ["naat", "huruf-jar", "isim"]), [])
+        self.assertEqual(CUR.too_early(AUTHORED, "1:3", ["naat", "huruf-jar", "isim"], before=True), ["naat"])
+        self.assertEqual(CUR.too_early(AUTHORED, "1:4", ["naat", "huruf-jar", "isim"], before=True), [])
+        self.assertEqual(CUR.too_early(AUTHORED, "1:1", ["huruf-jar", "isim"], before=True), ["huruf-jar"])
         # An-Nas comes before Al-Falaq: a term taught in An-Nas is known there, one of Al-Ikhlas is not.
         self.assertEqual(CUR.too_early(AUTHORED, "113:1", ["badal", "jazim"]), ["jazim"])
         # The narrated terms map onto the term table through their Arabic; a letter's name is free.

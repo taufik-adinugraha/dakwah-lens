@@ -11,6 +11,7 @@ import { SortCase } from "@/components/exercises/SortCase";
 import { TapWord } from "@/components/exercises/TapWord";
 import { WaznFactory } from "@/components/exercises/WaznFactory";
 import { WhyHarakat } from "@/components/exercises/WhyHarakat";
+import { WordKind } from "@/components/exercises/WordKind";
 import { ForestGlow } from "@/components/ForestGlow";
 import { MainSiteBridge } from "@/components/MainSiteBridge";
 import { ShareButton } from "@/components/ShareButton";
@@ -151,6 +152,7 @@ export default async function AyahPage({
   // 2026-10-10: "make sure all questions in quiz already have lesson beforehand"). The stage and
   // the standalone copies below ask the same questions.
   const quiz = quizAyah(s.slug, a.ayah);
+  const kindPlan = planOf(quiz, "word-kind");
   const tapPlan = planOf(quiz, "tap-word");
   const whyPlan = planOf(quiz, "why-harakat");
   const sortPlan = planOf(quiz, "sort-case");
@@ -221,11 +223,16 @@ export default async function AyahPage({
   // the stage's cards. With it, a word card marks a concept an EARLIER lesson of the curriculum
   // taught, under its chip: "sudah dipelajari di ayat 1" — for a record that arrives in parts
   // (i'rab), the part this word shows (its state). Text only; nothing for a next-level record.
+  // A step of LESSON ZERO (the three kinds of word) says "sudah dipelajari di Pengantar", and
+  // links that lesson (main session 2026-10-13) — in the surah that hosts it only: this page is
+  // prerendered and cannot ask which surahs are published (lib/curriculum.ts introOpen), but a
+  // visitor reading the host surah's page has that surah published, so the one rule holds.
   const lessonMap = lessonMapInput(s.slug, a.ayah);
-  const taughtNote = (w: (typeof a.words)[number], record: string): string | null => {
+  const taughtNote = (w: (typeof a.words)[number], record: string): { text: string; href: string | null } | null => {
     const at = lessonMap ? taughtBefore(a, w, record) : null;
     if (!at) return null;
-    return at.surah === s.surah ? tw("concept_taught", { n: at.ayah }) : tw("concept_taught_surah", { surah: at.surah, ayah: at.ayah });
+    if (at.zero) return { text: tw("concept_taught_intro"), href: ZERO_HOST?.slug === s.slug ? introHref() : null };
+    return { text: at.surah === s.surah ? tw("concept_taught", { n: at.ayah }) : tw("concept_taught_surah", { surah: at.surah, ayah: at.ayah }), href: null };
   };
 
   // Through MixedText (line breaks, operator 2026-10-10): the quotes and a
@@ -319,7 +326,8 @@ export default async function AyahPage({
                       lexeme={w.lemma_id ? getLexeme(w.lemma_id) : undefined}
                       concepts={w.concepts.flatMap((id) => {
                         const c = getConcept(id);
-                        return c ? [{ id: c.id, title: c.title, head: conceptHead[c.id], taught: taughtNote(w, c.id) }] : [];
+                        const note = c ? taughtNote(w, c.id) : null;
+                        return c ? [{ id: c.id, title: c.title, head: conceptHead[c.id], taught: note?.text ?? null, taughtHref: note?.href ?? null }] : [];
                       })}
                       lookup={lookup}
                       listen={
@@ -364,6 +372,7 @@ export default async function AyahPage({
                 </h2>
                 <p className="mt-1 max-w-prose text-base text-ink-muted">{t("practice_intro")}</p>
               </div>
+              {kindPlan && <WordKind id={`${key}/kind`} words={a.words} questions={kindPlan.questions} kinds={quiz.kinds} />}
               {tapPlan && <TapWord id={`${key}/tap`} words={playerWords} questions={tapPlan.questions} source={source} />}
               {whyPlan && <WhyHarakat id={`${key}/why`} words={a.words} questions={whyPlan.questions} states={quiz.states} />}
               {sortPlan && (

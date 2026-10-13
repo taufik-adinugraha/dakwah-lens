@@ -42,6 +42,7 @@ export function questionNumbers(quiz: QuizAyahLike | null | undefined): Partial<
 
 /** Suffix of each exercise's progress id on the lesson page. */
 const PROGRESS_SUFFIX: Record<ExerciseKey, string> = {
+  "word-kind": "kind",
   "tap-word": "tap",
   "why-harakat": "why",
   "sort-case": "sort",

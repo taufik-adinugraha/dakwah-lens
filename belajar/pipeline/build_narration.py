@@ -97,40 +97,13 @@ import curriculum as CUR
 import lessonmap as LM
 import quiz as Q
 import validate_narration as V
-from common import SURAHS
+from common import SURAHS, num_id, ordinal
 
 # Surahs cited in prose as "QS n:m" (fail loudly on any other): spoken "Surah <name> ayat <m>".
 CITED_SURAH = {6: "Al-An'am"}
 
-# ------------------------------------------------------------------ Indonesian numbers
-_UNITS = ["nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan",
-          "sepuluh", "sebelas"]
-
-
-def num_id(n: int) -> str:
-    """Cardinal number in Indonesian words (0 – 999 999)."""
-    if n < 0 or n >= 1_000_000:
-        raise ValueError(f"number out of range: {n}")
-    if n < 12:
-        return _UNITS[n]
-    if n < 20:
-        return f"{_UNITS[n - 10]} belas"
-    if n < 100:
-        t, u = divmod(n, 10)
-        return f"{_UNITS[t]} puluh" + (f" {_UNITS[u]}" if u else "")
-    if n < 1000:
-        h, r = divmod(n, 100)
-        head = "seratus" if h == 1 else f"{_UNITS[h]} ratus"
-        return head + (f" {num_id(r)}" if r else "")
-    th, r = divmod(n, 1000)
-    head = "seribu" if th == 1 else f"{num_id(th)} ribu"
-    return head + (f" {num_id(r)}" if r else "")
-
-
-def ordinal(n: int) -> str:
-    """pertama, kedua, …, kesebelas, kedua belas."""
-    return "pertama" if n == 1 else f"ke{num_id(n)}"
-
+# Indonesian numbers in words (num_id, ordinal): common.py, shared with quiz.py, whose warm-up
+# explanations name a word by its place as the narrator does.
 
 # Speech normalisation (quotes, brackets, ellipsis): validate_narration.tts_text, shared with the
 # validator so both read a caption the same way.
@@ -682,6 +655,8 @@ _REVEAL = "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi
 # Only in the "Tunggu saya" pace: otherwise the next question comes by itself.
 _NEXT = "Klik tombol yang diberi tanda untuk melanjutkan."
 SHARED_EX_TEXT = {
+    # The warm-up (operator 2026-10-13): three buttons, one answer.
+    (Q.WARMUP, "options"): "Pilih jenisnya: isim, fi'il, atau huruf.",
     # The lesson's imam recites the word by itself (no click): the learner only answers.
     ("tap-word", "play"): "Dengarkan imam membacakan satu kata dari ayat ini.",
     ("tap-word", "options"): "Sekarang klik kata yang tadi dibacakan imam.",
@@ -706,6 +681,14 @@ def ex_intro(ex: dict, terms: Q.Terms) -> str:
     "Exercise intros rewritten to match the new counts"; no "akar", which the lesson never defines)."""
     key = ex["key"]
     c = num_id(len(ex["questions"]))
+    if key == Q.WARMUP:
+        # The warm-up that opens the lesson (operator 2026-10-13: "in every ayat we identify first
+        # each words fall into which category: ismu, fi'il or harf. it's kind of exercise, kind of
+        # warming up"; the learner guesses first). What a question shows: a word, or — in an ayah
+        # with a word of two parts — a part of one.
+        shows = "satu kata atau satu bagian kata" if any(q["of"] > 1 for q in ex["questions"]) else "satu kata"
+        return (f"Latihan pemanasan, {c} soal. Setiap soal menampilkan {shows} dari ayat ini; tebak dulu jenisnya: "
+                "isim, fi'il, atau huruf.")
     if key == "sort-case":
         bins = [terms.by_id[Q.STATE_TERM[b]]["latin"] for b in ex.get("bins") or []]
         return (f"Latihan kelompokkan menurut akhiran, {c} kata, dalam {num_id(len(bins))} kelompok: {_list_id(bins)}. "
@@ -742,6 +725,8 @@ def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.T
     "Ini jawabannya." (operator 2026-10-10: "give narration/voice only for the correct answer, to
     give auditory explanation"; decision 2 of 2026-10-11: new short lines from the word's existing
     sourced fields only, never a new claim):
+      word-kind     the warm-up's sentence, built from data in quiz.py: the part's place, its
+                    kind, the kind's plain meaning, a visible sign an earlier lesson taught;
       tap-word      the word's place and gloss;
       why / sort    the word's `why` — its `why_basic` when it has one (said_why) —, then its case
                     state when the why does not name it ("Jadi, kata ini marfu'.": the state the
@@ -752,6 +737,11 @@ def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.T
     """
     A = a["ayah"]
     key = ex["key"]
+    if key == Q.WARMUP:
+        # The sentence the screen shows after the answer (quiz.warmup_marked: built once from the
+        # data), said as it stands: strict — it names a part by its place, never a Qur'anic word.
+        return san.prose(Q.warmup_prose(q, terms, Q.kind_meanings(library)), S, A, q["word"],
+                         strict=f"{a['loc']} ex:{key}:{q['n']}:why")
     if key == "wazn-factory":
         concept = next((c for tid in sorted(terms.ids(q["label"]))
                         for c in library["concepts"] if c["id"] == tid), None)
@@ -922,6 +912,20 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
         primer = V.primer_of(compose, A)
         for k, ln in enumerate((primer or {}).get("lines") or [], 1):
             add(f"primer:{k}", san.prose(ln["say"], S, A, strict=f"{base}:primer:{k}"))
+        # The exercises of content/quiz/<slug>.json (build_quiz.py): each one's introduction, then
+        # one explanation line per question, "ex:<key>:<n>:why". The warm-up opens the lesson,
+        # before its first word; the others follow the structure (below).
+        plan = Q.ayah_plan(quiz, A)
+
+        def exercise_lines(opening: bool) -> None:
+            for ex in plan:
+                if (ex["key"] in V.OPENING_EXERCISES) != opening:
+                    continue
+                add(f"ex:{ex['key']}:intro", ex_intro(ex, terms))
+                for q in ex["questions"]:
+                    add(f"ex:{ex['key']}:{q['n']}:why", ex_why(ex, q, a, library, san, terms, S))
+
+        exercise_lines(True)
         for i, w in enumerate(a["words"], 1):
             san.plain_check(f"{w['loc']} gloss", w["gloss"])
             comp = V.composition_of(compose, w["loc"])
@@ -950,12 +954,7 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
             add(f"structure:{k}", f"{V.STRUCTURE_LEAD} {said}" if k == 1 else said)
         if a.get("structure") and not items:
             add("structure", f"{V.STRUCTURE_LEAD} {san.prose(a['structure']['summary'], S, A)}")
-        # The exercises of content/quiz/<slug>.json (build_quiz.py): each one's introduction, then
-        # one explanation line per question, "ex:<key>:<n>:why".
-        for ex in Q.ayah_plan(quiz, A):
-            add(f"ex:{ex['key']}:intro", ex_intro(ex, terms))
-            for q in ex["questions"]:
-                add(f"ex:{ex['key']}:{q['n']}:why", ex_why(ex, q, a, library, san, terms, S))
+        exercise_lines(False)
         # … and what it taught, before the imam recites the ayah once more.
         if mapped is not None:
             add("learned", map_closing(mapped, lessonmap["steps"]))

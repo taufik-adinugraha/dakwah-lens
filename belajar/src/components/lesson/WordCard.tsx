@@ -103,8 +103,9 @@ export function WordCard({
   /** Concepts this word illustrates (Konsep library), resolved by the page, with the Arabic
    *  headword of each title — and, for a concept an earlier ayah already taught, `taught`: the
    *  short line shown under its chip, "sudah dipelajari di ayat 1" (the lesson map, plan L23;
-   *  only in a surah that has one). Text only: nothing here is spoken. */
-  concepts?: { id: string; title: string; head?: string | null; taught?: string | null }[];
+   *  only in a surah that has one). Text only: nothing here is spoken. `taughtHref`: the line is
+   *  a link to that lesson — lesson zero's, "sudah dipelajari di Pengantar" (an ayah's is text). */
+  concepts?: { id: string; title: string; head?: string | null; taught?: string | null; taughtHref?: string | null }[];
   /** Optional play control for this word (a labelled "Dengar" button),
    *  supplied by a client parent that owns the player; shown beside
    *  "Kata ke-N". The card itself has no audio. */
@@ -265,7 +266,15 @@ export function WordCard({
                         ) : null}
                       </Link>
                       {/* Under its chip, in the flow: it wraps with the column, never beside the chip. */}
-                      {c.taught ? (
+                      {c.taught && c.taughtHref ? (
+                        // A link of its own under the chip: a row as tall as every link of the
+                        // module (48px), underlined — never colour alone.
+                        <p data-concept-taught={c.id} className="px-4 text-sm text-ink-muted">
+                          <Link href={c.taughtHref} className="link-text inline-flex min-h-12 items-center">
+                            {c.taught}
+                          </Link>
+                        </p>
+                      ) : c.taught ? (
                         <p data-concept-taught={c.id} className="mt-1 px-4 text-sm text-ink-muted">
                           {c.taught}
                         </p>

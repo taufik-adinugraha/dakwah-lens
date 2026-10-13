@@ -85,9 +85,11 @@ import { IDLE_TICK_MS, MAX_REMINDERS } from "./timing";
 import {
   EXERCISE_KEYS,
   GUIDE_PARTS,
+  OPENING_EXERCISES,
   PARTS_OF,
   SHARED_KEYS,
   type AutoplaySequence,
+  type AutoplayStep,
   type AutoplayTexts,
   type ExampleClip,
   type ExerciseKey,
@@ -327,7 +329,17 @@ export function sequenceProblems(
 
   const order = steps.map((s) => s.kind);
   const lastWord = Math.max(order.lastIndexOf("explain"), order.lastIndexOf("compose"));
-  const firstAfter = (k: string) => order.indexOf(k as (typeof order)[number]);
+  // The warm-up OPENS the lesson (operator 2026-10-13; types.ts OPENING_EXERCISES): it is the
+  // step right before the first word, after what the ayah brings (the map, the primer). Every
+  // other exercise follows the explanations, as before.
+  const opens = (s: AutoplayStep) => s.kind === "exercise" && !!s.exercise && OPENING_EXERCISES.includes(s.exercise.key);
+  const openers = steps.filter(opens);
+  const firstWordAt = order.indexOf("recite_word");
+  const openAt = head + opening.length + primers.length;
+  if (openers.length && (firstWordAt === -1 || steps.slice(openAt, firstWordAt).length !== openers.length || steps.slice(openAt, firstWordAt).some((s) => !opens(s)))) {
+    out.push(`the warm-up (${openers.map((s) => s.id).join(", ")}) is not the step right before the first word, after the lesson map and the primer`);
+  }
+  const firstAfter = (k: string) => (k === "exercise" ? steps.findIndex((s) => s.kind === "exercise" && !opens(s)) : order.indexOf(k as (typeof order)[number]));
   for (const k of ["structure", "concept", "exercise", "learned", "recap"]) {
     const i = firstAfter(k);
     if (i !== -1 && i < lastWord) out.push(`${k} comes before the words are explained`);

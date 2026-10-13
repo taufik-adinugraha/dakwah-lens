@@ -11,10 +11,10 @@ import CurriculumPage, { generateMetadata } from "@/app/[locale]/quran/kurikulum
 import QuranTrackPage from "@/app/[locale]/quran/page";
 import { mapLatinName } from "@/lib/autoplay/lessonMap";
 import { SURAHS } from "@/lib/content";
-import { CURRICULUM } from "@/lib/curriculum";
+import { CURRICULUM, ZERO_HOST } from "@/lib/curriculum";
 import { DEFAULT_SURAHS } from "@/lib/features";
 import { LIBRARY, TERMS } from "@/lib/library";
-import { curriculumHref, SURAH_SLUGS } from "@/lib/routes";
+import { curriculumHref, introHref, SURAH_SLUGS } from "@/lib/routes";
 import { Scope, termDisplay, titleParts } from "@/lib/terms";
 import { ARABIC_RUN, hasArabic } from "@/lib/textUnits";
 
@@ -112,9 +112,19 @@ const unit = (uid: string) => CURRICULUM.units.find((u) => u.id === uid)!;
 const HIDDEN: readonly string[] = SURAH_SLUGS.filter((s) => !DEFAULT_SURAHS.includes(s));
 /** A link into a surah's lesson pages, rendered or in the RSC payload: scripts/ci/surahs-smoke.mjs linkInto. */
 const linkInto = (slug: string) => new RegExp(`(?:/belajar|\\\\?")/(?:(?:id|en)/)?quran/${slug}(?![A-Za-z0-9-])`);
-/** The lessons that may be links with these surahs published: written ayah lessons of a published surah. */
+/** The lessons that may be links with these surahs published: written ayah lessons of a published
+ *  surah, and the introduction (lesson "0") while it is written and its host surah is published. */
 const reachable = (published: readonly string[]) =>
-  CURRICULUM.lessons.filter((l) => l.map && l.ayah !== undefined && l.segment === undefined && published.includes(unit(l.unit).slug ?? "")).map((l) => l.id);
+  CURRICULUM.lessons
+    .filter((l) =>
+      l.id === "0"
+        ? !!l.map && ZERO_HOST !== null && published.includes(ZERO_HOST.slug)
+        : l.map && l.ayah !== undefined && l.segment === undefined && published.includes(unit(l.unit).slug ?? ""),
+    )
+    .map((l) => l.id);
+/** The address a reachable lesson's link carries, as the server draws it. */
+const pageOf = (locale: Locale, lid: string) =>
+  lid === "0" ? `/belajar/${locale}${introHref()}` : `/belajar/${locale}/quran/${unit(lesson(lid).unit).slug}/${lesson(lid).ayah}`;
 
 describe("the curriculum page lists the file: every lesson once, in order, with what is new and the running total", () => {
   for (const locale of ["id", "en"] as const) {
@@ -264,11 +274,11 @@ describe("a step with a Konsep page links to it; its Arabic is isolated as Mixed
 });
 
 describe("availability comes from the data: BELAJAR_SURAHS, the switch the track page reads", () => {
-  it("as production runs: only Al-Fatihah's lessons are links; the rest is plain text marked “Belum tersedia”", async () => {
+  it("as production runs: the introduction and Al-Fatihah's lessons are links; the rest is plain text marked “Belum tersedia”", async () => {
     for (const locale of ["id", "en"] as const) {
       const html = await curriculum(locale);
       const want = reachable(DEFAULT_SURAHS);
-      expect(want).toEqual(SURAHS.find((s) => s.slug === "al-fatihah")!.ayat.map((a) => `1:${a.ayah}`));
+      expect(want).toEqual(["0", ...SURAHS.find((s) => s.slug === "al-fatihah")!.ayat.map((a) => `1:${a.ayah}`)]);
       const mark = MSG[locale].Curriculum.unavailable;
       for (const b of lessonBlocks(html)) {
         const l = lesson(b.id);
@@ -276,10 +286,10 @@ describe("availability comes from the data: BELAJAR_SURAHS, the switch the track
         const into = anchors(b.html).filter((a) => /\/quran\//.test(a.href ?? ""));
         if (want.includes(b.id)) {
           expect(b.available, b.id).toBe(true);
-          expect(links.map((a) => a.href), b.id).toEqual([`/belajar/${locale}/quran/${unit(l.unit).slug}/${l.ayah}`]);
+          expect(links.map((a) => a.href), b.id).toEqual([pageOf(locale, b.id)]);
           expect(into, b.id).toHaveLength(1);
-          // The link says where it goes: the surah and the ayah.
-          expect(links[0].text, b.id).toBe(t(locale)("open_ayah", { unit: unit(l.unit).name, n: l.ayah! }));
+          // The link says where it goes: the surah and the ayah, or the introduction.
+          expect(links[0].text, b.id).toBe(b.id === "0" ? t(locale)("open_intro") : t(locale)("open_ayah", { unit: unit(l.unit).name, n: l.ayah! }));
           expect(visible(b.html), b.id).not.toContain(mark);
         } else {
           expect(b.available, b.id).toBe(false);
@@ -302,26 +312,41 @@ describe("availability comes from the data: BELAJAR_SURAHS, the switch the track
     }
   });
 
-  it("lesson “0” (the introduction) has no link, whatever is published: it has no route yet", async () => {
+  it("lesson “0” (the introduction) links /quran/pengantar while the surah that hosts it is published, and only then", async () => {
+    const konsep = lesson("0").steps.flatMap((sid) => (step(sid).concept ?? step(sid).basics ? [`/belajar/id/konsep/${step(sid).concept ?? step(sid).basics}`] : []));
+    expect(ZERO_HOST?.slug).toBe("al-fatihah");
     for (const published of [undefined, SURAH_SLUGS] as const) {
       const html = await curriculum("id", published);
       const b = lessonBlocks(html)[0];
       expect(b.id).toBe("0");
-      expect(b.available).toBe(false);
-      expect(anchors(b.html).filter((a) => /\/quran\//.test(a.href ?? ""))).toEqual([]);
-      expect(visible(b.html)).toContain(MSG.id.Curriculum.unavailable);
-      // Its new steps still link to their Konsep pages.
-      expect(anchors(b.html).map((a) => a.href)).toEqual(lesson("0").steps.flatMap((sid) => (step(sid).concept ?? step(sid).basics ? [`/belajar/id/konsep/${step(sid).concept ?? step(sid).basics}`] : [])));
+      expect(b.available).toBe(true);
+      const links = anchors(b.html).filter((a) => "data-lesson-link" in a);
+      expect(links.map((a) => [a.href, a.text])).toEqual([["/belajar/id/quran/pengantar", MSG.id.Curriculum.open_intro]]);
+      expect(visible(b.html)).not.toContain(MSG.id.Curriculum.unavailable);
+      // Its new steps link to their Konsep pages, before the lesson's own link.
+      expect(anchors(b.html).map((a) => a.href)).toEqual([...konsep, "/belajar/id/quran/pengantar"]);
     }
+    // The same gate as its card on the track page (lib/curriculum.ts introOpen): with the host
+    // surah hidden the row is plain text and the card is gone, and nothing names the path.
+    const hidden = ["an-nas"];
+    const html = await curriculum("id", hidden);
+    const b = lessonBlocks(html)[0];
+    expect(b.available).toBe(false);
+    expect(anchors(b.html).filter((a) => /\/quran\//.test(a.href ?? ""))).toEqual([]);
+    expect(visible(b.html)).toContain(MSG.id.Curriculum.unavailable);
+    expect(anchors(b.html).map((a) => a.href)).toEqual(konsep);
+    expect(html).not.toContain(introHref());
+    expect(await track("id", hidden)).not.toContain("data-intro-card");
+    expect(await track("id")).toContain("data-intro-card");
   });
 
-  it("with every surah listed: every written ayah lesson is a link; Ayat Kursi and the introduction stay plain", async () => {
+  it("with every surah listed: the introduction and every written ayah lesson are links; Ayat Kursi stays plain", async () => {
     const html = await curriculum("id", SURAH_SLUGS);
     const want = reachable(SURAH_SLUGS);
-    expect(want).toHaveLength(SURAHS.reduce((n, s) => n + s.ayat.length, 0));
+    expect(want).toHaveLength(1 + SURAHS.reduce((n, s) => n + s.ayat.length, 0));
     const linked = lessonBlocks(html).filter((b) => b.available).map((b) => b.id);
     expect(linked).toEqual(want);
-    expect(anchors(html).filter((a) => "data-lesson-link" in a).map((a) => a.href)).toEqual(want.map((lid) => `/belajar/id/quran/${unit(lesson(lid).unit).slug}/${lesson(lid).ayah}`));
+    expect(anchors(html).filter((a) => "data-lesson-link" in a).map((a) => a.href)).toEqual(want.map((lid) => pageOf("id", lid)));
     expect(visible(html).split(MSG.id.Curriculum.unavailable).length - 1).toBe(CURRICULUM.lessons.length - want.length);
     for (const slug of HIDDEN) expect(html, slug).toMatch(linkInto(slug));
   });

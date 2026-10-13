@@ -32,7 +32,11 @@ What it enforces (README "Narasi" has the reasons):
   in the ayah), ex:${key}:intro for each exercise of the ayah's quiz (content/quiz/<slug>.json,
   build_quiz.py) and ex:${key}:${n}:why for each of its questions (the explanation of the correct
   answer, said after "Benar." / "Ini jawabannya."; operator 2026-10-10), learned when the surah
-  has a lesson map, recap, and next (or done on the last ayah). Nothing else. shared.json holds
+  has a lesson map, recap, and next (or done on the last ayah). Nothing else. The lines of the
+  WARM-UP (ex:word-kind:…, quiz.OPENING_EXERCISES; operator 2026-10-13: "in every ayat we
+  identify first each words fall into which category: ismu, fi'il or harf") stand where the
+  lesson says them: after the map's lines and the primer, BEFORE the first word's — and may use
+  only the terms of EARLIER lessons (term_order_found). shared.json holds
   SHARED_KEYS plus ex:${key}:${part} for every guide part of every exercise (mirrors
   src/components/exercises/guide.ts).
 - The lesson map (operator 2026-10-13, plan L23: "at the beginning we inform what will be learnt,
@@ -223,9 +227,13 @@ def delivery_url(voice: dict, slug: str, text: str, sha256: str) -> str:
 
 
 # ------------------------------------------------------------------ the exercises (mirrors the app)
-EXERCISE_KEYS = ("tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory")
+EXERCISE_KEYS = QUIZ.EXERCISE_KEYS
+# The exercises a lesson asks before its words (the warm-up: quiz.OPENING_EXERCISES); the others
+# follow the structure.
+OPENING_EXERCISES = QUIZ.OPENING_EXERCISES
 # src/components/exercises/guide.ts EXERCISE_GUIDE_PARTS (checked against the file when it exists).
 EXERCISE_GUIDE_PARTS: dict[str, tuple[str, ...]] = {
+    "word-kind": ("options", "reveal", "next"),
     "tap-word": ("play", "options", "reveal", "next"),
     "why-harakat": ("options", "reveal", "next"),
     "sort-case": ("words", "bins", "reveal"),
@@ -365,6 +373,12 @@ def expected_parts(lesson: dict, library: dict, compose: dict | None = None,
         p = primer_of(compose, a["ayah"])
         if p:
             parts += [f"primer:{k}" for k in range(1, len(p.get("lines") or []) + 1)]
+        # The warm-up (operator 2026-10-13: "in every ayat we identify first each words fall into
+        # which category"): asked before the first word, after what the ayah brings.
+        plan = QUIZ.ayah_plan(quiz, a["ayah"])
+        for ex in plan:
+            if ex["key"] in OPENING_EXERCISES:
+                parts += [f"ex:{ex['key']}:intro"] + [f"ex:{ex['key']}:{q['n']}:why" for q in ex["questions"]]
         for i, w in enumerate(a["words"], 1):
             parts.append(f"w{i}")
             c = composition_of(compose, w["loc"])
@@ -372,8 +386,9 @@ def expected_parts(lesson: dict, library: dict, compose: dict | None = None,
                 parts += [f"w{i}:compose:{k}" for k in range(1, len(c.get("lines") or []) + 1)]
         parts += [t["line"] for t in taught_lines(a, curriculum)]
         parts += structure_parts(a)
-        for ex in QUIZ.ayah_plan(quiz, a["ayah"]):
-            parts += [f"ex:{ex['key']}:intro"] + [f"ex:{ex['key']}:{q['n']}:why" for q in ex["questions"]]
+        for ex in plan:
+            if ex["key"] not in OPENING_EXERCISES:
+                parts += [f"ex:{ex['key']}:intro"] + [f"ex:{ex['key']}:{q['n']}:why" for q in ex["questions"]]
         parts += (["learned"] if mapped else []) + ["recap", "done" if a["ayah"] == last else "next"]
         out[a["ayah"]] = parts
     return out
@@ -512,7 +527,7 @@ def line_view(ayah: dict | None, part: str, compose: dict | None = None,
         return [], None
     if ayah.get("zero") and not PRIMER_PART.fullmatch(part):
         return [], None  # lesson zero: no ayah, so nothing to light and no word card
-    if part in ("intro", "recite", "structure", "recap", "ex:tap-word:intro"):
+    if part in ("intro", "recite", "structure", "recap", "ex:tap-word:intro", f"ex:{QUIZ.WARMUP}:intro"):
         return list(WHOLE_AYAH), None
     m = re.fullmatch(r"w([1-9]\d*)(?::compose:[1-9]\d*)?", part)
     if m:
@@ -844,7 +859,9 @@ _COMPOUND_NEXT = r"(?! (?:maushul|fa'il|maf'ul|mudhari'|amr|madhi|majhul)(?![\w'
 LATIN_CONTEXT: dict[str, str] = {
     # "huruf" is also plain Indonesian ("huruf ba'", "empat huruf", "huruf 'athaf"): the word
     # class is said from the dictionary only where the Kalimah concept lists the three classes.
-    "حَرْف": r"(?:(?<=fi'il, dan ){h}|(?<=atau ){h}(?= \(kata tugas\)))",
+    # … and where the warm-up names the three (quiz.warmup_marked, build_narration.ex_intro:
+    # "isim, fi'il, atau huruf"; "… adalah huruf, yaitu kata tugas").
+    "حَرْف": r"(?:(?<=fi'il, dan ){h}|(?<=atau ){h}(?= \(kata tugas\))|(?<=fi'il, atau ){h}|(?<=adalah ){h}(?=, yaitu ))",
     # The letter of a prefixed preposition (bi-, li-), never "alif lam" or a root letter (fa', 'ain, lam).
     "بَاء": r"(?:(?<=[Hh]uruf )|(?<=jar )){h}",
     # … and the last of a wazan's three root letters as build_narration names them ("tiga huruf fa',
@@ -2165,7 +2182,11 @@ def term_order_found(uses: dict[str, list[str]], lesson: dict, curriculum: dict,
         if lesson_id not in rank:
             continue
         ok = allowance(int(m.group("ayah"))) if m.group("part") == "map:later" else frozenset()
-        bad = CUR.too_early(curriculum, lesson_id, terms, allowed=ok)
+        # A line of the warm-up is said before the lesson teaches anything: a term of this very
+        # lesson is too early there (main session 2026-10-13: "a warm-up line of ayat N may use
+        # only terms of lessons before N plus lesson zero's").
+        opening = any(m.group("part").startswith(f"ex:{k}:") for k in OPENING_EXERCISES)
+        bad = CUR.too_early(curriculum, lesson_id, terms, allowed=ok, before=opening)
         if bad:
             out[lid] = bad
     return out

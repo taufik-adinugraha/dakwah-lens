@@ -11,12 +11,13 @@
  * here: every name, order and count is the file's.
  *
  * AVAILABILITY is decided here, from the data, in one place: a lesson is a link only when
- *   - lib/routes.ts lessonHref gives it a page (no page today for lesson "0", the introduction,
- *     and for the segments of Ayat Kursi), and
- *   - it belongs to no surah (the introduction, once it has a route), or its surah is one
- *     BELAJAR_SURAHS publishes (`published`: lib/features.ts visibleSurahs(), the same switch that
- *     turns a surah's card on the track page into "Segera hadir") AND the lesson is written (the
- *     built file carries its derived lists only for an ayah that is on disk).
+ *   - lib/routes.ts lessonHref gives it a page (none for the segments of Ayat Kursi), and
+ *   - the lesson is written (the built file carries its derived lists only for an ayah that is on
+ *     disk, and for the introduction only while a surah hosts it), and
+ *   - its surah is one BELAJAR_SURAHS publishes (`published`: lib/features.ts visibleSurahs(), the
+ *     same switch that turns a surah's card on the track page into "Segera hadir") — or, for the
+ *     introduction, which belongs to no surah, `intro` says so: lib/curriculum.ts introOpen, the
+ *     ONE rule the track page's card asks too (the surah that hosts it is published).
  * Every other lesson has `href: null`; the page shows it as plain text marked "belum tersedia",
  * and its path is never built, so it is in no HTML and no RSC payload.
  *
@@ -81,8 +82,12 @@ type OutlineFile = Pick<CurriculumFile, "units" | "lessons" | "steps" | "lanjut"
 /**
  * @param published slugs of the surahs visitors can reach (lib/features.ts visibleSurahs()).
  * @param pages ids that have a Konsep page (the library's concepts and basics).
+ * @param intro may the introduction (lesson zero) be shown as a link (lib/curriculum.ts introOpen).
  */
-export function curriculumOutline(file: OutlineFile, { published, pages }: { published: ReadonlySet<string>; pages: ReadonlySet<string> }): Outline {
+export function curriculumOutline(
+  file: OutlineFile,
+  { published, pages, intro }: { published: ReadonlySet<string>; pages: ReadonlySet<string>; intro: boolean },
+): Outline {
   const steps = new Map(file.steps.map((s) => [s.id, s]));
   const units = new Map(file.units.map((u) => [u.id, u]));
   const step = (id: string): OutlineStep[] => {
@@ -100,7 +105,7 @@ export function curriculumOutline(file: OutlineFile, { published, pages }: { pub
     }
     const kind = l.surah === undefined ? "intro" : l.segment !== undefined ? "segment" : "ayah";
     const page = lessonHref({ id: l.id, slug: unit?.slug, ayah: l.ayah, segment: l.segment });
-    const open = page !== null && (kind === "intro" || (unit?.slug !== undefined && published.has(unit.slug) && l.map !== undefined));
+    const open = page !== null && l.map !== undefined && (kind === "intro" ? intro : unit?.slug !== undefined && published.has(unit.slug));
     group.lessons.push({
       id: l.id,
       kind,

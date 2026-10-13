@@ -112,7 +112,15 @@ jobs:
       # correct options. Since the basic curriculum (plan L26) a question that asks a term before
       # its lesson passes only while it is listed in pipeline/authored/curriculum.pending.json
       # (and a listed question that is taught by now fails: the list can only shrink), and no
-      # basic lesson asks the wazan exercise (decision 6). Stdlib only, no network.
+      # basic lesson asks the wazan exercise (decision 6). Since plan L31 (operator 2026-10-13:
+      # "in every ayat we identify first each words fall into which category: ismu, fi'il or
+      # harf. it's kind of exercise, kind of warming up"): the WARM-UP that opens every ayah of a
+      # surah with a lesson map is derived here — each part of each word once, in order, its
+      # answer the part's QAC tag and in agreement with the lesson's `pos` (a disagreement stops
+      # the build), a sign only where the data shows it and an earlier lesson taught it, the three
+      # answers and its sentence's terms taught by the lessons BEFORE it — and the explanation
+      # shown after any answer (a word's `why_basic`: what the narrator says) is held to TAUGHT
+      # too. Stdlib only, no network.
       - name: Quizzes — up to date
         run: python3 pipeline/build_quiz.py --check
       - name: Quizzes — taught before tested
@@ -366,6 +374,9 @@ jobs:
           grep -q 'href="/belajar/id/quran/kurikulum"' <<<"$track" || { echo "✗ the track page does not link the curriculum page"; exit 1; }
           kur="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/kurikulum)"
           grep -q 'href="/belajar/id/quran/al-fatihah/1"' <<<"$kur" || { echo "✗ the curriculum page does not link Al-Fatihah ayah 1"; exit 1; }
+          # … and lesson zero's row links its page (the gate of its card on the track page: the
+          # surah that hosts it is published, as Al-Fatihah always is in this container).
+          grep -q 'href="/belajar/id/quran/pengantar"' <<<"$kur" || { echo "✗ the curriculum page does not link lesson zero (/quran/pengantar)"; exit 1; }
           grep -q '>Belum tersedia<' <<<"$kur" || { echo "✗ the curriculum page marks no lesson as Belum tersedia"; exit 1; }
           if grep -qiE '\b(ketuk|mengetuk|diketuk)\b' <<<"$kur"; then echo "✗ /belajar/id/quran/kurikulum: says ketuk (use klik)"; exit 1; fi
           # The lesson page carries the streamed recitation + the AI-assisted footer. ONE imam

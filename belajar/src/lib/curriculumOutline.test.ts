@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import { MAX_STEPS_PER_LESSON, type CurriculumFile } from "./autoplay/curriculum";
 import { SURAHS } from "./content";
-import { CURRICULUM } from "./curriculum";
+import { CURRICULUM, introOpen, ZERO_HOST } from "./curriculum";
 import { curriculumOutline } from "./curriculumOutline";
 import { DEFAULT_SURAHS } from "./features";
 import { LIBRARY } from "./library";
-import { ayahHref, SURAH_SLUGS } from "./routes";
+import { ayahHref, introHref, SURAH_SLUGS } from "./routes";
 
 // THE CURRICULUM AS ITS PAGE READS IT (operator 2026-10-13: "we should also explain this curriculum
 // in the page"; docs/belajar-plan.md L30). curriculumOutline turns content/curriculum.json into
@@ -17,7 +17,7 @@ import { ayahHref, SURAH_SLUGS } from "./routes";
 
 const PAGES: ReadonlySet<string> = new Set([...LIBRARY.basics.map((b) => b.id), ...LIBRARY.concepts.map((c) => c.id)]);
 const outline = (published: readonly string[], file: Parameters<typeof curriculumOutline>[0] = CURRICULUM) =>
-  curriculumOutline(file, { published: new Set(published), pages: PAGES });
+  curriculumOutline(file, { published: new Set(published), pages: PAGES, intro: introOpen(new Set(published)) });
 const lessonsOf = (o: ReturnType<typeof outline>) => o.units.flatMap((u) => u.lessons);
 const step = (id: string) => CURRICULUM.steps.find((s) => s.id === id)!;
 const unitOf = (lessonId: string) => CURRICULUM.units.find((u) => u.id === CURRICULUM.lessons.find((l) => l.id === lessonId)!.unit)!;
@@ -96,7 +96,7 @@ describe("curriculumOutline: content/curriculum.json as the curriculum page list
     for (const s of CURRICULUM.steps.filter((x) => x.basics !== undefined)) expect(page(s.id), s.id).toBe(s.basics);
     for (const s of CURRICULUM.steps.filter((x) => x.concept === undefined && x.basics === undefined)) expect(page(s.id), s.id).toBeNull();
     // A record without a page is never linked (no dead link, whatever the file names).
-    const none = curriculumOutline(CURRICULUM, { published: new Set(DEFAULT_SURAHS), pages: new Set() });
+    const none = curriculumOutline(CURRICULUM, { published: new Set(DEFAULT_SURAHS), pages: new Set(), intro: true });
     expect(none.units.flatMap((u) => u.lessons).flatMap((l) => l.new).every((s) => s.page === null)).toBe(true);
     expect(none.lanjut).toEqual([]);
   });
@@ -114,8 +114,10 @@ describe("curriculumOutline: content/curriculum.json as the curriculum page list
       // Learnt earlier, so never one of this lesson's new steps (decision 9: always apart).
       for (const s of l.again!) expect(file.steps, `${l.id} ${s.id}`).not.toContain(s.id);
     }
-    // The file carries the lists for every ayah on disk, and for no other lesson.
-    expect(written).toBe(SURAHS.reduce((n, s) => n + s.ayat.length, 0));
+    // The file carries the lists for every ayah on disk and for lesson zero while a surah hosts
+    // it (its harakat primer is played there), and for no other lesson.
+    expect(written).toBe(SURAHS.reduce((n, s) => n + s.ayat.length, 0) + (ZERO_HOST ? 1 : 0));
+    expect(CURRICULUM.lessons[0].map !== undefined).toBe(ZERO_HOST !== null);
     expect(lessonsOf(o).filter((l) => l.again === null).length).toBeGreaterThan(0);
   });
 
@@ -137,16 +139,19 @@ describe("curriculumOutline: which lessons are links (BELAJAR_SURAHS, the track 
     const l = CURRICULUM.lessons.find((x) => x.id === id)!;
     return ayahHref(unitOf(id).slug!, l.ayah!);
   };
-  /** The written ayah lessons of these surahs: what may be linked. */
+  /** What may be linked with these surahs published: their written ayah lessons — and the
+   *  introduction (lesson "0") while it is written and the surah that hosts it is among them. */
   const expected = (slugs: readonly string[]) =>
-    Object.fromEntries(
-      CURRICULUM.lessons.filter((l) => l.map && l.ayah !== undefined && l.segment === undefined && slugs.includes(unitOf(l.id).slug ?? "")).map((l) => [l.id, pageOf(l.id)]),
-    );
+    Object.fromEntries([
+      ...(ZERO_HOST && slugs.includes(ZERO_HOST.slug) && CURRICULUM.lessons[0].map ? [["0", introHref()]] : []),
+      ...CURRICULUM.lessons.filter((l) => l.map && l.ayah !== undefined && l.segment === undefined && slugs.includes(unitOf(l.id).slug ?? "")).map((l) => [l.id, pageOf(l.id)]),
+    ]);
 
-  it("as production runs (Al-Fatihah only): its ayat are links, nothing else is", () => {
+  it("as production runs (Al-Fatihah only): the introduction and its ayat are links, nothing else is", () => {
     const got = linked(outline(DEFAULT_SURAHS));
     expect(got).toEqual(expected(DEFAULT_SURAHS));
-    expect(Object.keys(got)).toEqual(SURAHS.find((s) => s.slug === "al-fatihah")!.ayat.map((a) => `1:${a.ayah}`));
+    expect(Object.keys(got)).toEqual(["0", ...SURAHS.find((s) => s.slug === "al-fatihah")!.ayat.map((a) => `1:${a.ayah}`)]);
+    expect(got["0"]).toBe("/quran/pengantar");
     expect(got["1:2"]).toBe("/quran/al-fatihah/2");
     // No path of a hidden surah is even built.
     for (const slug of SURAH_SLUGS.filter((s) => !DEFAULT_SURAHS.includes(s))) expect(JSON.stringify(outline(DEFAULT_SURAHS))).not.toContain(`/${slug}`);
@@ -155,7 +160,7 @@ describe("curriculumOutline: which lessons are links (BELAJAR_SURAHS, the track 
   it("with every surah listed: every written ayah lesson is a link, in the file's (teaching) order", () => {
     const got = linked(outline(SURAH_SLUGS));
     expect(got).toEqual(expected(SURAH_SLUGS));
-    expect(Object.keys(got)).toHaveLength(SURAHS.reduce((n, s) => n + s.ayat.length, 0));
+    expect(Object.keys(got)).toHaveLength(1 + SURAHS.reduce((n, s) => n + s.ayat.length, 0));
     for (const s of SURAHS) for (const a of s.ayat) expect(got[`${s.surah}:${a.ayah}`], a.loc).toBe(ayahHref(s.slug, a.ayah));
   });
 
@@ -165,11 +170,33 @@ describe("curriculumOutline: which lessons are links (BELAJAR_SURAHS, the track 
     expect(linked(outline([]))).toEqual({});
   });
 
-  it("the introduction lesson has no link (it has no route yet), and neither has a segment or a lesson that is not written", () => {
+  it("the introduction lesson is a link under ONE rule: it is written and the surah that hosts it is published", () => {
+    const zero = (o: ReturnType<typeof outline>) => lessonsOf(o).find((l) => l.id === "0")!.href;
+    expect(ZERO_HOST?.slug).toBe("al-fatihah");
+    // The rule the track page's card asks (lib/curriculum.ts introOpen) …
+    expect(introOpen(new Set(DEFAULT_SURAHS))).toBe(true);
+    expect(introOpen(new Set(["an-nas"]))).toBe(false);
+    expect(introOpen(new Set())).toBe(false);
+    // … decides the curriculum page's row: a link with its host published, plain text without it.
+    expect(zero(outline(DEFAULT_SURAHS))).toBe(introHref());
+    expect(zero(outline(SURAH_SLUGS))).toBe(introHref());
+    for (const slugs of [["an-nas"], ["al-ikhlas", "al-falaq", "an-nas"], []]) expect(zero(outline(slugs)), slugs.join()).toBeNull();
+    // The outline takes the answer, it does not make a second one: closed means no link, whatever is published.
+    const closed = curriculumOutline(CURRICULUM, { published: new Set(SURAH_SLUGS), pages: PAGES, intro: false });
+    expect(lessonsOf(closed).find((l) => l.id === "0")!.href).toBeNull();
+    // And a lesson zero that is not written (no surah hosts it: the built file has no lists for
+    // it) is no link even when asked for.
+    const unwritten: Pick<CurriculumFile, "units" | "lessons" | "steps" | "lanjut"> = {
+      ...CURRICULUM,
+      lessons: CURRICULUM.lessons.map((l) => (l.id === "0" ? { ...l, map: undefined, lines: undefined } : l)),
+    };
+    expect(lessonsOf(curriculumOutline(unwritten, { published: new Set(SURAH_SLUGS), pages: PAGES, intro: true })).find((l) => l.id === "0")!.href).toBeNull();
+  });
+
+  it("a segment of a long ayah and a lesson that is not written are never links", () => {
     for (const slugs of [DEFAULT_SURAHS, SURAH_SLUGS, []]) {
       const all = lessonsOf(outline(slugs));
-      expect(all.find((l) => l.id === "0")!.href).toBeNull();
-      for (const l of all.filter((x) => x.kind !== "ayah")) expect(l.href, l.id).toBeNull();
+      for (const l of all.filter((x) => x.kind === "segment")) expect(l.href, l.id).toBeNull();
       for (const l of all) if (!CURRICULUM.lessons.find((x) => x.id === l.id)!.map) expect(l.href, l.id).toBeNull();
     }
     // A unit with no lesson pages (no slug: Ayat Kursi while it is not written) cannot be

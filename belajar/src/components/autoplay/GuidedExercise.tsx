@@ -8,13 +8,14 @@ import { SortCase } from "@/components/exercises/SortCase";
 import { TapWord } from "@/components/exercises/TapWord";
 import { WaznFactory } from "@/components/exercises/WaznFactory";
 import { WhyHarakat } from "@/components/exercises/WhyHarakat";
+import { WordKind } from "@/components/exercises/WordKind";
 import type { QuizAyah } from "@/content/quiz-schema";
 import type { Lexeme, Word } from "@/content/schema";
 import type { RecitationSource } from "@/hooks/useSegmentPlayer";
 import type { ExerciseKey } from "@/lib/autoplay";
 import { planOf } from "@/lib/quiz-plan";
 
-/** What the five exercises need, as the lesson page passes it to the stage. */
+/** What the exercises need, as the lesson page passes it to the stage. */
 export type StageExerciseData = {
   /** The ayah's words. */
   words: Word[];
@@ -28,6 +29,7 @@ export type StageExerciseData = {
 
 /** Message key of each exercise's title in the Exercise namespace. */
 export const EXERCISE_TITLE_KEY = {
+  "word-kind": "kind_title",
   "tap-word": "tap_title",
   "why-harakat": "why_title",
   "sort-case": "sort_title",
@@ -64,6 +66,10 @@ export function GuidedExercise({
   // data-exercise: the exercise on screen, by key (the CI exercise check finds its step by it).
   const wrap = (node: ReactNode) => <div data-exercise={exercise}>{node}</div>;
   switch (exercise) {
+    case "word-kind": {
+      const p = planOf(quiz, "word-kind");
+      return p && wrap(<WordKind id={progressId} words={data.words} questions={p.questions} kinds={quiz.kinds} guided={guided} compact />);
+    }
     case "tap-word": {
       const p = planOf(quiz, "tap-word");
       return p && wrap(<TapWord id={progressId} words={tapWords} questions={p.questions} source={tapSource} guided={guided} compact />);

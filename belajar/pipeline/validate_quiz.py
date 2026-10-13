@@ -19,6 +19,14 @@ Checks (quiz.py has the rules and their reasons):
      authored/curriculum.pending.json `quiz`, held both ways: one that is not listed fails, a
      listed one that is taught again fails as stale. And no basic lesson asks the wazan exercise
      (decision 6);
+  3b. the WARM-UP that opens every ayah of a surah with a lesson map (operator 2026-10-13: "in
+     every ayat we identify first each words fall into which category: ismu, fi'il or harf"):
+     every part of every word asked once, in order; the answer the one the part's QAC tag gives,
+     agreeing with the lesson's `pos`; the bytes the lesson's; a sign only where the data shows
+     it and an earlier lesson taught it; the sentence shown the one built from the data; and the
+     three answers and every term of that sentence TAUGHT by the lessons BEFORE this one (lesson
+     zero's lines count: they are "ayah 0"). And for every exercise: the terms of the explanation
+     shown after an answer (`why`) are held to TAUGHT too;
   4. the narration has the intro of every exercise and one explanation line per question
      ("<slug>:<ayah>:ex:<key>:<n>:why"), and nothing for an exercise the plan does not have.
 Prints the per-ayah quiz and what each ayah teaches. Exit 1 on any failure.
@@ -54,13 +62,16 @@ def narration_problems(content: dict, manifest: dict | None) -> list[str]:
 
 def check(lessons: dict[str, dict], library: dict, terms: Q.Terms, quizzes: dict[str, dict],
           manifests: dict[str, dict], *, fresh: dict[str, dict] | None = None,
-          pending: dict[str, list[str]] | None = None) -> list[str]:
+          pending: dict[str, list[str]] | None = None, curriculum: dict | None = None,
+          mapped: set[str] | None = None) -> list[str]:
     """Every check above; `fresh`: the quiz files a build produces now (default: built here);
-    `pending`: authored/curriculum.pending.json `quiz` (default: from disk)."""
+    `pending`: authored/curriculum.pending.json `quiz` (default: from disk); `curriculum`:
+    content/curriculum.json and `mapped`: the surahs whose lesson map is switched on (both
+    default: from disk) — what the warm-up is derived with."""
     errs: list[str] = []
     if fresh is None:
         try:
-            fresh = BQ.build_all(lessons, library, terms)
+            fresh = BQ.build_all(lessons, library, terms, curriculum=curriculum, mapped=mapped)
         except Q.QuizError as e:
             return [f"build_quiz.py fails: {e}"]
     for sp in SURAHS:
@@ -72,7 +83,8 @@ def check(lessons: dict[str, dict], library: dict, terms: Q.Terms, quizzes: dict
             continue
         if Q.dump(content) != Q.dump(fresh.get(sp.slug) or {}):
             errs.append(f"{sp.slug}: content/quiz/{sp.slug}.json is out of date with build_quiz.py (rebuild, do not hand-edit)")
-        errs += Q.plan_problems(content, lessons[sp.slug], library, terms, manifests.get(sp.slug), pending)
+        errs += Q.plan_problems(content, lessons[sp.slug], library, terms, manifests.get(sp.slug), pending,
+                                curriculum=curriculum, mapped=None if mapped is None else sp.slug in mapped)
         errs += narration_problems(content, manifests.get(sp.slug))
     return errs
 

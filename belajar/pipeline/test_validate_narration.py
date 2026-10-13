@@ -369,6 +369,9 @@ def then(*faults):
     return f
 
 
+# The first explanation of ayah 2's warm-up ("Kata pertama adalah isim …").
+W21 = "al-fatihah:2:ex:word-kind:1:why"
+
 # A sentence that names a term before its lesson, as (caption, speech) for `more`: idhafah is
 # taught in ayah 4, badal in An-Nas 2, isim fa'il at the next level.
 EARLY = ("Ini idhafah (إِضَافَة).", "Ini idhofah.")
@@ -594,6 +597,18 @@ MUTATIONS = [
     ("Qur'anic word in a why_basic", why_basic("1:5:1", "Dhamir iyyāka ini mabni: akhirnya tetap fathah."), "names the Qur'anic word(s)"),
     ("a why_basic with a Latin term the dictionary does not speak",
      both("al-fatihah:6:ex:sort-case:1:why", "fa’il (فَاعِل) kata ini", "fa'il-nya", "فَاعِل kata ini", "fa'il-nya"), "says \"fa'il\" in Latin"),
+    # --- the warm-up that opens a lesson (operator 2026-10-13: "in every ayat we identify first
+    # each words fall into which category: ismu, fi'il or harf"): its lines stand before the first
+    # word's, one per question, and may use only what EARLIER lessons taught
+    ("a warm-up line missing", drop("al-fatihah:3:ex:word-kind:2:why"), "al-fatihah:3:ex:word-kind:2:why"),
+    ("a warm-up line for a question the quiz does not ask", add("al-fatihah:3:ex:word-kind:9:why", "Kata ketiga adalah isim."), "al-fatihah:3:ex:word-kind:9:why"),
+    ("a warm-up sentence edited by hand", both(W21, "Kata pertama", "Kata yang pertama"), "out of date"),
+    ("a warm-up line that names a term of its OWN lesson (huruf jar, taught in ayah 1, said by ayah 1's warm-up)",
+     more("al-fatihah:1:ex:word-kind:2:why", "Tandanya: didahului huruf jar (حَرْف جَرّ).", "Tandanya: didahului حَرْف جَرّ."),
+     "al-fatihah:1:ex:word-kind:2:why: uses the term 'huruf-jar' before the lesson that teaches it (taught in 1:1)"),
+    ("a warm-up line that names a term of a later lesson", more(W21, *EARLY),
+     "al-fatihah:2:ex:word-kind:1:why: uses the term 'idhafah' before the lesson that teaches it (taught in 1:4)"),
+    ("Qur'anic word in a warm-up line", both(W21, "Kata pertama", "Kata al-ḥamdu"), "al-fatihah:2:ex:word-kind:1:why"),
     # --- Arabic terms said in Latin (rule 1) and the dictionary's approvals (review 2026-10-10)
     ("a compose line with a Latin grammar term (mubtada')", append_text(C1, " Kata ini mubtada'."),
      "says \"mubtada'\" in Latin"),
@@ -761,8 +776,14 @@ class NarrationValidation(unittest.TestCase):
         # recite → what the ayah brings (the lesson map, plan L23 and L26: one line per group of its
         # card) → each word: its gloss line, then its frames' lines (rule 14). The harakat primer
         # stood between them until 2026-10-13; it is lesson zero's now.
+        # … and, since the same day, the warm-up that opens the lesson stands before the first word.
         self.assertEqual(ids[1:6], ["al-fatihah:1:recite", "al-fatihah:1:map:new", "al-fatihah:1:map:learnt",
-                                    "al-fatihah:1:map:later", "al-fatihah:1:w1"])
+                                    "al-fatihah:1:map:later", "al-fatihah:1:ex:word-kind:intro"])
+        warm = [lid for lid in ids if ":ex:word-kind:" in lid]
+        self.assertEqual(warm, ["al-fatihah:1:ex:word-kind:intro", *[f"al-fatihah:1:ex:word-kind:{n}:why" for n in range(1, 6)]])
+        self.assertEqual(ids[5 + len(warm)], "al-fatihah:1:w1")
+        # Every other exercise's lines still follow the structure.
+        self.assertGreater(ids.index("al-fatihah:1:ex:tap-word:intro"), ids.index("al-fatihah:1:structure:4"))
         zero = [lid for lid in lines if lid.startswith("al-fatihah:0:")]
         self.assertEqual(zero, ["al-fatihah:0:intro", *[f"al-fatihah:0:primer:{k}" for k in range(1, 10)],
                                 "al-fatihah:0:concept:kalimah-isim-fiil-huruf", "al-fatihah:0:next"])
@@ -1242,6 +1263,30 @@ class Dictionary(unittest.TestCase):
         self.assertEqual(V.heavy_latin(text, LEX), ["Khabar", "'athaf", "zharaf", "qaul"])
         rows = [("x", "x:1:w1", "Kata pertama adalah khabar."), ("x", "x:1:w2", "Akhirnya dibaca كَسْرَة.")]
         self.assertEqual(R.blocked(rows, LEX), [("x:1:w1", ["khabar"])])
+
+    def test_huruf_is_the_word_class_only_where_the_three_kinds_are_named(self):
+        # "huruf" is plain Indonesian for a letter; the dictionary says it as the term (حَرْف) only
+        # where the Kalimah record lists the three kinds, and — since the warm-up, 2026-10-13 —
+        # where the warm-up names them: its introduction and its explanation of a huruf.
+        term = LEX.by_term["حَرْف"]
+
+        def found(prose):
+            return [prose[a:b] for a, b, t, _cap in LEX.latin_matches(prose) if t is term]
+
+        for prose in ("tebak dulu jenisnya: isim, fi'il, atau huruf.", "Pilih jenisnya: isim, fi'il, atau huruf.",
+                      "Bagian pertama kata pertama adalah huruf, yaitu kata tugas.", "isim, fi'il, dan huruf",
+                      "atau huruf (kata tugas)."):
+            self.assertEqual(found(prose), ["huruf"], prose)
+        for prose in ("Huruf pertama Surah Al-Fatihah, huruf ba', memakai kasrah.", "Bagian pertama adalah huruf jar, yaitu huruf ba'.",
+                      "Kata ini adalah huruf 'athaf.", "Tanda itu adalah huruf kecil.", "empat huruf atau huruf mati",
+                      "Yang pertama adalah huruf, bukan kata."):
+            self.assertEqual(found(prose), [], prose)
+        # The lines as built: the three kinds said from the dictionary, a letter still a letter.
+        lines = MANIFESTS["al-fatihah"]["lines"]
+        self.assertIn("اِسْم, فِعْل, atau حَرْف.", lines["al-fatihah:1:ex:word-kind:intro"]["text"])
+        self.assertEqual(lines["al-fatihah:1:ex:word-kind:1:why"]["text"], "Bagian pertama kata pertama adalah حَرْف, yaitu kata tugas.")
+        self.assertNotIn("حَرْف,", lines["al-fatihah:0:primer:4"]["text"])
+        self.assertEqual(MANIFESTS["shared"]["lines"]["shared:ex:word-kind:options"]["text"], "Pilih jenisnya: اِسْم, فِعْل, atau حَرْف.")
 
     def test_latin_terms_and_pending(self):
         # Arabic terms said in Latin are held back (render refuses them); the honorifics, Indonesian

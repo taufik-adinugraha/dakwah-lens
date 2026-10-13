@@ -797,8 +797,9 @@ describe("the role is always na't: a marked “sifat” shows نَعْت, never 
     // …and it is نَعْت they show: the quiz feedback the operator saw, and the role's own label.
     const quiz = strings(quizFor("al-fatihah"), "quiz").map(([, t]) => t);
     // The strings that said "sifat (صِفَة)" (one of them inside the prose's own bracket): twelve
-    // on 2026-10-13, eleven in the quiz plan of the same day (the basic curriculum).
-    expect(quiz.filter((t) => new RegExp(String.raw`sifat \(?${NAAT}`, "u").test(t))).toHaveLength(11);
+    // on 2026-10-13, eleven in the quiz plan of the same day (the basic curriculum), ten once the
+    // explanation shown is a word's `why_basic` (1:7:5's says "menjadikannya sifat" in plain words).
+    expect(quiz.filter((t) => new RegExp(String.raw`sifat \(?${NAAT}`, "u").test(t))).toHaveLength(10);
     // (The operator's own example, ayah 1's "sifat kedua bagi lafaz Allah", left the quiz with
     // ayah 1's reasons on 2026-10-13; ayah 4's "sifat keempat" is the same sentence.)
     expect(quiz).toContain(`Akhirnya kasrah (كَسْرَة) karena menjadi sifat (${NAAT}) keempat bagi lafaz Allah.`);

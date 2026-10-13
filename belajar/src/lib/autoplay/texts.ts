@@ -24,6 +24,12 @@ export const ID_TEXTS: AutoplayTexts = {
   concept: (title, summary) => `Konsep baru — ${title}: ${summary}`,
   conceptBrief: (title) => `Konsep baru — ${title}. Penjelasannya ada di bagian Pelajari lebih dalam.`,
   exercise: {
+    "word-kind": {
+      intro: "Pemanasan: isim, fi'il, atau huruf? Tebak dulu jenis setiap kata di ayat ini.",
+      options: "Klik salah satu jenis yang ditandai.",
+      reveal: "Coba pilih lagi, atau klik “Tunjukkan jawaban” yang ditandai.",
+      next: "Klik tombol yang ditandai untuk melanjutkan.",
+    },
     "tap-word": {
       intro: "Latihan: Dengar dan klik. Imam membacakan satu kata dari ayat ini, lalu Anda mengklik kata itu.",
       // The lesson's imam recites the word by itself: nothing to tap yet.

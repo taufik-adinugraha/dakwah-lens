@@ -7,6 +7,7 @@ import {
   conceptHref,
   curriculumHref,
   hubHref,
+  introHref,
   lessonHref,
   lexemeHref,
   quranHref,
@@ -80,12 +81,16 @@ describe("the curriculum page and its lesson links (plan L30)", () => {
     expect(segment).not.toBe("og");
   });
 
-  it("builds a lesson's link in ONE place: an ayah lesson of a surah with pages, and nothing else", () => {
+  it("builds a lesson's link in ONE place: an ayah lesson of a surah with pages, the introduction, and nothing else", () => {
     expect(lessonHref({ id: "1:4", slug: "al-fatihah", ayah: 4 })).toBe(ayahHref("al-fatihah", 4));
     expect(lessonHref({ id: "114:6", slug: "an-nas", ayah: 6 })).toBe("/quran/an-nas/6");
-    // The introduction (lesson "0") has no route yet: no link, whatever else it is given.
-    expect(lessonHref({ id: "0" })).toBeNull();
-    expect(lessonHref({ id: "0", slug: "al-fatihah", ayah: 1 })).toBeNull();
+    // The introduction (lesson "0") has its own page, whatever else it is given (WHETHER it may
+    // be shown as a link is lib/curriculum.ts introOpen: curriculumOutline.test.ts).
+    expect(introHref()).toBe("/quran/pengantar");
+    expect(lessonHref({ id: "0" })).toBe(introHref());
+    expect(lessonHref({ id: "0", slug: "al-fatihah", ayah: 1 })).toBe(introHref());
+    // A static segment beside [surah], like the curriculum page's: no surah slug may take it.
+    expect(SURAH_SLUGS as readonly string[]).not.toContain(introHref().slice(quranHref().length + 1));
     // A segment of a long ayah has no page; a unit without lesson pages has no slug.
     expect(lessonHref({ id: "2:255/3", ayah: 255, segment: 3 })).toBeNull();
     expect(lessonHref({ id: "2:255/3", slug: "al-fatihah", ayah: 255, segment: 3 })).toBeNull();
@@ -97,9 +102,9 @@ describe("the curriculum page and its lesson links (plan L30)", () => {
     for (const l of CURRICULUM.lessons) {
       const href = lessonHref({ id: l.id, slug: slug(l.unit), ayah: l.ayah, segment: l.segment });
       const page = slug(l.unit) !== undefined && l.ayah !== undefined && l.segment === undefined;
-      expect(href, l.id).toBe(page ? ayahHref(slug(l.unit)!, l.ayah!) : null);
+      expect(href, l.id).toBe(l.id === "0" ? introHref() : page ? ayahHref(slug(l.unit)!, l.ayah!) : null);
       // A unit's slug is a surah with lesson pages, so the link can only lead to a real lesson.
-      if (href) expect(SURAH_SLUGS as readonly string[], l.id).toContain(slug(l.unit));
+      if (href && l.id !== "0") expect(SURAH_SLUGS as readonly string[], l.id).toContain(slug(l.unit));
     }
     expect(CURRICULUM.lessons[0].id).toBe("0");
   });

@@ -698,7 +698,12 @@ describe("the narration listed ahead, across steps (operator 2026-10-12, lookahe
 
   it("the remembered place: from step N on, nothing of the steps before it", () => {
     for (const { ayah, seq } of fatihah) {
-      for (const from of [1, 4, seq.steps.length - 2]) {
+      // A place early in the lesson whose own line is rendered: found, not numbered (step 4 was
+      // one until the lines of the lesson map and of the warm-up, 2026-10-13, which have no file
+      // until they are rendered — a place with nothing to fetch has nothing to check).
+      const early = seq.steps.findIndex((st, i) => i >= 4 && st.cues.some((c) => c.audio.length > 0));
+      expect(early, `al-fatihah ${ayah}`).toBeGreaterThanOrEqual(4);
+      for (const from of [1, early, seq.steps.length - 2]) {
         const s = reduceAutoplay(seq, createAutoplayState(seq), { type: "start", reason: "restore", from });
         expect(s.idx).toBe(from);
         const before = new Set(seq.steps.slice(0, from).flatMap((st) => st.cues.flatMap((c) => c.audio.map((f) => f.url))));
@@ -715,7 +720,9 @@ describe("the narration listed ahead, across steps (operator 2026-10-12, lookahe
 
   it("at an exercise: what it says by itself ahead of it; while it waits, nothing of its feedback, the steps after it", () => {
     for (const { ayah, seq } of fatihah) {
-      const exIdx = seq.steps.findIndex((st) => st.exercise);
+      // The first exercise whose introduction is rendered (the warm-up that opens the lesson,
+      // 2026-10-13, is caption-only until its lines are; then it is the one found here).
+      const exIdx = seq.steps.findIndex((st) => st.exercise && st.exercise.lead.some((c) => st.cues[c].audio.length > 0));
       expect(exIdx, `al-fatihah ${ayah}`).toBeGreaterThan(0);
       const ex = seq.steps[exIdx];
       const spec = ex.exercise!;
@@ -1073,11 +1080,14 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
         // (until 2026-10-13 it was the imam's step, then the harakat primer's — which is lesson
         // zero's now; a step named here would be the next to move): the first one after the start
         // whose step two on has a file. A bounded walk: a step that is gone must fail, not spin.
-        const at = seq.steps.findIndex((_, i) => i > 0 && (seq.steps[i + 2]?.cues ?? []).some((c) => c.audio.length > 0));
+        // "Has a file" as the list itself counts it (an exercise two steps on is listed with
+        // what it says by itself, its introduction and first prompt — not with its other prompts).
+        const further = (st: AutoplayState) => lookaheadAudio(seq, st, { steps: LOOKAHEAD_STEPS }).length > lookaheadAudio(seq, st, { steps: 1 }).length;
+        let onPrimer = reduceAutoplay(seq, first, { type: "next" });
+        for (let k = 0; k < seq.steps.length && !further(onPrimer); k++) onPrimer = reduceAutoplay(seq, onPrimer, { type: "next" });
+        const at = onPrimer.idx;
         expect(at).toBeGreaterThan(0);
-        let onPrimer = first;
-        for (let k = 0; k < seq.steps.length && onPrimer.idx !== at; k++) onPrimer = reduceAutoplay(seq, onPrimer, { type: "next" });
-        expect(onPrimer.idx).toBe(at);
+        expect(further(onPrimer)).toBe(true);
         const v = aheadUpdate(seq, onPrimer, { conn, soundLoading: false, heardFor: null });
         expect(v.wanted).toEqual(lookaheadAudio(seq, onPrimer, { steps: 1 }));
         expect(v.path.length).toBeGreaterThan(v.wanted.length);

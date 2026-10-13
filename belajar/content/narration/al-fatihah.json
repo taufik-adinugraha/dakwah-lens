@@ -917,6 +917,44 @@
       "highlight": [],
       "focus": null
     },
+    "al-fatihah:1:ex:word-kind:intro": {
+      "text": "Latihan pemanasan, lima soal. Setiap soal menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: اِسْم, فِعْل, atau حَرْف.",
+      "display": "Latihan pemanasan, lima soal. Setiap soal menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: isim (اِسْم), fi’il (فِعْل), atau huruf (حَرْف).",
+      "highlight": [
+        0
+      ],
+      "focus": null
+    },
+    "al-fatihah:1:ex:word-kind:1:why": {
+      "text": "Bagian pertama kata pertama adalah حَرْف, yaitu kata tugas.",
+      "display": "Bagian pertama kata pertama adalah huruf (حَرْف), yaitu kata tugas.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:1:ex:word-kind:2:why": {
+      "text": "Bagian kedua kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Bagian kedua kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:1:ex:word-kind:3:why": {
+      "text": "Kata kedua adalah اِسْم.",
+      "display": "Kata kedua adalah isim (اِسْم).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:1:ex:word-kind:4:why": {
+      "text": "Kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:1:ex:word-kind:5:why": {
+      "text": "Kata keempat adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
     "al-fatihah:1:w1": {
       "text": "Kata pertama artinya: dengan nama. Kata ini terdiri dari dua bagian.",
       "display": "Kata pertama artinya: “dengan nama”. Kata ini terdiri dari dua bagian.",
@@ -3610,6 +3648,44 @@
     "al-fatihah:2:map:later": {
       "text": "Ada empat hal lagi di ayat ini, di antaranya alif lam dan نَعْت, tetapi baru kita bahas nanti. Ada juga dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
       "display": "Ada empat hal lagi di ayat ini, di antaranya alif lam (ال) dan na’t (نَعْت), tetapi baru kita bahas nanti. Ada juga dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:2:ex:word-kind:intro": {
+      "text": "Latihan pemanasan, lima soal. Setiap soal menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: اِسْم, فِعْل, atau حَرْف.",
+      "display": "Latihan pemanasan, lima soal. Setiap soal menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: isim (اِسْم), fi’il (فِعْل), atau huruf (حَرْف).",
+      "highlight": [
+        0
+      ],
+      "focus": null
+    },
+    "al-fatihah:2:ex:word-kind:1:why": {
+      "text": "Kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:2:ex:word-kind:2:why": {
+      "text": "Bagian pertama kata kedua adalah حَرْف, yaitu kata tugas.",
+      "display": "Bagian pertama kata kedua adalah huruf (حَرْف), yaitu kata tugas.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:2:ex:word-kind:3:why": {
+      "text": "Bagian kedua kata kedua adalah اِسْم. Tandanya: didahului حَرْف جَرّ.",
+      "display": "Bagian kedua kata kedua adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:2:ex:word-kind:4:why": {
+      "text": "Kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:2:ex:word-kind:5:why": {
+      "text": "Kata keempat adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
       "highlight": [],
       "focus": null
     },
@@ -7112,6 +7188,26 @@
       "highlight": [],
       "focus": null
     },
+    "al-fatihah:3:ex:word-kind:intro": {
+      "text": "Latihan pemanasan, dua soal. Setiap soal menampilkan satu kata dari ayat ini; tebak dulu jenisnya: اِسْم, فِعْل, atau حَرْف.",
+      "display": "Latihan pemanasan, dua soal. Setiap soal menampilkan satu kata dari ayat ini; tebak dulu jenisnya: isim (اِسْم), fi’il (فِعْل), atau huruf (حَرْف).",
+      "highlight": [
+        0
+      ],
+      "focus": null
+    },
+    "al-fatihah:3:ex:word-kind:1:why": {
+      "text": "Kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:3:ex:word-kind:2:why": {
+      "text": "Kata kedua adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
     "al-fatihah:3:w1": {
       "text": "Kata pertama artinya: Yang Maha Pengasih. Kata yang sama sudah kita pelajari di ayat pertama.",
       "display": "Kata pertama artinya: “Yang Maha Pengasih”. Kata yang sama sudah kita pelajari di ayat pertama.",
@@ -9007,6 +9103,32 @@
     "al-fatihah:4:map:later": {
       "text": "Di ayat ini ada dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
       "display": "Di ayat ini ada dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:4:ex:word-kind:intro": {
+      "text": "Latihan pemanasan, tiga soal. Setiap soal menampilkan satu kata dari ayat ini; tebak dulu jenisnya: اِسْم, فِعْل, atau حَرْف.",
+      "display": "Latihan pemanasan, tiga soal. Setiap soal menampilkan satu kata dari ayat ini; tebak dulu jenisnya: isim (اِسْم), fi’il (فِعْل), atau huruf (حَرْف).",
+      "highlight": [
+        0
+      ],
+      "focus": null
+    },
+    "al-fatihah:4:ex:word-kind:1:why": {
+      "text": "Kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:4:ex:word-kind:2:why": {
+      "text": "Kata kedua adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:4:ex:word-kind:3:why": {
+      "text": "Kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.",
+      "display": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam (ال).",
       "highlight": [],
       "focus": null
     },
@@ -11335,6 +11457,44 @@
     "al-fatihah:5:map:later": {
       "text": "Ada tiga hal lagi di ayat ini, tetapi baru kita bahas nanti: جُمْلَة فِعْلِيَّة di ayat keenam, مَفْعُول بِه di ayat keenam, dan عَطْف di ayat ketujuh. Ada juga tiga hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
       "display": "Ada tiga hal lagi di ayat ini, tetapi baru kita bahas nanti: jumlah fi’liyyah (جُمْلَة فِعْلِيَّة) di ayat keenam, maf’ul bih (مَفْعُول بِه) di ayat keenam, dan ‘athaf (عَطْف) di ayat ketujuh. Ada juga tiga hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:5:ex:word-kind:intro": {
+      "text": "Latihan pemanasan, lima soal. Setiap soal menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: اِسْم, فِعْل, atau حَرْف.",
+      "display": "Latihan pemanasan, lima soal. Setiap soal menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: isim (اِسْم), fi’il (فِعْل), atau huruf (حَرْف).",
+      "highlight": [
+        0
+      ],
+      "focus": null
+    },
+    "al-fatihah:5:ex:word-kind:1:why": {
+      "text": "Kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:5:ex:word-kind:2:why": {
+      "text": "Kata kedua adalah فِعْل, yaitu kata kerja.",
+      "display": "Kata kedua adalah fi’il (فِعْل), yaitu kata kerja.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:5:ex:word-kind:3:why": {
+      "text": "Bagian pertama kata ketiga adalah حَرْف, yaitu kata tugas.",
+      "display": "Bagian pertama kata ketiga adalah huruf (حَرْف), yaitu kata tugas.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:5:ex:word-kind:4:why": {
+      "text": "Bagian kedua kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Bagian kedua kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:5:ex:word-kind:5:why": {
+      "text": "Kata keempat adalah فِعْل, yaitu kata kerja.",
+      "display": "Kata keempat adalah fi’il (فِعْل), yaitu kata kerja.",
       "highlight": [],
       "focus": null
     },
@@ -14298,6 +14458,38 @@
     "al-fatihah:6:map:later": {
       "text": "Ada satu hal lagi di ayat ini, yaitu فِعْل أَمْر, tetapi baru kita bahas nanti. Ada juga tiga hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
       "display": "Ada satu hal lagi di ayat ini, yaitu fi’il amr (فِعْل أَمْر), tetapi baru kita bahas nanti. Ada juga tiga hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:6:ex:word-kind:intro": {
+      "text": "Latihan pemanasan, empat soal. Setiap soal menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: اِسْم, فِعْل, atau حَرْف.",
+      "display": "Latihan pemanasan, empat soal. Setiap soal menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: isim (اِسْم), fi’il (فِعْل), atau huruf (حَرْف).",
+      "highlight": [
+        0
+      ],
+      "focus": null
+    },
+    "al-fatihah:6:ex:word-kind:1:why": {
+      "text": "Bagian pertama kata pertama adalah فِعْل, yaitu kata kerja.",
+      "display": "Bagian pertama kata pertama adalah fi’il (فِعْل), yaitu kata kerja.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:6:ex:word-kind:2:why": {
+      "text": "Bagian kedua kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Bagian kedua kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:6:ex:word-kind:3:why": {
+      "text": "Kata kedua adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.",
+      "display": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam (ال).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:6:ex:word-kind:4:why": {
+      "text": "Kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.",
+      "display": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam (ال).",
       "highlight": [],
       "focus": null
     },
@@ -17539,6 +17731,92 @@
     "al-fatihah:7:map:later": {
       "text": "Ada satu hal lagi di ayat ini, yaitu بَدَل, tetapi baru kita bahas nanti. Ada juga empat hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
       "display": "Ada satu hal lagi di ayat ini, yaitu badal (بَدَل), tetapi baru kita bahas nanti. Ada juga empat hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:intro": {
+      "text": "Latihan pemanasan, tiga belas soal. Setiap soal menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: اِسْم, فِعْل, atau حَرْف.",
+      "display": "Latihan pemanasan, tiga belas soal. Setiap soal menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: isim (اِسْم), fi’il (فِعْل), atau huruf (حَرْف).",
+      "highlight": [
+        0
+      ],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:1:why": {
+      "text": "Kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:2:why": {
+      "text": "Kata kedua adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:3:why": {
+      "text": "Bagian pertama kata ketiga adalah فِعْل, yaitu kata kerja.",
+      "display": "Bagian pertama kata ketiga adalah fi’il (فِعْل), yaitu kata kerja.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:4:why": {
+      "text": "Bagian kedua kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Bagian kedua kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:5:why": {
+      "text": "Bagian pertama kata keempat adalah حَرْف, yaitu kata tugas.",
+      "display": "Bagian pertama kata keempat adalah huruf (حَرْف), yaitu kata tugas.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:6:why": {
+      "text": "Bagian kedua kata keempat adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: didahului حَرْف جَرّ.",
+      "display": "Bagian kedua kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: didahului huruf jar (حَرْف جَرّ).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:7:why": {
+      "text": "Kata kelima adalah اِسْم, yaitu nama benda, orang, atau sifat.",
+      "display": "Kata kelima adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:8:why": {
+      "text": "Kata keenam adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.",
+      "display": "Kata keenam adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam (ال).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:9:why": {
+      "text": "Bagian pertama kata ketujuh adalah حَرْف, yaitu kata tugas.",
+      "display": "Bagian pertama kata ketujuh adalah huruf (حَرْف), yaitu kata tugas.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:10:why": {
+      "text": "Bagian kedua kata ketujuh adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: didahului حَرْف جَرّ.",
+      "display": "Bagian kedua kata ketujuh adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: didahului huruf jar (حَرْف جَرّ).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:11:why": {
+      "text": "Bagian pertama kata kedelapan adalah حَرْف, yaitu kata tugas.",
+      "display": "Bagian pertama kata kedelapan adalah huruf (حَرْف), yaitu kata tugas.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:12:why": {
+      "text": "Bagian kedua kata kedelapan adalah حَرْف, yaitu kata tugas.",
+      "display": "Bagian kedua kata kedelapan adalah huruf (حَرْف), yaitu kata tugas.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:7:ex:word-kind:13:why": {
+      "text": "Kata kesembilan adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.",
+      "display": "Kata kesembilan adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam (ال).",
       "highlight": [],
       "focus": null
     },

@@ -111,8 +111,11 @@ describe("the quiz and the word card show one text", () => {
     // Exactly today's count: three drifting strings (40) was the defect. A change to the quiz or
     // the words that moves it is updated here knowingly.
     // 43 until the plan of 2026-10-13 (the basic curriculum): ayah 1 asks no reason any more, and
-    // the roles asked follow what each lesson has taught.
-    expect(shared).toBe(38);
+    // the roles asked follow what each lesson has taught. 38 until, the same day, the explanation
+    // shown after an answer became what the narrator says: a word's `why_basic` where it has one
+    // (pipeline/quiz.py explained) — eight reasons of the card are then no quiz string (an option
+    // is still the word's `why`; pipeline/test_validate_quiz.py holds the `why_basic` ones).
+    expect(shared).toBe(30);
     expect(strings.join("\n")).not.toMatch(/mahall, \p{Script=Arabic}+ raf'/u);
     // The shared strings carry the forms of 2026-10-12, so the count is not 43 strings that have
     // no bracket to differ in: an item inside the text's bracket with its Arabic after one space,

@@ -5,7 +5,7 @@ import { BackLink } from "@/components/BackLink";
 import { CurriculumOutline, NextLevelList } from "@/components/curriculum/CurriculumOutline";
 import { ForestGlow } from "@/components/ForestGlow";
 import { MixedText } from "@/components/library/MixedText";
-import { CURRICULUM } from "@/lib/curriculum";
+import { CURRICULUM, introOpen } from "@/lib/curriculum";
 import { curriculumOutline } from "@/lib/curriculumOutline";
 import { visibleSurahs } from "@/lib/features";
 import { getConcept, LIBRARY } from "@/lib/library";
@@ -55,8 +55,9 @@ const KONSEP_PAGES: ReadonlySet<string> = new Set([...LIBRARY.basics.map((b) => 
  * A lesson is a link only when visitors can reach it: the switch is BELAJAR_SURAHS
  * (lib/features.ts visibleSurahs(), the one the track page reads for its "Segera hadir" cards),
  * read per request, so this page renders at request time. A lesson of a surah that is not
- * published, a lesson that is not written (Ayat Kursi) and the introduction lesson (no route yet:
- * lib/routes.ts lessonHref) are plain text marked "Belum tersedia"; their paths are never built.
+ * published and a lesson that is not written (Ayat Kursi) are plain text marked "Belum tersedia";
+ * their paths are never built. The introduction lesson (/quran/pengantar) is a link while the
+ * surah that hosts it is published (lib/curriculum.ts introOpen, the track page's own rule).
  * The page promises no date and no human review; the module's AI-assisted footer is the layout's.
  */
 export default async function CurriculumPage({ params }: PageProps<"/[locale]/quran/kurikulum">) {
@@ -67,7 +68,7 @@ export default async function CurriculumPage({ params }: PageProps<"/[locale]/qu
   const tb = await getTranslations("Breadcrumb");
   const tc = await getTranslations("Concept");
   const published = new Set(await visibleSurahs());
-  const outline = curriculumOutline(CURRICULUM, { published, pages: KONSEP_PAGES });
+  const outline = curriculumOutline(CURRICULUM, { published, pages: KONSEP_PAGES, intro: introOpen(published) });
 
   // "Al-Fatihah, An-Nas, Al-Falaq, Al-Ikhlas, dan Ayat Kursi": the file's units that are a surah
   // or an ayah, in its order, joined as the locale joins a list.

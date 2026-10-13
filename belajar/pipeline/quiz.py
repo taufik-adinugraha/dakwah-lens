@@ -14,6 +14,9 @@ ayah waits at, and which question a correct answer explains), the narration buil
 intros with their counts, one explanation line per question) and its validator (the lines each ayah
 must have). Nothing re-derives a question at render time any more.
 
+THE WARM-UP ("word-kind": isim, fi'il, atau huruf?) is the one exercise that is in no plan: it is
+derived for every ayah of a surah with a lesson map and opens the lesson (below, "the warm-up").
+
 Two kinds of plan:
 
 - AUTHORED, authored/<slug>.quiz.json (Al-Fatihah): per ayah, the exercises it keeps and, per
@@ -31,7 +34,9 @@ Two kinds of plan:
       ayah, from that lemma's tashrif table, with distinct labels and distinct forms;
     * TAUGHT(ayah) ⊇ REQUIRED(question) for every question: every grammar term a question, its
       options, its bins or its form labels name (the case state of a why/sort word, its sign, the
-      terms in an option's text, a form's label) must have been TAUGHT by the end of the teaching
+      terms in an option's text, a form's label) — and, since 2026-10-13, every term of the
+      explanation shown after its answer (`why`: the word's `why_basic` where it has one, which
+      is what the narrator says) — must have been TAUGHT by the end of the teaching
       steps of the ayat ≤ this one. TAUGHT is derived from the narration lines those steps play
       (content/narration/<slug>.json: intro … structure of every ayah ≤ n; never a hand list): a
       term is taught where the lesson NAMES or DEFINES it — in a concept step's title (the concept
@@ -69,14 +74,22 @@ import unicodedata
 from pathlib import Path
 
 import curriculum as CUR
-from common import AUTHORED_DIR, CONTENT_DIR, SURAHS
+import lessonmap as LESSONMAP
+from common import AUTHORED_DIR, CONTENT_DIR, SURAHS, ordinal
 
 QUIZ_DIR = CONTENT_DIR / "quiz"
 TERMS_JSON = AUTHORED_DIR / "library.terms.json"
 QUIZ_VERSION = 1
 
-# The five exercises, in page order (mirrors src/components/exercises/guide.ts EXERCISE_KEYS).
-EXERCISE_KEYS = ("tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory")
+# The exercises, in page order (mirrors src/components/exercises/guide.ts EXERCISE_KEYS): the
+# warm-up that opens a lesson (below, "the warm-up: isim, fi'il, or huruf?"), then the five that
+# follow its explanations.
+WARMUP = "word-kind"
+EXERCISE_KEYS = (WARMUP, "tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory")
+# The exercises a lesson asks BEFORE its words, right after the lesson map's lines (mirrors
+# src/lib/autoplay/types.ts OPENING_EXERCISES); every other one follows the structure. What an
+# opening exercise needs must have been taught by EARLIER lessons: this one has taught nothing yet.
+OPENING_EXERCISES = (WARMUP,)
 # What a lesson of the BASIC level asks (operator-approved 2026-10-13, kurikulum-dasar.md decision
 # 6: "All sharaf is 'tingkat lanjut' … The wazan badge and the wazn-factory exercise leave the
 # basic lessons"). Every lesson surah today is a unit of the basic curriculum, so no plan has the
@@ -546,17 +559,201 @@ def mechanical_plan(lesson: dict, library: dict) -> dict:
     return {"ayat": out}
 
 
+# ------------------------------------------------------------------ the warm-up: isim, fi'il, or huruf?
+# Operator, 2026-10-13: "i think it's better in every ayat we identify first each words fall into
+# which category: ismu, fi'il or harf. it's kind of exercise, kind of warming up" — and he approved
+# the main session's proposal: the learner guesses first, and the answer gives the visible sign.
+# An exercise that OPENS every ayah lesson of a surah with a lesson map (authored/<slug>.map.json,
+# the per-surah switch): after the map's lines, before the first word. It is DERIVED, never
+# authored — a plan may not list it — and every text it shows or says is built from data:
+#
+#   what is asked   each PART of each word, in order. A word's parts are its QAC 0.4 segments (the
+#                   QAC line build_surah.py writes into the word's sources), the article (DET)
+#                   counted with the part it stands on: "dengan" + "nama" are two questions, a
+#                   word with alif lam is one. The part's Arabic is the lesson content's own bytes
+#                   — the word, or its QAC segments (lesson `segments`) — never typed;
+#   the answer      the part's QAC tag, as one of the three kinds (QAC_KIND). It must agree with
+#                   what the lesson already says about the word, its `pos` ("huruf jar + isim":
+#                   POS_KIND), part by part: a disagreement stops the build;
+#   the explanation the kind and its plain meaning as the Kalimah record's own summary gives it
+#                   (kind_meanings; for the Name of Allah the kind alone: QAC_LAFAZ), then a
+#                   VISIBLE SIGN only where the data shows one and the
+#                   step that teaches it belongs to an EARLIER lesson (SIGNS). The two signs are
+#                   the matn's own signs of an isim (Ajurrumiyyah, Shamela 11371/1: «فالاسم
+#                   يُعرَفُ: بالخَفضِ، والتنوينِ، ودخولِ الألف واللام، وحروفِ الخَفضِ»); no other
+#                   sign is given, and none for a fi'il or a huruf.
+#
+# One sentence, built ONCE (warmup_marked): the quiz file shows it after the answer (`why`), and
+# the narration says the same sentence (build_narration.ex_why reads warmup_prose).
+#
+# OTHER QUESTION KINDS LATER (decision 8 of kurikulum-dasar.md wants up to three questions on
+# earlier topics met again in the ayah; not built): every question carries `ask` — "kind" today.
+# A new kind is a new value of `ask` with fields of its own (schema: a member of the union on
+# `ask`; builder: a branch here; component: a branch on `ask`), numbered on in the same exercise,
+# so its explanation line is "ex:word-kind:<n>:why" like every question's.
+# The three kinds, by their term ids (authored/library.terms.json), in the order the lessons name
+# them — the order of the three buttons.
+KINDS = ("isim", "fiil", "huruf")
+# The Konsep record whose summary gives each kind its plain meaning.
+KALIMAH_RECORD = "kalimah-isim-fiil-huruf"
+# QAC 0.4 segment tag → kind (corpus.quran.com tagset: nouns N, PN; derived nominal ADJ; pronouns
+# PRON, DEM, REL; the adverbs of time and place T, LOC, which Arabic grammar counts as isim
+# (zharaf); verbs V; prepositions P, conjunctions CONJ, negative particles NEG). Only the tags the
+# lessons carry, each checked against its word's `pos`; a tag that is not here stops the build —
+# add it with its class, never guess one.
+QAC_KIND = {"N": "isim", "PN": "isim", "ADJ": "isim", "PRON": "isim", "DEM": "isim", "REL": "isim", "T": "isim", "LOC": "isim",
+            "V": "fiil", "P": "huruf", "CONJ": "huruf", "NEG": "huruf"}
+# The article: no part of its own (build_surah.pos_label leaves it out of `pos` as well).
+QAC_ARTICLE = "DET"
+# The Name of Allah, as QAC lemmatises it (build_surah.pos_label: "isim 'alam (lafaz Allah)"). Its
+# explanation says the kind and stops there: the kind's general gloss ("nama benda, orang, atau
+# sifat") is not said in the sentence whose subject is the Name.
+QAC_LAFAZ = "LEM:{ll~ah"
+# The first word of a `pos` part (build_surah.pos_label: "huruf jar", "isim 'alam (lafaz Allah)",
+# "dhamir muttashil", "fi'il mudhari'", "zharaf zaman", "lam taukid", "fa' jawab") → kind.
+POS_KIND = {"isim": "isim", "dhamir": "isim", "mashdar": "isim", "zharaf": "isim", "fi'il": "fiil",
+            "huruf": "huruf", "lam": "huruf", "fa'": "huruf"}
+# The visible signs of an isim an explanation may give: (id, the term or QAC tag whose step
+# teaches it, the words). "jar": the part before it — in its word, or the last part of the word
+# before it — is a huruf jar (QAC P); taught by the step that owns the term huruf-jar. "al": the
+# part carries the article (QAC DET); taught by the step that occurs on that tag.
+SIGNS = (("jar", "didahului [[huruf jar|huruf-jar]]"), ("al", "memakai alif lam"))
+_KIND_MEANINGS = re.compile(r"isim \(([^()]+)\), fi'il \(([^()]+)\), atau huruf \(([^()]+)\)")
+
+
+def kind_meanings(library: dict) -> dict[str, str]:
+    """Each kind's plain meaning, from the Kalimah record's own summary ("isim (nama benda, orang,
+    atau sifat), fi'il (kata kerja), atau huruf (kata tugas)"): nothing is typed here."""
+    record = next((c for c in library.get("concepts") or [] if c.get("id") == KALIMAH_RECORD), None)
+    m = _KIND_MEANINGS.search(_norm(str((record or {}).get("summary", ""))))
+    if not m:
+        raise QuizError(f"the Konsep record {KALIMAH_RECORD!r} no longer gives the three kinds their meanings as "
+                        "“isim (…), fi'il (…), atau huruf (…)”: the warm-up's explanations are built from that sentence")
+    return dict(zip(KINDS, (g.strip() for g in m.groups())))
+
+
+def word_parts(lesson: dict, w: dict) -> list[dict]:
+    """The parts of a lesson word the warm-up asks, in order: [{part, of, ar, tag, kind, article}].
+    Raises QuizError where the QAC line and the lesson's `pos` disagree, a tag has no kind, or
+    the lesson does not carry a compound word's parts."""
+    loc = w["loc"]
+    segs = CUR.qac_segments(w)
+    if not segs:
+        raise QuizError(f"{loc}: no QAC line in its sources — the warm-up derives the kind of each part from it")
+    groups: list[dict] = []  # {tag, article, segs: indices of the QAC segments it is written with}
+    article: list[int] = []
+    for i, seg in enumerate(segs):
+        if seg[0] == QAC_ARTICLE:
+            article.append(i)
+            continue
+        if seg[0] not in QAC_KIND:
+            raise QuizError(f"{loc}: QAC tag {seg[0]!r} has no kind in quiz.QAC_KIND (add it with its class; never guess)")
+        groups.append({"tag": seg[0], "article": bool(article), "segs": article + [i], "lafaz": QAC_LAFAZ in seg})
+        article = []
+    if article or not groups:
+        raise QuizError(f"{loc}: QAC segments {[s[0] for s in segs]} end on the article, or are nothing but one")
+    said = [p.strip() for p in str(w.get("pos", "")).split(" + ")]
+    heads = [POS_KIND.get(p.split(" ", 1)[0]) for p in said]
+    derived = [QAC_KIND[g["tag"]] for g in groups]
+    if heads != derived:
+        raise QuizError(f"{loc}: the lesson says this word is {w.get('pos')!r} ({heads}), its QAC line says "
+                        f"{[g['tag'] for g in groups]} ({derived}) — the two must agree part by part before a learner is asked")
+    if len(groups) == 1:
+        bytes_ = [w["ar"]]
+    else:
+        pieces = (lesson.get("segments") or {}).get(loc)
+        if not isinstance(pieces, list) or len(pieces) != len(segs) or "".join(pieces) != w["ar"]:
+            raise QuizError(f"{loc}: a word of {len(groups)} parts, and the lesson content does not carry its {len(segs)} QAC "
+                            "segments (`segments`: build_surah.py writes them for a word whose part the marked prose names)")
+        bytes_ = ["".join(pieces[i] for i in g["segs"]) for g in groups]
+    return [{"part": k, "of": len(groups), "ar": ar, "tag": g["tag"], "kind": QAC_KIND[g["tag"]], "article": g["article"],
+             "lafaz": g["lafaz"]} for k, (g, ar) in enumerate(zip(groups, bytes_), 1)]
+
+
+def sign_steps(cur: dict) -> dict[str, str | None]:
+    """sign id → the lesson that teaches it (the curriculum's): "jar" the lesson of the step that
+    owns the term huruf-jar, "al" the lesson of the step that occurs on the article's QAC tag;
+    None when no step does (the sign is then never given)."""
+    jar = CUR.step_of(cur, CUR.owners(cur).get("huruf-jar", ""))
+    al = next((s for s in cur.get("steps") or [] if isinstance(s.get("occurs"), dict) and s["occurs"].get("qac") == QAC_ARTICLE), None)
+    return {"jar": jar["lesson"] if jar else None, "al": al["lesson"] if al else None}
+
+
+def warmup_questions(lesson: dict, ayah: dict, cur: dict) -> list[dict]:
+    """The warm-up's questions for one ayah, without their texts: every part of every word, in
+    order, with its kind and the signs its explanation may give (those whose step an EARLIER
+    lesson of the curriculum taught)."""
+    rank = CUR.ranks(cur)
+    here = rank.get(CUR.ayah_lesson(lesson["surah"], ayah["ayah"]))
+    taught = {sid for sid, at in sign_steps(cur).items() if at is not None and here is not None and rank.get(at, here) < here}
+    out: list[dict] = []
+    prev_tag: str | None = None
+    for i, w in enumerate(ayah["words"], 1):
+        for p in word_parts(lesson, w):
+            shows = {"jar": p["kind"] == "isim" and prev_tag == "P", "al": p["kind"] == "isim" and p["article"]}
+            q = {"n": len(out) + 1, "ask": "kind", "word": i, "part": p["part"], "of": p["of"], "ar": p["ar"],
+                 "kind": p["kind"], "signs": [sid for sid, _text in SIGNS if shows[sid] and sid in taught]}
+            if p["lafaz"]:
+                q["lafaz"] = True
+            out.append(q)
+            prev_tag = p["tag"]
+    return out
+
+
+def warmup_marked(q: dict, terms: "Terms", meanings: dict[str, str]) -> str:
+    """The ONE sentence that explains a warm-up answer, as marked text ([[surface|term id]]): the
+    part by its place ("Kata kedua", "Bagian pertama kata pertama" — never a Qur'anic word), its
+    kind, the kind's plain meaning, and its signs."""
+    name = f"Kata {ordinal(q['word'])}" if q["of"] == 1 else f"Bagian {ordinal(q['part'])} kata {ordinal(q['word'])}"
+    kind = terms.by_id[q["kind"]]
+    out = f"{name} adalah [[{kind['latin']}|{q['kind']}]]" + ("." if q.get("lafaz") else f", yaitu {meanings[q['kind']]}.")
+    said = [text for sid, text in SIGNS if sid in (q.get("signs") or [])]
+    if said:
+        out += f" Tandanya: {' dan '.join(said)}."
+    return out
+
+
+def warmup_prose(q: dict, terms: "Terms", meanings: dict[str, str]) -> str:
+    """warmup_marked without its markup: what the narration build sanitises and says."""
+    return _MARKUP.sub(lambda m: m.group(1), warmup_marked(q, terms, meanings))
+
+
+def warmup(lesson: dict, ayah: dict, library: dict, terms: "Terms", cur: dict) -> dict:
+    """The warm-up exercise of one ayah as content/quiz carries it: each question with the
+    sentence shown after its answer (`why`: warmup_marked as the screen shows it, each term with
+    its Arabic from the table)."""
+    meanings = kind_meanings(library)
+    qs = warmup_questions(lesson, ayah, cur)
+    for q in qs:
+        q["why"] = terms.annotate_marked(warmup_marked(q, terms, meanings), {})
+    return {"key": WARMUP, "questions": qs}
+
+
+def has_map(slug: str) -> bool:
+    """Is the surah's lesson map switched on (authored/<slug>.map.json)? Then every ayah lesson
+    of it opens with the warm-up."""
+    return LESSONMAP.authored_path(slug).exists()
+
+
 # ------------------------------------------------------------------ resolving a plan
 def load_authored(slug: str) -> dict | None:
     p = AUTHORED_DIR / f"{slug}.quiz.json"
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
 
 
-def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> dict:
-    """content/quiz/<slug>.json from the plan (authored, or mechanical without one)."""
+def build(lesson: dict, library: dict, terms: Terms, authored: dict | None, *,
+          curriculum: dict | None = None, mapped: bool | None = None) -> dict:
+    """content/quiz/<slug>.json from the plan (authored, or mechanical without one) — and, for a
+    surah whose lesson map is switched on (`mapped`, default: has_map), the warm-up that opens
+    every ayah, derived with `curriculum` (content/curriculum.json, default: from disk)."""
     plan = authored if authored is not None else mechanical_plan(lesson, library)
     lex = {x["id"]: x for x in library["lexicon"]}
     slug = lesson["slug"]
+    mapped = has_map(slug) if mapped is None else mapped
+    if mapped and curriculum is None:
+        curriculum = CUR.load_content()
+        if curriculum is None:
+            raise QuizError("content/curriculum.json is missing: run build_curriculum.py first (the warm-up reads it)")
     ayat_out = []
     states_used: set[str] = set()
     labels_used: dict[str, str] = {}
@@ -569,6 +766,16 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> d
         is marked (terms and Qur'anic words in Arabic), else the plain text with its terms'."""
         mk = (w.get("marked") or {}).get(key)
         return terms.annotate_marked(mk, quran, segments) if mk else terms.annotate(w["case"]["sign"] if key == "sign" else w[key])
+
+    def explained(w: dict) -> str:
+        """What the learner READS after answering — the explanation under "Benar." — is what the
+        narrator SAYS (main session 2026-10-13): the word's `why_basic` where it has one, the
+        reason in the lesson's own vocabulary (build_narration.said_why says the same text),
+        else its `why`. Until then the screen showed the reference `why` while the voice said the
+        basic one, with terms of later lessons on screen (mudhaf ilaih in ayah 2, badal in ayah
+        7). A `why_basic` is plain prose with no marked twin: its terms get their Arabic from the
+        table (annotate). An OPTION stays the word's `why`: the options are compared by cause."""
+        return terms.annotate(w["why_basic"]) if w.get("why_basic") else shown(w, "why")
     for k in (plan.get("ayat") or {}):
         if k not in known:
             raise QuizError(f"{slug}: the plan names ayah {k}, which the lesson does not have")
@@ -579,6 +786,9 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> d
         unknown = set(spec) - set(EXERCISE_KEYS)
         if unknown:
             raise QuizError(f"{slug} {n}: unknown exercise(s) {sorted(unknown)}")
+        if WARMUP in spec:
+            raise QuizError(f"{slug} {n}: the plan lists {WARMUP!r} — the warm-up is derived for every ayah of a surah with a "
+                            "lesson map, never authored")
 
         def word(i: int, what: str) -> dict:
             if not isinstance(i, int) or not 0 < i <= len(words):
@@ -587,6 +797,10 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> d
 
         exercises = []
         for key in EXERCISE_KEYS:
+            if key == WARMUP:
+                if mapped:
+                    exercises.append(warmup(lesson, a, library, terms, curriculum))
+                continue
             if key not in spec:
                 continue
             s = spec[key]
@@ -605,7 +819,7 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> d
                         options.append({"from": loc, "text": shown(word_at(lesson, loc), "why")})
                     sign = w["case"]["sign"]
                     qs.append({"n": q, "word": item["word"], "sign": shown(w, "sign") if sign != "—" else None,
-                               "why": shown(w, "why"), "options": options})
+                               "why": explained(w), "options": options})
             elif key == "sort-case":
                 bins = list(s.get("bins") or [])
                 ex["bins"] = bins
@@ -615,7 +829,7 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> d
                     states_used.add(w["case"]["state"])
                     sign = w["case"]["sign"]
                     qs.append({"n": q, "word": i, "sign": shown(w, "sign") if sign != "—" else None,
-                               "why": shown(w, "why")})
+                               "why": explained(w)})
             elif key == "label-role":
                 for q, item in enumerate(s, 1):
                     w = word(item["word"], key)
@@ -627,7 +841,7 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> d
                         if not r:
                             raise QuizError(f"{slug} {n} {key}: {loc} has no role to offer")
                         options.append({"from": loc, "text": shown(word_at(lesson, loc), "role")})
-                    qs.append({"n": q, "word": item["word"], "why": shown(w, "why"), "options": options})
+                    qs.append({"n": q, "word": item["word"], "why": explained(w), "options": options})
             elif key == "wazn-factory":
                 for q, item in enumerate(s, 1):
                     lx = lex.get(item["lexeme"])
@@ -652,6 +866,8 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> d
         "states": {st: terms.label(STATE_TERM[st]) for st in sorted(states_used, key=SORT_BINS.index)
                    if st in STATE_TERM and STATE_TERM[st] in terms.by_id},
         "labels": dict(sorted(labels_used.items())),
+        # The three answers of the warm-up, as its buttons show them: "isim (اِسْم)".
+        "kinds": {k: terms.label(k) for k in KINDS} if mapped else {},
         "ayat": ayat_out,
     }
 
@@ -732,13 +948,20 @@ def defined_terms(part: str, display: str, terms: Terms) -> list[tuple[str, str]
     return out
 
 
-def taught(manifest: dict, lesson: dict, terms: Terms) -> dict[int, dict[str, str]]:
-    """ayah → {term id: the line that first taught it (by that ayah's end)}, cumulative."""
+def taught_first(manifest: dict, lesson: dict, terms: Terms) -> dict[str, tuple[int, str]]:
+    """term id → (the ayah whose lesson first taught it — 0: lesson zero, whose lines are the
+    lines of "ayah 0" of the surah that hosts it —, the line that did)."""
     first: dict[str, tuple[int, str]] = {}
     for a, lid, part, text in teaching_lines(manifest, lesson["slug"]):
         for tid, how in defined_terms(part, text, terms):
             if tid not in first or first[tid][0] > a:
                 first[tid] = (a, f"{lid} ({how})")
+    return first
+
+
+def taught(manifest: dict, lesson: dict, terms: Terms) -> dict[int, dict[str, str]]:
+    """ayah → {term id: the line that first taught it (by that ayah's end)}, cumulative."""
+    first = taught_first(manifest, lesson, terms)
     out = {}
     for ay in lesson["ayat"]:
         n = ay["ayah"]
@@ -748,7 +971,9 @@ def taught(manifest: dict, lesson: dict, terms: Terms) -> dict[int, dict[str, st
 
 def required(ex: dict, q: dict, lesson: dict, ayah: dict, terms: Terms, quiz: dict) -> dict[str, str]:
     """{term id: what in the question needs it}: the answer's case state and sign (why-harakat),
-    every bin (sort-case), every term an option's text names, every form label (wazn-factory)."""
+    every bin (sort-case), every term an option's text names, every form label (wazn-factory) —
+    and every term the explanation shown after the answer names (`why`; 2026-10-13: the feedback
+    is read by the learner like the question, so it is held to what the lesson taught too)."""
     need: dict[str, str] = {}
 
     def add(text: str | None, what: str) -> None:
@@ -774,6 +999,10 @@ def required(ex: dict, q: dict, lesson: dict, ayah: dict, terms: Terms, quiz: di
             add(o, f"form label {o!r}")
     if key == "wazn-factory":
         add(q["label"], f"the asked form {q['label']!r}")
+    if key == WARMUP:
+        for k in KINDS:
+            need.setdefault(k, "the three answers offered")
+    add(q.get("why"), "the explanation shown after the answer")
     return need
 
 
@@ -789,19 +1018,23 @@ def untaught_reasons(quiz: dict, lesson: dict, terms: Terms, manifest: dict | No
     if not quiz.get("authored") or manifest is None:
         return {}
     slug = lesson["slug"]
-    taught_at = taught(manifest, lesson, terms)
+    first = taught_first(manifest, lesson, terms)
     out: dict[str, dict[str, str]] = {}
     for a in lesson["ayat"]:
         n = a["ayah"]
         for ex in ayah_plan(quiz, n):
+            # An opening exercise is asked before this lesson teaches anything: only what EARLIER
+            # lessons taught counts (lesson zero's lines are "ayah 0").
+            opening = ex["key"] in OPENING_EXERCISES
             for q in ex.get("questions") or []:
                 for tid, what in required(ex, q, lesson, a, terms, quiz).items():
-                    if tid in taught_at[n]:
+                    at = first.get(tid)
+                    if at is not None and (at[0] < n if opening else at[0] <= n):
                         continue
-                    later = next((m for m in sorted(taught_at) if tid in taught_at[m]), None)
+                    by = f"before ayah {n} (the warm-up opens the lesson)" if opening else f"by the end of ayah {n}"
                     out.setdefault(question_key(slug, n, ex["key"], q["n"]), {})[tid] = (
-                        f"{slug} {n} {ex['key']} q{q['n']}: needs {terms.by_id[tid]['latin']!r} ({what}), not taught by the end "
-                        f"of ayah {n}" + (f" (first taught in ayah {later})" if later else " (never taught)"))
+                        f"{slug} {n} {ex['key']} q{q['n']}: needs {terms.by_id[tid]['latin']!r} ({what}), not taught {by}"
+                        + (f" (first taught in ayah {at[0]})" if at else " (never taught)"))
     return out
 
 
@@ -811,15 +1044,64 @@ def untaught(quiz: dict, lesson: dict, terms: Terms, manifest: dict | None) -> d
 
 
 # ------------------------------------------------------------------ the checks
+def warmup_problems(ex: dict | None, lesson: dict, ayah: dict, library: dict, terms: Terms, cur: dict | None, mapped: bool) -> list[str]:
+    """The warm-up of one ayah against what the data gives (the section "the warm-up" above): it is
+    there exactly when the surah's lesson map is switched on; every part of every word is asked
+    once, in order; the answer is the derived one; the bytes are the lesson's; the signs are the
+    ones the data shows and an earlier lesson taught; the sentence shown is the built one."""
+    where = f"{lesson['slug']} {ayah['ayah']} {WARMUP}"
+    if not mapped:
+        return [f"{where}: a warm-up in a surah whose lesson map is not switched on (authored/<slug>.map.json)"] if ex else []
+    if ex is None:
+        return [f"{where}: missing — every ayah lesson of a surah with a lesson map opens with the warm-up (build_quiz.py)"]
+    if cur is None:
+        return [f"{where}: content/curriculum.json is missing (the warm-up's signs are the curriculum's)"]
+    try:
+        want = warmup(lesson, ayah, library, terms, cur)["questions"]
+    except QuizError as e:
+        return [f"{where}: {e}"]
+    got = ex.get("questions") or []
+    asked = [(q.get("word"), q.get("part")) for q in got]
+    if asked != [(q["word"], q["part"]) for q in want]:
+        return [f"{where}: asks the parts {asked}; every part of every word is asked once, in order: "
+                f"{[(q['word'], q['part']) for q in want]}"]
+    errs = []
+    for q, w in zip(got, want):
+        at = f"{where} q{w['n']} (word {w['word']}" + (f", part {w['part']} of {w['of']})" if w["of"] > 1 else ")")
+        if q.get("ask") != "kind":
+            errs.append(f"{at}: `ask` must be \"kind\" (the one kind of question the warm-up has today)")
+        if q.get("kind") != w["kind"]:
+            errs.append(f"{at}: the answer is {q.get('kind')!r}, and the word's QAC tag and its `pos` give {w['kind']!r}")
+        if q.get("lafaz") != w.get("lafaz"):
+            errs.append(f"{at}: `lafaz` (the Name of Allah: its explanation says the kind and no general gloss) is "
+                        f"{q.get('lafaz')!r}, and the word's QAC lemma gives {w.get('lafaz')!r}")
+        if q.get("ar") != w["ar"] or q.get("of") != w["of"]:
+            errs.append(f"{at}: shows {q.get('ar')!r} as part {q.get('part')} of {q.get('of')}; the lesson's bytes are {w['ar']!r}, of {w['of']}")
+        if q.get("signs") != w["signs"]:
+            errs.append(f"{at}: gives the sign(s) {q.get('signs')}; the data shows, and an earlier lesson taught, {w['signs']} "
+                        "(“didahului huruf jar”: the part before it is a huruf jar; “memakai alif lam”: it carries the article; "
+                        "no other sign, and none for a fi'il or a huruf)")
+        elif q.get("why") != w["why"]:
+            errs.append(f"{at}: its explanation is not the sentence built from the data ({w['why']!r})")
+    return errs
+
+
 def plan_problems(quiz: dict, lesson: dict, library: dict, terms: Terms, manifest: dict | None,
-                  pending: dict[str, list[str]] | None = None) -> list[str]:
+                  pending: dict[str, list[str]] | None = None, *, curriculum: dict | None = None,
+                  mapped: bool | None = None) -> list[str]:
     """Every rule of the module docstring; the taught check needs the narration manifest.
     `pending`: authored/curriculum.pending.json `quiz` (default: from disk) — the questions that
-    may still need an untaught term."""
+    may still need an untaught term. `mapped`: the surah's lesson map is switched on (default:
+    has_map), `curriculum`: content/curriculum.json (default: from disk) — for the warm-up."""
     errs: list[str] = []
     slug = lesson["slug"]
     lex = {x["id"]: x for x in library["lexicon"]}
     authored = bool(quiz.get("authored"))
+    mapped = has_map(slug) if mapped is None else mapped
+    if mapped and curriculum is None:
+        curriculum = CUR.load_content()
+    if quiz.get("kinds") != ({k: terms.label(k) for k in KINDS} if mapped else {}):
+        errs.append(f"{slug}: `kinds` must be the three answers of the warm-up with their Arabic (a surah with a lesson map), else empty")
     for a in lesson["ayat"]:
         n = a["ayah"]
         words = a["words"]
@@ -828,6 +1110,7 @@ def plan_problems(quiz: dict, lesson: dict, library: dict, terms: Terms, manifes
         keys = [e["key"] for e in exs]
         if keys != [k for k in EXERCISE_KEYS if k in keys] or len(set(keys)) != len(keys):
             errs.append(f"{where0}: exercises {keys} are not in page order, or one repeats")
+        errs += warmup_problems(next((e for e in exs if e["key"] == WARMUP), None), lesson, a, library, terms, curriculum, mapped)
         for ex in exs:
             key = ex["key"]
             qs = ex.get("questions") or []
@@ -839,6 +1122,8 @@ def plan_problems(quiz: dict, lesson: dict, library: dict, terms: Terms, manifes
                             "all sharaf is tingkat lanjut)")
             if [q.get("n") for q in qs] != list(range(1, len(qs) + 1)):
                 errs.append(f"{where}: questions must be numbered 1, 2, …")
+            if key == WARMUP:
+                continue  # warmup_problems, above
             if key == "tap-word":
                 timed = set(timed_words(a))
                 if len(qs) < 2:
