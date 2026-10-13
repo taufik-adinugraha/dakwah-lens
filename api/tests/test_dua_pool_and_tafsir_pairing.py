@@ -11,8 +11,11 @@
 
 from __future__ import annotations
 
+import datetime
 import inspect
 from types import SimpleNamespace
+
+import pytest
 
 import api.scripts.manual_briefing as mb
 from api.services import briefing
@@ -43,12 +46,41 @@ def test_theme_slice_is_card_safe() -> None:
             assert lo <= len(d["translation_id"]) <= hi
 
 
-def test_theme_slice_is_led_by_theme_tags() -> None:
-    lib = {d["citation"]: d for d in kr._load_dua_library()}
-    pool = kr.weekly_dua_pool(12, theme_group="Kesehatan & Kehidupan")
-    tags = set(kr._THEME_DUA_TAGS["Kesehatan & Kehidupan"])
-    lead = pool[:4]
-    assert all(tags & set(lib[d["citation"]].get("tags") or []) for d in lead)
+def _dated(day: datetime.date) -> type[datetime.date]:
+    """A `date` whose today() is `day`: pins the ISO week a rotation reads."""
+
+    class _Day(datetime.date):
+        @classmethod
+        def today(cls) -> datetime.date:
+            return day
+
+    return _Day
+
+
+def test_theme_slice_is_led_by_theme_tags(monkeypatch: pytest.MonkeyPatch) -> None:
+    # An entry is identified by its citation AND its Arabic, never by the
+    # citation alone: 31 citations are shared by several library entries (a
+    # long hadith holding several du'a — Sahih Muslim 125 has five, two of
+    # them untagged). Looked up by citation, a correctly tagged lead entry
+    # read as untagged in every ISO week whose shuffle led with one of those:
+    # first 2026-W42, where this test failed with no code change and would
+    # have blocked the main deploy's verify job. So it is checked over a year
+    # of weeks and every theme, and no longer depends on the day it runs.
+    lib = {(d["citation"], d["arabic"]): d for d in kr._load_dua_library()}
+    assert len(lib) == len(kr._load_dua_library())
+    safe = [d for d in kr._load_dua_library() if kr._card_safe(d)]
+    monday = datetime.date(2026, 10, 5)
+    for week in range(53):
+        day = monday + datetime.timedelta(weeks=week)
+        monkeypatch.setattr(kr, "_date", _dated(day))
+        for g in GROUPS:
+            tags = set(kr._THEME_DUA_TAGS[g])
+            n_tagged = sum(1 for d in safe if tags & set(d.get("tags") or []))
+            lead = kr.weekly_dua_pool(12, theme_group=g)[: min(4, n_tagged)]
+            assert lead, (g, "no card-safe du'a carries this theme's tags")
+            for d in lead:
+                entry = lib[(d["citation"], d["arabic"])]
+                assert tags & set(entry.get("tags") or []), (day.isoformat(), g, d["citation"])
 
 
 def test_shared_weekly_slice_is_unchanged_without_a_group() -> None:
