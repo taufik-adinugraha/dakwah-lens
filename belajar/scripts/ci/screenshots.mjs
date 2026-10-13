@@ -1139,17 +1139,13 @@ const fmt = (b) => `${Math.round(b.top)}–${Math.round(b.bottom)}`;
 const FOREST = "rgb(14, 90, 60)";
 const PAPER = "rgb(251, 250, 246)";
 
-/**
- * Emphasis on the karaoke shot (operator 2026-10-11: "we can also use bold text or different color
- * to highlight the meanings or important things"): the meaning in `scope` — the word card's "yang
- * artinya “…”", the caption's gloss — is on screen, bold, and forest (paper while it is the word
- * being said, on the forest fill). So the emphasis cannot quietly disappear (a renamed prop, a
- * class Tailwind no longer generates) while the shots still look fine at a glance.
- */
-async function assertEmphasis(page, vp, scope, what) {
+/** How every emphasised meaning in `scope` ([data-emph="meaning"]: MixedText's overlay, a karaoke
+ *  word) looks right now: its text, weight and colour, whether it is the word being said, and
+ *  whether it is on screen. */
+async function meaningLooks(page, scope) {
   // A karaoke word's colour fades in 150ms when its state changes ("nama." the moment the narrator
   // moves on): measured in a moment none of them is fading, never in between two colours.
-  const looks = await page.locator(`${scope} [data-emph="meaning"]`).evaluateAll(async (els) => {
+  return page.locator(`${scope} [data-emph="meaning"]`).evaluateAll(async (els) => {
     for (let k = 0; k < 20; k++) {
       const fading = els.flatMap((el) => el.getAnimations());
       if (!fading.length) break;
@@ -1167,6 +1163,17 @@ async function assertEmphasis(page, vp, scope, what) {
       };
     });
   });
+}
+
+/**
+ * Emphasis on the karaoke shot (operator 2026-10-11: "we can also use bold text or different color
+ * to highlight the meanings or important things"): the meaning in `scope` — the word card's "yang
+ * artinya “…”", the caption's gloss — is on screen, bold, and forest (paper while it is the word
+ * being said, on the forest fill). So the emphasis cannot quietly disappear (a renamed prop, a
+ * class Tailwind no longer generates) while the shots still look fine at a glance.
+ */
+async function assertEmphasis(page, vp, scope, what) {
+  const looks = await meaningLooks(page, scope);
   if (!looks.length) throw new Error(`${vp}: ${what} has no emphasised meaning ([data-emph="meaning"])`);
   const bad = looks.filter((x) => !x.shown || !(x.weight >= 600) || x.color !== (x.now ? PAPER : FOREST));
   if (bad.length) throw new Error(`${vp}: ${what}: emphasised meaning not shown bold in ${FOREST} (${PAPER} on the word being said): ${JSON.stringify(bad)}`);
@@ -1258,6 +1265,84 @@ async function karaokeShots(page, vp, index) {
   console.log(
     `  narration: ${served.length} request(s) answered — ${standIns} silent stand-in(s) (the MP3s are not on this machine), ${served.length - standIns} other`,
   );
+  await page.goto("about:blank");
+}
+
+/**
+ * EVERY meaning of a caption is drawn as one (operator 2026-10-13: "sometimes found this: yang
+ * artinya “dengan” (which is correct), some sentence dont use “ and without color"; plan L22): on
+ * Al-Fatihah 1, the first concept line that glosses two or more words after "yang artinya" — read
+ * from content/narration/al-fatihah.json, never typed; today "Huruf jar": "huruf ba’ yang artinya
+ * “dengan”, dan huruf lam yang artinya “bagi”" — played from its start on its own step ("↺
+ * Ulangi"). Until 2026-10-13 a caption emphasised its first meaning and left the others plain.
+ * Each gloss must appear in the caption as [data-emph="meaning"], bold and forest (paper while it
+ * is the word being said): in the karaoke caption all of them at once, in a caption-only line
+ * (its narration not rendered) as its parts go by. Not asserted: that they fit the viewport (a
+ * long caption, a phone) — the karaoke shot's layout check covers the caption a word card sits
+ * above. Fails the job when a gloss never shows as a meaning or shows in another style.
+ */
+async function everyMeaningCheck(page, vp, index) {
+  const lines = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "narration", "al-fatihah.json"), "utf8")).lines ?? {};
+  const glossesOf = (display) => [...String(display ?? "").matchAll(/artinya:? “([^”]+)”/g)].map((m) => m[1]);
+  const found = Object.entries(lines).find(([id, l]) => /^al-fatihah:1:concept:[a-z0-9-]+$/.test(id) && glossesOf(l.display).length >= 2);
+  if (!found) throw new Error(`${vp}: every-meaning check — no concept line of Al-Fatihah 1 glosses two words after "artinya" (content/narration/al-fatihah.json)`);
+  const [lineId, line] = found;
+  const step = lineId.replace(/^al-fatihah:1:/, "");
+  const glosses = glossesOf(line.display);
+  const voiced = (await narratedLine("al-fatihah", lineId)).voiced;
+  /** Letters and digits only, so “dengan”, and dengan, are the same word. */
+  const norm = (t) => t.normalize("NFC").toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, " ").replace(/\s+/g, " ").trim();
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const scope = `[data-autoplay="caption"][data-line="${lineId}"]`;
+  const stage = page.locator('[data-autoplay="stage"]');
+  try {
+    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    // The earlier checks left a remembered place on this ayah ("Lanjutkan dari langkah N").
+    await page.evaluate(() => localStorage.removeItem("belajar:v1:autoplay:al-fatihah/1"));
+    await page.reload({ waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('[data-autoplay="start"]').click();
+    await settleScroll(page);
+    await toStep(page, vp, step);
+    await page.locator('[data-autoplay="replay"]').click();
+    await page.locator(`${scope} [data-emph="meaning"]`).first().waitFor({ state: "attached", timeout: 25_000 });
+    // The glosses seen as meanings, and any meaning seen in another style.
+    const seen = new Set();
+    const wrong = [];
+    const all = await until(
+      page,
+      async () => {
+        const looks = await meaningLooks(page, scope);
+        const drawn = ` ${looks.map((x) => norm(x.text)).join(" ")} `;
+        for (const g of glosses) if (drawn.includes(` ${norm(g)} `)) seen.add(g);
+        for (const x of looks) if (!(x.weight >= 600) || x.color !== (x.now ? PAPER : FOREST)) wrong.push(x);
+        return seen.size === glosses.length || wrong.length > 0;
+      },
+      60_000,
+    );
+    if (wrong.length) throw new Error(`${vp}: ${lineId}: a meaning not bold in ${FOREST} (${PAPER} on the word being said): ${JSON.stringify(wrong.slice(0, 4))}`);
+    if (!all) {
+      const missing = glosses.filter((g) => !seen.has(g));
+      throw new Error(`${vp}: ${lineId} glosses ${glosses.map((g) => `“${g}”`).join(", ")}, but ${missing.map((g) => `“${g}”`).join(", ")} never showed as a meaning ([data-emph="meaning"]) in its caption`);
+    }
+    await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-every-meaning.png` });
+    console.log(`shot ${vp}-autoplay-ayah1-every-meaning`);
+    console.log(`  every meaning ok: ${lineId} (${voiced ? "karaoke" : "caption-only"}) — ${glosses.map((g) => `“${g}”`).join(", ")} each bold in forest`);
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-every-meaning-FAILED.png`, fullPage: true }).catch(() => {});
+    const caption = await page
+      .locator('[data-autoplay="caption"]')
+      .innerHTML()
+      .catch(() => "(no caption element)");
+    console.error(`✗ ${vp}: the every-meaning check (Al-Fatihah 1, ${lineId}) failed`);
+    console.error(`  on screen: step ${(await stage.getAttribute("data-step").catch(() => null)) ?? "—"}, line ${(await page.locator('[data-autoplay="caption"]').getAttribute("data-line").catch(() => null)) ?? "—"}`);
+    console.error(`  caption HTML: ${caption.slice(0, 900)}`);
+    throw err;
+  } finally {
+    await page.unroute(isNarration, handler);
+  }
   await page.goto("about:blank");
 }
 
@@ -2884,6 +2969,7 @@ try {
     if (vp === "desktop") await ogShots(ctx.request);
     await autoplayShots(page, vp);
     await karaokeShots(page, vp, narration);
+    await everyMeaningCheck(page, vp, narration);
     if (vp === "phone") await loadingChecks(page, vp, narration);
     if (vp === "phone") await warmupChecks(page, vp, narration);
     if (vp === "phone") await aheadChecks(page, vp, narration);

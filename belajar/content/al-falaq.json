@@ -537,7 +537,7 @@
               "point": "Mā di sini isim maushul atau mā mashdariyyah?",
               "options": [
                 "Isim maushul (“yang”): “kejahatan (makhluk) yang Dia ciptakan”, dengan kata ganti penghubung yang dibuang — Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as; an-Nahhas dan as-Samin juga membolehkannya",
-                "Mā mashdariyyah (pembentuk mashdar): mā khalaqa sama dengan “ciptaan-Nya”, sehingga tidak memerlukan kata ganti penghubung — an-Nahhas menyebutnya lebih dulu, Darwisy dan as-Samin membolehkannya, dan al-Jadwal menukilnya dari al-'Ukbari dengan al-khalq bermakna makhluk"
+                "Mā mashdariyyah (pembentuk mashdar): mā khalaqa sama dengan “ciptaan-Nya”, sehingga tidak memerlukan kata ganti penghubung — an-Nahhas menyebutnya lebih dulu, Darwisy dan as-Samin membolehkannya, dan al-Jadwal menukilnya dari al-'Ukbari dengan al-khalq bermakna “makhluk”"
               ]
             }
           ],
@@ -743,12 +743,12 @@
           },
           {
             "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
-            "ref": "jil. 5, hlm. 197 (QS 113:2: mā bisa mashdar sehingga tidak perlu kata ganti penghubung, atau bermakna 'yang' dengan kata ganti -hu yang dibuang)",
+            "ref": "jil. 5, hlm. 197 (QS 113:2: mā bisa mashdar sehingga tidak perlu kata ganti penghubung, atau bermakna “yang” dengan kata ganti -hu yang dibuang)",
             "url": "https://shamela.ws/book/23587/1414"
           },
           {
             "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
-            "ref": "jil. 11, hlm. 158 (QS 113:2: min syarri terkait a‘ūżu; mā mashdariyyah atau bermakna 'yang')",
+            "ref": "jil. 11, hlm. 158 (QS 113:2: min syarri terkait a‘ūżu; mā mashdariyyah atau bermakna “yang”)",
             "url": "https://shamela.ws/book/9057/10760"
           },
           {
@@ -2649,8 +2649,8 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:f8250fd994df183364e019892b0f8e5a9c4f16c527ec173a54326618b38e5d6a",
-    "authored_words": "authored/al-falaq.words.json sha256:f15a21310244b21c869aeee61c14ac8e3d34f905317b71fe821893077c6d5d4e",
-    "authored_structure": "authored/al-falaq.structure.json sha256:2a9811bbc7e5d374152ac7089be6d2b946a5bbbb5a569856532d0e336cd3d6af",
+    "authored_words": "authored/al-falaq.words.json sha256:c431b95177c1b29159ab3fe2a5333eeed1e5349b467b05ebec4ba94bd7d6229e",
+    "authored_structure": "authored/al-falaq.structure.json sha256:aee44f97abcf01539c7d43bf91a684eb045f450ce093017f4817c0e81afd2545",
     "authored_concepts_map": "authored/al-falaq.concepts-map.json sha256:aed1fd50942fa30fa657a55a384d2fe284d957714238d05a9499b0065e82aaf4",
     "authored_facts": "authored/al-falaq.facts.generated.json sha256:75ebf95f8fe6d95dbad2bd5b19df7a8e6cb49e44b945adf96abde2b533e1ebd3",
     "authored_hadith": "authored/al-falaq.hadith.json sha256:b21ea1e52401b20e98c0b96dac242a626180ec8bc779405b3bb099f7b429ba62",

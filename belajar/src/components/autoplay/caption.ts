@@ -15,13 +15,15 @@
  *   engine's caption part — the display text when the manifest has one —
  *   which the machine times by reading pace.
  * A karaoke caption carries each word's emphasis (operator 2026-10-11,
- * narration rule 18: the meaning after "yang artinya", the term taught, a
- * harakah's sound), found in the line's display text and matched to its
- * words (src/lib/emphasis.ts alignEmphasis) here in the browser: the
- * manifest, the narration and the audio stay as they are. A text caption
- * carries its part's slice of the whole line's emphasis (partEmphasis): a
- * caption emphasises its first meaning, or a quiz answer alone (review
- * 2026-10-11), and a part shown alone must not pick a "first" of its own.
+ * narration rule 18: its meanings, the term taught, a harakah's sound),
+ * found in the line's display text and matched to its words
+ * (src/lib/emphasis.ts alignEmphasis) here in the browser: the manifest,
+ * the narration and the audio stay as they are. A text caption carries its
+ * part's slice of the whole line's emphasis (partEmphasis): a caption
+ * emphasises every meaning of its line (operator 2026-10-13, plan L22; its
+ * first one only until then), a quiz explanation its answer and its
+ * meanings; and what a quotation comes after ("Terjemahannya:") may stand in
+ * the part before, so a part is never read alone.
  *
  * The mushaf line and the word card (stageMarks): the words the line on
  * screen highlights (the whole ayah for the intro, the recitation lead,

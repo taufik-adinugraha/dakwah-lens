@@ -745,3 +745,90 @@ describe("planted faults in the marked lessons and the Kosakata are caught", () 
     expect(problems(s)).toMatch(/word 1:1:1: no marked prose/);
   });
 });
+
+// Operator 2026-10-13: "in quiz of ayat 1 (the last question) it says ‘sifat’ , you write shifah in
+// arabic instead of na’t, which one is correct? because in other explanations its written as na't".
+// Both name the same thing; the course says na't. The Indonesian word "sifat", where an author
+// marks it as the role, is a form of the term na't itself (pipeline/authored/library.terms.json),
+// so it draws نَعْت — never صِفَة, the term `shifah`, which only the aside that explains the two
+// names uses ("Na't atau shifah?": "then we need explanation about na't vs shifah, just intermezo").
+describe("the role is always na't: a marked “sifat” shows نَعْت, never صِفَة", () => {
+  /** Every string of a JSON value, with its path. */
+  const strings = (value: unknown, where: string, out: [string, string][] = []): [string, string][] => {
+    if (typeof value === "string") out.push([where, value]);
+    else if (Array.isArray(value)) value.forEach((v, i) => strings(v, `${where}[${i}]`, out));
+    else if (value && typeof value === "object") for (const [k, v] of Object.entries(value)) strings(v, `${where}.${k}`, out);
+    return out;
+  };
+  const NAAT = "نَعْت";
+  const SHIFAH = "صِفَة";
+  /** "sifat", then at most a bracket and the Latin na't, then صِفَة: "sifat (صِفَة)", "sifat صِفَة)". */
+  const SIFAT_AS_SHIFAH = new RegExp(String.raw`sifat(?:nya)?[^\p{L}]{0,3}${SHIFAH}`, "iu");
+
+  it("the term table: “sifat” belongs to na't; صِفَة is its other name, shifah", () => {
+    const byId = new Map(LIBRARY.terms.map((t) => [t.id, t]));
+    expect(byId.get("naat")).toMatchObject({ latin: "na't", ar: NAAT });
+    expect(byId.get("shifah")).toMatchObject({ latin: "shifah", ar: SHIFAH });
+    expect(byId.has("sifat")).toBe(false);
+    const draw = (marked: string) => termDisplay(annotate(marked, new Scope(), TERMS)).text;
+    // The word an author marks, as the quiz and the word cards have it (plain text unchanged: it
+    // is recorded narration).
+    expect(draw("Akhirnya [[kasrah|kasrah]] karena menjadi [[sifat|naat]] kedua bagi lafaz Allah.")).toContain(`menjadi sifat (${NAAT}) kedua bagi`);
+    // Where the text names na't itself first, the word after it stays bare: one Arabic, once.
+    expect(draw("menjadi sifat ([[na't|naat]]) bagi lafaz Allah, dan [[sifat|naat]] mengikuti kata yang disifatinya")).toBe(
+      `menjadi sifat (na't ${NAAT}) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya`,
+    );
+  });
+
+  it("no string a learner sees shows صِفَة beside “sifat” (quiz, lessons, library, every marked field as drawn)", () => {
+    const texts: [string, string][] = [];
+    for (const s of SURAHS) {
+      const lookup = lessonLookup(TERMS, s);
+      for (const [where, t] of strings(s, s.slug)) texts.push([where, /\.marked\./u.test(where) ? termDisplay(annotate(t, new Scope(), lookup)).text : t]);
+      texts.push(...strings(quizFor(s.slug), `quiz/${s.slug}`));
+    }
+    for (const [where, t] of strings(LIBRARY, "library")) texts.push([where, /\.marked\./u.test(where) ? termDisplay(annotate(t, new Scope(), TERMS)).text : t]);
+    expect(texts.length).toBeGreaterThan(9000);
+    // The check sees what it is for: the twelve quiz strings of 2026-10-13 said exactly this.
+    expect(SIFAT_AS_SHIFAH.test(`karena menjadi sifat (${SHIFAH}) kedua bagi lafaz Allah`)).toBe(true);
+    expect(SIFAT_AS_SHIFAH.test(`menjadikannya sifat ${SHIFAH})`)).toBe(true);
+    expect(SIFAT_AS_SHIFAH.test(`Na't (${NAAT}) atau shifah (${SHIFAH})?`)).toBe(false);
+    expect(texts.filter(([, t]) => SIFAT_AS_SHIFAH.test(t)).map(([where]) => where)).toEqual([]);
+    // …and it is نَعْت they show: the quiz feedback the operator saw, and the role's own label.
+    const quiz = strings(quizFor("al-fatihah"), "quiz").map(([, t]) => t);
+    // The twelve strings that said "sifat (صِفَة)" (one of them inside the prose's own bracket).
+    expect(quiz.filter((t) => new RegExp(String.raw`sifat \(?${NAAT}`, "u").test(t))).toHaveLength(12);
+    expect(quiz).toContain(`Akhirnya kasrah (كَسْرَة) karena menjadi sifat (${NAAT}) kedua bagi lafaz Allah, sehingga ikut majrur (مَجْرُور).`);
+    expect(quiz).toContain(`na't (${NAAT}, sifat)`);
+  });
+
+  it("صِفَة is shown in one place only: the aside that explains the two names", () => {
+    // Every use of the term `shifah` in the marked content.
+    const uses = [...SURAHS.flatMap((s) => strings(s, s.slug)), ...strings(LIBRARY, "library")].filter(([, t]) => /\|shifah\]\]/u.test(t)).map(([where]) => where);
+    const fatihah = SURAHS.find((s) => s.slug === "al-fatihah")!;
+    const k = fatihah.facts.findIndex((f) => f.id === "naat-atau-shifah");
+    expect(k).toBeGreaterThanOrEqual(0);
+    expect(uses.sort()).toEqual([`al-fatihah.facts[${k}].marked.body`, `al-fatihah.facts[${k}].marked.title`]);
+    // No Arabic صِفَة is typed anywhere a learner reads either (a hadith's own Arabic text aside).
+    const typed = [...SURAHS.flatMap((s) => [...strings({ ayat: s.ayat, facts: s.facts }, s.slug), ...strings(quizFor(s.slug), `quiz/${s.slug}`)]), ...strings(LIBRARY, "library")]
+      .filter(([where, t]) => t.includes(SHIFAH) && !/^library\.terms\[\d+\]\.ar$/u.test(where))
+      .map(([where]) => where);
+    expect(typed).toEqual([]);
+    // The aside as its card draws it (title first, then the body, one scope): each name with its
+    // Arabic once, the examples in the ayah's own letters.
+    const fact = fatihah.facts[k];
+    const sc = new Scope();
+    const lookup = lessonLookup(TERMS, fatihah);
+    const title = termDisplay(markedTokens(fact.marked?.title, sc, lookup)!).text;
+    const body = termDisplay(markedTokens(fact.marked?.body, sc, lookup)!).text;
+    expect(title).toBe(`Na't (${NAAT}) atau shifah (${SHIFAH})?`);
+    expect(body).not.toContain(NAAT);
+    expect(body).not.toContain(SHIFAH);
+    expect(body).toContain("al-mustaqīma (ٱلْمُسْتَقِيمَ)");
+    expect(fact.locations).toEqual(["1:1", "1:3", "1:6"]);
+    expect(fact.method).toMatch(/^Bukan hitungan; dikutip dari /u);
+    expect(fact.sources.map((x) => x.url)).toEqual(["https://shamela.ws/book/11371/15", "https://shamela.ws/book/2163/12", "https://shamela.ws/book/9057/67"]);
+    // An aside, not a lesson step: no narration line and no quiz question names it.
+    expect(strings(quizFor("al-fatihah"), "quiz").some(([, t]) => /shifah/iu.test(t))).toBe(false);
+  });
+});

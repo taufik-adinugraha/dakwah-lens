@@ -178,7 +178,7 @@ export function WordCard({
                 <div>
                   <dt className="text-sm font-semibold text-ink-muted">{labels.role}</dt>
                   <dd className="text-base text-ink">
-                    <Prose tokens={role} plain={word.role} />
+                    <Prose tokens={role} plain={word.role} emphasis="meaning" />
                   </dd>
                 </div>
               ) : null}
@@ -262,14 +262,16 @@ export function WordCard({
                           on its own line (rule 15, 2026-10-11: a " · " join could start a line
                           at Sangat besar, and a list is easier to read). */}
                       <span className="font-semibold text-ink">
-                        <Prose tokens={ikhtilaf[i].point} plain={`${x.point}:`} />
+                        <Prose tokens={ikhtilaf[i].point} plain={`${x.point}:`} emphasis="meaning" />
                       </span>
                       {/* No indent: at Sangat besar on a phone the column is already the width of
                           its longest word ("membolehkannya,"). */}
                       <ul className="mt-1 space-y-1">
                         {x.options.map((o, j) => (
                           <li key={o}>
-                            <Prose tokens={ikhtilaf[i].options[j]} plain={o} />
+                            {/* A scholars' reading glosses what it reads (“aku memulai”): the
+                                meaning forest, as in the explanation above (plan L22). */}
+                            <Prose tokens={ikhtilaf[i].options[j]} plain={o} emphasis="meaning" />
                           </li>
                         ))}
                       </ul>

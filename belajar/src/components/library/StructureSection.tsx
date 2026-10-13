@@ -83,7 +83,9 @@ export function StructureSection({
             </span>
             {w.role ? (
               <span dir="ltr" className="max-w-36 text-center text-sm text-ink-muted">
-                <Prose tokens={roles[i]} plain={w.role} />
+                {/* A gloss inside a role ("fa'il tersimpan: “kami”") is a meaning like any other
+                    (operator 2026-10-13, plan L22): forest, the rest of the label as it was. */}
+                <Prose tokens={roles[i]} plain={w.role} emphasis="meaning" />
               </span>
             ) : null}
           </li>
@@ -122,6 +124,7 @@ export function StructureSection({
                   <Prose
                     tokens={groups[i] ? [{ kind: "text", text: "— " }, ...groups[i]!] : null}
                     plain={`— ${g.label}`}
+                    emphasis="meaning"
                   />
                 </span>
                 {g.concept && conceptTitle[g.concept] ? (

@@ -109,7 +109,7 @@ export function SharafPanel({
                     </span>
                   </p>
                   <p className="mt-1 text-pretty text-base text-ink-muted">
-                    <Prose tokens={tokens?.ilal[i] ?? null} plain={x.rule} />
+                    <Prose tokens={tokens?.ilal[i] ?? null} plain={x.rule} emphasis="meaning" />
                   </p>
                 </li>
               ))}

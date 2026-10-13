@@ -1,6 +1,6 @@
 import { Fragment, type ReactNode } from "react";
 
-import { emphasisSpans, type Emphasis, type EmphasisKind } from "@/lib/emphasis";
+import { emphasisSpans, meaningSpans, type Emphasis, type EmphasisKind } from "@/lib/emphasis";
 import { joinUnits, rtlRuns, textUnits, type Seg, type UnitPart } from "@/lib/textUnits";
 
 /**
@@ -207,12 +207,16 @@ function Pieces({ text, at = 0, ov = [] }: { text: string; at?: number; ov?: Ove
  *
  * `emphasis` (operator 2026-10-11: "we can also use bold text or different
  * color to highlight the meanings or important things"): `true` emphasises
- * what the text itself names (src/lib/emphasis.ts: the meaning after "yang
- * artinya", the term being taught, a harakah's sound) — opt-in, on prose a
- * learner reads, never on titles, buttons, chips, references or quiz options;
- * a list of spans emphasises a known slot (a word card's gloss, glossSlot).
- * Drawn as overlays after `overlays`, so the pieces and their breaks stay
- * those of the text alone.
+ * what the text itself names (src/lib/emphasis.ts: its meanings, the term
+ * being taught, a harakah's sound) — opt-in, on prose a learner reads;
+ * `"meaning"` its meanings alone, for a text that is a label more than a
+ * sentence (a word's role, a structure group, a quiz option, a concept's
+ * title): a gloss inside any of them is quoted and forest like every other
+ * (operator 2026-10-13, plan L22), and nothing else of a label is
+ * emphasised. Never on buttons, link chips or references. A list of spans
+ * emphasises a known slot (a word card's gloss, glossSlot). Drawn as
+ * overlays after `overlays`, so the pieces and their breaks stay those of
+ * the text alone.
  */
 export function MixedText({
   text,
@@ -221,9 +225,9 @@ export function MixedText({
 }: {
   text: string;
   overlays?: readonly Overlay[];
-  emphasis?: true | readonly Emphasis[];
+  emphasis?: true | "meaning" | readonly Emphasis[];
 }) {
-  const spans = emphasis === true ? emphasisSpans(text) : (emphasis ?? []);
+  const spans = emphasis === true ? emphasisSpans(text) : emphasis === "meaning" ? meaningSpans(text) : (emphasis ?? []);
   const ov = spans.length ? [...(overlays ?? []), ...spans.map(emphasisOverlay)] : overlays;
   return <Pieces text={text} ov={ov} />;
 }

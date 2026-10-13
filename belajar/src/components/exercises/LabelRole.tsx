@@ -128,7 +128,9 @@ function LabelRoleRound({
                     optionKey={opt}
                   >
                     <span>
-                      <MixedText text={item.text.get(opt) ?? ""} />
+                      {/* A gloss inside a role ("fa'il tersimpan: “aku”") is forest in every
+                          option, right or wrong: it marks a meaning, never the answer (plan L22). */}
+                      <MixedText text={item.text.get(opt) ?? ""} emphasis="meaning" />
                     </span>
                   </OptionButton>
                 </li>
@@ -147,7 +149,7 @@ function LabelRoleRound({
                     after a kept-together word, so "(jar-majrur)" ⏎ "." could
                     happen with the stop outside (line breaks, 2026-10-10). */}
                 <strong className="font-semibold">
-                  <MixedText text={`${item.text.get(w.loc) ?? w.role}.`} />
+                  <MixedText text={`${item.text.get(w.loc) ?? w.role}.`} emphasis="meaning" />
                 </strong>{" "}
                 <MixedText text={item.q.why} emphasis />
               </>

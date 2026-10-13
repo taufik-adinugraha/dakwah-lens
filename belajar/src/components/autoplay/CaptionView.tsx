@@ -34,12 +34,12 @@ import type { StageCaption } from "./caption";
  * margin: the gaps between words are plain spaces, as in the text it follows.
  *
  * Emphasis (operator 2026-10-11: "we can also use bold text or different
- * color to highlight the meanings or important things"): the meaning after
- * "yang artinya", the term being taught and a harakah's sound are bold —
- * in a text caption its part's slice of the line's (caption.ts
- * `emphasis`), in a karaoke one per word (caption.ts `emph`); a caption
- * emphasises its first meaning only, or a quiz answer alone (review
- * 2026-10-11). A word keeps its weight in every state, so the
+ * color to highlight the meanings or important things"): a meaning, the
+ * term being taught and a harakah's sound are bold — in a text caption its
+ * part's slice of the line's (caption.ts `emphasis`), in a karaoke one per
+ * word (caption.ts `emph`); every meaning of the line (operator 2026-10-13,
+ * plan L22: a meaning is always in “…” and always forest), and in a quiz
+ * explanation the answer beside them. A word keeps its weight in every state, so the
  * highlight moving never reflows the line; its colour follows the state:
  * the word being said is paper on forest whatever it is (7.9:1; no forest
  * inside it, its Arabic would vanish into the fill), a meaning is forest

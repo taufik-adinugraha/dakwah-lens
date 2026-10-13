@@ -75,9 +75,13 @@ EXERCISE_KEYS = ("tap-word", "why-harakat", "sort-case", "label-role", "wazn-fac
 SORT_BINS = ("marfu", "manshub", "majrur", "mabni")
 # Case state → its term in the table.
 STATE_TERM = {"marfu": "marfu", "manshub": "manshub", "majrur": "majrur", "mabni": "mabni", "majzum": "majzum"}
-# One cause, two names: a sifat is a na't; a jar-majrur phrase is a huruf jar with its majrur; an
-# isim majrur is majrur (cause classes and the overlap of role options).
-SAME_CAUSE = {"sifat": "naat", "jar-majrur": "huruf-jar", "isim-majrur": "majrur"}
+# One cause, two names: a jar-majrur phrase is a huruf jar with its majrur; an isim majrur is
+# majrur (cause classes and the overlap of role options). "sifat" needs no entry: the Indonesian
+# word, where it names the role, is a form of the term na't itself (library.terms.json, operator
+# 2026-10-13: "you write shifah in arabic instead of na't … in other explanations its written as
+# na't"), so a marked "sifat" shows نَعْت, never صِفَة (the term `shifah`, the other name of the
+# same thing, which only the aside that explains the two names uses).
+SAME_CAUSE = {"jar-majrur": "huruf-jar", "isim-majrur": "majrur"}
 # The parts of an ayah's narration that TEACH (played before its exercises): line ids
 # "<slug>:<ayah>:<part>"; exercise lines, the recap and next/done teach nothing.
 TEACHING_PART = re.compile(r"intro|recite|primer:\d+|w\d+(?::compose:\d+)?|structure|concept:[a-z0-9-]+")
@@ -396,7 +400,7 @@ def cause_class(text: str, terms: Terms, *, after_karena: bool) -> str | None:
 
 
 def term_classes(text: str, terms: Terms) -> set[str]:
-    """Every term a role names, as causes (sifat = na't, jar-majrur = huruf jar)."""
+    """Every term a role names, as causes ("sifat" is na't's own form; jar-majrur = huruf jar)."""
     return {SAME_CAUSE.get(tid, tid) for _a, _b, tid in terms.matches(text, ambiguous=True) if tid != "huruf"}
 
 

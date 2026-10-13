@@ -72,6 +72,11 @@
     },
     "yang-diberi-nikmat": {
       "method": "Bukan hitungan. Kaitan kedua ayat dikutip dari Ibnu Katsir (tafsir 1:7). Dicek di QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): 4:69 memuat kata kerja dengan LEM:>anoEama, lemma yang sama dengan [[an‘amta|q:1:7:3]] (1:7:3)."
+        },
+    "naat-atau-shifah": {
+      "title": "[[Na't]] atau [[shifah]]?",
+      "body": "[[Na't]] dan [[shifah]] adalah dua nama untuk hal yang sama: kata yang menerangkan kata benda sebelumnya dan mengikuti akhirannya. Pelajaran ini memakai [[na't]], kata yang dipakai Ibnu Ajurrum: babnya berjudul Bab an-Na't. Kitab lain memakai [[shifah]] atau washf: Darwisy menyebut [[al-mustaqīma|q:1:6:3]] di ayat 6 [[shifah]] bagi [[aṣ-ṣirāṭa|q:1:6:2]] dan, di halaman yang sama, menyebut [[gairi|q:1:7:5]] di ayat 7 boleh menjadi [[na't]] bagi [[allażīna|q:1:7:2]]; as-Samin, membahas [[gairi|q:1:7:5]] yang sama, memakai kata [[shifah]] dan washf. Jadi bila Anda menjumpai [[shifah]] di buku lain, yang dimaksud adalah [[na't]] yang sama.",
+      "method": "Bukan hitungan; dikutip dari Matn al-Ajurrumiyyah (Bab an-Na't), dari Darwisy ([[i'rab]] QS 1:6 dan 1:7) dan dari as-Samin (QS 1:7)."
     }
   }
 }
