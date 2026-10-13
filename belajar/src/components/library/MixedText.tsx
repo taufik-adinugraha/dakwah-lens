@@ -40,12 +40,23 @@ const EMPHASIS_CLASS: Record<EmphasisKind, string> = {
   sound: "font-semibold",
 };
 
-/** An emphasis as an overlay: its Latin in a `data-emph` span, a term's Arabic in forest. */
-const emphasisOverlay = (e: Emphasis): Overlay => ({
+/**
+ * A meaning inside a LABEL (emphasis="meaning": a word's role, a structure group, a quiz option, a
+ * scholars' reading, a title): forest, at the label's own weight. Its “…” is the second cue there
+ * (plan L22: quotes AND colour), so colour is still never the only one — and the label's words keep
+ * their widths, so its line breaks stay the ones it had. Semibold made “permulaanku” a few pixels
+ * wider than its line in a scholars' reading on a phone at the largest text size, and the "—" glued
+ * after it started the next line (CI line breaks, 2026-10-13).
+ */
+const LABEL_MEANING_CLASS = "text-forest";
+
+/** An emphasis as an overlay: its Latin in a `data-emph` span, a term's Arabic in forest. `label`:
+ *  inside a label (LABEL_MEANING_CLASS). */
+const emphasisOverlay = (e: Emphasis, label = false): Overlay => ({
   from: e.from,
   to: e.to,
   wrap: (children) => (
-    <span data-emph={e.kind} className={EMPHASIS_CLASS[e.kind]}>
+    <span data-emph={e.kind} className={label && e.kind === "meaning" ? LABEL_MEANING_CLASS : EMPHASIS_CLASS[e.kind]}>
       {children}
     </span>
   ),
@@ -222,13 +233,17 @@ export function MixedText({
   text,
   overlays,
   emphasis,
+  label = emphasis === "meaning",
 }: {
   text: string;
   overlays?: readonly Overlay[];
   emphasis?: true | "meaning" | readonly Emphasis[];
+  /** The spans are a label's meanings (TermText passes its own spans for emphasis="meaning"):
+   *  drawn at the label's weight (LABEL_MEANING_CLASS). Default: true for emphasis="meaning". */
+  label?: boolean;
 }) {
   const spans = emphasis === true ? emphasisSpans(text) : emphasis === "meaning" ? meaningSpans(text) : (emphasis ?? []);
-  const ov = spans.length ? [...(overlays ?? []), ...spans.map(emphasisOverlay)] : overlays;
+  const ov = spans.length ? [...(overlays ?? []), ...spans.map((e) => emphasisOverlay(e, label))] : overlays;
   return <Pieces text={text} ov={ov} />;
 }
 
