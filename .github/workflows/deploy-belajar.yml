@@ -126,6 +126,22 @@ jobs:
       - name: Konsep — validator mutation tests (corpus-free)
         run: python3 pipeline/test_validate_terms.py --no-corpus
 
+      # The imam's voice of every example (operator 2026-10-12: "each explanation should be
+      # followed by examples (visual + voice)"; plan L19): content/library.json `clips` covers every
+      # concept example, Harakat sign word and parts diagram word/tile, each clip is Alafasy's
+      # EveryAyah file of its ayah with a plausible word length, a lesson ayah's clip is the
+      # lesson's own timing of that word, a clip outside the lessons is the one the committed
+      # fixture gives (pipeline/fixtures/clips_outside_lessons.json: those ayat's Tanzil lines and
+      # quran-align entries), and the quran-align pin is current. And what is HEARD (review
+      # 2026-10-12): `last` on every clip that ends its ayah (the imam's waqf), each Harakat sign
+      # heard where its example is, a hamzat-washal tile played with the word before it. The fresh
+      # build from quran-align, the Tanzil tokens and the fixture against the pinned files need
+      # pipeline/cache (git-ignored) and run locally with plain `python3 pipeline/validate_clips.py`.
+      - name: Example voices — validate (corpus-free)
+        run: python3 pipeline/validate_clips.py --no-corpus
+      - name: Example voices — validator mutation tests (corpus-free)
+        run: python3 pipeline/test_validate_clips.py --no-corpus
+
       # Ilmu Waris M1 (docs/waris-plan.md §10). Research-phase parity: the
       # belajar copies of the test vectors and of dalil.json must equal the
       # docs/waris-research originals byte for byte (this job checks out the
