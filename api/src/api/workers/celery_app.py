@@ -136,11 +136,22 @@ celery_app.conf.update(
         # existing rows). limit=100 halves the per-run cost to ~$2.50
         # while still yielding ~8,000 fresh items — ample for the weekly
         # briefing's 7d window. Matches the daily trending X_LIMIT=100.
-        "ingest-x-weekly": {
-            "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=0, hour=22, day_of_week=3),
-            "kwargs": {"platform": "x", "limit": 100, "n_keywords": 999},
-        },
+        #
+        # PAUSED 2026-10-13 at operator request ("we will also disable X
+        # for now … only youtube and mainstream media"). With TikTok and
+        # Instagram paused since 2026-06-08 (below), no Apify-billed
+        # platform is fetched any more: the corpus is mainstream RSS +
+        # YouTube. The daily trending overlay no longer fans out to X
+        # either (workers/ingest.py TRENDING_PLATFORMS). The site says so
+        # where it describes its sources (web/src/lib/ingest-status.ts).
+        #
+        # Re-enable by uncommenting this block, adding "x" back to
+        # TRENDING_PLATFORMS, and updating web/src/lib/ingest-status.ts.
+        # "ingest-x-weekly": {
+        #     "task": "api.workers.ingest.rotating_ingest",
+        #     "schedule": crontab(minute=0, hour=22, day_of_week=3),
+        #     "kwargs": {"platform": "x", "limit": 100, "n_keywords": 999},
+        # },
         # TikTok + Instagram — PAUSED 2026-06-08 to claw back budget for
         # higher-value LLM work (briefings, daleel pool widening). Three
         # weekly cycles (May 20, 27, Jun 3) showed:
@@ -304,6 +315,11 @@ celery_app.conf.update(
         # Re-enabled 2026-05-25 after the weekly X schedule landed —
         # was paused 2026-05-20 because it depended on X scrapes which
         # were themselves paused.
+        #
+        # Since 2026-10-13 the surviving keywords fan out to YouTube ONLY
+        # (X paused at operator request; workers/ingest.py
+        # TRENDING_PLATFORMS), so this task has no Apify cost: the X
+        # figures above describe the task as it ran until then.
         "trending-ingest": {
             "task": "api.workers.ingest.trending_ingest",
             "schedule": crontab(minute=0, hour=12),
