@@ -1009,10 +1009,21 @@ describe("what the stage draws for a beat (ExampleCard, WordComposition)", () =>
   it("an example from another ayah says where it stands instead of a word number", () => {
     const word = WORDS.get("112:4:4");
     if (!word) throw new Error("no 112:4:4");
-    const example = { of: "concept" as const, key: "112:4:4", word: null, translit: word.translit, gloss: word.gloss, place: { surah: 112, ayah: 4 }, ar: word.ar, ending: null, waqf: false, washal: null };
+    const example = { of: "concept" as const, key: "112:4:4", word: null, translit: word.translit, gloss: word.gloss, place: { surah: 112, ayah: 4 }, ar: word.ar, ending: null, waqf: false, washal: null, about: null };
     const html = intl("id", createElement(ExampleCard, { id: "concept:contoh:2", example, state: "reciting", marks: null }));
     expect(html).toContain("QS 112:4");
     expect(html).not.toContain("Kata ke-");
+    expect(count(html, word.ar)).toBe(1);
+    expect(html).not.toContain("data-example-about");
+  });
+
+  it("in lesson zero the card says what the word is an example of (no ayah on screen says it)", () => {
+    const word = WORDS.get("1:5:2");
+    if (!word) throw new Error("no 1:5:2");
+    const example = { of: "concept" as const, key: "1:5:2", word: null, translit: word.translit, gloss: word.gloss, place: { surah: 1, ayah: 5 }, ar: word.ar, ending: null, waqf: false, washal: null, about: "fi'il, kata kerja." };
+    const html = intl("id", createElement(ExampleCard, { id: "concept:kalimah-isim-fiil-huruf:2", example, state: "reciting", marks: null }));
+    expect(html).toContain("data-example-about");
+    expect(html.replace(/<[^>]+>/g, "").replace(/&#x27;/g, "'")).toContain("Fi'il, kata kerja.");
     expect(count(html, word.ar)).toBe(1);
   });
 
@@ -1119,14 +1130,14 @@ describe("what the beats add to a lesson", () => {
     // Until 2026-10-13 a beat lasted its caption's captionMs (a 2.5 s settle for the eyes, never
     // under 5 s): 5.8 s for a one-line card, 240 s in all — "about four minutes to a lesson of
     // about seventy; no ayah more than 75 s". Plan L24: the reading alone (timing.ts exampleReadMs).
-    "Al-Fatihah: 26 beats in its ayat and 2 in lesson zero add about two minutes to its lessons; no lesson more than 45 s",
+    "Al-Fatihah: 26 beats in its ayat and 3 in lesson zero add about two minutes to its lessons; no lesson more than 45 s",
     () => {
       const report = runAutoplayChecks({ ...input, property: { streams: 0, length: 0 } });
       expect(report.errors).toEqual([]);
       const rows = Object.entries(report.stats.examples).filter(([k]) => k.startsWith("al-fatihah/"));
       expect(rows.map(([k, r]) => [k, r.beats.length])).toEqual([
-        // Lesson zero: the three kinds of word, shown by two clips (isim and huruf in one word, a fi'il).
-        ["al-fatihah/0", 2],
+        // Lesson zero: the three kinds of word, one clip each (an isim, a fi'il, a huruf with its isim).
+        ["al-fatihah/0", 3],
         ["al-fatihah/1", 5],
         ["al-fatihah/2", 5],
         ["al-fatihah/3", 2],

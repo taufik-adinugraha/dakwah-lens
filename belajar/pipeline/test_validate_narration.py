@@ -810,7 +810,7 @@ class NarrationValidation(unittest.TestCase):
         for lid, ln in lines.items():
             if ":compose:" in lid or ":primer:" in lid:
                 self.assertNotRegex(ln["text"], r"\b(?:bi|ismu|ismi|bismi|ar-rahmanu|ar-rahmani)\b", lid)
-        self.assertIn("bunyi a", lines["al-fatihah:0:primer:3"]["text"])
+        self.assertIn("bunyinya a", lines["al-fatihah:0:primer:3"]["text"])
 
     def test_mutations_fail(self):
         for name, mutate, expect in MUTATIONS:

@@ -14,23 +14,23 @@
     "frames": [
       {"stage": "overview", "marks": ["fathah", "kasrah", "dhammah"],
        "say": [
-         "Sebelum mulai, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab.",
+         "Pertama, harakat, yaitu tanda bunyi pada huruf Arab.",
          "Tiga harakat utama adalah fathah, kasrah, dan dhammah. Bunyinya a, i, dan u."
        ]},
       {"stage": "mark", "marks": ["fathah"], "tiles": ["ba-a"],
-       "say": ["Fathah adalah garis kecil miring di atas huruf. Huruf yang diberi fathah dibaca dengan bunyi a."]},
+       "say": ["Fathah adalah garis kecil miring di atas huruf; bunyinya a. Contohnya huruf ba' ini, dengan fathah."]},
       {"stage": "mark", "marks": ["kasrah"], "tiles": ["ba-i"],
-       "say": ["Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama Surah Al-Fatihah, huruf ba', memakai kasrah."]},
+       "say": ["Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Contohnya huruf ba' ini, dengan kasrah."]},
       {"stage": "mark", "marks": ["dhammah"], "tiles": ["ba-u"],
-       "say": ["Dhammah bentuknya seperti huruf wawu kecil di atas huruf; bunyinya u."]},
+       "say": ["Dhammah bentuknya seperti huruf wawu kecil di atas huruf; bunyinya u. Contohnya huruf ba' ini, dengan dhammah."]},
       {"stage": "mark", "marks": ["sukun", "shaddah"], "tiles": ["sin", "rra"],
        "say": [
-         "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf sin disebut sukun: ia menandakan huruf mati, dibaca tanpa vokal.",
+         "Selain harakat, ada tanda lain. Tanda kecil di atas huruf sin ini disebut sukun: ia menandakan huruf mati, dibaca tanpa vokal.",
          "Tanda seperti huruf w kecil di atas huruf ra' menandakan huruf itu dibaca dobel."
        ]},
       {"stage": "mark", "marks": ["small_alif"], "tiles": ["maa"],
        "say": [
-         "Satu tanda lagi: alif kecil yang tegak di atas huruf mim pada kata ketiga ayat itu.",
+         "Satu tanda lagi: alif kecil yang tegak di atas huruf mim ini.",
          "Huruf kecil seperti ini menandai huruf yang tidak tertulis dalam tulisan asli Al-Qur'an, tetapi wajib dibaca; karena itu bunyi a pada huruf mim itu dibaca panjang."
        ]}
     ],

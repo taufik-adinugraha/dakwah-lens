@@ -90,13 +90,16 @@ export const ID_TEXTS: AutoplayTexts = {
   done: ({ surah }) => `Pelajaran ayat ini selesai. Ini ayat terakhir surah ${surah}.`,
   // As the narration says them (pipeline/build_narration.py ZERO_INTRO, ZERO_NEXT).
   zeroIntro: ({ surah }) =>
-    `Ini pelajaran pengantar, sebelum kita masuk ke ayat pertama Surah ${surah}. Ada dua hal yang kita kenali di sini: harakat, dan tiga jenis kata dalam bahasa Arab.`,
+    `Ini pelajaran pengantar, sebelum kita belajar Surah ${surah}. Ada dua hal yang kita kenali di sini: harakat, lalu tiga jenis kata dalam bahasa Arab.`,
   zeroNext: ({ surah }) => `Pelajaran pengantar selesai. Berikutnya ayat pertama Surah ${surah}; pelajaran berlanjut sendiri.`,
   // Short on purpose: the card beside it shows the word, its transliteration and its meaning, and
   // a beat lasts at least its caption's reading time (25 beats in Al-Fatihah).
   example: {
     word: ({ n, translit }) => `Contoh: kata ke-${n}, ${translit}.`,
     other: ({ translit, surah, ayah }) => `Contoh lain: ${translit}, di QS ${surah}:${ayah}.`,
+    // Lesson zero has no ayah, so its examples are not "another" one, and the card cites the
+    // place: the caption says what the word is an example OF (the record's note).
+    zero: ({ translit, about }) => `Contoh — ${translit}: ${about}`,
     base: ({ translit, surah, ayah }) => `Contoh: ${translit}, di QS ${surah}:${ayah}.`,
     // What is heard where it is not what is written, as the Konsep pages say it beside an
     // example's button (messages Clip.waqf_note, washal_note).

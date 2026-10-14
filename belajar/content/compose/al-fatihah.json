@@ -207,7 +207,7 @@
     "lines": [
       {
         "frame": 1,
-        "say": "Sebelum mulai, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab."
+        "say": "Pertama, harakat, yaitu tanda bunyi pada huruf Arab."
       },
       {
         "frame": 1,
@@ -215,19 +215,19 @@
       },
       {
         "frame": 2,
-        "say": "Fathah adalah garis kecil miring di atas huruf. Huruf yang diberi fathah dibaca dengan bunyi a."
+        "say": "Fathah adalah garis kecil miring di atas huruf; bunyinya a. Contohnya huruf ba' ini, dengan fathah."
       },
       {
         "frame": 3,
-        "say": "Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama Surah Al-Fatihah, huruf ba', memakai kasrah."
+        "say": "Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Contohnya huruf ba' ini, dengan kasrah."
       },
       {
         "frame": 4,
-        "say": "Dhammah bentuknya seperti huruf wawu kecil di atas huruf; bunyinya u."
+        "say": "Dhammah bentuknya seperti huruf wawu kecil di atas huruf; bunyinya u. Contohnya huruf ba' ini, dengan dhammah."
       },
       {
         "frame": 5,
-        "say": "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf sin disebut sukun: ia menandakan huruf mati, dibaca tanpa vokal."
+        "say": "Selain harakat, ada tanda lain. Tanda kecil di atas huruf sin ini disebut sukun: ia menandakan huruf mati, dibaca tanpa vokal."
       },
       {
         "frame": 5,
@@ -235,7 +235,7 @@
       },
       {
         "frame": 6,
-        "say": "Satu tanda lagi: alif kecil yang tegak di atas huruf mim pada kata ketiga ayat itu."
+        "say": "Satu tanda lagi: alif kecil yang tegak di atas huruf mim ini."
       },
       {
         "frame": 6,
@@ -5331,7 +5331,7 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:35dbb32acbef05c428a1ee19216cf56eddee359044e90e0159b6c3b3d564cd1b",
+    "authored_compose": "authored/al-fatihah.compose.json sha256:cc775789d455e4e5c10ad29aade1cfd90217acf8351356ba10c361e4b5fe501c",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }

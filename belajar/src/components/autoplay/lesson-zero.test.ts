@@ -14,7 +14,7 @@ import {
   ID_TEXTS,
   LESSON_ZERO,
   LINE_ID_RE,
-  MAX_EXAMPLES_PER_RULE,
+  MAX_EXAMPLES_ZERO,
   primerAyah,
   reduceAutoplay,
   sequenceLineIds,
@@ -163,19 +163,31 @@ describe("its sequence, as its page builds it", () => {
 });
 
 describe("its examples: the imam's clips of the record's first examples", () => {
-  it("the three kinds of word in two clips (an isim with its huruf, a fi'il): no word of an ayah here to recite", () => {
+  it("the three kinds of word, one clip each (an isim, a fi'il, a huruf), each saying which it is: no word of an ayah here to recite", () => {
     const record = LIBRARY.concepts.find((c) => c.id === KALIMAH)!;
     const derived = zeroExamplesFor(FATIHAH);
     expect(derived.gaps).toEqual([]);
     expect(derived.examples.map((e) => [e.id, e.step, e.key, e.word, e.clip])).toEqual(
-      record.examples.slice(0, MAX_EXAMPLES_PER_RULE).map((e, k) => [`concept:${KALIMAH}:${k + 1}`, `concept:${KALIMAH}:ex`, e.loc, null, LIBRARY.clips[e.loc]]),
+      record.examples.slice(0, MAX_EXAMPLES_ZERO).map((e, k) => [`concept:${KALIMAH}:${k + 1}`, `concept:${KALIMAH}:ex`, e.loc, null, LIBRARY.clips[e.loc]]),
     );
-    expect(derived.examples.map((e) => e.key)).toEqual(["1:1:1", "1:5:2"]);
+    // Operator's audit of lesson zero (2026-10-14): an example of each kind, in the order the line
+    // names them — the huruf last, in bismi with its isim (Al-Fatihah has no huruf heard on its
+    // own: wa lā loses its long ā before aḍ-ḍāllīna, and a surah not yet published gives none).
+    expect(derived.examples.map((e) => e.key)).toEqual(["1:7:1", "1:5:2", "1:1:1"]);
+    // Each says what it is an example of (the stage has no ayah to show it).
+    expect(derived.examples.map((e) => e.about)).toEqual(["isim, nama benda.", "fi'il, kata kerja.", "bi- (huruf) + ism (isim), dua jenis kata dalam satu tulisan."]);
     // Neither ends its ayah (the imam's stop would change what is heard).
     for (const e of derived.examples) expect([e.clip?.last, e.waqf], e.id).toEqual([undefined, false]);
     const beats = seq.steps.find((s) => s.kind === "example")!.examples!;
     expect(beats.map((b) => [b.id, b.key, b.word])).toEqual(derived.examples.map((e) => [e.id, e.key, null]));
     for (const b of beats) expect(b.caption).not.toMatch(/[؀-ۿ]/);
+    // Not "Contoh lain" (there is no first one here), and no place said in the caption: the card
+    // cites it beside the word.
+    expect(beats.map((b) => b.caption)).toEqual([
+      "Contoh — ṣirāṭa: isim, nama benda.",
+      "Contoh — na‘budu: fi'il, kata kerja.",
+      "Contoh — bismi: bi- (huruf) + ism (isim), dua jenis kata dalam satu tulisan.",
+    ]);
     expect(
       exampleProblems(seq, { ayah: { words: [], recitation: [] }, introduced: taughtInZero(), compose: composeFor("al-fatihah"), derived, clips: LIBRARY.clips, wordAt: () => undefined, texts: ID_TEXTS, zero: true })
         .filter((p) => !/bytes/.test(p)),
@@ -184,7 +196,7 @@ describe("its examples: the imam's clips of the record's first examples", () => 
 });
 
 describe("the lesson left to run", () => {
-  it("plays every line once, shows the primer's frames in order, recites both clips, and ends with the way to ayah 1", () => {
+  it("plays every line once, shows the primer's frames in order, recites the three clips, and ends with the way to ayah 1", () => {
     for (const pace of ["biasa", "pelan"] as const) {
       const states = run(seq, pace);
       const last = states[states.length - 1];
@@ -197,9 +209,9 @@ describe("the lesson left to run", () => {
       // The primer's frames, 1 … 6.
       const frames = states.filter((s) => s.idx === 1).map((s) => stageFrame(seq, s)?.frame).filter((f, i, all) => f !== undefined && all[i - 1] !== f);
       expect(frames, pace).toEqual([1, 2, 3, 4, 5, 6]);
-      // The two examples, each a clip, in order.
+      // The three examples, each a clip, in order.
       const clips = states.flatMap((s) => (s.activity?.kind === "recite" && s.activity.target === "clip" ? [stageExample(seq, s)?.beat.key] : []));
-      expect([...new Set(clips)], pace).toEqual(["1:1:1", "1:5:2"]);
+      expect([...new Set(clips)], pace).toEqual(["1:7:1", "1:5:2", "1:1:1"]);
       // No recitation of an ayah or of a lesson word.
       expect(states.some((s) => s.activity?.kind === "recite" && s.activity.target !== "clip"), pace).toBe(false);
     }

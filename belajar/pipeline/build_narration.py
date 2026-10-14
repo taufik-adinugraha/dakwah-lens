@@ -153,7 +153,10 @@ PRE_REWRITES: list[tuple[str, str]] = [
     (r"^Isim maf'ul \(kata “yang di-”\)$", "Isim maf'ul, yaitu kata bagi yang dikenai perbuatan"),
     (r"^Fi'il majhul \(kata kerja pasif: “di-…”\)$", "Fi'il majhul, yaitu kata kerja pasif"),
     # The Kalimah title lists the three word classes with the gloss after the list; spoken, the
-    # gloss goes with the name, and the classes read as a list ("…, dan huruf").
+    # gloss goes with the name, and the classes read as a list ("…, dan huruf"). The list stays in
+    # the title although the summary names each kind again with its meaning: the quiz counts a kind
+    # as taught where a concept's title names it (quiz.py defined_terms), and "huruf" is an ordinary
+    # word anywhere else (tried and reverted in the audit of lesson zero, 2026-10-14).
     (r"^Kalimah: isim, fi'il, huruf \(tiga jenis kata\)$", "Tiga jenis kalimah, atau kata: isim, fi'il, dan huruf"),
     # The quiz explanations speak the words' `why` (2026-10-11). A Latin term inside an Indonesian
     # verb ("di-'athaf-kan") cannot be said from the dictionary: the verb is said in Indonesian,
@@ -861,11 +864,11 @@ Line = tuple[str, str, dict | None, str]  # id, prose, ayah (None for shared lin
 
 
 # Lesson zero's own two sentences (2026-10-13; plain, for adults and seniors, no all-caps): what
-# the lesson is for, before its first line of the primer ("Sebelum mulai, kita kenali dulu
-# harakat …"), and the hand-over, in the words an ayah's "next" line uses ("Pelajaran ayat
+# the lesson is for, before its first line of the primer ("Pertama, harakat, yaitu tanda bunyi
+# …"), and the hand-over, in the words an ayah's "next" line uses ("Pelajaran ayat
 # pertama selesai. Berikutnya ayat kedua; pelajaran berlanjut sendiri.").
-ZERO_INTRO = ("Ini pelajaran pengantar, sebelum kita masuk ke ayat pertama Surah {surah}. Ada dua hal yang kita kenali di sini: "
-              "harakat, dan tiga jenis kata dalam bahasa Arab.")
+ZERO_INTRO = ("Ini pelajaran pengantar, sebelum kita belajar Surah {surah}. Ada dua hal yang kita kenali di sini: "
+              "harakat, lalu tiga jenis kata dalam bahasa Arab.")
 ZERO_NEXT = "Pelajaran pengantar selesai. Berikutnya ayat pertama Surah {surah}; pelajaran berlanjut sendiri."
 
 

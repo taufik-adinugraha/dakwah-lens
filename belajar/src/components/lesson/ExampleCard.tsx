@@ -22,7 +22,8 @@ export type ExampleCardState = "reciting" | "failed" | "shown";
  * table of content/compose; in words, never colour alone, and the Arabic is never split or
  * coloured in pieces) — while the imam recites it and the mushaf line lights the word. The tag
  * says "Contoh" and where the word stands: its number in this ayah, or "QS 112:1" for an example
- * from another ayah.
+ * from another ayah. In lesson zero (no ayah) it also says what the word is an example of
+ * ("Fi'il, kata kerja."): the narrator named the three kinds, and the card names this one.
  *
  * ONE focused card (operator 2026-10-10: "too crowded"): it takes the word card's place, with the
  * word card's own layout — one compact row on a phone, the Arabic on the right; stacked and
@@ -86,6 +87,13 @@ export function ExampleCard({
                 <span className="font-semibold whitespace-nowrap text-forest">{tc("sound", { v: mark.sound })}</span>
               </>
             ) : null}
+          </p>
+        ) : null}
+        {example.about ? (
+          // Lesson zero: what the word is an example of ("Fi'il, kata kerja."), the record's note
+          // (examples.ts aboutOf) — with no ayah on screen, nothing else on the stage says it.
+          <p data-example-about className="text-base text-pretty font-semibold text-forest sm:order-5">
+            <MixedText text={example.about.charAt(0).toUpperCase() + example.about.slice(1)} />
           </p>
         ) : null}
       </div>
