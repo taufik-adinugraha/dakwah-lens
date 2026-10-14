@@ -1,0 +1,764 @@
+{
+ "version": 1,
+ "steps": [
+  {
+   "step": "kalimah",
+   "lesson": "0",
+   "rumus": "Tanda [[isim|isim]]: [[tanwin|tanwin]], alif lam di depannya, kata depan di depannya, dan satu tanda lagi yang kita pelajari di Al-Fatihah ayat 1. Tanda [[fi'il|fiil]]: qad, sin, saufa, atau ta' penanda perempuan yang mati. [[Huruf|huruf]] adalah kata yang tidak punya tanda [[isim|isim]] maupun tanda [[fi'il|fiil]].",
+   "sumber": [
+    {
+     "page": "11371/1",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "5",
+     "bab": "مدخل",
+     "url": "https://shamela.ws/book/11371/1",
+     "quotes": [
+      "فالاسم يُعرَفُ: بالخَفضِ، والتنوينِ، ودخولِ الألف واللام، وحروفِ الخَفضِ",
+      "والفعلُ يُعرَفُ بقد، والسِّين، وسَوف، وتاء التأنيث الساكنة",
+      "والحرفُ ما لا يَصلُحُ معه دليلُ الاسم ولا دليل الفعل"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "majrur",
+   "lesson": "1:1",
+   "rumus": "[[Isim|isim]] [[majrur|majrur]] umumnya berakhir [[kasrah|kasrah]]. Ada tiga sebab sebuah [[isim|isim]] menjadi [[majrur|majrur]]: (1) didahului [[huruf jar|huruf-jar]]; (2) disandarkan kepada [[isim|isim]] lain, kita pelajari di Al-Fatihah ayat 4; (3) mengikuti kata yang [[majrur|majrur]], kita mulai di Al-Fatihah ayat 3.",
+   "awas": "Jamak laki-laki beraturan [[majrur|majrur]] dengan ya', bukan [[kasrah|kasrah]] (kita pelajari di Al-Fatihah ayat 2).",
+   "example": {
+    "loc": "1:1:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/4",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "7",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/4",
+     "quotes": [
+      "فأما الكسرةُ: فتكونُ علامةً للخفضِ في ثلاثة مواضع: في الاسم المفرد المُنصَرِف، وجمع التكسير المُنصَرِف، وفي جمع المؤنث السالم"
+     ]
+    },
+    {
+     "page": "11371/6",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "9",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/6",
+     "quotes": [
+      "وكلها تُرفَعُ بالضمة، وتُنصَبُ بالفتحة، وتُخفَضُ بالكسرة، وتُجزَمُ بالسكون",
+      "وأما جمع المذكر السالم: فيُرفَعُ بالواو، ويُنصَبُ ويُخفَضُ بالياء"
+     ]
+    },
+    {
+     "page": "11371/30",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "22",
+     "bab": "باب المخفوضات من الأسماء",
+     "url": "https://shamela.ws/book/11371/30",
+     "quotes": [
+      "المخفوضات ثلاثة أنواع: مخفوضٌ بالحَرفِ، ومخفوضٌ بالإضافة، وتابِعٌ للمَخفوض"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "huruf-jar",
+   "lesson": "1:1",
+   "rumus": "[[Isim|isim]] yang didahului [[huruf jar|huruf-jar]] menjadi [[majrur|majrur]]. [[Huruf jar|huruf-jar]] antara lain: [[min|min]], [[ilā|ila]], [[‘an|an-jar]], [[‘alā|ala]], [[fī|fi]], [[rubba|rubba]], huruf ba', kaf, dan lam.",
+   "example": {
+    "loc": "1:1:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/31",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "23",
+     "bab": "باب المخفوضات من الأسماء",
+     "url": "https://shamela.ws/book/11371/31",
+     "quotes": [
+      "فأما المخفوض بالحرف فهو: ما يُخفَضُ بمِن، وإلى، وعن، وعلى، وفي، ورُبَّ، والباءِ، والكافِ، واللامِ، وبحروفِ القَسَم، وهي: الواو، والباءُ، والتاءُ، وبواو رُبَّ، وبمُذْ، ومُنذ"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "jumlah-ismiyyah",
+   "lesson": "1:2",
+   "rumus": "[[Mubtada'|mubtada]] adalah [[isim|isim]] [[marfu'|marfu]] yang tidak didahului kata yang mempengaruhi akhirannya. [[Khabar|khabar]] adalah [[isim|isim]] [[marfu'|marfu]] yang menjadi berita tentang [[mubtada'|mubtada]] itu. [[Khabar|khabar]] bisa berupa satu [[isim|isim]], atau berupa [[jar-majrur|jar-majrur]].",
+   "example": {
+    "loc": "1:2:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/11",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "12",
+     "bab": "باب المبتدأ والخبر",
+     "url": "https://shamela.ws/book/11371/11",
+     "quotes": [
+      "المبتدأ: هو الاسم المرفوعُ العاري عن العوامل اللفظية. والخبر: هو الاسم المرفوع المُسنَدُ إليه"
+     ]
+    },
+    {
+     "page": "11371/12",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "13",
+     "bab": "باب المبتدأ والخبر",
+     "url": "https://shamela.ws/book/11371/12",
+     "quotes": [
+      "والخبر قسمان: مُفرد؛ وغير مفرد",
+      "وغير المفرد أربعة أشياء: الجارُّ والمجرور، والظَّرف، والفِعل مع فاعله، والمبتدأ مع خبره"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "marfu",
+   "lesson": "1:2",
+   "rumus": "[[Isim|isim]] [[marfu'|marfu]] umumnya berakhir [[dhammah|dhammah]]. [[Mubtada'|mubtada]] dan [[khabar|khabar]] selalu [[marfu'|marfu]].",
+   "awas": "[[Jamak mudzakkar salim|jamak-mudzakkar-salim]] [[marfu'|marfu]] dengan wawu, bukan [[dhammah|dhammah]].",
+   "example": {
+    "loc": "1:2:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/3",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "6",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/3",
+     "quotes": [
+      "فأما الضمة فتكون علامة للرفع في أربعة مواضع في الاسم المُفرد، وجَمع التكسير، وجمع المؤنث السالم، والفعل المضارع الذي لم يتصل بآخره شيء"
+     ]
+    },
+    {
+     "page": "11371/6",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "9",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/6",
+     "quotes": [
+      "وكلها تُرفَعُ بالضمة، وتُنصَبُ بالفتحة، وتُخفَضُ بالكسرة، وتُجزَمُ بالسكون",
+      "وأما جمع المذكر السالم: فيُرفَعُ بالواو، ويُنصَبُ ويُخفَضُ بالياء"
+     ]
+    },
+    {
+     "page": "11371/11",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "12",
+     "bab": "باب المبتدأ والخبر",
+     "url": "https://shamela.ws/book/11371/11",
+     "quotes": [
+      "المبتدأ: هو الاسم المرفوعُ العاري عن العوامل اللفظية. والخبر: هو الاسم المرفوع المُسنَدُ إليه"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "jamak-mudzakkar-salim",
+   "lesson": "1:2",
+   "rumus": "[[Jamak mudzakkar salim|jamak-mudzakkar-salim]] (jamak laki-laki beraturan): [[marfu'|marfu]] dengan wawu; pada keadaan lainnya, termasuk [[majrur|majrur]], dengan ya'.",
+   "example": {
+    "loc": "1:2:4"
+   },
+   "sumber": [
+    {
+     "page": "11371/6",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "9",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/6",
+     "quotes": [
+      "وأما جمع المذكر السالم: فيُرفَعُ بالواو، ويُنصَبُ ويُخفَضُ بالياء"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "alif-lam",
+   "lesson": "1:3",
+   "rumus": "[[Isim|isim]] yang memakai alif lam adalah [[ma'rifah|marifah]] (tertentu). Nama diri juga [[ma'rifah|marifah]], tanpa alif lam.",
+   "awas": "Alif lam bukan satu-satunya tanda [[ma'rifah|marifah]]: ada lima jenis, yaitu kata ganti, nama diri, kata tunjuk, [[isim|isim]] yang memakai alif lam, dan [[isim|isim]] yang disandarkan kepada salah satu dari empat itu.",
+   "example": {
+    "loc": "1:3:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/15",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "14",
+     "bab": "باب النعت",
+     "url": "https://shamela.ws/book/11371/15",
+     "quotes": [
+      "والمَعرِفة خمسة أشياء: الاسم المُضمَرُ، نحو: أنا، وأنتَ، والاسم العَلَمُ، نحو: زيدٌ ومَكَّةَ، والاسم المُبْهَمُ، نحو: هذا وهذه وهؤلاء، والاسم الذي فيه الألف واللام، نحو: الرجُلُ والغلامُ، وما أُضِيفَ إلى واحد من هذه الأربعة"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "naat",
+   "lesson": "1:3",
+   "rumus": "[[Na't|naat]] mengikuti kata yang disifatinya ([[man'ut|manut]]): akhirannya sama, dan sama tertentu atau tidaknya.",
+   "example": {
+    "loc": "1:3:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/15",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "14",
+     "bab": "باب النعت",
+     "url": "https://shamela.ws/book/11371/15",
+     "quotes": [
+      "النَّعتُ: تابِعٌ للمنعوت في رَفعِهِ، ونصبِهِ، وخفضِهِ، وتعريفِهِ، وتنكيرِهِ"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "idhafah",
+   "lesson": "1:4",
+   "rumus": "Dalam [[idhafah|idhafah]], kata kedua ([[mudhaf ilaih|mudhaf-ilaih]]) selalu [[majrur|majrur]].",
+   "example": {
+    "loc": "1:4:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/30",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "22",
+     "bab": "باب المخفوضات من الأسماء",
+     "url": "https://shamela.ws/book/11371/30",
+     "quotes": [
+      "المخفوضات ثلاثة أنواع: مخفوضٌ بالحَرفِ، ومخفوضٌ بالإضافة، وتابِعٌ للمَخفوض"
+     ]
+    },
+    {
+     "page": "11371/31",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "23",
+     "bab": "باب المخفوضات من الأسماء",
+     "url": "https://shamela.ws/book/11371/31",
+     "quotes": [
+      "وأما ما يُخفَضُ بالإضافة, فنحو قولك: \"غلامُ زيدٍ\""
+     ]
+    }
+   ]
+  },
+  {
+   "step": "dhamir",
+   "lesson": "1:5",
+   "rumus": "[[Dhamir|dhamir]] (kata ganti) ada dua jenis: [[muttashil|muttashil]] (menempel pada kata lain) dan [[munfashil|munfashil]] (berdiri sendiri). Masing-masing ada dua belas bentuk.",
+   "example": {
+    "loc": "1:5:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/20",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "17",
+     "bab": "باب المفعول به",
+     "url": "https://shamela.ws/book/11371/20",
+     "quotes": [
+      "والمضمر قسمان: مُتَّصِل، ومُنفَصِل",
+      "فالمتصل اثنا عشر",
+      "والمنفصل اثنا عشر"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "fiil-mudhari",
+   "lesson": "1:5",
+   "rumus": "[[Fi'il mudhari'|fiil-mudhari]] diawali salah satu dari empat huruf: hamzah, nun, ya', atau ta'. Ia selalu [[marfu'|marfu]], berakhir [[dhammah|dhammah]] bila tidak ada apa pun yang bersambung di akhirnya, sampai ada kata yang masuk padanya dan mengubahnya (kita pelajari di Al-Ikhlas ayat 3).",
+   "example": {
+    "loc": "1:5:2"
+   },
+   "sumber": [
+    {
+     "page": "11371/3",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "6",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/3",
+     "quotes": [
+      "فأما الضمة فتكون علامة للرفع في أربعة مواضع في الاسم المُفرد، وجَمع التكسير، وجمع المؤنث السالم، والفعل المضارع الذي لم يتصل بآخره شيء"
+     ]
+    },
+    {
+     "page": "11371/7",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "10",
+     "bab": "باب الأفعال",
+     "url": "https://shamela.ws/book/11371/7",
+     "quotes": [
+      "والمضارع: ما كان في أوله إحدى الزوائدِ الأربعِ التي يجمَعُهَا قولُك: \"أنَيتُ\" وهو مرفوعٌ أبدا، حتى يدخُلَ عليه ناصِبٌ أو جازِم"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "jumlah-filiyyah",
+   "lesson": "1:6",
+   "rumus": "[[Fa'il|fail]] adalah [[isim|isim]] [[marfu'|marfu]] yang kata kerjanya disebut sebelum dia. [[Fa'il|fail]] ada dua: tertulis jelas, atau berupa [[dhamir|dhamir]].",
+   "example": {
+    "loc": "1:6:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/9",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "11",
+     "bab": "باب الفاعل",
+     "url": "https://shamela.ws/book/11371/9",
+     "quotes": [
+      "الفاعل هو: الاسم المرفوعُ المذكورُ قبلَهُ فِعلَهُ. وهو على قسمين: ظاهِر, ومُضمَر"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "maful-bih",
+   "lesson": "1:6",
+   "rumus": "[[Maf'ul bih|maful-bih]] adalah [[isim|isim]] [[manshub|manshub]] yang dikenai perbuatan kata kerja.",
+   "example": {
+    "loc": "1:6:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/20",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "17",
+     "bab": "باب المفعول به",
+     "url": "https://shamela.ws/book/11371/20",
+     "quotes": [
+      "وهو الاسمُ المنصوب الذي يقَعُ بِهِ الفِعل"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "manshub",
+   "lesson": "1:6",
+   "rumus": "[[Isim|isim]] [[manshub|manshub]] umumnya berakhir [[fathah|fathah]]. [[Isim|isim]] punya tiga keadaan: [[marfu'|marfu]] ([[dhammah|dhammah]]), [[manshub|manshub]] ([[fathah|fathah]]), [[majrur|majrur]] ([[kasrah|kasrah]]).",
+   "awas": "Jamak mu'annats salim [[manshub|manshub]] dengan [[kasrah|kasrah]], bukan [[fathah|fathah]] (kita pelajari di Al-Falaq ayat 4).",
+   "example": {
+    "loc": "1:6:2"
+   },
+   "sumber": [
+    {
+     "page": "11371/2",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "6",
+     "bab": "باب الإعراب",
+     "url": "https://shamela.ws/book/11371/2",
+     "quotes": [
+      "فللأسماء من ذلك الرفع، والنصب، والخفض، ولا جزم فيها"
+     ]
+    },
+    {
+     "page": "11371/4",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "7",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/4",
+     "quotes": [
+      "فأما الفتحةُ فتكون علامةً للنصب في ثلاثة مواضع: في الاسم المفرد, وجمع التكسير، والفعل المضارع إذا دخل عليه ناصِبٌ ولم يَتَّصل بآخره شيء",
+      "وأما الكسرة: فتكون علامة للنصب في جمع المؤنث السالم"
+     ]
+    },
+    {
+     "page": "11371/6",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "9",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/6",
+     "quotes": [
+      "وكلها تُرفَعُ بالضمة، وتُنصَبُ بالفتحة، وتُخفَضُ بالكسرة، وتُجزَمُ بالسكون",
+      "جمع المؤنث السالم يُنصَبُ بالكسرة"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "fiil-madhi",
+   "lesson": "1:7",
+   "rumus": "[[Fi'il madhi|fiil-madhi]] (kata kerja lampau): akhirnya selalu [[fathah|fathah]].",
+   "awas": "Bila kata ganti pelaku yang berharakat bersambung padanya, huruf akhirnya terbaca [[sukun|sukun]]; bila wawu jamak bersambung padanya, terbaca [[dhammah|dhammah]].",
+   "example": {
+    "loc": "1:7:3"
+   },
+   "sumber": [
+    {
+     "page": "11371/7",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "10",
+     "bab": "باب الأفعال",
+     "url": "https://shamela.ws/book/11371/7",
+     "quotes": [
+      "فالماضي: مفتوحُ الآخر أبدا"
+     ]
+    },
+    {
+     "page": "6970/15",
+     "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+     "hlm": "27",
+     "bab": "الفعل الماضي",
+     "url": "https://shamela.ws/book/6970/15",
+     "quotes": [
+      "وَقد يخرج عَنهُ إِلَى الضَّم وَذَلِكَ إِذا اتَّصَلت بِهِ وَاو الْجَمَاعَة كَقَوْلِك قَامُوا وقعدوا أَو إِلَى السّكُون وَذَلِكَ إِذا اتَّصل بِهِ الضَّمِير الْمَرْفُوع المتحرك"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "athaf",
+   "lesson": "1:7",
+   "rumus": "Kata yang disambung dengan [[huruf 'athaf|huruf-athaf]] seperti wawu (“dan”) mengikuti akhiran kata sebelumnya: yang disambung ke kata [[marfu'|marfu]] menjadi [[marfu'|marfu]], ke kata [[manshub|manshub]] menjadi [[manshub|manshub]], ke kata [[majrur|majrur]] menjadi [[majrur|majrur]].",
+   "example": {
+    "loc": "1:7:8"
+   },
+   "sumber": [
+    {
+     "page": "11371/16",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "15",
+     "bab": "باب العطف",
+     "url": "https://shamela.ws/book/11371/16",
+     "quotes": [
+      "وحروف العطف عَشَرَة، وهي: الواو، والفاء، وثُمَّ",
+      "فإن عَطَفْتَ بها على مرفوعٍ رَفَعْتَ، أو على منصوب نَصَبْتَ، أو على مخفوض خَفَضْتَ، أو على مجزوم جَزَمْتَ"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "fiil-amr",
+   "lesson": "114:1",
+   "rumus": "[[Fi'il amr|fiil-amr]] (bentuk perintah) selalu berada dalam keadaan [[i'rab|irab]] yang keempat, yang kita pelajari di Al-Ikhlas ayat 3.",
+   "example": {
+    "loc": "114:1:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/2",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "6",
+     "bab": "باب الإعراب",
+     "url": "https://shamela.ws/book/11371/2",
+     "quotes": [
+      "وأقسامُه أربعة: رَفع، ونَصب، وخَفْض، وجَزْم"
+     ]
+    },
+    {
+     "page": "11371/7",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "10",
+     "bab": "باب الأفعال",
+     "url": "https://shamela.ws/book/11371/7",
+     "quotes": [
+      "والأمر: مجزومٌ أبدا"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "badal",
+   "lesson": "114:2",
+   "rumus": "Jika sebuah [[isim|isim]] menjadi [[badal|badal]] dari [[isim|isim]] lain (atau [[fi'il|fiil]] dari [[fi'il|fiil]]), ia mengikuti seluruh [[i'rab|irab]] kata yang digantikannya.",
+   "example": {
+    "loc": "114:2:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/18",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "16",
+     "bab": "باب البدل",
+     "url": "https://shamela.ws/book/11371/18",
+     "quotes": [
+      "إذا أُبدِلَ اسمٌ مِن اسم أو فعلٌ مِن فعلٍ تَبِعَهُ في جميع إعرابِهِ"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "jamak-taksir",
+   "lesson": "114:5",
+   "rumus": "Jamak taksir umumnya sama seperti [[isim|isim]] tunggal: [[marfu'|marfu]] dengan [[dhammah|dhammah]], [[manshub|manshub]] dengan [[fathah|fathah]], [[majrur|majrur]] dengan [[kasrah|kasrah]].",
+   "sumber": [
+    {
+     "page": "11371/3",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "6",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/3",
+     "quotes": [
+      "فأما الضمة فتكون علامة للرفع في أربعة مواضع في الاسم المُفرد، وجَمع التكسير، وجمع المؤنث السالم، والفعل المضارع الذي لم يتصل بآخره شيء"
+     ]
+    },
+    {
+     "page": "11371/4",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "7",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/4",
+     "quotes": [
+      "فأما الفتحةُ فتكون علامةً للنصب في ثلاثة مواضع: في الاسم المفرد, وجمع التكسير، والفعل المضارع إذا دخل عليه ناصِبٌ ولم يَتَّصل بآخره شيء",
+      "فأما الكسرةُ: فتكونُ علامةً للخفضِ في ثلاثة مواضع: في الاسم المفرد المُنصَرِف، وجمع التكسير المُنصَرِف، وفي جمع المؤنث السالم"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "tanwin-nakirah",
+   "lesson": "113:3",
+   "rumus": "[[Tanwin|tanwin]] adalah tanda [[isim|isim]]. [[Nakirah|nakirah]] adalah [[isim|isim]] yang umum, tidak menunjuk satu saja; ciri mudahnya: bisa dimasuki alif lam.",
+   "sumber": [
+    {
+     "page": "11371/1",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "5",
+     "bab": "مدخل",
+     "url": "https://shamela.ws/book/11371/1",
+     "quotes": [
+      "فالاسم يُعرَفُ: بالخَفضِ، والتنوينِ، ودخولِ الألف واللام، وحروفِ الخَفضِ"
+     ]
+    },
+    {
+     "page": "11371/15",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "14",
+     "bab": "باب النعت",
+     "url": "https://shamela.ws/book/11371/15",
+     "quotes": [
+      "والنَّكِرَة: كل اسم شائعٍ في جِنسِه لا يَختَصُّ به واحد دون آخر، وتقريبُهُ كلُّ ما صَلَحَ دخولُ الألف واللام عليه"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "jamak-muannats-salim",
+   "lesson": "113:4",
+   "rumus": "Jamak mu'annats salim: [[marfu'|marfu]] dengan [[dhammah|dhammah]], [[majrur|majrur]] dengan [[kasrah|kasrah]], dan [[manshub|manshub]] juga dengan [[kasrah|kasrah]], bukan [[fathah|fathah]].",
+   "sumber": [
+    {
+     "page": "11371/3",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "6",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/3",
+     "quotes": [
+      "فأما الضمة فتكون علامة للرفع في أربعة مواضع في الاسم المُفرد، وجَمع التكسير، وجمع المؤنث السالم، والفعل المضارع الذي لم يتصل بآخره شيء"
+     ]
+    },
+    {
+     "page": "11371/4",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "7",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/4",
+     "quotes": [
+      "فأما الكسرةُ: فتكونُ علامةً للخفضِ في ثلاثة مواضع: في الاسم المفرد المُنصَرِف، وجمع التكسير المُنصَرِف، وفي جمع المؤنث السالم",
+      "وأما الكسرة: فتكون علامة للنصب في جمع المؤنث السالم"
+     ]
+    },
+    {
+     "page": "11371/6",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "9",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/6",
+     "quotes": [
+      "جمع المؤنث السالم يُنصَبُ بالكسرة"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "nafi-lam",
+   "lesson": "112:3",
+   "rumus": "[[Fi'il mudhari'|fiil-mudhari]] yang didahului huruf [[nafi|nafi]] “tidak” seperti pada contoh di bawah menjadi [[majzum|majzum]], karena huruf itu termasuk [[jazim|jazim]].",
+   "example": {
+    "loc": "112:3:1"
+   },
+   "sumber": [
+    {
+     "page": "11371/7",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "10",
+     "bab": "باب الأفعال",
+     "url": "https://shamela.ws/book/11371/7",
+     "quotes": [
+      "والجوازِمُ ثمانيةَ عَشَر، وهي: لَمْ، لَمَّا",
+      "وهو مرفوعٌ أبدا، حتى يدخُلَ عليه ناصِبٌ أو جازِم"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "majzum",
+   "lesson": "112:3",
+   "rumus": "Tanda [[majzum|majzum]] ada dua: [[sukun|sukun]] pada akhir [[fi'il mudhari'|fiil-mudhari]] yang huruf akhirnya kuat, atau dibuangnya huruf akhir bila huruf akhirnya huruf lemah.",
+   "example": {
+    "loc": "112:3:2"
+   },
+   "sumber": [
+    {
+     "page": "11371/5",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "8",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/5",
+     "quotes": [
+      "وللجَزمِ علامتان: السُّكُون, والحَذف",
+      "فأما السكون فيكون علامة للجزم في الفعل المضارع الصحيح الآخر",
+      "وأما الحذف فيكون علامة للجزم في الفعل المضارع المُعتَلِّ الآخِر"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "kana",
+   "lesson": "112:4",
+   "rumus": "[[Kāna|kana]] dan saudaranya masuk pada [[mubtada'|mubtada]] dan [[khabar|khabar]]: [[isimnya|isim]] menjadi [[marfu'|marfu]] dan [[khabarnya|khabar]] menjadi [[manshub|manshub]].",
+   "example": {
+    "loc": "112:4:2"
+   },
+   "sumber": [
+    {
+     "page": "11371/13",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "13",
+     "bab": "باب العوامل الداخلة على المبتدأ والخبر",
+     "url": "https://shamela.ws/book/11371/13",
+     "quotes": [
+      "فأما كان وأخواتها, فإنها ترفَعُ الاسمَ, وتَنصِبُ الخَبَرَ"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "fail-isim",
+   "lesson": "2:255/2",
+   "rumus": "[[Fa'il|fail]] bisa berupa [[isim|isim]] yang tertulis jelas atau berupa [[dhamir|dhamir]]. [[Fa'il|fail]] yang tertulis jelas adalah [[isim|isim]] [[marfu'|marfu]] yang disebut sesudah kata kerjanya.",
+   "sumber": [
+    {
+     "page": "11371/9",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "11",
+     "bab": "باب الفاعل",
+     "url": "https://shamela.ws/book/11371/9",
+     "quotes": [
+      "الفاعل هو: الاسم المرفوعُ المذكورُ قبلَهُ فِعلَهُ. وهو على قسمين: ظاهِر, ومُضمَر",
+      "فالظاهر نحو قولِك: قام زيدٌ"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "isim-isyarah",
+   "lesson": "2:255/4",
+   "rumus": "Kata tunjuk ([[isim|isim]] isyarah) termasuk [[ma'rifah|marifah]].",
+   "sumber": [
+    {
+     "page": "11371/15",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "14",
+     "bab": "باب النعت",
+     "url": "https://shamela.ws/book/11371/15",
+     "quotes": [
+      "والمَعرِفة خمسة أشياء: الاسم المُضمَرُ، نحو: أنا، وأنتَ، والاسم العَلَمُ، نحو: زيدٌ ومَكَّةَ، والاسم المُبْهَمُ، نحو: هذا وهذه وهؤلاء، والاسم الذي فيه الألف واللام، نحو: الرجُلُ والغلامُ، وما أُضِيفَ إلى واحد من هذه الأربعة"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "zharaf",
+   "lesson": "2:255/5",
+   "rumus": "[[Zharaf|zharaf]] ada dua: waktu dan tempat. Keduanya adalah [[isim|isim]] yang [[manshub|manshub]], dengan makna “di” atau “pada” yang tersirat.",
+   "sumber": [
+    {
+     "page": "11371/22",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "18",
+     "bab": "باب ظرف الزمان وظرف المكان",
+     "url": "https://shamela.ws/book/11371/22",
+     "quotes": [
+      "ظرفُ الزمان هو: اسم الزمان المنصوب بتقدير \"في\"",
+      "وظرف المكان هو: اسم المكان المنصوب بتقدير \"في\""
+     ]
+    }
+   ]
+  },
+  {
+   "step": "kasrah-manshub",
+   "lesson": "2:255/7",
+   "rumus": "Jamak mu'annats salim [[manshub|manshub]] dengan [[kasrah|kasrah]], bukan [[fathah|fathah]].",
+   "sumber": [
+    {
+     "page": "11371/4",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "7",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/4",
+     "quotes": [
+      "وأما الكسرة: فتكون علامة للنصب في جمع المؤنث السالم"
+     ]
+    },
+    {
+     "page": "11371/6",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "9",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/6",
+     "quotes": [
+      "جمع المؤنث السالم يُنصَبُ بالكسرة"
+     ]
+    }
+   ]
+  },
+  {
+   "step": "mutsanna",
+   "lesson": "2:255/8",
+   "rumus": "Mutsanna (kata untuk dua): [[marfu'|marfu]] dengan alif; [[manshub|manshub]] dan [[majrur|majrur]] dengan ya'.",
+   "sumber": [
+    {
+     "page": "11371/6",
+     "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+     "hlm": "9",
+     "bab": "باب معرفة علامات الإعراب",
+     "url": "https://shamela.ws/book/11371/6",
+     "quotes": [
+      "فأما التثنيةُ: فتُرفَعُ بالألف، وتُنصَبُ وتُخفَضُ بالياء"
+     ]
+    }
+   ]
+  }
+ ],
+ "data_versions": {
+  "pages": {
+   "6970/15": "e3c8886d5b36d5b3b800867e5d40210c474f73721de2b08b56310f7151bb8afa",
+   "11371/1": "a1543cf8dfa4b8d9be343ccbd61950a4ecb5c7b5e40256b0955778e1144f80e4",
+   "11371/2": "870935b97942dc099997b554eea6b50980efb56db01b3bdb5044bf22c6086e6d",
+   "11371/3": "355255f4bdf67c6a99afaea90d3f6c0cada6d4d8e8552dc240401360fad7d627",
+   "11371/4": "8109d5c8c1c3998377b07534e5c88384f3bf6b08930aed2951a2ec63433ce65b",
+   "11371/5": "aab31a48f743101d806452ce3e3e8ead48f05112e81577ba679f64226bb1b896",
+   "11371/6": "44f82960bcbd30924f2ad96dfb7015900ece398021cadcad78fc423ee37dd91e",
+   "11371/7": "0299ac590d3d32ff9ceb81255b9ee8a4f796e1ccf3cc8894b87004770eea5102",
+   "11371/9": "e490d97813a98dec833a2862bc73004126571f86746a2af8681df51aa1fe3f7f",
+   "11371/11": "483e378788dbc69e6127e6e69ecdc6159d09ac88623801f02723c1557e4fc961",
+   "11371/12": "5b8e06abe28b4de5b052ce470ee5cc4ef2c342409d641688965f8a44788a8d85",
+   "11371/13": "47c937de4152cb334e04699eb8ffd7e47c06bae0e395828e396566fc05d57470",
+   "11371/15": "c3f554eed9e58b010e7baed84b5f6017e7a827a139f15bf0a83766eda5da6111",
+   "11371/16": "780814645e83295a58812b59bfcbc60db8c11b3680b8ab42435dcc7db076cbac",
+   "11371/18": "b5b28f6ccc058ed72758bd4fc3be5b3097eaaa2a8cbc1cc268cf871f066335eb",
+   "11371/20": "d34face9e866a7a808994705eeda4d7aa5c105cfdccad160956e61fe85d22818",
+   "11371/22": "22ad6685bc1f9ad95a57596cb3c88b94b46fb58a3d5164b02ad7c38cc2b3ebef",
+   "11371/30": "86d9d699c90829f5706e508479dcb3364aa4cdb3fc5ee42297a4ca43c27bd818",
+   "11371/31": "c87feae120746da56e890f2d8b625253342948cc242d4bfe796e358af9ae9511"
+  },
+  "pipeline": "belajar/pipeline/build_rumus.py (stdlib only, no LLM)"
+ }
+}
