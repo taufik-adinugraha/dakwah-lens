@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import urllib.error
@@ -33,8 +34,12 @@ ENV_FILE = W.BELAJAR.parent / ".env"
 DEFAULT_OUT = W.BELAJAR / "pipeline" / "out" / "words"
 # A word is trimmed of the silence the model puts before and after it (a clean word is the point
 # of this module), with a few ms of fade so no click is left at either edge.
+# (A fade needs its edge: afade=t=out with no start time fades out at 0 s and leaves the rest
+# silent — the first version of this filter did, and every word came out as digital silence. The
+# fades are therefore fade-INs on the file and on its reverse.)
 TRIM = ("silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.03,areverse,"
-        "silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.05,areverse,afade=t=out:d=0.02")
+        "silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.05,"
+        "afade=t=in:d=0.02,areverse,afade=t=in:d=0.01")
 
 
 def api_key(env_file: Path) -> str:
@@ -62,6 +67,31 @@ def speak(key: str, text: str) -> bytes:
 
 def ffmpeg(*a: str) -> None:
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", *a], check=True)
+
+
+# A word is levelled to the narration's own average (the v3 lines measure about -16 dB mean), so
+# a word is neither lost in nor louder than the sentence around it; the limiter keeps a short
+# peaky word (a single letter) from clipping.
+TARGET_MEAN_DB = -16.0
+GAIN_RANGE = (-6.0, 9.0)
+
+
+def mean_db(path: Path) -> float:
+    r = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", str(path), "-af", "volumedetect", "-f", "null", "-"],
+                       capture_output=True, text=True).stderr
+    m = re.search(r"mean_volume: (-?[0-9.]+) dB", r)
+    if not m:
+        raise SystemExit(f"cannot measure the level of {path}")
+    return float(m.group(1))
+
+
+def encode(master: Path, final: Path) -> None:
+    """Trim, level, and encode once (the level is measured on the trimmed audio, not on the mp3)."""
+    tmp = final.with_suffix(".wav")
+    ffmpeg("-i", str(master), "-af", TRIM, "-ar", "44100", "-ac", "1", str(tmp))
+    gain = min(max(TARGET_MEAN_DB - mean_db(tmp), GAIN_RANGE[0]), GAIN_RANGE[1])
+    ffmpeg("-i", str(tmp), "-af", f"volume={gain:.1f}dB,alimiter=limit=0.89:level=disabled", "-b:a", "64k", str(final))
+    tmp.unlink()
 
 
 def duration_ms(path: Path) -> int:
@@ -96,6 +126,8 @@ def main() -> int:
     ap.add_argument("--env-file", default=str(ENV_FILE))
     ap.add_argument("--out", default=str(DEFAULT_OUT))
     ap.add_argument("--limit", type=int, default=0, help="record at most N texts (a trial)")
+    ap.add_argument("--reencode", action="store_true",
+                    help="with --render: encode every text again from its master (no API call, no spend)")
     a = ap.parse_args()
 
     inv, unresolved = W.inventory()
@@ -117,7 +149,7 @@ def main() -> int:
         return 0
 
     if a.render:
-        if not a.i_approve_spend:
+        if not a.i_approve_spend and not a.reencode:
             raise SystemExit("--render sends text to ElevenLabs and costs money: add --i-approve-spend once the operator has said go")
         if unresolved:
             raise SystemExit(f"unresolved runs: {', '.join(unresolved)}")
@@ -127,7 +159,11 @@ def main() -> int:
         (out / "master").mkdir(parents=True, exist_ok=True)
         deliv = out / "delivery" / "kang-nandar" / "words"
         deliv.mkdir(parents=True, exist_ok=True)
-        todo = [t for t, e in manifest["words"].items() if not e.get("audio")]
+        todo = [t for t, e in manifest["words"].items() if a.reencode or not e.get("audio")]
+        if a.reencode:
+            gone = [t for t in todo if not (out / "master" / f"{W.file_id(t)}.mp3").exists()]
+            if gone:
+                raise SystemExit(f"--reencode needs every master on disk; {len(gone)} are missing (it never sends text)")
         if a.limit:
             todo = todo[: a.limit]
         sent = 0
@@ -138,7 +174,7 @@ def main() -> int:
                 master.write_bytes(speak(key, t))
                 sent += len(t)
             final = deliv / f"{fid}.mp3"
-            ffmpeg("-i", str(master), "-af", TRIM, "-ar", "44100", "-ac", "1", "-b:a", "64k", str(final))
+            encode(master, final)
             ms = duration_ms(final)
             manifest["words"][t]["audio"] = {"url": W.url_of(t), "ms": ms, "sha256": hashlib.sha256(final.read_bytes()).hexdigest()}
             W.MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
