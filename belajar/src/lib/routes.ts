@@ -66,6 +66,13 @@ export const wordAnchorId = (loc: string) => `w-${loc.replaceAll(":", "-")}`;
 export const curriculumHref = () => `/${QURAN}/kurikulum`;
 
 /**
+ * The cheat sheet, "Rumus singkat": one short formula per step of the basic curriculum, each beside
+ * the kitab sentence it restates (docs/belajar-plan.md L32). A static segment beside [surah], like
+ * the curriculum page's: no surah slug may be "rumus" (src/lib/routes.test.ts).
+ */
+export const rumusHref = () => `/${QURAN}/rumus`;
+
+/**
  * The page of ONE lesson of the basic curriculum (content/curriculum.json
  * `lessons`), or null: the lesson has no page. Every link the curriculum page
  * draws to a lesson is built here, and nowhere else.

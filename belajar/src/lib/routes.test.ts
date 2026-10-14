@@ -11,6 +11,7 @@ import {
   lessonHref,
   lexemeHref,
   quranHref,
+  rumusHref,
   SURAH_SLUGS,
   surahHref,
   warisHref,
@@ -79,6 +80,15 @@ describe("the curriculum page and its lesson links (plan L30)", () => {
     expect(SURAH_SLUGS as readonly string[]).not.toContain(segment);
     // … nor the track's other static segment, its share card.
     expect(segment).not.toBe("og");
+  });
+
+  it("the cheat sheet sits beside them: one more static segment, no surah's", () => {
+    expect(rumusHref()).toBe("/quran/rumus");
+    expect(rumusHref().startsWith(`${quranHref()}/`)).toBe(true);
+    const segment = rumusHref().slice(quranHref().length + 1);
+    expect(SURAH_SLUGS as readonly string[]).not.toContain(segment);
+    expect(segment).not.toBe("og");
+    for (const other of [curriculumHref(), introHref()]) expect(other.slice(quranHref().length + 1)).not.toBe(segment);
   });
 
   it("builds a lesson's link in ONE place: an ayah lesson of a surah with pages, the introduction, and nothing else", () => {

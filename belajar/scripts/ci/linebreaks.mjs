@@ -4,7 +4,9 @@
 //
 // Every page a learner reaches by its links — the hub, the track, the curriculum page the track
 // links (plan L30: every unit, lesson and step name of the basic curriculum, the next level's
-// list), each surah and ayah it links
+// list), the cheat sheet it links too (plan L32: "Rumus singkat", each formula with its Arabic
+// terms, its example word and the kitab's own quoted sentences in right-to-left blocks), each
+// surah and ayah it links
 // (every ayah closed, then with every disclosure open), the Konsep index and every concept, every
 // Kosakata entry linked from those, the fact cards' ayah dialog (the longest ayah a card locates,
 // one with footnotes, the first chip) — and the autoplay lesson stage step by step (Al-Fatihah 1 with
@@ -95,10 +97,14 @@ const MAX_PRINTED = 600;
  *  inline Arabic), an ayah page with every disclosure open (word cards, Rujukan) and the
  *  curriculum page (a long list of step names with their Arabic: how it reads on a phone at the
  *  largest size is looked at by eye, too). */
-const SHOTS = { "surah al-fatihah": "surah", "ayah al-fatihah/2 (open)": "ayah-2-open", kurikulum: "kurikulum" };
+const SHOTS = { "surah al-fatihah": "surah", "ayah al-fatihah/2 (open)": "ayah-2-open", kurikulum: "kurikulum", rumus: "rumus" };
 /** The curriculum page (src/lib/routes.ts curriculumHref): a page of the track beside the surahs'
  *  own segment, so its address has the shape of a surah's and is told apart by name. */
 const CURRICULUM = "/belajar/id/quran/kurikulum";
+/** The cheat sheet (src/lib/routes.ts rumusHref, plan L32): the same shape of address, the same
+ *  rule — measured as a page of its own, never taken for a surah. The shot at the largest size is
+ *  the one the operator's phone question is about (a long list of formulas and Arabic quotes). */
+const RUMUS = "/belajar/id/quran/rumus";
 const SURAH_PATH = /^\/belajar\/id\/quran\/[^/]+$/;
 const AYAH_PATH = /^\/belajar\/id\/quran\/[^/]+\/\d+$/;
 
@@ -190,23 +196,28 @@ async function staticPages(page, vp) {
     ["hub", "/belajar/id"],
     ["track", "/belajar/id/quran"],
     ["kurikulum", CURRICULUM],
+    ["rumus", RUMUS],
   ];
   const surahs = [];
   const ayat = new Set();
   let intro = false;
   let curriculumLinked = false;
+  let rumusLinked = false;
   if (await open(page, vp, "/belajar/id/quran"))
     for (const p of await paths(page, 'main a[href*="/quran/"]')) {
       // Lesson zero and the curriculum page are no surahs, though their addresses look like one:
       // left out of the surah harvest, each measured as a page of its own.
       if (p === INTRO_PATH) intro = true;
       else if (p === CURRICULUM) curriculumLinked = true;
+      else if (p === RUMUS) rumusLinked = true;
       else if (SURAH_PATH.test(p)) surahs.push(p);
       else if (AYAH_PATH.test(p)) ayat.add(p);
     }
   // "Reached by its links": the track must link the curriculum page.
   if (!curriculumLinked)
     record({ page: "/belajar/id/quran", viewport: vp, size: "-", kind: "nothing-measured", where: "track", detail: "the track does not link the curriculum page", text: "" });
+  if (!rumusLinked)
+    record({ page: "/belajar/id/quran", viewport: vp, size: "-", kind: "nothing-measured", where: "track", detail: "the track does not link the cheat sheet (rumus)", text: "" });
   for (const s of surahs) {
     if (!(await open(page, vp, s))) continue;
     for (const p of await paths(page, 'main a[href*="/quran/"]')) if (AYAH_PATH.test(p)) ayat.add(p);

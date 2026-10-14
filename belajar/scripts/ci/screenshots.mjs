@@ -8,7 +8,9 @@
 // (operator, 2026-10-10: the Mu'awwidzat "segera hadir", not clickable),
 // including the 404 a hidden waris or surah URL answers, the "Segera hadir"
 // cards (checked: no link, nothing to focus), the curriculum page (checked:
-// only reachable lessons are links, the others say "Belum tersedia") and the end of Al-Fatihah
+// only reachable lessons are links, the others say "Belum tersedia"), the cheat sheet "Rumus
+// singkat" (checked: a formula only for an available lesson, each with the kitab's quoted
+// sentences byte for byte, none of a hidden surah's) and the end of Al-Fatihah
 // (checked: the next surah is coming soon, nothing to click, no move).
 // `--waris`: only the Ilmu Waris pages, from a container started with
 // BELAJAR_WARIS=on. `--surahs`: the Mu'awwidzat lessons, from a container
@@ -37,11 +39,14 @@ const ZERO_AYAH = 0;
 const lessonPath = (ayah) => (ayah === ZERO_AYAH ? INTRO : `/belajar/id/quran/al-fatihah/${ayah}`);
 // The basic curriculum's page (plan L30; src/lib/routes.ts curriculumHref).
 const CURRICULUM = "/belajar/id/quran/kurikulum";
+// The cheat sheet "Rumus singkat" (plan L32; src/lib/routes.ts rumusHref).
+const RUMUS = "/belajar/id/quran/rumus";
 const PAGES = [
   ["hub", "/belajar/id"],
   ["track", "/belajar/id/quran"],
   ["pengantar", INTRO],
   ["kurikulum", CURRICULUM],
+  ["rumus", RUMUS],
   ["surah", "/belajar/id/quran/al-fatihah"],
   ["ayah-2", AYAH_2],
   ["ayah-7", "/belajar/id/quran/al-fatihah/7"],
@@ -61,6 +66,8 @@ const SURAH_PAGES = [
   ["track-semua-surah", "/belajar/id/quran"],
   // The curriculum page with the Mu'awwidzat lessons as links.
   ["kurikulum-semua-surah", CURRICULUM],
+  // … and the cheat sheet with every written lesson's formula drawn.
+  ["rumus-semua-surah", RUMUS],
   ["ikhlas-1", "/belajar/id/quran/al-ikhlas/1"],
   ["nas-6", "/belajar/id/quran/an-nas/6"],
 ];
@@ -519,6 +526,7 @@ async function ogShots(request) {
   for (const [name, path] of [
     ["og-hub-id", "/belajar/id/og"],
     ["og-kurikulum-id", `${CURRICULUM}/og`],
+    ["og-rumus-id", `${RUMUS}/og`],
     ["og-al-fatihah-1-id", "/belajar/id/quran/al-fatihah/1/og"],
   ]) {
     const res = await request.get(BASE + path);
@@ -776,6 +784,29 @@ async function comingSoonCheck(page, vp) {
 }
 
 /**
+ * Which lessons of content/curriculum.json a visitor can open in a run: a written ayah of a
+ * published surah (`surahsOn`: every surah with lesson pages; else all but HIDDEN_SURAHS) and the
+ * introduction (lesson "0") while it is written and the surah that hosts it is published. ONE rule
+ * for the curriculum page's links and the cheat sheet's formulas (src/lib/curriculumOutline.ts
+ * lessonLink is what the app asks for both), so the two checks cannot drift.
+ */
+async function reachability(surahsOn) {
+  const file = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "curriculum.json"), "utf8"));
+  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8"));
+  const mark = msgs.Curriculum?.unavailable;
+  if (!mark) throw new Error("messages/id.json has no Curriculum.unavailable");
+  const slugOf = Object.fromEntries(file.units.map((u) => [u.id, u.slug ?? null]));
+  // Lesson zero's host: the surah whose harakat primer is played there (src/lib/curriculum.ts ZERO_HOST).
+  const zeroHost = (await Promise.all(Object.values(slugOf).filter(Boolean).map(async (slug) => [slug, JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", `${slug}.json`), "utf8").catch(() => "null"))]))).find(([, c]) => c?.primer?.lesson === "0")?.[0] ?? null;
+  const on = (slug) => !!slug && (surahsOn || !HIDDEN_SURAHS.includes(slug));
+  const reachable = (l) => {
+    if (l.id === "0") return !!l.map && on(zeroHost);
+    return on(slugOf[l.unit]) && l.ayah !== undefined && l.segment === undefined && !!l.map;
+  };
+  return { file, msgs, mark, slugOf, reachable };
+}
+
+/**
  * The curriculum page as a browser draws it (operator, 2026-10-13: "we should also explain this
  * curriculum in the page"; plan L30), against content/curriculum.json: every lesson of the file
  * is listed once, in its order; a lesson visitors can reach — a written ayah of a published surah
@@ -790,18 +821,7 @@ async function comingSoonCheck(page, vp) {
  * otherwise.
  */
 async function curriculumCheck(page, vp, surahsOn) {
-  const file = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "curriculum.json"), "utf8"));
-  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8"));
-  const mark = msgs.Curriculum?.unavailable;
-  if (!mark) throw new Error("messages/id.json has no Curriculum.unavailable");
-  const slugOf = Object.fromEntries(file.units.map((u) => [u.id, u.slug ?? null]));
-  // Lesson zero's host: the surah whose harakat primer is played there (src/lib/curriculum.ts ZERO_HOST).
-  const zeroHost = (await Promise.all(Object.values(slugOf).filter(Boolean).map(async (slug) => [slug, JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", `${slug}.json`), "utf8").catch(() => "null"))]))).find(([, c]) => c?.primer?.lesson === "0")?.[0] ?? null;
-  const on = (slug) => !!slug && (surahsOn || !HIDDEN_SURAHS.includes(slug));
-  const reachable = (l) => {
-    if (l.id === "0") return !!l.map && on(zeroHost);
-    return on(slugOf[l.unit]) && l.ayah !== undefined && l.segment === undefined && !!l.map;
-  };
+  const { file, msgs, mark, slugOf, reachable } = await reachability(surahsOn);
   await page.goto(BASE + CURRICULUM, { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
   const rows = await page.locator("main [data-lesson]").evaluateAll((els) =>
@@ -852,6 +872,157 @@ async function curriculumCheck(page, vp, surahsOn) {
   await setTextSizeAttr(page, null);
   if (problems.length) throw new Error(`${vp}: curriculum page — ${problems.join("; ")}`);
   console.log(`  ${vp}: curriculum page ok (${rows.length} lessons in the file's order, ${linked} linked, ${rows.length - linked} "${mark}" as plain text${surahsOn ? "" : ", no link into a hidden surah"})`);
+  await page.goto("about:blank");
+}
+
+/**
+ * The cheat sheet "Rumus singkat" as a browser draws it (operator, 2026-10-13: "we can make some
+ * 'cheat sheet' to explain the rules … of course we need to refer to valid kitab"; 2026-10-14:
+ * "release cheat sheet"; plan L32), against content/rumus.json and content/curriculum.json:
+ *   1. every step of the curriculum is listed once, in teaching order;
+ *   2. a step whose lesson a visitor can open (`reachability`) shows its formula iff the file has
+ *      one — else "Rumus belum tersedia"; its quoted kitab sentences are the file's, byte for byte,
+ *      each in a right-to-left block at the 24px floor, with its Shamela link, and its example
+ *      links one ayah of its own lesson; a step whose lesson is not available names itself, says
+ *      "Belum tersedia" and shows no formula, no quote and no link;
+ *   3. as production shows it, no byte of a hidden surah's formula is on the page and no link
+ *      leads into a hidden surah;
+ *   4. at the largest text size nothing scrolls sideways (phone: shot);
+ *   5. printed (print media): the header and the page's own controls are gone, the footer (with the
+ *      AI label) stays, and every step is kept whole. Desktop saves the page as a PDF too.
+ * Fails the job otherwise.
+ */
+async function rumusCheck(page, vp, surahsOn) {
+  const { file, mark, slugOf, reachable } = await reachability(surahsOn);
+  const rumus = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "rumus.json"), "utf8"));
+  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8"));
+  const none = msgs.Rumus?.none;
+  if (!none) throw new Error("messages/id.json has no Rumus.none");
+  const lessonOf = Object.fromEntries(file.lessons.map((l) => [l.id, l]));
+  const entry = Object.fromEntries(rumus.steps.map((e) => [e.step, e]));
+  await page.goto(BASE + RUMUS, { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+  const rows = await page.locator("main [data-rumus-step]").evaluateAll((els) =>
+    els.map((e) => {
+      const status = e.querySelector("[data-rumus-status]");
+      const box = status ? status.getBoundingClientRect() : null;
+      const sources = [...e.querySelectorAll("[data-rumus-source]")].map((s) => ({
+        page: s.getAttribute("data-rumus-source"),
+        quotes: [...s.querySelectorAll("[data-rumus-quote]")].map((q) => ({
+          text: (q.textContent ?? "").trim(),
+          lang: q.getAttribute("lang"),
+          dir: q.getAttribute("dir"),
+          size: parseFloat(getComputedStyle(q).fontSize),
+        })),
+        shamela: [...s.querySelectorAll("a[data-rumus-shamela]")].map((a) => a.getAttribute("href")),
+      }));
+      const formula = e.querySelector("[data-rumus-formula]");
+      const fbox = formula ? formula.getBoundingClientRect() : null;
+      return {
+        id: e.getAttribute("data-rumus-step"),
+        state: e.getAttribute("data-rumus-state"),
+        formula: formula && fbox.width > 0 && fbox.height > 0 ? (formula.textContent ?? "").trim() : null,
+        none: !!e.querySelector("[data-rumus-none]"),
+        status: status && box.width > 0 && box.height > 0 ? (status.textContent ?? "").trim() : null,
+        focusable: status ? status.querySelectorAll("a, button, input, select, textarea, summary, [tabindex]").length : 0,
+        example: e.querySelector("[data-rumus-example]")?.getAttribute("data-rumus-example") ?? null,
+        links: [...e.querySelectorAll('a[href*="/quran/"]')].map((a) => a.getAttribute("href")),
+        sources,
+      };
+    }),
+  );
+  const problems = [];
+  const want = file.steps.map((s) => s.id);
+  if (JSON.stringify(rows.map((r) => r.id)) !== JSON.stringify(want)) problems.push(`lists ${rows.length} step(s), not the ${want.length} of content/curriculum.json in its order`);
+  let shown = 0;
+  for (const s of file.steps) {
+    const r = rows.find((x) => x.id === s.id);
+    if (!r) continue;
+    const l = lessonOf[s.lesson];
+    const e = entry[s.id];
+    if (!reachable(l)) {
+      if (r.state !== "locked") problems.push(`${s.id}: state ${r.state}, expected locked (its lesson is not available)`);
+      if (r.status !== mark) problems.push(`${s.id}: no visible "${mark}" (got ${JSON.stringify(r.status)})`);
+      if (r.focusable > 0) problems.push(`${s.id}: ${r.focusable} focusable element(s) inside its "${mark}" label`);
+      if (r.formula !== null || r.sources.length > 0 || r.example !== null || r.links.length > 0) problems.push(`${s.id}: a step that is not available shows a formula, a source, an example or a link`);
+      continue;
+    }
+    if (!e) {
+      if (r.state !== "none" || !r.none) problems.push(`${s.id}: no formula in the file but the page says ${r.state} (expected "${none}")`);
+      if (r.formula !== null || r.sources.length > 0) problems.push(`${s.id}: shows a formula or a source that the file does not have`);
+      continue;
+    }
+    shown++;
+    if (r.state !== "shown" || !r.formula) problems.push(`${s.id}: state ${r.state}, no visible formula (the file has one)`);
+    if ((r.example ?? null) !== (e.example?.loc ?? null)) problems.push(`${s.id}: example ${r.example}, the file's is ${e.example?.loc ?? "none"}`);
+    if (e.example) {
+      const [surah, ayah] = e.example.loc.split(":");
+      const slug = file.units.find((u) => String(u.surah) === surah && u.slug)?.slug;
+      const want = `/belajar/id/quran/${slug}/${ayah}#w-${e.example.loc.replaceAll(":", "-")}`;
+      if (!r.links.includes(want)) problems.push(`${s.id}: the example does not link ${want}`);
+    }
+    if (JSON.stringify(r.sources.map((x) => x.page)) !== JSON.stringify(e.sumber.map((x) => x.page))) problems.push(`${s.id}: sources ${JSON.stringify(r.sources.map((x) => x.page))}, the file's are ${JSON.stringify(e.sumber.map((x) => x.page))}`);
+    e.sumber.forEach((src, k) => {
+      const got = r.sources[k];
+      if (!got) return;
+      if (JSON.stringify(got.quotes.map((q) => q.text)) !== JSON.stringify(src.quotes)) problems.push(`${s.id}: the quotes of ${src.page} are not the file's, byte for byte`);
+      for (const q of got.quotes) {
+        if (q.lang !== "ar" || q.dir !== "rtl") problems.push(`${s.id}: a quote of ${src.page} is not lang="ar" dir="rtl"`);
+        if (q.size < 23.5) problems.push(`${s.id}: a quote of ${src.page} is drawn at ${q.size}px (< 24px)`);
+      }
+      if (JSON.stringify(got.shamela) !== JSON.stringify([src.url])) problems.push(`${s.id}: the Shamela link of ${src.page} is ${JSON.stringify(got.shamela)}, the file's is ${src.url}`);
+    });
+  }
+  if (shown === 0) problems.push("no formula is shown");
+  // 3. nothing of a hidden surah, as production shows it
+  if (!surahsOn) {
+    for (const slug of HIDDEN_SURAHS) {
+      const n = await page.locator(`a[href^="/belajar/id/quran/${slug}"]`).count();
+      if (n > 0) problems.push(`${n} link(s) into the hidden ${slug}`);
+    }
+    const body = await page.evaluate(() => document.body.innerText);
+    for (const e of rumus.steps) {
+      const l = lessonOf[e.lesson];
+      if (reachable(l)) continue;
+      const shownElsewhere = rumus.steps.some((o) => reachable(lessonOf[o.lesson]) && o.sumber.some((x) => x.quotes.some((oq) => e.sumber.some((y) => y.quotes.some((q) => oq.includes(q))))));
+      if (shownElsewhere) continue;
+      for (const src of e.sumber) for (const q of src.quotes) if (body.includes(q)) problems.push(`${e.step}: a quote of its hidden lesson is on the page (${src.page})`);
+    }
+  }
+  // 4. the largest text size
+  await setTextSizeAttr(page, "sangat-besar");
+  const wide = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth }));
+  if (wide.scroll > wide.inner + 1) problems.push(`scrolls sideways at the largest text size (${wide.scroll} > ${wide.inner})`);
+  if (vp === "phone") {
+    const name = surahsOn ? "rumus-semua-surah-sangat-besar" : "rumus-sangat-besar";
+    await page.screenshot({ path: `shots/${vp}-${name}.png`, fullPage: true });
+    console.log(`shot ${vp}-${name} (${RUMUS}, text size sangat-besar)`);
+  }
+  await setTextSizeAttr(page, null);
+  // 5. printed
+  await page.emulateMedia({ media: "print" });
+  const printed = await page.evaluate(() => {
+    const shown = (el) => !!el && getComputedStyle(el).display !== "none" && el.getBoundingClientRect().height > 0;
+    return {
+      header: shown(document.querySelector("body > header")),
+      hidden: [...document.querySelectorAll("[data-rumus-sheet] [data-print-hide]")].filter(shown).length,
+      sheet: shown(document.querySelector("[data-rumus-sheet]")),
+      footer: shown(document.querySelector("body > footer")),
+      keep: [...document.querySelectorAll("[data-rumus-step]")].every((e) => getComputedStyle(e).breakInside === "avoid"),
+    };
+  });
+  if (printed.header) problems.push("printed: the site header is still drawn");
+  if (printed.hidden > 0) problems.push(`printed: ${printed.hidden} control(s) marked data-print-hide are still drawn`);
+  if (!printed.sheet) problems.push("printed: the sheet is not drawn");
+  if (!printed.footer) problems.push("printed: the footer (with the AI label) is not drawn");
+  if (!printed.keep) problems.push("printed: a step may be cut across pages (break-inside is not avoid)");
+  if (vp === "desktop" && !surahsOn) {
+    await page.pdf({ path: `shots/${vp}-rumus-cetak.pdf`, format: "A4", printBackground: false });
+    console.log(`shot ${vp}-rumus-cetak.pdf (${RUMUS}, print media)`);
+  }
+  await page.emulateMedia({ media: "screen" });
+  if (problems.length) throw new Error(`${vp}: cheat sheet — ${problems.join("; ")}`);
+  console.log(`  ${vp}: cheat sheet ok (${rows.length} steps in the file's order, ${shown} with a formula${surahsOn ? "" : ", no byte of a hidden surah's"}, printable)`);
   await page.goto("about:blank");
 }
 
@@ -3752,6 +3923,7 @@ try {
     }
     if (SURAHS_ON) {
       await curriculumCheck(page, vp, true);
+      await rumusCheck(page, vp, true);
       await endCardShots(page, vp, true);
       await ctx.close();
       continue;
@@ -3797,6 +3969,7 @@ try {
     await composeFitSweep(page, vp, "sangat-besar", [ZERO_AYAH, 1, 2, 3, 4, 5, 6, 7], units);
     await comingSoonCheck(page, vp);
     await curriculumCheck(page, vp, false);
+    await rumusCheck(page, vp, false);
     await endCardShots(page, vp, false);
     await ctx.close();
   }

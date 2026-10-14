@@ -1,0 +1,443 @@
+{
+ "_comment": "THE CHEAT SHEET, \"Rumus singkat\" (operator 2026-10-13: \"we can make some 'cheat sheet' to explain the rules, for example: harf jar + ism = kasrah (give examples), isim followed by another ism is mudhof ilaih etc. this cheat sheet is explained also along with formal explanation\" and \"of course we need to refer to valid kitab, my example is just example\"; 2026-10-14: \"release cheat sheet\"). One entry per curriculum STEP id that has a formula the kitab states: `rumus` (and `awas`, only where its own claim is a quoted sentence) in the Konsep records' markup, held to the term rule of the lessons — a term of a later lesson is pointed to with {{di:<step id>}}; `sumber`: a pinned page (sources.json shamela_istilah) and, per sentence, `match`, the FOLDED anchor (consonants only) of the kitab's sentence. The quote that is SHOWN is the pinned page's own bytes, found by the anchor (rumus.py); nothing Arabic is typed here but an anchor. A step with no entry has no formula the matn states yet (the page says \"Rumus belum tersedia\"): harakat (the signs' sounds are SKB 158/1987, not the matn), murab-mabni and isim-maushul (their kitab sentences are in Ibnu Hisyam and Ibnu 'Aqil and have to be quoted first), mudzakkar-muannats, istitsna, la-nafi, istifham (no kitab sentence pinned). docs/belajar-research/rumus-singkat.md has the draft table and the reasons.",
+ "version": 1,
+ "steps": {
+  "kalimah": {
+   "rumus": "Tanda [[isim]]: [[tanwin]], alif lam di depannya, kata depan di depannya, dan satu tanda lagi yang kita pelajari {{di:majrur}}. Tanda [[fi'il]]: qad, sin, saufa, atau ta' penanda perempuan yang mati. [[Huruf]] adalah kata yang tidak punya tanda [[isim]] maupun tanda [[fi'il]].",
+   "sumber": [
+    {
+     "page": "11371/1",
+     "match": [
+      "فالاسم يعرف بالخفض والتنوين ودخول الالف واللام وحروف الخفض",
+      "والفعل يعرف بقد والسين وسوف وتاء التانيث الساكنة",
+      "والحرف ما لا يصلح معه دليل الاسم ولا دليل الفعل"
+     ]
+    }
+   ]
+  },
+  "majrur": {
+   "rumus": "[[Isim]] [[majrur]] umumnya berakhir [[kasrah]]. Ada tiga sebab sebuah [[isim]] menjadi [[majrur]]: (1) didahului [[huruf jar]]; (2) disandarkan kepada [[isim]] lain, kita pelajari {{di:idhafah}}; (3) mengikuti kata yang [[majrur]], kita mulai {{di:naat}}.",
+   "awas": "Jamak laki-laki beraturan [[majrur]] dengan ya', bukan [[kasrah]] (kita pelajari {{di:jamak-mudzakkar-salim}}).",
+   "sumber": [
+    {
+     "page": "11371/4",
+     "match": [
+      "فاما الكسرة فتكون علامة للخفض في ثلاثة مواضع في الاسم المفرد المنصرف وجمع التكسير المنصرف وفي جمع المؤنث السالم"
+     ]
+    },
+    {
+     "page": "11371/6",
+     "match": [
+      "وكلها ترفع بالضمة وتنصب بالفتحة وتخفض بالكسرة وتجزم بالسكون",
+      "واما جمع المذكر السالم فيرفع بالواو وينصب ويخفض بالياء"
+     ]
+    },
+    {
+     "page": "11371/30",
+     "match": [
+      "المخفوضات ثلاثة انواع مخفوض بالحرف ومخفوض بالاضافة وتابع للمخفوض"
+     ]
+    }
+   ]
+  },
+  "huruf-jar": {
+   "rumus": "[[Isim]] yang didahului [[huruf jar]] menjadi [[majrur]]. [[Huruf jar]] antara lain: [[min]], [[ilā]], [[‘an]], [[‘alā]], [[fī]], [[rubba]], huruf ba', kaf, dan lam.",
+   "sumber": [
+    {
+     "page": "11371/31",
+     "match": [
+      "فاما المخفوض بالحرف فهو ما يخفض بمن والي وعن وعلي وفي ورب والباء والكاف واللام وبحروف القسم وهي الواو والباء والتاء وبواو رب وبمذ ومنذ"
+     ]
+    }
+   ]
+  },
+  "jumlah-ismiyyah": {
+   "rumus": "[[Mubtada']] adalah [[isim]] [[marfu']] yang tidak didahului kata yang mempengaruhi akhirannya. [[Khabar]] adalah [[isim]] [[marfu']] yang menjadi berita tentang [[mubtada']] itu. [[Khabar]] bisa berupa satu [[isim]], atau berupa [[jar-majrur]].",
+   "sumber": [
+    {
+     "page": "11371/11",
+     "match": [
+      "المبتدا هو الاسم المرفوع العاري عن العوامل اللفظية والخبر هو الاسم المرفوع المسند اليه"
+     ]
+    },
+    {
+     "page": "11371/12",
+     "match": [
+      "والخبر قسمان مفرد وغير مفرد",
+      "وغير المفرد اربعة اشياء الجار والمجرور والظرف والفعل مع فاعله والمبتدا مع خبره"
+     ]
+    }
+   ]
+  },
+  "marfu": {
+   "rumus": "[[Isim]] [[marfu']] umumnya berakhir [[dhammah]]. [[Mubtada']] dan [[khabar]] selalu [[marfu']].",
+   "awas": "[[Jamak mudzakkar salim]] [[marfu']] dengan wawu, bukan [[dhammah]].",
+   "sumber": [
+    {
+     "page": "11371/3",
+     "match": [
+      "فاما الضمة فتكون علامة للرفع في اربعة مواضع في الاسم المفرد وجمع التكسير وجمع المؤنث السالم والفعل المضارع الذي لم يتصل باخره شيء"
+     ]
+    },
+    {
+     "page": "11371/6",
+     "match": [
+      "وكلها ترفع بالضمة وتنصب بالفتحة وتخفض بالكسرة وتجزم بالسكون",
+      "واما جمع المذكر السالم فيرفع بالواو وينصب ويخفض بالياء"
+     ]
+    },
+    {
+     "page": "11371/11",
+     "match": [
+      "المبتدا هو الاسم المرفوع العاري عن العوامل اللفظية والخبر هو الاسم المرفوع المسند اليه"
+     ]
+    }
+   ]
+  },
+  "jamak-mudzakkar-salim": {
+   "rumus": "[[Jamak mudzakkar salim]] (jamak laki-laki beraturan): [[marfu']] dengan wawu; pada keadaan lainnya, termasuk [[majrur]], dengan ya'.",
+   "sumber": [
+    {
+     "page": "11371/6",
+     "match": [
+      "واما جمع المذكر السالم فيرفع بالواو وينصب ويخفض بالياء"
+     ]
+    }
+   ]
+  },
+  "alif-lam": {
+   "rumus": "[[Isim]] yang memakai alif lam adalah [[ma'rifah]] (tertentu). Nama diri juga [[ma'rifah]], tanpa alif lam.",
+   "awas": "Alif lam bukan satu-satunya tanda [[ma'rifah]]: ada lima jenis, yaitu kata ganti, nama diri, kata tunjuk, [[isim]] yang memakai alif lam, dan [[isim]] yang disandarkan kepada salah satu dari empat itu.",
+   "sumber": [
+    {
+     "page": "11371/15",
+     "match": [
+      "والمعرفة خمسة اشياء الاسم المضمر نحو انا وانت والاسم العلم نحو زيد ومكة والاسم المبهم نحو هذا وهذه وهؤلاء والاسم الذي فيه الالف واللام نحو الرجل والغلام وما اضيف الي واحد من هذه الاربعة"
+     ]
+    }
+   ]
+  },
+  "naat": {
+   "rumus": "[[Na't]] mengikuti kata yang disifatinya ([[man'ut]]): akhirannya sama, dan sama tertentu atau tidaknya.",
+   "sumber": [
+    {
+     "page": "11371/15",
+     "match": [
+      "النعت تابع للمنعوت في رفعه ونصبه وخفضه وتعريفه وتنكيره"
+     ]
+    }
+   ]
+  },
+  "idhafah": {
+   "rumus": "Dalam [[idhafah]], kata kedua ([[mudhaf ilaih]]) selalu [[majrur]].",
+   "sumber": [
+    {
+     "page": "11371/30",
+     "match": [
+      "المخفوضات ثلاثة انواع مخفوض بالحرف ومخفوض بالاضافة وتابع للمخفوض"
+     ]
+    },
+    {
+     "page": "11371/31",
+     "match": [
+      "واما ما يخفض بالاضافة فنحو قولك غلام زيد"
+     ]
+    }
+   ]
+  },
+  "dhamir": {
+   "rumus": "[[Dhamir]] (kata ganti) ada dua jenis: [[muttashil]] (menempel pada kata lain) dan [[munfashil]] (berdiri sendiri). Masing-masing ada dua belas bentuk.",
+   "sumber": [
+    {
+     "page": "11371/20",
+     "match": [
+      "والمضمر قسمان متصل ومنفصل",
+      "فالمتصل اثنا عشر",
+      "والمنفصل اثنا عشر"
+     ]
+    }
+   ]
+  },
+  "fiil-mudhari": {
+   "rumus": "[[Fi'il mudhari']] diawali salah satu dari empat huruf: hamzah, nun, ya', atau ta'. Ia selalu [[marfu']], berakhir [[dhammah]] bila tidak ada apa pun yang bersambung di akhirnya, sampai ada kata yang masuk padanya dan mengubahnya (kita pelajari {{di:nafi-lam}}).",
+   "sumber": [
+    {
+     "page": "11371/3",
+     "match": [
+      "فاما الضمة فتكون علامة للرفع في اربعة مواضع في الاسم المفرد وجمع التكسير وجمع المؤنث السالم والفعل المضارع الذي لم يتصل باخره شيء"
+     ]
+    },
+    {
+     "page": "11371/7",
+     "match": [
+      "والمضارع ما كان في اوله احدي الزوائد الاربع التي يجمعها قولك انيت وهو مرفوع ابدا حتي يدخل عليه ناصب او جازم"
+     ]
+    }
+   ]
+  },
+  "jumlah-filiyyah": {
+   "rumus": "[[Fa'il]] adalah [[isim]] [[marfu']] yang kata kerjanya disebut sebelum dia. [[Fa'il]] ada dua: tertulis jelas, atau berupa [[dhamir]].",
+   "sumber": [
+    {
+     "page": "11371/9",
+     "match": [
+      "الفاعل هو الاسم المرفوع المذكور قبله فعله وهو علي قسمين ظاهر ومضمر"
+     ]
+    }
+   ]
+  },
+  "maful-bih": {
+   "rumus": "[[Maf'ul bih]] adalah [[isim]] [[manshub]] yang dikenai perbuatan kata kerja.",
+   "sumber": [
+    {
+     "page": "11371/20",
+     "match": [
+      "وهو الاسم المنصوب الذي يقع به الفعل"
+     ]
+    }
+   ]
+  },
+  "manshub": {
+   "rumus": "[[Isim]] [[manshub]] umumnya berakhir [[fathah]]. [[Isim]] punya tiga keadaan: [[marfu']] ([[dhammah]]), [[manshub]] ([[fathah]]), [[majrur]] ([[kasrah]]).",
+   "awas": "Jamak mu'annats salim [[manshub]] dengan [[kasrah]], bukan [[fathah]] (kita pelajari {{di:jamak-muannats-salim}}).",
+   "sumber": [
+    {
+     "page": "11371/2",
+     "match": [
+      "فللاسماء من ذلك الرفع والنصب والخفض ولا جزم فيها"
+     ]
+    },
+    {
+     "page": "11371/4",
+     "match": [
+      "فاما الفتحة فتكون علامة للنصب في ثلاثة مواضع في الاسم المفرد وجمع التكسير والفعل المضارع اذا دخل عليه ناصب ولم يتصل باخره شيء",
+      "واما الكسرة فتكون علامة للنصب في جمع المؤنث السالم"
+     ]
+    },
+    {
+     "page": "11371/6",
+     "match": [
+      "وكلها ترفع بالضمة وتنصب بالفتحة وتخفض بالكسرة وتجزم بالسكون",
+      "جمع المؤنث السالم ينصب بالكسرة"
+     ]
+    }
+   ]
+  },
+  "fiil-madhi": {
+   "rumus": "[[Fi'il madhi]] (kata kerja lampau): akhirnya selalu [[fathah]].",
+   "awas": "Bila kata ganti pelaku yang berharakat bersambung padanya, huruf akhirnya terbaca [[sukun]]; bila wawu jamak bersambung padanya, terbaca [[dhammah]].",
+   "sumber": [
+    {
+     "page": "11371/7",
+     "match": [
+      "فالماضي مفتوح الاخر ابدا"
+     ]
+    },
+    {
+     "page": "6970/15",
+     "match": [
+      "وقد يخرج عنه الي الضم وذلك اذا اتصلت به واو الجماعة كقولك قاموا وقعدوا او الي السكون وذلك اذا اتصل به الضمير المرفوع المتحرك"
+     ]
+    }
+   ]
+  },
+  "athaf": {
+   "rumus": "Kata yang disambung dengan [[huruf 'athaf]] seperti wawu (“dan”) mengikuti akhiran kata sebelumnya: yang disambung ke kata [[marfu']] menjadi [[marfu']], ke kata [[manshub]] menjadi [[manshub]], ke kata [[majrur]] menjadi [[majrur]].",
+   "sumber": [
+    {
+     "page": "11371/16",
+     "match": [
+      "وحروف العطف عشرة وهي الواو والفاء وثم",
+      "فان عطفت بها علي مرفوع رفعت او علي منصوب نصبت او علي مخفوض خفضت او علي مجزوم جزمت"
+     ]
+    }
+   ]
+  },
+  "fiil-amr": {
+   "rumus": "[[Fi'il amr]] (bentuk perintah) selalu berada dalam keadaan [[i'rab]] yang keempat, yang kita pelajari {{di:majzum}}.",
+   "sumber": [
+    {
+     "page": "11371/2",
+     "match": [
+      "واقسامه اربعة رفع ونصب وخفض وجزم"
+     ]
+    },
+    {
+     "page": "11371/7",
+     "match": [
+      "والامر مجزوم ابدا"
+     ]
+    }
+   ]
+  },
+  "badal": {
+   "rumus": "Jika sebuah [[isim]] menjadi [[badal]] dari [[isim]] lain (atau [[fi'il]] dari [[fi'il]]), ia mengikuti seluruh [[i'rab]] kata yang digantikannya.",
+   "sumber": [
+    {
+     "page": "11371/18",
+     "match": [
+      "اذا ابدل اسم من اسم او فعل من فعل تبعه في جميع اعرابه"
+     ]
+    }
+   ]
+  },
+  "jamak-taksir": {
+   "rumus": "Jamak taksir umumnya sama seperti [[isim]] tunggal: [[marfu']] dengan [[dhammah]], [[manshub]] dengan [[fathah]], [[majrur]] dengan [[kasrah]].",
+   "sumber": [
+    {
+     "page": "11371/3",
+     "match": [
+      "فاما الضمة فتكون علامة للرفع في اربعة مواضع في الاسم المفرد وجمع التكسير وجمع المؤنث السالم والفعل المضارع الذي لم يتصل باخره شيء"
+     ]
+    },
+    {
+     "page": "11371/4",
+     "match": [
+      "فاما الفتحة فتكون علامة للنصب في ثلاثة مواضع في الاسم المفرد وجمع التكسير والفعل المضارع اذا دخل عليه ناصب ولم يتصل باخره شيء",
+      "فاما الكسرة فتكون علامة للخفض في ثلاثة مواضع في الاسم المفرد المنصرف وجمع التكسير المنصرف وفي جمع المؤنث السالم"
+     ]
+    }
+   ]
+  },
+  "tanwin-nakirah": {
+   "rumus": "[[Tanwin]] adalah tanda [[isim]]. [[Nakirah]] adalah [[isim]] yang umum, tidak menunjuk satu saja; ciri mudahnya: bisa dimasuki alif lam.",
+   "sumber": [
+    {
+     "page": "11371/1",
+     "match": [
+      "فالاسم يعرف بالخفض والتنوين ودخول الالف واللام وحروف الخفض"
+     ]
+    },
+    {
+     "page": "11371/15",
+     "match": [
+      "والنكرة كل اسم شائع في جنسه لا يختص به واحد دون اخر وتقريبه كل ما صلح دخول الالف واللام عليه"
+     ]
+    }
+   ]
+  },
+  "jamak-muannats-salim": {
+   "rumus": "Jamak mu'annats salim: [[marfu']] dengan [[dhammah]], [[majrur]] dengan [[kasrah]], dan [[manshub]] juga dengan [[kasrah]], bukan [[fathah]].",
+   "sumber": [
+    {
+     "page": "11371/3",
+     "match": [
+      "فاما الضمة فتكون علامة للرفع في اربعة مواضع في الاسم المفرد وجمع التكسير وجمع المؤنث السالم والفعل المضارع الذي لم يتصل باخره شيء"
+     ]
+    },
+    {
+     "page": "11371/4",
+     "match": [
+      "فاما الكسرة فتكون علامة للخفض في ثلاثة مواضع في الاسم المفرد المنصرف وجمع التكسير المنصرف وفي جمع المؤنث السالم",
+      "واما الكسرة فتكون علامة للنصب في جمع المؤنث السالم"
+     ]
+    },
+    {
+     "page": "11371/6",
+     "match": [
+      "جمع المؤنث السالم ينصب بالكسرة"
+     ]
+    }
+   ]
+  },
+  "nafi-lam": {
+   "rumus": "[[Fi'il mudhari']] yang didahului huruf [[nafi]] “tidak” seperti pada contoh di bawah menjadi [[majzum]], karena huruf itu termasuk [[jazim]].",
+   "sumber": [
+    {
+     "page": "11371/7",
+     "match": [
+      "والجوازم ثمانية عشر وهي لم لما",
+      "وهو مرفوع ابدا حتي يدخل عليه ناصب او جازم"
+     ]
+    }
+   ]
+  },
+  "majzum": {
+   "rumus": "Tanda [[majzum]] ada dua: [[sukun]] pada akhir [[fi'il mudhari']] yang huruf akhirnya kuat, atau dibuangnya huruf akhir bila huruf akhirnya huruf lemah.",
+   "sumber": [
+    {
+     "page": "11371/5",
+     "match": [
+      "وللجزم علامتان السكون والحذف",
+      "فاما السكون فيكون علامة للجزم في الفعل المضارع الصحيح الاخر",
+      "واما الحذف فيكون علامة للجزم في الفعل المضارع المعتل الاخر"
+     ]
+    }
+   ]
+  },
+  "kana": {
+   "rumus": "[[Kāna]] dan saudaranya masuk pada [[mubtada']] dan [[khabar]]: [[isimnya|isim]] menjadi [[marfu']] dan [[khabarnya|khabar]] menjadi [[manshub]].",
+   "sumber": [
+    {
+     "page": "11371/13",
+     "match": [
+      "فاما كان واخواتها فانها ترفع الاسم وتنصب الخبر"
+     ]
+    }
+   ]
+  },
+  "fail-isim": {
+   "rumus": "[[Fa'il]] bisa berupa [[isim]] yang tertulis jelas atau berupa [[dhamir]]. [[Fa'il]] yang tertulis jelas adalah [[isim]] [[marfu']] yang disebut sesudah kata kerjanya.",
+   "sumber": [
+    {
+     "page": "11371/9",
+     "match": [
+      "الفاعل هو الاسم المرفوع المذكور قبله فعله وهو علي قسمين ظاهر ومضمر",
+      "فالظاهر نحو قولك قام زيد"
+     ]
+    }
+   ]
+  },
+  "isim-isyarah": {
+   "rumus": "Kata tunjuk ([[isim]] isyarah) termasuk [[ma'rifah]].",
+   "sumber": [
+    {
+     "page": "11371/15",
+     "match": [
+      "والمعرفة خمسة اشياء الاسم المضمر نحو انا وانت والاسم العلم نحو زيد ومكة والاسم المبهم نحو هذا وهذه وهؤلاء والاسم الذي فيه الالف واللام نحو الرجل والغلام وما اضيف الي واحد من هذه الاربعة"
+     ]
+    }
+   ]
+  },
+  "zharaf": {
+   "rumus": "[[Zharaf]] ada dua: waktu dan tempat. Keduanya adalah [[isim]] yang [[manshub]], dengan makna “di” atau “pada” yang tersirat.",
+   "sumber": [
+    {
+     "page": "11371/22",
+     "match": [
+      "ظرف الزمان هو اسم الزمان المنصوب بتقدير في",
+      "وظرف المكان هو اسم المكان المنصوب بتقدير في"
+     ]
+    }
+   ]
+  },
+  "kasrah-manshub": {
+   "rumus": "Jamak mu'annats salim [[manshub]] dengan [[kasrah]], bukan [[fathah]].",
+   "sumber": [
+    {
+     "page": "11371/4",
+     "match": [
+      "واما الكسرة فتكون علامة للنصب في جمع المؤنث السالم"
+     ]
+    },
+    {
+     "page": "11371/6",
+     "match": [
+      "جمع المؤنث السالم ينصب بالكسرة"
+     ]
+    }
+   ]
+  },
+  "mutsanna": {
+   "rumus": "Mutsanna (kata untuk dua): [[marfu']] dengan alif; [[manshub]] dan [[majrur]] dengan ya'.",
+   "sumber": [
+    {
+     "page": "11371/6",
+     "match": [
+      "فاما التثنية فترفع بالالف وتنصب وتخفض بالياء"
+     ]
+    }
+   ]
+  }
+ }
+}

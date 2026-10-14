@@ -12,7 +12,8 @@
 //     on any page;
 //   - the bridges in the static HTML (hub, track, the two inside "Materi lengkap ayat ini") with the
 //     main-site addresses verified by page title (src/lib/mainSite.ts), written out here again;
-//   - og:* / twitter:* on the hub, the track, the curriculum page (plan L30) and every published
+//   - og:* / twitter:* on the hub, the track, the curriculum page (plan L30), the cheat sheet
+//     (plan L32) and every published
 //     lesson: og:url = the canonical link, the image = the page's own /og card; the pages stay
 //     noindex;
 //   - every card: 200, image/png, a real PNG of 1200×630; unknown lessons' cards 404; nothing
@@ -211,7 +212,12 @@ for (const locale of ["id", "en"]) {
   const curriculum = await chrome(curriculumPath, locale);
   await shareMeta(curriculumPath, curriculum, { card: `${curriculumPath}/og` });
 
-  for (const card of [`${hubPath}/og`, `${trackPath}/og`, `${curriculumPath}/og`]) if (await cardImage(card)) ok(`${card}: 1200×630 PNG`);
+  // The cheat sheet "Rumus singkat" (plan L32): the same, its own card.
+  const rumusPath = `/belajar/${locale}/quran/rumus`;
+  const rumus = await chrome(rumusPath, locale);
+  await shareMeta(rumusPath, rumus, { card: `${rumusPath}/og` });
+
+  for (const card of [`${hubPath}/og`, `${trackPath}/og`, `${curriculumPath}/og`, `${rumusPath}/og`]) if (await cardImage(card)) ok(`${card}: 1200×630 PNG`);
 
   // Every lesson: its og tags name its own card, and the card is drawn.
   let cards = 0;

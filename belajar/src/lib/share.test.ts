@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { BRIDGES, MAIN_PAGES, mainSiteHref } from "./mainSite";
-import { ayahHref, curriculumHref, hubHref, quranHref, SURAH_SLUGS } from "./routes";
+import { ayahHref, curriculumHref, hubHref, quranHref, rumusHref, SURAH_SLUGS } from "./routes";
 import { alternatesFor, lessonShareable, ogImageUrl, pageUrl, shareMetadata, shareUrl, whatsappHref } from "./share";
 
 // Brand, bridges to the main site and sharing (operator, 2026-10-10: "we hope this feature can
@@ -59,6 +59,9 @@ describe("sharing (lib/share.ts)", () => {
     // The curriculum page (plan L30): its address and its own card, in its own folder.
     expect(pageUrl("en", curriculumHref())).toBe("https://dakwah-lens.id/belajar/en/quran/kurikulum");
     expect(ogImageUrl("id", curriculumHref())).toBe("https://dakwah-lens.id/belajar/id/quran/kurikulum/og");
+    // … and the cheat sheet's (plan L32), the same way.
+    expect(pageUrl("en", rumusHref())).toBe("https://dakwah-lens.id/belajar/en/quran/rumus");
+    expect(ogImageUrl("id", rumusHref())).toBe("https://dakwah-lens.id/belajar/id/quran/rumus/og");
     expect(ogImageUrl("id", ayahHref("al-fatihah", 1))).toBe("https://dakwah-lens.id/belajar/id/quran/al-fatihah/1/og");
     const url = pageUrl("id", ayahHref("al-fatihah", 1));
     expect(shareUrl(url, "share")).toBe(`${url}?utm_source=share&utm_medium=share`);
@@ -98,6 +101,11 @@ describe("sharing (lib/share.ts)", () => {
     expect(curriculum).toContain("alternates: alternatesFor(locale, curriculumHref())");
     expect(curriculum).toContain("path: curriculumHref(),");
     expect(existsSync(join(BELAJAR, "src/app/[locale]", `${curriculumHref().slice(1)}/og/route.ts`))).toBe(true);
+    // The cheat sheet's too (plan L32).
+    const rumus = read("src/app/[locale]/quran/rumus/page.tsx");
+    expect(rumus).toContain("alternates: alternatesFor(locale, rumusHref())");
+    expect(rumus).toContain("path: rumusHref(),");
+    expect(existsSync(join(BELAJAR, "src/app/[locale]", `${rumusHref().slice(1)}/og/route.ts`))).toBe(true);
   });
 
   it("has the same message keys in both locales, every namespace", () => {

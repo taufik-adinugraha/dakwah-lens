@@ -44,7 +44,10 @@
     "p3_body": "Penjelasan disusun dengan bantuan AI dari kitab yang disebut namanya. Ini bahan belajar, bukan fatwa: periksa rujukannya, dan tanyakan kepada guru bila ragu.",
     "curriculum_heading": "Kurikulum tingkat dasar",
     "curriculum_body": "Pelajaran disusun bertahap: paling banyak {max} hal baru di setiap pelajaran, dan yang sudah dipelajari diulang setiap kali muncul lagi. Lihat urutannya, dari pelajaran pengantar sampai {last}.",
-    "curriculum_link": "Lihat kurikulum tingkat dasar"
+    "curriculum_link": "Lihat kurikulum tingkat dasar",
+    "rumus_heading": "Rumus singkat",
+    "rumus_body": "Satu rumus pendek untuk setiap hal yang dipelajari, dengan contoh dari pelajaran dan kalimat kitab yang mendasarinya.",
+    "rumus_link": "Lihat rumus singkat"
   },
   "Curriculum": {
     "title": "Kurikulum tingkat dasar",
@@ -68,7 +71,8 @@
     "open_segment": "Buka pelajaran {unit} penggalan {n}",
     "open_intro": "Buka pelajaran pengantar",
     "next_heading": "Tingkat lanjut",
-    "next_body": "{n} topik berikut belum diajarkan di tingkat dasar: seluruh ilmu sharaf (perubahan bentuk kata) dan beberapa topik nahwu lanjutan. Di pelajaran tingkat dasar topik ini hanya disebut namanya; klik sebuah topik untuk membaca penjelasannya di halaman Konsep."
+    "next_body": "{n} topik berikut belum diajarkan di tingkat dasar: seluruh ilmu sharaf (perubahan bentuk kata) dan beberapa topik nahwu lanjutan. Di pelajaran tingkat dasar topik ini hanya disebut namanya; klik sebuah topik untuk membaca penjelasannya di halaman Konsep.",
+    "rumus_link": "Rumus singkat untuk setiap hal yang dipelajari"
   },
   "Breadcrumb": {
     "label": "Anda berada di",
@@ -111,7 +115,32 @@
     "image_alt": "Belajar Bahasa Arab Al-Qur'an, dari Dakwah-Lens",
     "lesson_image_alt": "{surah} · Ayat {n}: transliterasi dan terjemahan, Belajar Bahasa Arab Al-Qur'an dari Dakwah-Lens",
     "curriculum_title": "Kurikulum tingkat dasar",
-    "curriculum_body": "Urutan pelajaran tingkat dasar: yang baru di setiap pelajaran, dan yang sudah dipelajari sampai di situ."
+    "curriculum_body": "Urutan pelajaran tingkat dasar: yang baru di setiap pelajaran, dan yang sudah dipelajari sampai di situ.",
+    "rumus_title": "Rumus singkat Bahasa Arab Al-Qur'an",
+    "rumus_body": "Satu rumus pendek untuk setiap hal yang dipelajari, dengan contoh dan kalimat kitab yang mendasarinya."
+  },
+  "Rumus": {
+    "title": "Rumus singkat",
+    "description": "Rumus singkat tata bahasa Arab tingkat dasar: satu rumus pendek untuk setiap hal yang dipelajari, dengan contoh dari pelajaran dan kalimat kitab yang mendasarinya.",
+    "intro_what": "Rumus singkat adalah ringkasan pendek dari setiap hal yang dipelajari di tingkat dasar, untuk dipegang sambil membaca. Setiap rumus disertai satu contoh dari pelajaran.",
+    "intro_sources": "Setiap rumus menyatakan ulang satu kalimat dari kitab yang disebut di bawahnya, pada bagian “Dasar”, lengkap dengan halamannya dan kutipan kalimat kitab itu. Hal yang belum punya kalimat kitab yang bisa dikutip belum diberi rumus.",
+    "intro_label": "Dibantu AI, bukan fatwa otoritatif. Rumus ini disusun dari kitab yang disebut di bawahnya; periksa rujukannya.",
+    "intro_with_lesson": "Rumus singkat melengkapi penjelasan lengkap di pelajaran dan di halaman Konsep; ia tidak menggantikannya.",
+    "curriculum_link": "Lihat urutan pelajarannya di kurikulum tingkat dasar",
+    "list_heading": "Rumus untuk setiap hal yang dipelajari",
+    "list_help": "Urutannya sama dengan urutan pelajaran. Saat ini {shown} rumus tersedia dari {steps} hal yang dipelajari; hal dari bacaan yang belum tersedia bertanda “belum tersedia” di kartunya.",
+    "unit_meta": "{shown} rumus tersedia, {steps} hal yang dipelajari",
+    "taught_in": "Dipelajari di: {place}",
+    "none": "Rumus belum tersedia.",
+    "none_hint": "Belum ada kalimat kitab yang bisa dikutip untuk hal ini.",
+    "awas": "Awas:",
+    "example": "Contoh dari pelajaran",
+    "example_open": "Buka {unit} ayat {ayah}, kata ke-{n}",
+    "basis": "Dasar",
+    "page": "hlm. {page}",
+    "section": "Bagian:",
+    "shamela": "Buka halaman di Shamela",
+    "shamela_label": "Buka halaman {page} dari {kitab} di Shamela"
   },
   "Credits": {
     "title": "Sumber & lisensi",

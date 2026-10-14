@@ -13,6 +13,12 @@
 // surah is published, every other lesson is plain text marked "Belum tersedia", and nothing on
 // the page, rendered or in the RSC payload, leads into a hidden surah.
 //
+// And the cheat sheet (/quran/rumus, "Rumus singkat"; plan L32), which lists every STEP of that
+// curriculum: rumusPage() holds it to content/rumus.json and to the switch — a step of an
+// available lesson shows its formula (or says it has none), every other step is named and marked
+// "Belum tersedia", and no byte of a hidden surah's formula, quoted sentence or example link is in
+// the response, rendered or in the RSC payload.
+//
 // Text checks read the VISIBLE text: <script>, <style> and <template> bodies are removed first,
 // because next-intl serialises the whole message catalogue ("Segera hadir" included) into every
 // page's scripts. Link checks read the whole response: an <a href="/belajar/id/quran/al-ikhlas">,
@@ -45,6 +51,7 @@ const SURAH = Object.fromEntries(await Promise.all(SLUGS.map(async (slug) => [sl
 const BY_NUMBER = Object.fromEntries(SLUGS.map((slug) => [SURAH[slug].surah, slug]));
 const LIBRARY = await readJson("content/library.json");
 const CURRICULUM = await readJson("content/curriculum.json");
+const RUMUS = await readJson("content/rumus.json");
 // LESSON ZERO ("Pengantar", src/lib/routes.ts introHref): the surah that hosts it is the one whose
 // harakat primer is played there (content/compose/<slug>.json `primer.lesson` "0"; src/lib/
 // curriculum.ts ZERO_HOST), and its page may be linked only while that surah is published
@@ -238,6 +245,94 @@ async function curriculumPage(published, hidden) {
   }
 }
 
+/**
+ * The cheat sheet (/belajar/{locale}/quran/rumus) with `published` surahs visible and `hidden` ones
+ * not, both locales:
+ *   - every step of content/curriculum.json is listed once, in the file's order (data-rumus-step);
+ *   - a step is "shown" when its lesson is available (the curriculum page's rule: curriculumPage's
+ *     `reachable`) and content/rumus.json has its formula, "none" when it is available and the
+ *     file has none ("Rumus belum tersedia"), "locked" when its lesson is not available;
+ *   - a shown step's formula, its example's link and every quoted sentence of its sources are in
+ *     the visible text, byte for byte; "Belum tersedia" is there once per locked step;
+ *   - no locked step's formula or quoted sentence is anywhere in the response (rendered text, and
+ *     the RSC payload by the opening of each sentence), and nothing links into a hidden surah.
+ */
+async function rumusPage(published, hidden) {
+  const slugOf = Object.fromEntries(CURRICULUM.units.map((u) => [u.id, u.slug ?? null]));
+  const lessonOf = Object.fromEntries(CURRICULUM.lessons.map((l) => [l.id, l]));
+  const reachable = (l) => {
+    if (l.id === "0") return !!l.map && ZERO_HOST !== null && published.includes(ZERO_HOST);
+    const slug = slugOf[l.unit];
+    return !!slug && published.includes(slug) && l.ayah !== undefined && l.segment === undefined && !!l.map;
+  };
+  const entry = Object.fromEntries(RUMUS.steps.map((e) => [e.step, e]));
+  const plain = (s) => s.replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, "$1");
+  const open = RUMUS.steps.filter((e) => reachable(lessonOf[e.lesson]));
+  const openQuotes = open.flatMap((e) => e.sumber.flatMap((s) => s.quotes));
+  const openProse = open.map((e) => plain(`${e.rumus} ${e.awas ?? ""}`));
+  for (const locale of ["id", "en"]) {
+    const path = `/belajar/${locale}/quran/rumus`;
+    const { status, html } = await get(path);
+    console.log(`${path} -> ${status}`);
+    if (status !== 200) {
+      fail(path, `status ${status}, expected 200`);
+      continue;
+    }
+    const rows = [...html.matchAll(/<li\b[^>]*\bdata-rumus-step="([^"]+)" data-rumus-state="(shown|none|locked)"/g)].map((m) => ({ id: m[1], state: m[2] }));
+    const want = CURRICULUM.steps.map((s) => s.id);
+    if (JSON.stringify(rows.map((r) => r.id)) !== JSON.stringify(want)) {
+      fail(path, `lists ${rows.length} step(s), not the ${want.length} of content/curriculum.json in its order`);
+    }
+    const text = visibleText(mainOf(html));
+    let shown = 0;
+    let locked = 0;
+    for (const s of CURRICULUM.steps) {
+      const row = rows.find((r) => r.id === s.id);
+      if (!row) continue;
+      const e = entry[s.id];
+      const expected = !reachable(lessonOf[s.lesson]) ? "locked" : e ? "shown" : "none";
+      if (row.state !== expected) fail(path, `step ${s.id} is ${row.state}, expected ${expected}`);
+      if (expected === "locked") locked++;
+      if (expected !== "shown" || !e) continue;
+      shown++;
+      for (const src of e.sumber) {
+        for (const q of src.quotes) if (!text.includes(q)) fail(path, `step ${s.id}: the quoted sentence of ${src.page} is not on the page byte for byte`);
+        if (!html.includes(`href="${src.url}"`)) fail(path, `step ${s.id}: no link to ${src.url}`);
+      }
+      if (e.example) {
+        const [surah, ayah] = e.example.loc.split(":");
+        const slug = CURRICULUM.units.find((u) => String(u.surah) === surah && u.slug)?.slug;
+        const href = `href="/belajar/${locale}/quran/${slug}/${ayah}#w-${e.example.loc.replaceAll(":", "-")}"`;
+        if (!html.includes(href)) fail(path, `step ${s.id}: no example link (${href})`);
+      }
+    }
+    if (shown === 0) fail(path, "shows no formula at all");
+    noLinkInto(path, html, hidden);
+    const mark = MSG[locale].Curriculum.unavailable;
+    if (count(text, mark) !== locked) fail(path, `"${mark}" shown ${count(text, mark)} time(s), expected ${locked}`);
+    // The locked steps' words are nowhere: not rendered, not in the payload.
+    let leaks = 0;
+    for (const e of RUMUS.steps) {
+      if (reachable(lessonOf[e.lesson])) continue;
+      for (const src of e.sumber) {
+        for (const q of src.quotes) {
+          if (openQuotes.some((o) => o.includes(q))) continue;
+          if (text.includes(q) || (!openQuotes.some((o) => o.includes(q.slice(0, 24))) && html.includes(q.slice(0, 24)))) {
+            fail(path, `step ${e.step}: a quoted sentence of its unavailable lesson is in the response (${src.page})`);
+            leaks++;
+          }
+        }
+      }
+      const lead = plain(e.rumus.split("[[")[0]).trim();
+      if (locale === "id" && lead.length >= 15 && !openProse.some((p) => p.includes(lead)) && text.includes(lead)) {
+        fail(path, `step ${e.step}: its formula ("${lead}…") is on the page though its lesson is not available`);
+        leaks++;
+      }
+    }
+    console.log(`  ${shown} formula(s) shown, ${locked} step(s) marked "${mark}"${leaks ? `, ${leaks} LEAK(S)` : ", none of an unavailable lesson's"}`);
+  }
+}
+
 async function api(expected) {
   const res = await fetch(`${BASE}/belajar/api/surahs`);
   const body = await res.json().catch(() => null);
@@ -348,12 +443,14 @@ async function checkHidden() {
       else if (tag.toLowerCase() === "a") fail(path, `the "Segera hadir" card of ${u.id} is a link`);
       if (!text.includes(unitLabel(locale, u))) fail(path, `the card of ${u.id} does not say "${unitLabel(locale, u)}"`);
     }
-    // … and it links the curriculum page (plan L30).
+    // … and it links the curriculum page (plan L30) and the cheat sheet (plan L32).
     if (!html.includes(`href="/belajar/${locale}/quran/kurikulum"`)) fail(path, "no link to the curriculum page");
+    if (!html.includes(`href="/belajar/${locale}/quran/rumus"`)) fail(path, "no link to the cheat sheet");
   }
 
   // 4b. The curriculum page names the hidden surahs as plain text: no lesson of theirs is a link.
   await curriculumPage(DEFAULT, hidden);
+  await rumusPage(DEFAULT, hidden);
 
   // 5. The hub: "Tersedia sekarang" names the published surahs only, "Segera hadir" the others.
   for (const locale of ["id", "en"]) {
@@ -499,6 +596,7 @@ async function checkShown() {
   }
   // The curriculum page links every written lesson now; Ayat Kursi and the introduction stay plain.
   await curriculumPage(SLUGS, []);
+  await rumusPage(SLUGS, []);
   for (const locale of ["id", "en"]) {
     const track = await get(`/belajar/${locale}/quran`);
     if (/\bdata-coming-soon=/.test(track.html)) fail(`/belajar/${locale}/quran`, 'a "Segera hadir" card of a surah with every surah published');

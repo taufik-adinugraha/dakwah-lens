@@ -15,7 +15,7 @@ import { SURAHS } from "@/lib/content";
 import { CURRICULUM, ZERO_HOST } from "@/lib/curriculum";
 import { DEFAULT_SURAHS } from "@/lib/features";
 import { LIBRARY, TERMS } from "@/lib/library";
-import { curriculumHref, introHref, SURAH_SLUGS } from "@/lib/routes";
+import { curriculumHref, introHref, rumusHref, SURAH_SLUGS } from "@/lib/routes";
 import { Scope, termDisplay, titleParts } from "@/lib/terms";
 import { ARABIC_RUN, hasArabic } from "@/lib/textUnits";
 
@@ -471,6 +471,19 @@ describe("the track page introduces the curriculum and links to it", () => {
       expect(visible(html)).toContain(tqu("coming_unit", { name: "Ayat Kursi", surah: "Al-Baqarah", ayah: 255 }));
       for (const slug of HIDDEN) expect(html, slug).not.toMatch(linkInto(slug));
     }
+  });
+});
+
+describe("the page links the cheat sheet (plan L32)", () => {
+  it("one link in the header to /quran/rumus, in the page's words, through the route helper", async () => {
+    for (const locale of ["id", "en"] as const) {
+      const html = await curriculum(locale);
+      const links = anchors(html).filter((a) => "data-rumus-link" in a);
+      expect(links.map((a) => [a.href, a.text])).toEqual([[`/belajar/${locale}${rumusHref()}`, MSG[locale].Curriculum.rumus_link]]);
+      // In the header, before the list of lessons.
+      expect(html.indexOf("data-rumus-link")).toBeLessThan(html.indexOf("data-lesson="));
+    }
+    expect(read("src/app/[locale]/quran/kurikulum/page.tsx")).toContain("href={rumusHref()}");
   });
 });
 

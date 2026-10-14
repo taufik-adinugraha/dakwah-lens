@@ -13,7 +13,7 @@ import { SURAHS } from "@/lib/content";
 import { CURRICULUM, introOpen } from "@/lib/curriculum";
 import { visibleSurahs } from "@/lib/features";
 import { surahNamesFor } from "@/lib/ayat";
-import { ayahHref, curriculumHref, surahHref } from "@/lib/routes";
+import { ayahHref, curriculumHref, rumusHref, surahHref } from "@/lib/routes";
 import { pageUrl, shareMetadata } from "@/lib/share";
 
 /** This page's path, lib/routes.ts quranHref() (src/lib/share.test.ts holds them equal), for
@@ -255,6 +255,14 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
           </p>
           <Link href={curriculumHref()} data-curriculum-link="" className="btn-secondary mt-4">
             <span>{t("curriculum_link")}</span>
+            <ArrowRight aria-hidden className="h-5 w-5 shrink-0 text-forest" />
+          </Link>
+          {/* Beside it, the cheat sheet (plan L32): one sentence and ONE link. */}
+          <p className="mt-6 max-w-prose text-pretty text-base text-ink">
+            <MixedText text={t("rumus_body")} />
+          </p>
+          <Link href={rumusHref()} data-rumus-link="" className="btn-secondary mt-4">
+            <span>{t("rumus_link")}</span>
             <ArrowRight aria-hidden className="h-5 w-5 shrink-0 text-forest" />
           </Link>
         </section>
