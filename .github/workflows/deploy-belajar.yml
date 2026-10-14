@@ -324,6 +324,12 @@ jobs:
         run: python3 pipeline/validate_clips.py --no-corpus
       - name: Example voices — validator mutation tests (corpus-free)
         run: python3 pipeline/test_validate_clips.py --no-corpus
+      # One recording per Qur'anic word and form (pipeline/wordvoice.py): the manifest is derived
+      # from the lesson and library content, so a new word with no entry fails here.
+      - name: Word voices — manifest up to date
+        run: python3 pipeline/build_wordvoice.py --check
+      - name: Word voices — planted-fault tests
+        run: python3 pipeline/test_validate_wordvoice.py
 
       # Ilmu Waris M1 (docs/waris-plan.md §10). Research-phase parity: the
       # belajar copies of the test vectors and of dalil.json must equal the
