@@ -51,6 +51,8 @@ class PlainLetters(unittest.TestCase):
         ina = "\u0627\u0644\u0630\u0651\u064E\u0650\u064A\u0646\u064E"
         self.assertEqual(W.say_of(ina), ina + " \u06D4")
         self.assertEqual(W.say_of("\u0645\u0650\u0646\u064E"), "\u0645\u0650\u0646\u064E")  # mina: not -ina
+        jinnati = "\u0627\u0644\u0652\u062C\u0650\u0646\u0651\u064E\u062A\u0650"
+        self.assertEqual(W.say_of(jinnati), jinnati + " \u06D4")  # an open ta with a kasrah
         qala = "\u0642\u064E\u0627\u0644\u064E"
         self.assertEqual(W.say_of(qala), "\u0642\u064E\u0627\u0627\u0644\u064E")  # the operator's pick: two alifs
         self.assertEqual(W.say_of(W.plain(WORD_ADDALLINA)), "ad-dhoooolliin")  # Latin, the operator's pick (L5)

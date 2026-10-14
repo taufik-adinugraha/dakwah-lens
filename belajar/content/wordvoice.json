@@ -295,10 +295,11 @@
    }
   },
   "النَّفَّاثَاتِ": {
+   "say": "النَّفَّاثَاتِ ۔",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/d5730477a5b8dc13-6faf0a7b42.mp3",
-    "ms": 1097,
-    "sha256": "6faf0a7b42becba26b25c5ee97bbe28b3fa6c2b36fe909d6349a6193842d1b76"
+    "url": "/belajar/media/narration/kang-nandar/words/d5730477a5b8dc13-7c894ece13.mp3",
+    "ms": 1045,
+    "sha256": "7c894ece133c4baa45384e6648d7e224d9b4ea2f60946ed68863cd8a1504395d"
    }
   },
   "الَّذِي": {
@@ -331,10 +332,11 @@
    }
   },
   "الْجِنَّتِ": {
+   "say": "الْجِنَّتِ ۔",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/57a487cceca8e725-7b8f0e0073.mp3",
-    "ms": 705,
-    "sha256": "7b8f0e0073ff139cdbb756addb8c117559bc37c6f41f73d47acbdfc75a496bc4"
+    "url": "/belajar/media/narration/kang-nandar/words/57a487cceca8e725-a4b945fe4f.mp3",
+    "ms": 888,
+    "sha256": "a4b945fe4faaeb206f2b39ffa2b2791f7bdcd9338d955040236628fcce984218"
    }
   },
   "الْحَمْدُ": {
@@ -659,10 +661,11 @@
    }
   },
   "شَرِّ النَّفَّاثَاتِ": {
+   "say": "شَرِّ النَّفَّاثَاتِ ۔",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/52c7bc8f1c45c0a5-5c3febd314.mp3",
-    "ms": 1411,
-    "sha256": "5c3febd31487d647248b25262f292f45b9c6add4c964fb975ac1f6e3a74339ed"
+    "url": "/belajar/media/narration/kang-nandar/words/52c7bc8f1c45c0a5-a2a8bab7d2.mp3",
+    "ms": 1202,
+    "sha256": "a2a8bab7d2e95e74106d1db11ce99d2c0c131b73f66514594eb52ec04fc3f41b"
    }
   },
   "شَرِّ الْوَسْوَاسِ": {
@@ -1093,10 +1096,11 @@
    }
   },
   "مِنَ الْجِنَّتِ": {
+   "say": "مِنَ الْجِنَّتِ ۔",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/f5f3502b069362c0-214b00c2bc.mp3",
+    "url": "/belajar/media/narration/kang-nandar/words/f5f3502b069362c0-55a4c24e4d.mp3",
     "ms": 1019,
-    "sha256": "214b00c2bc8a1e44ff19aada39b3da577d141958eea4b97c835e3a1c9bee37b2"
+    "sha256": "55a4c24e4d104b642458e0a6bcce0c876946f8d8b1216ee576c5403564ec1186"
    }
   },
   "مِنَ الْجِنَّتِ وَالنَّاسِ": {

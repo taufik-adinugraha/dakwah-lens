@@ -93,7 +93,7 @@ def plain(text: str) -> str:
 
 
 # ------------------------------------------------ what is SENT for a text (the manifest key stays the plain text)
-DAL, SUKUN, KASRA = "\u062F", "\u0652", "\u0650"
+DAL, SUKUN, KASRA, TA = "\u062F", "\u0652", "\u0650", "\u062A"
 PLURAL_INA = "\u064A\u0646\u064E"   # ya + nun + fathah: -ina
 STOP = " \u06D4"                       # space + the Arabic full stop
 # Per-text overrides, each decided by the operator's ear (a spelling cannot be derived from the
@@ -146,6 +146,11 @@ def say_of(text: str) -> str:
     # a full stop after it keeps the vowel (operator 2026-10-14, #109 1:7:1-2: "+ titik Arab" of
     # five tries, over a comma, the connected reading and a second seed).
     if text.endswith(PLURAL_INA):
+        return text + STOP
+    # The same for an open ta with a kasrah (al-jinnati, written ة before `plain`): the kasrah was
+    # lost at the end of the text ("aljinnat"); "1 kata + titik Arab" of seven tries (operator
+    # 2026-10-14).
+    if text.endswith(TA + KASRA):
         return text + STOP
     return text
 
