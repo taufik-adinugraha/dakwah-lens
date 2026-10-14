@@ -127,7 +127,7 @@
     "intro_with_lesson": "Rumus singkat melengkapi penjelasan lengkap di pelajaran dan di halaman Konsep; ia tidak menggantikannya.",
     "curriculum_link": "Lihat urutan pelajarannya di kurikulum tingkat dasar",
     "list_heading": "Rumus untuk setiap hal yang dipelajari",
-    "list_help": "Urutannya sama dengan urutan pelajaran. Saat ini {shown} rumus tersedia dari {steps} hal yang dipelajari; hal dari bacaan yang belum tersedia bertanda “Belum tersedia”.",
+    "list_help": "Urutannya sama dengan urutan pelajaran. Saat ini {shown} rumus tersedia dari {steps} hal yang dipelajari; hal dari bacaan yang belum tersedia bertanda “belum tersedia” di kartunya.",
     "unit_meta": "{shown} rumus tersedia, {steps} hal yang dipelajari",
     "taught_in": "Dipelajari di: {place}",
     "none": "Rumus belum tersedia.",

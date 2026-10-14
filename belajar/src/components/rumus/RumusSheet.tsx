@@ -168,7 +168,10 @@ function Basis({ sources }: { sources: RumusSource[] }) {
               <p className="text-sm text-ink-muted">
                 <MixedText text={[k.edition, t("page", { page: s.hlm })].filter(Boolean).join(" · ")} />{" "}
                 <span>{t("section")}</span>{" "}
-                <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-ink">
+                {/* A section title can be longer than a phone's line ("باب معرفة علامات الإعراب" at Sangat
+                    besar: CI line breaks, 2026-10-14): a block of its own that wraps at its spaces,
+                    right to left (the base rule keeps a bare bdi on one line). */}
+                <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-ink mt-1 block whitespace-normal">
                   {s.bab}
                 </bdi>
               </p>

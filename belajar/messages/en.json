@@ -127,7 +127,7 @@
     "intro_with_lesson": "The quick formulas complement the full explanation in the lessons and on the Concept pages; they do not replace it.",
     "curriculum_link": "See the order of the lessons in the basic curriculum",
     "list_heading": "A formula for each thing learnt",
-    "list_help": "The order is that of the lessons. For now {shown, plural, one {# formula is} other {# formulas are}} available of {steps} things to learn; things in readings that are not available yet are marked “Not available yet”.",
+    "list_help": "The order is that of the lessons. For now {shown, plural, one {# formula is} other {# formulas are}} available of {steps} things to learn; things in readings that are not available yet are marked “not available yet” on its card.",
     "unit_meta": "{shown, plural, one {# formula} other {# formulas}} available, {steps, plural, one {# thing} other {# things}} to learn",
     "taught_in": "Learnt in: {place}",
     "none": "No formula yet.",
