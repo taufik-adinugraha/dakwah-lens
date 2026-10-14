@@ -54,6 +54,9 @@ python3 test_validate_clips.py     # plants 58 faults (an example with no voice,
 python3 build_curriculum.py        # the curriculum ../content/curriculum.json from authored/curriculum.json (see "Kurikulum"); after the lessons and the library, BEFORE the quizzes, the lesson map and the narration, which read it
 python3 validate_curriculum.py     # the curriculum: every step in one lesson, at most three a lesson, every Konsep placed once, term owners, a step's own text and sources, the lists derived per lesson; prints the table; exit 1 on any failure
 python3 test_validate_curriculum.py # plants 74 faults (a step in two lessons, a fourth step, a record placed twice or not at all, a term with two owners, a text with no source or with a Qur'anic word, a derived list that drifted, …), each must fail
+python3 build_rumus.py             # the cheat sheet ../content/rumus.json from authored/rumus.json (see "Rumus singkat"): the kitab's own words quoted from the pinned pages; after build_curriculum.py and build_surah.py; `--check` compares, `--check --no-corpus` (CI) takes the quotes from the file
+python3 validate_rumus.py          # the cheat sheet: every formula's terms against its lesson, every quote the pinned page's own bytes (CI: --no-corpus); see "Rumus singkat"
+python3 test_validate_rumus.py     # plants 40 faults (a typed quote, an anchor not on its page or found twice, a term of a later lesson, a pointer to an earlier step, Qur'anic Arabic in a formula, a step missing or listed twice, the wrong example, a changed pin …) + unit tests of the folding, the term rule, the pointers and the coverage (`--no-corpus` skips the 2 faults only the cache can catch)
 python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Kuis"); before the narration, which reads them
 python3 build_map.py               # the lesson maps ../content/map/*.json, for the surahs switched on (see "Peta pelajaran"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi"); stops on a term said before its lesson that authored/curriculum.pending.json does not list (`--write-pending` writes that list: see "Kurikulum")
@@ -138,6 +141,11 @@ a machine whose cache predates them). `cache/` is git-ignored.
 | `build_curriculum.py` | 2 | Writes `belajar/content/curriculum.json` (the authored file + each step's spoken name and text through the narration's sanitiser and dictionary + the derived lists); `--show` prints the table |
 | `validate_curriculum.py` | 6 | The curriculum checks, each on its own (see "Kurikulum"); equality with a fresh build; prints the per-lesson table and the totals |
 | `test_validate_curriculum.py` | 6 | Planted-fault tests for the curriculum + unit tests of the occurrence rule, the teaching order and the pending list |
+| `authored/rumus.json` | 3 | THE CHEAT SHEET "Rumus singkat" (operator 2026-10-13/14): per curriculum step a short formula (`rumus`, Konsep markup), its limit (`awas`, only where a quoted sentence says it) and `sumber` — a pinned Shamela page and, per sentence, the FOLDED consonant skeleton of the kitab's words (never the words); a step with no sourced formula has no entry. Generated once, edited by hand |
+| `rumus.py` | — | The cheat sheet's rules (stdlib): folding and finding an anchor as a run of whole words in the pinned page's matn, taking the page's own bytes, the term rule through `curriculum.too_early`, the `{{di:step}}` pointers, the example word, the build and the checks |
+| `build_rumus.py` | 2 | Writes `belajar/content/rumus.json`; `--check` compares with a fresh build; `--check --no-corpus` (CI) takes each quote from the file and holds it to its anchor; `--show` prints the sheet |
+| `validate_rumus.py` | 6 | The cheat sheet checks, each on its own; `--no-corpus` in CI; the per-unit count of formulas with and without |
+| `test_validate_rumus.py` | 6 | Planted-fault tests for `validate_rumus.py` + unit tests (`--no-corpus` skips the faults only the cache can catch) |
 | `authored/<slug>.map.json` | 3 | The per-surah switch of the lesson map (Al-Fatihah only): its existence switches the surah on. It holds only `names`, an explicit short name for a next-level record whose caption title gives none (Al-Fatihah needs none); the authored "later" items of version 1 are refused (marfu' is a step of the curriculum now) |
 | `lessonmap.py` | — | The lesson map (version 2): the curriculum's four lists per ayah (new, learnt so far with what comes up again, later, next-level) with each step's and record's name, the name cut, the file format and its checks |
 | `build_map.py` | 2 | Writes `belajar/content/map/<slug>.json` for the surahs switched on (names through the narration's sanitiser and dictionary); `--show` prints the table |
@@ -1919,6 +1927,85 @@ rules; it is **derived, never authored** (a plan that lists it stops the build).
   new value of `ask` with its own fields — a member of the union in `quiz-schema.ts`, a branch in
   `quiz.warmup` and in the component — numbered on in the same exercise, so its explanation line
   is `ex:word-kind:<n>:why` like every question's.
+
+## Rumus singkat (the cheat sheet, 2026-10-14)
+
+The operator, 2026-10-13: "we can make some 'cheat sheet' to explain the rules, for example: harf
+jar + ism = kasrah (give examples), isim followed by another ism is mudhof ilaih etc. this cheat
+sheet is explained also along with formal explanation" — "of course we need to refer to valid
+kitab, my example is just example"; 2026-10-14: "release cheat sheet". The draft table and what
+the matn says of each row is `docs/belajar-research/rumus-singkat.md`; the decision is
+`docs/belajar-plan.md` L32; the page is `/belajar/{locale}/quran/rumus`.
+
+**What a row is.** One formula per step of the basic curriculum, in teaching order, with its
+example word and the kitab's own sentences it restates. `authored/rumus.json`:
+
+```json
+{"version": 1, "steps": {"majrur": {
+    "rumus": "[[Isim]] [[majrur]] umumnya berakhir [[kasrah]]. …",
+    "awas":  "Jamak laki-laki beraturan [[majrur]] dengan ya', bukan [[kasrah]] (kita pelajari {{di:jamak-mudzakkar-salim}}).",
+    "sumber": [{"page": "11371/6", "match": ["folded sentence", "…"]}]}}}
+```
+
+- **Nothing about grammar is typed.** The kitab's words are never in the authored file: a `match`
+  is the sentence's consonant skeleton (alif forms unified, no harakat; at least three words), and
+  `build_rumus.py` finds it as a run of whole words in the pinned page's matn (the editor's
+  footnotes are cut at the mark `terms.HAMESH_MARK`), once, and takes the page's own bytes —
+  harakat and all, the footnote digit dropped, spaces collapsed. An anchor not found, or found
+  twice, stops the build. A `quote` key is refused. The kitab's name, print page, section and
+  address come from the pin (`sources.json` `shamela_istilah.books/pages`), never typed twice.
+- **Pins.** 19 pages, 18 of Ibnu Ajurrum's *Matn al-Ajurrumiyyah* (book 11371: pages 1–7, 9, 11–13,
+  15, 16, 18, 20, 22, 30, 31) and one of 6970 (page 15, for a limit the matn does not state). The
+  eight pages new with this release (11371/9, 10, 11, 14, 17, 18, 22, 31) were read from
+  shamela.ws on 2026-10-13 and are pinned by `fetch.py --only shamela_istilah` (the sha256 of the
+  extracted text); five of them are quoted (9, 11, 18, 22, 31), 10, 14 and 17 are pinned and
+  quoted by no shipped row. `content/rumus.json` `data_versions.pages` holds the hash each quote
+  was taken from.
+- **The term rule of the lessons applies.** A formula uses only terms taught up to its own lesson
+  (plus the free terms), through `curriculum.too_early`; a term of a later lesson is not said but
+  pointed to: `{{di:<step id>}}` becomes "di Al-Fatihah ayat 4" from the curriculum (a pointer must
+  name a LATER step). Every term form is marked (`terms.check_markup`) and no Qur'anic word is
+  written: Arabic reaches the reader only as a dictionary term or as the quoted kitab.
+- **The limit (`awas`) is shown only where a quoted sentence says it.** An awas the matn does not
+  state was dropped, not softened (the draft's dropped items are listed in
+  `docs/belajar-research/rumus-singkat.md`). 5 steps have one (majrur, marfu, alif-lam, manshub,
+  fiil-madhi). The fi'il madhi's (the last letter is not always fathah: sukun when a doer's dhamir
+  with a vowel is attached, dhammah with the plural wawu) comes from the pinned 6970/15 page, because
+  the matn's "always fathah" is contradicted by the lesson's own 1:7:3.
+- **The example is derived**: the first word of the step's lesson that the step occurs on (the
+  curriculum's `lines[].words`, else `curriculum.occurs`); the app draws the word's Arabic,
+  transliteration and meaning from the lesson file and links its ayah page.
+- **Left out** (no entry; the page says "Rumus belum tersedia"): harakat (a reading convention with
+  a primer, not a kitab rule), murab-mabni and isim-maushul (the records cite Ibnu Hisyam and Ibnu
+  'Aqil, not yet quoted), mudzakkar-muannats, istitsna, la-nafi and istifham (no sentence of the matn
+  was found). 29 of 36 steps have a formula: pengantar 1 of 2, Al-Fatihah 15 of 17, An-Nas 3 of 4,
+  Al-Falaq 2 of 2, Al-Ikhlas 3 of 3, Ayat Kursi 5 of 8. Four of the 29 (idhafah, fi'il madhi,
+  jamak taksir, isim isyarah) are shown only in the part the matn states.
+
+```bash
+python3 build_rumus.py            # write content/rumus.json (needs pipeline/cache; stops on any gap)
+python3 build_rumus.py --check    # exit 1 if the file differs from a fresh build
+python3 build_rumus.py --check --no-corpus   # CI: quotes from the file, each held to its anchor
+python3 build_rumus.py --show     # the sheet as built
+python3 validate_rumus.py         # each rule on its own (CI: --no-corpus)
+python3 test_validate_rumus.py    # planted faults + unit tests (CI: --no-corpus)
+```
+
+**In the app.** `src/lib/rumus.ts` parses the file (zod, `src/content/rumus-schema.ts`) and checks
+it against the curriculum at load; `src/lib/rumusSheet.ts` turns it into what the page draws.
+**Availability is data**: a step shows its formula only when `lessonLink` (`src/lib/curriculumOutline.ts`,
+the ONE rule the curriculum page's links use) gives its lesson a page — a written ayah of a
+published surah (`BELAJAR_SURAHS`, read per request), or lesson zero while `introOpen`; every other
+step is named and marked "Belum tersedia" and carries nothing of the file, so a hidden surah's
+formulas are in no HTML and no RSC payload. The page is a list (never a table), the kitab's quote
+is an isolated right-to-left block at the 24px floor, the sources are always visible (a printed
+sheet has no disclosure to open), a print stylesheet drops the header and keeps each step whole,
+and the footer carries the module's AI-assisted label. It is linked from the track page and the
+curriculum page header through `rumusHref()` (`src/lib/routes.ts`).
+
+**Not in this release**: the formulas are not in lesson narration (that would change a recorded
+line and cost a re-render), the opening card does not show them, and no formula that is not in the
+draft table was added. A formula the matn does not state stays out until a kitab sentence is found.
 
 ## Not built here
 

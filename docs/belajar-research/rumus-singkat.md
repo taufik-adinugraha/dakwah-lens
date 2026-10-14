@@ -1,6 +1,6 @@
 # Belajar Al-Qur'an: rumus singkat (the cheat sheet), draft for approval
 
-Date: 2026-10-13. Status: **draft, not built, not recorded.** Nothing here is shown or spoken until the operator approves the table.
+Date: 2026-10-13. Status (2026-10-14): **built; 29 rows sourced, 7 left out** ("release cheat sheet", operator 2026-10-14). Page `/belajar/{locale}/quran/rumus`, data `belajar/pipeline/authored/rumus.json` → `belajar/content/rumus.json` (plan L32, `belajar/pipeline/README.md` "Rumus singkat"). The table below is the draft as approved for building; "As built" at the end says what changed and what is not in the release. Nothing is spoken or recorded.
 
 The operator's words (2026-10-13): "we can make some 'cheat sheet' to explain the rules, for example: harf jar + ism = kasrah (give examples), isim followed by another ism is mudhof ilaih etc. this cheat sheet is explained also along with formal explanation." And on sourcing: "of course we need to refer to valid kitab, my example is just example."
 
@@ -75,3 +75,12 @@ The operator's words (2026-10-13): "we can make some 'cheat sheet' to explain th
 
 - 36 rows. The formula as written is stated by the matn in 25 (rows 2–9, 11, 12, 14–16, 19–21, 24–28, 31, 34–36). In 4 the matn covers part and a note says what is missing (10, 18, 22, 33). 6 have no kitab sentence yet (13, 17, 23, 29, 30, 32). Row 1 is a reading convention with its own source.
 - Not checked by an ustadz.
+
+## As built (2026-10-14)
+
+- **29 of 36 steps have a formula**: lesson zero 1 of 2, Al-Fatihah 15 of 17, An-Nas 3 of 4, Al-Falaq 2 of 2, Al-Ikhlas 3 of 3, Ayat Kursi 5 of 8. Rows 2–9, 11, 12, 14–16, 19–21, 24–28, 31, 34–36 as stated by the matn; rows 10, 18, 22, 33 only in the part the matn states.
+- **Left out, with no entry (the page says "Rumus belum tersedia")**: 1 harakat (a reading convention with its own source, no kitab sentence on a pinned page), 13 mu'rab dan mabni, 17 isim maushul, 23 mudzakkar dan mu'annats, 29 istitsna', 30 lā nafi, 32 istifham. A row returns when a kitab sentence is quoted for it.
+- **Nothing about grammar is typed**: a formula is Indonesian prose in the Konsep markup; the kitab's words are the pinned page's bytes, found by a folded anchor, never typed; each formula uses only terms of its own lesson or earlier (a later one is pointed to, "kita pelajari di Al-Fatihah ayat 4").
+- **The limit ("awas") is shown only where a quoted sentence says it**: 5 steps (majrur, marfu', alif lam, manshub, fi'il madhi). The rest of the draft's limits are about the five units, not the matn (a mabni word's ending in the majrur position; a dhamir after a huruf jar or as maf'ul bih; a khabar that is jar-majrur; mulhaq at 1:2:4; na't read as badal; the first word of an idhafah; the fa'il that is an isim first met in 2:255): they were dropped, not softened, and each stays out until a kitab sentence is found for it.
+- **One limit from outside the matn**: the matn says the fi'il madhi is "always fathah" (11371/7), and the lesson's own 1:7:3 is not (sukun before a doer's dhamir). The limit shown is the sentence of the pinned 6970/15 page that says so.
+- **Not in this release**: formulas in the lesson narration (a changed recorded line costs a re-render), the opening card's "Sudah kita pelajari" showing formulas, a formula not in the table above, and any grammar sentence not quoted from the cited page. Not checked by an ustadz; the page carries the module's AI-assisted label and promises no review.

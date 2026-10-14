@@ -19,6 +19,8 @@ import { SURAHS, WORD_INFO } from "./content";
 import { CURRICULUM } from "./curriculum";
 import { captionSpans, emphasisSpans, partEmphasis, termEmphasis } from "./emphasis";
 import { LIBRARY, TERMS } from "./library";
+import { RUMUS } from "./rumus";
+import { splitKitab } from "./sources";
 import { annotate, lessonLookup, prepareParts, Scope, soundsOf, termDisplay, titleParts, type Token } from "./terms";
 import { ARABIC_RUN, arabicRuns, hasArabic, joinUnits, rtlRuns, textUnits, type Seg } from "./textUnits";
 
@@ -76,11 +78,41 @@ const CURRICULUM_TEXTS: [string, string][] = (() => {
   return out;
 })();
 
+/**
+ * What the cheat sheet draws through MixedText that no file holds as shown (plan L32;
+ * src/components/rumus/RumusSheet.tsx): each source's kitab name and "edition · hlm. N" line, each
+ * example's "translit · meaning" line and its link text, each step's "Dipelajari di" line.
+ * (The formulas and limits go through TermText: TERM_TEXTS below.)
+ */
+const RUMUS_TEXTS: [string, string][] = (() => {
+  const out: [string, string][] = [];
+  for (const locale of ["id", "en"] as const) {
+    const messages = readJson(`messages/${locale}.json`) as Parameters<typeof createTranslator>[0]["messages"];
+    const t = createTranslator({ locale, messages, namespace: "Rumus" });
+    for (const e of RUMUS.steps) {
+      const w = WORD_INFO[e.example?.loc ?? ""];
+      if (e.example && w) {
+        const [surah, ayah, n] = e.example.loc.split(":");
+        out.push([`rumus ${e.step} example (${locale})`, `${w.translit} · ${w.gloss}`]);
+        out.push([`rumus ${e.step} example link (${locale})`, t("example_open", { unit: `Surah ${surah}`, ayah: Number(ayah), n: Number(n) })]);
+      }
+      for (const s of e.sumber) {
+        const k = splitKitab(s.kitab);
+        out.push([`rumus ${e.step} kitab ${s.page} (${locale})`, k.name]);
+        out.push([`rumus ${e.step} edition ${s.page} (${locale})`, [k.edition, t("page", { page: s.hlm })].filter(Boolean).join(" · ")]);
+      }
+    }
+    for (const s of CURRICULUM.steps) out.push([`rumus taught ${s.id} (${locale})`, t("taught_in", { place: s.name })]);
+  }
+  return out;
+})();
+
 /** Every string a page can render: lesson + library content, the quizzes (their reasons and roles
  *  are text built by pipeline/quiz.py: an item inside a bracket with its Arabic right after it, a
  *  phrase with one bracket), manifests, both message files, the curriculum page's own texts. */
 const CORPUS: [string, string][] = [
   ...CURRICULUM_TEXTS,
+  ...RUMUS_TEXTS,
   ...["al-fatihah", "al-ikhlas", "al-falaq", "an-nas", "library"].flatMap((f) =>
     strings(readJson(`content/${f}.json`), f),
   ),
@@ -185,6 +217,15 @@ const TERM_TEXTS: [string, string][] = (() => {
     });
   }
   for (const r of LIBRARY.roots) if (r.marked) add(`root ${r.id}`, annotate(r.marked.meaning, new Scope(), TERMS));
+  // The cheat sheet (plan L32): each step's formula and its limit, in ONE first-use scope per block
+  // (RumusSheet.tsx) and each alone — the Arabic a term draws is the Konsep table's.
+  for (const e of RUMUS.steps) {
+    const block = new Scope(false);
+    add(`rumus ${e.step} formula`, annotate(e.rumus, block, TERMS));
+    if (e.awas) add(`rumus ${e.step} awas`, annotate(e.awas, block, TERMS));
+    add(`rumus ${e.step} formula (alone)`, annotate(e.rumus, new Scope(false), TERMS));
+    if (e.awas) add(`rumus ${e.step} awas (alone)`, annotate(e.awas, new Scope(false), TERMS));
+  }
   return out;
 })();
 

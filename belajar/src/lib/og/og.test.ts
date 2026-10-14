@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { SURAHS } from "@/lib/content";
 import { lessonShareable } from "@/lib/share";
 
-import { type CardText, curriculumCard, hubCard, lessonCard, trackCard, translationExcerpt, translitLine } from "./text";
+import { type CardText, curriculumCard, hubCard, lessonCard, rumusCard, trackCard, translationExcerpt, translitLine } from "./text";
 
 // The share cards (lib/og/card.tsx) are drawn by satori, which cannot shape Arabic and which
 // downloads a fallback font from the network for any glyph its fonts lack. So every card the
@@ -25,7 +25,7 @@ function allCards(): [string, CardText][] {
   const cards: [string, CardText][] = [];
   for (const locale of ["id", "en"] as const) {
     const t = og(locale);
-    cards.push([`${locale} hub`, hubCard(t)], [`${locale} track`, trackCard(t)], [`${locale} curriculum`, curriculumCard(t)]);
+    cards.push([`${locale} hub`, hubCard(t)], [`${locale} track`, trackCard(t)], [`${locale} curriculum`, curriculumCard(t)], [`${locale} rumus`, rumusCard(t)]);
     for (const s of SURAHS.filter((x) => lessonShareable(x.slug))) {
       for (const a of s.ayat) cards.push([`${locale} ${s.slug} ${a.ayah}`, lessonCard(t, s, a)]);
     }
@@ -89,8 +89,8 @@ describe("share cards (lib/og)", () => {
   it("draws a card for every shareable lesson in both locales", () => {
     const lessons = SURAHS.filter((s) => lessonShareable(s.slug)).reduce((n, s) => n + s.ayat.length, 0);
     expect(lessons).toBeGreaterThan(0);
-    // Per locale: the hub, the track, the curriculum page (plan L30) and every lesson.
-    expect(cards).toHaveLength(2 * (3 + lessons));
+    // Per locale: the hub, the track, the curriculum page (plan L30), the cheat sheet (L32) and every lesson.
+    expect(cards).toHaveLength(2 * (4 + lessons));
   });
 
   it("the curriculum page's card says what the page is, and names no surah (it could not be published)", () => {
@@ -99,6 +99,17 @@ describe("share cards (lib/og)", () => {
     expect(curriculumCard(og("en")).title).toBe(messages.en.Og.curriculum_title);
     for (const locale of ["id", "en"] as const) {
       const words = textsOf(curriculumCard(og(locale))).join(" ");
+      for (const s of SURAHS) expect(words, `${locale} ${s.slug}`).not.toContain(s.name_id);
+      expect(words).not.toMatch(/Ayat Kursi|\d/);
+    }
+  });
+
+  it("the cheat sheet's card says what it is, in its own words, and carries no formula and no surah", () => {
+    const card = rumusCard(og("id"));
+    expect(card).toEqual({ eyebrow: "Belajar Bahasa Arab Al-Qur'an", title: messages.id.Og.rumus_title, body: messages.id.Og.rumus_body });
+    expect(rumusCard(og("en")).title).toBe(messages.en.Og.rumus_title);
+    for (const locale of ["id", "en"] as const) {
+      const words = textsOf(rumusCard(og(locale))).join(" ");
       for (const s of SURAHS) expect(words, `${locale} ${s.slug}`).not.toContain(s.name_id);
       expect(words).not.toMatch(/Ayat Kursi|\d/);
     }

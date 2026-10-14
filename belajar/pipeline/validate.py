@@ -100,8 +100,8 @@ LIBRARY = CONTENT_DIR / "library.json"
 # curriculum (content/curriculum.json, 2026-10-13: build_curriculum.py writes it and
 # validate_curriculum.py checks it; until this line this validator took it for a surah nobody
 # registered — found on the first run with the corpus cache after it was added, CI running
-# neither).
-NOT_LESSONS = {LIBRARY.name, "curriculum.json"}
+# neither). And the cheat sheet (content/rumus.json, 2026-10-14: build_rumus.py, validate_rumus.py).
+NOT_LESSONS = {LIBRARY.name, "curriculum.json", "rumus.json"}
 CONTENT_TS_PATH = CONTENT_TS
 ROUTES_TS_PATH = ROUTES_TS
 AUTHORED = PIPELINE / "authored"

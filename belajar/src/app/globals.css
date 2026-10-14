@@ -751,3 +751,28 @@ html[data-text-size="sangat-besar"] {
 html[data-text-hint="off"] .text-size-hint {
   display: none;
 }
+
+/* ── Print: the cheat sheet (/quran/rumus, plan L32) is a page people print and keep beside a
+   reading. One column on the paper, no header controls and no skip link, each step kept whole on
+   a page (its formula, its example and its basis are one thing); the footer stays, because the
+   page's label ("Dibantu AI, bukan fatwa otoritatif") must travel with it. Only a page that carries
+   [data-rumus-sheet] is touched. */
+@media print {
+  body:has([data-rumus-sheet]) > header,
+  body:has([data-rumus-sheet]) > a[href="#isi"],
+  [data-rumus-sheet] [data-print-hide] {
+    display: none !important;
+  }
+  [data-rumus-sheet] {
+    max-width: none;
+    padding-inline: 0;
+  }
+  [data-rumus-sheet] [data-rumus-unit] {
+    border: 0;
+    padding: 0;
+  }
+  [data-rumus-sheet] [data-rumus-step] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

@@ -103,6 +103,26 @@ jobs:
       - name: Curriculum — planted-fault tests
         run: python3 pipeline/test_validate_curriculum.py
 
+      # The cheat sheet "Rumus singkat" (operator 2026-10-13: "we can make some 'cheat sheet' to
+      # explain the rules, for example: harf jar + ism = kasrah (give examples) … of course we
+      # need to refer to valid kitab, my example is just example"; 2026-10-14: "release cheat
+      # sheet"; plan L32). A short formula per step of the curriculum, each restating one sentence
+      # of the pinned Matn al-Ajurrumiyyah (or Shamela's 6970 / 11371 pages) that it quotes; no
+      # grammar sentence is typed: the authored file (pipeline/authored/rumus.json) keeps only
+      # folded anchors and the build takes the kitab's own bytes from the pinned page. Checked here
+      # without the corpus: content/rumus.json equals a fresh build with its quotes taken from the
+      # file (each must fold to its authored anchor — the corpus-checked locally, where the pins
+      # are); every formula uses only terms up to its own lesson (a later one is pointed to, "kita
+      # pelajari di ayat 4"); each step in its lesson, in teaching order; each example a word of its
+      # lesson; and the planted-fault tests prove each guard fails. After the curriculum. Stdlib
+      # only, no network.
+      - name: Rumus — up to date (no corpus)
+        run: python3 pipeline/build_rumus.py --check --no-corpus
+      - name: Rumus — validate (no corpus)
+        run: python3 pipeline/validate_rumus.py --no-corpus
+      - name: Rumus — planted-fault tests (no corpus)
+        run: python3 pipeline/test_validate_rumus.py --no-corpus
+
       # Quizzes (operator 2026-10-10: "make sure all questions in quiz already have lesson
       # beforehand when exploring ayat"): content/quiz equal to a fresh build, and for the authored
       # Al-Fatihah plan every term a question, an option, a bin or a form label needs TAUGHT by the
@@ -308,6 +328,7 @@ jobs:
                       /belajar/id/quran /belajar/en/quran \
                       /belajar/id/quran/pengantar /belajar/en/quran/pengantar \
                       /belajar/id/quran/kurikulum /belajar/en/quran/kurikulum \
+                      /belajar/id/quran/rumus /belajar/en/quran/rumus \
                       /belajar/id/quran/al-fatihah /belajar/id/quran/al-fatihah/1 \
                       /belajar/id/quran/al-fatihah/7 /belajar/en/quran/al-fatihah/5; do
             code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
@@ -379,6 +400,23 @@ jobs:
           grep -q 'href="/belajar/id/quran/pengantar"' <<<"$kur" || { echo "✗ the curriculum page does not link lesson zero (/quran/pengantar)"; exit 1; }
           grep -q '>Belum tersedia<' <<<"$kur" || { echo "✗ the curriculum page marks no lesson as Belum tersedia"; exit 1; }
           if grep -qiE '\b(ketuk|mengetuk|diketuk)\b' <<<"$kur"; then echo "✗ /belajar/id/quran/kurikulum: says ketuk (use klik)"; exit 1; fi
+          # The cheat sheet "Rumus singkat" (operator 2026-10-13/14; plan L32): the track and the
+          # curriculum page link it; it shows Al-Fatihah's and lesson zero's formulas with the
+          # kitab's quoted sentences, says "Belum tersedia" for the steps of every other lesson,
+          # carries the AI-assisted label, and says "klik", never "ketuk". What it lists against
+          # content/rumus.json — every step once, in order, a formula only for an available lesson,
+          # no byte of a hidden surah's, rendered or in the RSC payload — is surahs-smoke.mjs's part
+          # (rumusPage), in both containers; the browser checks (quotes right to left at the 24px
+          # floor, printed) are screenshots.mjs's (rumusCheck).
+          grep -q 'href="/belajar/id/quran/rumus"' <<<"$track" || { echo "✗ the track page does not link the cheat sheet"; exit 1; }
+          grep -q 'href="/belajar/id/quran/rumus"' <<<"$kur" || { echo "✗ the curriculum page does not link the cheat sheet"; exit 1; }
+          rumus="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/rumus)"
+          grep -q 'data-rumus-formula' <<<"$rumus" || { echo "✗ the cheat sheet shows no formula"; exit 1; }
+          grep -q 'data-rumus-quote' <<<"$rumus" || { echo "✗ the cheat sheet quotes no kitab sentence"; exit 1; }
+          grep -q 'href="https://shamela.ws/book/11371/' <<<"$rumus" || { echo "✗ the cheat sheet links no Shamela page of the Ajurrumiyyah"; exit 1; }
+          grep -q '>Belum tersedia<' <<<"$rumus" || { echo "✗ the cheat sheet marks no step as Belum tersedia"; exit 1; }
+          grep -q 'Dibantu AI, bukan fatwa otoritatif' <<<"$rumus" || { echo "✗ the cheat sheet does not carry the AI-assisted label"; exit 1; }
+          if grep -qiE '\b(ketuk|mengetuk|diketuk)\b' <<<"$rumus"; then echo "✗ /belajar/id/quran/rumus: says ketuk (use klik)"; exit 1; fi
           # The lesson page carries the streamed recitation + the AI-assisted footer. ONE imam
           # everywhere and no reciter setting (operator, 2026-10-13: "better to use alafasy for
           # all? no need to give option to user to change"; plan L21): the page carries Mishary
@@ -607,7 +645,7 @@ jobs:
       # Line breaks (operator, 2026-10-10: "make sure the line break is clean and easy to read,
       # sometime i see wrong line break especially for arabic words"). linebreaks.mjs measures
       # where Chromium REALLY breaks the lines of the real image: every page a learner reaches by
-      # its links (hub, track, the curriculum page, each linked surah, every linked ayah closed and with every
+      # its links (hub, track, the curriculum page, the cheat sheet, each linked surah, every linked ayah closed and with every
       # disclosure open, Konsep and every concept, every Kosakata entry linked from those) and the
       # autoplay lesson step by step (Al-Fatihah 1 with the routed narration, so the karaoke
       # caption; 2 and 7 caption-only, 7 up to its end card; each kind of exercise answered once,

@@ -80,6 +80,24 @@ export type Outline = {
 type OutlineFile = Pick<CurriculumFile, "units" | "lessons" | "steps" | "lanjut">;
 
 /**
+ * The lesson's page when it may be SHOWN as available, else null. The one rule of the module's
+ * lesson list (the curriculum page's links, and the cheat sheet's formulas in
+ * src/lib/rumusSheet.ts, ask it and nothing else): lib/routes.ts lessonHref gives the lesson a page,
+ * the lesson is written (its derived lists are in the built file), and — for an ayah — its surah is
+ * published (`published`), for the introduction `intro` (lib/curriculum.ts introOpen).
+ */
+export function lessonLink(
+  l: Pick<OutlineFile["lessons"][number], "id" | "surah" | "ayah" | "segment" | "map">,
+  unit: { slug?: string } | undefined,
+  { published, intro }: { published: ReadonlySet<string>; intro: boolean },
+): string | null {
+  const kind = l.surah === undefined ? "intro" : l.segment !== undefined ? "segment" : "ayah";
+  const page = lessonHref({ id: l.id, slug: unit?.slug, ayah: l.ayah, segment: l.segment });
+  const open = page !== null && l.map !== undefined && (kind === "intro" ? intro : unit?.slug !== undefined && published.has(unit.slug));
+  return open ? page : null;
+}
+
+/**
  * @param published slugs of the surahs visitors can reach (lib/features.ts visibleSurahs()).
  * @param pages ids that have a Konsep page (the library's concepts and basics).
  * @param intro may the introduction (lesson zero) be shown as a link (lib/curriculum.ts introOpen).
@@ -104,8 +122,6 @@ export function curriculumOutline(
       out.push(group);
     }
     const kind = l.surah === undefined ? "intro" : l.segment !== undefined ? "segment" : "ayah";
-    const page = lessonHref({ id: l.id, slug: unit?.slug, ayah: l.ayah, segment: l.segment });
-    const open = page !== null && l.map !== undefined && (kind === "intro" ? intro : unit?.slug !== undefined && published.has(unit.slug));
     group.lessons.push({
       id: l.id,
       kind,
@@ -113,7 +129,7 @@ export function curriculumOutline(
       new: l.steps.flatMap(step),
       after: l.after,
       again: l.map ? l.map.learnt.filter((x) => x.here).flatMap((x) => step(x.id)) : null,
-      href: open ? page : null,
+      href: lessonLink(l, unit, { published, intro }),
     });
     group.steps += l.steps.length;
   }

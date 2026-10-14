@@ -1766,6 +1766,33 @@
           "chars": 215,
           "retrieved": "2026-10-10"
         },
+        "11371/9": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/9",
+          "print_page": "11",
+          "title": "ص11 - كتاب الآجرومية - باب الفاعل - المكتبة الشاملة",
+          "text_sha256": "e490d97813a98dec833a2862bc73004126571f86746a2af8681df51aa1fe3f7f",
+          "chars": 598,
+          "retrieved": "2026-10-14"
+        },
+        "11371/10": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/10",
+          "print_page": "12",
+          "title": "ص12 - كتاب الآجرومية - باب المفعول الذي لم يسم فاعله - المكتبة الشاملة",
+          "text_sha256": "7d34d8a1a3cf82fb40053febb1c9a5b541e51d38417bebbedf550cfba6e3157c",
+          "chars": 474,
+          "retrieved": "2026-10-14"
+        },
+        "11371/11": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/11",
+          "print_page": "12",
+          "title": "ص12 - كتاب الآجرومية - باب المبتدأ والخبر - المكتبة الشاملة",
+          "text_sha256": "483e378788dbc69e6127e6e69ecdc6159d09ac88623801f02723c1557e4fc961",
+          "chars": 230,
+          "retrieved": "2026-10-14"
+        },
         "11371/12": {
           "book": "11371",
           "url": "https://shamela.ws/book/11371/12",
@@ -1784,6 +1811,15 @@
           "chars": 413,
           "retrieved": "2026-10-11"
         },
+        "11371/14": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/14",
+          "print_page": "14",
+          "title": "ص14 - كتاب الآجرومية - باب العوامل الداخلة على المبتدأ والخبر - المكتبة الشاملة",
+          "text_sha256": "97b739910a02bdd8b7ec07b04dac8d7cdae241ae6bf09ee94a21c302db4335d5",
+          "chars": 531,
+          "retrieved": "2026-10-14"
+        },
         "11371/15": {
           "book": "11371",
           "url": "https://shamela.ws/book/11371/15",
@@ -1801,6 +1837,24 @@
           "text_sha256": "780814645e83295a58812b59bfcbc60db8c11b3680b8ab42435dcc7db076cbac",
           "chars": 398,
           "retrieved": "2026-10-10"
+        },
+        "11371/17": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/17",
+          "print_page": "15",
+          "title": "ص15 - كتاب الآجرومية - باب التوكيد - المكتبة الشاملة",
+          "text_sha256": "d9d40ed157b3a262c2833691489d8ecc1459955e2cdf0a90684d027f8985ae98",
+          "chars": 278,
+          "retrieved": "2026-10-14"
+        },
+        "11371/18": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/18",
+          "print_page": "16",
+          "title": "ص16 - كتاب الآجرومية - باب البدل - المكتبة الشاملة",
+          "text_sha256": "b5b28f6ccc058ed72758bd4fc3be5b3097eaaa2a8cbc1cc268cf871f066335eb",
+          "chars": 396,
+          "retrieved": "2026-10-14"
         },
         "11371/19": {
           "book": "11371",
@@ -1828,6 +1882,15 @@
           "text_sha256": "abe40e472041433383dfb70f637bf32c9273f4294f303f3ec7702cf599a7ee3f",
           "chars": 299,
           "retrieved": "2026-10-10"
+        },
+        "11371/22": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/22",
+          "print_page": "18",
+          "title": "ص18 - كتاب الآجرومية - باب ظرف الزمان وظرف المكان - المكتبة الشاملة",
+          "text_sha256": "22ad6685bc1f9ad95a57596cb3c88b94b46fb58a3d5164b02ad7c38cc2b3ebef",
+          "chars": 386,
+          "retrieved": "2026-10-14"
         },
         "11371/23": {
           "book": "11371",
@@ -2386,6 +2449,15 @@
           "text_sha256": "ba5119c3cef9f3f37b2992e87dd322a0576fcd0b41c23e7e39e981f3219214eb",
           "chars": 1342,
           "retrieved": "2026-10-10"
+        },
+        "11371/31": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/31",
+          "print_page": "23",
+          "title": "ص23 - كتاب الآجرومية - باب المخفوضات من الأسماء - المكتبة الشاملة",
+          "text_sha256": "c87feae120746da56e890f2d8b625253342948cc242d4bfe796e358af9ae9511",
+          "chars": 408,
+          "retrieved": "2026-10-14"
         }
       },
       "licence": "al-Maktabah asy-Syamilah publishes the texts for reading; the classical matn are public domain, modern works (Darwisy, al-Jadwal, al-Mujtaba, the editors' footnotes) are not, so the pages are cached locally for verification only and never shipped or committed (cache/ is git-ignored).",
