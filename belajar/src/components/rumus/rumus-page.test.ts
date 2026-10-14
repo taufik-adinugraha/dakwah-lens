@@ -34,6 +34,8 @@ const request = vi.hoisted(() => ({ locale: "id" as "id" | "en" }));
 
 // connection() needs a live Next request (lib/features.ts visibleSurahs()).
 vi.mock("next/server", () => ({ connection: async () => undefined }));
+// The track page names surahs through src/lib/ayat.ts, which is server-only (src/lib/ayah.test.ts).
+vi.mock("server-only", () => ({}));
 vi.mock("next-intl/server", async () => {
   const intl = await import("next-intl");
   const messages = { id: (await import("../../../messages/id.json")).default, en: (await import("../../../messages/en.json")).default };
