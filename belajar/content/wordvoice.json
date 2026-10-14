@@ -252,10 +252,11 @@
    }
   },
   "الضَّآلِّينَ": {
+   "say": "ad-dhoooolliin",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/1237d9eca3bbf446-048920e1fc.mp3",
-    "ms": 1019,
-    "sha256": "048920e1fcf9fc7172885171ac059ee0c54e4869f64dd90a71d7b6b6e74ce16f"
+    "url": "/belajar/media/narration/kang-nandar/words/1237d9eca3bbf446-b9ef0f0a78.mp3",
+    "ms": 1071,
+    "sha256": "b9ef0f0a788d1d5ba5d3ec74101e8829f6ad82f92aeb66acb3d01671e72a0a78"
    }
   },
   "اللَّهُ": {
@@ -308,10 +309,11 @@
    }
   },
   "الَّذِينَ": {
+   "say": "الَّذِينَ ۔",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/bd3c540010046452-7683a729a2.mp3",
-    "ms": 836,
-    "sha256": "7683a729a22e2b03e008b51554a8878ef792505831f6ced16effe4262acd746e"
+    "url": "/belajar/media/narration/kang-nandar/words/bd3c540010046452-34b2829009.mp3",
+    "ms": 784,
+    "sha256": "34b2829009cd6d780149728f9b08632dae95422341a986779c6832fe5465d834"
    }
   },
   "الَّذِينَ أَنْعَمْتَ": {
@@ -350,17 +352,19 @@
    }
   },
   "الْخَنَّاسِ": {
+   "cut": "tail",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/7afcf1ac27fcd3b7-e5e48670c5.mp3",
-    "ms": 1071,
-    "sha256": "e5e48670c5a6dc2e93cd928590c8ff9fe4e2c48cb08290c1c2875e6bcff07bbf"
+    "url": "/belajar/media/narration/kang-nandar/words/7afcf1ac27fcd3b7-1878749cee.mp3",
+    "ms": 601,
+    "sha256": "1878749cee4204d50da2f04b6c981db0502f5013711e9f8391bf56c48e93b4e0"
    }
   },
   "الْعَالَمِينَ": {
+   "say": "الْعَالَمِينَ ۔",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/e2a63c0c13c91743-a3e5ee33b6.mp3",
-    "ms": 967,
-    "sha256": "a3e5ee33b6444de85c121d84a7f12ca147198156be1fe9de2ca5275b3116d7e3"
+    "url": "/belajar/media/narration/kang-nandar/words/e2a63c0c13c91743-728bd1ad17.mp3",
+    "ms": 1123,
+    "sha256": "728bd1ad17ec90389faf3c956eb08752ae91a0e1605ad205461274b3ef58ad85"
    }
   },
   "الْعُقَدِ": {
@@ -434,10 +438,11 @@
    }
   },
   "اهْدِ": {
+   "cut": "tail",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/8f411bbdf25aa05d-2cf57669f8.mp3",
-    "ms": 549,
-    "sha256": "2cf57669f8e0595157160f39ee265bf234bfefced05662812a642e32a3a222ed"
+    "url": "/belajar/media/narration/kang-nandar/words/8f411bbdf25aa05d-77830a47c0.mp3",
+    "ms": 340,
+    "sha256": "77830a47c0a9f4db831d30408b2a61a86194abf69236773ea3a8dae68e82cec5"
    }
   },
   "اهْدِنَا": {
@@ -447,11 +452,11 @@
     "sha256": "84ba97c9dd81029d52b800070f72ac91b581eb4ecf57b0920f0aa453f6ab0185"
    }
   },
-  "اهْدِنَا الصِّرَاطَ": {
+  "اهْدِنَا لصِّرَاطَ": {
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/dadb0b7f4073c500-e4541d193d.mp3",
-    "ms": 1202,
-    "sha256": "e4541d193d55766d30243a9b009a6c59836c7d71ed247e6c3d3cbdf0ec081378"
+    "url": "/belajar/media/narration/kang-nandar/words/da02b30b04333478-86b4afbdc9.mp3",
+    "ms": 1358,
+    "sha256": "86b4afbdc9b027c874863140250ab6f4e5682c321c8f20fb3b3c8a57b8229c38"
    }
   },
   "بِ": {
@@ -476,10 +481,11 @@
    }
   },
   "بِرَبِّ النَّاسِ": {
+   "cut": "tail",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/3fa68288f7ca992f-6756aac7c7.mp3",
-    "ms": 914,
-    "sha256": "6756aac7c7932d1ce3a672fe47cbf9f34ac479bcebc8668ac65d405c9c42229c"
+    "url": "/belajar/media/narration/kang-nandar/words/3fa68288f7ca992f-345fcb792d.mp3",
+    "ms": 862,
+    "sha256": "345fcb792da0118149c7cf540fe31b7a2732d9498c007a7674982f302079dd81"
    }
   },
   "بِرَبِّ الْفَلَقِ": {
@@ -511,10 +517,11 @@
    }
   },
   "تَ": {
+   "seed": 1,
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/2d6a557df5ca357e-2ce2f1b9f6.mp3",
-    "ms": 522,
-    "sha256": "2ce2f1b9f664b805efe60bcc01fcc17b31ac7b012c0e19b94da5111b1978f2d6"
+    "url": "/belajar/media/narration/kang-nandar/words/2d6a557df5ca357e-3e0f2bfa91.mp3",
+    "ms": 392,
+    "sha256": "3e0f2bfa91dfd8b124cccd5129c5e2e69cb5baa7368c2f58d40123d358974b99"
    }
   },
   "تَبَارَكَ": {
@@ -588,10 +595,11 @@
    }
   },
   "رَبِّ الْعَالَمِينَ": {
+   "say": "رَبِّ الْعَالَمِينَ ۔",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/0b5bc33d6d2dcfe4-58fc1d58ac.mp3",
-    "ms": 1358,
-    "sha256": "58fc1d58acb346080c5696c5129b71f29d36dfd436dc07592ef27b0f4b21c856"
+    "url": "/belajar/media/narration/kang-nandar/words/0b5bc33d6d2dcfe4-3024a0dc85.mp3",
+    "ms": 1228,
+    "sha256": "3024a0dc85f388c98837cc89ca2bd804bd253e22cce44d857d6dfe76bdf71da0"
    }
   },
   "رَحِيم": {
@@ -693,10 +701,11 @@
    }
   },
   "صُدُورِ النَّاسِ": {
+   "cut": "tail",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/a1c73091c5fd9747-f0af673466.mp3",
-    "ms": 1123,
-    "sha256": "f0af673466b7a127a732aade12e2dc7c22bda9c14d10dbd004b4403f24293b14"
+    "url": "/belajar/media/narration/kang-nandar/words/a1c73091c5fd9747-89fd4e6f80.mp3",
+    "ms": 862,
+    "sha256": "89fd4e6f807cea1d5cec9739fd4ee55cfcc5740f996db1f08d6da8d0d8e603fa"
    }
   },
   "صِرَاط": {
@@ -714,10 +723,11 @@
    }
   },
   "صِرَاطَ الَّذِينَ": {
+   "say": "صِرَاطَ الَّذِينَ ۔",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/b424943cd5b7e0f9-a5989aa4c3.mp3",
-    "ms": 1228,
-    "sha256": "a5989aa4c302838bb7ed87c28d5599a793f8edfe8633652253adc11112388fe5"
+    "url": "/belajar/media/narration/kang-nandar/words/b424943cd5b7e0f9-febf9e5a8d.mp3",
+    "ms": 1280,
+    "sha256": "febf9e5a8dd9ad1700f1ebad1a016a1fbfb53893cea25abcc9bb1724cce174f6"
    }
   },
   "صِرَاطَ الَّذِينَ أَنْعَمْتَ": {
@@ -735,17 +745,19 @@
    }
   },
   "ضَآلِّينَ": {
+   "say": "ضَآلِّينَ ۔",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/02c346e3be20f902-ea43357c38.mp3",
-    "ms": 758,
-    "sha256": "ea43357c38bac1b09e7c42f3b7d042435c96b862a2b4ae39afa807ecc8d18ce7"
+    "url": "/belajar/media/narration/kang-nandar/words/02c346e3be20f902-40ae7b58b8.mp3",
+    "ms": 862,
+    "sha256": "40ae7b58b82e789ca82a1c7dc9f68a30efe4a56a3687969f7feb43ecffdd994f"
    }
   },
   "عَالَمِينَ": {
+   "say": "عَالَمِينَ ۔",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/80c17ba711d5a803-76bdf4588f.mp3",
-    "ms": 731,
-    "sha256": "76bdf4588f26a39d0b3ba48852fe88744005350341ee9da1b790d8425478adb4"
+    "url": "/belajar/media/narration/kang-nandar/words/80c17ba711d5a803-c51018a4e3.mp3",
+    "ms": 784,
+    "sha256": "c51018a4e39a15e1ea7ccdbeaba6b1696f855077a9e006ad19d39e2415772361"
    }
   },
   "عَلَى": {
@@ -846,18 +858,18 @@
     "sha256": "f9b4c5d8f978b5d6e808b8f0197c6678de6e5fd5da7932f4e8d839aa55948084"
    }
   },
-  "فِي الْعُقَدِ": {
-   "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/429f06f2c70064cb-5c6a4e67a1.mp3",
-    "ms": 1045,
-    "sha256": "5c6a4e67a1e53f25ee84c73c79cd6d4915b6a4dc9bb3c6d24961131405980c20"
-   }
-  },
   "فِي صُدُورِ": {
    "audio": {
     "url": "/belajar/media/narration/kang-nandar/words/feafaf2939b86e9c-13e195886a.mp3",
     "ms": 862,
     "sha256": "13e195886a95e602d9195b97f5496464c74ebb98d8185f53269d61bdfb80f90f"
+   }
+  },
+  "فِي لْعُقَدِ": {
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/1e7f0c87263a2386-ec7f84e090.mp3",
+    "ms": 810,
+    "sha256": "ec7f84e0908b1bf36daaa3226affc4a7b6ca186fffec841cab16915487ed6146"
    }
   },
   "قٍ": {
@@ -868,10 +880,11 @@
    }
   },
   "قَالَ": {
+   "say": "قَاالَ",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/2aca770439ec9012-27275fbdb0.mp3",
-    "ms": 549,
-    "sha256": "27275fbdb0486c025e58c0843f964285c1cfbe8c02668103832a8099aadb2188"
+    "url": "/belajar/media/narration/kang-nandar/words/2aca770439ec9012-7713d7e6c1.mp3",
+    "ms": 731,
+    "sha256": "7713d7e6c17c32bbd7ce303822d659d4c59c75a87f5d9bdc4bc3c7e3192c32d5"
    }
   },
   "قُلْ": {
@@ -910,10 +923,11 @@
    }
   },
   "لَا": {
+   "seed": 1,
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/a4e8ac8696fd9d09-d8b8597e8e.mp3",
-    "ms": 549,
-    "sha256": "d8b8597e8e85bdc5c754790c8a4d6a286cd925e953381cac2fdcf21c57329fb9"
+    "url": "/belajar/media/narration/kang-nandar/words/a4e8ac8696fd9d09-09aba78196.mp3",
+    "ms": 444,
+    "sha256": "09aba7819605bb2e38b7f72981f1cbc851298ef7824f15245f98c30fffa2084d"
    }
   },
   "لَمْ": {
@@ -924,10 +938,11 @@
    }
   },
   "لَمْ يَلِدْ": {
+   "say": "لَمْ يَلِدْدْ",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/7060034343168fee-066c6782b8.mp3",
-    "ms": 914,
-    "sha256": "066c6782b8255dd3f7230beef2c9fbc01c1b8decb878167188b775b7a793807c"
+    "url": "/belajar/media/narration/kang-nandar/words/7060034343168fee-681bc8cc56.mp3",
+    "ms": 888,
+    "sha256": "681bc8cc56d074e2018fe252a4bf0d0c9c8e8e4ffdd8504b75673da6d2db98ce"
    }
   },
   "لَمْ يَلِدْ وَلَمْ يُولَدْ": {
@@ -1309,10 +1324,11 @@
    }
   },
   "يَلِدْ": {
+   "say": "يَلِدْدْ",
    "audio": {
-    "url": "/belajar/media/narration/kang-nandar/words/4c9adc018513ee2b-a4e1aff99e.mp3",
-    "ms": 679,
-    "sha256": "a4e1aff99e4509f2d965a032273065f0153744a7ea6e197de4707fe10483e8a2"
+    "url": "/belajar/media/narration/kang-nandar/words/4c9adc018513ee2b-0b1a12f8b8.mp3",
+    "ms": 731,
+    "sha256": "0b1a12f8b8ca3218f87bab3f1d7814b512882c1c0b2a3fd72b2b75bab28e7119"
    }
   },
   "يَوْمُ": {

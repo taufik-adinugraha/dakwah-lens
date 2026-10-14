@@ -14,6 +14,7 @@ import wordvoice as W
 
 ALIF_WASLA, DAGGER, SMALL_SUKUN, STOP = "ٱ", "ٰ", "ۡ", "ۖ"
 INV, UNRESOLVED = W.inventory()
+WORD_ADDALLINA = next(w["ar"] for a in json.load(open(W.CONTENT / "al-fatihah.json"))["ayat"] for w in a["words"] if w["loc"] == "1:7:9")
 
 
 def sample_manifest() -> dict:
@@ -39,6 +40,29 @@ class PlainLetters(unittest.TestCase):
         self.assertEqual(W.plain("\u062C\u0650\u0646\u0651\u064E\u0629\u0650"), "\u062C\u0650\u0646\u0651\u064E\u062A\u0650")  # al-jinnati
         self.assertEqual(W.plain("\u062C\u0646\u0629\u0652"), "\u062C\u0646\u0629\u0652")  # sukun: a stop
         self.assertEqual(W.plain("\u062C\u0646\u0629"), "\u062C\u0646\u0629")  # no mark: a stop
+
+    def test_a_final_dal_with_a_sukun_is_sent_twice_and_nothing_else_is(self):
+        yalid = "\u064A\u064E\u0644\u0650\u062F\u0652"
+        self.assertEqual(W.say_of(yalid), yalid + "\u062F\u0652")
+        yulad = "\u064A\u064F\u0648\u0644\u064E\u062F\u0652"
+        self.assertEqual(W.say_of(yulad), yulad)  # the operator found no spelling that sounded right
+        self.assertEqual(W.say_of("\u062F\u064F"), "\u062F\u064F")          # a vowel: not a stop
+        self.assertEqual(W.say_of("\u0642\u064F\u0644\u0652"), "\u0642\u064F\u0644\u0652")  # another letter
+        ina = "\u0627\u0644\u0630\u0651\u064E\u0650\u064A\u0646\u064E"
+        self.assertEqual(W.say_of(ina), ina + " \u06D4")
+        self.assertEqual(W.say_of("\u0645\u0650\u0646\u064E"), "\u0645\u0650\u0646\u064E")  # mina: not -ina
+        qala = "\u0642\u064E\u0627\u0644\u064E"
+        self.assertEqual(W.say_of(qala), "\u0642\u064E\u0627\u0627\u0644\u064E")  # the operator's pick: two alifs
+        self.assertEqual(W.say_of(W.plain(WORD_ADDALLINA)), "ad-dhoooolliin")  # Latin, the operator's pick (L5)
+        self.assertEqual(W.seed_of("\u062A\u064E"), 1)
+        self.assertEqual(W.seed_of("\u0644\u064E\u0627"), 1)
+        self.assertIsNone(W.seed_of(yalid))
+
+    def test_an_alif_wasla_after_a_long_vowel_is_not_read_and_after_a_consonantal_waw_it_is(self):
+        fi_al = "\u0641\u0650\u0649 \u0671\u0644\u0652\u0639\u064F\u0642\u064E\u062F\u0650"
+        self.assertEqual(W.plain(fi_al), "\u0641\u0650\u064A \u0644\u0652\u0639\u064F\u0642\u064E\u062F\u0650")
+        huwa_allah = "\u0647\u064F\u0648\u064E \u0671\u0644\u0644\u0651\u064E\u0647\u064F"  # the waw has a fathah
+        self.assertIn(" \u0627\u0644", W.plain(huwa_allah))
 
     def test_ordinary_harakat_are_untouched_and_the_rule_is_idempotent(self):
         w = "بِسْمِ"
@@ -103,6 +127,7 @@ class Manifest(unittest.TestCase):
             ("a checksum that is not a sha256", lambda m: m["words"][first]["audio"].update(sha256="zz"), "sha256 is not 64 hex"),
             ("an audio entry with a stray key", lambda m: m["words"][first]["audio"].update(extra=1), "keys"),
             ("the voice changed", lambda m: m["voice"].update(model="eleven_v3"), "voice block differs"),
+            ("a say that is not what would be sent", lambda m: m["words"][first].update(say="x"), "say/seed"),
             ("the version changed", lambda m: m.update(version=2), "version"),
         ]
         for name, mutate, want in cases:

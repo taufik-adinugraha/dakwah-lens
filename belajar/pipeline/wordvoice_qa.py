@@ -44,3 +44,34 @@ def hissy_tail(path: Path) -> bool:
         return False
     loudest = max(db for _, db, _ in fr)
     return any(db > loudest - REL_DB and hf > HF_SHARE for _, db, hf in fr[-TAIL_FRAMES:])
+
+
+def cut_tail(wav: Path, fade_ms: int = 15) -> float | None:
+    """Cut a made-up tail off `wav` in place: at the first frame, in the last half, that is mostly
+    above HF_HZ and within REL_DB of the loudest (the same test as hissy_tail, on 20 ms frames).
+    Returns the cut point in ms, or None when there is nothing to cut."""
+    import wave
+    x = samples(wav)
+    n = SR * 20 // 1000
+    f = np.fft.rfftfreq(n, 1 / SR)
+    db = []
+    hf = []
+    for i in range(0, len(x) - n + 1, n):
+        s = x[i:i + n]
+        spec = np.abs(np.fft.rfft(s * np.hanning(n))) ** 2
+        db.append(10 * np.log10((s ** 2).mean() + 1e-12))
+        hf.append(float(spec[f > HF_HZ].sum() / (spec.sum() + 1e-18)))
+    if not db:
+        return None
+    loud = max(db)
+    for k in range(len(db) // 2, len(db)):
+        if db[k] > loud - REL_DB and hf[k] > HF_SHARE:
+            cut = max(k * n - SR // 100, SR // 10)        # 10 ms before the frame, never under 100 ms
+            y = x[:cut].copy()
+            m = min(SR * fade_ms // 1000, len(y))
+            y[-m:] *= np.linspace(1, 0, m)
+            with wave.open(str(wav), "wb") as w:
+                w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR)
+                w.writeframes((np.clip(y, -1, 1) * 32767).astype("<i2").tobytes())
+            return cut / SR * 1000
+    return None

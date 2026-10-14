@@ -87,10 +87,15 @@ def mean_db(path: Path) -> float:
     return float(m.group(1))
 
 
-def encode(master: Path, final: Path) -> None:
-    """Trim, level, and encode once (the level is measured on the trimmed audio, not on the mp3)."""
+def encode(master: Path, final: Path, cut_tail: bool = False) -> None:
+    """Trim, (cut a made-up tail,) level, and encode once (the level is measured on the trimmed
+    audio, not on the mp3)."""
     tmp = final.with_suffix(".wav")
     ffmpeg("-i", str(master), "-af", TRIM, "-ar", "44100", "-ac", "1", str(tmp))
+    if cut_tail:
+        import wordvoice_qa as Q
+        at = Q.cut_tail(tmp)
+        print(f"    tail cut at {at:.0f} ms" if at is not None else "    (no tail to cut)")
     gain = min(max(TARGET_MEAN_DB - mean_db(tmp), GAIN_RANGE[0]), GAIN_RANGE[1])
     ffmpeg("-i", str(tmp), "-af", f"volume={gain:.1f}dB,alimiter=limit=0.89:level=disabled", "-b:a", "64k", str(final))
     tmp.unlink()
@@ -233,10 +238,10 @@ def main() -> int:
             fid = W.file_id(t)
             master = out / "master" / f"{fid}.mp3"
             if not master.exists():
-                master.write_bytes(speak(key, t))
-                sent += len(t)
+                master.write_bytes(speak(key, W.say_of(t), W.seed_of(t)))
+                sent += len(W.say_of(t))
             final = deliv / f"{fid}.mp3"
-            encode(master, final)
+            encode(master, final, t in W.CUT_TAIL)
             manifest["words"][t]["audio"] = place(final, t)
             W.MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
         files = sorted(p.relative_to(out / "delivery").as_posix() for p in (out / "delivery").rglob("*.mp3"))

@@ -31,6 +31,11 @@ describe("the plain-letter rule (pipeline/wordvoice.py plain)", () => {
     expect(plainLetters("\u062c\u0646\u0629")).toBe("\u062c\u0646\u0629");
   });
 
+  it("drops an alif wasla right after a long vowel, and keeps it after a consonantal waw", () => {
+    expect(plainLetters("\u0641\u0650\u0649 \u0671\u0644\u0652\u0639\u064f\u0642\u064e\u062f\u0650")).toBe("\u0641\u0650\u064a \u0644\u0652\u0639\u064f\u0642\u064e\u062f\u0650");
+    expect(plainLetters("\u0647\u064f\u0648\u064e \u0671\u0644\u0644\u0651\u064e\u0647\u064f")).toContain(" \u0627\u0644");
+  });
+
   it("is the Python rule: every text the builder keyed is already plain, and every content word lands on a key", () => {
     for (const t of Object.keys(M.words)) expect(plainLetters(t), t).toBe(t);
     for (const w of lessonWords) expect(M.words[plainLetters(w.ar)], w.loc).toBeDefined();
