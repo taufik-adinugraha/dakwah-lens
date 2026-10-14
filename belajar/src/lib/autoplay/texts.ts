@@ -101,6 +101,7 @@ export const ID_TEXTS: AutoplayTexts = {
     // place: the caption says what the word is an example OF (the record's note).
     zero: ({ translit, about }) => `Contoh — ${translit}: ${about}`,
     base: ({ translit, surah, ayah }) => `Contoh: ${translit}, di QS ${surah}:${ayah}.`,
+    form: ({ translit }) => `Contoh bentuk dasar: ${translit}.`,
     // What is heard where it is not what is written, as the Konsep pages say it beside an
     // example's button (messages Clip.waqf_note, washal_note).
     waqf: "Di akhir ayat imam berhenti, jadi harakat akhirnya tidak terdengar.",

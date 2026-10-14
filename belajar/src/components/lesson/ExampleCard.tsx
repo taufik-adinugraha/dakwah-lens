@@ -46,7 +46,11 @@ export function ExampleCard({
   const tc = useTranslations("Compose");
   const mark = example.ending && marks ? (marks[example.ending] ?? null) : null;
   const where =
-    example.word !== null ? t("word_n", { n: example.word }) : t("example_place", { surah: example.place.surah, ayah: example.place.ayah });
+    example.word !== null
+      ? t("word_n", { n: example.word })
+      : example.place
+        ? t("example_place", { surah: example.place.surah, ayah: example.place.ayah })
+        : t("example_form");
   return (
     <div
       data-autoplay="example"

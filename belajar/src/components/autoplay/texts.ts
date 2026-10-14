@@ -116,6 +116,7 @@ const EN: AutoplayTexts = {
     other: ({ translit, surah, ayah }) => `Another example: ${translit}, in QS ${surah}:${ayah}.`,
     zero: ({ translit, surah, ayah }) => `Example: ${translit}, in QS ${surah}:${ayah}.`,
     base: ({ translit, surah, ayah }) => `Example: ${translit}, in QS ${surah}:${ayah}.`,
+    form: ({ translit }) => `Example of the base form: ${translit}.`,
     waqf: "The imam stops at the end of the ayah, so its last vowel is not heard.",
     washal: ({ heard }) => `With the word before it you hear “${heard}”, because its first alif is not read.`,
   },

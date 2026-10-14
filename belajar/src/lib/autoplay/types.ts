@@ -462,6 +462,8 @@ export type AutoplayTexts = {
     zero: (a: { translit: string; surah: number; ayah: number; about: string }) => string;
     /** The bentuk dasar a composition shows, where it stands in the Qur'an. */
     base: (a: { translit: string; surah: number; ayah: number }) => string;
+    /** A bentuk dasar no ayah has (a teaching form): named, with no place. */
+    form: (a: { translit: string }) => string;
     /** Added when the example ends its ayah and the imam's stop drops its last harakah. */
     waqf: string;
     /** Added when a word that starts with hamzat washal is played with the word before it. */

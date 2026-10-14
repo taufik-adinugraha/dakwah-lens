@@ -54,6 +54,7 @@ import type { Ayah, Concept, Lexeme } from "@/content/schema";
 
 import { composeFileProblems, composeInputFor, type ComposeInput } from "../composition";
 import { hasWaqfNote, waqfDrop } from "../heard";
+import { voiceFrom, type WordVoiceManifest } from "../wordvoice-core";
 import { MAX_CAPTION, type Pace } from "../lessonSteps";
 import { SURAH_SLUGS } from "../routes";
 import { lessonExamples, MAX_EXAMPLES_PER_RULE, MAX_EXAMPLES_ZERO, type ComposeLike, type ExampleGap, type LessonExample } from "./examples";
@@ -124,9 +125,9 @@ export type CheckInput = {
   /** Parsed content/curriculum.json (plan L26): which steps each ayah's lesson teaches.
    *  null/absent = an error: every lesson is placed by the curriculum. */
   curriculum?: unknown;
-  /** content/library.json `clips`: the imam's voice of every concept example (an example beat
-   *  of another ayah's word plays one). */
-  clips?: Readonly<Record<string, ExampleClip>>;
+  /** Parsed content/wordvoice.json: the narrator's recording of every form (an example beat
+   *  that is not a word of its own ayah plays one). */
+  voices?: WordVoiceManifest;
   texts?: AutoplayTexts;
   property?: { streams?: number; length?: number; seed?: number };
 };
@@ -192,7 +193,6 @@ export function loadCheckInput(read: (rel: string) => string | null): { input: C
   const library = (json("library.json", true) ?? { concepts: [], lexicon: [] }) as {
     concepts: Concept[];
     lexicon: Lexeme[];
-    clips?: Record<string, ExampleClip>;
   };
   return {
     input: {
@@ -206,7 +206,7 @@ export function loadCheckInput(read: (rel: string) => string | null): { input: C
       quiz,
       maps,
       curriculum: json("curriculum.json", true),
-      clips: library.clips ?? {},
+      voices: json("wordvoice.json", true) as WordVoiceManifest | undefined,
     },
     errors,
   };
@@ -468,15 +468,16 @@ export type ExampleContext = {
   compose: ComposeLike | null;
   /** What examples.ts derived for this ayah (the sequence was built from `derived.examples`). */
   derived: { examples: readonly LessonExample[]; gaps: readonly ExampleGap[] };
-  /** content/library.json `clips`. */
-  clips: Readonly<Record<string, ExampleClip>>;
+  /** The narrator's recording of a form's Arabic (examples.ts `voice`). */
+  voice: (ar: string) => ExampleClip | null;
   wordAt: (loc: string) => { ar: string } | undefined;
   texts: AutoplayTexts;
   /** Lesson zero (zero.ts): no ayah, so a concept's examples are clips of other ayat. */
   zero?: boolean;
 };
 
-const EVERYAYAH_FILE = /^https:\/\/everyayah\.com\/data\/[A-Za-z0-9_]+\/\d{6}\.mp3$/;
+/** A recording of content/wordvoice.json: the narrator's file of a word, from its start, whole. */
+const VOICE_FILE = /^\/belajar\/media\/narration\/kang-nandar\/words\/[0-9a-f]{16}-[0-9a-f]{10}\.mp3$/;
 
 /**
  * Problems of one ayah's example beats (operator 2026-10-12, plan L20; empty when fine):
@@ -535,9 +536,9 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
           out.push(`${w}: frame ${b.frame} of the composition is not a base frame`);
         }
       }
-      // What the imam recites: one recording, and it exists.
+      // What is heard: the stage's own recitation of a word of this ayah, or one recording of the narrator's.
       if ((b.word === null) === (b.clip === null)) out.push(`${w}: needs exactly one of a word of this ayah and a clip`);
-      const last = b.word !== null ? b.word === n : b.clip?.last === true;
+      const last = b.word !== null && b.word === n;
       if (b.word !== null) {
         const word = words[b.word - 1];
         if (!word || word.loc !== b.key) out.push(`${w}: word ${b.word} of this ayah is not ${b.key}`);
@@ -547,11 +548,11 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
         if (!ctx.ayah.recitation.length) out.push(`${w}: the ayah has no recitation`);
       } else if (b.clip) {
         const c = b.clip;
-        if (!EVERYAYAH_FILE.test(c.url) || !Number.isInteger(c.start) || !Number.isInteger(c.end) || c.start < 0 || c.end <= c.start) {
-          out.push(`${w}: clip ${JSON.stringify(c)} is not [start, end) of an EveryAyah file`);
+        if (!VOICE_FILE.test(c.url) || c.start !== 0 || !Number.isInteger(c.end) || c.end <= 0) {
+          out.push(`${w}: clip ${JSON.stringify(c)} is not a whole recording of content/wordvoice.json`);
         }
-        const given = b.of === "base" ? ctx.compose?.examples?.[s.loc ?? ""]?.find((x) => x.frame === b.frame)?.clip : ctx.clips[b.key];
-        if (JSON.stringify(given ?? null) !== JSON.stringify(c)) out.push(`${w}: its clip is not the one the content gives for ${b.key}`);
+        const given = ctx.voice(d.ar);
+        if (JSON.stringify(given ?? null) !== JSON.stringify(c)) out.push(`${w}: its clip is not the recording of ${d.translit}`);
       }
       // Its Arabic: the content's own bytes.
       const bytes =
@@ -572,10 +573,8 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
       if (d.waqf !== waqf || b.caption.includes(ctx.texts.example.waqf) !== waqf) {
         out.push(`${w}: ${waqf ? "ends its ayah, where its last harakah is not heard, and does not say so" : "says its last harakah is not heard, which is not so here"}`);
       }
-      if (last && (b.of === "base" || (b.of === "concept" && b.id.endsWith(":2")))) out.push(`${w}: ends its ayah, so the ending it is there for is not heard`);
-      const run = b.key.includes("-");
-      if (run !== (d.washal !== null)) out.push(`${w}: ${run ? "a run is played without saying what is heard" : "says what a run sounds like, but plays one word"}`);
-      if (d.washal && !b.caption.includes(d.washal.heard)) out.push(`${w}: played with the word before it, and the caption does not say what is heard (${d.washal.heard})`);
+      // A recording of a form is said whole: there is no run, and no "what is heard" to add.
+      if (d.washal !== null) out.push(`${w}: says what a run sounds like, but a form is recorded on its own`);
     }
   });
   for (const id of derived.keys()) if (!seen.has(id)) out.push(`example ${id}: the content gives it, and no step plays it`);
@@ -589,9 +588,9 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
     if (!first) {
       if (!gapsOf(`concept:${c.id}:ex`).length) out.push(`concept:${c.id}: its line is followed by no example`);
     } else if (ctx.zero) {
-      // Lesson zero has no ayah: the record's first example, as the imam's clip of its own ayah.
+      // Lesson zero has no ayah: the record's first example, as the narrator's recording of that word.
       if (first.key !== c.examples[0]?.loc || first.word !== null || first.clip === null) {
-        out.push(`concept:${c.id}: in lesson zero its first example is the imam's clip of the concept's first example (${c.examples[0]?.loc})`);
+        out.push(`concept:${c.id}: in lesson zero its first example is the narrator's recording of the concept's first example (${c.examples[0]?.loc})`);
       }
     } else if (first.key !== c.examples[0]?.loc || first.word === null) {
       out.push(`concept:${c.id}: its first example is not the concept's example in this ayah (${c.examples[0]?.loc})`);
@@ -605,7 +604,7 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
       const voiced = beats.filter((b) => b.of === "base").map((b) => b.frame);
       const unvoiced = gapsOf(s.id).length;
       if (base.some((k) => !voiced.includes(k)) && voiced.length + unvoiced !== base.length) {
-        out.push(`${s.id}: base frame(s) ${base.filter((k) => !voiced.includes(k)).join(", ")} have neither the imam's voice of the bentuk dasar nor a reason`);
+        out.push(`${s.id}: base frame(s) ${base.filter((k) => !voiced.includes(k)).join(", ")} have neither a recording of the bentuk dasar nor a reason`);
       }
       if (voiced.length !== new Set(voiced).size) out.push(`${s.id}: two examples for one base frame`);
     }
@@ -1103,7 +1102,7 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
       const compose = composeInputFor(composeFiles.get(surah.slug), ayah);
       // The example beats (operator 2026-10-12, plan L20): derived from the content, as the page does.
       const composeFile = (composeFiles.get(surah.slug) ?? null) as ComposeLike | null;
-      const derived = lessonExamples({ ayah, introduced, compose: composeFile, clips: input.clips ?? {}, wordAt, zero });
+      const derived = lessonExamples({ ayah, introduced, compose: composeFile, voice: (ar) => voiceFrom(input.voices ?? { words: {} }, ar), wordAt, zero });
       const map = lessonMapInputOf(mapFiles.get(surah.slug), ayah.ayah);
       // A lesson map names the new steps: they are this ayah's concept steps, in that order.
       if (map && JSON.stringify(map.new.map((c) => c.id)) !== JSON.stringify(introduced.map((c) => c.step))) {
@@ -1130,7 +1129,7 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
       stats.steps += seq.steps.length;
       stats.exerciseSteps += seq.steps.filter((x) => x.kind === "exercise").length;
       for (const p of sequenceProblems(seq, { ayah, last, exercises, introduced, compose, map, zero })) errors.push(`${where}: ${p}`);
-      for (const p of exampleProblems(seq, { ayah, introduced, compose: composeFile, derived, clips: input.clips ?? {}, wordAt, texts, zero })) {
+      for (const p of exampleProblems(seq, { ayah, introduced, compose: composeFile, derived, voice: (ar) => voiceFrom(input.voices ?? { words: {} }, ar), wordAt, texts, zero })) {
         errors.push(`${where}: ${p}`);
       }
 

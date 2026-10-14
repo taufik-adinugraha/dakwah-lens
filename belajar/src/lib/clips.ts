@@ -27,15 +27,18 @@ export const CLIP_QREF = /^q:(\d{1,3}):(\d{1,3}):(\d{1,3})(?:-(\d{1,3})|\/(\d{1,
 /**
  * The clip key of something a page shows as an example: a word loc ("1:1:1") or a word q-ref
  * ("q:55:78:2") is that word; a letter q-ref ("q:1:1:1#1", a Harakat sign's example letter) is the
- * word it is cut from — a letter alone is never recited; a run ("q:112:1:2-4") is the run. A QAC
- * segment ("q:1:1:1/1", the bi- of bismi) is null: a part of a word is never recited on its own,
- * and the joined word's clip voices it. pipeline/clips.py key_of is the same rule.
+ * word it is cut from — a letter alone is not voiced, its word is; a run ("q:112:1:2-4") is the
+ * run; a QAC segment ("q:1:1:1/1", the bi- of bismi) is the part itself ("1:1:1/1"). Until
+ * 2026-10-14 a part had no key, because the imam's recitation cannot be cut at a part of a word;
+ * the narrator's recording of the part can (src/lib/wordvoice.ts, content/wordvoice.json). The keys
+ * are `library.quran`'s own.
  */
 export function clipKey(ref: string): string | null {
   if (WORD_LOC.test(ref)) return ref;
   const m = CLIP_QREF.exec(ref);
-  if (!m || m[5]) return null;
+  if (!m) return null;
   const loc = `${m[1]}:${m[2]}:${m[3]}`;
+  if (m[5]) return `${loc}/${m[5]}`;
   return m[4] ? `${loc}-${m[4]}` : loc;
 }
 

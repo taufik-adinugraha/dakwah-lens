@@ -5,6 +5,7 @@
  * a word pointing at a lemma or concept that doesn't exist fails CI.
  */
 import raw from "../../content/library.json";
+import voices from "../../content/wordvoice.json";
 
 import {
   Library,
@@ -17,6 +18,7 @@ import {
 } from "@/content/schema";
 
 import { IS_PUBLIC } from "./flags";
+import { voiceFrom, type WordVoiceManifest } from "./wordvoice";
 import { lookupFrom, type Lookup } from "./terms";
 
 const parsed = Library.safeParse(raw);
@@ -26,7 +28,26 @@ if (!parsed.success) {
       JSON.stringify(parsed.error.issues.slice(0, 10), null, 2),
   );
 }
-export const LIBRARY: Library = parsed.data;
+/**
+ * The voice of every Qur'anic word, run and part of a word the library shows: the narrator's
+ * recording of its bytes (content/wordvoice.json, pipeline/wordvoice.py), NEVER a cut of the
+ * imam's recitation — the cuts were "not clean" in places (operator 2026-10-14). Keyed like
+ * `quran` (a word "1:1:1", a run "112:1:2-4", a part "1:7:3/2"), so a page looks a clip up by the
+ * q-ref it already has (src/lib/clips.ts clipFor). `library.json`'s own `clips` (the imam's cuts,
+ * and the build's checks of them) are not used by the pages any more. A text with no recording has
+ * no entry: its button is not drawn; CI keeps that set empty (build_wordvoice.py --check
+ * --require-audio).
+ */
+function voiced(quran: Readonly<Record<string, string>>): Library["clips"] {
+  const out: Library["clips"] = {};
+  for (const [key, ar] of Object.entries(quran)) {
+    const clip = voiceFrom(voices as WordVoiceManifest, ar);
+    if (clip) out[key] = clip;
+  }
+  return out;
+}
+
+export const LIBRARY: Library = { ...parsed.data, clips: voiced(parsed.data.quran) };
 
 const conceptMap = new Map(LIBRARY.concepts.map((c) => [c.id, c]));
 const lexemeMap = new Map(LIBRARY.lexicon.map((l) => [l.id, l]));

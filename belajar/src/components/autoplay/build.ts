@@ -22,9 +22,9 @@ import { availableExercises, buildAutoplaySequence, lessonExamples, questionNumb
 import { composeFor, composeInput } from "@/lib/compose-content";
 import { SURAHS } from "@/lib/content";
 import { taughtAt, taughtInZero } from "@/lib/curriculum";
-import { LIBRARY } from "@/lib/library";
 import { lessonMapInput } from "@/lib/map-content";
 import { quizAyah } from "@/lib/quiz-content";
+import { wordVoice } from "@/lib/wordvoice";
 
 import { narrationFor, SHARED_NARRATION } from "./manifests";
 import { autoplayTexts } from "./texts";
@@ -42,7 +42,7 @@ export function lessonExamplesFor(s: SurahContent, a: Ayah): { examples: LessonE
     ayah: a,
     introduced: taughtAt(a),
     compose: composeFor(s.slug),
-    clips: LIBRARY.clips,
+    voice: wordVoice,
     wordAt: (loc) => WORDS.get(loc),
   });
 }
@@ -87,7 +87,7 @@ export function zeroExamplesFor(s: SurahContent): { examples: LessonExample[]; g
     zero: true,
     introduced: taughtInZero(),
     compose: composeFor(s.slug),
-    clips: LIBRARY.clips,
+    voice: wordVoice,
     wordAt: (loc) => WORDS.get(loc),
   });
 }

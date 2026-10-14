@@ -128,7 +128,7 @@ export function useExamplePlayer(opts: { rate?: PlaybackRate } = {}) {
       timer = null;
     };
     const load = (type: MediaEventType) => {
-      const at = { kind: "recitation" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
+      const at = { kind: "narration" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
       setLoading((prev) => mediaLoading(prev, type, at));
     };
     /** Ends the clip playing now: its handlers are dropped first, so nothing reports twice. */

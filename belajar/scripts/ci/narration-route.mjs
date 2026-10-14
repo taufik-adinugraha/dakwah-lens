@@ -16,8 +16,16 @@ import { fileURLToPath } from "node:url";
 export const BELAJAR_DIR = process.env.BELAJAR_DIR ?? fileURLToPath(new URL("../..", import.meta.url));
 export const NARRATION_PREFIX = "/belajar/media/narration/";
 export const isNarration = (url) => url.pathname.startsWith(NARRATION_PREFIX);
+/** The narrator's recording of every word, run, part of a word and base form the module shows by
+ *  itself (content/wordvoice.json, pipeline/wordvoice.py; operator 2026-10-14): the example voices
+ *  of the Konsep pages and of the lessons' example beats. They are served from the narration media
+ *  store, so `isNarration` is true of them and the route below answers them. */
+export const WORD_VOICE_PREFIX = `${NARRATION_PREFIX}kang-nandar/words/`;
+export const isWordVoice = (url) => url.pathname.startsWith(WORD_VOICE_PREFIX);
 
-/** Every narration file the manifests point at → its duration (ms). */
+/** Every narration file the manifests point at → its duration (ms): the lines of the narration
+ *  manifests (content/narration/*.json) and the narrator's recordings of the words
+ *  (content/wordvoice.json). A file no manifest names is answered 404 (narrationRoute). */
 export async function narrationIndex() {
   const dir = path.join(BELAJAR_DIR, "content", "narration");
   const index = new Map();
@@ -27,6 +35,23 @@ export async function narrationIndex() {
       const a = line?.audio;
       if (a && typeof a.url === "string" && Number.isInteger(a.ms) && a.ms > 0) index.set(a.url, a.ms);
     }
+  }
+  for (const [url, ms] of await wordVoiceIndex()) index.set(url, ms);
+  return index;
+}
+
+/** Every recording of content/wordvoice.json → its duration (ms); empty when the file is not there. */
+export async function wordVoiceIndex() {
+  const index = new Map();
+  let manifest = null;
+  try {
+    manifest = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "wordvoice.json"), "utf8"));
+  } catch {
+    return index;
+  }
+  for (const entry of Object.values(manifest?.words ?? {})) {
+    const a = entry?.audio;
+    if (a && typeof a.url === "string" && Number.isInteger(a.ms) && a.ms > 0) index.set(a.url, a.ms);
   }
   return index;
 }

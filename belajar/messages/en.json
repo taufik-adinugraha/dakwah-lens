@@ -145,6 +145,8 @@
   "Credits": {
     "title": "Sources & licences",
     "intro": "This module is built on the works and data below. We credit each source as its licence requires, and we do not store reciters' recordings on our servers: recitation streams directly from the provider.",
+    "voice_heading": "The narrator's voice and the example voices",
+    "voice_body": "The explanations, and the voice of each word and part of a word, are made with AI from the voice of the narrator Kang Nandar (ElevenLabs, multilingual v2). The spelling of a letter is adjusted where needed so it is read correctly, and every recording was listened to before it was used. These are not recordings of the imam.",
     "recitation_heading": "The imam's recitation on the lesson pages",
     "recitation_body": "Every ayah is played from these recordings, with a timing for every word:",
     "streaming_note": "When you start a lesson or play a recitation, your browser fetches the audio directly from the recording provider's servers abroad, so your IP address is visible to them.",
@@ -335,13 +337,12 @@
   },
   "Clip": {
     "play": "Listen",
-    "play_label": "Listen to the imam's recitation: {word}",
+    "play_label": "Listen to the AI voice: {word}",
     "stop": "Stop",
-    "stop_label": "Stop the imam's recitation: {word}",
-    "retry_label": "Try again, the imam's recitation: {word}",
+    "stop_label": "Stop the AI voice: {word}",
+    "retry_label": "Try again, the AI voice: {word}",
     "waqf_note": "At the end of an ayah the imam stops (waqf), so the final vowel sign is not heard.",
-    "washal_note": "In mid-recitation the alif at the start of this word is not read: with the word before it you hear “{heard}”.",
-    "credit": "Example voices: recitation by Mishary Rashid Alafasy, streamed from EveryAyah.com; word timings: quran-align (Collin Fair, CC BY 4.0)."
+    "credit": "Example voices: made with AI (the narrator Kang Nandar, ElevenLabs), not a recording of the imam; whole ayat are recited by the imam on the lesson pages."
   },
   "Lexeme": {
     "eyebrow": "Vocabulary",
@@ -399,6 +400,7 @@
     "card_meaning": "meaning “{gloss}”",
     "example_tag": "Example",
     "example_place": "QS {surah}:{ayah}",
+    "example_form": "Base form",
     "example_ending": "it ends in",
     "example_failed": "This example's sound could not be played. The lesson goes on by itself.",
     "map_label": "What this ayah's lesson covers",

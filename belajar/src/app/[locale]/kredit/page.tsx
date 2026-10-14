@@ -76,6 +76,13 @@ export default async function CreditsPage({
           </li>
         ))}
       </ul>
+      {/* The narrator's voice of the words and the explanations (src/lib/wordvoice.ts): AI, and said so. */}
+      <section className="mt-8" aria-labelledby="narrator-voice">
+        <h2 id="narrator-voice" className="text-lg font-semibold text-ink">
+          {t("voice_heading")}
+        </h2>
+        <p className="mt-1 max-w-prose text-base text-ink-muted">{t("voice_body")}</p>
+      </section>
       {recitationCredits.length > 0 && (
         <section className="mt-8" aria-labelledby="recitations">
           <h2 id="recitations" className="text-lg font-semibold text-ink">

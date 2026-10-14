@@ -58,7 +58,7 @@ export function useClipPlayer() {
       timer = null;
     };
     const load = (type: MediaEventType) => {
-      const at = { kind: "recitation" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
+      const at = { kind: "narration" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
       setLoading((prev) => mediaLoading(prev, type, at));
     };
     /** Stops the element once it has reached the clip's end. True when there is nothing more to

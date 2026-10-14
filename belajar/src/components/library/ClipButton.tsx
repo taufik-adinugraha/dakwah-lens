@@ -81,7 +81,7 @@ export function ClipButton({
       : view.line === "slow"
         ? ta("loading_slow")
         : view.line === "loading"
-          ? tg("loading_recitation")
+          ? tg("loading_narration")
           : null;
   const [label, visible] =
     view.mode === "stop"

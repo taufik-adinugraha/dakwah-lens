@@ -145,6 +145,8 @@
   "Credits": {
     "title": "Sumber & lisensi",
     "intro": "Modul ini dibangun di atas karya dan data berikut. Kami menyebut setiap sumber sesuai ketentuan lisensinya, dan tidak menyimpan rekaman qari di server kami: bacaan diputar langsung dari server penyedianya.",
+    "voice_heading": "Suara narator dan suara contoh",
+    "voice_body": "Penjelasan dan suara tiap kata dan bagian kata dibuat dengan AI, dari suara narator Kang Nandar (ElevenLabs, model multilingual v2). Ejaan huruf diubah seperlunya agar terbaca benar, dan setiap rekaman sudah didengar sebelum dipakai. Ini bukan rekaman imam.",
     "recitation_heading": "Bacaan imam di halaman pelajaran",
     "recitation_body": "Setiap ayat diperdengarkan dari rekaman berikut, lengkap dengan penanda waktu setiap kata:",
     "streaming_note": "Saat Anda memulai pelajaran atau memutar bacaan, peramban Anda mengambil berkas audio langsung dari server penyedia rekaman di luar negeri, sehingga alamat IP Anda terlihat oleh server tersebut.",
@@ -335,13 +337,12 @@
   },
   "Clip": {
     "play": "Dengarkan",
-    "play_label": "Dengarkan bacaan imam: {word}",
+    "play_label": "Dengarkan suara AI: {word}",
     "stop": "Hentikan",
-    "stop_label": "Hentikan bacaan imam: {word}",
-    "retry_label": "Coba lagi, bacaan imam: {word}",
+    "stop_label": "Hentikan suara AI: {word}",
+    "retry_label": "Coba lagi, suara AI: {word}",
     "waqf_note": "Di akhir ayat imam berhenti (waqaf), jadi harakat akhirnya tidak terdengar.",
-    "washal_note": "Di tengah bacaan, alif di awal kata ini tidak dibaca: bersama kata sebelumnya terdengar “{heard}”.",
-    "credit": "Suara contoh: bacaan Mishary Rasyid Alafasy, diputar langsung dari EveryAyah.com; penanda waktu kata: quran-align (Collin Fair, CC BY 4.0)."
+    "credit": "Suara contoh: dibuat dengan AI (narator Kang Nandar, ElevenLabs), bukan rekaman imam; ayat lengkap dibacakan imam di halaman pelajaran."
   },
   "Lexeme": {
     "eyebrow": "Kosakata",
@@ -399,6 +400,7 @@
     "card_meaning": "yang artinya “{gloss}”",
     "example_tag": "Contoh",
     "example_place": "QS {surah}:{ayah}",
+    "example_form": "Bentuk dasar",
     "example_ending": "akhirnya",
     "example_failed": "Suara contoh ini belum bisa diputar. Pelajaran berlanjut sendiri.",
     "map_label": "Isi pelajaran ayat ini",

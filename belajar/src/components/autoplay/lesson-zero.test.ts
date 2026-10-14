@@ -26,11 +26,12 @@ import {
 } from "@/lib/autoplay";
 import { exampleProblems, sequenceProblems } from "@/lib/autoplay/checks";
 import { composeFor, composeInput } from "@/lib/compose-content";
-import { SURAHS } from "@/lib/content";
+import { SURAHS, WORD_AR } from "@/lib/content";
 import { CURRICULUM, taughtAt, taughtInZero, ZERO_HOST } from "@/lib/curriculum";
 import { LIBRARY } from "@/lib/library";
 import { lessonMapInput } from "@/lib/map-content";
 import { ayahHref, INTRO_SEGMENT, introHref, SURAH_SLUGS } from "@/lib/routes";
+import { wordVoice } from "@/lib/wordvoice";
 
 import en from "../../../messages/en.json";
 import id from "../../../messages/id.json";
@@ -49,7 +50,7 @@ import { autoplayTexts } from "./texts";
 // "Konsep baru" line was said nowhere.
 //
 // Here: who hosts it, its sequence as its page builds it (no ayah: no recitation, no recap, no
-// exercise), its lines in the manifest, its examples (the imam's clips), the run to its end and
+// exercise), its lines in the manifest, its examples (the narrator's recordings), the run to its end and
 // the hand-over to ayah 1, what left Al-Fatihah 1, where it is linked, and the CI scripts' paths.
 // The pipeline's half (the lines, the curriculum's lists) is pipeline/test_validate_narration.py
 // and test_validate_curriculum.py; that a browser plays it is scripts/ci/screenshots.mjs introChecks.
@@ -162,8 +163,8 @@ describe("its sequence, as its page builds it", () => {
   });
 });
 
-describe("its examples: the imam's clips of the record's first examples", () => {
-  it("the three kinds of word, one clip each (an isim, a fi'il, a huruf), each saying which it is: no word of an ayah here to recite", () => {
+describe("its examples: the narrator's recordings of the record's first examples", () => {
+  it("the three kinds of word, one recording each (an isim, a fi'il, a huruf), each saying which it is: no word of an ayah here to recite", () => {
     const record = LIBRARY.concepts.find((c) => c.id === KALIMAH)!;
     const derived = zeroExamplesFor(FATIHAH);
     expect(derived.gaps).toEqual([]);
@@ -171,13 +172,20 @@ describe("its examples: the imam's clips of the record's first examples", () => 
       record.examples.slice(0, MAX_EXAMPLES_ZERO).map((e, k) => [`concept:${KALIMAH}:${k + 1}`, `concept:${KALIMAH}:ex`, e.loc, null, LIBRARY.clips[e.loc]]),
     );
     // Operator's audit of lesson zero (2026-10-14): an example of each kind, in the order the line
-    // names them — the huruf last, in bismi with its isim (Al-Fatihah has no huruf heard on its
-    // own: wa lā loses its long ā before aḍ-ḍāllīna, and a surah not yet published gives none).
+    // names them — the huruf last, in bismi with its isim. They are the record's first three,
+    // each the first of its kind with a recording (the narrator's: any word of the record has one;
+    // until 2026-10-14 the imam's cut of wa lā lost its long ā before aḍ-ḍāllīna, which is why a
+    // huruf alone was not on offer).
     expect(derived.examples.map((e) => e.key)).toEqual(["1:7:1", "1:5:2", "1:1:1"]);
     // Each says what it is an example of (the stage has no ayah to show it).
     expect(derived.examples.map((e) => e.about)).toEqual(["isim, nama benda.", "fi'il, kata kerja.", "bi- (huruf) + ism (isim), dua jenis kata dalam satu tulisan."]);
-    // Neither ends its ayah (the imam's stop would change what is heard).
-    for (const e of derived.examples) expect([e.clip?.last, e.waqf], e.id).toEqual([undefined, false]);
+    // Each is the narrator's whole recording of the word's own bytes: no `last`, no stop, no run.
+    for (const e of derived.examples) {
+      expect(e.clip, e.id).toEqual(wordVoice(WORD_AR[e.key]));
+      expect(e.clip, e.id).not.toBeNull();
+      expect([e.clip?.start, e.clip?.last, e.waqf, e.washal], e.id).toEqual([0, undefined, false, null]);
+      expect(e.clip?.url, e.id).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\//);
+    }
     const beats = seq.steps.find((s) => s.kind === "example")!.examples!;
     expect(beats.map((b) => [b.id, b.key, b.word])).toEqual(derived.examples.map((e) => [e.id, e.key, null]));
     for (const b of beats) expect(b.caption).not.toMatch(/[؀-ۿ]/);
@@ -189,14 +197,14 @@ describe("its examples: the imam's clips of the record's first examples", () => 
       "Contoh — bismi: bi- (huruf) + ism (isim), dua jenis kata dalam satu tulisan.",
     ]);
     expect(
-      exampleProblems(seq, { ayah: { words: [], recitation: [] }, introduced: taughtInZero(), compose: composeFor("al-fatihah"), derived, clips: LIBRARY.clips, wordAt: () => undefined, texts: ID_TEXTS, zero: true })
+      exampleProblems(seq, { ayah: { words: [], recitation: [] }, introduced: taughtInZero(), compose: composeFor("al-fatihah"), derived, voice: wordVoice, wordAt: () => undefined, texts: ID_TEXTS, zero: true })
         .filter((p) => !/bytes/.test(p)),
     ).toEqual([]);
   });
 });
 
 describe("the lesson left to run", () => {
-  it("plays every line once, shows the primer's frames in order, recites the three clips, and ends with the way to ayah 1", () => {
+  it("plays every line once, shows the primer's frames in order, plays the three recordings, and ends with the way to ayah 1", () => {
     for (const pace of ["biasa", "pelan"] as const) {
       const states = run(seq, pace);
       const last = states[states.length - 1];
@@ -209,7 +217,7 @@ describe("the lesson left to run", () => {
       // The primer's frames, 1 … 6.
       const frames = states.filter((s) => s.idx === 1).map((s) => stageFrame(seq, s)?.frame).filter((f, i, all) => f !== undefined && all[i - 1] !== f);
       expect(frames, pace).toEqual([1, 2, 3, 4, 5, 6]);
-      // The three examples, each a clip, in order.
+      // The three examples, each a recording, in order.
       const clips = states.flatMap((s) => (s.activity?.kind === "recite" && s.activity.target === "clip" ? [stageExample(seq, s)?.beat.key] : []));
       expect([...new Set(clips)], pace).toEqual(["1:7:1", "1:5:2", "1:1:1"]);
       // No recitation of an ayah or of a lesson word.

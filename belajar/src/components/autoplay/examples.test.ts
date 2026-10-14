@@ -50,6 +50,7 @@ import { hasWaqfNote, waqfDrop } from "@/lib/heard";
 import { captionMs, PACES, type Pace } from "@/lib/lessonSteps";
 import { taughtAt } from "@/lib/curriculum";
 import { LIBRARY } from "@/lib/library";
+import { wordVoice } from "@/lib/wordvoice";
 
 import { lessonExamplesFor, stageSequence } from "./build";
 import { stageExample, stageFrame, stageMarks } from "./caption";
@@ -89,7 +90,7 @@ const lessonOf = (s: SurahContent, a: Ayah, locale: "id" | "en" = "id"): Lesson 
       introduced: taughtAt(a),
       compose: composeFor(s.slug),
       derived,
-      clips: LIBRARY.clips,
+      voice: wordVoice,
       wordAt: (loc) => WORDS.get(loc),
       texts: autoplayTexts(locale),
     },
@@ -138,32 +139,57 @@ describe("which examples a lesson plays (src/lib/autoplay/examples.ts)", () => {
   // marfu', alif lam, manshub), and none for a next-level record — 26 beats where there were 35
   // (25 until ihdinā, 1:6:1, became an example of jumlah fi'liyyah on 2026-10-13: the step is
   // taught in ayah 6 and had no word of that ayah to show).
-  it("Al-Fatihah: every concept line has its example in this ayah, every bentuk dasar heard in the Qur'an its clip — 26 beats, the rest listed with a reason", () => {
+  it("Al-Fatihah: every concept line has its example in this ayah, every bentuk dasar that is not the lesson's own word its recording — 30 beats, the 3 own forms listed with a reason", () => {
     const rows = Object.fromEntries(fatihah.map((l) => [l.ayah.ayah, beatsOf(l.seq).map(({ step, beat }) => `${step.id} → ${beat.key}`)]));
+    // A bentuk dasar is the narrator's recording of the form as the composition shows it (key:
+    // "<word>#<form>"): ismu, which the imam's cut played as "tabārakasmu", and the teaching forms
+    // no ayah has (na‘budu's, al-ḥamdu's), which had no voice at all, are now all voiced.
     expect(rows[1]).toEqual([
-      // "ismu (read by voice + show visual) … becomes ismi (read by voice + visual)": the base
-      // form where the Qur'an has it, heard with the word before it (hamzat washal); the joined
-      // word is the lesson's own, which the imam recites when its step opens (plan L24).
-      "w1:compose → 55:78:1-2",
-      "w2:compose → 112:2:1",
-      "w3:compose → 20:5:1",
+      "w1:compose → 1:1:1#ismu",
+      "w2:compose → 1:1:2#allahu",
+      "w3:compose → 1:1:3#ar-rahmanu",
       // The step majrur (a part of the i'rab record, its own text): a majrur word of the ayah.
       "concept:majrur:ex → 1:1:1",
       "concept:huruf-jar:ex → 1:1:1",
     ]);
-    expect(rows[2]).toEqual(["w2:compose → 112:2:1", "w3:compose → 41:9:13", "concept:jumlah-ismiyyah:ex → 1:2:1", "concept:marfu:ex → 1:2:1", "concept:jamak-mudzakkar-salim:ex → 1:2:4"]);
+    // al-ḥamdu's base form IS the word: the lesson recites it when the step opens, so no beat.
+    expect(rows[2]).toEqual([
+      "w2:compose → 1:2:2#allahu",
+      "w3:compose → 1:2:3#rabbu",
+      "concept:jumlah-ismiyyah:ex → 1:2:1",
+      "concept:marfu:ex → 1:2:1",
+      "concept:jamak-mudzakkar-salim:ex → 1:2:4",
+    ]);
     // Alif lam has no record: the first word of the ayah that carries it. Na't and idhafah moved
     // here from ayah 1, and take their example in THIS ayah.
     expect(rows[3]).toEqual(["concept:alif-lam:ex → 1:3:1", "concept:naat:ex → 1:3:1"]);
-    expect(rows[4]).toEqual(["w2:compose → 37:20:4", "concept:idhafah:ex → 1:4:1"]);
-    expect(rows[5]).toEqual(["concept:dhamir:ex → 1:5:1", "concept:fiil-mudhari:ex → 1:5:2", "concept:murab-mabni:ex → 1:5:1"]);
-    expect(rows[6]).toEqual(["concept:jumlah-filiyyah:ex → 1:6:1", "concept:maful-bih:ex → 1:6:1", "concept:manshub:ex → 1:6:2"]);
-    // an‘ama: the Konsep diagram's place (plan L19: QS 5:23, a clean alignment), not QS 4:69.
-    expect(rows[7].slice(0, 3)).toEqual(["w1:compose → 6:126:2", "w3:compose → 5:23:6", "w5:compose → 74:10:3"]);
+    expect(rows[4]).toEqual(["w1:compose → 1:4:1#maliku", "w2:compose → 1:4:2#yaumu", "concept:idhafah:ex → 1:4:1"]);
+    // na‘budu's and nasta‘īnu's base forms are the words themselves: no beat either.
+    expect(rows[5]).toEqual([
+      "concept:dhamir:ex → 1:5:1",
+      "concept:fiil-mudhari:ex → 1:5:2",
+      "concept:murab-mabni:ex → 1:5:1",
+    ]);
+    expect(rows[6]).toEqual([
+      "w2:compose → 1:6:2#as-siratu",
+      "w3:compose → 1:6:3#al-mustaqimu",
+      "concept:jumlah-filiyyah:ex → 1:6:1",
+      "concept:maful-bih:ex → 1:6:1",
+      "concept:manshub:ex → 1:6:2",
+    ]);
+    expect(rows[7]).toEqual([
+      "w1:compose → 1:7:1#siratu",
+      "w3:compose → 1:7:3#anama",
+      "w5:compose → 1:7:5#gairu",
+      "w6:compose → 1:7:6#al-magdubu",
+      "concept:isim-maushul:ex → 1:7:2",
+      "concept:fiil-madhi:ex → 1:7:3",
+      "concept:athaf:ex → 1:7:8",
+    ]);
     const all = fatihah.flatMap((l) => beatsOf(l.seq));
-    expect(all.length).toBe(26);
+    expect(all.length).toBe(30);
     expect(all.filter((x) => x.beat.word !== null).length).toBe(17);
-    expect(all.filter((x) => x.beat.clip !== null).length).toBe(9);
+    expect(all.filter((x) => x.beat.clip !== null).length).toBe(13);
     // A step taught here: exactly one example step, right after its line. Every step of
     // Al-Fatihah occurs on a word of its ayah (the one that did not — jumlah fi'liyyah in ayah 6 —
     // has ihdinā since 2026-10-13); the rule for one that does not is planted below.
@@ -178,16 +204,12 @@ describe("which examples a lesson plays (src/lib/autoplay/examples.ts)", () => {
         expect(c.words, `${l.seq.lessonKey} ${c.id}`).toContain(Number(c.examples[0].loc.split(":")[2]));
       }
     }
-    // Without a beat of their own: listed, each with its reason (no hand list: the build's).
-    const gaps = fatihah.flatMap((l) => l.derived.gaps.map((g) => `${l.ayah.ayah} ${g.step}: ${g.rule}`));
-    expect(gaps).toEqual([
+    // Without a beat of their own: the three base forms that are the lesson's own word, each with
+    // its reason (a form with no recording would be listed too).
+    expect(fatihah.flatMap((l) => l.derived.gaps.map((g) => `${l.ayah.ayah} ${g.step}: ${g.rule}`))).toEqual([
       "2 w1:compose: bentuk dasar al-ḥamdu",
-      "4 w1:compose: bentuk dasar māliku",
       "5 w2:compose: bentuk dasar na‘budu",
       "5 w4:compose: bentuk dasar nasta‘īnu",
-      "6 w2:compose: bentuk dasar aṣ-ṣirāṭu",
-      "6 w3:compose: bentuk dasar al-mustaqīmu",
-      "7 w6:compose: bentuk dasar al-magḍūbu",
     ]);
     for (const l of fatihah) for (const g of l.derived.gaps) expect(g.why.length, g.step).toBeGreaterThan(20);
     // PLANTED: a step taught in an ayah none of whose words carries it (what jumlah fi'liyyah was
@@ -195,11 +217,21 @@ describe("which examples a lesson plays (src/lib/autoplay/examples.ts)", () => {
     // step, and the lesson lists it with the reason.
     const six = fatihah[5];
     const elsewhere = { id: "jumlah-filiyyah", examples: [{ loc: "1:5:2", note: "contoh di ayat lain" }] };
-    const planted = lessonExamples({ ayah: six.ayah, introduced: [elsewhere], compose: null, clips: LIBRARY.clips, wordAt: (loc) => WORDS.get(loc) });
+    const planted = lessonExamples({ ayah: six.ayah, introduced: [elsewhere], compose: null, voice: wordVoice, wordAt: (loc) => WORDS.get(loc) });
     expect(planted.examples).toEqual([]);
     expect(planted.gaps).toEqual([{ step: "concept:jumlah-filiyyah:ex", rule: "jumlah-filiyyah", why: "its first example is not a word of this ayah" }]);
-    const none = lessonExamples({ ayah: six.ayah, introduced: [{ id: "jumlah-filiyyah", examples: [] }], compose: null, clips: LIBRARY.clips, wordAt: (loc) => WORDS.get(loc) });
+    const none = lessonExamples({ ayah: six.ayah, introduced: [{ id: "jumlah-filiyyah", examples: [] }], compose: null, voice: wordVoice, wordAt: (loc) => WORDS.get(loc) });
     expect(none.gaps).toEqual([{ step: "concept:jumlah-filiyyah:ex", rule: "jumlah-filiyyah", why: "no word of this ayah carries it" }]);
+    // PLANTED: a form the narrator has not recorded (the manifest lacks its text): no beat, and the
+    // lesson lists it with the reason — never a silent base frame, never the imam's cut in its place.
+    const one = fatihah[0];
+    const unrecorded = lessonExamples({ ayah: one.ayah, introduced: [], compose: composeFor("al-fatihah"), voice: () => null, wordAt: (loc) => WORDS.get(loc) });
+    expect(unrecorded.examples).toEqual([]);
+    expect(unrecorded.gaps.map((g) => g.step)).toEqual(["w1:compose", "w2:compose", "w3:compose"]);
+    for (const g of unrecorded.gaps) {
+      expect(g.rule, g.step).toMatch(/^bentuk dasar /);
+      expect(g.why, g.step).toBe("the form has no recording (content/wordvoice.json)");
+    }
   });
 
   // "When transation from word X to X+1, i think we dont need to recite the X, just directly to
@@ -272,23 +304,40 @@ describe("which examples a lesson plays (src/lib/autoplay/examples.ts)", () => {
       id: "contoh",
       examples: [{ loc: lastWord.loc, note: `${lastWord.translit}: khabar, berakhir ${lastWord.case.sign}.` }, ...others.map((loc) => ({ loc, note: "contoh lain" }))],
     });
-    const derive = (others: string[]) =>
-      lessonExamples({ ayah: a, introduced: [concept(others)], compose: null, clips: LIBRARY.clips, wordAt: (loc) => WORDS.get(loc) });
-    // another ayah's word that does not end its ayah: a clip of it
+    const derive = (others: string[], voice: (ar: string) => ReturnType<typeof wordVoice> = wordVoice) =>
+      lessonExamples({ ayah: a, introduced: [concept(others)], compose: null, voice, wordAt: (loc) => WORDS.get(loc) });
+    // The second example is the first of the others that HAS a recording — the narrator's, said
+    // whole, where the ending is heard. (Until 2026-10-14 it had to be a word that does not end its
+    // ayah, because the imam's cut of one lost its ending too: 112:4:5 was skipped for 112:4:4.)
     const far = derive(["112:4:5", "112:4:4"]).examples.filter((e) => e.of === "concept");
     expect(far.map((e) => [e.id, e.key, e.word, e.waqf])).toEqual([
       ["concept:contoh:1", lastWord.loc, a.words.length, true],
-      ["concept:contoh:2", "112:4:4", null, false],
+      ["concept:contoh:2", "112:4:5", null, false],
     ]);
-    expect(far[1].clip).toEqual(LIBRARY.clips["112:4:4"]);
-    expect(far[1].clip?.last).toBeUndefined();
-    // a word of this very ayah: the stage's own player, no clip
+    expect(far[1].clip).toEqual(wordVoice(WORDS.get("112:4:5")!.ar));
+    expect(far[1].clip).not.toHaveProperty("last");
+    expect(far[1].clip?.url).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\//);
+    // … and with no recording of that one, the next: a form with none is skipped, never played
+    const unvoiced = (ar: string) => (ar === WORDS.get("112:4:5")!.ar ? null : wordVoice(ar));
+    const next = derive(["112:4:5", "112:4:4"], unvoiced).examples.filter((e) => e.of === "concept");
+    expect(next.map((e) => [e.id, e.key, e.word])).toEqual([
+      ["concept:contoh:1", lastWord.loc, a.words.length],
+      ["concept:contoh:2", "112:4:4", null],
+    ]);
+    expect(next[1].clip).toEqual(wordVoice(WORDS.get("112:4:4")!.ar));
+    // a word of this very ayah is the narrator's recording too, not the stage's own player (that
+    // recites the ayah's words only where the lesson goes through them: the concept's first example)
     const near = derive(["112:1:3"]).examples.filter((e) => e.of === "concept");
-    expect([near[1].key, near[1].word, near[1].clip]).toEqual(["112:1:3", 3, null]);
-    // only ayah-final examples elsewhere: none is added, and the lesson says why
-    const none = derive(["112:4:5"]);
+    expect([near[1].key, near[1].word, near[1].clip]).toEqual(["112:1:3", null, wordVoice(WORDS.get("112:1:3")!.ar)]);
+    expect(near[1].place).toEqual({ surah: 112, ayah: 1 });
+    // none of the others has a recording: none is added, and the lesson says why
+    const none = derive(["112:4:5", "112:4:4"], () => null);
     expect(none.examples.filter((e) => e.of === "concept").length).toBe(1);
-    expect(none.gaps.some((g) => g.step === "concept:contoh:ex" && /does not end its ayah/.test(g.why))).toBe(true);
+    expect(none.gaps).toEqual([
+      expect.objectContaining({ step: "concept:contoh:ex", rule: "contoh", why: expect.stringMatching(/^its example here ends the ayah, where the dhammatain it is about is not heard/) }),
+    ]);
+    // a concept with no other example at all: the same
+    expect(derive([]).gaps.map((g) => g.step)).toEqual(["concept:contoh:ex"]);
     expect(MAX_EXAMPLES_PER_RULE).toBe(2);
   });
 
@@ -316,7 +365,7 @@ describe("which examples a lesson plays (src/lib/autoplay/examples.ts)", () => {
         ayah: a1,
         introduced: [{ id: "contoh", examples: [{ loc: a1.words[n - 1].loc, note: `${a1.words[n - 1].translit}: sifat, ikut majrur dengan kasrah.` }] }],
         compose: null,
-        clips: LIBRARY.clips,
+        voice: wordVoice,
         wordAt: (loc) => WORDS.get(loc),
       }).examples.find((e) => e.of === "concept");
     expect([about(4)?.ending, about(4)?.waqf]).toEqual([null, true]);
@@ -346,17 +395,24 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     }
   });
 
-  it("heard: an ayah's last word says the imam stops; a bentuk dasar is never one; ismu is played with the word before it", () => {
+  it("heard: an ayah's last word says the imam stops; a bentuk dasar and a second example are the narrator's whole recording, so never one; ismu is its own recording", () => {
     let waqf = 0;
     for (const l of every) {
       for (const { beat } of beatsOf(l.seq)) {
         const d = l.derived.examples.find((e) => e.id === beat.id);
         if (!d) throw new Error(beat.id);
-        const last = beat.word !== null ? beat.word === l.ayah.words.length : beat.clip?.last === true;
+        // Only a word of this ayah is recited by the imam, on the stage's own player; a recording
+        // is the narrator's whole word and is never "the last word" of anything.
+        const last = beat.word !== null && beat.word === l.ayah.words.length;
         expect(d.waqf, beat.id).toBe(hasWaqfNote(last ? { last: true } : null, d.ar));
         expect(beat.caption.includes(l.ctx.texts.example.waqf), beat.id).toBe(d.waqf);
         if (last) expect(waqfDrop(d.ar), beat.id).not.toBe("other");
         if (beat.of !== "concept") expect(last, beat.id).toBe(false);
+        if (beat.clip) {
+          expect(beat.clip, beat.id).not.toHaveProperty("last");
+          expect([d.waqf, d.washal], beat.id).toEqual([false, null]);
+          expect(beat.clip, beat.id).toEqual(wordVoice(d.ar));
+        }
         if (d.waqf) waqf++;
       }
     }
@@ -364,19 +420,32 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     // next-level now and have no line); yūlad (112:3:4) drops nothing.
     expect(fatihah.flatMap((l) => l.derived.examples.filter((e) => e.waqf).map((e) => e.id))).toEqual(["concept:jamak-mudzakkar-salim:1"]);
     expect(waqf).toBe(1);
+    // ismu, the bentuk dasar of bismi: the narrator's recording of the form on its own (until
+    // 2026-10-14 the imam's run tabāraka-smu, whose caption said "bersama kata sebelumnya terdengar
+    // tabārakasmu, karena alif di awalnya tidak dibaca"). Its key names the word and the form; the
+    // QS 55:78 where the form stands is still said.
     const ismu = beatsOf(fatihah[0].seq).find((x) => x.beat.id === "w1:base:2")?.beat;
-    expect([ismu?.key, ismu?.word, ismu?.frame, ismu?.clip]).toEqual(["55:78:1-2", null, 2, LIBRARY.clips["55:78:1-2"]]);
-    expect(ismu?.caption).toBe("Contoh: ismu, di QS 55:78. Bersama kata sebelumnya terdengar “tabārakasmu”, karena alif di awalnya tidak dibaca.");
-    // The clips the lesson and the Konsep pages both play are one and the same cut.
+    const form = composeFor("al-fatihah")!.words["1:1:1"].forms.ismu;
+    expect([ismu?.key, ismu?.word, ismu?.frame, ismu?.clip]).toEqual(["1:1:1#ismu", null, 2, wordVoice(form.ar)]);
+    expect(ismu?.clip).toEqual(LIBRARY.clips["55:78:2"]); // the Konsep page's ismu tile plays the same file
+    expect(ismu?.clip?.start).toBe(0);
+    expect(ismu?.caption).toBe("Contoh: ismu, di QS 55:78.");
+    // The recordings the lesson and the Konsep pages both play are one and the same file.
     for (const l of fatihah) {
       for (const { beat } of beatsOf(l.seq)) if (beat.clip && LIBRARY.clips[beat.key]) expect(beat.clip, beat.id).toEqual(LIBRARY.clips[beat.key]);
     }
+    // A form no ayah has (a teaching form: māliku, al-magḍūbu) is recorded as it is written and
+    // names no place: its card and caption say it is a base form.
+    const maliku = beatsOf(fatihah[3].seq).find((x) => x.beat.id === "w1:base:1")?.beat;
+    expect([maliku?.key, maliku?.word, maliku?.caption]).toEqual(["1:4:1#maliku", null, "Contoh bentuk dasar: māliku."]);
+    const own = fatihah[3].derived.examples.find((e) => e.id === "w1:base:1")!;
+    expect([own.place, own.washal, own.ar]).toEqual([null, null, composeFor("al-fatihah")!.words["1:4:1"].forms.maliku.ar]);
   });
 
   it("captions are plain on-screen words in both languages: no Arabic script, no ALL CAPS, never “ketuk”, short", () => {
     for (const [locale, texts] of Object.entries(AUTOPLAY_TEXT_SETS)) {
       const t = texts.example;
-      const all = [t.word({ n: 1, translit: "bismi" }), t.other({ translit: "aḥadun", surah: 112, ayah: 1 }), t.base({ translit: "ismu", surah: 55, ayah: 78 }), t.waqf, t.washal({ heard: "tabārakasmu" })];
+      const all = [t.word({ n: 1, translit: "bismi" }), t.other({ translit: "aḥadun", surah: 112, ayah: 1 }), t.base({ translit: "ismu", surah: 55, ayah: 78 }), t.form({ translit: "māliku" }), t.waqf, t.washal({ heard: "tabārakasmu" })];
       for (const c of all) {
         expect(hasArabicScript(c), `${locale}: ${c}`).toBe(false);
         expect(c, locale).not.toMatch(/\b[A-Z]{3,}\b/);
@@ -386,10 +455,14 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     }
     expect(AUTOPLAY_TEXT_SETS.id.example.word({ n: 1, translit: "bismi" })).toBe("Contoh: kata ke-1, bismi.");
     expect(AUTOPLAY_TEXT_SETS.id.example.base({ translit: "rabbu", surah: 41, ayah: 9 })).toBe("Contoh: rabbu, di QS 41:9.");
+    // a base form no ayah has: named, with no place
+    expect(AUTOPLAY_TEXT_SETS.id.example.form({ translit: "māliku" })).toBe("Contoh bentuk dasar: māliku.");
+    expect(AUTOPLAY_TEXT_SETS.en.example.form({ translit: "māliku" })).toBe("Example of the base form: māliku.");
     expect(AUTOPLAY_TEXT_SETS.en.example.word({ n: 1, translit: "bismi" })).toBe("Example: word 1, bismi.");
     const msgs = { id: JSON.parse(read("messages/id.json")).Guided, en: JSON.parse(read("messages/en.json")).Guided } as Record<string, Record<string, string>>;
     expect([msgs.id.example_tag, msgs.en.example_tag]).toEqual(["Contoh", "Example"]);
-    for (const m of Object.values(msgs)) for (const k of ["example_tag", "example_place", "example_ending", "example_failed"]) expect(m[k], k).toBeTruthy();
+    expect([msgs.id.example_form, msgs.en.example_form]).toEqual(["Bentuk dasar", "Base form"]);
+    for (const m of Object.values(msgs)) for (const k of ["example_tag", "example_place", "example_form", "example_ending", "example_failed"]) expect(m[k], k).toBeTruthy();
     for (const l of [...fatihah, ...FATIHAH.ayat.map((a) => lessonOf(FATIHAH, a, "en"))]) {
       for (const { beat } of beatsOf(l.seq)) {
         expect(hasArabicScript(beat.caption), beat.id).toBe(false);
@@ -423,10 +496,11 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
       setCaption(beat(l, "concept:idhafah:1"), l.ctx.texts.example.word({ n: 2, translit: w.translit }));
     }, /concept:idhafah: its first example is not the concept's example in this ayah \(1:4:1\)/],
     ["a beat that is not the example the content gives", 4, (l) => void (beat(l, "concept:idhafah:1").word = 2), /differs from the example the content gives/],
-    ["a bentuk dasar shown without the imam's voice and without a reason", 1, (l) => {
+    // (checks.ts words this "the imam's voice of the bentuk dasar": the recording is the narrator's now)
+    ["a bentuk dasar shown without its recording and without a reason", 1, (l) => {
       step(l, "w1:compose").examples = [];
       forget(l, "w1:base:2");
-    }, /w1:compose: base frame\(s\) 2 have neither the imam's voice of the bentuk dasar nor a reason/],
+    }, /w1:compose: base frame\(s\) 2 have neither a recording of the bentuk dasar nor a reason/],
     // Plan L24 (2026-10-13): this fault used to be the opposite one, "a word whose harakah its line
     // explains, with neither its recitation nor a reason". A word is now recited once, when its
     // step opens: a beat that recites it again after its own line is the fault.
@@ -437,22 +511,38 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
       b.frame = 3;
       b.after = 4;
     }, /differs from the example the content gives/],
-    // (the lesson's own list shifted with it: only "the clip the content gives for this key" can tell)
-    ["a clip shifted by 10 ms", 1, (l) => {
-      const clip = { ...LIBRARY.clips["55:78:1-2"], start: 40 };
+    // A recording is the manifest's, whole: the file, from 0, to its length (the lesson's own list
+    // shifted with it, so only "the recording of this form" can tell the last of these).
+    ["a recording that does not start at 0 (a cut)", 1, (l) => {
+      const clip = { ...beat(l, "w1:base:2").clip!, start: 40 };
       beat(l, "w1:base:2").clip = clip;
       example(l, "w1:base:2").clip = clip;
-    }, /w1:base:2: its clip is not the one the content gives for 55:78:1-2/],
-    ["a second example whose clip is not the Konsep page's", -2, (l) => {
+    }, /w1:base:2: clip .* is not a whole recording of content\/wordvoice\.json/],
+    ["a recording shortened by 10 ms", 1, (l) => {
+      const clip = { ...beat(l, "w1:base:2").clip!, end: beat(l, "w1:base:2").clip!.end - 10 };
+      beat(l, "w1:base:2").clip = clip;
+      example(l, "w1:base:2").clip = clip;
+    }, /w1:base:2: its clip is not the recording of ismu/],
+    ["a recording of another word (the right kind of file, the wrong text)", 1, (l) => {
+      const clip = { ...beat(l, "w1:base:2").clip!, url: wordVoice(l.ayah.words[2].ar)!.url };
+      beat(l, "w1:base:2").clip = clip;
+      example(l, "w1:base:2").clip = clip;
+    }, /w1:base:2: its clip is not the recording of ismu/],
+    ["a second example whose clip is not the one wordvoice gives", -2, (l) => {
       const clip = { ...beat(l, "concept:contoh:2").clip!, end: beat(l, "concept:contoh:2").clip!.end + 10 };
       beat(l, "concept:contoh:2").clip = clip;
       example(l, "concept:contoh:2").clip = clip;
-    }, /concept:contoh:2: its clip is not the one the content gives for 112:4:4/],
+    }, /concept:contoh:2: its clip is not the recording of/],
     ["a clip of another host", 1, (l) => {
-      const clip = { ...LIBRARY.clips["55:78:1-2"], url: "https://example.org/055078.mp3" };
+      const clip = { ...beat(l, "w1:base:2").clip!, url: "https://example.org/055078.mp3" };
       beat(l, "w1:base:2").clip = clip;
       example(l, "w1:base:2").clip = clip;
-    }, /is not \[start, end\) of an EveryAyah file/],
+    }, /is not a whole recording of content\/wordvoice\.json/],
+    ["the imam's EveryAyah cut where the narrator's recording belongs", 1, (l) => {
+      const clip = { url: "https://everyayah.com/data/Alafasy_128kbps/055078.mp3", start: 30, end: 1490 };
+      beat(l, "w1:base:2").clip = clip;
+      example(l, "w1:base:2").clip = clip;
+    }, /is not a whole recording of content\/wordvoice\.json/],
     // Na't is taught in ayah 3 (the curriculum): its example there is the ayah's first word.
     ["a beat with a word and a clip", 3, (l) => void (beat(l, "concept:naat:1").clip = LIBRARY.clips["1:3:1"]), /exactly one of a word of this ayah and a clip/],
     ["a beat with neither", 3, (l) => void (beat(l, "concept:naat:1").word = null), /exactly one of a word of this ayah and a clip/],
@@ -468,16 +558,19 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
       const b = beat(l, "concept:naat:1");
       setCaption(b, `${b.caption} ${l.ctx.texts.example.waqf}`);
     }, /which is not so here/],
-    ["a bentuk dasar voiced on an ayah's last word", 4, (l) => {
+    // A recording is whole, so an "ayah's last word" mark on it is the imam's stop, which it does
+    // not have (until 2026-10-14 a form that was an ayah's last word was refused: a stop that
+    // changed what is heard — a rule with no case left, since a form is recorded on its own).
+    ["a bentuk dasar's recording carrying the imam's `last` mark", 4, (l) => {
       const clip = { ...beat(l, "w2:base:1").clip!, last: true };
       beat(l, "w2:base:1").clip = clip;
       example(l, "w2:base:1").clip = clip;
-    }, /ends its ayah, so the ending it is there for is not heard/],
-    ["a run played without saying what is heard", 1, (l) => void setCaption(beat(l, "w1:base:2"), "Contoh: ismu, di QS 55:78."), /does not say what is heard/],
-    ["a hamzat-washal form played alone, labelled as a run", 1, (l) => {
-      beat(l, "w1:base:2").key = "55:78:2";
-      example(l, "w1:base:2").key = "55:78:2";
-    }, /says what a run sounds like, but plays one word/],
+    }, /w2:base:1: its clip is not the recording of yaumu/],
+    // Nor does a form say it is played with the word before it: it is recorded on its own, whose
+    // alif is read (until 2026-10-14 ismu was the run tabāraka-smu, and its caption said so).
+    ["a bentuk dasar that says it is played with the word before it", 1, (l) => {
+      example(l, "w1:base:2").washal = { before: "tabāraka", heard: "tabārakasmu" };
+    }, /w1:base:2: says what a run sounds like, but a form is recorded on its own/],
     ["three examples after one concept", 3, (l) => {
       const st = step(l, "concept:naat:ex");
       st.examples = [st.examples![0], { ...st.examples![0], id: "concept:naat:2" }, { ...st.examples![0], id: "concept:naat:3" }];
@@ -488,7 +581,12 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     }, /the id is used twice/],
     // (until plan L24 the opposite: "a composition that does not end with the joined word")
     ["a composition that ends with the imam reciting its word again", 1, (l) => void (step(l, "w1:compose").recite = { target: "word", word: 1 }), /w1:compose: ends with the imam reciting its word again/],
-    ["a rule listed without its reason", 2, (l) => void (l.ctx = { ...l.ctx, derived: { ...l.derived, gaps: l.derived.gaps.map((g) => ({ ...g, why: " " })) } }), /must say which and why/],
+    // (no form is unvoiced any more, so a gap is planted: a form with no recording, no reason given)
+    ["a rule listed without its reason", 2, (l) => {
+      const gaps = [{ step: "w1:compose", rule: "bentuk dasar al-ḥamdu", why: " " }];
+      l.derived = { ...l.derived, gaps };
+      l.ctx = { ...l.ctx, derived: l.derived };
+    }, /must say which and why/],
     ["an example beat on a step that explains nothing", 3, (l) => void (step(l, "recap").examples = [beat(l, "concept:naat:1")]), /a recap step has example beats/],
   ];
   const step = (l: Lesson, id: string) => {
@@ -520,14 +618,14 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     const end = a.words[a.words.length - 1];
     const made = { id: "contoh", examples: [{ loc: end.loc, note: `${end.translit}: khabar, berakhir ${end.case.sign}.` }, { loc: "112:4:4", note: "contoh lain" }] };
     const introduced = [...taughtAt(a), made];
-    const derived = lessonExamples({ ayah: a, introduced, compose: null, clips: LIBRARY.clips, wordAt: (loc) => WORDS.get(loc) });
+    const derived = lessonExamples({ ayah: a, introduced, compose: null, voice: wordVoice, wordAt: (loc) => WORDS.get(loc) });
     const base = lessonOf(s, a);
     const seq = structuredClone(base.seq);
     const texts = base.ctx.texts.example;
     const beats = derived.examples
       .filter((e) => e.step === "concept:contoh:ex")
       .map((e): ExampleBeat => {
-        const lead = e.word !== null ? texts.word({ n: e.word, translit: e.translit }) : texts.other({ translit: e.translit, surah: e.place.surah, ayah: e.place.ayah });
+        const lead = e.word !== null ? texts.word({ n: e.word, translit: e.translit }) : texts.other({ translit: e.translit, surah: e.place!.surah, ayah: e.place!.ayah });
         const caption = e.waqf ? `${lead} ${texts.waqf}` : lead;
         return { id: e.id, of: e.of, after: -1, key: e.key, word: e.word, clip: e.clip, frame: null, caption, parts: [caption] };
       });
@@ -594,8 +692,8 @@ describe("the lesson's own word is recited once, and its step does not wait for 
     WALK_TIMEOUT_MS,
   );
 
-  it("every composition (29 words): its last line is said over its last frame — the joined word — which stays to the end of the step; 22 end there, the 7 of an ayah's last word go on to the imam reciting it, that line still the caption", () => {
-    const ends = { line: 0, imam: 0 };
+  it("every composition (29 words): its last line is said over its last frame — the joined word — which stays to the end of the step; 22 end there, the 7 of an ayah's last word go on to the imam reciting it, that line still the caption — and where its last frame is a base frame, the narrator's recording of that form comes first", () => {
+    const ends = { line: 0, imam: 0, tail: [] as string[] };
     /** The last lines that have no voice yet (shown, not said). */
     const unvoiced = new Set<string>();
     for (const l of fatihah) {
@@ -624,32 +722,50 @@ describe("the lesson's own word is recited once, and its step does not wait for 
             expect(saying.map((x) => (x.activity?.kind === "read" ? x.activity.ms : -1)), where).toEqual(lastCue.parts.map((part) => readMs(part, pace)));
             unvoiced.add(lastLine);
           }
-          // What the step does after that line (its pause included): nothing, or the imam.
+          // What the step does after that line (its pause included): nothing; the narrator's
+          // recording of the base form, where the last frame IS a base frame (al-ḥamdu, na‘budu:
+          // their bentuk dasar closes the composition, and an unvoiced one used to be skipped);
+          // and then, for an ayah's last word, the imam.
           const after = on.slice(on.indexOf(saying[saying.length - 1]) + 1);
-          const imam = after.filter((x) => x.activity?.kind === "recite");
+          const tail = (st.examples ?? []).filter((b) => b.after === st.cues.length - 1);
+          const imam = after.filter((x) => x.activity?.kind === "recite" && exampleOf(x.activity) === null);
           const stop = st.word === l.ayah.words.length;
           expect(st.recite !== undefined, where).toBe(stop);
           const pause = voiced ? ["wait"] : [];
+          // one hearing and its pause, twice with the gap in "Pelan"
+          const hearing = pace === "pelan" ? ["recite", "wait", "recite", "wait"] : ["recite", "wait"];
+          const beats = tail.flatMap(() => hearing);
           if (!stop) {
-            expect(after.map((x) => x.activity?.kind), where).toEqual(pause);
+            expect(after.map((x) => x.activity?.kind), where).toEqual([...pause, ...beats]);
             for (const x of after) expect([stageFrame(l.seq, x)?.frame, stageFrame(l.seq, x)?.recited], where).toEqual([st.frames, false]);
+            // each recording is a beat of this step, the example on the card while it plays
+            expect(after.filter((x) => x.activity?.kind === "recite").map((x) => exampleOf(x.activity)), where).toEqual(tail.flatMap((b) => (pace === "pelan" ? [b.id, b.id] : [b.id])));
             if (pace === "biasa") ends.line++;
+            if (pace === "biasa" && tail.length) ends.tail.push(`${l.seq.lessonKey}:${st.id}`);
           } else {
             // His word, as long as it lasts (no reading time: no new caption), "Pelan" twice
             // with the gap; the joined word "recited", its word marked, the stop line still on screen.
-            expect(after.map((x) => x.activity?.kind), where).toEqual([...pause, ...(pace === "pelan" ? ["recite", "wait", "recite", "wait"] : ["recite", "wait"])]);
+            expect(after.map((x) => x.activity?.kind), where).toEqual([...pause, ...beats, ...hearing]);
             for (const x of imam) {
               expect(x.activity, where).toMatchObject({ kind: "recite", target: "word", word: st.word, minMs: 0 });
               expect(viewAutoplay(l.seq, x).caption.line, where).toBe(lastLine);
             }
-            for (const x of after.slice(pause.length)) {
+            for (const x of after.slice(pause.length + beats.length)) {
               expect([stageFrame(l.seq, x)?.frame, stageFrame(l.seq, x)?.recited, stageMarks(l.seq, x)], where).toEqual([st.frames, true, { marked: [st.word], focus: st.word }]);
             }
             if (pace === "biasa") ends.imam++;
           }
-          // The step's last moment: the joined word and its card's word still there, no example.
+          // The step's last moment: the joined word and its card's word still there; no example,
+          // unless the step ends on a base frame's recording (shown, no longer playing).
           const end = on[on.length - 1];
-          expect([end.activity?.kind, stageFrame(l.seq, end)?.frame, stageMarks(l.seq, end).focus, stageExample(l.seq, end)], where).toEqual([voiced || stop ? "wait" : "read", st.frames, st.word, null]);
+          const closing = tail.length && !stop ? { id: tail[tail.length - 1].id, reciting: false } : null;
+          const shown = stageExample(l.seq, end);
+          expect([end.activity?.kind, stageFrame(l.seq, end)?.frame, stageMarks(l.seq, end).focus, shown && { id: shown.beat.id, reciting: shown.reciting }], where).toEqual([
+            voiced || stop || closing ? "wait" : "read",
+            st.frames,
+            st.word,
+            closing,
+          ]);
           // … and what follows is not the imam saying this word (again).
           const next = states[states.indexOf(end) + 1];
           expect(next.idx, where).toBe(idx + 1);
@@ -657,7 +773,11 @@ describe("the lesson's own word is recited once, and its step does not wait for 
         }
       }
     }
-    expect(ends).toEqual({ line: 22, imam: 7 });
+    expect({ line: ends.line, imam: ends.imam }).toEqual({ line: 22, imam: 7 });
+    // None of the 22 closes on a bentuk dasar's recording: the forms that were once the last frame
+    // (al-ḥamdu 1:2:1, na‘budu 1:5:2) ARE the word itself, which the lesson recited when the step
+    // opened, so they have no beat and the step ends with its last line.
+    expect(ends.tail).toEqual([]);
     // Which last lines wait for a render is the manifest's to say: each has no audio there.
     const lines = narrationFor("al-fatihah")?.lines ?? {};
     for (const id of unvoiced) expect(lines[id]?.audio, id).toBeUndefined();
@@ -704,7 +824,7 @@ describe("the lesson's own word is recited once, and its step does not wait for 
 
 describe("how the lesson plays an example beat (machine.ts)", () => {
   it(
-    "every Al-Fatihah lesson, every pace: each beat is recited once (twice in Pelan), by the imam alone, after the line it follows",
+    "every Al-Fatihah lesson, every pace: each beat is played once (twice in Pelan), by one player alone — the imam on the stage's own player for this ayah's word, the narrator's recording otherwise — after the line it follows",
     () => {
       for (const l of fatihah) {
         for (const pace of PACES) {
@@ -722,7 +842,8 @@ describe("how the lesson plays an example beat (machine.ts)", () => {
             const b = (st.examples ?? []).find((x) => x.id === id);
             const at = `${where} #${k} ${st.id} ${id}`;
             if (!b) throw new Error(`${at}: not a beat of this step`);
-            // ONE activity, the imam's: never the narrator over him, never two recordings.
+            // ONE activity: this ayah's word on the stage's own player (the imam), or the narrator's
+            // recording of a form or of another ayah's word — never both, never two recordings.
             const a = s.activity!;
             if (a.kind !== "recite" || a.target === "ayah") throw new Error(at);
             expect(a.target === "clip" ? [a.clip, a.key] : [a.word, null], at).toEqual(b.word !== null ? [b.word, null] : [b.clip, b.key]);
@@ -749,6 +870,8 @@ describe("how the lesson plays an example beat (machine.ts)", () => {
             expect([lessonRuns(s), screenAwake(s)], at).toEqual([true, "on"]);
             for (const u of [...lookaheadAudio(l.seq, s), ...audioAhead(l.seq, s, 3).flat().map((f) => f.url), nextNarration(l.seq, s) ?? ""]) {
               expect(u.includes("everyayah"), `${at}: ${u}`).toBe(false);
+              // … nor an example's recording: exampleToWarm asks for that one, when its step opens
+              expect(u.includes("/kang-nandar/words/"), `${at}: ${u}`).toBe(false);
             }
           });
           const want = beatsOf(l.seq).flatMap(({ beat: b }) => (pace === "pelan" ? [b.id, b.id] : [b.id]));
@@ -766,7 +889,7 @@ describe("how the lesson plays an example beat (machine.ts)", () => {
     for (const l of fatihah) {
       for (const s of run(l.seq, started(l.seq, "biasa"))) {
         for (const u of lookaheadAudio(l.seq, s)) {
-          expect(clips.has(u) || !u.startsWith("/belajar/media/narration/"), `${l.seq.lessonKey} ${u}`).toBe(false);
+          expect(clips.has(u) || !u.startsWith("/belajar/media/narration/") || u.includes("/kang-nandar/words/"), `${l.seq.lessonKey} ${u}`).toBe(false);
           lists++;
         }
       }
@@ -910,11 +1033,14 @@ describe("what the stage shows during a beat (caption.ts)", () => {
     expect(stageExample(l.seq, line)).toBeNull();
   });
 
-  it("a bentuk dasar: the composition stays on its base frame while the imam recites the base form, and in the pause after", () => {
+  it("a bentuk dasar: the composition stays on its base frame while the narrator's recording of the base form plays, and in the pause after", () => {
     const l = fatihah[0];
     const s = atBeat(l.seq, "w1:base:2");
     expect(stageFrame(l.seq, s)).toEqual({ step: "compose", word: 1, frame: 2, recited: false });
-    expect(stageExample(l.seq, s)).toMatchObject({ reciting: true, beat: { id: "w1:base:2", key: "55:78:1-2" } });
+    expect(stageExample(l.seq, s)).toMatchObject({ reciting: true, beat: { id: "w1:base:2", key: "1:1:1#ismu" } });
+    // what plays is the narrator's recording of the form (one activity: a clip, never the stage's own word)
+    const playing = s.activity;
+    expect(playing?.kind === "recite" && playing.target === "clip" ? [playing.key, playing.clip] : null).toEqual(["1:1:1#ismu", wordVoice(composeFor("al-fatihah")!.words["1:1:1"].forms.ismu.ar)]);
     expect(stageMarks(l.seq, s).marked).toEqual([1]);
     const settle = reduceAutoplay(l.seq, s, { type: "recite_end", token: s.activity!.token });
     expect([stageFrame(l.seq, settle)?.frame, stageExample(l.seq, settle)?.reciting]).toEqual([2, false]);
@@ -1017,6 +1143,22 @@ describe("what the stage draws for a beat (ExampleCard, WordComposition)", () =>
     expect(html).not.toContain("data-example-about");
   });
 
+  it("a base form no ayah has says it is a base form: no place, no word number, its bytes once", () => {
+    const form = composeFor("al-fatihah")!.words["1:4:1"].forms.maliku;
+    const example = { of: "base" as const, key: "1:4:1#maliku", word: null, translit: form.translit, gloss: form.gloss ?? null, place: null, ar: form.ar, ending: null, waqf: false, washal: null, about: null };
+    for (const locale of ["id", "en"] as const) {
+      const html = intl(locale, createElement(ExampleCard, { id: "w1:base:1", example, state: "reciting", marks: null }));
+      const text = textOf(html);
+      expect(text, locale).toContain(MSG[locale].Guided.example_tag);
+      expect(text, locale).toContain(MSG[locale].Guided.example_form);
+      expect(text, locale).not.toContain("QS ");
+      expect(html, locale).not.toContain(MSG[locale].Guided.word_n.replace("{n}", "").trim());
+      expect(count(html, form.ar), locale).toBe(1);
+      expect(html, locale).toContain(`data-clip="1:4:1#maliku"`);
+      expect(html, locale).not.toMatch(/<button|<a /);
+    }
+  });
+
   it("in lesson zero the card says what the word is an example of (no ayah on screen says it)", () => {
     const word = WORDS.get("1:5:2");
     if (!word) throw new Error("no 1:5:2");
@@ -1027,19 +1169,19 @@ describe("what the stage draws for a beat (ExampleCard, WordComposition)", () =>
     expect(count(html, word.ar)).toBe(1);
   });
 
-  it("a bentuk dasar: on its base frame the ringed tile is filled while the imam recites it, and only then; nothing is added to the figure", () => {
+  it("a bentuk dasar: on its base frame the ringed tile is filled while its recording plays, and only then; nothing is added to the figure", () => {
     const unit = composeFor("al-fatihah")!.words["1:1:1"];
     const draw = (example: { id: string; key: string; state: "reciting" | "failed" | "shown" } | null, frame = 2) =>
       intl("id", createElement(WordComposition, { unit, kind: "compose", frame, recited: false, marks, word: 1, stepKey: "w1:compose", example }));
     const plain = draw(null);
-    const reciting = draw({ id: "w1:base:2", key: "55:78:1-2", state: "reciting" });
-    const shown = draw({ id: "w1:base:2", key: "55:78:1-2", state: "shown" });
-    const failed = draw({ id: "w1:base:2", key: "55:78:1-2", state: "failed" });
+    const reciting = draw({ id: "w1:base:2", key: "1:1:1#ismu", state: "reciting" });
+    const shown = draw({ id: "w1:base:2", key: "1:1:1#ismu", state: "shown" });
+    const failed = draw({ id: "w1:base:2", key: "1:1:1#ismu", state: "failed" });
     expect(plain).not.toContain("data-example");
     for (const [html, state] of [[reciting, "reciting"], [shown, "shown"], [failed, "failed"]] as const) {
       expect(html).toContain(`data-example="w1:base:2"`);
       expect(html).toContain(`data-example-state="${state}"`);
-      expect(html).toContain(`data-clip="55:78:1-2"`);
+      expect(html).toContain(`data-clip="1:1:1#ismu"`);
       expect(html).toContain(`data-compose-stage="base"`);
     }
     // The filled tile (the recited look: forest, paper text): exactly one, the ringed ismu.
@@ -1058,7 +1200,7 @@ describe("what the stage draws for a beat (ExampleCard, WordComposition)", () =>
     expect(reciting).toContain(MSG.id.Compose.recited);
     expect(shown).not.toContain(MSG.id.Compose.recited);
     // On another frame of the same word the example changes nothing.
-    expect(filled(draw({ id: "w1:base:2", key: "55:78:1-2", state: "reciting" }, 3))).toBe(0);
+    expect(filled(draw({ id: "w1:base:2", key: "1:1:1#ismu", state: "reciting" }, 3))).toBe(0);
     // Word 1 is not its ayah's last word: its joined word is never "recited" (plan L24), on no
     // frame a filled tile or the mark the browser check looks for.
     for (let k = 1; k <= unit.frames.length; k++) expect([k, filled(draw(null, k)), draw(null, k).includes("data-recited")]).toEqual([k, 0, false]);
@@ -1073,7 +1215,9 @@ describe("what the stage draws for a beat (ExampleCard, WordComposition)", () =>
 describe("the example clip fetched ahead (warm.ts exampleToWarm)", () => {
   it("only while the lesson runs, only the clip the current step is about to play, never with Save-Data", () => {
     const l = fatihah[0];
-    const ismu = LIBRARY.clips["55:78:1-2"].url;
+    // the narrator's recording of the form ismu (a file of the lesson's own media store, not the imam's)
+    const ismu = wordVoice(composeFor("al-fatihah")!.words["1:1:1"].forms.ismu.ar)!.url;
+    expect(ismu).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\//);
     const idx = l.seq.steps.findIndex((s) => s.id === "w1:compose");
     // A page only looked at; a step without a clip; this ayah's own word as the example.
     expect(exampleToWarm(l.seq, createAutoplayState(l.seq))).toBeNull();
@@ -1111,8 +1255,12 @@ describe("the example clip fetched ahead (warm.ts exampleToWarm)", () => {
         }
         const a = s.activity;
         if (a?.kind === "recite" && a.target === "clip") expect(asked.has(a.clip.url), `${l.seq.lessonKey} ${a.key}`).toBe(true);
-        // Never this ayah's own recording (the stage's player warms that), never narration.
-        if (url !== null) expect(l.ayah.recitation.some((r) => r.url === url) || url.startsWith("/belajar/"), url).toBe(false);
+        // Never this ayah's own recording (the stage's player warms that), never a narration LINE
+        // (the media store holds those under the slug of the surah): only a word's own recording.
+        if (url !== null) {
+          expect(l.ayah.recitation.some((r) => r.url === url), url).toBe(false);
+          expect(url, `${l.seq.lessonKey} ${l.seq.steps[s.idx].id}`).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\/[0-9a-f]{16}-[0-9a-f]{10}\.mp3$/);
+        }
       }
     }
   });
@@ -1130,35 +1278,40 @@ describe("what the beats add to a lesson", () => {
     // Until 2026-10-13 a beat lasted its caption's captionMs (a 2.5 s settle for the eyes, never
     // under 5 s): 5.8 s for a one-line card, 240 s in all — "about four minutes to a lesson of
     // about seventy; no ayah more than 75 s". Plan L24: the reading alone (timing.ts exampleReadMs).
-    "Al-Fatihah: 26 beats in its ayat and 3 in lesson zero add about two minutes to its lessons; no lesson more than 45 s",
+    // 2026-10-14: every bentuk dasar that is not the lesson's own word is voiced (the narrator's
+    // recording of the form, the teaching forms no ayah has included), so 30 beats where there were
+    // 26 — 4 more, each about 3.5 s; the three forms that ARE the word stay without one.
+    "Al-Fatihah: 30 beats in its ayat and 3 in lesson zero add about two minutes to its lessons; no lesson more than 45 s",
     () => {
       const report = runAutoplayChecks({ ...input, property: { streams: 0, length: 0 } });
       expect(report.errors).toEqual([]);
       const rows = Object.entries(report.stats.examples).filter(([k]) => k.startsWith("al-fatihah/"));
       expect(rows.map(([k, r]) => [k, r.beats.length])).toEqual([
-        // Lesson zero: the three kinds of word, one clip each (an isim, a fi'il, a huruf with its isim).
+        // Lesson zero: the three kinds of word, one recording each (an isim, a fi'il, a huruf with its isim).
         ["al-fatihah/0", 3],
         ["al-fatihah/1", 5],
         ["al-fatihah/2", 5],
         ["al-fatihah/3", 2],
-        ["al-fatihah/4", 2],
+        ["al-fatihah/4", 3],
         ["al-fatihah/5", 3],
-        ["al-fatihah/6", 3],
-        ["al-fatihah/7", 6],
+        ["al-fatihah/6", 5],
+        ["al-fatihah/7", 7],
       ]);
       for (const [k, r] of rows) {
         // Every beat: its caption's reading time (2.3 s for the shortest, 23 characters) and the
-        // pause after the imam (0.8 s) — a one-line card about 3.5 s, where it was 5.8 s.
+        // pause after the recording (0.8 s) — a one-line card about 3.5 s, where it was 5.8 s.
         expect(r.addedMs.biasa, k).toBeGreaterThan(r.beats.length * 3000);
         expect(r.addedMs.biasa, k).toBeLessThan(45_000);
         expect(r.addedMs.pelan, k).toBeGreaterThan(r.addedMs.biasa);
-        // On average under 6 s (ayah 5, with two waqf notes of 97 characters: 5.2 s).
+        // On average under 6 s (lesson zero, whose captions say what each word is an example of:
+        // 5.7 s; the longest lesson, ayah 2 with six beats: 28.7 s in all).
         expect(r.addedMs.biasa / r.beats.length, k).toBeLessThan(6_000);
       }
-      // About 108 s in Biasa since the basic curriculum (2026-10-13): 26 beats, where 35 added 153 s.
+      // About 143 s in Biasa (2.4 min), where 26 beats added 108 s and, before the basic curriculum
+      // (2026-10-13), 35 added 153 s.
       const total = rows.reduce((n, [, r]) => n + r.addedMs.biasa, 0);
-      expect(total).toBeGreaterThan(80_000);
-      expect(total).toBeLessThan(130_000);
+      expect(total).toBeGreaterThan(110_000);
+      expect(total).toBeLessThan(160_000);
       expect(total / 60_000 / report.stats.minutes["al-fatihah"].biasa).toBeLessThan(0.05);
     },
     WALK_TIMEOUT_MS,

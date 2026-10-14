@@ -229,15 +229,17 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     (input.examples ?? []).flatMap((e) => {
       const at = e.step === id ? after(e) : null;
       if (at === null || (e.word === null) === (e.clip === null)) return [];
-      const where = { translit: e.translit, surah: e.place.surah, ayah: e.place.ayah };
+      const where = e.place ? { translit: e.translit, surah: e.place.surah, ayah: e.place.ayah } : null;
       const lead =
         e.of === "base"
-          ? texts.example.base(where)
+          ? where
+            ? texts.example.base(where)
+            : texts.example.form({ translit: e.translit })
           : e.word !== null
             ? texts.example.word({ n: e.word, translit: e.translit })
             : e.about !== null
-              ? texts.example.zero({ ...where, about: e.about })
-              : texts.example.other(where);
+              ? texts.example.zero({ translit: e.translit, surah: e.place?.surah ?? 0, ayah: e.place?.ayah ?? 0, about: e.about })
+              : texts.example.other(where ?? { translit: e.translit, surah: 0, ayah: 0 });
       const caption = clean(stripArabic([lead, e.washal ? texts.example.washal({ heard: e.washal.heard }) : "", e.waqf ? texts.example.waqf : ""].filter(Boolean).join(" ")));
       return [{ id: e.id, of: e.of, after: at, key: e.key, word: e.word, clip: e.clip, frame: e.frame, caption, parts: splitCaption(caption) }];
     });
