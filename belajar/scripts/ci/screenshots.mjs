@@ -996,7 +996,7 @@ const STOP_LATE_S = 0.15;
  *      note ([data-clip-note]) is the description of exactly one button (aria-describedby) and
  *      has the right words — a "waqf" note only on a clip that ends its ayah (`last`), a "washal"
  *      note on the tile played with the word before it, naming what is heard ("tabārakasmu") —
- *      and a note that is shown is real text at a reading size (≥ 16px), inside the screen, under
+ *      and a note that is shown is real text at a reading size (≥ 14px, the main site's text-sm), inside the screen, under
  *      its button's line. The page's expected notes are on it (idhafah: its ayah-final rows;
  *      Harakat: none, no sign's word ends its ayah; huruf jar: the two washal tiles);
  *   2. pressing one (the longest clip, so it still plays at step 3) asks EveryAyah for that
@@ -1126,7 +1126,9 @@ async function clipChecks(page, vp) {
           if (!b.label.endsWith(w.heard)) fail(`${b.loc}: the button is named “${b.label}”, not by what is heard (${w.heard})`);
         } else fail(`a note of an unknown kind "${n.kind}" beside ${b.loc}`);
         if (!n.visible) continue;
-        if (n.fontPx < 15.5) fail(`${b.loc}: its ${n.kind} note is set at ${n.fontPx}px (< 16px)`);
+        // The floor is the main site's text-sm, 14px at Normal (2026-10-14: Normal is the main site's
+        // scale; it was 16px while Normal's body was 18px). It grows with the learner's size.
+        if (n.fontPx < 13.5) fail(`${b.loc}: its ${n.kind} note is set at ${n.fontPx}px (< 14px)`);
         if (n.left < -1 || n.right > width + 1) fail(`${b.loc}: its ${n.kind} note sticks out of the screen (${Math.round(n.left)}–${Math.round(n.right)} of ${width})`);
         if (b.visible && n.top < b.bottom - 1) fail(`${b.loc}: its ${n.kind} note is not under the button's line (note top ${Math.round(n.top)}, button bottom ${Math.round(b.bottom)})`);
       }
