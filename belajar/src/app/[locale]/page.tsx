@@ -4,11 +4,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
 import { MixedText } from "@/components/library/MixedText";
-import { TextSizeHint } from "@/components/TextSizeSwitch";
 import { AiChip } from "@/components/waris/report/AiChip";
 import { MainSiteBridge } from "@/components/MainSiteBridge";
+import { NoteRow, type PillTone } from "@/components/StatusPill";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
+import { comingUnits } from "@/lib/comingUnits";
 import { visibleSurahs, warisVisible } from "@/lib/features";
 import { LIBRARY } from "@/lib/library";
 import { conceptIndexHref, quranHref, warisHref } from "@/lib/routes";
@@ -44,9 +45,9 @@ type TrackCard = {
   Icon: typeof BookOpen;
   title: string;
   body: string;
-  available: string;
-  /** What is coming next, under `available` (the Qur'an track's surahs not published yet). */
-  coming?: string;
+  /** The card's notes, each a row of coloured pills (StatusPill): what exists today (`ok`), and
+   *  what is coming next (`soon`: the Qur'an track's surahs not published yet, and Ayat Kursi). */
+  notes: { tone: PillTone; label?: string; items: string[] }[];
   /** Ilmu Waris only (hidden for now): its AI label (no human review, plan L11). The other
    *  cards carry no status label (operator, 2026-10-11: "remove label 'uji coba dibantu AI'"). */
   aiChip?: string;
@@ -74,9 +75,10 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
   const published = new Set(await visibleSurahs());
   const available = SURAHS.filter((s) => published.has(s.slug));
   const coming = SURAHS.filter((s) => !published.has(s.slug));
-  const surahList = available.map((s) =>
-    t("surah_ayat", { name: s.name_id, ayat: s.ayat.length }),
-  ).join(", ");
+  const surahItems = available.map((s) => t("surah_ayat", { name: s.name_id, ayat: s.ayat.length }));
+  // Not published yet: the surahs built but hidden, then the curriculum's units with no lessons
+  // yet (Ayat Kursi), by their short names (operator 2026-10-14).
+  const comingItems = [...coming.map((s) => s.name_id), ...comingUnits().map((u) => u.name)];
 
   const tracks: TrackCard[] = [
     {
@@ -84,15 +86,17 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
       Icon: BookOpen,
       title: t("quran_title"),
       body: t("quran_body"),
-      available: t("quran_available", { list: surahList }),
-      coming: coming.length > 0 ? t("quran_coming", { list: coming.map((s) => s.name_id).join(", ") }) : undefined,
+      notes: [
+        { tone: "ok", label: t("status_available"), items: surahItems },
+        ...(comingItems.length > 0 ? [{ tone: "soon" as const, label: t("status_coming"), items: comingItems }] : []),
+      ],
     },
     {
       href: conceptIndexHref(),
       Icon: Library,
       title: t("concepts_title"),
       body: t("concepts_body"),
-      available: t("concepts_available", { n: LIBRARY.concepts.length }),
+      notes: [{ tone: "ok", items: [t("concepts_available", { n: LIBRARY.concepts.length })] }],
     },
   ];
   if (await warisVisible()) {
@@ -104,7 +108,7 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
       Icon: Scale,
       title: tw("hub_title"),
       body: tw("hub_body"),
-      available: tw("hub_available"),
+      notes: [{ tone: "ok", items: [tw("hub_available")] }],
       aiChip: tw("chip"),
     });
   }
@@ -124,10 +128,6 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
           </p>
         </section>
 
-        {/* One-time card: hidden before paint once the learner has chosen a
-            size or closed it. The header switch is always there. */}
-        <TextSizeHint className="mt-8" />
-
         <section className="mt-10" aria-labelledby="tracks">
           <h2 id="tracks" className="text-lg font-semibold text-ink">
             {t("tracks_heading")}
@@ -136,7 +136,7 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
               learner's text size grows (senior-ux.md §3.4). */}
           <div className="@container mt-3">
             <ul className="grid gap-4 @2xl:grid-cols-2">
-              {tracks.map(({ href, Icon, title, body, available, coming, aiChip }) => (
+              {tracks.map(({ href, Icon, title, body, notes, aiChip }) => (
                 <li key={href}>
                   {/* The whole card is the link; nothing inside it is
                       interactive (the status is a label, not a control). */}
@@ -151,14 +151,9 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
                     <p className="mt-1.5 text-pretty text-base text-ink-muted">
                       <MixedText text={body} />
                     </p>
-                    <p className="mt-3 text-base text-ink">
-                      <MixedText text={available} />
-                    </p>
-                    {coming ? (
-                      <p className="mt-1 text-base text-ink-muted">
-                        <MixedText text={coming} />
-                      </p>
-                    ) : null}
+                    {notes.map((n) => (
+                      <NoteRow key={n.tone + (n.label ?? "")} tone={n.tone} label={n.label} items={n.items} />
+                    ))}
                     {aiChip ? (
                       <span className="mt-auto flex flex-wrap items-center gap-3 pt-5">
                         <AiChip label={aiChip} />

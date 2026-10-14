@@ -20,8 +20,6 @@ export type TextSize = "normal" | "besar" | "sangat-besar";
 export const TEXT_SIZES: readonly TextSize[] = ["normal", "besar", "sangat-besar"];
 
 const KEY = "belajar:v1:text-size";
-/** Set once the Home hint card ("Tulisan kurang jelas?") is dismissed. */
-const HINT_KEY = "belajar:v1:text-size-hint";
 
 const listeners = new Set<() => void>();
 // Fallback when storage is blocked (private mode): the choice still applies
@@ -80,22 +78,4 @@ export function setTextSize(size: TextSize) {
 export function useTextSize(): [TextSize, (s: TextSize) => void] {
   const size = useSyncExternalStore(subscribe, read, () => "normal" as const);
   return [size, setTextSize];
-}
-
-/**
- * Hide the one-time Home hint card for good. Hidden through CSS
- * (html[data-text-hint="off"] .text-size-hint), the same attribute the
- * pre-paint script sets, so a returning learner never sees it flash.
- */
-export function dismissTextSizeHint() {
-  try {
-    window.localStorage.setItem(HINT_KEY, "1");
-  } catch {
-    // blocked storage: hidden for this page view only
-  }
-  try {
-    document.documentElement.dataset.textHint = "off";
-  } catch {
-    // no document
-  }
 }

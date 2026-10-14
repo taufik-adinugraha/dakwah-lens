@@ -468,12 +468,10 @@ describe("meanings (plan L22): always in “…”, always emphasised", () => {
       "yang sudah ada pada gairi. “Tambahan” dalam istilah nahwu berarti tidak diperlukan",
       // A control named, and what is heard, in both caption languages.
       "Coba pilih lagi, atau klik “Tunjukkan jawaban” yang ditandai.",
-      "kapan saja lewat tombol “Aa” di bagian atas halaman.",
       "Ingin membaca lebih banyak? Buka “Materi lengkap ayat ini” di bawah pelajaran",
       "Bersama kata sebelumnya terdengar “bismillāhi”, karena alif di awalnya tidak dibaca.",
       "Try again, or click the marked “Show the answer”.",
       "To continue without this practice, click “Skip practice”.",
-      "at any time with the “Aa” button at the top of the page.",
       "With the word before it you hear “bismillāhi”, because its first alif is not read.",
       // Arabic inside; six words (SHORT_WORDS is five); empty.
       "Ibnu Ajurrum pun berkata “majzum (مَجْزُوم)” di babnya",
@@ -519,7 +517,6 @@ describe("meanings (plan L22): always in “…”, always emphasised", () => {
       "“Materi lengkap ayat ini”",
       "“Coba lagi”",
       "“Lanjutkan”",
-      "“Aa”",
       "“Tunjukkan jawaban”",
       "“Lewati latihan”",
       "“{heard}”",

@@ -63,6 +63,17 @@ const ZERO_HOST =
 const MSG = { id: await readJson("messages/id.json"), en: await readJson("messages/en.json") };
 const fmt = (template, values) => template.replace(/\{(\w+)\}/g, (all, k) => (k in values ? String(values[k]) : all));
 
+// The curriculum's units that are no surah of the module (today Ayat Kursi, 2:255): listed as
+// "Segera hadir" on the hub (by their short name, a pill) and on the track page (a card named
+// "Ayat Kursi (Al-Baqarah: 255)"), whatever surahs are published (operator 2026-10-14). Read
+// from the curriculum file and the ayat data, never typed; src/lib/comingUnits.ts is the app's.
+const AYAT_NAMES = (await readJson("content/ayat/locations.json")).names;
+const COMING_UNITS = CURRICULUM.units
+  .filter((u) => u.surah !== undefined && !(u.surah in BY_NUMBER))
+  .map((u) => ({ id: u.id, name: u.name, surah: u.surah, ayah: u.ayah ?? null }));
+const unitLabel = (locale, u) =>
+  AYAT_NAMES[String(u.surah)] && u.ayah !== null ? fmt(MSG[locale].Quran.coming_unit, { name: u.name, surah: AYAT_NAMES[String(u.surah)], ayah: u.ayah }) : u.name;
+
 const ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
 function visibleText(html) {
   return html
@@ -422,8 +433,16 @@ async function checkHidden() {
     noLinkInto(path, html, hidden);
     const text = visibleText(mainOf(html));
     const soon = MSG[locale].Quran.coming_soon;
-    if (count(text, soon) !== hidden.length) fail(path, `"${soon}" shown ${count(text, soon)} time(s), expected ${hidden.length}`);
+    // One "Segera hadir" per hidden surah, and one per unit with no lessons (Ayat Kursi).
+    const expectedSoon = hidden.length + COMING_UNITS.length;
+    if (count(text, soon) !== expectedSoon) fail(path, `"${soon}" shown ${count(text, soon)} time(s), expected ${expectedSoon}`);
     for (const slug of hidden) if (!text.includes(SURAH[slug].name_id)) fail(path, `the card of ${slug} does not name it`);
+    for (const u of COMING_UNITS) {
+      const tag = new RegExp(`<([a-zA-Z][\\w-]*)\\b[^>]*\\bdata-coming-unit="${u.id}"`).exec(html)?.[1];
+      if (!tag) fail(path, `no "Segera hadir" card for ${u.id}`);
+      else if (tag.toLowerCase() === "a") fail(path, `the "Segera hadir" card of ${u.id} is a link`);
+      if (!text.includes(unitLabel(locale, u))) fail(path, `the card of ${u.id} does not say "${unitLabel(locale, u)}"`);
+    }
     // … and it links the curriculum page (plan L30) and the cheat sheet (plan L32).
     if (!html.includes(`href="/belajar/${locale}/quran/kurikulum"`)) fail(path, "no link to the curriculum page");
     if (!html.includes(`href="/belajar/${locale}/quran/rumus"`)) fail(path, "no link to the cheat sheet");
@@ -440,13 +459,17 @@ async function checkHidden() {
     console.log(`${path} -> ${status}`);
     if (status !== 200) fail(path, `status ${status}, expected 200`);
     const hub = MSG[locale].Hub;
-    const available = fmt(hub.quran_available, {
-      list: DEFAULT.map((s) => fmt(hub.surah_ayat, { name: SURAH[s].name_id, ayat: SURAH[s].ayat.length })).join(", "),
-    });
-    const coming = fmt(hub.quran_coming, { list: hidden.map((s) => SURAH[s].name_id).join(", ") });
+    // The two notes are rows of coloured pills (StatusPill): a label, then one pill per name.
     const text = visibleText(html);
-    if (!text.includes(available)) fail(path, `"${available}" not shown`);
-    if (!text.includes(coming)) fail(path, `"${coming}" not shown`);
+    if (!text.includes(hub.status_available)) fail(path, `"${hub.status_available}" not shown`);
+    for (const s of DEFAULT) {
+      const pill = fmt(hub.surah_ayat, { name: SURAH[s].name_id, ayat: SURAH[s].ayat.length });
+      if (!text.includes(pill)) fail(path, `"${pill}" not shown`);
+    }
+    if (!text.includes(hub.status_coming)) fail(path, `"${hub.status_coming}" not shown`);
+    for (const name of [...hidden.map((s) => SURAH[s].name_id), ...COMING_UNITS.map((u) => u.name)]) {
+      if (!text.includes(name)) fail(path, `"${name}" not shown among the coming ones`);
+    }
     for (const slug of hidden) {
       const listed = fmt(hub.surah_ayat, { name: SURAH[slug].name_id, ayat: SURAH[slug].ayat.length });
       if (text.includes(listed)) fail(path, `lists the hidden ${slug} as available ("${listed}")`);
@@ -576,18 +599,22 @@ async function checkShown() {
   await rumusPage(SLUGS, []);
   for (const locale of ["id", "en"]) {
     const track = await get(`/belajar/${locale}/quran`);
-    if (track.html.includes("data-coming-soon")) fail(`/belajar/${locale}/quran`, 'a "Segera hadir" card with every surah published');
+    if (/\bdata-coming-soon=/.test(track.html)) fail(`/belajar/${locale}/quran`, 'a "Segera hadir" card of a surah with every surah published');
     for (const slug of SLUGS) {
       if (!track.html.includes(`href="/belajar/${locale}/quran/${slug}"`)) fail(`/belajar/${locale}/quran`, `no card link to ${slug}`);
     }
-    if (visibleText(mainOf(track.html)).includes(MSG[locale].Quran.coming_soon)) fail(`/belajar/${locale}/quran`, '"Segera hadir" shown');
+    // Every surah published: "Segera hadir" is only the units with no lessons (Ayat Kursi).
+    const soon = MSG[locale].Quran.coming_soon;
+    const shown = count(visibleText(mainOf(track.html)), soon);
+    if (shown !== COMING_UNITS.length) fail(`/belajar/${locale}/quran`, `"${soon}" shown ${shown} time(s), expected ${COMING_UNITS.length} (the units with no lessons)`);
     const hub = MSG[locale].Hub;
-    const available = fmt(hub.quran_available, {
-      list: SLUGS.map((s) => fmt(hub.surah_ayat, { name: SURAH[s].name_id, ayat: SURAH[s].ayat.length })).join(", "),
-    });
     const text = visibleText((await get(`/belajar/${locale}`)).html);
-    if (!text.includes(available)) fail(`/belajar/${locale}`, `"${available}" not shown`);
-    if (text.includes(fmt(hub.quran_coming, { list: "" }).trim())) fail(`/belajar/${locale}`, "a coming-soon line with every surah published");
+    if (!text.includes(hub.status_available)) fail(`/belajar/${locale}`, `"${hub.status_available}" not shown`);
+    for (const s of SLUGS) {
+      const pill = fmt(hub.surah_ayat, { name: SURAH[s].name_id, ayat: SURAH[s].ayat.length });
+      if (!text.includes(pill)) fail(`/belajar/${locale}`, `"${pill}" not shown`);
+    }
+    for (const u of COMING_UNITS) if (!text.includes(u.name)) fail(`/belajar/${locale}`, `"${u.name}" not shown among the coming ones`);
   }
   // The library links into every lesson again.
   for (const [what, ids, prefix] of [

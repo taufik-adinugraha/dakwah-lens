@@ -14,8 +14,8 @@
     "tracks_heading": "Choose what you would like to learn",
     "quran_title": "Qur'anic Arabic",
     "quran_body": "Listen to the imam, then understand each word: its meaning, its root, and why its ending is read the way it is.",
-    "quran_available": "Available now: {list}",
-    "quran_coming": "Coming soon: {list}",
+    "status_available": "Available now",
+    "status_coming": "Coming soon",
     "surah_ayat": "{name} ({ayat} ayat)",
     "concepts_title": "Grammar concepts",
     "concepts_body": "A nahwu and sharaf library: each concept is explained once, then reused in every lesson that contains it.",
@@ -28,6 +28,7 @@
     "jump_heading": "Go straight to an ayah",
     "surah_meta": "{ayat} ayat · {words} words",
     "coming_soon": "Coming soon",
+    "coming_unit": "{name} ({surah}: {ayah})",
     "fatihah_pace": "~3 weeks at 10 minutes a day",
     "ayat_nav": "Ayat of {name}",
     "how_heading": "How it works",
@@ -449,9 +450,6 @@
     "selected": "Selected",
     "panel_title": "Text size",
     "panel_body": "All text grows, Arabic included. Your choice is saved on this device.",
-    "close": "Close",
-    "hint_title": "Text hard to read? Make it bigger here.",
-    "hint_body": "Pick the size you find most comfortable to read. You can change it again at any time with the “Aa” button at the top of the page.",
-    "hint_dismiss": "Close this tip"
+    "close": "Close"
   }
 }

@@ -200,6 +200,8 @@ Current order: breadcrumb → AyahPlayer → GuidedLesson → translation → ta
 ### 3.1 Type scale
 Body is 18px. NN/g sets a 12pt (16px) minimum for senior-focused sites, so 18px leaves margin for mid-range phones in bright light and for small transliteration marks (ā, ḥ, ’).
 
+**Changed 2026-10-14 (operator: "let's set normal size as the one we use in main web, then set normal as default. for ordinary people i think current normal size is too big"; "remove the biggest font option"; "so, we still have 3 font size options").** The default, Normal, is now the main site's scale (Tailwind's own sizes, body 16px). The three options stay three: Normal (16px) · Besar (18px, what Normal was) · Sangat besar (20.25px, what Besar was); the 24px option is gone. The Arabic floor below is set in rem and is unchanged at Normal. The 18px recommendation above now describes Besar, which is the size to suggest to a learner who finds Normal small.
+
 Override the Tailwind v4 scale in `@theme` so every existing `text-*` grows at once. Then replace all 32 `text-[10px]`/`text-[11px]` with `text-xs`.
 
 ```css
