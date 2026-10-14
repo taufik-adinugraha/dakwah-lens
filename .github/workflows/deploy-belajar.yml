@@ -9,6 +9,18 @@ name: Deploy belajar
 #   - the image is built HERE on the runner, never on the 1.9 GB prod VM or
 #     the operator's laptop, smoke-tested against a throwaway Postgres on
 #     every run (PRs too), then shipped with `docker save | docker load`;
+#   - the checks run as PARALLEL jobs (operator 2026-10-14: "why CI takes a lot of time"):
+#     `gate` decides what a run must test; `verify` (npm: lint, unit tests, typecheck, build)
+#     and `pipeline` (the lesson content's Python checks) run beside `image` (build + smoke
+#     test), and the four browser passes (`shots`, `linebreaks`, `surahs`, `waris`) beside each
+#     other once the image is built; `ship` waits for all of them. Two shortcuts, both exact:
+#       * `pipeline` runs only when the change touches what those checks read (gate's
+#         PIPELINE_INPUTS; scripts/check-pipeline-inputs.mjs fails if the pipeline starts
+#         reading something outside it);
+#       * a push to main whose git TREE a pull-request run of this workflow already passed
+#         (that run left the artifact `belajar-tested-<tree>`) skips the tests: it builds,
+#         smoke-tests and ships the identical tree. Any other push (a direct push, a PR whose
+#         base moved) runs everything.
 #   - it ships a self-contained release dir to /srv/dakwah-lens/belajar/ and
 #     NEVER touches the main checkout /srv/dakwah-lens/repo;
 #   - on the VM it runs under /srv/dakwah-lens/.deploy.lock, the lock
@@ -38,7 +50,58 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # What this run must test. Cheap (seconds). `tested`: the push is to main and a pull-request
+  # run of this workflow already passed this exact git tree. `pipeline`: the change touches an
+  # input of the lesson content's Python checks (belajar/scripts/check-pipeline-inputs.mjs holds
+  # this list to what the pipeline really reads); unknown (no diff available) counts as yes.
+  gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      tested: ${{ steps.decide.outputs.tested }}
+      pipeline: ${{ steps.decide.outputs.pipeline }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decide what this run must test
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          PR: ${{ github.event.pull_request.number }}
+          BEFORE: ${{ github.event.before }}
+          PIPELINE_INPUTS: '^(belajar/pipeline/|belajar/content/|belajar/src/(lib|content|components/exercises)/|belajar/scripts/check-|belajar/package|docs/waris-|\.github/workflows/deploy-belajar\.yml)'
+        run: |
+          set -euo pipefail
+          tested=false
+          pipeline=true
+          if [[ "$EVENT" == "push" && "$GITHUB_REF" == "refs/heads/main" ]]; then
+            tree="$(git rev-parse 'HEAD^{tree}')"
+            found="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=belajar-tested-$tree&per_page=10" \
+              --jq '[.artifacts[] | select(.expired == false)] | length' || echo 0)"
+            echo "tree $tree: $found passing pull-request run(s) left a marker"
+            if [[ "$found" -gt 0 ]]; then tested=true; fi
+          fi
+          files=""
+          if [[ "$EVENT" == "pull_request" ]]; then
+            files="$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR/files" --jq '.[].filename' || true)"
+          elif [[ "$EVENT" == "push" && "$BEFORE" =~ [1-9a-f] ]]; then
+            files="$(gh api --paginate "repos/$GITHUB_REPOSITORY/compare/$BEFORE...$GITHUB_SHA" --jq '.files[].filename' || true)"
+          fi
+          if [[ -n "$files" ]]; then
+            echo "changed files: $(wc -l <<<"$files")"
+            if grep -Eq "$PIPELINE_INPUTS" <<<"$files"; then pipeline=true; else pipeline=false; fi
+          fi
+          echo "tested=$tested" >> "$GITHUB_OUTPUT"
+          echo "pipeline=$pipeline" >> "$GITHUB_OUTPUT"
+          echo "tested=$tested pipeline=$pipeline"
+
   verify:
+    needs: gate
+    if: ${{ needs.gate.outputs.tested != 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -63,6 +126,41 @@ jobs:
 
       - name: Test
         run: npm test
+
+      # The gate's PIPELINE_INPUTS must cover everything the pipeline's Python checks read
+      # outside belajar/pipeline and belajar/content (a new read outside it would let an
+      # app-only change skip a check that depends on it).
+      - name: Pipeline inputs are covered by the gate
+        run: node scripts/check-pipeline-inputs.mjs
+
+      # Full type check first: `next build` stops at the FIRST type error,
+      # which costs a CI round per error. `next typegen` writes the route
+      # types (PageProps/LayoutProps) without building, then tsc lists every
+      # error at once.
+      - name: Typecheck (all errors at once)
+        run: npx next typegen && npx tsc --noEmit -p .
+
+      # `next build` is the typecheck for App Router (PageProps/LayoutProps
+      # globals only exist after build) and prerenders the lesson pages.
+      - name: Build
+        run: npm run build
+
+  # The lesson content's checks (stdlib Python + two node scripts): up to date with the sources,
+  # validated, and each validator's planted-fault tests. Only when the change touches what they
+  # read (gate.pipeline); the narration planted-fault tests alone take about twelve minutes.
+  pipeline:
+    needs: gate
+    if: ${{ needs.gate.outputs.tested != 'true' && needs.gate.outputs.pipeline == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: belajar
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
       # The narration guard that matters: no Qur'anic word in any spelling or
       # ending the AI narrator could voice (plan §6.1 A1; no human review,
@@ -247,24 +345,12 @@ jobs:
       - name: Waris — validator mutation tests (corpus-free)
         run: python3 pipeline/test_validate_waris.py --no-corpus
 
-      # Full type check first: `next build` stops at the FIRST type error,
-      # which costs a CI round per error. `next typegen` writes the route
-      # types (PageProps/LayoutProps) without building, then tsc lists every
-      # error at once.
-      - name: Typecheck (all errors at once)
-        run: npx next typegen && npx tsc --noEmit -p .
-
-      # `next build` is the typecheck for App Router (PageProps/LayoutProps
-      # globals only exist after build) and prerenders the lesson pages.
-      - name: Build
-        run: npm run build
-
   # Build the real runtime image and smoke-test it on EVERY run (PRs too):
   # `next build` passing does not prove the container starts — e.g. a
   # package bundled away from node_modules only fails at `docker run`.
   # On main, the same image is then shipped and deployed.
   image:
-    needs: verify
+    needs: gate
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -282,8 +368,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Node for the CI scripts below (Playwright, the waris smoke/e2e scripts, tsx); the image
-      # brings its own runtime.
+      # Node for the CI scripts below (the smoke checks); the image brings its own runtime.
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -591,6 +676,50 @@ jobs:
           [[ "$waris_rc" -eq 0 ]] || { echo "✗ Ilmu Waris is not hidden (listed above)"; exit 1; }
           [[ "$surahs_rc" -eq 0 ]] || { echo "✗ the unpublished surahs are not hidden (listed above)"; exit 1; }
 
+      # Once built and smoke-tested, the image is handed to the browser jobs and the release.
+      - name: Save the image
+        run: docker save dakwah-belajar-web:latest | gzip -1 > /tmp/belajar-image.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: belajar-image
+          path: /tmp/belajar-image.tar.gz
+          retention-days: 1
+          compression-level: 0
+
+  # Screenshots (phone + desktop) of the image started like production.
+  shots:
+    needs: [gate, image]
+    if: ${{ !cancelled() && needs.gate.outputs.tested != 'true' && needs.image.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: smoke
+          POSTGRES_PASSWORD: smoke
+          POSTGRES_DB: smoke
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U smoke"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node for the CI scripts below (Playwright, the waris smoke/e2e scripts, tsx).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: belajar-image
+          path: /tmp/image
+      - name: Load the image
+        run: gunzip -c /tmp/image/belajar-image.tar.gz | docker load
+
       # Visual review without a developer laptop: phone + desktop screenshots
       # of the real image, uploaded as a build artifact on every run. The
       # container starts like production (no BELAJAR_WARIS, no BELAJAR_SURAHS),
@@ -623,7 +752,6 @@ jobs:
       # before (observed, the real CDN answers); Tutup stops it; the longest ayah
       # wraps at the largest text size; shots of the open dialog.
       - name: Screenshots (phone + desktop)
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
           set -euo pipefail
           trap 'docker rm -f shots >/dev/null 2>&1 || true' EXIT
@@ -641,6 +769,53 @@ jobs:
           npx playwright install --with-deps chromium >/dev/null
           BELAJAR_DIR="$GITHUB_WORKSPACE/belajar" node screenshots.mjs
           docker rm -f shots >/dev/null
+
+
+      - name: Upload screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: belajar-screenshots-shots
+          path: |
+            /tmp/shots-run/shots/*.png
+            /tmp/shots-run/shots/*.pdf
+            /tmp/shots-run/shots/*.json
+            /tmp/shots-run/waris-plan.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  # Line breaks, measured in Chromium at three text sizes on a phone and a desktop.
+  linebreaks:
+    needs: [gate, image]
+    if: ${{ !cancelled() && needs.gate.outputs.tested != 'true' && needs.image.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: smoke
+          POSTGRES_PASSWORD: smoke
+          POSTGRES_DB: smoke
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U smoke"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node for the CI scripts below (Playwright, the waris smoke/e2e scripts, tsx).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: belajar-image
+          path: /tmp/image
+      - name: Load the image
+        run: gunzip -c /tmp/image/belajar-image.tar.gz | docker load
 
       # Line breaks (operator, 2026-10-10: "make sure the line break is clean and easy to read,
       # sometime i see wrong line break especially for arabic words"). linebreaks.mjs measures
@@ -662,7 +837,6 @@ jobs:
       # measured on the every-surah container in the next step (linebreaks.mjs --surahs).
       # Removed on every exit so :3300 is free again.
       - name: Line breaks (phone + desktop, three text sizes)
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
           set -euo pipefail
           trap 'docker rm -f linebreaks >/dev/null 2>&1 || true' EXIT
@@ -688,6 +862,53 @@ jobs:
           fi
           BELAJAR_DIR="$GITHUB_WORKSPACE/belajar" node linebreaks.mjs
 
+
+      - name: Upload screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: belajar-screenshots-linebreaks
+          path: |
+            /tmp/shots-run/shots/*.png
+            /tmp/shots-run/shots/*.pdf
+            /tmp/shots-run/shots/*.json
+            /tmp/shots-run/waris-plan.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  # The Mu'awwidzat, on a container with every surah listed.
+  surahs:
+    needs: [gate, image]
+    if: ${{ !cancelled() && needs.gate.outputs.tested != 'true' && needs.image.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: smoke
+          POSTGRES_PASSWORD: smoke
+          POSTGRES_DB: smoke
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U smoke"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node for the CI scripts below (Playwright, the waris smoke/e2e scripts, tsx).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: belajar-image
+          path: /tmp/image
+      - name: Load the image
+        run: gunzip -c /tmp/image/belajar-image.tar.gz | docker load
+
       # The Mu'awwidzat on the real image, on a container started with every surah listed
       # (BELAJAR_SURAHS): only Al-Fatihah is published on the live site (operator, 2026-10-10;
       # src/lib/features.ts), but Al-Ikhlas, Al-Falaq and An-Nas stay built and tested, so showing
@@ -708,7 +929,6 @@ jobs:
       #         lb-semua-surah-*.png.
       # Each lists its problems; the step fails after all three have run.
       - name: Al-Mu'awwidzat with every surah listed (smoke, screenshots, line breaks)
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
           set -euo pipefail
           # A failed check must not leave :3300 taken.
@@ -747,6 +967,53 @@ jobs:
           [[ "$lb_rc" -eq 0 ]] || { echo "✗ line breaks with every surah listed failed (listed above)"; rc=1; }
           exit "$rc"
 
+
+      - name: Upload screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: belajar-screenshots-surahs
+          path: |
+            /tmp/shots-run/shots/*.png
+            /tmp/shots-run/shots/*.pdf
+            /tmp/shots-run/shots/*.json
+            /tmp/shots-run/waris-plan.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  # Ilmu Waris, on a container with the switch on.
+  waris:
+    needs: [gate, image]
+    if: ${{ !cancelled() && needs.gate.outputs.tested != 'true' && needs.image.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: smoke
+          POSTGRES_PASSWORD: smoke
+          POSTGRES_DB: smoke
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U smoke"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node for the CI scripts below (Playwright, the waris smoke/e2e scripts, tsx).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: belajar-image
+          path: /tmp/image
+      - name: Load the image
+        run: gunzip -c /tmp/image/belajar-image.tar.gz | docker load
+
       # Ilmu Waris on the real image, on a container started with the switch on
       # (BELAJAR_WARIS=on): the track is hidden on the live site (operator, 2026-10-10;
       # src/lib/features.ts) but stays built and tested, so showing it again is an env change.
@@ -770,7 +1037,6 @@ jobs:
       # The smoke and the screenshots list their problems and fail the step after the end-to-end
       # run, so one run reports all three.
       - name: Ilmu Waris with the switch on (smoke, screenshots, end-to-end)
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
           set -euo pipefail
           # A failed check must not leave :3300 taken.
@@ -803,16 +1069,12 @@ jobs:
           [[ "$smoke_rc" -eq 0 ]] || { echo "✗ waris smoke checks failed (listed above)"; exit 1; }
           [[ "$shots_rc" -eq 0 ]] || { echo "✗ waris screenshots failed (above)"; exit 1; }
 
+
       - name: Upload screenshots
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: belajar-screenshots
-          # shots/: page screenshots (the waris pages and the Mu'awwidzat lessons from their
-          # switch-on containers), waris e2e shots + print PDFs + waris-e2e-record.json (page
-          # counts, heights, network summary), linebreaks.json + lb-*.png (the line-break check:
-          # every offender, shots at each text size; linebreaks-semua-surah.json +
-          # lb-semua-surah-*.png from the every-surah container); waris-plan.json: the e2e plan.
+          name: belajar-screenshots-waris
           path: |
             /tmp/shots-run/shots/*.png
             /tmp/shots-run/shots/*.pdf
@@ -821,8 +1083,49 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  # A pull-request run that passed everything leaves a marker named after the git TREE it tested;
+  # the gate of the push to main that merges the same tree finds it and does not test it again.
+  tested:
+    needs: [gate, verify, pipeline, shots, linebreaks, surahs, waris]
+    if: ${{ !cancelled() && github.event_name == 'pull_request' && needs.verify.result == 'success' && (needs.pipeline.result == 'success' || (needs.pipeline.result == 'skipped' && needs.gate.outputs.pipeline != 'true')) && needs.shots.result == 'success' && needs.linebreaks.result == 'success' && needs.surahs.result == 'success' && needs.waris.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Leave the marker
+        run: |
+          set -euo pipefail
+          tree="$(git rev-parse 'HEAD^{tree}')"
+          echo "$tree" > tested-tree.txt
+          echo "name=belajar-tested-$tree" >> "$GITHUB_ENV"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.name }}
+          path: tested-tree.txt
+          retention-days: 30
+
+  # On main: the image built above, shipped and deployed on the VM. It waits for every test
+  # job, or for nothing when this exact tree was already tested on its pull request.
+  ship:
+    needs: [gate, verify, pipeline, image, shots, linebreaks, surahs, waris]
+    if: ${{ always() && !cancelled() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.image.result == 'success' && (needs.gate.outputs.tested == 'true' || (needs.verify.result == 'success' && (needs.pipeline.result == 'success' || (needs.pipeline.result == 'skipped' && needs.gate.outputs.pipeline != 'true')) && needs.shots.result == 'success' && needs.linebreaks.result == 'success' && needs.surahs.result == 'success' && needs.waris.result == 'success')) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: belajar-image
+          path: /tmp/image
+      - name: Load the image
+        run: gunzip -c /tmp/image/belajar-image.tar.gz | docker load
+
       - name: Ship release + deploy on VM
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
