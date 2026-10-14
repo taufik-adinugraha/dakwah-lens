@@ -2946,7 +2946,7 @@ async function composeShots(page, vp, index) {
  *      `change` frame BY ITSELF — whether the runner could play the recording or not.
  *   2. A CLIP THAT DOES NOT COME IS NEVER A DEAD STOP (phone): word 2's composition with every
  *      request for a narrator's word recording held back (its base form's, QS 112:2). The beat
- *      shows; "Memuat bacaan imam…" shows in the bottom panel; after the lesson's own limit
+ *      shows; "Memuat suara narator…" shows in the bottom panel; after the lesson's own limit
  *      (EXAMPLE_LOAD_LIMIT_MS, not sooner) the example is given up — data-example-state "failed",
  *      "Suara contoh ini belum bisa diputar." — and the lesson, never paused, goes on to the next
  *      frame by itself.
@@ -3137,10 +3137,12 @@ async function exampleChecks(page, vp, index) {
         const wait2 = compose.words["1:1:2"].lines.filter((l) => l.frame <= allahu.frame).length * 12_000;
         if (!(await beatShows(heldId, wait2 + 20_000))) fail(`the example ${heldId} never showed in word 2's composition (step "${await attr("data-step")}")`);
         const t2 = Date.now();
-        const status = page.locator('[data-autoplay="loading"][data-kind="recitation"]');
+        // A word's recording is the NARRATOR's (the loading kind "narration": "Memuat suara
+        // narator…"), not the imam's: the imam's "Memuat bacaan imam…" is for an ayah's recitation.
+        const status = page.locator('[data-autoplay="loading"][data-kind="narration"]');
         await status.waitFor({ state: "visible", timeout: 3_000 }).catch(() => fail(`with the narrator's recordings held back, no loading status showed within 3 s of the beat`));
         const says = await text(status);
-        if (says !== msgs.loading_recitation) fail(`the loading status says “${says}”, expected “${msgs.loading_recitation}”`);
+        if (says !== msgs.loading_narration) fail(`the loading status says “${says}”, expected “${msgs.loading_narration}”`);
         if (!heldBack.length) fail(`no recording of the narrator was requested at the beat (nothing was held back)`);
         await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-example-loading.png` });
         console.log(`shot ${vp}-autoplay-ayah1-example-loading`);
