@@ -13,7 +13,8 @@ import raw from "../../content/wordvoice.json";
 import type { Clip } from "@/content/schema";
 
 /** Alif wasla and dagger alif as alif, the small sukun as a sukun, the small high signs dropped
- *  (pipeline/wordvoice.py `plain`; wordvoice.test.ts keeps the two equal on the content). */
+ *  and the dotless ya after a kasrah as a ya (pipeline/wordvoice.py `plain`; wordvoice.test.ts keeps
+ *  the two equal on the content). */
 const TO_LETTER: Readonly<Record<number, string>> = { 0x0671: "ا", 0x0670: "ا", 0x06e1: "ْ" };
 const isDropped = (cp: number) => (cp >= 0x06d6 && cp <= 0x06dc) || cp === 0x06df || cp === 0x06e0 || (cp >= 0x06e2 && cp <= 0x06ed);
 
@@ -24,7 +25,8 @@ export function plainLetters(text: string): string {
     if (isDropped(cp)) continue;
     out += TO_LETTER[cp] ?? ch;
   }
-  return out;
+  // kasrah + alif maqsura (alladhī, fī) is the long ī: a ya with its dots; after a fathah it stays (hudā)
+  return out.replaceAll("\u0650\u0649", "\u0650\u064a");
 }
 
 export type WordVoiceEntry = { audio?: { url: string; ms: number; sha256: string } };

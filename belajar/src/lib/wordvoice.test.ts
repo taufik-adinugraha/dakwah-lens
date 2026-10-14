@@ -20,6 +20,11 @@ describe("the plain-letter rule (pipeline/wordvoice.py plain)", () => {
     expect(plainLetters("لۖم")).toBe("لم");
   });
 
+  it("writes the long ī after a kasrah with a dotted ya, and leaves the long ā after a fathah", () => {
+    expect(plainLetters("\u0630\u0650\u0649")).toBe("\u0630\u0650\u064a");
+    expect(plainLetters("\u0647\u064f\u062f\u064e\u0649")).toBe("\u0647\u064f\u062f\u064e\u0649");
+  });
+
   it("is the Python rule: every text the builder keyed is already plain, and every content word lands on a key", () => {
     for (const t of Object.keys(M.words)) expect(plainLetters(t), t).toBe(t);
     for (const w of lessonWords) expect(M.words[plainLetters(w.ar)], w.loc).toBeDefined();

@@ -11,8 +11,10 @@ Why plain letters (operator's listening test, 2026-10-14): eleven_v3 reads a lon
 of a sentence and drops its last vowel ("bism" for bismi); eleven_multilingual_v2 reads it whole,
 but reads the mushaf's alif wasla (U+0671) as nothing — "Allah" came out as "lillahi". So the
 Uthmani marks the model does not know are written as the plain letters it does (`plain`):
-alif wasla and dagger alif as alif, the small sukun as a sukun, the small high signs dropped.
-The mapping is tiny and total; src/lib/wordvoice.ts is its twin and wordvoice.test.ts keeps the two
+alif wasla and dagger alif as alif, the small sukun as a sukun, the small high signs dropped,
+and the dotless ya after a kasrah (alladhī, fī: the mushaf writes the long ī with ى, U+0649, which
+the model reads as a separate "ya" syllable: "alladziya", operator 2026-10-14) as a ya with its dots.
+After a fathah the same letter is a long ā (hudā) and stays. The mapping is tiny and total; src/lib/wordvoice.ts is its twin and wordvoice.test.ts keeps the two
 equal on the content's own words.
 
 The set of strings to voice is DERIVED, never listed by hand (`inventory`): every word of every
@@ -59,7 +61,8 @@ _DROP = set(range(0x06D6, 0x06DD)) | {0x06DF, 0x06E0} | set(range(0x06E2, 0x06EE
 
 def plain(text: str) -> str:
     """The word as the voice model should read it (see the module docstring)."""
-    return "".join(_TO_LETTER.get(ord(c), c) for c in text.strip() if ord(c) not in _DROP)
+    out = "".join(_TO_LETTER.get(ord(c), c) for c in text.strip() if ord(c) not in _DROP)
+    return out.replace("\u0650\u0649", "\u0650\u064A")  # kasrah + alif maqsura: the long ī
 
 
 def file_id(text: str) -> str:

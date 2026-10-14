@@ -31,6 +31,10 @@ class PlainLetters(unittest.TestCase):
         self.assertEqual(W.plain(f"ل{SMALL_SUKUN}"), "لْ")
         self.assertEqual(W.plain(f"ل{STOP}م"), "لم")  # a stop sign is dropped
 
+    def test_the_dotless_ya_is_a_long_i_after_a_kasrah_and_a_long_a_after_a_fathah(self):
+        self.assertEqual(W.plain("\u0630\u0650\u0649"), "\u0630\u0650\u064A")  # alladhī: ى -> ي
+        self.assertEqual(W.plain("\u0647\u064F\u062F\u064E\u0649"), "\u0647\u064F\u062F\u064E\u0649")  # hudā stays
+
     def test_ordinary_harakat_are_untouched_and_the_rule_is_idempotent(self):
         w = "بِسْمِ"
         self.assertEqual(W.plain(w), w)
