@@ -158,7 +158,9 @@ describe("every place that lists or links surahs reads the switch", () => {
     expect(id.Guided.end_repeat).toBe("Ulangi {surah}");
     for (const msgs of [id, en]) {
       expect(msgs.Guided.end_soon).toContain("{surah}");
-      expect(msgs.Hub.quran_coming).toContain("{list}");
+      // The hub card's two notes are pills (StatusPill, 2026-10-14): a label and the names.
+      expect(msgs.Hub.status_available).toBeTruthy();
+      expect(msgs.Hub.status_coming).toBe(msgs.Quran.coming_soon);
     }
     const card = read("src/components/autoplay/SurahEndCard.tsx");
     for (const m of ['data-autoplay="end-soon"', 'data-autoplay="end-next"', 'data-autoplay="end-repeat"']) {

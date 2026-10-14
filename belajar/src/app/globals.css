@@ -15,24 +15,29 @@
   --font-display: var(--font-fraunces);
   --font-body: var(--font-inter);
 
-  /* Type scale (senior-ux.md §3.1): body is 18px. Overriding the Tailwind
-     scale makes every text-* utility grow at once. text-xs (15px) is the
-     absolute floor and is for citations and metadata only. */
-  --text-xs: 0.9375rem;
+  /* Type scale (senior-ux.md §3.1, changed 2026-10-14). NORMAL is the main site's scale
+     (dakwah-lens.id: Tailwind's own sizes, body 16px; operator: "for ordinary people i think
+     current normal size is too big"). The line heights stay Belajar's, more open than the
+     main site's, for Arabic and for reading. Overriding the Tailwind scale makes every text-*
+     utility follow at once. Learners who want it larger use "Ukuran huruf" (below): Besar is
+     what Normal was until 2026-10-14 (body 18px), Sangat besar what Besar was (20.25px); the
+     old 24px option was dropped. Everything is rem, so Arabic, spacing and targets scale with
+     them; the Arabic floor (--text-ar-sm, 24px) is set in rem too and holds at every size. */
+  --text-xs: 0.75rem;
   --text-xs--line-height: 1.5;
-  --text-sm: 1rem;
+  --text-sm: 0.875rem;
   --text-sm--line-height: 1.6;
-  --text-base: 1.125rem;
+  --text-base: 1rem;
   --text-base--line-height: 1.7;
-  --text-lg: 1.25rem;
+  --text-lg: 1.125rem;
   --text-lg--line-height: 1.55;
-  --text-xl: 1.375rem;
+  --text-xl: 1.25rem;
   --text-xl--line-height: 1.5;
-  --text-2xl: 1.625rem;
+  --text-2xl: 1.5rem;
   --text-2xl--line-height: 1.35;
-  --text-3xl: 2rem;
+  --text-3xl: 1.875rem;
   --text-3xl--line-height: 1.25;
-  --text-4xl: 2.5rem;
+  --text-4xl: 2.25rem;
   --text-4xl--line-height: 1.2;
   --text-5xl: 3rem;
   --text-5xl--line-height: 1.15;
@@ -743,11 +748,5 @@ html[data-text-size="besar"] {
   font-size: 112.5%;
 }
 html[data-text-size="sangat-besar"] {
-  font-size: 133.333%;
-}
-
-/* The one-time Home hint card hides before paint once the learner has
-   chosen a size or dismissed it (data-text-hint is set by the same script). */
-html[data-text-hint="off"] .text-size-hint {
-  display: none;
+  font-size: 126.5625%; /* 112.5% twice: body 20.25px at the browser's default root */
 }

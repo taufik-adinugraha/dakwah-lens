@@ -14,8 +14,8 @@
     "tracks_heading": "Pilih yang ingin Anda pelajari",
     "quran_title": "Bahasa Arab Al-Qur'an",
     "quran_body": "Dengarkan bacaan imam, lalu pahami setiap kata: artinya, akar katanya, dan alasan harakat di akhirnya.",
-    "quran_available": "Tersedia sekarang: {list}",
-    "quran_coming": "Segera hadir: {list}",
+    "status_available": "Tersedia sekarang",
+    "status_coming": "Segera hadir",
     "surah_ayat": "{name} ({ayat} ayat)",
     "concepts_title": "Konsep tata bahasa",
     "concepts_body": "Pustaka nahwu dan sharaf: setiap konsep dijelaskan sekali, lalu dipakai ulang di setiap pelajaran yang memuatnya.",
@@ -28,6 +28,7 @@
     "jump_heading": "Langsung ke ayat tertentu",
     "surah_meta": "{ayat} ayat · {words} kata",
     "coming_soon": "Segera hadir",
+    "coming_unit": "{name} ({surah}: {ayah})",
     "fatihah_pace": "±3 pekan, 10 menit sehari",
     "ayat_nav": "Ayat {name}",
     "how_heading": "Cara belajarnya",
@@ -420,9 +421,6 @@
     "selected": "Dipilih",
     "panel_title": "Ukuran huruf",
     "panel_body": "Semua tulisan ikut membesar, termasuk huruf Arab. Pilihan Anda disimpan di perangkat ini.",
-    "close": "Tutup",
-    "hint_title": "Tulisan kurang jelas? Perbesar di sini.",
-    "hint_body": "Pilih ukuran yang paling nyaman Anda baca. Anda bisa mengubahnya lagi kapan saja lewat tombol “Aa” di bagian atas halaman.",
-    "hint_dismiss": "Tutup petunjuk ini"
+    "close": "Tutup"
   }
 }

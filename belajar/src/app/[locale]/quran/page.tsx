@@ -8,9 +8,11 @@ import { MixedText } from "@/components/library/MixedText";
 import { MainSiteBridge } from "@/components/MainSiteBridge";
 import { ShareButton } from "@/components/ShareButton";
 import { Link } from "@/i18n/navigation";
+import { comingUnits } from "@/lib/comingUnits";
 import { SURAHS } from "@/lib/content";
 import { CURRICULUM, introOpen } from "@/lib/curriculum";
 import { visibleSurahs } from "@/lib/features";
+import { surahNamesFor } from "@/lib/ayat";
 import { ayahHref, curriculumHref, surahHref } from "@/lib/routes";
 import { pageUrl, shareMetadata } from "@/lib/share";
 
@@ -89,6 +91,13 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
   // ends with, both read from the file.
   const maxNew = CURRICULUM.lessons.reduce((n, l) => Math.max(n, l.steps.length), 0);
   const lastUnit = CURRICULUM.units.find((u) => u.id === CURRICULUM.lessons.at(-1)?.unit)?.name ?? "";
+  // The curriculum's units with no lessons of their own yet (Ayat Kursi), listed as "Segera hadir"
+  // after the surahs (operator 2026-10-14: "write as ayat kursi (albaqarah: XXX)"): the surah's
+  // name and the ayah number come from the data.
+  const comingUnit = comingUnits().map((u) => {
+    const surah = surahNamesFor([`${u.surah}:${u.ayah ?? 1}`])[String(u.surah)];
+    return { ...u, label: surah && u.ayah !== null ? t("coming_unit", { name: u.name, surah, ayah: u.ayah }) : u.name };
+  });
 
   return (
     <div className="relative isolate">
@@ -185,6 +194,26 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
                 </li>
               );
             })}
+            {comingUnit.map((u) => (
+              <li key={u.id}>
+                {/* Like a surah not published yet: no link, a dashed card, the words "Segera hadir".
+                    Its own attribute (not data-coming-soon, which is one per hidden SURAH). */}
+                <div
+                  data-coming-unit={u.id}
+                  className="block rounded-2xl border-[1.5px] border-dashed border-border-ui bg-paper-deep p-5 sm:p-7"
+                >
+                  <span className="block font-display text-2xl font-medium text-ink">
+                    <MixedText text={u.label} />
+                  </span>
+                  <span className="mt-4 flex flex-wrap items-center gap-3">
+                    <span className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-border-ui bg-white px-3 py-1 text-sm font-semibold text-ink">
+                      <Clock aria-hidden className="h-4 w-4 shrink-0 text-ink-muted" />
+                      {t("coming_soon")}
+                    </span>
+                  </span>
+                </div>
+              </li>
+            ))}
           </ul>
 
           {/* Straight to any ayah, folded away: one quiet row instead of a
@@ -230,48 +259,61 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
           </Link>
         </section>
 
+        {/* "Cara belajarnya" and "Cara kami menyusun materi" fold away (operator 2026-10-14:
+            "make these sections collapsable"): the same quiet row as "Langsung ke ayat tertentu",
+            closed until opened. The heading stays a real h2, inside its summary. */}
         <section className="mt-12" aria-labelledby="how">
-          <h2 id="how" className="text-lg font-semibold text-ink">
-            {t("how_heading")}
-          </h2>
-          <ol className="mt-3 max-w-prose space-y-3">
-            {steps.map((step, i) => (
-              <li key={step} className="flex gap-3 text-base text-ink">
-                <span
-                  aria-hidden
-                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-forest-tint text-sm font-semibold text-forest"
-                >
-                  {i + 1}
-                </span>
-                <span className="pt-1">
-                  <MixedText text={step} />
-                </span>
-              </li>
-            ))}
-          </ol>
+          <details className="rounded-2xl border border-hairline bg-white px-5">
+            <summary className="disclosure-row text-ink">
+              <h2 id="how" className="text-lg font-semibold text-ink">
+                {t("how_heading")}
+              </h2>
+              <ChevronDown aria-hidden className="chev h-5 w-5 shrink-0 text-forest" />
+            </summary>
+            <ol className="max-w-prose space-y-3 pt-1 pb-5">
+              {steps.map((step, i) => (
+                <li key={step} className="flex gap-3 text-base text-ink">
+                  <span
+                    aria-hidden
+                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-forest-tint text-sm font-semibold text-forest"
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="pt-1">
+                    <MixedText text={step} />
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </details>
         </section>
 
         <section className="mt-12" aria-labelledby="principles">
-          <h2 id="principles" className="text-lg font-semibold text-ink">
-            {t("principles_heading")}
-          </h2>
-          {/* Container query, not a media query: columns collapse as the
-              learner's text size grows (senior-ux.md §3.4). */}
-          <div className="@container mt-3">
-            <ul className="grid gap-4 @3xl:grid-cols-3">
-              {principles.map(({ Icon, title, body }) => (
-                <li key={title} className="rounded-2xl border border-hairline bg-white p-5">
-                  <Icon className="h-6 w-6 text-forest" aria-hidden />
-                  <p className="mt-3 font-display text-xl font-medium">
-                    <MixedText text={title} />
-                  </p>
-                  <p className="mt-1.5 text-base text-ink-muted">
-                    <MixedText text={body} />
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <details className="rounded-2xl border border-hairline bg-white px-5">
+            <summary className="disclosure-row text-ink">
+              <h2 id="principles" className="text-lg font-semibold text-ink">
+                {t("principles_heading")}
+              </h2>
+              <ChevronDown aria-hidden className="chev h-5 w-5 shrink-0 text-forest" />
+            </summary>
+            {/* Container query, not a media query: columns collapse as the
+                learner's text size grows (senior-ux.md §3.4). */}
+            <div className="@container pt-1 pb-5">
+              <ul className="grid gap-4 @3xl:grid-cols-3">
+                {principles.map(({ Icon, title, body }) => (
+                  <li key={title} className="rounded-2xl border border-hairline bg-paper p-5">
+                    <Icon className="h-6 w-6 text-forest" aria-hidden />
+                    <p className="mt-3 font-display text-xl font-medium">
+                      <MixedText text={title} />
+                    </p>
+                    <p className="mt-1.5 text-base text-ink-muted">
+                      <MixedText text={body} />
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </details>
           {/* One line to the main site's kitab search, under the principles
               (operator, 2026-10-10): the next step for a reader who wants the
               texts themselves. */}

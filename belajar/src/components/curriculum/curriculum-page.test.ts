@@ -10,6 +10,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import CurriculumPage, { generateMetadata } from "@/app/[locale]/quran/kurikulum/page";
 import QuranTrackPage from "@/app/[locale]/quran/page";
 import { mapLatinName } from "@/lib/autoplay/lessonMap";
+import { comingUnits } from "@/lib/comingUnits";
 import { SURAHS } from "@/lib/content";
 import { CURRICULUM, ZERO_HOST } from "@/lib/curriculum";
 import { DEFAULT_SURAHS } from "@/lib/features";
@@ -36,6 +37,9 @@ const request = vi.hoisted(() => ({ locale: "id" as "id" | "en" }));
 
 // connection() needs a live Next request (lib/features.ts visibleSurahs()).
 vi.mock("next/server", () => ({ connection: async () => undefined }));
+// The track page names surahs through src/lib/ayat.ts, which is server-only (the marker package
+// throws outside a server build; src/lib/ayah.test.ts does the same).
+vi.mock("server-only", () => ({}));
 // The page's translators, from the real message files.
 vi.mock("next-intl/server", async () => {
   const intl = await import("next-intl");
@@ -456,9 +460,15 @@ describe("the track page introduces the curriculum and links to it", () => {
       expect([...html.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)].map((m) => text(m[1]))).toContain(MSG[locale].Quran.curriculum_heading);
       // What CI's smoke and browser checks count on the track page (surahs-smoke.mjs,
       // screenshots.mjs comingSoonCheck): one "Segera hadir" per hidden surah, one card each, and
-      // no link into them.
-      expect(visible(html).split(MSG[locale].Quran.coming_soon).length - 1).toBe(HIDDEN.length);
+      // no link into them — plus one per unit with no lessons of its own (Ayat Kursi, 2026-10-14),
+      // a card of its own kind (data-coming-unit) that is no link either.
+      const units = comingUnits();
+      expect(units.map((u) => u.id)).toEqual(["ayat-kursi"]);
+      expect(visible(html).split(MSG[locale].Quran.coming_soon).length - 1).toBe(HIDDEN.length + units.length);
       expect([...html.matchAll(/data-coming-soon="([^"]+)"/g)].map((m) => m[1])).toEqual(SURAHS.filter((s) => HIDDEN.includes(s.slug)).map((s) => s.slug));
+      expect([...html.matchAll(/data-coming-unit="([^"]+)"/g)].map((m) => m[1])).toEqual(units.map((u) => u.id));
+      const tqu = createTranslator({ locale, messages: MSG[locale], namespace: "Quran" });
+      expect(visible(html)).toContain(tqu("coming_unit", { name: "Ayat Kursi", surah: "Al-Baqarah", ayah: 255 }));
       for (const slug of HIDDEN) expect(html, slug).not.toMatch(linkInto(slug));
     }
   });

@@ -754,6 +754,17 @@ async function comingSoonCheck(page, vp) {
     if (c.focusable > 0) problems.push(`${c.slug}: ${c.focusable} focusable element(s) inside`);
     if (!c.text.includes("Segera hadir")) problems.push(`${c.slug}: the card does not say "Segera hadir"`);
   }
+  // The units with no lessons of their own (Ayat Kursi, 2:255): a dashed card that says "Segera hadir",
+  // no link, nothing to focus — and its own attribute, so the surah cards above stay one per hidden surah.
+  const units = await page.locator("[data-coming-unit]").evaluateAll((els) =>
+    els.map((e) => ({ id: e.getAttribute("data-coming-unit"), tag: e.tagName, inLink: !!e.closest("a"), focusable: e.querySelectorAll("a, button, input, select, textarea, summary, [tabindex]").length, text: e.textContent ?? "" })),
+  );
+  if (units.length === 0) problems.push("no card for the unit with no lessons (Ayat Kursi): it is listed as Segera hadir");
+  for (const u of units) {
+    if (u.tag === "A" || u.inLink) problems.push(`${u.id}: the "Segera hadir" card is a link`);
+    if (u.focusable > 0) problems.push(`${u.id}: ${u.focusable} focusable element(s) inside`);
+    if (!u.text.includes("Segera hadir")) problems.push(`${u.id}: the card does not say "Segera hadir"`);
+  }
   if ((await page.locator('a[href="/belajar/id/quran/al-fatihah"]').count()) === 0) problems.push("Al-Fatihah's card is no link");
   for (const slug of HIDDEN_SURAHS) {
     const n = await page.locator(`a[href^="/belajar/id/quran/${slug}"]`).count();

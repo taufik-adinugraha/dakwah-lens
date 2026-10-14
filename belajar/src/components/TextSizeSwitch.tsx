@@ -2,25 +2,21 @@
 
 import { useId } from "react";
 import clsx from "clsx";
-import { Check, X } from "lucide-react";
+import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import {
-  dismissTextSizeHint,
-  useTextSize,
-  type TextSize,
-} from "@/hooks/useTextSize";
+import { useTextSize, type TextSize } from "@/hooks/useTextSize";
 
 /**
  * "Ukuran huruf" controls (docs/belajar-research/senior-ux.md §3.4):
  * - TextSizeOptions: the bare three-option radio group, used by the header's
- *   "Aa" panel (HeaderControls), the lesson's Pengaturan panel and the Home
- *   hint card.
- * - TextSizeHint: the one-time Home card "Tulisan kurang jelas? …".
+ *   "Aa" panel (HeaderControls) and the lesson's Pengaturan panel. (The
+ *   one-time Home card "Tulisan kurang jelas? …" was removed 2026-10-14: the
+ *   header's "Aa" button is the one place to change the size.)
  */
 
-// Each option is shown in (roughly) its own size relative to Normal:
-// 18px · 20.25px · 24px at the browser's default root size.
+// Each option is shown in its own size: body 16px · 18px · 20.25px at the browser's default
+// root size (2026-10-14: Normal is the main site's size; the 24px option was dropped).
 const OPTIONS: {
   value: TextSize;
   label: "size_normal" | "size_besar" | "size_sangat_besar";
@@ -28,7 +24,7 @@ const OPTIONS: {
 }[] = [
   { value: "normal", label: "size_normal", sample: "text-base" },
   { value: "besar", label: "size_besar", sample: "text-lg" },
-  { value: "sangat-besar", label: "size_sangat_besar", sample: "text-[1.5rem]" },
+  { value: "sangat-besar", label: "size_sangat_besar", sample: "text-[1.265625rem]" },
 ];
 
 /** `showLegend`: print the group's name ("Ukuran huruf") above the options,
@@ -93,39 +89,5 @@ export function TextSizeOptions({ showLegend = false }: { showLegend?: boolean }
         </div>
       </div>
     </fieldset>
-  );
-}
-
-/** One-time Home card; hidden for good once dismissed or a size is chosen. */
-export function TextSizeHint({ className }: { className?: string }) {
-  const t = useTranslations("Settings");
-  const headingId = useId();
-
-  const dismiss = () => {
-    dismissTextSizeHint();
-    // The card is gone: keep keyboard users oriented on the switch itself.
-    document.querySelector<HTMLButtonElement>("[data-text-size-toggle]")?.focus();
-  };
-
-  return (
-    <section
-      aria-labelledby={headingId}
-      className={clsx(
-        "text-size-hint rounded-2xl border-[1.5px] border-forest bg-white p-5 shadow-sm sm:p-6",
-        className,
-      )}
-    >
-      <h2 id={headingId} className="text-lg font-semibold text-ink">
-        {t("hint_title")}
-      </h2>
-      <p className="mt-1 max-w-prose text-base text-ink-muted">{t("hint_body")}</p>
-      <div className="mt-4">
-        <TextSizeOptions />
-      </div>
-      <button type="button" onClick={dismiss} className="btn-secondary mt-4">
-        <X className="h-5 w-5" aria-hidden />
-        {t("hint_dismiss")}
-      </button>
-    </section>
   );
 }

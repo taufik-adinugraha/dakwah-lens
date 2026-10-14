@@ -34,11 +34,11 @@ const inter = Inter({
 });
 
 /**
- * Applies the learner's text size ("Ukuran huruf") and hides the one-time
- * Home hint before first paint, so statically rendered pages never flash at
- * the wrong size. Keys and values must match src/hooks/useTextSize.ts.
+ * Applies the learner's text size ("Ukuran huruf") before first paint, so
+ * statically rendered pages never flash at the wrong size. Keys and values
+ * must match src/hooks/useTextSize.ts.
  */
-const PRE_PAINT = `(function(){try{var d=document.documentElement,s=localStorage.getItem("belajar:v1:text-size");if(s==="besar"||s==="sangat-besar")d.dataset.textSize=s;if(s||localStorage.getItem("belajar:v1:text-size-hint"))d.dataset.textHint="off"}catch(e){}})();`;
+const PRE_PAINT = `(function(){try{var d=document.documentElement,s=localStorage.getItem("belajar:v1:text-size");if(s==="besar"||s==="sangat-besar")d.dataset.textSize=s}catch(e){}})();`;
 
 /**
  * Ilmu Waris namespaces (messages/waris/*.json, merged in i18n/request.ts). Kept out of the
@@ -84,8 +84,8 @@ export default async function LocaleLayout({
   const all = await getMessages();
   const clientMessages = Object.fromEntries(Object.entries(all).filter(([ns]) => !WARIS_NAMESPACES.has(ns)));
 
-  // suppressHydrationWarning: the pre-paint script sets data-text-size /
-  // data-text-hint on <html> before React hydrates.
+  // suppressHydrationWarning: the pre-paint script sets data-text-size on
+  // <html> before React hydrates.
   return (
     <html
       lang={locale}
