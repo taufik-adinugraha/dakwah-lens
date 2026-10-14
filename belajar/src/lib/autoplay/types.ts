@@ -457,6 +457,9 @@ export type AutoplayTexts = {
     word: (a: { n: number; translit: string }) => string;
     /** One more example, a word of another ayah. */
     other: (a: { translit: string; surah: number; ayah: number }) => string;
+    /** An example in lesson zero (no ayah): what it is an example of — `about`, the Konsep
+     *  record's note of that example without the word it opens with ("fi'il, kata kerja."). */
+    zero: (a: { translit: string; surah: number; ayah: number; about: string }) => string;
     /** The bentuk dasar a composition shows, where it stands in the Qur'an. */
     base: (a: { translit: string; surah: number; ayah: number }) => string;
     /** Added when the example ends its ayah and the imam's stop drops its last harakah. */

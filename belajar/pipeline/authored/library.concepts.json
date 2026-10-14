@@ -3,7 +3,7 @@
     "id": "kalimah-isim-fiil-huruf",
     "kind": "nahwu",
     "title": "[[Kalimah]]: [[isim]], [[fi'il]], [[huruf]] (tiga jenis kata)",
-    "summary": "Setiap kata Arab termasuk salah satu dari tiga jenis: [[isim]] (nama benda, orang, atau sifat), [[fi'il]] (kata kerja), atau [[huruf]] (kata tugas).",
+    "summary": "Setiap kata Arab termasuk salah satu dari tiga jenis: [[isim]] (nama benda, orang, atau sifat), [[fi'il]] (kata kerja), atau [[huruf]] (kata tugas). [[Huruf]] di sini bukan huruf abjad, melainkan jenis kata yang baru bermakna bersama kata lain.",
     "explanation": [
       "Dalam [[nahwu]] (tata bahasa Arab), satu kata disebut [[kalimah]]. Ibnu Ajurrum menyebut tiga bagian penyusun [[kalam]] (ucapan yang bermakna): [[isim]], [[fi'il]], dan [[huruf]] yang membawa makna. Ahmad Zaini Dahlan menjelaskan bedanya: [[isim]] punya makna sendiri dan tidak terikat waktu; [[fi'il]] punya makna sendiri dan terikat waktu (lampau, sekarang, atau perintah untuk nanti); [[huruf]] baru jelas maknanya bila bergabung dengan kata lain.",
       "[[Isim]] bisa dikenali dari tanda-tandanya, antara lain didahului [[huruf jar]] (kata depan seperti [[bi-|q:1:1:1/1]] yang artinya “dengan”) atau diawali [[al-|q:1:2:1/1]]. Kata pertama Al-Fatihah, [[bismi|q:1:1:1]], sudah memuat dua jenis kata: [[bi-|q:1:1:1/1]] adalah [[huruf]], dan [[ism|q:55:78:2]], yang artinya “nama”, adalah [[isim]], karena ia didahului [[huruf jar]].",
@@ -13,12 +13,16 @@
     "bridge": "Kira-kira: [[isim]] mencakup kata benda dan kata sifat, [[fi'il]] adalah kata kerja, dan [[huruf]] mirip kata tugas (kata depan, kata sambung). Padanannya tidak persis: kata ganti seperti [[iyyāka|q:1:5:1]], misalnya, dihitung sebagai [[isim]].",
     "examples": [
       {
-        "loc": "1:1:1",
-        "note": "[[bi-|q:1:1:1/1]] ([[huruf jar]]) + [[ism|q:55:78:2]] ([[isim]]): dua jenis kata dalam satu tulisan."
+        "loc": "1:7:1",
+        "note": "[[ṣirāṭa|q:1:7:1]]: [[isim]], nama benda."
       },
       {
         "loc": "1:5:2",
         "note": "[[na‘budu|q:1:5:2]]: [[fi'il]], kata kerja."
+      },
+      {
+        "loc": "1:1:1",
+        "note": "[[bismi|q:1:1:1]]: [[bi-|q:1:1:1/1]] ([[huruf]]) + [[ism|q:55:78:2]] ([[isim]]), dua jenis kata dalam satu tulisan."
       },
       {
         "loc": "1:7:8",
@@ -62,7 +66,7 @@
       },
       {
         "kitab": "Quranic Arabic Corpus 0.4",
-        "ref": "(1:1:1) P + N; (1:5:2) V IMPF; (1:7:8) CONJ + NEG",
+        "ref": "(1:1:1) P + N; (1:5:2) V IMPF; (1:7:1) N; (1:7:8) CONJ + NEG",
         "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=1"
       }
     ],

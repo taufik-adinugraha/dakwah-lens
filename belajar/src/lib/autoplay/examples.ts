@@ -57,6 +57,10 @@ export type EndingMark = (typeof ENDING_MARKS)[number];
 
 /** At most this many example beats per rule (a concept, a bentuk dasar). */
 export const MAX_EXAMPLES_PER_RULE = 2;
+/** … and in lesson zero, where the one concept names three kinds of word (isim, fi'il, huruf):
+ *  one example of each, in the record's order (operator's audit of lesson zero, 2026-10-14:
+ *  "give general example with showing the words"). */
+export const MAX_EXAMPLES_ZERO = 3;
 
 /** Why a `base` frame of a composition has no voice of its own (pipeline/compose.py UNVOICED). */
 export const UNVOICED_REASON: Readonly<Record<string, string>> = {
@@ -97,8 +101,8 @@ export type ExampleSource = {
   ayah: { surah: number; ayah: number; words: readonly WordLike[] };
   /** A lesson with NO ayah (lesson zero): a concept's examples are then all words of other
    *  places, so each is the imam's clip of its own ayah — the record's first
-   *  MAX_EXAMPLES_PER_RULE that have one and do not end their ayah (there the imam's stop
-   *  changes what is heard). */
+   *  MAX_EXAMPLES_ZERO that have one and do not end their ayah (there the imam's stop
+   *  changes what is heard) — and each says what it is an example of (`about`). */
   zero?: boolean;
   /** What this ayah's lesson teaches as "Konsep baru" (curriculum.ts taughtIn): each with its
    *  examples, the one in this ayah first. */
@@ -137,6 +141,11 @@ export type LessonExample = {
   ar: string;
   /** The harakah the example is about, when it is heard there: named beside it on the stage. */
   ending: EndingMark | null;
+  /** Lesson zero: what the word is an example of, from the record's note without the word it
+   *  opens with ("na‘budu: fi'il, kata kerja." → "fi'il, kata kerja."). Shown on the card and in
+   *  the caption: with no ayah on screen, nothing else tells the learner which kind it is. Null
+   *  elsewhere (the narrator's line is about the word on the mushaf line). */
+  about: string | null;
 };
 
 /** A rule explained without an example beat of its own, and why. */
@@ -152,6 +161,13 @@ const placeOf = (loc: string) => {
 export function claimsEnding(note: string, sign: string): boolean {
   if (!HARAKAT.has(sign)) return false;
   return new RegExp(`(^|[^\\p{L}])${sign}([^\\p{L}]|$)`, "iu").test(note);
+}
+
+/** A record note without the word it opens with ("na‘budu: fi'il, kata kerja." → "fi'il, kata
+ *  kerja."): the card shows the word above it. A note with no "…:" lead is kept whole. */
+export function aboutOf(note: string): string {
+  const i = note.indexOf(": ");
+  return i > 0 ? note.slice(i + 2).trim() : note.trim();
 }
 
 const endingMark = (sign: string): EndingMark | null => (ENDING_MARKS as readonly string[]).includes(sign) ? (sign as EndingMark) : null;
@@ -195,6 +211,7 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
           washal: e.washal ? { before: e.washal.before, heard: e.washal.heard } : null,
           ar: form.ar,
           ending: null,
+          about: null,
         });
       }
     }
@@ -206,7 +223,7 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
     const n = first ? numberOf.get(first.loc) : undefined;
     const step = `concept:${c.id}:ex`;
     if (src.zero) {
-      const picks = c.examples.filter((x) => !!src.clips[x.loc] && !src.clips[x.loc].last && !!src.wordAt(x.loc)).slice(0, MAX_EXAMPLES_PER_RULE);
+      const picks = c.examples.filter((x) => !!src.clips[x.loc] && !src.clips[x.loc].last && !!src.wordAt(x.loc)).slice(0, MAX_EXAMPLES_ZERO);
       if (!picks.length) gaps.push({ step, rule: c.id, why: "the lesson has no ayah, and the concept has no example whose clip does not end its ayah" });
       picks.forEach((x, k) => {
         const word = src.wordAt(x.loc)!;
@@ -226,6 +243,7 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
           washal: null,
           ar: word.ar,
           ending: null,
+          about: aboutOf(x.note),
         });
       });
       continue;
@@ -253,6 +271,7 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
       washal: null,
       ar: w.ar,
       ending: claims && !last ? endingMark(w.case.sign) : null,
+      about: null,
     });
     if (!(last && drop !== "none" && claims)) continue;
     // The example is about an ending that is not heard here: one more, where it is.
@@ -282,22 +301,23 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
       washal: null,
       ar: word.ar,
       ending: null,
+      about: null,
     });
   }
   return { examples, gaps };
 }
 
 /** The part of a LessonExample the sequence is built from: no Arabic, nothing for drawing. */
-export type ExampleInput = Pick<LessonExample, "id" | "of" | "step" | "frame" | "key" | "word" | "clip" | "translit" | "place" | "waqf" | "washal">;
+export type ExampleInput = Pick<LessonExample, "id" | "of" | "step" | "frame" | "key" | "word" | "clip" | "translit" | "place" | "waqf" | "washal" | "about">;
 
 /** What the stage draws for one beat, by its id (content bytes; LessonStage). */
-export type StageExample = Pick<LessonExample, "of" | "key" | "word" | "translit" | "gloss" | "place" | "ar" | "ending" | "waqf" | "washal">;
+export type StageExample = Pick<LessonExample, "of" | "key" | "word" | "translit" | "gloss" | "place" | "ar" | "ending" | "waqf" | "washal" | "about">;
 
 export function stageExamples(examples: readonly LessonExample[]): Record<string, StageExample> {
   return Object.fromEntries(
     examples.map((e) => [
       e.id,
-      { of: e.of, key: e.key, word: e.word, translit: e.translit, gloss: e.gloss, place: e.place, ar: e.ar, ending: e.ending, waqf: e.waqf, washal: e.washal },
+      { of: e.of, key: e.key, word: e.word, translit: e.translit, gloss: e.gloss, place: e.place, ar: e.ar, ending: e.ending, waqf: e.waqf, washal: e.washal, about: e.about },
     ]),
   );
 }

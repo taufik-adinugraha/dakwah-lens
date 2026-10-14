@@ -56,7 +56,7 @@ import { composeFileProblems, composeInputFor, type ComposeInput } from "../comp
 import { hasWaqfNote, waqfDrop } from "../heard";
 import { MAX_CAPTION, type Pace } from "../lessonSteps";
 import { SURAH_SLUGS } from "../routes";
-import { lessonExamples, MAX_EXAMPLES_PER_RULE, type ComposeLike, type ExampleGap, type LessonExample } from "./examples";
+import { lessonExamples, MAX_EXAMPLES_PER_RULE, MAX_EXAMPLES_ZERO, type ComposeLike, type ExampleGap, type LessonExample } from "./examples";
 import { availableExercises, questionNumbers, type QuizAyahLike } from "./exercises";
 import { LINE_ID_RE, manifestParts, parseLineId, promptLineId, ZERO_AYAH } from "./ids";
 import { curriculumProblems, taughtIn, type CurriculumFile } from "./curriculum";
@@ -493,7 +493,7 @@ const EVERYAYAH_FILE = /^https:\/\/everyayah\.com\/data\/[A-Za-z0-9_]+\/\d{6}\.m
  * - HEARD: an ayah-final word whose last harakah the pause drops says so (and only such a word
  *   does); a bentuk dasar and a second example never end their ayah; a run played with the word
  *   before it says what is heard;
- * - at most MAX_EXAMPLES_PER_RULE beats per rule.
+ * - at most MAX_EXAMPLES_PER_RULE beats per rule (MAX_EXAMPLES_ZERO in lesson zero: one per kind of word).
  */
 export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): string[] {
   const out: string[] = [];
@@ -507,7 +507,8 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
   seq.steps.forEach((s, i) => {
     const beats = s.examples ?? [];
     if (beats.length && s.kind !== "example" && s.kind !== "compose") out.push(`${s.id}: a ${s.kind} step has example beats`);
-    if (beats.length > MAX_EXAMPLES_PER_RULE && s.kind !== "compose") out.push(`${s.id}: ${beats.length} example beats after one rule (at most ${MAX_EXAMPLES_PER_RULE})`);
+    const cap = ctx.zero ? MAX_EXAMPLES_ZERO : MAX_EXAMPLES_PER_RULE;
+    if (beats.length > cap && s.kind !== "compose") out.push(`${s.id}: ${beats.length} example beats after one rule (at most ${cap})`);
     for (const b of beats) {
       const w = `${s.id} example ${b.id}`;
       if (seen.has(b.id)) out.push(`${w}: the id is used twice`);

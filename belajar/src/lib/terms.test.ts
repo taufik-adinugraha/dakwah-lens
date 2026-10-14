@@ -115,7 +115,10 @@ describe("planted faults are caught", () => {
 
   it("a term id the table does not have, and a retyped (Uthmani-marked) term spelling", () => {
     const lib = clone(LIBRARY);
-    lib.concepts[0].marked!.notes[0] = lib.concepts[0].marked!.notes[0].replace("|huruf-jar]]", "|huruf-jarr]]");
+    // The first example note that links the term (found, not by position: records reorder).
+    const c = lib.concepts.find((x) => x.marked?.notes.some((n) => n.includes("|huruf-jar]]")))!;
+    const i = c.marked!.notes.findIndex((n) => n.includes("|huruf-jar]]"));
+    c.marked!.notes[i] = c.marked!.notes[i].replace("|huruf-jar]]", "|huruf-jarr]]");
     lib.terms.find((t) => t.id === "kasrah")!.ar = lib.quran["1:1:2"]; // Qur'anic bytes, not a typed term
     const p = libraryProblems(lib, WORD_AR).join("\n");
     expect(p).toMatch(/term huruf-jarr is not in library.json terms/);

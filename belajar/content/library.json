@@ -4,7 +4,7 @@
       "id": "kalimah-isim-fiil-huruf",
       "kind": "nahwu",
       "title": "Kalimah: isim, fi'il, huruf (tiga jenis kata)",
-      "summary": "Setiap kata Arab termasuk salah satu dari tiga jenis: isim (nama benda, orang, atau sifat), fi'il (kata kerja), atau huruf (kata tugas).",
+      "summary": "Setiap kata Arab termasuk salah satu dari tiga jenis: isim (nama benda, orang, atau sifat), fi'il (kata kerja), atau huruf (kata tugas). Huruf di sini bukan huruf abjad, melainkan jenis kata yang baru bermakna bersama kata lain.",
       "explanation": [
         "Dalam nahwu (tata bahasa Arab), satu kata disebut kalimah. Ibnu Ajurrum menyebut tiga bagian penyusun kalam (ucapan yang bermakna): isim, fi'il, dan huruf yang membawa makna. Ahmad Zaini Dahlan menjelaskan bedanya: isim punya makna sendiri dan tidak terikat waktu; fi'il punya makna sendiri dan terikat waktu (lampau, sekarang, atau perintah untuk nanti); huruf baru jelas maknanya bila bergabung dengan kata lain.",
         "Isim bisa dikenali dari tanda-tandanya, antara lain didahului huruf jar (kata depan seperti bi- yang artinya “dengan”) atau diawali al-. Kata pertama Al-Fatihah, bismi, sudah memuat dua jenis kata: bi- adalah huruf, dan ism, yang artinya “nama”, adalah isim, karena ia didahului huruf jar.",
@@ -14,12 +14,16 @@
       "bridge": "Kira-kira: isim mencakup kata benda dan kata sifat, fi'il adalah kata kerja, dan huruf mirip kata tugas (kata depan, kata sambung). Padanannya tidak persis: kata ganti seperti iyyāka, misalnya, dihitung sebagai isim.",
       "examples": [
         {
-          "loc": "1:1:1",
-          "note": "bi- (huruf jar) + ism (isim): dua jenis kata dalam satu tulisan."
+          "loc": "1:7:1",
+          "note": "ṣirāṭa: isim, nama benda."
         },
         {
           "loc": "1:5:2",
           "note": "na‘budu: fi'il, kata kerja."
+        },
+        {
+          "loc": "1:1:1",
+          "note": "bismi: bi- (huruf) + ism (isim), dua jenis kata dalam satu tulisan."
         },
         {
           "loc": "1:7:8",
@@ -63,14 +67,14 @@
         },
         {
           "kitab": "Quranic Arabic Corpus 0.4",
-          "ref": "(1:1:1) P + N; (1:5:2) V IMPF; (1:7:8) CONJ + NEG",
+          "ref": "(1:1:1) P + N; (1:5:2) V IMPF; (1:7:1) N; (1:7:8) CONJ + NEG",
           "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=1"
         }
       ],
       "status": "draft",
       "marked": {
         "title": "[[Kalimah|kalimah]]: [[isim|isim]], [[fi'il|fiil]], [[huruf|huruf]] (tiga jenis kata)",
-        "summary": "Setiap kata Arab termasuk salah satu dari tiga jenis: [[isim|isim]] (nama benda, orang, atau sifat), [[fi'il|fiil]] (kata kerja), atau [[huruf|huruf]] (kata tugas).",
+        "summary": "Setiap kata Arab termasuk salah satu dari tiga jenis: [[isim|isim]] (nama benda, orang, atau sifat), [[fi'il|fiil]] (kata kerja), atau [[huruf|huruf]] (kata tugas). [[Huruf|huruf]] di sini bukan huruf abjad, melainkan jenis kata yang baru bermakna bersama kata lain.",
         "explanation": [
           "Dalam [[nahwu|nahwu]] (tata bahasa Arab), satu kata disebut [[kalimah|kalimah]]. Ibnu Ajurrum menyebut tiga bagian penyusun [[kalam|kalam]] (ucapan yang bermakna): [[isim|isim]], [[fi'il|fiil]], dan [[huruf|huruf]] yang membawa makna. Ahmad Zaini Dahlan menjelaskan bedanya: [[isim|isim]] punya makna sendiri dan tidak terikat waktu; [[fi'il|fiil]] punya makna sendiri dan terikat waktu (lampau, sekarang, atau perintah untuk nanti); [[huruf|huruf]] baru jelas maknanya bila bergabung dengan kata lain.",
           "[[Isim|isim]] bisa dikenali dari tanda-tandanya, antara lain didahului [[huruf jar|huruf-jar]] (kata depan seperti [[bi-|q:1:1:1/1]] yang artinya “dengan”) atau diawali [[al-|q:1:2:1/1]]. Kata pertama Al-Fatihah, [[bismi|q:1:1:1]], sudah memuat dua jenis kata: [[bi-|q:1:1:1/1]] adalah [[huruf|huruf]], dan [[ism|q:55:78:2]], yang artinya “nama”, adalah [[isim|isim]], karena ia didahului [[huruf jar|huruf-jar]].",
@@ -79,8 +83,9 @@
         ],
         "bridge": "Kira-kira: [[isim|isim]] mencakup kata benda dan kata sifat, [[fi'il|fiil]] adalah kata kerja, dan [[huruf|huruf]] mirip kata tugas (kata depan, kata sambung). Padanannya tidak persis: kata ganti seperti [[iyyāka|q:1:5:1]], misalnya, dihitung sebagai [[isim|isim]].",
         "notes": [
-          "[[bi-|q:1:1:1/1]] ([[huruf jar|huruf-jar]]) + [[ism|q:55:78:2]] ([[isim|isim]]): dua jenis kata dalam satu tulisan.",
+          "[[ṣirāṭa|q:1:7:1]]: [[isim|isim]], nama benda.",
           "[[na‘budu|q:1:5:2]]: [[fi'il|fiil]], kata kerja.",
+          "[[bismi|q:1:1:1]]: [[bi-|q:1:1:1/1]] ([[huruf|huruf]]) + [[ism|q:55:78:2]] ([[isim|isim]]), dua jenis kata dalam satu tulisan.",
           "[[wa lā|q:1:7:8]]: dua [[huruf|huruf]], [[wa|q:1:7:8/1]] yang artinya “dan”, dan [[lā|q:1:7:8/2]] yang artinya “bukan”.",
           "[[lam|q:112:3:1]]: [[huruf|huruf]]; maknanya baru utuh bersama kata kerja sesudahnya."
         ]
@@ -12841,9 +12846,9 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "tanzil": "uthmani-1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8 (only to byte-check «…» quotations in prose)",
     "authored_lexicon": "authored/library.lexicon.json sha256:245f33c8c033af498d332e1c1bc1dda3140c446bc0118f9ebe64512835805d51",
-    "authored_concepts": "authored/library.concepts.json sha256:8d5086a74a010418b592f6ca66d0ea077edb7a75d03bd00b164507a57e587ef0",
+    "authored_concepts": "authored/library.concepts.json sha256:d6f3dc4002265c4577e35eb9d261c85e7b64fe14bfe293e7e7cdc150f5eca663",
     "authored_terms": "authored/library.terms.json sha256:9c823ee53ebebcb22cfc37cab4792fa5285cc7443bba7c6a7df3c520084e7e91",
-    "shamela_istilah": "121 Shamela pages pinned by text sha256 (sources.json shamela_istilah)",
+    "shamela_istilah": "129 Shamela pages pinned by text sha256 (sources.json shamela_istilah)",
     "authored_basics": "authored/library.basics.json sha256:f27842e6d58c634e35eb0566a8caa62ce5734d3768b8e25cd925ace881ef27d6",
     "authored_parts": "authored/library.parts.json sha256:a0262681a8b8cd5c47b9e6ea29eb18670a73ea2a0120d7d74db98fd0dacecaf3",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (clips: Konsep example voices)",

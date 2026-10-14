@@ -231,7 +231,13 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
       if (at === null || (e.word === null) === (e.clip === null)) return [];
       const where = { translit: e.translit, surah: e.place.surah, ayah: e.place.ayah };
       const lead =
-        e.of === "base" ? texts.example.base(where) : e.word !== null ? texts.example.word({ n: e.word, translit: e.translit }) : texts.example.other(where);
+        e.of === "base"
+          ? texts.example.base(where)
+          : e.word !== null
+            ? texts.example.word({ n: e.word, translit: e.translit })
+            : e.about !== null
+              ? texts.example.zero({ ...where, about: e.about })
+              : texts.example.other(where);
       const caption = clean(stripArabic([lead, e.washal ? texts.example.washal({ heard: e.washal.heard }) : "", e.waqf ? texts.example.waqf : ""].filter(Boolean).join(" ")));
       return [{ id: e.id, of: e.of, after: at, key: e.key, word: e.word, clip: e.clip, frame: e.frame, caption, parts: splitCaption(caption) }];
     });
