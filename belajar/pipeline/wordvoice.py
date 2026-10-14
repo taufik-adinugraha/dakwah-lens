@@ -24,8 +24,8 @@ teaching forms no ayah has). One recording per distinct plain text, kept in
 content/wordvoice.json:
 
   words[<plain text>].audio = {url, ms, sha256}   — the 64 kbps mono delivery file, served from the
-  narration media store (/belajar/media/narration/kang-nandar/words/<id>.mp3), id = the first 16
-  hex digits of sha256(plain text).
+  narration media store (/belajar/media/narration/kang-nandar/words/<id>-<sum>.mp3), id = the first
+  16 hex digits of sha256(plain text), sum = the first 10 of the file's own sha256.
 
 The imam's recitation of WHOLE ayat is not touched (the karaoke the lessons follow, the recap).
 This module reads content only: no corpus, no cache, nothing outside pipeline/ and content/.
@@ -69,8 +69,11 @@ def file_id(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
 
-def url_of(text: str) -> str:
-    return f"{DELIVERY_PREFIX}{file_id(text)}.mp3"
+def url_of(text: str, sha256: str) -> str:
+    """The file's URL carries its checksum: the media store sends `immutable, max-age=1 year`, so a
+    word recorded again (a retake) must not keep its old URL — a browser that has the old file would
+    never ask for the new one."""
+    return f"{DELIVERY_PREFIX}{file_id(text)}-{sha256[:10]}.mp3"
 
 
 # ---------------------------------------------------------------- what has to be voiced
@@ -175,10 +178,10 @@ def problems(manifest: dict | None, inv: dict[str, set[str]], require_audio: boo
         if set(a) != {"url", "ms", "sha256"}:
             out.append(f"{t!r}: audio has keys {sorted(a)} (expected url, ms, sha256)")
             continue
-        if a["url"] != url_of(t):
-            out.append(f"{t!r}: url {a['url']} is not {url_of(t)} (the id is the text's hash)")
-        if not isinstance(a["ms"], int) or not MIN_MS <= a["ms"] <= MAX_MS:
-            out.append(f"{t!r}: {a['ms']!r} ms is not a plausible length ({MIN_MS}–{MAX_MS})")
         if not re.fullmatch(r"[0-9a-f]{64}", str(a["sha256"])):
             out.append(f"{t!r}: sha256 is not 64 hex digits")
+        elif a["url"] != url_of(t, a["sha256"]):
+            out.append(f"{t!r}: url {a['url']} is not {url_of(t, a['sha256'])} (the text's hash and the file's)")
+        if not isinstance(a["ms"], int) or not MIN_MS <= a["ms"] <= MAX_MS:
+            out.append(f"{t!r}: {a['ms']!r} ms is not a plausible length ({MIN_MS}–{MAX_MS})")
     return out

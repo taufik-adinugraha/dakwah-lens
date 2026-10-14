@@ -20,7 +20,7 @@ def sample_manifest() -> dict:
     m = W.expected(INV, None)
     for i, t in enumerate(sorted(INV)):
         if i % 3 == 0:
-            m["words"][t]["audio"] = {"url": W.url_of(t), "ms": 900 + i, "sha256": "ab" * 32}
+            m["words"][t]["audio"] = {"url": W.url_of(t, "ab" * 32), "ms": 900 + i, "sha256": "ab" * 32}
     return m
 
 
@@ -93,6 +93,7 @@ class Manifest(unittest.TestCase):
             ("an entry no content shows", lambda m: m["words"].update({"اب": {}}), "no content shows any more"),
             ("a text with a mark the model misreads", lambda m: m["words"].update({ALIF_WASLA + "ل": {}}), "not in plain letters"),
             ("a url that is not the text's hash", lambda m: m["words"][first]["audio"].update(url="/belajar/media/x.mp3"), "is not"),
+            ("a retaken file that kept its old url (the sum is the file's)", lambda m: m["words"][first]["audio"].update(sha256="cd" * 32), "is not"),
             ("a length no word has", lambda m: m["words"][first]["audio"].update(ms=20), "plausible length"),
             ("a checksum that is not a sha256", lambda m: m["words"][first]["audio"].update(sha256="zz"), "sha256 is not 64 hex"),
             ("an audio entry with a stray key", lambda m: m["words"][first]["audio"].update(extra=1), "keys"),

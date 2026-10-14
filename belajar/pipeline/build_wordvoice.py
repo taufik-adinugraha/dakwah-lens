@@ -52,8 +52,10 @@ def api_key(env_file: Path) -> str:
     raise SystemExit(f"ELEVENLABS_API_KEY is not set in {env_file}")
 
 
-def speak(key: str, text: str) -> bytes:
+def speak(key: str, text: str, seed: int | None = None) -> bytes:
     body = {"text": text, "model_id": W.MODEL, "voice_settings": W.VOICE_SETTINGS, "apply_text_normalization": "off"}
+    if seed is not None:
+        body["seed"] = seed
     req = urllib.request.Request(
         f"https://api.elevenlabs.io/v1/text-to-speech/{W.VOICE_ID}?output_format={W.MASTER_FORMAT}",
         data=json.dumps(body).encode("utf-8"), method="POST",
@@ -100,6 +102,20 @@ def duration_ms(path: Path) -> int:
     return round(float(r.stdout.strip()) * 1000)
 
 
+def place(final: Path, text: str) -> dict:
+    """Name a delivery file by its content (W.url_of), drop the older takes of the same text, and
+    return its manifest entry."""
+    data = final.read_bytes()
+    sha = hashlib.sha256(data).hexdigest()
+    named = final.with_name(W.url_of(text, sha).rsplit("/", 1)[1])
+    for old in final.parent.glob(f"{W.file_id(text)}*.mp3"):
+        if old not in (named, final):
+            old.unlink()
+    if final != named:
+        final.rename(named)
+    return {"url": W.url_of(text, sha), "ms": duration_ms(named), "sha256": sha}
+
+
 def dry(inv: dict[str, set[str]], unresolved: list[str], manifest: dict | None) -> None:
     have = {t for t, e in ((manifest or {}).get("words") or {}).items() if e.get("audio")}
     by: dict[str, set[str]] = {}
@@ -126,6 +142,10 @@ def main() -> int:
     ap.add_argument("--env-file", default=str(ENV_FILE))
     ap.add_argument("--out", default=str(DEFAULT_OUT))
     ap.add_argument("--limit", type=int, default=0, help="record at most N texts (a trial)")
+    ap.add_argument("--qa", action="store_true", help="screen every recorded word for a made-up sound after it (local; no spend)")
+    ap.add_argument("--retake", action="store_true",
+                    help="with --i-approve-spend: record again, with another seed, every word --qa flags (up to --tries)")
+    ap.add_argument("--tries", type=int, default=5)
     ap.add_argument("--reencode", action="store_true",
                     help="with --render: encode every text again from its master (no API call, no spend)")
     a = ap.parse_args()
@@ -146,6 +166,48 @@ def main() -> int:
             return 1
         n = sum(1 for e in manifest["words"].values() if e.get("audio"))
         print(f"wordvoice manifest up to date: {len(manifest['words'])} texts, {n} recorded")
+        return 0
+
+    if a.qa or a.retake:
+        import wordvoice_qa as Q
+        if manifest is None:
+            raise SystemExit("content/wordvoice.json is missing")
+        out = Path(a.out)
+
+        def delivery(t: str) -> Path:
+            return out / "delivery" / "kang-nandar" / "words" / manifest["words"][t]["audio"]["url"].rsplit("/", 1)[1]
+
+        flagged = [t for t, e in manifest["words"].items() if e.get("audio") and Q.hissy_tail(delivery(t))]
+        print(f"{len(flagged)} of {len(manifest['words'])} recorded words end in a made-up sound:")
+        for t in flagged:
+            print(f"  {len(t):3d} chars  {W.file_id(t)}  {', '.join(sorted(inv.get(t, {'?'})))}")
+        if not a.retake:
+            return 0
+        if not a.i_approve_spend:
+            raise SystemExit("--retake sends text to ElevenLabs: add --i-approve-spend once the operator has said go")
+        key = api_key(Path(a.env_file))
+        sent = 0
+        for t in flagged:
+            fid = W.file_id(t)
+            master = out / "master" / f"{fid}.mp3"
+            if master.exists():
+                master.rename(out / "master" / f"{fid}.take0.mp3")  # a paid master is never thrown away
+            for seed in range(1, a.tries + 1):
+                master.write_bytes(speak(key, t, seed))
+                sent += len(t)
+                tmp = out / "delivery" / "kang-nandar" / "words" / f"{fid}.mp3"
+                encode(master, tmp)
+                if not Q.hissy_tail(tmp):
+                    print(f"  {fid}: seed {seed} is clean")
+                    break
+                print(f"  {fid}: seed {seed} still ends in a made-up sound")
+            else:
+                print(f"  {fid}: NO clean take in {a.tries} seeds — needs another spelling")
+            manifest["words"][t]["audio"] = place(out / "delivery" / "kang-nandar" / "words" / f"{fid}.mp3", t)
+            W.MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        files = sorted(p.relative_to(out / "delivery").as_posix() for p in (out / "delivery").rglob("*.mp3"))
+        (out / "delivery" / "files.txt").write_text("\n".join(files) + "\n", encoding="utf-8")
+        print(f"retaken: {sent} characters sent (about USD {sent / 1000 * W.PRICE_PER_1K:.3f})")
         return 0
 
     if a.render:
@@ -175,8 +237,7 @@ def main() -> int:
                 sent += len(t)
             final = deliv / f"{fid}.mp3"
             encode(master, final)
-            ms = duration_ms(final)
-            manifest["words"][t]["audio"] = {"url": W.url_of(t), "ms": ms, "sha256": hashlib.sha256(final.read_bytes()).hexdigest()}
+            manifest["words"][t]["audio"] = place(final, t)
             W.MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
         files = sorted(p.relative_to(out / "delivery").as_posix() for p in (out / "delivery").rglob("*.mp3"))
         (out / "delivery" / "files.txt").write_text("\n".join(files) + "\n", encoding="utf-8")
