@@ -2,7 +2,9 @@
 // sure the line break is clean and easy to read, sometime i see wrong line break especially for
 // arabic words"). Started by the workflow against a container on :3300, like screenshots.mjs.
 //
-// Every page a learner reaches by its links — the hub, the track, each surah and ayah it links
+// Every page a learner reaches by its links — the hub, the track, the curriculum page the track
+// links (plan L30: every unit, lesson and step name of the basic curriculum, the next level's
+// list), each surah and ayah it links
 // (every ayah closed, then with every disclosure open), the Konsep index and every concept, every
 // Kosakata entry linked from those, the fact cards' ayah dialog (the longest ayah a card locates,
 // one with footnotes, the first chip) — and the autoplay lesson stage step by step (Al-Fatihah 1 with
@@ -79,15 +81,24 @@ const VIEWPORTS = [
   ["desktop", { width: 1280, height: 900 }],
 ];
 /** The lesson stage, step by step: [ayah path, narrated (karaoke via the routed narration)?]. */
+// LESSON ZERO ("Pengantar": the curriculum's lesson with no ayah, 2026-10-13; src/lib/routes.ts
+// introHref). A page of its own under the track: no surah, although its path has a surah's shape.
+const INTRO_PATH = "/belajar/id/quran/pengantar";
 const LESSONS = [
+  [INTRO_PATH, false],
   ["/belajar/id/quran/al-fatihah/1", true],
   ["/belajar/id/quran/al-fatihah/2", false],
   ["/belajar/id/quran/al-fatihah/7", false],
 ];
 const MAX_PRINTED = 600;
 /** Pages also shot at each size: the surah page (its "Tahukah Anda?" facts hold the longest
- *  inline Arabic) and an ayah page with every disclosure open (word cards, Rujukan). */
-const SHOTS = { "surah al-fatihah": "surah", "ayah al-fatihah/2 (open)": "ayah-2-open" };
+ *  inline Arabic), an ayah page with every disclosure open (word cards, Rujukan) and the
+ *  curriculum page (a long list of step names with their Arabic: how it reads on a phone at the
+ *  largest size is looked at by eye, too). */
+const SHOTS = { "surah al-fatihah": "surah", "ayah al-fatihah/2 (open)": "ayah-2-open", kurikulum: "kurikulum" };
+/** The curriculum page (src/lib/routes.ts curriculumHref): a page of the track beside the surahs'
+ *  own segment, so its address has the shape of a surah's and is told apart by name. */
+const CURRICULUM = "/belajar/id/quran/kurikulum";
 const SURAH_PATH = /^\/belajar\/id\/quran\/[^/]+$/;
 const AYAH_PATH = /^\/belajar\/id\/quran\/[^/]+\/\d+$/;
 
@@ -171,21 +182,31 @@ const openDetails = async (page) => {
 const paths = (page, sel) =>
   page.locator(sel).evaluateAll((as) => [...new Set(as.map((a) => new URL(a.getAttribute("href"), location.href).pathname))]);
 
-/** The pages a learner reaches by links: the hub, the track, every surah and ayah the track and
- *  surah pages link (a surah behind a runtime switch is not linked, so not visited), the Konsep
- *  index and every concept, then every Kosakata entry those pages link. */
+/** The pages a learner reaches by links: the hub, the track, the curriculum page, every surah and
+ *  ayah the track and surah pages link (a surah behind a runtime switch is not linked, so not
+ *  visited), the Konsep index and every concept, then every Kosakata entry those pages link. */
 async function staticPages(page, vp) {
   const pages = [
     ["hub", "/belajar/id"],
     ["track", "/belajar/id/quran"],
+    ["kurikulum", CURRICULUM],
   ];
   const surahs = [];
   const ayat = new Set();
+  let intro = false;
+  let curriculumLinked = false;
   if (await open(page, vp, "/belajar/id/quran"))
     for (const p of await paths(page, 'main a[href*="/quran/"]')) {
-      if (SURAH_PATH.test(p)) surahs.push(p);
+      // Lesson zero and the curriculum page are no surahs, though their addresses look like one:
+      // left out of the surah harvest, each measured as a page of its own.
+      if (p === INTRO_PATH) intro = true;
+      else if (p === CURRICULUM) curriculumLinked = true;
+      else if (SURAH_PATH.test(p)) surahs.push(p);
       else if (AYAH_PATH.test(p)) ayat.add(p);
     }
+  // "Reached by its links": the track must link the curriculum page.
+  if (!curriculumLinked)
+    record({ page: "/belajar/id/quran", viewport: vp, size: "-", kind: "nothing-measured", where: "track", detail: "the track does not link the curriculum page", text: "" });
   for (const s of surahs) {
     if (!(await open(page, vp, s))) continue;
     for (const p of await paths(page, 'main a[href*="/quran/"]')) if (AYAH_PATH.test(p)) ayat.add(p);
@@ -195,6 +216,8 @@ async function staticPages(page, vp) {
     const [sb, nb] = b.split("/").slice(-2);
     return surahs.findIndex((s) => s.endsWith(`/${sa}`)) - surahs.findIndex((s) => s.endsWith(`/${sb}`)) || Number(na) - Number(nb);
   };
+  pages.push(["pengantar", INTRO_PATH]);
+  if (!intro) record({ page: "/belajar/id/quran", viewport: vp, size: "-", kind: "nothing-measured", where: "track", detail: `the track does not link lesson zero (${INTRO_PATH})`, text: "" });
   pages.push(...surahs.map((s) => [`surah ${s.split("/").pop()}`, s]));
   pages.push(...[...ayat].sort(byAyah).map((a) => [`ayah ${a.split("/").slice(-2).join("/")}`, a]));
   pages.push(["konsep", "/belajar/id/konsep"]);

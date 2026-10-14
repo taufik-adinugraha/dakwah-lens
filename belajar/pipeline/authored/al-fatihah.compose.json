@@ -1,7 +1,8 @@
 {
-  "_comment": "Word composition (kata dari bagian-bagiannya) and the harakat primer for Al-Fatihah — operator 2026-10-10, feedback_belajar_narration_style rule 14 and the harakat request ('expect also people dont understand what is kasrah, dhommah, and fathah'). Built by build_compose.py into content/compose/al-fatihah.json; checked by validate_compose.py; each `say` string becomes one narration line (build_narration.py). NO Arabic is typed here: every form names where its bytes come from (a lesson word, a Tanzil token, a QAC segment, or a deterministic edit of one; compose.py docstring), and the build records where in the Qur'an each form stands. Say 'bentuk dasar', never 'akar' (akar = the root letters). Narration rules: pipeline/README.md 'Komposisi kata'. Status draft (pipeline state; no human review, plan L11). In the lesson the IMAM recites each bentuk dasar a `base` frame shows (plan L20; the build writes `examples`, compose.py 'THE IMAM'S VOICE OF A BENTUK DASAR'): a form that QUOTES a place ({'tanzil': loc}) is voiced from that very place, so quote one where it is HEARD as shown — never an ayah's last word (the imam stops there and the ending is not pronounced), a word that starts with hamzat washal only at the start of its ayah or where the library's diagram types the word before it (ismu, QS 55:78: played with tabāraka, 'tabārakasmu'), and from an ayah whose quran-align alignment is clean where the Qur'an has one: rabbu is quoted from QS 41:9 (żālika rabbu al-‘ālamīna; 7:54:31 has insertions 4), an‘ama from QS 5:23 as on the Konsep diagram (4:69:8: insertions 6, transpositions 1). The frame's note names that place ('seperti di QS 41:9'): display only, the narration never names it. The build stops on a quoted place that is not heard as shown and says why.",
+  "_comment": "Word composition (kata dari bagian-bagiannya) and the harakat primer for Al-Fatihah — operator 2026-10-10, feedback_belajar_narration_style rule 14 and the harakat request ('expect also people dont understand what is kasrah, dhommah, and fathah'). Built by build_compose.py into content/compose/al-fatihah.json; checked by validate_compose.py; each `say` string becomes one narration line (build_narration.py). NO Arabic is typed here: every form names where its bytes come from (a lesson word, a Tanzil token, a QAC segment, or a deterministic edit of one; compose.py docstring), and the build records where in the Qur'an each form stands. Say 'bentuk dasar', never 'akar' (akar = the root letters). Narration rules: pipeline/README.md 'Komposisi kata'. Status draft (pipeline state; no human review, plan L11). In the lesson the IMAM recites each bentuk dasar a `base` frame shows (plan L20; the build writes `examples`, compose.py 'THE IMAM'S VOICE OF A BENTUK DASAR'): a form that QUOTES a place ({'tanzil': loc}) is voiced from that very place, so quote one where it is HEARD as shown — never an ayah's last word (the imam stops there and the ending is not pronounced), a word that starts with hamzat washal only at the start of its ayah or where the library's diagram types the word before it (ismu, QS 55:78: played with tabāraka, 'tabārakasmu'), and from an ayah whose quran-align alignment is clean where the Qur'an has one: rabbu is quoted from QS 41:9 (żālika rabbu al-‘ālamīna; 7:54:31 has insertions 4), an‘ama from QS 5:23 as on the Konsep diagram (4:69:8: insertions 6, transpositions 1). The frame's note names that place ('seperti di QS 41:9'): display only, the narration never names it. The build stops on a quoted place that is not heard as shown and says why. The primer's `ayah` is the ayah whose words its frames show (the letters of 1:1). Its `lesson` says which lesson PLAYS it when that is not that ayah's: \"0\", the lesson with no ayah that opens the course (kurikulum-dasar.md decision 1; since 2026-10-13 the primer plays there, with the kalimah record's line, and Al-Fatihah 1 no longer plays it) — so four of its lines say \"Surah Al-Fatihah\" / \"ayat pertama surah itu\" / \"ayat itu\" where they said \"ayat ini\".",
   "primer": {
     "ayah": 1,
+    "lesson": "0",
     "forms": {
       "ba-a": {"ar": {"from": {"word": "1:1:1", "pieces": [0, 1]}, "ops": [{"mark": 0, "to": "fathah"}]}, "translit": "ba", "label": "b + a"},
       "ba-i": {"ar": {"word": "1:1:1", "pieces": [0, 1]}, "translit": "bi", "label": "b + i"},
@@ -13,23 +14,23 @@
     "frames": [
       {"stage": "overview", "marks": ["fathah", "kasrah", "dhammah"],
        "say": [
-         "Sebelum membahas kata demi kata, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab.",
+         "Sebelum mulai, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab.",
          "Tiga harakat utama adalah fathah, kasrah, dan dhammah. Bunyinya a, i, dan u."
        ]},
       {"stage": "mark", "marks": ["fathah"], "tiles": ["ba-a"],
        "say": ["Fathah adalah garis kecil miring di atas huruf. Huruf yang diberi fathah dibaca dengan bunyi a."]},
       {"stage": "mark", "marks": ["kasrah"], "tiles": ["ba-i"],
-       "say": ["Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama ayat ini, huruf ba', memakai kasrah."]},
+       "say": ["Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama Surah Al-Fatihah, huruf ba', memakai kasrah."]},
       {"stage": "mark", "marks": ["dhammah"], "tiles": ["ba-u"],
        "say": ["Dhammah bentuknya seperti huruf wawu kecil di atas huruf; bunyinya u."]},
       {"stage": "mark", "marks": ["sukun", "shaddah"], "tiles": ["sin", "rra"],
        "say": [
-         "Ada tanda lain di ayat ini. Tanda kecil di atas huruf sin menandakan huruf mati, dibaca tanpa vokal.",
+         "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf sin disebut sukun: ia menandakan huruf mati, dibaca tanpa vokal.",
          "Tanda seperti huruf w kecil di atas huruf ra' menandakan huruf itu dibaca dobel."
        ]},
       {"stage": "mark", "marks": ["small_alif"], "tiles": ["maa"],
        "say": [
-         "Satu tanda lagi: alif kecil yang tegak di atas huruf mim pada kata ketiga.",
+         "Satu tanda lagi: alif kecil yang tegak di atas huruf mim pada kata ketiga ayat itu.",
          "Huruf kecil seperti ini menandai huruf yang tidak tertulis dalam tulisan asli Al-Qur'an, tetapi wajib dibaca; karena itu bunyi a pada huruf mim itu dibaca panjang."
        ]}
     ],
@@ -93,7 +94,7 @@
         {"stage": "base", "tiles": ["allahu"], "focus": "allahu", "note": "seperti di awal QS 112:2",
          "say": ["Dalam bentuk dasarnya, kata ini berakhir dengan dhammah, bunyi u, seperti di awal ayat kedua Surah Al-Ikhlas."]},
         {"stage": "change", "tiles": ["allahi"], "from": "allahu", "to": "allahi",
-         "say": ["Di ayat ini akhirnya menjadi kasrah, bunyi i, karena kata ini menjadi mudhaf ilaih: kata yang artinya “nama” disandarkan kepadanya."]}
+         "say": ["Di ayat ini akhirnya menjadi kasrah, bunyi i, karena kata yang artinya “nama” disandarkan kepadanya.", "Susunan sandaran seperti ini kita pelajari di ayat keempat."]}
       ],
       "sources": [
         {"kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)", "ref": "jil. 1, hlm. 9 (al-I'rab: Allāhi mudhaf ilaih)", "url": "https://tafsir.app/iraab-aldarweesh/1/1"},
@@ -113,7 +114,7 @@
       "frames": [
         {"stage": "parts", "tiles": ["al", "rahman"],
          "say": [
-           "Bagian pertama adalah alif lam, penanda bahwa kata itu sudah tertentu.",
+           "Bagian pertama adalah alif lam. Gunanya kita pelajari di ayat ketiga.",
            "Bagian kedua adalah isim yang artinya “Maha Pengasih”."
          ]},
         {"stage": "join", "tiles": ["ar-rahman"], "from": ["al", "rahman"], "silent": [0], "note": "alif dan lam tidak dibaca, ra' dibaca dobel",
@@ -124,7 +125,7 @@
         {"stage": "base", "tiles": ["ar-rahmanu"], "focus": "ar-rahmanu",
          "say": ["Bentuk dasarnya berakhir dengan dhammah, bunyi u."]},
         {"stage": "change", "tiles": ["ar-rahmani"], "from": "ar-rahmanu", "to": "ar-rahmani",
-         "say": ["Di sini akhirnya menjadi kasrah, bunyi i, karena kata ini sifat, atau na't, bagi kata kedua; sifat mengikuti akhiran kata yang disifatinya."]}
+         "say": ["Di sini akhirnya menjadi kasrah, bunyi i, karena kata ini sifat bagi kata kedua; sifat mengikuti akhiran kata yang disifatinya.", "Aturan sifat ini kita pelajari di ayat ketiga."]}
       ],
       "sources": [
         {"kitab": "Quranic Arabic Corpus 0.4", "ref": "(1:1:3:*) dua bagian: DET {l (alif lam ta'rif) dan ADJ STEM; lam tanpa sukun, huruf sesudahnya bersyaddah", "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=1"},
@@ -242,7 +243,7 @@
         {"stage": "change", "tiles": ["rabbi"], "from": "rabbu", "to": "rabbi",
          "say": [
            "Di ayat ini akhirnya menjadi kasrah, bunyi i, karena kata ini mengikuti nama Allah pada kata kedua, yang berakhir kasrah.",
-           "Kata ini sifat, atau na't, bagi nama itu, seperti sifat-sifat di ayat pertama; sebagian ulama menyebutnya pengganti, dengan akhiran yang sama."
+           "Kata ini sifat bagi nama itu, seperti sifat-sifat di ayat pertama; sebagian ulama menyebutnya pengganti, dengan akhiran yang sama."
          ]}
       ],
       "sources": [
@@ -276,7 +277,7 @@
          ]},
         {"stage": "whole", "tiles": ["al-alamina"], "note": "majrur: -īna; bentuk dasar: -ūna",
          "say": [
-           "Kata ini menjadi mudhaf ilaih: kata ketiga, yang artinya “Tuhan”, disandarkan kepadanya, seperti di ayat pertama.",
+           "Kata ketiga, yang artinya “Tuhan”, disandarkan kepada kata ini, seperti di ayat pertama.",
            "Kata ini majrur, tetapi tandanya bukan kasrah, bunyi i, melainkan huruf ya' sebelum huruf nun.",
            "Sebabnya, kata ini diperlakukan seperti jamak laki-laki beraturan, yang memakai huruf ya' sebagai pengganti kasrah ketika majrur.",
            "Dalam bentuk dasarnya, jamak seperti ini memakai huruf wawu, bunyi u panjang, di tempat huruf ya' itu."
@@ -314,7 +315,7 @@
         {"stage": "change", "tiles": ["ar-rahmani"], "from": "ar-rahmanu", "to": "ar-rahmani",
          "say": [
            "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini akhirnya kasrah, bunyi i.",
-           "Sebabnya, kata ini sekali lagi menjadi sifat bagi nama Allah di ayat kedua, yang berakhir kasrah."
+           "Sebabnya, kata ini sekali lagi menjadi sifat, atau na't, bagi nama Allah di ayat kedua, yang berakhir kasrah."
          ]},
         {"stage": "whole", "tiles": ["ar-rahmani"], "note": "awal ayat: alif dibaca",
          "say": ["Karena ayat ini dimulai dari kata ini, alif di awalnya dibaca, sama seperti di awal ayat kedua."]}

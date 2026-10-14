@@ -18,6 +18,8 @@
  */
 import type { ComposeChip, ComposeFile, ComposeForm, ComposeFrame, Composition, Primer } from "@/content/compose-schema";
 
+import { primerAyah } from "./autoplay/zero";
+
 const MARKS = {
   fathah: "َ",
   dhammah: "ُ",
@@ -348,6 +350,8 @@ export function composeInputFor(file: ComposeFile | null | undefined, ayah: { ay
     words[w.loc] = c.lead ? { ...unitInput(c), lead: c.lead } : unitInput(c);
     if (w.loc === lastLoc && endsOnStop(c)) words[w.loc].stop = true;
   }
-  const primer = file.primer && file.primer.ayah === ayah.ayah ? unitInput(file.primer) : null;
+  // The primer plays in the lesson of its own ayah — or in lesson zero ("ayah 0"), when it is
+  // that lesson's (autoplay/zero.ts).
+  const primer = file.primer && primerAyah(file.primer) === ayah.ayah ? unitInput(file.primer) : null;
   return primer || Object.keys(words).length ? { primer, words } : null;
 }

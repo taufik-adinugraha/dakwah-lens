@@ -3,13 +3,15 @@ import { ArrowRight, BookOpenCheck, ChevronDown, Clock, Library, Mic } from "luc
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
+import { IntroCard } from "@/components/lesson/IntroCard";
 import { MixedText } from "@/components/library/MixedText";
 import { MainSiteBridge } from "@/components/MainSiteBridge";
 import { ShareButton } from "@/components/ShareButton";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
+import { CURRICULUM, introOpen } from "@/lib/curriculum";
 import { visibleSurahs } from "@/lib/features";
-import { ayahHref, surahHref } from "@/lib/routes";
+import { ayahHref, curriculumHref, surahHref } from "@/lib/routes";
 import { pageUrl, shareMetadata } from "@/lib/share";
 
 /** This page's path, lib/routes.ts quranHref() (src/lib/share.test.ts holds them equal), for
@@ -57,6 +59,10 @@ export async function generateMetadata({
  * not publish (lib/features.ts) keeps its card, the same size, but as a
  * plain element labelled "Segera hadir", and has no ayah chips. The switch
  * is read per request, so this page renders at request time.
+ * Under the surahs, one short block introduces the basic curriculum and links
+ * to its page (operator, 2026-10-13: "we should also explain this curriculum
+ * in the page"; plan L30): its two figures are counted from
+ * content/curriculum.json, and it names no surah but the file's last unit.
  */
 export default async function QuranTrackPage({ params }: PageProps<"/[locale]/quran">) {
   const { locale } = await params;
@@ -78,6 +84,11 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
     { Icon: BookOpenCheck, title: t("p3_title"), body: t("p3_body") },
   ];
   const tshare = await getTranslations("Share");
+  const ti = await getTranslations("Intro");
+  // The curriculum block: the most new steps any lesson teaches and the unit the basic level
+  // ends with, both read from the file.
+  const maxNew = CURRICULUM.lessons.reduce((n, l) => Math.max(n, l.steps.length), 0);
+  const lastUnit = CURRICULUM.units.find((u) => u.id === CURRICULUM.lessons.at(-1)?.unit)?.name ?? "";
 
   return (
     <div className="relative isolate">
@@ -105,6 +116,12 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
             {t("start_heading")}
           </h2>
           <ul className="mt-3 space-y-4">
+            {/* Lesson zero first (2026-10-13): the lesson with no ayah that opens the course. */}
+            {introOpen(published) && (
+              <li>
+                <IntroCard eyebrow={ti("eyebrow")} title={ti("title")} hint={ti("card_hint")} cta={ti("card_cta")} />
+              </li>
+            )}
             {SURAHS.map((s) => {
               const words = s.ayat.reduce((n, a) => n + a.words.length, 0);
               const meta = [t("surah_meta", { ayat: s.ayat.length, words }), pace[s.slug]]
@@ -195,6 +212,22 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
             </div>
           </details>
 
+        </section>
+
+        {/* The basic curriculum, in one short block with ONE link (plan L30). Not a card of
+            the surah list above, and it never says "Segera hadir": those words belong to the
+            cards of the surahs that are not published (CI counts them). */}
+        <section className="mt-12" aria-labelledby="curriculum">
+          <h2 id="curriculum" className="text-lg font-semibold text-ink">
+            {t("curriculum_heading")}
+          </h2>
+          <p className="mt-3 max-w-prose text-pretty text-base text-ink">
+            <MixedText text={t("curriculum_body", { max: maxNew, last: lastUnit })} />
+          </p>
+          <Link href={curriculumHref()} data-curriculum-link="" className="btn-secondary mt-4">
+            <span>{t("curriculum_link")}</span>
+            <ArrowRight aria-hidden className="h-5 w-5 shrink-0 text-forest" />
+          </Link>
         </section>
 
         <section className="mt-12" aria-labelledby="how">

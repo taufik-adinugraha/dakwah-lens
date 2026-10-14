@@ -698,7 +698,12 @@ describe("the narration listed ahead, across steps (operator 2026-10-12, lookahe
 
   it("the remembered place: from step N on, nothing of the steps before it", () => {
     for (const { ayah, seq } of fatihah) {
-      for (const from of [1, 4, seq.steps.length - 2]) {
+      // A place early in the lesson whose own line is rendered: found, not numbered (step 4 was
+      // one until the lines of the lesson map and of the warm-up, 2026-10-13, which have no file
+      // until they are rendered — a place with nothing to fetch has nothing to check).
+      const early = seq.steps.findIndex((st, i) => i >= 4 && st.cues.some((c) => c.audio.length > 0));
+      expect(early, `al-fatihah ${ayah}`).toBeGreaterThanOrEqual(4);
+      for (const from of [1, early, seq.steps.length - 2]) {
         const s = reduceAutoplay(seq, createAutoplayState(seq), { type: "start", reason: "restore", from });
         expect(s.idx).toBe(from);
         const before = new Set(seq.steps.slice(0, from).flatMap((st) => st.cues.flatMap((c) => c.audio.map((f) => f.url))));
@@ -715,7 +720,9 @@ describe("the narration listed ahead, across steps (operator 2026-10-12, lookahe
 
   it("at an exercise: what it says by itself ahead of it; while it waits, nothing of its feedback, the steps after it", () => {
     for (const { ayah, seq } of fatihah) {
-      const exIdx = seq.steps.findIndex((st) => st.exercise);
+      // The first exercise whose introduction is rendered (the warm-up that opens the lesson,
+      // 2026-10-13, is caption-only until its lines are; then it is the one found here).
+      const exIdx = seq.steps.findIndex((st) => st.exercise && st.exercise.lead.some((c) => st.cues[c].audio.length > 0));
       expect(exIdx, `al-fatihah ${ayah}`).toBeGreaterThan(0);
       const ex = seq.steps[exIdx];
       const spec = ex.exercise!;
@@ -984,7 +991,10 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
             }
           }
         }
-        expect(lines).toBeGreaterThan(2000);
+        // Not vacuous. The number follows what is rendered: 2,244 lines played from a copy when
+        // every Al-Fatihah line had its voice; 1,896 on 2026-10-13, with the lines whose text is
+        // new (the lesson map's, the structure told item by item) waiting for their render.
+        expect(lines).toBeGreaterThan(1500);
         // A second fetch of a file is rare: only those few repeated lines (24 of 2,244 lines played,
         // 2026-10-13) — and `force-cache` answers it from the browser's HTTP cache.
         expect(refetched).toBeLessThan(lines / 50);
@@ -1057,19 +1067,29 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
         for (const u of fetched) expect(seen, u).toContain(u);
         expect(r.lines.filter((l) => !l.fromCopy).map((l) => l.url)).toEqual([r.lines[0].url]);
         // At the start: the intro line and the next step's, not the step two steps on — the
-        // lesson map's line (plan L23; the primer's before that step existed). That line has a
-        // file only once it is rendered: until then nothing lies two steps ahead of the start.
+        // lesson map's first line (plan L23, L26; the primer's before those steps existed). That
+        // line has a file only once it is rendered: until then nothing lies two steps ahead of the
+        // start.
         const first = reduceAutoplay(seq, createAutoplayState(seq), { type: "start", reason: "fresh" });
         const u = aheadUpdate(seq, first, { conn, soundLoading: false, heardFor: null });
         expect(u.wanted).toEqual(lookaheadAudio(seq, first, { steps: 1 }));
         expect(u.path).toEqual(lookaheadAudio(seq, first, { steps: LOOKAHEAD_STEPS }));
         const twoOn = seq.steps[2].cues.flatMap((c) => c.audio.map((f) => f.url));
         expect(u.path).toEqual([...u.wanted, ...twoOn]);
-        // … and from the imam's step, whose step two ahead (the primer) is rendered: strictly further.
-        const onRecite = reduceAutoplay(seq, first, { type: "next" });
-        expect(seq.steps[onRecite.idx].id).toBe("recite");
-        const v = aheadUpdate(seq, onRecite, { conn, soundLoading: false, heardFor: null });
-        expect(v.wanted).toEqual(lookaheadAudio(seq, onRecite, { steps: 1 }));
+        // … and from a step whose step two ahead IS rendered: strictly further. Found, not named
+        // (until 2026-10-13 it was the imam's step, then the harakat primer's — which is lesson
+        // zero's now; a step named here would be the next to move): the first one after the start
+        // whose step two on has a file. A bounded walk: a step that is gone must fail, not spin.
+        // "Has a file" as the list itself counts it (an exercise two steps on is listed with
+        // what it says by itself, its introduction and first prompt — not with its other prompts).
+        const further = (st: AutoplayState) => lookaheadAudio(seq, st, { steps: LOOKAHEAD_STEPS }).length > lookaheadAudio(seq, st, { steps: 1 }).length;
+        let onPrimer = reduceAutoplay(seq, first, { type: "next" });
+        for (let k = 0; k < seq.steps.length && !further(onPrimer); k++) onPrimer = reduceAutoplay(seq, onPrimer, { type: "next" });
+        const at = onPrimer.idx;
+        expect(at).toBeGreaterThan(0);
+        expect(further(onPrimer)).toBe(true);
+        const v = aheadUpdate(seq, onPrimer, { conn, soundLoading: false, heardFor: null });
+        expect(v.wanted).toEqual(lookaheadAudio(seq, onPrimer, { steps: 1 }));
         expect(v.path.length).toBeGreaterThan(v.wanted.length);
       }
     } finally {
@@ -1130,7 +1150,30 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
 
   it("the next file of this step is what the lesson plays next in it — never a part of a split line already played", () => {
     let split = 0;
-    for (const { ayah, seq } of fatihah) {
+    // PLANTED: a voiced line in two files. No line of Al-Fatihah is split any more (its only
+    // long lines were the structure paragraphs, told item by item since 2026-10-13), and the rule
+    // must hold for the surahs whose long lines will be: ayah 2 with its first voiced concept
+    // line cut in two.
+    const two = fatihah[1];
+    const cut = two.seq.steps.findIndex((st) => st.kind === "concept" && st.cues[0]?.audio.length === 1);
+    expect(cut).toBeGreaterThan(-1);
+    const planted = {
+      ayah: two.ayah,
+      seq: {
+        ...two.seq,
+        steps: two.seq.steps.map((st, i) => {
+          if (i !== cut) return st;
+          const [whole] = st.cues[0].audio;
+          const half = Math.floor(whole.ms / 2);
+          const parts = [
+            { ...whole, id: `${whole.id}:a`, url: whole.url.replace(/\.mp3$/, "-a.mp3"), ms: half, words: undefined },
+            { ...whole, id: `${whole.id}:b`, url: whole.url.replace(/\.mp3$/, "-b.mp3"), ms: whole.ms - half, words: undefined },
+          ];
+          return { ...st, cues: [{ ...st.cues[0], audio: parts }, ...st.cues.slice(1)] };
+        }),
+      },
+    };
+    for (const { ayah, seq } of [...fatihah, planted]) {
       for (const pace of PACES) {
         const run = walk(seq, { type: "start", reason: "fresh" }, pace, "skip");
         run.forEach((s, k) => {

@@ -6,11 +6,14 @@
  *  1. sequences: non-empty, in lesson order, unique step ids, every caption
  *     non-empty and ≤ 180 characters per part, Arabic script in a caption
  *     only from a manifest's display, line ids on the contract, the right
- *     exercises, the last ayah ends "done"; in a surah with a lesson map
- *     (content/map, plan L23) the "map" step right after the imam's ayah and
- *     the "learned" step right before the recap, and neither anywhere else;
- *     the harakat primer right after the imam's ayah (after the map step,
- *     where there is one), and each word's recite → explain → compose (when it
+ *     exercises, the last ayah ends "done"; the concept steps are the steps
+ *     the CURRICULUM teaches in that ayah's lesson (content/curriculum.json,
+ *     plan L26; the file itself held to the lessons); in a surah with a lesson
+ *     map (content/map, plan L23, L26) the map's opening steps — one per group
+ *     of its card — right after the imam's ayah and the "learned" step right
+ *     before the recap, and none anywhere else;
+ *     the harakat primer right after the imam's ayah (after the map steps,
+ *     where there are any), and each word's recite → explain → compose (when it
  *     has a composition: one cue per line, frames in order); each word
  *     recited by ONE step, its opening one — and the ayah's last word once
  *     more, by the composition that ends on the stop frame (operator
@@ -55,8 +58,10 @@ import { MAX_CAPTION, type Pace } from "../lessonSteps";
 import { SURAH_SLUGS } from "../routes";
 import { lessonExamples, MAX_EXAMPLES_PER_RULE, type ComposeLike, type ExampleGap, type LessonExample } from "./examples";
 import { availableExercises, questionNumbers, type QuizAyahLike } from "./exercises";
-import { LINE_ID_RE, manifestParts, parseLineId, promptLineId } from "./ids";
-import { lessonMapInputOf, lessonMapProblems, type LessonMapFile, type LessonMapInput } from "./lessonMap";
+import { LINE_ID_RE, manifestParts, parseLineId, promptLineId, ZERO_AYAH } from "./ids";
+import { curriculumProblems, taughtIn, type CurriculumFile } from "./curriculum";
+import { hostsZero, zeroAyah } from "./zero";
+import { lessonMapInputOf, lessonMapProblems, mapOpening, type LessonMapFile, type LessonMapInput } from "./lessonMap";
 import {
   createAutoplayState,
   reduceAutoplay,
@@ -74,15 +79,17 @@ import {
   spokenTextProblems,
   usableTokens,
 } from "./narration";
-import { buildAutoplaySequence, introducedConcepts, sequenceLineIds, type SequenceInput } from "./sequence";
+import { buildAutoplaySequence, sequenceLineIds, type SequenceInput } from "./sequence";
 import { ID_TEXTS } from "./texts";
 import { IDLE_TICK_MS, MAX_REMINDERS } from "./timing";
 import {
   EXERCISE_KEYS,
   GUIDE_PARTS,
+  OPENING_EXERCISES,
   PARTS_OF,
   SHARED_KEYS,
   type AutoplaySequence,
+  type AutoplayStep,
   type AutoplayTexts,
   type ExampleClip,
   type ExerciseKey,
@@ -90,6 +97,8 @@ import {
 } from "./types";
 
 export type CheckSurah = { slug: string; name_id: string; ayat: readonly Ayah[] };
+/** What the checks read of a lesson's "ayah": an ayah of the content, or lesson zero's place. */
+type LessonAyah = Pick<Ayah, "ayah" | "loc" | "words" | "structure" | "recitation"> & { surah: number };
 
 export type CheckInput = {
   surahs: readonly CheckSurah[];
@@ -112,6 +121,9 @@ export type CheckInput = {
   /** Parsed content/map/${slug}.json per slug (the lesson map, plan L23);
    *  null/absent = the surah has none, and its lessons no map / learned step. */
   maps?: Readonly<Record<string, unknown>>;
+  /** Parsed content/curriculum.json (plan L26): which steps each ayah's lesson teaches.
+   *  null/absent = an error: every lesson is placed by the curriculum. */
+  curriculum?: unknown;
   /** content/library.json `clips`: the imam's voice of every concept example (an example beat
    *  of another ayah's word plays one). */
   clips?: Readonly<Record<string, ExampleClip>>;
@@ -193,6 +205,7 @@ export function loadCheckInput(read: (rel: string) => string | null): { input: C
       compose,
       quiz,
       maps,
+      curriculum: json("curriculum.json", true),
       clips: library.clips ?? {},
     },
     errors,
@@ -226,13 +239,16 @@ function rngOf(seed: number) {
 export function sequenceProblems(
   seq: AutoplaySequence,
   ctx: {
-    ayah: Pick<Ayah, "words">;
+    ayah: Pick<Ayah, "words" | "structure">;
     last: boolean;
     exercises: readonly ExerciseKey[];
     introduced: readonly { id: string }[];
     compose?: ComposeInput | null;
     /** This ayah's lesson map (plan L23), or null / absent: its surah has none. */
     map?: LessonMapInput | null;
+    /** LESSON ZERO (zero.ts): no ayah, so no recitation of one and no recap; the primer comes
+     *  right after the opening line, and the lesson leads to ayah 1. */
+    zero?: boolean;
   },
 ): string[] {
   const out: string[] = [];
@@ -241,7 +257,15 @@ export function sequenceProblems(
   const ids = steps.map((s) => s.id);
   if (new Set(ids).size !== ids.length) out.push("step ids are not unique");
   if (steps[0].kind !== "intro") out.push("does not open with the intro");
-  if (steps[1]?.kind !== "recite_ayah") out.push("the imam does not recite the ayah second");
+  const zero = ctx.zero === true;
+  /** How many steps open the lesson before its map / primer: the intro, and the imam's ayah. */
+  const head = zero ? 1 : 2;
+  if (zero) {
+    const off = steps.filter((s) => s.recite?.target === "ayah" || s.kind === "recite_ayah" || s.kind === "recap" || s.kind === "recite_word" || s.kind === "exercise");
+    if (off.length) out.push(`lesson zero has no ayah: it cannot have the step(s) ${off.map((s) => s.id).join(", ")}`);
+    if (seq.ayah !== 0) out.push("lesson zero's lines are the lines of “ayah 0”");
+    if (!steps.some((s) => s.kind === "primer")) out.push("lesson zero does not play the harakat primer");
+  } else if (steps[1]?.kind !== "recite_ayah") out.push("the imam does not recite the ayah second");
 
   // Every word: recite_word then explain (then compose, for a word with a
   // composition), in order; the primer, when there is one, right after the
@@ -250,26 +274,30 @@ export function sequenceProblems(
   const wordSteps = steps.filter((s) => s.kind === "recite_word" || s.kind === "explain" || s.kind === "compose");
   const expected = ctx.ayah.words.flatMap((_, i) => [`w${i + 1}:recite`, `w${i + 1}`, ...(composed(i) ? [`w${i + 1}:compose`] : [])]);
   if (JSON.stringify(wordSteps.map((s) => s.id)) !== JSON.stringify(expected)) out.push("word steps are not recite + explain (+ compose) per word in order");
-  // The lesson map (plan L23): with one, what the ayah brings is said right after the imam's ayah
-  // and what it taught right before the recap; without one, neither step exists.
+  // The lesson map (plan L23, L26): with one, what the ayah brings is said right after the imam's
+  // ayah — one step per group of its card, in the card's order — and what it taught right before
+  // the recap; without one, none of these steps exists.
   const mapped = !!ctx.map;
   const maps = steps.filter((s) => s.kind === "map");
   const learned = steps.filter((s) => s.kind === "learned");
-  if (maps.length !== (mapped ? 1 : 0) || (mapped && steps[2] !== maps[0])) {
-    out.push(mapped ? "the lesson map is not the step right after the imam's ayah" : "a map step in a lesson without a lesson map");
+  const opening = ctx.map ? mapOpening(ctx.map).map((g) => `map:${g}`) : [];
+  if (!mapped && maps.length) out.push("a map step in a lesson without a lesson map");
+  else if (JSON.stringify(steps.slice(head, head + opening.length).map((s) => s.id)) !== JSON.stringify(opening) || maps.length !== opening.length) {
+    out.push(`the lesson map's steps (${opening.join(", ")}) are not the steps right after the imam's ayah, one per group`);
   }
   if (learned.length !== (mapped ? 1 : 0) || (mapped && steps[steps.length - 3] !== learned[0])) {
     out.push(mapped ? "what the ayah taught is not said in the step right before the recap" : "a learned step in a lesson without a lesson map");
   }
   for (const s of [...maps, ...learned]) {
-    if (s.id !== s.kind || s.cues.length !== 1 || s.cues[0].line !== `${seq.slug}:${seq.ayah}:${s.kind}`) out.push(`${s.id}: a lesson map step is its one line`);
+    const named = s.kind === "learned" ? s.id === "learned" : /^map:(?:new|learnt|later)$/.test(s.id);
+    if (!named || s.cues.length !== 1 || s.cues[0].line !== `${seq.slug}:${seq.ayah}:${s.id}`) out.push(`${s.id}: a lesson map step is its one line`);
     if (s.recite || s.examples?.length || s.cues.some((c) => c.highlight.length > 0 || c.focus !== null)) {
       out.push(`${s.id}: a lesson map step recites nothing and marks no word (its card is what the stage shows)`);
     }
   }
   const primers = steps.filter((s) => s.kind === "primer");
-  if (primers.length !== (ctx.compose?.primer?.lines.length ? 1 : 0) || (primers.length && steps[mapped ? 3 : 2] !== primers[0])) {
-    out.push("the harakat primer is not the step right after the imam's ayah (and the lesson map, where there is one)");
+  if (primers.length !== (ctx.compose?.primer?.lines.length ? 1 : 0) || (primers.length && steps[head + opening.length] !== primers[0])) {
+    out.push(zero ? "the harakat primer is not the step right after lesson zero's opening line" : "the harakat primer is not the step right after the imam's ayah (and the lesson map, where there is one)");
   }
   for (const s of steps) {
     if (s.kind === "recite_word" && (s.recite?.target !== "word" || s.recite.word !== s.word)) out.push(`${s.id}: recites the wrong thing`);
@@ -301,15 +329,44 @@ export function sequenceProblems(
 
   const order = steps.map((s) => s.kind);
   const lastWord = Math.max(order.lastIndexOf("explain"), order.lastIndexOf("compose"));
-  const firstAfter = (k: string) => order.indexOf(k as (typeof order)[number]);
+  // The warm-up OPENS the lesson (operator 2026-10-13; types.ts OPENING_EXERCISES): it is the
+  // step right before the first word, after what the ayah brings (the map, the primer). Every
+  // other exercise follows the explanations, as before.
+  const opens = (s: AutoplayStep) => s.kind === "exercise" && !!s.exercise && OPENING_EXERCISES.includes(s.exercise.key);
+  const openers = steps.filter(opens);
+  const firstWordAt = order.indexOf("recite_word");
+  const openAt = head + opening.length + primers.length;
+  if (openers.length && (firstWordAt === -1 || steps.slice(openAt, firstWordAt).length !== openers.length || steps.slice(openAt, firstWordAt).some((s) => !opens(s)))) {
+    out.push(`the warm-up (${openers.map((s) => s.id).join(", ")}) is not the step right before the first word, after the lesson map and the primer`);
+  }
+  const firstAfter = (k: string) => (k === "exercise" ? steps.findIndex((s) => s.kind === "exercise" && !opens(s)) : order.indexOf(k as (typeof order)[number]));
   for (const k of ["structure", "concept", "exercise", "learned", "recap"]) {
     const i = firstAfter(k);
     if (i !== -1 && i < lastWord) out.push(`${k} comes before the words are explained`);
   }
   const concepts = steps.filter((s) => s.kind === "concept").map((s) => s.id);
-  if (JSON.stringify(concepts) !== JSON.stringify(ctx.introduced.map((c) => `concept:${c.id}`))) out.push("concept steps differ from the concepts introduced here");
+  if (JSON.stringify(concepts) !== JSON.stringify(ctx.introduced.map((c) => `concept:${c.id}`))) out.push("concept steps differ from the steps the curriculum teaches here");
   const ex = steps.filter((s) => s.kind === "exercise").map((s) => s.exercise?.key);
   if (JSON.stringify(ex) !== JSON.stringify([...ctx.exercises])) out.push(`exercise steps ${JSON.stringify(ex)} differ from the page's ${JSON.stringify(ctx.exercises)}`);
+  // The sentence structure (operator 2026-10-13): told item by item where the ayah has items —
+  // one step per item, in order, each about its item's words — else the one step of its summary.
+  const items = ctx.ayah.structure?.items ?? [];
+  const told = steps.filter((s) => s.kind === "structure");
+  const wantTold = items.length ? items.map((_, i) => `structure:${i + 1}`) : ctx.ayah.structure ? ["structure"] : [];
+  if (JSON.stringify(told.map((s) => s.id)) !== JSON.stringify(wantTold)) {
+    out.push(`structure steps ${JSON.stringify(told.map((s) => s.id))} are not ${items.length ? "the ayah's items, one step each, in order" : "the one step of its summary"} ${JSON.stringify(wantTold)}`);
+  } else {
+    told.forEach((s, i) => {
+      const it = items[i];
+      if (!it) {
+        if (s.item) out.push(`${s.id}: an item on the step of a structure told from its summary`);
+        return;
+      }
+      if (JSON.stringify(s.item) !== JSON.stringify({ n: i + 1, of: items.length, words: it.words })) out.push(`${s.id}: is not about item ${i + 1} of ${items.length} and its words ${JSON.stringify(it.words)}`);
+      if (s.cues.length !== 1 || JSON.stringify(s.cues[0].highlight) !== JSON.stringify(it.words) || s.cues[0].focus !== null) out.push(`${s.id}: its one line must light the item's words ${JSON.stringify(it.words)} and show no word card`);
+    });
+    if (told.length && order.lastIndexOf("structure") - order.indexOf("structure") !== told.length - 1) out.push("the structure's items are not said one after another");
+  }
   const structureAt = firstAfter("structure");
   const conceptAt = firstAfter("concept");
   // The lesson page's order (lessonSteps) and the narration's: the structure
@@ -317,7 +374,7 @@ export function sequenceProblems(
   if (structureAt !== -1 && conceptAt !== -1 && structureAt < order.lastIndexOf("concept")) out.push("the structure comes before the new concepts");
   const firstEx = firstAfter("exercise");
   if (firstEx !== -1 && (conceptAt > firstEx || structureAt > firstEx)) out.push("an exercise comes before the explanations");
-  if (order.at(-2) !== "recap") out.push("the recap is not the second-to-last step");
+  if (!zero && order.at(-2) !== "recap") out.push("the recap is not the second-to-last step");
   const end = steps[steps.length - 1];
   if (ctx.last) {
     if (end.kind !== "done") out.push("the last ayah does not end with done");
@@ -404,7 +461,9 @@ export function sequenceProblems(
 /** What exampleProblems checks one ayah's beats against (all of it content, none of it typed). */
 export type ExampleContext = {
   ayah: Pick<Ayah, "words" | "recitation">;
-  introduced: readonly Pick<Concept, "id" | "examples">[];
+  /** What the ayah's lesson teaches (curriculum.ts taughtIn): each with its examples, the one
+   *  in this ayah first. */
+  introduced: readonly { id: string; examples: readonly { loc: string; note: string }[] }[];
   /** content/compose/${slug}.json (raw), or null. */
   compose: ComposeLike | null;
   /** What examples.ts derived for this ayah (the sequence was built from `derived.examples`). */
@@ -413,6 +472,8 @@ export type ExampleContext = {
   clips: Readonly<Record<string, ExampleClip>>;
   wordAt: (loc: string) => { ar: string } | undefined;
   texts: AutoplayTexts;
+  /** Lesson zero (zero.ts): no ayah, so a concept's examples are clips of other ayat. */
+  zero?: boolean;
 };
 
 const EVERYAYAH_FILE = /^https:\/\/everyayah\.com\/data\/[A-Za-z0-9_]+\/\d{6}\.mp3$/;
@@ -526,6 +587,11 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
     if (at === -1) continue;
     if (!first) {
       if (!gapsOf(`concept:${c.id}:ex`).length) out.push(`concept:${c.id}: its line is followed by no example`);
+    } else if (ctx.zero) {
+      // Lesson zero has no ayah: the record's first example, as the imam's clip of its own ayah.
+      if (first.key !== c.examples[0]?.loc || first.word !== null || first.clip === null) {
+        out.push(`concept:${c.id}: in lesson zero its first example is the imam's clip of the concept's first example (${c.examples[0]?.loc})`);
+      }
     } else if (first.key !== c.examples[0]?.loc || first.word === null) {
       out.push(`concept:${c.id}: its first example is not the concept's example in this ayah (${c.examples[0]?.loc})`);
     }
@@ -968,6 +1034,8 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
       const p = parseLineId(id);
       if (!p || p.kind !== "ayah") return { why: "not a line id on the contract" };
       if (p.slug !== s.slug) return { why: `belongs to "${p.slug}"` };
+      // Lesson zero's lines are the lines of "ayah 0" of the surah that hosts it (zero.ts).
+      if (p.ayah === ZERO_AYAH && hostsZero(input.compose?.[s.slug] as Parameters<typeof hostsZero>[0])) return { why: null, words: [] };
       const a = s.ayat.find((x) => x.ayah === p.ayah);
       if (!a) return { why: `ayah ${p.ayah} is not in ${s.slug}` };
       return { why: null, words: a.words };
@@ -976,19 +1044,36 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
     if (!m) notes.push(`content/narration/${s.slug}.json not present: ${s.slug} line ids not checked (caption-only)`);
   }
 
-  // The lesson maps (plan L23): each held to the lessons and the library (what is new, repeated
-  // and taught later is derived, never typed), then given to its surah's sequences.
+  // The curriculum (plan L26): where each step is taught. Held to the lessons (every ayah is a
+  // lesson, and the lines and lists the file gives are the ones the words give), then asked for
+  // what each ayah teaches.
+  const curriculum = (input.curriculum ?? null) as CurriculumFile | null;
+  const curriculumOk = !!curriculum && typeof curriculum === "object" && Array.isArray(curriculum.lessons) && Array.isArray(curriculum.steps) && Array.isArray(curriculum.lanjut);
+  if (!curriculumOk) errors.push("content/curriculum.json: missing, or not a curriculum (run pipeline/build_curriculum.py)");
+  else {
+    try {
+      const zero = input.surahs.some((s) => hostsZero(input.compose?.[s.slug] as Parameters<typeof hostsZero>[0]));
+      for (const p of curriculumProblems(curriculum, input.surahs, input.concepts, zero)) errors.push(p);
+    } catch (e) {
+      errors.push(`content/curriculum.json: ${(e as Error).message}`);
+    }
+  }
+
+  // The lesson maps (plan L23, L26): each held to the curriculum (what is new, learnt so far,
+  // taught later and next-level is the curriculum's, never typed), then given to its surah's
+  // sequences.
   const mapFiles = new Map<string, LessonMapFile>();
   for (const s of input.surahs) {
     const raw = input.maps?.[s.slug];
     if (raw === null || raw === undefined) continue;
     const file = raw as LessonMapFile;
-    if (!file || typeof file !== "object" || file.slug !== s.slug || !Array.isArray(file.ayat) || !file.concepts || typeof file.concepts !== "object") {
+    if (!file || typeof file !== "object" || file.slug !== s.slug || !Array.isArray(file.ayat) || !file.steps || typeof file.steps !== "object" || !file.lanjut) {
       errors.push(`content/map/${s.slug}.json: not a lesson map of ${s.slug}`);
       continue;
     }
+    if (!curriculumOk) continue;
     try {
-      for (const p of lessonMapProblems(file, input.surahs, input.concepts)) errors.push(p);
+      for (const p of lessonMapProblems(file, curriculum)) errors.push(p);
     } catch (e) {
       errors.push(`content/map/${s.slug}.json: ${(e as Error).message}`);
       continue;
@@ -1001,21 +1086,27 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
     const manifest = parsed.get(surah.slug) ?? null;
     const referenced = new Set<string>();
     stats.minutes[surah.slug] = { biasa: 0, pelan: 0, tunggu: 0 };
-    for (const ayah of surah.ayat) {
+    // LESSON ZERO first, in the surah that hosts it (zero.ts): the lesson with no ayah — "ayah 0",
+    // no word, no recitation, no exercise — checked and driven like every ayah's lesson.
+    const hosted = hostsZero(composeFiles.get(surah.slug)) && surah.ayat.length > 0;
+    const zeroLesson: LessonAyah | null = hosted ? { ...zeroAyah(surah.ayat[0].surah), recitation: [] } : null;
+    const lessonsOf: LessonAyah[] = [...(zeroLesson ? [zeroLesson] : []), ...surah.ayat];
+    for (const ayah of lessonsOf) {
+      const zero = ayah === zeroLesson;
       stats.ayat++;
       const where = `${surah.slug} ${ayah.loc}`;
       const quizAyah = quizAyahOf(input.quiz?.[surah.slug], ayah.ayah);
       const exercises = availableExercises(quizAyah);
-      const introduced = introducedConcepts(input.concepts, ayah.loc);
+      const introduced = curriculumOk ? taughtIn(curriculum, input.concepts, ayah) : [];
       const last = ayah.ayah >= surah.ayat.length;
       const compose = composeInputFor(composeFiles.get(surah.slug), ayah);
       // The example beats (operator 2026-10-12, plan L20): derived from the content, as the page does.
       const composeFile = (composeFiles.get(surah.slug) ?? null) as ComposeLike | null;
-      const derived = lessonExamples({ ayah, introduced, compose: composeFile, clips: input.clips ?? {}, wordAt });
+      const derived = lessonExamples({ ayah, introduced, compose: composeFile, clips: input.clips ?? {}, wordAt, zero });
       const map = lessonMapInputOf(mapFiles.get(surah.slug), ayah.ayah);
-      // A lesson map names the new concepts: they are this ayah's concept steps, in that order.
-      if (map && JSON.stringify(map.new.map((c) => c.id)) !== JSON.stringify(introduced.map((c) => c.id))) {
-        errors.push(`${where}: the lesson map's new concepts differ from the concepts introduced here`);
+      // A lesson map names the new steps: they are this ayah's concept steps, in that order.
+      if (map && JSON.stringify(map.new.map((c) => c.id)) !== JSON.stringify(introduced.map((c) => c.step))) {
+        errors.push(`${where}: the lesson map's new steps differ from the steps the curriculum teaches here`);
       }
       const base: SequenceInput = {
         slug: surah.slug,
@@ -1031,13 +1122,14 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
         compose,
         examples: derived.examples,
         map,
+        zero,
       };
       const seq = buildAutoplaySequence(base);
       if (JSON.stringify(seq) !== JSON.stringify(buildAutoplaySequence(base))) errors.push(`${where}: building the sequence twice differs`);
       stats.steps += seq.steps.length;
       stats.exerciseSteps += seq.steps.filter((x) => x.kind === "exercise").length;
-      for (const p of sequenceProblems(seq, { ayah, last, exercises, introduced, compose, map })) errors.push(`${where}: ${p}`);
-      for (const p of exampleProblems(seq, { ayah, introduced, compose: composeFile, derived, clips: input.clips ?? {}, wordAt, texts })) {
+      for (const p of sequenceProblems(seq, { ayah, last, exercises, introduced, compose, map, zero })) errors.push(`${where}: ${p}`);
+      for (const p of exampleProblems(seq, { ayah, introduced, compose: composeFile, derived, clips: input.clips ?? {}, wordAt, texts, zero })) {
         errors.push(`${where}: ${p}`);
       }
 

@@ -47,6 +47,16 @@ LEXICON = AUTHORED_DIR / "library.lexicon.json"
 CONCEPTS = AUTHORED_DIR / "library.concepts.json"
 STRUCTURE_KEYS = ["type", "summary", "groups", "sources", "status"]  # schema.ts Ayah.structure
 GROUP_KEYS = {"words", "label", "concept"}
+# The same analysis as separate narrated items (operator 2026-10-13: "can we make this kind of
+# explanation in items: harfjar in one item, idhafah in next item etc, it's kind of confusing
+# which for which in this paragraph"): optional per ayah, `structure.items: [{words, say}]`.
+# `say` is spoken as it stands, like a composition's `say` (plain prose: no markup, no Qur'anic
+# word — the narration build's strict check holds it to that); `words` are lit while it is said.
+# An ayah with items is narrated item by item ("structure:1" …) instead of from its `summary`,
+# which stays the reference text of the page.
+STRUCTURE_ITEMS = "items"
+ITEM_KEYS = {"words", "say"}
+ITEM_SAY_MIN = 20  # schema.ts: a sentence, not a label
 FACT_KEYS = ["id", "title", "body", "locations", "method", "sources", "status"]  # schema.ts Fact
 HADITH_KEYS = ["citation", "ar", "id", "grade", "provenance", "status"]  # schema.ts Hadith
 REVIEWER_ONLY = {"review_notes"}
@@ -306,8 +316,8 @@ def ayah_structure(s: int, a: int, n_words: int, struct: dict, concept_ids: set,
         errors.append(f"structure.json: no structure for ayah {s}:{a}")
         return None
     where = f"structure {s}:{a}"
-    if set(sa) != set(STRUCTURE_KEYS):
-        errors.append(f"{where}: keys {sorted(sa)} != {STRUCTURE_KEYS}")
+    if set(sa) - {STRUCTURE_ITEMS} != set(STRUCTURE_KEYS):
+        errors.append(f"{where}: keys {sorted(sa)} != {STRUCTURE_KEYS} (+ optional {STRUCTURE_ITEMS!r})")
     if sa.get("status") != "draft":
         errors.append(f"{where}: status must be draft")
     if not sa.get("sources"):
@@ -326,6 +336,8 @@ def ayah_structure(s: int, a: int, n_words: int, struct: dict, concept_ids: set,
         groups.append({k: g[k] for k in ("words", "label", "concept") if k in g})
     out = {"type": sa["type"], "summary": sa["summary"], "groups": groups, "sources": sa["sources"],
            "status": sa["status"]}
+    if STRUCTURE_ITEMS in sa:
+        out[STRUCTURE_ITEMS] = structure_items(sa[STRUCTURE_ITEMS], n_words, where)
     if prose is not None:
         sw = f"structure[{s}:{a}]"
         out["type"], type_m = prose(sa["type"], f"{sw}.type")
@@ -336,6 +348,52 @@ def ayah_structure(s: int, a: int, n_words: int, struct: dict, concept_ids: set,
             labels_m.append(lm)
         if type_m is not None:
             out["marked"] = {"type": type_m, "summary": summary_m, "groups": labels_m}
+    return out
+
+
+WHY_BASIC_MIN = 20  # schema.ts: a sentence
+
+
+def word_why_basic(au: dict, where: str) -> str | None:
+    """A word's optional `why_basic` (2026-10-13): its reason in the lesson's own vocabulary, for
+    the lines the narrator says (a quiz explanation, the word line of a word without a
+    composition); the card keeps `why`. Plain prose spoken as it stands: no markup, and no marked
+    twin — it is never drawn. None when the word has none."""
+    if "why_basic" not in au:
+        return None
+    text = au["why_basic"]
+    if not isinstance(text, str) or len(text.strip()) < WHY_BASIC_MIN or text != text.strip():
+        errors.append(f"{where}.why_basic: a sentence of at least {WHY_BASIC_MIN} characters, without surrounding space "
+                      "(leave the key out for a word whose `why` is said as it is)")
+        return None
+    if "[[" in text or "]]" in text:
+        errors.append(f"{where}.why_basic: spoken as it stands, so it carries no [[…]] markup (the narration's dictionary "
+                      "shows a term's Arabic)")
+    return text
+
+
+def structure_items(items, n_words: int, where: str) -> list[dict]:
+    """`structure.items` of the authored file, checked: a non-empty list of {words, say}; `words`
+    ascending 1-based indices of the ayah (one is enough: an item may be about a single word);
+    `say` a sentence of plain prose with no markup — it is spoken as it stands."""
+    if not isinstance(items, list) or not items:
+        errors.append(f"{where}.items: a non-empty list of {{words, say}} (leave the key out for an ayah told from its summary)")
+        return []
+    out = []
+    for i, it in enumerate(items):
+        iw = f"{where}.items[{i}]"
+        if not isinstance(it, dict) or set(it) != ITEM_KEYS:
+            errors.append(f"{iw}: an item is exactly {{words, say}}")
+            continue
+        idx, say = it["words"], it["say"]
+        if (not isinstance(idx, list) or not idx or idx != sorted(set(idx))
+                or any(not isinstance(x, int) or isinstance(x, bool) or not 1 <= x <= n_words for x in idx)):
+            errors.append(f"{iw}: words {idx} must be >= 1 ascending indices within 1..{n_words}")
+        if not isinstance(say, str) or len(say.strip()) < ITEM_SAY_MIN or say != say.strip():
+            errors.append(f"{iw}: say must be a sentence of at least {ITEM_SAY_MIN} characters, without surrounding space")
+        elif "[[" in say or "]]" in say:
+            errors.append(f"{iw}: say is spoken as it stands and carries no [[…]] markup (the narration's dictionary shows a term's Arabic)")
+        out.append({"words": idx, "say": say})
     return out
 
 
@@ -512,6 +570,7 @@ def build(spec: SurahSpec) -> int:
             if "mahall" in au["case"]:
                 case["mahall"] = au["case"]["mahall"]
             why, why_m = prose(au["why"], f"{wp}.why")
+            why_basic = word_why_basic(au, wp)
             wazn, wazn_m = prose(au["wazn"], f"{wp}.wazn")
             ikh, ikh_m = [], []
             for i, x in enumerate(au["ikhtilaf"]):
@@ -542,6 +601,8 @@ def build(spec: SurahSpec) -> int:
                 "why": why, "lemma_id": lemma_id, "concepts": list(cmap[loc]), "role": role,
                 "ikhtilaf": ikh, "sources": sources, "status": "draft",
             }
+            if why_basic is not None:
+                word["why_basic"] = why_basic
             if mk is not None:
                 # ship-only twins of the prose (schema.ts WordMarked): the app shows these, with
                 # the Arabic of every term and Qur'anic word they name (src/lib/terms.ts)

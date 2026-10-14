@@ -3,12 +3,18 @@
  * written per ayah), in the order a learner meets it:
  *
  *   intro → recite_ayah (imam, whole ayah; mushaf words follow the imam)
- *   → map (only in a surah with a lesson map, content/map/${slug}.json: what
- *     this ayah brings — the concepts that are new, the ones repeated from
- *     earlier ayat, the ones present but taught later — one line, with its
- *     card on the stage; operator 2026-10-13, plan L23, lessonMap.ts)
+ *   → map:new → map:learnt → map:later (only in a surah with a lesson map,
+ *     content/map/${slug}.json: what this ayah brings, ONE step per group of
+ *     its card, each with its one line — what is new; how much has been learnt
+ *     so far and what of it comes up again here (once something was learnt);
+ *     what is here and taught later, and how many next-level topics (when
+ *     there is any); operator 2026-10-13, plan L23 and L26, lessonMap.ts)
  *   → primer (the harakat primer, when content/compose opens this ayah with
  *     it: each mark on a dotted circle, its sound, an example from the ayah)
+ *   → the warm-up (ex:word-kind, when the ayah's quiz has it — every ayah of
+ *     a surah with a lesson map: "isim, fi'il, atau huruf?" for each part of
+ *     each word; operator 2026-10-13, types.ts OPENING_EXERCISES). It WAITS
+ *     for the learner like every exercise
  *   → for every word: recite_word (imam, that word — the one time he says
  *     it, but for the ayah's last word: operator 2026-10-13, plan L24) +
  *     explain (w${n}: the gloss and the word's why — or, when the word has a
@@ -19,17 +25,19 @@
  *     word. The ayah's LAST word alone is recited once more, at the end of its
  *     composition: its last line says the imam stops on it and what is not
  *     heard there (composition.ts STOP_NOTE), and no next word follows
- *   → concept (each concept FIRST introduced in this ayah), each followed by
- *     its example step (the concept's example in this ayah, recited by the
+ *   → concept (each step the CURRICULUM teaches in this ayah's lesson that
+ *     has a text — a whole Konsep record or a step's own — at most three;
+ *     operator-approved 2026-10-13, plan L26, curriculum.ts), each followed by
+ *     its example step (its example in this ayah, recited by the
  *     imam; operator 2026-10-12, plan L20, examples.ts) → structure
  *     (the lesson page's order, and the narration's: the structure line
  *     uses the terms the concept lines introduce)
- *   → exercises the page renders, in page order (each WAITS for the learner;
+ *   → the other exercises the page renders, in page order (each WAITS for the learner;
  *     content/quiz/<slug>.json decides them, and each question's correct
  *     answer has its explanation line, said after "Benar." or "Ini
  *     jawabannya.": operator 2026-10-10)
- *   → learned (with a lesson map: the new concepts this ayah taught, one
- *     line, with its card)
+ *   → learned (with a lesson map: what this ayah taught and the running
+ *     total, one line, with its card)
  *   → recap (imam again) → next (to ayah + 1) | done (end of the surah)
  *
  * Every step carries its narration line ids (contract in types.ts), the
@@ -46,16 +54,17 @@
  * step. A beat has a caption (AutoplayTexts.example) and what the imam
  * recites; no narration line, so no manifest and no render knows of it.
  */
-import type { Ayah, Concept } from "@/content/schema";
+import type { Ayah } from "@/content/schema";
 
 import type { ComposeInput } from "../composition";
 import { latinSentences, splitCaption, stripArabic } from "../lessonSteps";
 import type { ExampleInput } from "./examples";
 import { canonicalExercises, exerciseProgressId } from "./exercises";
-import type { LessonMapInput } from "./lessonMap";
+import { mapHere, mapOpening, mapTotal, type LessonMapInput } from "./lessonMap";
 import { explainLineId, lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
 import { lineDisplay, lineMarks, lineSegments, lineText, wordRefs } from "./narration";
 import {
+  OPENING_EXERCISES,
   PARTS_OF,
   SHARED_KEYS,
   type AutoplaySequence,
@@ -76,9 +85,17 @@ export type SequenceInput = {
   surahName: string;
   /** Number of ayat in the surah (the last one ends with "done"). */
   ayahCount: number;
-  ayah: Ayah;
-  /** Concepts FIRST introduced in this ayah (library.conceptsIntroducedIn). */
-  introduced: readonly Concept[];
+  ayah: Pick<Ayah, "ayah" | "words" | "structure">;
+  /** LESSON ZERO (the basic curriculum's lesson with no ayah, decision 1: "A 'lesson zero' with
+   *  no ayah opens the course. It teaches harakat and the three kinds of word"): `ayah` is then
+   *  its place in the manifest — number 0, no word — and the sequence has no recitation of an
+   *  ayah and no recap: its opening line, the harakat primer, the "Konsep baru" line of each
+   *  step it teaches with the examples the imam recites, and the hand-over to ayah 1. */
+  zero?: boolean;
+  /** What this ayah's lesson teaches as "Konsep baru", in the order said (curriculum.ts taughtIn):
+   *  a whole Konsep record (`id` its id) or a step's own text (`id` the step's); `words`: the
+   *  words of the ayah its line lights (else: the words tagged with a record of that id). */
+  introduced: readonly TaughtInput[];
   /** Exercises the page renders for this ayah (availableExercises). */
   exercises: readonly ExerciseKey[];
   /** Each exercise's question numbers (questionNumbers, content/quiz): the
@@ -95,18 +112,12 @@ export type SequenceInput = {
   /** This ayah's example beats (examples.ts lessonExamples), when it has any. */
   examples?: readonly ExampleInput[] | null;
   /** This ayah's lesson map (lessonMap.ts lessonMapInputOf), when its surah has one: then the
-   *  sequence gets its "map" and "learned" steps (plan L23). */
+   *  sequence gets its map steps and its "learned" step (plan L23, L26). */
   map?: LessonMapInput | null;
 };
 
-/** Concepts whose FIRST example lies in `ayahLoc` ("1:2"). Same rule as
- *  library.conceptsIntroducedIn (parity-tested), without its zod import. */
-export function introducedConcepts<C extends Pick<Concept, "examples">>(concepts: readonly C[], ayahLoc: string): C[] {
-  return concepts.filter((c) => {
-    const first = c.examples[0]?.loc;
-    return first ? first.split(":").slice(0, 2).join(":") === ayahLoc : false;
-  });
-}
+/** What the sequence reads of a taught item (curriculum.ts Taught; a Konsep record fits too). */
+export type TaughtInput = { id: string; title: string; summary: string; words?: readonly number[] };
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim();
 
@@ -136,8 +147,10 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
   };
   /** What a line highlights when its manifest does not say (operator,
    *  2026-10-10): the whole ayah for the intro, the recitation, the
-   *  structure and the recap; the word a w${n} line explains; for a concept,
-   *  the words tagged with it (Word.concepts) and the words of the ayah's
+   *  structure and the recap; the word a w${n} line explains; for a taught
+   *  step, the words it occurs on (the curriculum's `words`: every majrur
+   *  word for the step majrur) — or, for a record given without them, the
+   *  words tagged with it (Word.concepts) and the words of the ayah's
    *  structure groups of that concept (the idhafah of bismi + Allāhi is
    *  [1, 2] although only Allāhi is tagged; validate_narration.concept_words);
    *  else the places the line names. */
@@ -145,8 +158,13 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     if (part === "intro" || part === "recite" || part === "structure" || part === "recap") return every;
     const w = explained(part);
     if (w !== null) return [w];
+    // An item of the structure: the words it is about.
+    const item = /^structure:([1-9][0-9]*)$/.exec(part);
+    if (item) return (ayah.structure?.items?.[Number(item[1]) - 1]?.words ?? []).filter((x) => x >= 1 && x <= words);
     if (part.startsWith("concept:")) {
       const id = part.slice("concept:".length);
+      const own = input.introduced.find((c) => c.id === id)?.words;
+      if (own) return [...new Set(own)].filter((w) => w >= 1 && w <= words).sort((a, b) => a - b);
       const tagged = new Set(ayah.words.flatMap((x, i) => ((x.concepts ?? []).includes(id) ? [i + 1] : [])));
       for (const g of ayah.structure?.groups ?? []) {
         if (g.concept === id) for (const x of g.words) if (Number.isInteger(x) && x >= 1 && x <= words) tagged.add(x);
@@ -219,31 +237,42 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     });
   const withBeats = (beats: ExampleBeat[]) => (beats.length ? { examples: beats } : {});
 
+  const zero = input.zero === true;
+  // No ayah on the stage of lesson zero: nothing for the spotlight to point at.
+  const onAyah = zero ? [] : [line];
   const steps: AutoplayStep[] = [];
   steps.push(
     step({
       id: "intro",
       kind: "intro",
-      cues: [cue(p("intro"), texts.intro({ surah: input.surahName, ayah: n, total: input.ayahCount }), [line])],
-      guides: [line],
+      cues: [cue(p("intro"), zero ? texts.zeroIntro({ surah: input.surahName }) : texts.intro({ surah: input.surahName, ayah: n, total: input.ayahCount }), onAyah)],
+      guides: onAyah,
     }),
   );
-  steps.push(
-    step({
-      id: "recite",
-      kind: "recite_ayah",
-      cues: [cue(p("recite"), texts.recite, [line])],
-      guides: [line],
-      recite: { target: "ayah" },
-    }),
-  );
+  if (!zero) {
+    steps.push(
+      step({
+        id: "recite",
+        kind: "recite_ayah",
+        cues: [cue(p("recite"), texts.recite, [line])],
+        guides: [line],
+        recite: { target: "ayah" },
+      }),
+    );
+  }
 
-  // What this ayah brings, before its words (plan L23): the card on the stage lists the concepts,
-  // so the engine's own caption (a page without narration) gives their counts only.
+  // What this ayah brings, before its words (plan L23, L26): ONE step per group of the card, in
+  // step with the narrator (each waits for "Lanjut" in the "Tunggu saya" pace, and "↺ Ulangi"
+  // plays that one group again). The card on the stage lists the steps, so the engine's own
+  // caption (a page without narration) gives their counts only.
   const map = input.map ?? null;
   if (map) {
-    const counts = { new: map.new.length, review: map.review.length, later: map.later.length };
-    steps.push(step({ id: "map", kind: "map", cues: [cue(p("map"), texts.lessonMap(counts))], guides: [] }));
+    const captions = {
+      new: texts.lessonMap.new({ new: map.new.length }),
+      learnt: texts.lessonMap.learnt({ learnt: map.learnt.length, here: mapHere(map).length }),
+      later: texts.lessonMap.later({ later: map.later.length, lanjut: map.lanjut.length }),
+    };
+    for (const g of mapOpening(map)) steps.push(step({ id: `map:${g}`, kind: "map", cues: [cue(p(`map:${g}`), captions[g])], guides: [] }));
   }
 
   const primer = input.compose?.primer;
@@ -258,6 +287,48 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
       }),
     );
   }
+
+  /** One exercise's step: its introduction, the prompt of each control, and the explanation of
+   *  each question's correct answer. */
+  const exerciseStep = (key: ExerciseKey): AutoplayStep => {
+    const t = texts.exercise[key];
+    const parts = PARTS_OF[key];
+    const cues: Cue[] = [cue(p(`ex:${key}:intro`), t.intro)];
+    const lead = [0];
+    const promptCue: Partial<Record<GuidePart, number>> = {};
+    const guides: Partial<Record<GuidePart, Guide>> = {};
+    for (const part of parts) {
+      guides[part] = partGuide(key, part);
+      const text = t[part];
+      if (!text) continue;
+      promptCue[part] = cues.length;
+      // The ayah's own prompt when its manifest has one, else the shared one.
+      const own = p(`ex:${key}:${part}`);
+      const id = input.narration && manifestParts(input.narration, own) ? own : promptLineId(key, part);
+      cues.push(cue(id, text, [partGuide(key, part)]));
+    }
+    // The explanation of each question's correct answer, from the manifest only (its words come
+    // from the narration build; a page without narration says just "Benar.").
+    const explain: Partial<Record<number, number>> = {};
+    for (const q of input.questions?.[key] ?? []) {
+      const id = explainLineId(slug, n, key, q);
+      if (!input.narration || !manifestParts(input.narration, id)) continue;
+      explain[q] = cues.length;
+      cues.push(cue(id, ""));
+    }
+    return step({
+      id: `ex:${key}`,
+      kind: "exercise",
+      cues,
+      guides: [partGuide(key, parts[0])],
+      exercise: { key, progressId: exerciseProgressId(lessonKey, key), parts, lead, promptCue, guides, explain },
+    });
+  };
+  const asked = canonicalExercises(input.exercises);
+  // The warm-up (operator 2026-10-13: "in every ayat we identify first each words fall into which
+  // category: ismu, fi'il or harf. it's kind of exercise, kind of warming up"): asked before the
+  // first word, after what the ayah brings. It WAITS for the learner like every exercise.
+  for (const key of asked) if (OPENING_EXERCISES.includes(key)) steps.push(exerciseStep(key));
 
   ayah.words.forEach((w, i) => {
     const wn = i + 1;
@@ -336,57 +407,44 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     }
   }
 
-  if (ayah.structure) {
+  // The sentence structure. Told ITEM BY ITEM where the ayah has items (operator 2026-10-13: "can
+  // we make this kind of explanation in items: harfjar in one item, idhafah in next item etc, it's
+  // kind of confusing which for which in this paragraph"): one step per item, so "↺ Ulangi"
+  // replays that item and "Tunggu saya" waits after each; its line lights the item's words and
+  // the stage shows them (LessonStage). Else the one line of its summary, the whole ayah lit.
+  const items = ayah.structure?.items ?? [];
+  items.forEach((it, i) => {
+    const k = i + 1;
+    const own = stripArabic(it.say);
+    steps.push(
+      step({
+        id: `structure:${k}`,
+        kind: "structure",
+        cues: [cue(p(`structure:${k}`), k === 1 ? texts.structureItems(own) : own, [line])],
+        guides: [line],
+        item: { n: k, of: items.length, words: [...it.words] },
+      }),
+    );
+  });
+  if (ayah.structure && !items.length) {
     const summary = latinSentences(ayah.structure.summary);
     const caption = summary ? texts.structure(summary) : texts.structureBrief;
     steps.push(step({ id: "structure", kind: "structure", cues: [cue(p("structure"), caption, [line])], guides: [line] }));
   }
 
-  for (const key of canonicalExercises(input.exercises)) {
-    const t = texts.exercise[key];
-    const parts = PARTS_OF[key];
-    const cues: Cue[] = [cue(p(`ex:${key}:intro`), t.intro)];
-    const lead = [0];
-    const promptCue: Partial<Record<GuidePart, number>> = {};
-    const guides: Partial<Record<GuidePart, Guide>> = {};
-    for (const part of parts) {
-      guides[part] = partGuide(key, part);
-      const text = t[part];
-      if (!text) continue;
-      promptCue[part] = cues.length;
-      // The ayah's own prompt when its manifest has one, else the shared one.
-      const own = p(`ex:${key}:${part}`);
-      const id = input.narration && manifestParts(input.narration, own) ? own : promptLineId(key, part);
-      cues.push(cue(id, text, [partGuide(key, part)]));
-    }
-    // The explanation of each question's correct answer, from the manifest only (its words come
-    // from the narration build; a page without narration says just "Benar.").
-    const explain: Partial<Record<number, number>> = {};
-    for (const q of input.questions?.[key] ?? []) {
-      const id = explainLineId(slug, n, key, q);
-      if (!input.narration || !manifestParts(input.narration, id)) continue;
-      explain[q] = cues.length;
-      cues.push(cue(id, ""));
-    }
-    steps.push(
-      step({
-        id: `ex:${key}`,
-        kind: "exercise",
-        cues,
-        guides: [partGuide(key, parts[0])],
-        exercise: { key, progressId: exerciseProgressId(lessonKey, key), parts, lead, promptCue, guides, explain },
-      }),
-    );
-  }
+  for (const key of asked) if (!OPENING_EXERCISES.includes(key)) steps.push(exerciseStep(key));
 
   // … and what it taught, before the imam recites the ayah once more.
   if (map) {
-    steps.push(step({ id: "learned", kind: "learned", cues: [cue(p("learned"), texts.learned({ new: map.new.length }))], guides: [] }));
+    const said = texts.learned({ new: map.new.length, total: mapTotal(map), here: mapHere(map).length });
+    steps.push(step({ id: "learned", kind: "learned", cues: [cue(p("learned"), said)], guides: [] }));
   }
 
-  steps.push(
-    step({ id: "recap", kind: "recap", cues: [cue(p("recap"), texts.recap, [line])], guides: [line], recite: { target: "ayah" } }),
-  );
+  if (!zero) {
+    steps.push(
+      step({ id: "recap", kind: "recap", cues: [cue(p("recap"), texts.recap, [line])], guides: [line], recite: { target: "ayah" } }),
+    );
+  }
 
   const last = n >= input.ayahCount;
   if (last) {
@@ -399,7 +457,8 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
       }),
     );
   } else {
-    steps.push(step({ id: "next", kind: "next", cues: [cue(p("next"), texts.next({ ayah: n + 1 }))], guides: [] }));
+    const said = zero ? texts.zeroNext({ surah: input.surahName }) : texts.next({ ayah: n + 1 });
+    steps.push(step({ id: "next", kind: "next", cues: [cue(p("next"), said)], guides: [] }));
   }
 
   const skipGuide: Guide = { target: "skip", label: texts.guide.skip };

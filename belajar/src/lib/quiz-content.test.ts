@@ -63,11 +63,13 @@ describe("quizzes (content/quiz)", () => {
     const ar = new Map(LIBRARY.terms.map((t) => [t.id, t.ar]));
     const q = quizFor("al-fatihah")!;
     for (const st of ["marfu", "manshub", "majrur", "mabni"]) expect(q.states[st]).toContain(ar.get(st)!);
-    expect(q.labels["fi'il mudhari'"]).toContain(ar.get("fiil-mudhari")!);
+    // No form labels: the wazan exercise left the basic lessons (kurikulum-dasar.md decision 6,
+    // 2026-10-13: "All sharaf is 'tingkat lanjut'"), in the authored plan and the mechanical ones.
+    expect(q.labels).toEqual({});
+    for (const s of SURAHS) for (const a of s.ayat) expect(planOf(quizAyah(s.slug, a.ayah), "wazn-factory"), a.loc).toBeNull();
     // Ayah 2 sorts into the two states taught by then: marfu' (at its first word) and majrur.
     expect(planOf(quizAyah("al-fatihah", 2), "sort-case")?.bins).toEqual(["marfu", "majrur"]);
     expect(planOf(quizAyah("al-fatihah", 1), "sort-case")).toBeNull();
-    expect(planOf(quizAyah("al-fatihah", 4), "wazn-factory")).toBeNull();
   });
 });
 
@@ -94,8 +96,8 @@ describe("the quiz and the word card show one text", () => {
     const lookup = lessonLookup(TERMS, fatihah);
     const inQuiz = new Set(strings);
     // A reason or role the quiz shows is the card's rendering, character for character. Counted,
-    // not matched one by one (a quiz string and its plain text differ by the Arabic itself): 43 of
-    // the 58 reasons and roles are quiz text today — the other 15 are no quiz string in any
+    // not matched one by one (a quiz string and its plain text differ by the Arabic itself): 38 of
+    // the 58 reasons and roles are quiz text today — the other 20 are no quiz string in any
     // rendering (the authored quiz asks nothing that shows them) — and a renderer that drifts
     // drops the count.
     let shared = 0;
@@ -108,7 +110,13 @@ describe("the quiz and the word card show one text", () => {
     }
     // Exactly today's count: three drifting strings (40) was the defect. A change to the quiz or
     // the words that moves it is updated here knowingly.
-    expect(shared).toBe(43);
+    // 43 until the plan of 2026-10-13 (the basic curriculum): ayah 1 asks no reason any more, and
+    // the roles asked follow what each lesson has taught. 38 until, the same day, the explanation
+    // shown after an answer became what the narrator says: a word's `why_basic` where it has one
+    // (pipeline/quiz.py explained) — eight reasons of the card are then no quiz string (an option
+    // is still the word's `why`; pipeline/test_validate_quiz.py holds the `why_basic` ones). 29
+    // since 1:7:2 has a `why_basic` too (it says "majrur" where the card says "jar").
+    expect(shared).toBe(29);
     expect(strings.join("\n")).not.toMatch(/mahall, \p{Script=Arabic}+ raf'/u);
     // The shared strings carry the forms of 2026-10-12, so the count is not 43 strings that have
     // no bracket to differ in: an item inside the text's bracket with its Arabic after one space,

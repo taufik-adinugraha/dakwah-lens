@@ -42,10 +42,17 @@ const EN: AutoplayTexts = {
   wordIntro: ({ n, translit }) => `Word ${n}: ${translit}. Listen to the imam recite it.`,
   meaning: ({ n, gloss }) => `Word ${n} means “${gloss}”.`,
   structure: (summary) => `How this ayah's sentence is built: ${summary}`,
+  structureItems: (item) => `Now how its sentence is built. ${item}`,
   structureBrief: "How this ayah's sentence is built is explained under Learn more.",
   concept: (title, summary) => `New concept — ${title}: ${summary}`,
   conceptBrief: (title) => `New concept — ${title}. It is explained under Learn more.`,
   exercise: {
+    "word-kind": {
+      intro: "Warm-up: isim, fi'il, or huruf? Guess the kind of each word of this ayah first.",
+      options: "Click one of the marked kinds.",
+      reveal: "Try again, or click the marked “Show the answer”.",
+      next: "Click the marked button to continue.",
+    },
     "tap-word": {
       intro: "Practice: Listen and click. The imam recites one word of this ayah, then you click that word.",
       play: "Listen to the imam recite one word of this ayah.",
@@ -78,20 +85,32 @@ const EN: AutoplayTexts = {
       next: "Click the marked button to continue.",
     },
   },
-  lessonMap: ({ new: fresh, review, later }) =>
-    [
-      fresh ? `This ayah has ${fresh} new ${fresh === 1 ? "thing" : "things"} to learn.` : "This ayah has nothing new.",
-      review ? `We repeat ${review} we have already learnt.` : "",
-      later ? `${later} more ${later === 1 ? "is" : "are"} explained later.` : "",
-      "The list is on the screen.",
-    ]
-      .filter(Boolean)
-      .join(" "),
-  learned: ({ new: fresh }) =>
-    fresh ? `In this ayah we have learnt ${fresh} new ${fresh === 1 ? "thing" : "things"}. The list is on the screen.` : "This ayah had nothing new.",
+  lessonMap: {
+    new: ({ new: fresh }) =>
+      fresh ? `This ayah has ${fresh} new ${fresh === 1 ? "thing" : "things"} to learn. The list is on the screen.` : "This ayah has nothing new.",
+    learnt: ({ learnt, here }) =>
+      `Before this ayah, we have learnt ${learnt} ${learnt === 1 ? "thing" : "things"}. ` +
+      (here ? `${here} of them ${here === 1 ? "comes" : "come"} up again in this ayah; the list is on the screen.` : "None of them comes up again in this ayah."),
+    later: ({ later, lanjut }) =>
+      [
+        later ? `${later} more ${later === 1 ? "thing is" : "things are"} in this ayah and explained later.` : "",
+        lanjut ? `${later ? "There" : "In this ayah there"} ${lanjut === 1 ? "is" : "are"}${later ? " also" : ""} ${lanjut} advanced ${lanjut === 1 ? "topic" : "topics"}, which the basic level does not cover.` : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
+  },
+  learned: ({ new: fresh, total, here }) =>
+    fresh
+      ? `In this ayah we learnt ${fresh} new ${fresh === 1 ? "thing" : "things"}. That makes ${total} learnt so far.`
+      : here
+        ? `This ayah had nothing new; it repeated ${here} ${here === 1 ? "thing" : "things"} we have already learnt.`
+        : "This ayah had nothing new.",
   recap: "Listen to the whole ayah once more, and recite along with the imam.",
   next: ({ ayah }) => `This ayah's lesson is complete. Next: ayah ${ayah}.`,
   done: ({ surah }) => `This ayah's lesson is complete. It is the last ayah of surah ${surah}.`,
+  zeroIntro: ({ surah }) =>
+    `This is the introductory lesson, before the first ayah of Surah ${surah}. It covers two things: the vowel marks (harakat), and the three kinds of word in Arabic.`,
+  zeroNext: ({ surah }) => `The introductory lesson is complete. Next: the first ayah of Surah ${surah}; the lesson continues by itself.`,
   example: {
     word: ({ n, translit }) => `Example: word ${n}, ${translit}.`,
     other: ({ translit, surah, ayah }) => `Another example: ${translit}, in QS ${surah}:${ayah}.`,

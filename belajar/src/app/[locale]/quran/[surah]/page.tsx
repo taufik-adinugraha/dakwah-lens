@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { BackLink } from "@/components/BackLink";
 import { ForestGlow } from "@/components/ForestGlow";
+import { IntroCard } from "@/components/lesson/IntroCard";
 import { MixedText } from "@/components/library/MixedText";
 import { AyahDialogProvider } from "@/components/surah/AyahDialog";
 import { AyahProgressMark } from "@/components/surah/AyahProgressMark";
@@ -12,6 +13,7 @@ import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
 import { surahNamesFor } from "@/lib/ayat";
 import { getSurah, SURAHS } from "@/lib/content";
+import { ZERO_HOST } from "@/lib/curriculum";
 import { TERMS } from "@/lib/library";
 import { ayahHref, quranHref } from "@/lib/routes";
 import { lessonLookup } from "@/lib/terms";
@@ -43,6 +45,7 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/quran/[
   if (!s) notFound();
   const t = await getTranslations("Surah");
   const tb = await getTranslations("Breadcrumb");
+  const ti = await getTranslations("Intro");
   const words = s.ayat.reduce((n, a) => n + a.words.length, 0);
 
   return (
@@ -63,7 +66,14 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/quran/[
           </p>
         </header>
 
-        <ol className="mt-8 space-y-4">
+        {/* Lesson zero first, on the page of the surah that hosts it (2026-10-13): before ayah 1,
+            outside the numbered list of ayat (it is no ayah). */}
+        {ZERO_HOST?.slug === s.slug && (
+          <div className="mt-8">
+            <IntroCard eyebrow={ti("eyebrow")} title={ti("title")} hint={ti("card_hint")} cta={ti("card_cta")} />
+          </div>
+        )}
+        <ol className={ZERO_HOST?.slug === s.slug ? "mt-4 space-y-4" : "mt-8 space-y-4"}>
           {s.ayat.map((a) => (
             <li key={a.loc}>
               <Link

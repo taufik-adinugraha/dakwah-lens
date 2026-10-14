@@ -1,5 +1,5 @@
 {
-  "_comment": "Hand-authored per-word values for Al-Fatihah (stage 3 'Author', plan §7.5). DRAFT pending ustadz review. Sources: docs/belajar-plan.md Appendix A and docs/belajar-research/fatihah-content.md §2-§3, re-read against the i'rab texts on tafsir.app (scratch copies of Darwisy 1/1-1/7, al-Jadwal, al-Mujtaba, an-Nahhas, as-Samin, Ibn Kathir 1:7). No Qur'anic Arabic is typed here: words are referred to in SKB transliteration; Arabic in `wazn` is a morphological pattern, not Qur'anic text. root/lemma/pos are NOT authored here: build_fatihah.py reads them from QAC 0.4. `src` lists kitab refs as [abbr], [abbr, ref] or [abbr, ref, url_ayah] (ref null = the kitab's default page for the ayah; url_ayah = the ayah page holding the passage, null = no url); build_fatihah.py expands them into SourceRef objects and adds the QAC, QAC verb-form (verbs with a wazn) and gloss-anchor refs. `pos` (with a required `pos_note`) overrides the QAC-derived word class when a kitab labels it differently. `wazn` is filled only where a cited kitab (or, for verbs, the QAC verb-form tag) states it. `review_notes` never reach the output; they are for the reviewer.",
+  "_comment": "Hand-authored per-word values for Al-Fatihah (stage 3 'Author', plan §7.5). DRAFT pending ustadz review. Sources: docs/belajar-plan.md Appendix A and docs/belajar-research/fatihah-content.md §2-§3, re-read against the i'rab texts on tafsir.app (scratch copies of Darwisy 1/1-1/7, al-Jadwal, al-Mujtaba, an-Nahhas, as-Samin, Ibn Kathir 1:7). No Qur'anic Arabic is typed here: words are referred to in SKB transliteration; Arabic in `wazn` is a morphological pattern, not Qur'anic text. root/lemma/pos are NOT authored here: build_fatihah.py reads them from QAC 0.4. `src` lists kitab refs as [abbr], [abbr, ref] or [abbr, ref, url_ayah] (ref null = the kitab's default page for the ayah; url_ayah = the ayah page holding the passage, null = no url); build_fatihah.py expands them into SourceRef objects and adds the QAC, QAC verb-form (verbs with a wazn) and gloss-anchor refs. `pos` (with a required `pos_note`) overrides the QAC-derived word class when a kitab labels it differently. `wazn` is filled only where a cited kitab (or, for verbs, the QAC verb-form tag) states it. `review_notes` never reach the output; they are for the reviewer. `why_basic` (optional, 2026-10-13): the same reason as `why` in the LESSON'S OWN vocabulary — only terms the lesson has taught by then (authored/curriculum.json) — for the lines the narrator SAYS: a quiz question's explanation and the word line of a word without a composition. Plain prose spoken as it stands (no markup, no Qur'anic word: positions and meanings instead). `why` stays the full reference text with every term and its sources, and is what the word's card shows.",
   "kitab": {
     "D": {
       "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
@@ -113,6 +113,7 @@
       "wazn": null,
       "case": { "state": "majrur", "sign": "[[kasrah]]" },
       "why": "Akhirnya [[kasrah]] karena didahului [[huruf jar]] [[li-|q:1:2:2/1]]; [[jar-majrur]] ini bergantung pada [[khabar]] yang tidak disebut (misalnya “tetap”).",
+      "why_basic": "Akhirnya kasrah karena didahului huruf jar yang artinya “bagi”. Keterangan ini bergantung pada kata yang tidak diucapkan, yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”.",
       "ikhtilaf": [
         {
           "point": "Makna huruf [[lam|q:1:2:2#1]] pada [[lillāhi|q:1:2:2]]",
@@ -148,6 +149,7 @@
       "wazn": "فَاعَل",
       "case": { "state": "majrur", "sign": "[[ya'|q:1:2:4#6]]" },
       "why": "[[Majrur]] dengan tanda [[ya'|q:1:2:4#6]] karena menjadi [[mudhaf ilaih]] dan termasuk kata yang disamakan ([[mulhaq]]) dengan [[jamak mudzakkar salim]].",
+      "why_basic": "Majrur dengan tanda ya', karena kata ketiga disandarkan kepadanya dan kata ini diperlakukan seperti jamak mudzakkar salim.",
       "ikhtilaf": [
         {
           "point": "Apakah [[al-‘ālamīna|q:1:2:4]] jamak dari ‘ālam?",
@@ -237,6 +239,7 @@
       "wazn": null,
       "case": { "state": "mabni", "sign": "[[fathah]]", "mahall": "mahall nashb" },
       "why": "Kata ganti ini [[mabni]] di atas [[fathah]] (akhirnya tetap) dan berkedudukan [[nashab]] sebagai objek yang didahulukan, sehingga bermakna “hanya kepada-Mu”.",
+      "why_basic": "Dhamir ini mabni: akhirnya tetap fathah. Ia menjadi objek yang didahulukan, sehingga bermakna “hanya kepada-Mu”.",
       "ikhtilaf": [
         {
           "point": "Bagian mana dari [[iyyāka|q:1:5:1]] yang [[mabni]]?",
@@ -254,6 +257,7 @@
       "wazn": "نَفْعُلُ",
       "case": { "state": "marfu", "sign": "[[dhammah]]" },
       "why": "Akhirnya [[dhammah]] karena [[fi'il mudhari']] ini tidak didahului huruf [[penashab]] atau [[penjazm]]; pelakunya tersirat, yaitu “kami”.",
+      "why_basic": "Akhirnya dhammah karena fi'il mudhari' ini tidak didahului kata yang mengubah akhirnya; pelakunya tersirat, yaitu “kami”.",
       "ikhtilaf": [],
       "src": [["D"], ["J"]]
     },
@@ -263,6 +267,7 @@
       "wazn": null,
       "case": { "state": "mabni", "sign": "[[fathah]]", "mahall": "mahall nashb" },
       "why": "[[Wawu|q:1:5:3#1]] adalah [[huruf 'athaf]], dan [[iyyāka|q:1:5:3/2]] ([[mabni]] di atas [[fathah]], berkedudukan [[nashab]]) diulang sebagai objek yang didahulukan bagi [[nasta‘īnu|q:1:5:4]] agar makna “hanya” melekat pada kedua perbuatan.",
+      "why_basic": "Huruf wawu menyambungkan, dan dhamir yang sama diulang sebagai objek yang didahulukan bagi kata keempat; dhamir ini mabni, akhirnya tetap fathah.",
       "ikhtilaf": [
         {
           "point": "Bagian mana dari [[iyyāka|q:1:5:3/2]] yang [[mabni]]?",
@@ -280,6 +285,7 @@
       "wazn": "نَسْتَفْعِلُ",
       "case": { "state": "marfu", "sign": "[[dhammah]]" },
       "why": "Akhirnya [[dhammah]] dengan alasan yang sama seperti [[na‘budu|q:1:5:2]]: [[fi'il mudhari']] tanpa huruf [[penashab]] atau [[penjazm]].",
+      "why_basic": "Akhirnya dhammah dengan alasan yang sama seperti kata kedua: fi'il mudhari' yang tidak didahului kata yang mengubah akhirnya.",
       "ikhtilaf": [],
       "src": [["D"], ["J"], ["M", "catatan tentang nasta‘īnu ada pada pembahasan QS 1:6 (halaman cetak belum diverifikasi)", 6]],
       "review_notes": ["Asal nasta‘īnu adalah nasta‘wanu (i'lal); D, J, M sepakat. Bisa dimuat sebagai catatan sharaf. Catatan al-Mujtaba tentang kata ini ada di halaman ayat 6, bukan ayat 5."]
@@ -290,6 +296,7 @@
       "wazn": "افْعِنا",
       "case": { "state": "mabni", "sign": "dibuangnya [[huruf 'illah]] (ya')" },
       "why": "[[Fi'il amr]] yang bermakna doa ini [[mabni]] dengan dibuangnya huruf ya' di akhir; pelakunya tersirat (“Engkau”), dan [[-nā|q:1:6:1/2]], yang artinya “kami”, adalah objeknya.",
+      "why_basic": "Kata kerja perintah yang bermakna doa ini mabni, ditandai dengan dibuangnya huruf ya' di akhirnya; fa'il kata ini tersirat, yaitu “Engkau”, dan dhamir yang artinya “kami” adalah maf'ul bih baginya.",
       "ikhtilaf": [],
       "src": [["D"], ["J"]],
       "review_notes": ["al-Mujtaba QS 1:6 tidak membahas mengapa ihdinā mabni, jadi tidak dikutip untuk kata ini.", "Lampiran A mengosongkan wazan; al-Jadwal menulis 'wazan ihdina: if'ina' (افعنا), dipakai di sini persis seperti di laporan riset §2."]
@@ -327,6 +334,7 @@
       "wazn": null,
       "case": { "state": "manshub", "sign": "[[fathah]]" },
       "why": "Akhirnya [[fathah]] karena menjadi [[badal]] (pengganti) dari [[aṣ-ṣirāṭa|q:1:6:2]] di ayat 6 yang [[manshub]].",
+      "why_basic": "Akhirnya fathah karena menjadi pengganti bagi kata yang artinya “jalan” di ayat keenam, yang manshub; pengganti mengikuti akhiran kata yang digantikannya.",
       "ikhtilaf": [
         {
           "point": "Kedudukan [[ṣirāṭa|q:1:7:1]] di ayat 7",
@@ -345,6 +353,7 @@
       "wazn": null,
       "case": { "state": "mabni", "sign": "[[fathah]]", "mahall": "mahall jarr" },
       "why": "[[Isim maushul]] ini [[mabni]] (bentuknya tetap) dan berkedudukan [[jar]] sebagai [[mudhaf ilaih]] dari [[ṣirāṭa|q:1:7:1]].",
+      "why_basic": "Isim maushul ini mabni, bentuknya tetap; kedudukannya majrur, karena kata pertama disandarkan kepadanya: ia mudhaf ilaih.",
       "ikhtilaf": [],
       "src": [["D"], ["J"]]
     },
@@ -377,6 +386,7 @@
       "wazn": null,
       "case": { "state": "majrur", "sign": "[[kasrah]]" },
       "why": "Akhirnya [[kasrah]] karena menjadi [[badal]] dari [[allażīna|q:1:7:2]] yang berkedudukan [[jar]] (sebagian ulama menjadikannya [[sifat]]).",
+      "why_basic": "Akhirnya kasrah karena menjadi pengganti bagi kata kedua, yang kedudukannya majrur; sebagian ulama menjadikannya sifat.",
       "ikhtilaf": [
         {
           "point": "Kedudukan [[gairi|q:1:7:5]]",

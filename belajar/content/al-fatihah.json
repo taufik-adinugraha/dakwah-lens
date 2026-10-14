@@ -368,6 +368,38 @@
           }
         ],
         "status": "draft",
+        "items": [
+          {
+            "words": [
+              1
+            ],
+            "say": "Kata pertama diawali huruf jar yang artinya “dengan”, sehingga isim sesudahnya, yang artinya “nama”, menjadi majrur. Gabungan seperti ini disebut jar-majrur."
+          },
+          {
+            "words": [
+              1,
+              2
+            ],
+            "say": "Kata yang artinya “nama” itu disandarkan kepada kata kedua, sehingga maknanya “nama Allah”. Susunan sandaran ini kita pelajari di ayat keempat."
+          },
+          {
+            "words": [
+              2,
+              3,
+              4
+            ],
+            "say": "Kata ketiga dan kata keempat adalah dua sifat bagi kata kedua, dan keduanya mengikuti akhirannya, yaitu kasrah. Ini kita pelajari di ayat ketiga."
+          },
+          {
+            "words": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "say": "Seluruh ayat ini adalah satu keterangan, dan kata yang diterangkannya tidak diucapkan. Para ulama memperkirakannya, misalnya kata kerja yang artinya “aku memulai”, sehingga maknanya “aku memulai dengan nama Allah”."
+          }
+        ],
         "marked": {
           "type": "[[jumlah|jumlah]] [[ibtida'iyyah|ibtidaiyyah]] (kalimat pembuka) dengan bagian yang tersirat",
           "summary": "Yang terucap hanya keterangan [[bismi|q:1:1:1]] (“dengan nama”), yaitu [[huruf jar|huruf-jar]] [[bi-|q:1:1:1/1]] (“dengan”) beserta kata yang dijarkannya, yang disandarkan ([[idhafah|idhafah]]) kepada [[Allāhi|q:1:1:2]] lalu diikuti dua sifat ([[na't|naat]]), [[ar-raḥmāni|q:1:1:3]] dan [[ar-raḥīmi|q:1:1:4]]; kata tempat bergantungnya keterangan ini tidak diucapkan. Ulama memberi dua perkiraan yang oleh Darwisy dinilai sama-sama baik: kata kerja seperti abtadi’u (“aku memulai”; pendapat ulama Kufah), sehingga menjadi kalimat kata kerja ([[jumlah fi'liyyah|jumlah-filiyyah]]), atau ibtidā’ī (“permulaanku”; pendapat ulama Bashrah), sehingga menjadi kalimat nominal ([[jumlah ismiyyah|jumlah-ismiyyah]]).",
@@ -557,6 +589,7 @@
             }
           ],
           "status": "draft",
+          "why_basic": "Akhirnya kasrah karena didahului huruf jar yang artinya “bagi”. Keterangan ini bergantung pada kata yang tidak diucapkan, yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”.",
           "marked": {
             "why": "Akhirnya [[kasrah|kasrah]] karena didahului [[huruf jar|huruf-jar]] [[li-|q:1:2:2/1]]; [[jar-majrur|jar-majrur]] ini bergantung pada [[khabar|khabar]] yang tidak disebut (misalnya “tetap”).",
             "role": "[[khabar|khabar]] ([[jar-majrur|jar-majrur]])",
@@ -731,6 +764,7 @@
             }
           ],
           "status": "draft",
+          "why_basic": "Majrur dengan tanda ya', karena kata ketiga disandarkan kepadanya dan kata ini diperlakukan seperti jamak mudzakkar salim.",
           "marked": {
             "why": "[[Majrur|majrur]] dengan tanda [[ya'|q:1:2:4#6]] karena menjadi [[mudhaf ilaih|mudhaf-ilaih]] dan termasuk kata yang disamakan ([[mulhaq|mulhaq]]) dengan [[jamak mudzakkar salim|jamak-mudzakkar-salim]].",
             "role": "[[mudhaf ilaih|mudhaf-ilaih]]",
@@ -854,6 +888,35 @@
           }
         ],
         "status": "draft",
+        "items": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "say": "Ini jumlah ismiyyah: kata pertama adalah mubtada', yaitu pokok kalimat, dan kata kedua adalah khabar, yaitu berita tentangnya."
+          },
+          {
+            "words": [
+              2
+            ],
+            "say": "Khabar di sini berupa huruf jar beserta isim yang majrur. Keterangan seperti ini bergantung pada kata yang tidak diucapkan; para ulama memperkirakannya, misalnya kata yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”."
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "say": "Kata ketiga adalah sifat bagi nama Allah pada kata kedua, sehingga ikut majrur; sebagian ulama menyebutnya pengganti. Sifat seperti ini kita pelajari di ayat ketiga."
+          },
+          {
+            "words": [
+              3,
+              4
+            ],
+            "say": "Kata ketiga disandarkan kepada kata keempat, sehingga maknanya “Tuhan seluruh alam”, dan kata keempat menjadi majrur. Susunan sandaran ini kita pelajari di ayat keempat."
+          }
+        ],
         "marked": {
           "type": "[[jumlah ismiyyah|jumlah-ismiyyah]]",
           "summary": "Kalimat nominal: [[al-ḥamdu|q:1:2:1]] adalah pokok kalimat ([[mubtada'|mubtada]]), dan [[lillāhi|q:1:2:2]] menerangkannya ([[khabar|khabar]]); [[jar-majrur|jar-majrur]] ini bergantung pada kata yang tidak diucapkan, misalnya “tetap”. Kata [[rabbi|q:1:2:3]] mengikuti lafaz Allah sebagai sifat ([[na't|naat]]) atau pengganti ([[badal|badal]]), lalu disandarkan kepada [[al-‘ālamīna|q:1:2:4]], yang menjadi [[mudhaf ilaih|mudhaf-ilaih]] (kata yang disandari).",
@@ -1078,6 +1141,22 @@
           }
         ],
         "status": "draft",
+        "items": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "say": "Ayat ini bukan kalimat baru: kedua katanya adalah na't, yaitu dua sifat lagi bagi nama Allah di ayat kedua, maka keduanya ikut majrur, berakhir kasrah."
+          },
+          {
+            "words": [
+              1,
+              2
+            ],
+            "say": "Keduanya memakai alif lam, karena na't mengikuti kata yang disifatinya juga dalam tertentu atau tidaknya, dan nama Allah sudah ma'rifah."
+          }
+        ],
         "marked": {
           "type": "lanjutan jumlah ayat 2 ([[na't|naat]])",
           "summary": "Ayat ini bukan kalimat baru: [[ar-raḥmāni|q:1:3:1]] dan [[ar-raḥīmi|q:1:3:2]] adalah dua [[sifat|naat]] lagi bagi lafaz Allah di ayat 2, maka keduanya ikut [[majrur|majrur]] (berakhiran [[kasrah|kasrah]]). Al-Jadwal dan as-Samin juga membolehkan keduanya dibaca sebagai [[badal|badal]].",
@@ -1362,6 +1441,29 @@
           }
         ],
         "status": "draft",
+        "items": [
+          {
+            "words": [
+              1
+            ],
+            "say": "Ayat ini masih melanjutkan ayat kedua: kata pertama adalah na't berikutnya bagi nama Allah."
+          },
+          {
+            "words": [
+              1,
+              2,
+              3
+            ],
+            "say": "Lalu kata pertama disandarkan kepada kata kedua, dan kata kedua disandarkan kepada kata ketiga. Inilah rangkaian idhafah tiga kata, yang artinya “Pemilik hari pembalasan”."
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "say": "Kata kedua dan kata ketiga sama-sama mudhaf ilaih, maka keduanya majrur. Dengan ini kita mengenal tiga sebab sebuah isim menjadi majrur: didahului huruf jar, menjadi mudhaf ilaih, dan mengikuti kata yang majrur, seperti na't."
+          }
+        ],
         "marked": {
           "type": "lanjutan jumlah ayat 2 ([[na't|naat]] + rangkaian [[idhafah|idhafah]])",
           "summary": "Ayat ini masih melanjutkan ayat 2: [[māliki|q:1:4:1]] adalah [[sifat|naat]] berikutnya bagi lafaz Allah (Darwisy menyebutnya [[sifat|naat]] keempat), lalu ia disandarkan kepada [[yaumi|q:1:4:2]], dan [[yaumi|q:1:4:2]] disandarkan kepada [[ad-dīni|q:1:4:3]]. Inilah rangkaian [[idhafah|idhafah]] tiga kata: [[yaumi|q:1:4:2]] dan [[ad-dīni|q:1:4:3]] sama-sama [[mudhaf ilaih|mudhaf-ilaih]], maka keduanya berakhiran [[kasrah|kasrah]].",
@@ -1438,6 +1540,7 @@
             }
           ],
           "status": "draft",
+          "why_basic": "Dhamir ini mabni: akhirnya tetap fathah. Ia menjadi objek yang didahulukan, sehingga bermakna “hanya kepada-Mu”.",
           "marked": {
             "why": "Kata ganti ini [[mabni|mabni]] di atas [[fathah|fathah]] (akhirnya tetap) dan berkedudukan [[nashab|nashab]] sebagai objek yang didahulukan, sehingga bermakna “hanya kepada-Mu”.",
             "role": "[[maf'ul bih|maful-bih]] (didahulukan)",
@@ -1508,6 +1611,7 @@
             }
           ],
           "status": "draft",
+          "why_basic": "Akhirnya dhammah karena fi'il mudhari' ini tidak didahului kata yang mengubah akhirnya; pelakunya tersirat, yaitu “kami”.",
           "marked": {
             "why": "Akhirnya [[dhammah|dhammah]] karena [[fi'il mudhari'|fiil-mudhari]] ini tidak didahului huruf [[penashab|nashib]] atau [[penjazm|jazim]]; pelakunya tersirat, yaitu “kami”.",
             "role": "[[fi'il mudhari'|fiil-mudhari]] ([[fa'il|fail]] tersimpan: “kami”)",
@@ -1575,6 +1679,7 @@
             }
           ],
           "status": "draft",
+          "why_basic": "Huruf wawu menyambungkan, dan dhamir yang sama diulang sebagai objek yang didahulukan bagi kata keempat; dhamir ini mabni, akhirnya tetap fathah.",
           "marked": {
             "why": "[[Wawu|q:1:5:3#1]] adalah [[huruf 'athaf|huruf-athaf]], dan [[iyyāka|q:1:5:3/2]] ([[mabni|mabni]] di atas [[fathah|fathah]], berkedudukan [[nashab|nashab]]) diulang sebagai objek yang didahulukan bagi [[nasta‘īnu|q:1:5:4]] agar makna “hanya” melekat pada kedua perbuatan.",
             "role": "[[huruf 'athaf|huruf-athaf]] + [[maf'ul bih|maful-bih]] (didahulukan)",
@@ -1649,6 +1754,7 @@
             }
           ],
           "status": "draft",
+          "why_basic": "Akhirnya dhammah dengan alasan yang sama seperti kata kedua: fi'il mudhari' yang tidak didahului kata yang mengubah akhirnya.",
           "marked": {
             "why": "Akhirnya [[dhammah|dhammah]] dengan alasan yang sama seperti [[na‘budu|q:1:5:2]]: [[fi'il mudhari'|fiil-mudhari]] tanpa huruf [[penashab|nashib]] atau [[penjazm|jazim]].",
             "role": "[[fi'il mudhari'|fiil-mudhari]] ([[fa'il|fail]] tersimpan: “kami”)",
@@ -1771,6 +1877,31 @@
           }
         ],
         "status": "draft",
+        "items": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "say": "Ayat ini terdiri dari dua kalimat. Pada kalimat pertama, objeknya, yaitu dhamir pada kata pertama, diletakkan sebelum kata kerjanya, sehingga maknanya menjadi “hanya kepada-Mu”."
+          },
+          {
+            "words": [
+              3,
+              4
+            ],
+            "say": "Kalimat kedua memakai pola yang sama: dhamir pada kata ketiga didahulukan sebelum kata kerjanya, yaitu kata keempat."
+          },
+          {
+            "words": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "say": "Kedua kalimat itu disambung dengan huruf wawu, yang artinya “dan”. Pelaku kedua kata kerja itu tidak tertulis, yaitu “kami”."
+          }
+        ],
         "marked": {
           "type": "dua [[jumlah fi'liyyah|jumlah-filiyyah]] (yang kedua di-'athaf-kan)",
           "summary": "Dua kalimat kata kerja yang disambung dengan [[wa|q:1:5:3/1]] ([['athaf|athaf]], penyambungan): pada masing-masing, objek ([[maf'ul bih|maful-bih]]) [[iyyāka|q:1:5:1]] didahulukan sebelum kata kerjanya, [[na‘budu|q:1:5:2]] dan [[nasta‘īnu|q:1:5:4]], sehingga maknanya “hanya kepada-Mu”. Pelaku ([[fa'il|fail]]) kedua kata kerja itu tidak tertulis, yaitu “kami”.",
@@ -1811,6 +1942,7 @@
           "concepts": [
             "dhamir",
             "fiil-amr",
+            "jumlah-filiyyah",
             "maful-bih"
           ],
           "role": "fi'il amr (doa) + maf'ul bih pertama (-nā); fa'il tersimpan: “Engkau”",
@@ -1843,6 +1975,7 @@
             }
           ],
           "status": "draft",
+          "why_basic": "Kata kerja perintah yang bermakna doa ini mabni, ditandai dengan dibuangnya huruf ya' di akhirnya; fa'il kata ini tersirat, yaitu “Engkau”, dan dhamir yang artinya “kami” adalah maf'ul bih baginya.",
           "marked": {
             "why": "[[Fi'il amr|fiil-amr]] yang bermakna doa ini [[mabni|mabni]] dengan dibuangnya huruf ya' di akhir; pelakunya tersirat (“Engkau”), dan [[-nā|q:1:6:1/2]], yang artinya “kami”, adalah objeknya.",
             "role": "[[fi'il amr|fiil-amr]] (doa) + [[maf'ul bih|maful-bih]] pertama ([[-nā|q:1:6:1/2]]); [[fa'il|fail]] tersimpan: “Engkau”",
@@ -2077,6 +2210,28 @@
           }
         ],
         "status": "draft",
+        "items": [
+          {
+            "words": [
+              1
+            ],
+            "say": "Ini jumlah fi'liyyah: intinya kata kerja perintah pada kata pertama, yang di sini bermakna doa. Fa'il kata kerja ini tidak tertulis, yaitu “Engkau”."
+          },
+          {
+            "words": [
+              1,
+              2
+            ],
+            "say": "Kata kerja ini mempunyai dua maf'ul bih: yang pertama dhamir yang artinya “kami” pada kata pertama, dan yang kedua adalah kata kedua, yang artinya “jalan”."
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "say": "Kata ketiga adalah na't bagi kata kedua, maka ikut manshub, berakhir fathah."
+          }
+        ],
         "marked": {
           "type": "[[jumlah fi'liyyah|jumlah-filiyyah]] (doa)",
           "summary": "Kalimat kata kerja berupa kata perintah ([[fi'il amr|fiil-amr]]) yang di sini bermakna doa: [[ihdinā|q:1:6:1]] memuat pelaku yang tidak tertulis, “Engkau”, dan objek pertama [[-nā|q:1:6:1/2]] (“kami”), lalu [[aṣ-ṣirāṭa|q:1:6:2]] menjadi objek kedua. Kata [[al-mustaqīma|q:1:6:3]] adalah sifat bagi [[aṣ-ṣirāṭa|q:1:6:2]], maka ikut [[manshub|manshub]] (berakhiran [[fathah|fathah]]).",
@@ -2164,6 +2319,7 @@
             }
           ],
           "status": "draft",
+          "why_basic": "Akhirnya fathah karena menjadi pengganti bagi kata yang artinya “jalan” di ayat keenam, yang manshub; pengganti mengikuti akhiran kata yang digantikannya.",
           "marked": {
             "why": "Akhirnya [[fathah|fathah]] karena menjadi [[badal|badal]] (pengganti) dari [[aṣ-ṣirāṭa|q:1:6:2]] di ayat 6 yang [[manshub|manshub]].",
             "role": "[[badal|badal]]",
@@ -2225,6 +2381,7 @@
             }
           ],
           "status": "draft",
+          "why_basic": "Isim maushul ini mabni, bentuknya tetap; kedudukannya majrur, karena kata pertama disandarkan kepadanya: ia mudhaf ilaih.",
           "marked": {
             "why": "[[Isim maushul|isim-maushul]] ini [[mabni|mabni]] (bentuknya tetap) dan berkedudukan [[jar|jar]] sebagai [[mudhaf ilaih|mudhaf-ilaih]] dari [[ṣirāṭa|q:1:7:1]].",
             "role": "[[isim maushul|isim-maushul]] ([[mudhaf ilaih|mudhaf-ilaih]])",
@@ -2429,6 +2586,7 @@
             }
           ],
           "status": "draft",
+          "why_basic": "Akhirnya kasrah karena menjadi pengganti bagi kata kedua, yang kedudukannya majrur; sebagian ulama menjadikannya sifat.",
           "marked": {
             "why": "Akhirnya [[kasrah|kasrah]] karena menjadi [[badal|badal]] dari [[allażīna|q:1:7:2]] yang berkedudukan [[jar|jar]] (sebagian ulama menjadikannya [[sifat|naat]]).",
             "role": "[[badal|badal]]",
@@ -2860,6 +3018,47 @@
           }
         ],
         "status": "draft",
+        "items": [
+          {
+            "words": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "say": "Ayat ini melanjutkan ayat keenam: empat kata pertamanya menjadi pengganti yang menjelaskan kata yang artinya “jalan” di ayat keenam."
+          },
+          {
+            "words": [
+              1,
+              2
+            ],
+            "say": "Kata pertama disandarkan kepada kata kedua: ini idhafah, yang artinya “jalan orang-orang yang”."
+          },
+          {
+            "words": [
+              2,
+              3,
+              4
+            ],
+            "say": "Kata kedua adalah isim maushul, dan dua kata sesudahnya adalah shilah baginya, yaitu kalimat yang menjelaskannya, yang artinya “yang telah Engkau beri nikmat”."
+          },
+          {
+            "words": [
+              5,
+              6,
+              7
+            ],
+            "say": "Tiga kata berikutnya menjadi pengganti bagi kata kedua; sebagian ulama menjadikannya sifat. Di dalamnya, kata ketujuh menempati posisi pelaku bagi kata keenam, yang bermakna dikenai perbuatan."
+          },
+          {
+            "words": [
+              8,
+              9
+            ],
+            "say": "Kata terakhir disambungkan dengan huruf wawu: ini 'athaf. Huruf yang artinya “bukan” sesudah huruf wawu itu menegaskan makna “bukan” yang sudah ada pada kata kelima."
+          }
+        ],
         "marked": {
           "type": "lanjutan jumlah ayat 6 ([[badal|badal]]), memuat [[jumlah|jumlah]] [[shilah|shilah]]",
           "summary": "Kata [[ṣirāṭa|q:1:7:1]] adalah pengganti ([[badal|badal]]) yang menjelaskan [[aṣ-ṣirāṭa|q:1:6:2]] di ayat 6; ia disandarkan kepada [[allażīna|q:1:7:2]], kata sambung “yang” ([[isim maushul|isim-maushul]]) yang diterangkan oleh anak kalimat ([[shilah|shilah]]) [[an‘amta ‘alaihim|q:1:7:3-4]]. Berikutnya [[gairi al-magḍūbi ‘alaihim|q:1:7:5-7]] menjadi [[badal|badal]] dari [[allażīna|q:1:7:2]] (sebagian ulama menjadikannya [[sifat|naat]]), dengan [[‘alaihim|q:1:7:7]] sebagai pengganti pelaku ([[na'ib fa'il|naib-fail]]) bagi [[al-magḍūbi|q:1:7:6]], lalu [[aḍ-ḍāllīna|q:1:7:9]] disambung dengan [[wa lā|q:1:7:8]], dan [[lā|q:1:7:8/2]] di situ menegaskan makna “bukan”.",
@@ -5134,9 +5333,9 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
-    "authored_words": "authored/al-fatihah.words.json sha256:192760f3b4e86c18a0843b1c3ec8a04c0043d891b208fd671df9518a859f4afa",
-    "authored_structure": "authored/al-fatihah.structure.json sha256:7d24d7b529f20127dbf1b2f929180698fa3de5dcb57c701e87619090c4387dc9",
-    "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:656c8d94d0a68b81de3ab3c32608db99f9481e8e1b382c7c838bae61b636f960",
+    "authored_words": "authored/al-fatihah.words.json sha256:7483cc2d5ccafa8265d9354456b36c1db39b3bdc4696b9518a194800d5c02f7f",
+    "authored_structure": "authored/al-fatihah.structure.json sha256:22cafd59cb62f2af6aa87cd0c6174e3d71ae4739c4afb5424853081b3859d849",
+    "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:f39f21abd48c0257e9c4733933ca744d46c0ecc36bd42499a14a7415436c47ee",
     "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:1181789ee65c1b2e800270475f1c6264576a0062f8d75290ee2f99af9d2adc5f",
     "pipeline": "belajar/pipeline/build_fatihah.py + facts.py (stdlib only, no LLM)"
   }

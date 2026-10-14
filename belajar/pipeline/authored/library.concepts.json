@@ -864,7 +864,7 @@
     "id": "jamak-mudzakkar-salim",
     "kind": "nahwu",
     "title": "[[Jamak mudzakkar salim]] (jamak -ūna/-īna)",
-    "summary": "Jamak laki-laki beraturan dibentuk dengan menambah -ūna ketika [[rafa']] atau -īna ketika [[nashab]] dan [[jar]] pada bentuk tunggalnya.",
+    "summary": "Jamak laki-laki beraturan dibentuk dengan menambah -ūna pada bentuk tunggalnya ketika [[marfu']], dan -īna pada keadaan lainnya.",
     "explanation": [
       "Dalam [[jamak mudzakkar salim]], yang artinya “jamak laki-laki yang utuh”, bentuk tunggalnya tidak berubah, hanya diberi akhiran. Menurut Ibnu Ajurrum, tanda [[rafa'-nya|rafa]] wawu, dan tanda [[nashab]] serta [[jar-nya|jar]] ya'. Jadi bunyinya -ūna ketika [[rafa']] dan -īna ketika [[nashab]] atau [[jar]].",
       "[[Aḍ-ḍāllīna|q:1:7:9]] (ayat 7), yang artinya “orang-orang yang sesat”, adalah [[jamak mudzakkar salim]]. Ia disambung dengan wa, yang artinya “dan”, kepada kata yang [[majrur]], maka ia pun [[majrur]] dengan tanda [[ya'|q:1:7:9#6]] (Darwisy; al-Jadwal).",
@@ -1460,7 +1460,7 @@
     "id": "fiil-mudhari",
     "kind": "nahwu",
     "title": "[[Fi'il mudhari']] (kata kerja sekarang dan akan datang)",
-    "summary": "[[Fi'il mudhari']] adalah kata kerja untuk sekarang atau yang akan datang; ia diawali salah satu dari empat huruf (hamzah, nun, ya', ta') dan [[marfu']] selama tidak didahului [[huruf]] [[penashab]] atau [[penjazm]].",
+    "summary": "[[Fi'il mudhari']] adalah kata kerja untuk sekarang atau yang akan datang; ia diawali salah satu dari empat huruf (hamzah, nun, ya', ta') dan [[marfu']] selama tidak didahului kata yang mengubah akhirnya.",
     "explanation": [
       "[[Mudhari']] menunjuk perbuatan yang sedang atau akan terjadi (Ahmad Zaini Dahlan). Ibnu Ajurrum memberi cirinya: diawali salah satu dari empat huruf tambahan yang terkumpul dalam kata [[anaitu]], yaitu hamzah, nun, ya', dan ta'.",
       "Setiap huruf awal itu menunjuk pelakunya: hamzah untuk “aku”, nun untuk “kami” (atau orang yang berbicara dengan mengagungkan diri), ya' untuk “dia” laki-laki, dan ta' untuk “engkau” atau “dia” perempuan (Ahmad Zaini Dahlan). [[Na‘budu|q:1:5:2]] dan [[nasta‘īnu|q:1:5:4]] diawali [[nun|q:1:5:2#1]], jadi pelakunya “kami”; [[a‘ūżu|q:113:1:2]] (113:1, 114:1) diawali [[hamzah|q:113:1:2#1]], jadi pelakunya “aku”, dan [[yuwaswisu|q:114:5:2]] (114:5) diawali [[ya'|q:114:5:2#1]], jadi pelakunya “ia” (Darwisy).",
@@ -1585,6 +1585,10 @@
       {
         "loc": "1:5:2",
         "note": "[[na‘budu|q:1:5:2]]: [[fi'il]] + [[fa'il]] tersirat “kami”."
+      },
+      {
+        "loc": "1:6:1",
+        "note": "[[ihdinā|q:1:6:1]]: [[fi'il]] + [[fa'il]] tersirat “Engkau”."
       },
       {
         "loc": "1:7:3",

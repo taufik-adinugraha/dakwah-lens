@@ -51,7 +51,47 @@ const WaznQ = z.object({
   options: z.array(z.string().min(2)).min(2),
 });
 
+/** The three kinds of word, by their term ids (authored/library.terms.json): the warm-up's answers. */
+export const WordKind = z.enum(["isim", "fiil", "huruf"]);
+export type WordKind = z.infer<typeof WordKind>;
+
+/**
+ * A question of the WARM-UP that opens an ayah's lesson (operator 2026-10-13: "in every ayat we
+ * identify first each words fall into which category: ismu, fi'il or harf. it's kind of exercise,
+ * kind of warming up"; pipeline/quiz.py "the warm-up"). Derived, never authored. `ask` says what
+ * kind of question it is — "kind" today: which of the three kinds is this part of a word? A later
+ * kind (decision 8 of the basic curriculum: questions on earlier topics met again in the ayah)
+ * is one more member of this union, numbered on in the same exercise.
+ */
+const KindQ = z.object({
+  n: N,
+  ask: z.literal("kind"),
+  /** The word of the ayah (1-based) … */
+  word: N,
+  /** … and which of its parts (1-based; a word of one part: 1 of 1). A compound word is its QAC
+   *  segments, the article counted with the part it stands on ("dengan" + "nama": two). */
+  part: N,
+  of: N,
+  /** The part as the mushaf writes it: the lesson content's own bytes (the word, or its QAC
+   *  segments), never typed. The parts of a word, joined, are the word. */
+  ar: z.string().min(1),
+  /** The answer: from the part's QAC tag, agreeing with the word's `pos`. */
+  kind: WordKind,
+  /** The visible signs its explanation gives (an isim only, and only what an earlier lesson
+   *  taught): "jar" — the part before it is a huruf jar; "al" — it carries alif lam. */
+  signs: z.array(z.enum(["jar", "al"])),
+  /** false: the explanation says the kind and stops, without the kind's plain meaning — an isim
+   *  that is no noun, proper noun or adjective (a pronoun, a relative …: the Kalimah record's
+   *  gloss does not cover it), and the Name of Allah (pipeline/quiz.py `glossed`). */
+  gloss: z.literal(false).optional(),
+  /** The one sentence shown after the answer, which the narrator says too. */
+  why: z.string().min(1),
+});
+export const WarmupQuestion = z.discriminatedUnion("ask", [KindQ]);
+export type WarmupQuestion = z.infer<typeof WarmupQuestion>;
+
 export const QuizExercise = z.discriminatedUnion("key", [
+  z.object({ key: z.literal("word-kind"), questions: z.array(WarmupQuestion).min(1) }),
   z.object({ key: z.literal("tap-word"), questions: z.array(TapQ).min(1) }),
   z.object({ key: z.literal("why-harakat"), questions: z.array(WhyQ).min(1) }),
   z.object({
@@ -75,6 +115,9 @@ export const QuizFile = z.object({
   states: z.record(z.string(), z.string().min(1)),
   /** Each wazan form label the quiz shows, with its Arabic: "fi'il mudhari' (فِعْل مُضَارِع)". */
   labels: z.record(z.string(), z.string().min(1)),
+  /** The warm-up's three answers as its buttons show them, "isim (اِسْم)"; empty for a surah
+   *  without a lesson map (it has no warm-up). */
+  kinds: z.record(z.string(), z.string().min(1)),
   ayat: z.array(z.object({ ayah: N, exercises: z.array(QuizExercise) })),
 });
 export type QuizFile = z.infer<typeof QuizFile>;
@@ -84,4 +127,5 @@ export type QuizAyah = {
   exercises: QuizExercise[];
   states: Record<string, string>;
   labels: Record<string, string>;
+  kinds: Record<string, string>;
 };

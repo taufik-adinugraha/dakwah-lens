@@ -36,6 +36,17 @@ export const quranHref = () => `/${QURAN}`;
 export const surahHref = (slug: string) => `/${QURAN}/${slug}`;
 
 /**
+ * The path segment of LESSON ZERO under the track — "Pengantar", the curriculum's lesson with no
+ * ayah that opens the course (harakat and the three kinds of word; kurikulum-dasar.md decision
+ * 1). No surah has this slug (SURAH_SLUGS), so the static route wins over /quran/[surah] and
+ * the proxy's surah gate lets it through: it is published whenever the track is.
+ */
+export const INTRO_SEGMENT = "pengantar";
+
+/** Lesson zero: /quran/pengantar. */
+export const introHref = () => `/${QURAN}/${INTRO_SEGMENT}`;
+
+/**
  * One ayah's lesson; with `wordLoc` ("1:2:3"), straight to that word's card
  * ("#w-1-2-3", the id WordCard renders).
  */
@@ -46,6 +57,39 @@ export function ayahHref(slug: string, ayah: number, wordLoc?: string) {
 
 /** DOM id of a word card, from its loc: "1:2:3" → "w-1-2-3". */
 export const wordAnchorId = (loc: string) => `w-${loc.replaceAll(":", "-")}`;
+
+/**
+ * The basic curriculum, explained: which lesson teaches what, in teaching order
+ * (docs/belajar-plan.md L30). A static segment beside [surah], so it wins over
+ * it; no surah slug may be "kurikulum" (src/lib/routes.test.ts).
+ */
+export const curriculumHref = () => `/${QURAN}/kurikulum`;
+
+/**
+ * The page of ONE lesson of the basic curriculum (content/curriculum.json
+ * `lessons`), or null: the lesson has no page. Every link the curriculum page
+ * draws to a lesson is built here, and nowhere else.
+ *
+ * - An ayah lesson of a surah that has lesson pages (`slug`): that ayah's page.
+ * - Lesson "0", the introduction with no ayah: its own page (introHref,
+ *   /quran/pengantar; 2026-10-13). It belongs to no surah, but it is played
+ *   from the surah that hosts it, so it may be SHOWN as a link only while it
+ *   is written and that surah is published — one rule, lib/curriculum.ts
+ *   introOpen, which the track page's card and the curriculum page both ask.
+ *   The same rule is held by routes.test.ts, curriculumOutline.test.ts and
+ *   curriculum-page.test.ts, and by `reachable` in scripts/ci/surahs-smoke.mjs
+ *   (curriculumPage) and scripts/ci/screenshots.mjs (curriculumCheck).
+ * - A segment of a long ayah ("2:255/3", Ayat Kursi): no route.
+ *
+ * WHETHER a lesson may be shown as a link is not decided here (this file stays
+ * free of imports): the caller asks lib/features.ts for the published surahs
+ * (src/lib/curriculumOutline.ts).
+ */
+export function lessonHref(lesson: { id: string; slug?: string; ayah?: number; segment?: number }): string | null {
+  if (lesson.id === "0") return introHref();
+  if (!lesson.slug || lesson.ayah === undefined || lesson.segment !== undefined) return null;
+  return ayahHref(lesson.slug, lesson.ayah);
+}
 
 /** The Ilmu Waris track's segment: /belajar/{locale}/waris/… (docs/waris-plan.md §9.1). */
 const WARIS = "waris";

@@ -53,6 +53,11 @@ export function trackCard(t: Translate): CardText {
   return { eyebrow: t("module"), title: t("track"), body: t("track_body") };
 }
 
+/** The curriculum page's card (quran/kurikulum/og/route.ts): like the track's, it names no surah. */
+export function curriculumCard(t: Translate): CardText {
+  return { eyebrow: t("track"), title: t("curriculum_title"), body: t("curriculum_body") };
+}
+
 export function lessonCard(t: Translate, s: SurahContent, a: Ayah): CardText {
   return {
     eyebrow: t("track"),

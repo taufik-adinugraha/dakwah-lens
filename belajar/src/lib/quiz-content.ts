@@ -34,6 +34,24 @@ export function quizFileProblems(q: File, surah: Pick<SurahContent, "slug" | "ay
       ex.questions.forEach((qq, i) => {
         if (qq.n !== i + 1) out.push(`${where}: question ${i + 1} is numbered ${qq.n}`);
       });
+      if (ex.key === "word-kind") {
+        // The warm-up: every part of every word of the ayah, once, in order; a word's parts,
+        // joined, are the word as the lesson writes it (its bytes, never typed).
+        const asked = ex.questions.map((qq) => `${qq.word}/${qq.part}`);
+        const parts = new Map<number, typeof ex.questions>();
+        for (const qq of ex.questions) parts.set(qq.word, [...(parts.get(qq.word) ?? []), qq]);
+        const want = ayah.words.flatMap((_, i) => (parts.get(i + 1) ?? []).map((_qq, k) => `${i + 1}/${k + 1}`));
+        if (JSON.stringify(asked) !== JSON.stringify(want) || parts.size !== ayah.words.length) {
+          out.push(`${where}: asks ${JSON.stringify(asked)}; every part of each of the ${ayah.words.length} words is asked once, in order`);
+        }
+        for (const [n, qs] of parts) {
+          const w = ayah.words[n - 1];
+          if (!w) out.push(`${where}: word ${n} is not a word of the ayah`);
+          else if (qs.some((qq) => qq.of !== qs.length) || qs.map((qq) => qq.ar).join("") !== w.ar) out.push(`${where}: the ${qs.length} part(s) of word ${n} are not the word ${w.loc} as the lesson writes it`);
+        }
+        for (const qq of ex.questions) if (!q.kinds[qq.kind]) out.push(`${where} q${qq.n}: no label for the kind ${qq.kind}`);
+        continue;
+      }
       if (ex.key === "wazn-factory") {
         for (const qq of ex.questions) {
           const forms = new Set((lexeme(qq.lexeme)?.tashrif?.forms ?? []).map((f) => f.label));
@@ -103,5 +121,6 @@ export function quizAyah(slug: string, ayah: number): QuizAyah {
     exercises: q?.ayat.find((a) => a.ayah === ayah)?.exercises ?? [],
     states: q?.states ?? {},
     labels: q?.labels ?? {},
+    kinds: q?.kinds ?? {},
   };
 }

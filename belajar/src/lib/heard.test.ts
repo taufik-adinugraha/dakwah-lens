@@ -82,10 +82,10 @@ describe("the waqf note is decided from the data: `last` and the word's ending",
     expect(hasWaqfNote({ last: true }, `${WORD_AR["112:3:3"]} ${WORD_AR["112:3:4"]}`)).toBe(false); // … yūlad
   });
 
-  it("47 of the 200 concept example rows are an ayah's last word, on 21 concept pages; 43 carry the note", () => {
+  it("47 of the 201 concept example rows are an ayah's last word, on 21 concept pages; 43 carry the note", () => {
     const rows = LIBRARY.concepts.flatMap((c) => c.examples.map((e) => ({ id: c.id, loc: e.loc })));
     const last = rows.filter((r) => LIBRARY.clips[r.loc]?.last);
-    expect(rows).toHaveLength(200);
+    expect(rows).toHaveLength(201); // 200 until ihdinā (1:6:1) joined jumlah fi'liyyah, 2026-10-13
     expect(last.map((r) => r.loc).every(isLast)).toBe(true);
     expect(rows.filter((r) => isLast(r.loc))).toHaveLength(last.length);
     expect(last).toHaveLength(47);

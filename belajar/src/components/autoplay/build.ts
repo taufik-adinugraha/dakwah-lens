@@ -18,10 +18,11 @@
  * their drawing (stageExamples: the content's bytes, by beat id).
  */
 import type { Ayah, SurahContent } from "@/content/schema";
-import { availableExercises, buildAutoplaySequence, lessonExamples, questionNumbers, type AutoplaySequence, type ExampleGap, type LessonExample } from "@/lib/autoplay";
+import { availableExercises, buildAutoplaySequence, lessonExamples, questionNumbers, zeroAyah, type AutoplaySequence, type ExampleGap, type LessonExample } from "@/lib/autoplay";
 import { composeFor, composeInput } from "@/lib/compose-content";
 import { SURAHS } from "@/lib/content";
-import { conceptsIntroducedIn, LIBRARY } from "@/lib/library";
+import { taughtAt, taughtInZero } from "@/lib/curriculum";
+import { LIBRARY } from "@/lib/library";
 import { lessonMapInput } from "@/lib/map-content";
 import { quizAyah } from "@/lib/quiz-content";
 
@@ -39,7 +40,7 @@ const WORDS = new Map(SURAHS.flatMap((x) => x.ayat.flatMap((y) => y.words.map((w
 export function lessonExamplesFor(s: SurahContent, a: Ayah): { examples: LessonExample[]; gaps: ExampleGap[] } {
   return lessonExamples({
     ayah: a,
-    introduced: conceptsIntroducedIn(a.loc),
+    introduced: taughtAt(a),
     compose: composeFor(s.slug),
     clips: LIBRARY.clips,
     wordAt: (loc) => WORDS.get(loc),
@@ -53,7 +54,7 @@ export function stageSequence(s: SurahContent, a: Ayah, locale: string): Autopla
     surahName: s.name_id,
     ayahCount: s.ayat.length,
     ayah: a,
-    introduced: conceptsIntroducedIn(a.loc),
+    introduced: taughtAt(a),
     // The ayah's quiz (content/quiz): the exercises the page renders, so the lesson only ever
     // waits at an exercise that appears, and each question's explanation line.
     exercises: availableExercises(quiz),
@@ -66,9 +67,49 @@ export function stageSequence(s: SurahContent, a: Ayah, locale: string): Autopla
     // the words' Indonesian explanations.
     compose: composeInput(s.slug, a),
     examples: lessonExamplesFor(s, a).examples,
-    // The lesson map (operator 2026-10-13, plan L23): in a surah that has one (content/map), what
-    // the ayah brings is said after the imam's recitation and what it taught before the recap; on
-    // every locale — the card lists the concepts, the caption follows the narration when there is one.
+    // The lesson map (operator 2026-10-13, plan L23 and L26): in a surah that has one (content/map),
+    // what the ayah brings is said after the imam's recitation, one step per group of its card, and
+    // what it taught before the recap; on every locale — the card lists the steps, the caption
+    // follows the narration when there is one.
     map: lessonMapInput(s.slug, a.ayah),
+  });
+}
+
+/**
+ * LESSON ZERO (the basic curriculum's lesson with no ayah, src/lib/autoplay/zero.ts), for the
+ * surah that hosts it (src/lib/curriculum.ts ZERO_HOST): the example beats of the steps it
+ * teaches — the kalimah record's first examples, each the imam's clip of its own ayah (there is
+ * no ayah here whose own recording could give them) …
+ */
+export function zeroExamplesFor(s: SurahContent): { examples: LessonExample[]; gaps: ExampleGap[] } {
+  return lessonExamples({
+    ayah: zeroAyah(s.surah),
+    zero: true,
+    introduced: taughtInZero(),
+    compose: composeFor(s.slug),
+    clips: LIBRARY.clips,
+    wordAt: (loc) => WORDS.get(loc),
+  });
+}
+
+/** … and its autoplay sequence, as its page builds it: its opening line, the harakat primer, the
+ *  "Konsep baru" line of the three kinds of word with those examples, and the hand-over to the
+ *  surah's first ayah. No recitation of an ayah, no exercise, no lesson map. */
+export function zeroSequence(s: SurahContent, locale: string): AutoplaySequence {
+  const zero = zeroAyah(s.surah);
+  return buildAutoplaySequence({
+    slug: s.slug,
+    surahName: s.name_id,
+    ayahCount: s.ayat.length,
+    ayah: zero,
+    zero: true,
+    introduced: taughtInZero(),
+    exercises: [],
+    texts: autoplayTexts(locale),
+    narration: locale === NARRATION_LOCALE ? narrationFor(s.slug) : null,
+    shared: locale === NARRATION_LOCALE ? SHARED_NARRATION : null,
+    compose: composeInput(s.slug, zero),
+    examples: zeroExamplesFor(s).examples,
+    map: null,
   });
 }

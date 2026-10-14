@@ -11,6 +11,7 @@ import { SortCase } from "@/components/exercises/SortCase";
 import { TapWord } from "@/components/exercises/TapWord";
 import { WaznFactory } from "@/components/exercises/WaznFactory";
 import { WhyHarakat } from "@/components/exercises/WhyHarakat";
+import { WordKind } from "@/components/exercises/WordKind";
 import { ForestGlow } from "@/components/ForestGlow";
 import { MainSiteBridge } from "@/components/MainSiteBridge";
 import { ShareButton } from "@/components/ShareButton";
@@ -18,6 +19,7 @@ import { LessonStage, WordListenButton } from "@/components/lesson/LessonStage";
 import { MaterialsDisclosure } from "@/components/lesson/MaterialsDisclosure";
 import { WordCard } from "@/components/lesson/WordCard";
 import { ConceptCard } from "@/components/library/ConceptCard";
+import { StepCard } from "@/components/library/StepCard";
 import { MixedText } from "@/components/library/MixedText";
 import { SourceList } from "@/components/library/SourceList";
 import { StructureSection } from "@/components/library/StructureSection";
@@ -27,12 +29,13 @@ import { Link } from "@/i18n/navigation";
 import { surahNamesFor } from "@/lib/ayat";
 import { composeFor } from "@/lib/compose-content";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
-import { stageExamples } from "@/lib/autoplay";
-import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY, TERMS } from "@/lib/library";
+import { primerAyah, stageExamples } from "@/lib/autoplay";
+import { taughtAt, taughtBefore, ZERO_HOST } from "@/lib/curriculum";
+import { getConcept, getLexeme, LIBRARY, TERMS } from "@/lib/library";
 import { lessonMapInput } from "@/lib/map-content";
 import { quizAyah } from "@/lib/quiz-content";
 import { planOf } from "@/lib/quiz-plan";
-import { ayahHref, surahHref } from "@/lib/routes";
+import { ayahHref, introHref, surahHref } from "@/lib/routes";
 import { lessonCard, translationExcerpt } from "@/lib/og/text";
 import { alternatesFor, lessonShareable, pageUrl, shareMetadata } from "@/lib/share";
 import { headwordOf, lessonLookup } from "@/lib/terms";
@@ -128,6 +131,7 @@ export default async function AyahPage({
   const tp = await getTranslations("Player");
   const tm = await getTranslations("MainSite");
   const tshare = await getTranslations("Share");
+  const ti = await getTranslations("Intro");
 
   const playerWords = a.words.map((w, i) => ({
     index: i + 1,
@@ -148,6 +152,7 @@ export default async function AyahPage({
   // 2026-10-10: "make sure all questions in quiz already have lesson beforehand"). The stage and
   // the standalone copies below ask the same questions.
   const quiz = quizAyah(s.slug, a.ayah);
+  const kindPlan = planOf(quiz, "word-kind");
   const tapPlan = planOf(quiz, "tap-word");
   const whyPlan = planOf(quiz, "why-harakat");
   const sortPlan = planOf(quiz, "sort-case");
@@ -160,7 +165,9 @@ export default async function AyahPage({
   // move under /quran so saved progress survives it.
   const key = `${s.slug}/${a.ayah}`;
   const pageTitle = `${s.name_id} · ${t("ayah", { n: a.ayah })}`;
-  const introduced = conceptsIntroducedIn(a.loc);
+  // What this ayah's lesson teaches as "Konsep baru": the curriculum's steps (operator-approved
+  // 2026-10-13, plan L26; at most three), each a whole Konsep record or a step's own text.
+  const introduced = taughtAt(a);
   // The autoplay lesson of this ayah (src/lib/autoplay), built here at build
   // time: captions in the page's locale, narration audio from
   // content/narration/ when it has been rendered.
@@ -176,7 +183,9 @@ export default async function AyahPage({
   const compose = composeFile
     ? {
         marks: composeFile.marks,
-        primer: composeFile.primer && composeFile.primer.ayah === a.ayah ? composeFile.primer : null,
+        // The primer opens the lesson of its own ayah — unless it is lesson zero's (Al-Fatihah's
+        // is, since 2026-10-13: /quran/pengantar plays it, and ayah 1 no longer does).
+        primer: composeFile.primer && primerAyah(composeFile.primer) === a.ayah ? composeFile.primer : null,
         words: Object.fromEntries(
           a.words.flatMap((w, i) => (composeFile.words[w.loc] ? [[i + 1, composeFile.words[w.loc]]] : [])),
         ),
@@ -210,15 +219,21 @@ export default async function AyahPage({
     sources: tw("sources"),
   };
   const hasDeeper = !!a.structure || introduced.length > 0 || !!a.tafsir || facts.length > 0;
-  // The lesson map of this ayah (operator 2026-10-13, plan L23), for a surah that has one: the
-  // stage's two cards, and on a word card the mark under a concept an earlier ayah already taught.
+  // The lesson map of this ayah (operator 2026-10-13, plan L23 and L26), for a surah that has one:
+  // the stage's cards. With it, a word card marks a concept an EARLIER lesson of the curriculum
+  // taught, under its chip: "sudah dipelajari di ayat 1" — for a record that arrives in parts
+  // (i'rab), the part this word shows (its state). Text only; nothing for a next-level record.
+  // A step of LESSON ZERO (the three kinds of word) says "sudah dipelajari di Pengantar", and
+  // links that lesson (main session 2026-10-13) — in the surah that hosts it only: this page is
+  // prerendered and cannot ask which surahs are published (lib/curriculum.ts introOpen), but a
+  // visitor reading the host surah's page has that surah published, so the one rule holds.
   const lessonMap = lessonMapInput(s.slug, a.ayah);
-  const taughtBefore = Object.fromEntries(
-    (lessonMap?.review ?? []).map((it) => [
-      it.id,
-      it.surah === s.surah ? tw("concept_taught", { n: it.ayah }) : tw("concept_taught_surah", { surah: it.surah, ayah: it.ayah }),
-    ]),
-  );
+  const taughtNote = (w: (typeof a.words)[number], record: string): { text: string; href: string | null } | null => {
+    const at = lessonMap ? taughtBefore(a, w, record) : null;
+    if (!at) return null;
+    if (at.zero) return { text: tw("concept_taught_intro"), href: ZERO_HOST?.slug === s.slug ? introHref() : null };
+    return { text: at.surah === s.surah ? tw("concept_taught", { n: at.ayah }) : tw("concept_taught_surah", { surah: at.surah, ayah: at.ayah }), href: null };
+  };
 
   // Through MixedText (line breaks, operator 2026-10-10): the quotes and a
   // footnote mark stay on their word ("pembalasan.[1]”"), "orang-orang" and
@@ -252,6 +267,16 @@ export default async function AyahPage({
         <h1 className="mt-2 text-balance font-display text-3xl font-medium">
           <MixedText text={`${s.name_id} · ${t("ayah_of", { n: a.ayah, total: s.ayat.length })}`} />
         </h1>
+        {/* One quiet line for someone who lands on the first ayah first (2026-10-13): the harakat
+            primer is lesson zero's now, so this lesson starts with two things already learnt. */}
+        {ZERO_HOST?.slug === s.slug && a.ayah === s.ayat[0].ayah && (
+          <p data-intro-hint className="mt-1 text-base text-ink-muted">
+            {ti("ayah1_question")}{" "}
+            <Link href={introHref()} className="link-text font-medium">
+              {ti("ayah1_link")}
+            </Link>
+          </p>
+        )}
 
         {/* 2. The stage: ayah, translation and the autoplay lesson — one
             player. Keyed by ayah: the next ayah (reached by the lesson's own
@@ -271,8 +296,9 @@ export default async function AyahPage({
             compose={compose && (compose.primer || Object.keys(compose.words).length) ? compose : null}
             examples={examples}
             marks={composeFile?.marks ?? null}
-            // The lesson map's card (operator 2026-10-13, plan L23): what this ayah brings and what
-            // it taught, for a surah that has a map (content/map); the sequence above has its steps.
+            // The lesson map's card (operator 2026-10-13, plan L23 and L26): what this ayah brings,
+            // one group at a time, and what it taught, for a surah that has a map (content/map);
+            // the sequence above has its steps.
             lessonMap={lessonMap}
           />
         </div>
@@ -300,7 +326,8 @@ export default async function AyahPage({
                       lexeme={w.lemma_id ? getLexeme(w.lemma_id) : undefined}
                       concepts={w.concepts.flatMap((id) => {
                         const c = getConcept(id);
-                        return c ? [{ id: c.id, title: c.title, head: conceptHead[c.id], taught: taughtBefore[c.id] ?? null }] : [];
+                        const note = c ? taughtNote(w, c.id) : null;
+                        return c ? [{ id: c.id, title: c.title, head: conceptHead[c.id], taught: note?.text ?? null, taughtHref: note?.href ?? null }] : [];
                       })}
                       lookup={lookup}
                       listen={
@@ -345,6 +372,7 @@ export default async function AyahPage({
                 </h2>
                 <p className="mt-1 max-w-prose text-base text-ink-muted">{t("practice_intro")}</p>
               </div>
+              {kindPlan && <WordKind id={`${key}/kind`} words={a.words} questions={kindPlan.questions} kinds={quiz.kinds} />}
               {tapPlan && <TapWord id={`${key}/tap`} words={playerWords} questions={tapPlan.questions} source={source} />}
               {whyPlan && <WhyHarakat id={`${key}/why`} words={a.words} questions={whyPlan.questions} states={quiz.states} />}
               {sortPlan && (
@@ -385,16 +413,16 @@ export default async function AyahPage({
                     >
                       <div className="@container">
                         <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
-                          {introduced.map((c) => (
-                            <ConceptCard
-                              key={c.id}
-                              concept={c}
-                              labels={conceptLabels}
-                              surahs={SURAH_INDEX}
-                              wordAr={wordAr}
-                              compact
-                            />
-                          ))}
+                          {introduced.map((it) => {
+                            // A whole Konsep record: its own card. A step with its own text (a
+                            // part of a record, or no record): the same card from that text.
+                            const record = it.whole && it.concept ? getConcept(it.concept) : undefined;
+                            return record ? (
+                              <ConceptCard key={it.id} concept={record} labels={conceptLabels} surahs={SURAH_INDEX} wordAr={wordAr} compact />
+                            ) : (
+                              <StepCard key={it.id} taught={it} labels={{ more: tc("more"), sources: tw("sources") }} />
+                            );
+                          })}
                         </div>
                       </div>
                     </Deeper>

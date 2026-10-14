@@ -315,3 +315,33 @@ def mp3_duration_ms(b: bytes) -> dict:
         raise ValueError("no MPEG Layer III frames found")
     return {"duration_ms": round(samples * 1000 / sr_seen), "frames": frames, "sample_rate": sr_seen,
             "unsynced_bytes": skipped}
+
+
+# ------------------------------------------------------------------ Indonesian numbers
+_UNITS = ["nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan",
+          "sepuluh", "sebelas"]
+
+
+def num_id(n: int) -> str:
+    """Cardinal number in Indonesian words (0 – 999 999)."""
+    if n < 0 or n >= 1_000_000:
+        raise ValueError(f"number out of range: {n}")
+    if n < 12:
+        return _UNITS[n]
+    if n < 20:
+        return f"{_UNITS[n - 10]} belas"
+    if n < 100:
+        t, u = divmod(n, 10)
+        return f"{_UNITS[t]} puluh" + (f" {_UNITS[u]}" if u else "")
+    if n < 1000:
+        h, r = divmod(n, 100)
+        head = "seratus" if h == 1 else f"{_UNITS[h]} ratus"
+        return head + (f" {num_id(r)}" if r else "")
+    th, r = divmod(n, 1000)
+    head = "seribu" if th == 1 else f"{num_id(th)} ribu"
+    return head + (f" {num_id(r)}" if r else "")
+
+
+def ordinal(n: int) -> str:
+    """pertama, kedua, …, kesebelas, kedua belas."""
+    return "pertama" if n == 1 else f"ke{num_id(n)}"

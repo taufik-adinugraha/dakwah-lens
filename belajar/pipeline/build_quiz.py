@@ -29,14 +29,18 @@ def load_lessons() -> dict[str, dict]:
 
 
 def build_all(lessons: dict[str, dict], library: dict, terms: Q.Terms,
-              authored: dict[str, dict | None] | None = None) -> dict[str, dict]:
-    """slug → content/quiz/<slug>.json. `authored`: the plans by slug (default: from disk)."""
+              authored: dict[str, dict | None] | None = None, *, curriculum: dict | None = None,
+              mapped: set[str] | None = None) -> dict[str, dict]:
+    """slug → content/quiz/<slug>.json. `authored`: the plans by slug (default: from disk);
+    `curriculum`: content/curriculum.json and `mapped`: the surahs whose lesson map is switched
+    on (both default: from disk) — for the warm-up that opens their ayat."""
     out = {}
     for sp in SURAHS:
         if sp.slug not in lessons:
             continue
         plan = (authored or {}).get(sp.slug) if authored is not None else Q.load_authored(sp.slug)
-        out[sp.slug] = Q.build(lessons[sp.slug], library, terms, plan)
+        out[sp.slug] = Q.build(lessons[sp.slug], library, terms, plan, curriculum=curriculum,
+                               mapped=None if mapped is None else sp.slug in mapped)
     return out
 
 
@@ -62,7 +66,7 @@ def main() -> int:
         return 0
     failed = False
     for slug, content in built.items():
-        errs = Q.plan_problems(content, lessons[slug], library, terms, None)
+        errs = Q.plan_problems(content, lessons[slug], library, terms, None)  # the warm-up included
         if errs:
             print(f"{slug}: BUILD FAILED:\n  " + "\n  ".join(errs), file=sys.stderr)
             failed = True

@@ -60,13 +60,8 @@ export function libraryHasDrafts(): boolean {
   );
 }
 
-/** Concepts whose FIRST example is in this ayah: introduced here. */
-export function conceptsIntroducedIn(ayahLoc: string): Concept[] {
-  return LIBRARY.concepts.filter((c) => {
-    const first = c.examples[0]?.loc;
-    return first ? first.split(":").slice(0, 2).join(":") === ayahLoc : false;
-  });
-}
+// Where a Konsep is TAUGHT is the curriculum's (src/lib/curriculum.ts taughtAt; operator-approved
+// 2026-10-13, plan L26). Until then: conceptsIntroducedIn here, the ayah of its first example.
 
 /** "1:2:1" → { surah: 1, ayah: 2, word: 1 } */
 export function parseLoc(loc: string) {

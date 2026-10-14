@@ -18,16 +18,22 @@
  *
  * Narration lines are keyed by the step-id contract shared by every part of
  * the autoplay build (and by pipeline/build_narration.py + validate_narration.py):
- *   "${slug}:${ayah}:${part}"   part ∈ intro | recite | map | primer:${k} | w${n} |
- *                                      w${n}:compose:${k} | structure |
- *                                      concept:${conceptId} |
+ *   "${slug}:${ayah}:${part}"   part ∈ intro | recite | map:new | map:learnt |
+ *                                      map:later | primer:${k} | w${n} |
+ *                                      w${n}:compose:${k} | structure | structure:${k} |
+ *                                      concept:${id} |
  *                                      ex:${exerciseKey}:intro |
  *                                      ex:${exerciseKey}:${n}:why |
  *                                      learned | recap | next | done
- *   (map / learned: the lesson map's two lines, only in a surah that has one —
- *    what this ayah brings, said right after the imam's recitation, and what
- *    it taught, said right before the recap; operator 2026-10-13, plan L23,
- *    content/map/${slug}.json, lessonMap.ts;
+ *   (map:* / learned: the lesson map's lines, only in a surah that has one —
+ *    what this ayah brings, said right after the imam's recitation, one line
+ *    per group of its card (what is new; what has been learnt so far and comes
+ *    up again; what is taught later and how many next-level topics), and what
+ *    it taught, said right before the recap; operator 2026-10-13, plan L23 and
+ *    L26, content/map/${slug}.json, lessonMap.ts;
+ *    concept:${id}: a "Konsep baru" line of a step the curriculum teaches in
+ *    this ayah's lesson — a Konsep record's id (a whole record) or the id of a
+ *    step with its own text; content/curriculum.json, curriculum.ts;
  *    primer:${k}: the k-th line of the harakat primer that opens an ayah;
  *    w${n}:compose:${k}: the k-th line of word n's composition — both play
  *    over an animation frame, the manifest's `frame`; operator 2026-10-10,
@@ -69,10 +75,20 @@ export type { Pace };
 
 // ───────────────────────────── Exercises ─────────────────────────────
 
-/** The five exercises, in the order the lesson page renders them. Mirrors
- *  EXERCISE_KEYS in components/exercises/guide.ts (parity-tested). */
-export const EXERCISE_KEYS = ["tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory"] as const;
+/** The exercises, in the order the lesson page renders them: the warm-up that opens a lesson,
+ *  then the five that follow its explanations. Mirrors EXERCISE_KEYS in
+ *  components/exercises/guide.ts (parity-tested) and pipeline/quiz.py. */
+export const EXERCISE_KEYS = ["word-kind", "tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory"] as const;
 export type ExerciseKey = (typeof EXERCISE_KEYS)[number];
+
+/**
+ * The exercises a lesson asks BEFORE its words, right after what the ayah brings (the lesson
+ * map's steps): the warm-up "isim, fi'il, or huruf?" (operator 2026-10-13: "i think it's better
+ * in every ayat we identify first each words fall into which category: ismu, fi'il or harf. it's
+ * kind of exercise, kind of warming up"). Every other exercise follows the structure. Mirrors
+ * pipeline/quiz.py OPENING_EXERCISES.
+ */
+export const OPENING_EXERCISES: readonly ExerciseKey[] = ["word-kind"];
 
 /** The control inside an exercise the learner should use next. Mirrors
  *  GUIDE_PARTS in components/exercises/guide.ts (parity-tested). */
@@ -83,6 +99,7 @@ export type GuidePart = (typeof GUIDE_PARTS)[number];
  *  them (the first is where a fresh exercise starts). Mirrors
  *  EXERCISE_GUIDE_PARTS in components/exercises/guide.ts (parity-tested). */
 export const PARTS_OF: Readonly<Record<ExerciseKey, readonly GuidePart[]>> = {
+  "word-kind": ["options", "reveal", "next"],
   "tap-word": ["play", "options", "reveal", "next"],
   "why-harakat": ["options", "reveal", "next"],
   "sort-case": ["words", "bins", "reveal"],
@@ -288,8 +305,10 @@ export type ExampleBeat = {
 export type StepKind =
   | "intro"
   | "recite_ayah"
-  /** The lesson map's opening (plan L23): what this ayah brings — the concepts that are new, the
-   *  ones repeated from earlier ayat, the ones present but taught later — with its card. */
+  /** The lesson map's opening (plan L23, L26): what this ayah brings, ONE step per group of its
+   *  card, in step with the narrator — "map:new" (what is new), "map:learnt" (what has been learnt
+   *  so far, and what of it comes up again here), "map:later" (what is taught later, and the
+   *  next-level topics). */
   | "map"
   /** The harakat primer (fathah a, kasrah i, dhammah u, …) opening an ayah. */
   | "primer"
@@ -305,7 +324,7 @@ export type StepKind =
   /** The example(s) of the concept just introduced: no narration line, the imam only. */
   | "example"
   | "exercise"
-  /** The lesson map's closing (plan L23): the new concepts this ayah taught, with its card. */
+  /** The lesson map's closing (plan L23, L26): what this ayah taught, and the running total. */
   | "learned"
   | "recap"
   | "next"
@@ -360,6 +379,10 @@ export type AutoplayStep = {
   exercise?: ExerciseSpec;
   /** The step's example beats, each after the cue it names (operator 2026-10-12, plan L20). */
   examples?: ExampleBeat[];
+  /** A structure step that tells ONE item of the ayah's structure (operator 2026-10-13: "can we
+   *  make this kind of explanation in items"): which item of how many, and the words (1-based)
+   *  it is about — what its line lights and the stage shows. */
+  item?: { n: number; of: number; words: number[] };
 };
 
 /** Where the learner goes when the ayah's sequence ends. */
@@ -399,6 +422,8 @@ export type AutoplayTexts = {
   /** Opens a word's explanation; the content's "why" sentence follows. */
   meaning: (a: { n: number; translit: string; gloss: string }) => string;
   structure: (summary: string) => string;
+  /** The first ITEM of a structure told item by item (the others are said as they stand). */
+  structureItems: (item: string) => string;
   /** A structure summary with no sentence free of Arabic script. */
   structureBrief: string;
   concept: (title: string, summary: string) => string;
@@ -406,14 +431,25 @@ export type AutoplayTexts = {
   conceptBrief: (title: string) => string;
   /** Per exercise: its introduction and the prompt for each control. */
   exercise: Record<ExerciseKey, { intro: string } & Partial<Record<GuidePart, string>>>;
-  /** The lesson map's opening without a narration display text (plan L23): how many concepts
-   *  are new, repeated and taught later. The card beside it names them, so the caption does not. */
-  lessonMap: (a: { new: number; review: number; later: number }) => string;
-  /** … and its closing: how many new concepts the ayah taught. */
-  learned: (a: { new: number }) => string;
+  /** The lesson map's opening without a narration display text (plan L23, L26), one caption per
+   *  group: how many steps are new; how many have been learnt so far and how many of them come
+   *  up again here; how many are taught later and how many belong to the next level. The card
+   *  beside it names them, so the caption does not. */
+  lessonMap: {
+    new: (a: { new: number }) => string;
+    learnt: (a: { learnt: number; here: number }) => string;
+    later: (a: { later: number; lanjut: number }) => string;
+  };
+  /** … and its closing: how many new steps the ayah taught and how many are learnt in all — or,
+   *  with nothing new, how many learnt steps it repeated. */
+  learned: (a: { new: number; total: number; here: number }) => string;
   recap: string;
   next: (a: { ayah: number }) => string;
   done: (a: { surah: string }) => string;
+  /** Lesson zero (the lesson with no ayah that opens the course): what it is for, and its
+   *  hand-over to the surah's first ayah. */
+  zeroIntro: (a: { surah: string }) => string;
+  zeroNext: (a: { surah: string }) => string;
   /** The caption of an example beat (shown, never spoken; operator 2026-10-12, plan L20). Plain
    *  words for adults: "klik" never "ketuk", no ALL CAPS, Latin transliteration at most. */
   example: {

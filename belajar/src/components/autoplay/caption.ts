@@ -226,10 +226,11 @@ export function karaokeParts(parts: readonly string[], words: readonly KaraokeWo
   return w === words.length ? out : null;
 }
 
-/** Is `line` a lesson-map line ("…:map", "…:learned"), whose karaoke caption goes part by part? */
+/** Is `line` a lesson-map line ("…:map:new", "…:map:learnt", "…:map:later", "…:learned"), whose
+ *  karaoke caption goes part by part? */
 const byParts = (line: string) => {
   const id = parseLineId(line);
-  return id?.kind === "ayah" && (id.part === "map" || id.part === "learned");
+  return id?.kind === "ayah" && (id.part.startsWith("map:") || id.part === "learned");
 };
 
 export function stageCaption(

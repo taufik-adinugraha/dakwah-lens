@@ -1,0 +1,142 @@
+{
+ "_comment": "TOLERATED FOR NOW: what the lessons written before the basic curriculum (authored/curriculum.json, operator-approved 2026-10-13; docs/belajar-research/kurikulum-dasar.md decision 7: 'No lesson line may use a term before the lesson that teaches it') still say too early. `lines`: narration line id -> the dictionary terms (authored/library.terms.json ids) its prose uses although their step is taught in a later lesson, or in none (tingkat lanjut). `quiz`: '<slug>:<ayah>:<exercise>:<question number>' -> the terms that question needs although the lesson has not TAUGHT them by that ayah (quiz.py, TAUGHT ⊇ REQUIRED: a term's lesson moved later — or, since the explanation shown after an answer joined REQUIRED on 2026-10-13, a term that explanation names and no line teaches: give the word a `why_basic`). Held BOTH ways by build_narration.py / validate_narration.py (lines) and validate_quiz.py (quiz): a violation that is not listed here fails, and an entry that no longer violates fails as stale ('remove it'). NEVER add an entry by hand to make a new line pass: rewrite the line. This file only shrinks — `python3 build_narration.py --write-pending` rewrites it from what the checks find (use it to drop the entries a rewrite has cleared), and it must end as {\"lines\": {}, \"quiz\": {}}.",
+ "lines": {
+  "al-ikhlas:1:structure": [
+   "maqul-al-qaul"
+  ],
+  "al-ikhlas:3:w2": [
+   "huruf-illah"
+  ],
+  "al-ikhlas:3:w4": [
+   "majhul",
+   "naib-fail"
+  ],
+  "al-ikhlas:3:concept:jazm-lam": [
+   "sahih"
+  ],
+  "al-ikhlas:3:ex:label-role:2:why": [
+   "huruf-illah"
+  ],
+  "al-ikhlas:3:ex:label-role:4:why": [
+   "majhul",
+   "naib-fail"
+  ],
+  "al-falaq:1:w2": [
+   "nashib",
+   "jazim"
+  ],
+  "al-falaq:1:structure": [
+   "maqul-al-qaul"
+  ],
+  "al-falaq:1:ex:why-harakat:2:why": [
+   "nashib",
+   "jazim"
+  ],
+  "al-falaq:1:ex:sort-case:2:why": [
+   "nashib",
+   "jazim"
+  ],
+  "al-falaq:1:ex:label-role:2:why": [
+   "nashib",
+   "jazim"
+  ],
+  "al-falaq:2:structure": [
+   "mashdariyyah"
+  ],
+  "al-falaq:3:w4": [
+   "zharaf"
+  ],
+  "al-falaq:3:structure": [
+   "zharaf"
+  ],
+  "al-falaq:3:ex:why-harakat:3:why": [
+   "zharaf"
+  ],
+  "al-falaq:3:ex:sort-case:3:why": [
+   "zharaf"
+  ],
+  "al-falaq:3:ex:label-role:4:why": [
+   "zharaf"
+  ],
+  "al-falaq:4:w3": [
+   "mubalaghah",
+   "isim-fail"
+  ],
+  "al-falaq:4:structure": [
+   "mubalaghah",
+   "isim-fail"
+  ],
+  "al-falaq:4:ex:why-harakat:2:why": [
+   "mubalaghah",
+   "isim-fail"
+  ],
+  "al-falaq:4:ex:sort-case:2:why": [
+   "mubalaghah",
+   "isim-fail"
+  ],
+  "al-falaq:4:ex:label-role:3:why": [
+   "mubalaghah",
+   "isim-fail"
+  ],
+  "al-falaq:5:w3": [
+   "isim-fail"
+  ],
+  "al-falaq:5:w4": [
+   "zharaf"
+  ],
+  "al-falaq:5:ex:why-harakat:2:why": [
+   "isim-fail"
+  ],
+  "al-falaq:5:ex:why-harakat:3:why": [
+   "zharaf"
+  ],
+  "al-falaq:5:ex:sort-case:2:why": [
+   "isim-fail"
+  ],
+  "al-falaq:5:ex:sort-case:3:why": [
+   "zharaf"
+  ],
+  "al-falaq:5:ex:label-role:3:why": [
+   "isim-fail"
+  ],
+  "al-falaq:5:ex:label-role:4:why": [
+   "zharaf"
+  ],
+  "an-nas:1:w2": [
+   "nashib",
+   "jazim"
+  ],
+  "an-nas:1:structure": [
+   "maqul-al-qaul"
+  ],
+  "an-nas:1:ex:why-harakat:2:why": [
+   "nashib",
+   "jazim"
+  ],
+  "an-nas:1:ex:sort-case:2:why": [
+   "nashib",
+   "jazim"
+  ],
+  "an-nas:1:ex:label-role:2:why": [
+   "nashib",
+   "jazim"
+  ],
+  "an-nas:5:w2": [
+   "nashib",
+   "jazim"
+  ],
+  "an-nas:5:ex:why-harakat:2:why": [
+   "nashib",
+   "jazim"
+  ],
+  "an-nas:5:ex:sort-case:2:why": [
+   "nashib",
+   "jazim"
+  ],
+  "an-nas:5:ex:label-role:2:why": [
+   "nashib",
+   "jazim"
+  ]
+ },
+ "quiz": {}
+}

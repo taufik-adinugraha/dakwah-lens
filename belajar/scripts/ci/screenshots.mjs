@@ -7,7 +7,8 @@
 // Waris hidden (since 2026-10-10) and the Qur'an track on Al-Fatihah only
 // (operator, 2026-10-10: the Mu'awwidzat "segera hadir", not clickable),
 // including the 404 a hidden waris or surah URL answers, the "Segera hadir"
-// cards (checked: no link, nothing to focus) and the end of Al-Fatihah
+// cards (checked: no link, nothing to focus), the curriculum page (checked:
+// only reachable lessons are links, the others say "Belum tersedia") and the end of Al-Fatihah
 // (checked: the next surah is coming soon, nothing to click, no move).
 // `--waris`: only the Ilmu Waris pages, from a container started with
 // BELAJAR_WARIS=on. `--surahs`: the Mu'awwidzat lessons, from a container
@@ -26,9 +27,21 @@ const BASE = process.env.BASE_URL ?? "http://127.0.0.1:3300";
 // URL shape: plan L9 (hub → /quran track; Konsep/Kosakata at hub level).
 const AYAH_1 = "/belajar/id/quran/al-fatihah/1";
 const AYAH_2 = "/belajar/id/quran/al-fatihah/2";
+// LESSON ZERO, "Pengantar: harakat dan tiga jenis kata" (the basic curriculum's lesson with no ayah,
+// kurikulum-dasar.md decision 1; since 2026-10-13 the harakat primer plays there, not in Al-Fatihah
+// 1). Its path is src/lib/routes.ts introHref() (lesson-zero.test.ts checks they agree); in the
+// content its lines are the lines of "ayah 0" of Al-Fatihah.
+const INTRO = "/belajar/id/quran/pengantar";
+const ZERO_AYAH = 0;
+/** The page of an Al-Fatihah lesson: an ayah's, or lesson zero's (ayah 0). */
+const lessonPath = (ayah) => (ayah === ZERO_AYAH ? INTRO : `/belajar/id/quran/al-fatihah/${ayah}`);
+// The basic curriculum's page (plan L30; src/lib/routes.ts curriculumHref).
+const CURRICULUM = "/belajar/id/quran/kurikulum";
 const PAGES = [
   ["hub", "/belajar/id"],
   ["track", "/belajar/id/quran"],
+  ["pengantar", INTRO],
+  ["kurikulum", CURRICULUM],
   ["surah", "/belajar/id/quran/al-fatihah"],
   ["ayah-2", AYAH_2],
   ["ayah-7", "/belajar/id/quran/al-fatihah/7"],
@@ -46,6 +59,8 @@ const PAGES = [
 // and a lesson of two of them.
 const SURAH_PAGES = [
   ["track-semua-surah", "/belajar/id/quran"],
+  // The curriculum page with the Mu'awwidzat lessons as links.
+  ["kurikulum-semua-surah", CURRICULUM],
   ["ikhlas-1", "/belajar/id/quran/al-ikhlas/1"],
   ["nas-6", "/belajar/id/quran/an-nas/6"],
 ];
@@ -100,7 +115,7 @@ async function settleScroll(page) {
 
 /**
  * "Berikutnya ›" until the lesson is on step `id` — the stage's data-step (LessonStage: "intro",
- * "primer", "w1:recite", "w1", "w1:compose", …): a step is reached by what it is, never by a count
+ * "primer" (lesson zero), "w1:recite", "w1", "w1:compose", …): a step is reached by what it is, never by a count
  * of clicks (the harakat primer and the composition steps, 2026-10-10, moved every step after them
  * and the karaoke check landed on a composition line). The lesson is paused first ("Jeda"), so it
  * cannot move on by itself between a look and a click (a step that ends on its own just then would
@@ -503,6 +518,7 @@ async function ogShots(request) {
   const { writeFile } = await import("node:fs/promises");
   for (const [name, path] of [
     ["og-hub-id", "/belajar/id/og"],
+    ["og-kurikulum-id", `${CURRICULUM}/og`],
     ["og-al-fatihah-1-id", "/belajar/id/quran/al-fatihah/1/og"],
   ]) {
     const res = await request.get(BASE + path);
@@ -745,6 +761,86 @@ async function comingSoonCheck(page, vp) {
   }
   if (problems.length) throw new Error(`${vp}: track page — ${problems.join("; ")}`);
   console.log(`  ${vp}: "Segera hadir" cards ok (${slugs.join(", ")}: plain elements, nothing to focus)`);
+  await page.goto("about:blank");
+}
+
+/**
+ * The curriculum page as a browser draws it (operator, 2026-10-13: "we should also explain this
+ * curriculum in the page"; plan L30), against content/curriculum.json: every lesson of the file
+ * is listed once, in its order; a lesson visitors can reach — a written ayah of a published surah
+ * (`surahsOn`: every surah with lesson pages; else all but HIDDEN_SURAHS) — has ONE link into the
+ * track, to that ayah — and so has the introduction (lesson "0"), to INTRO, while it is written
+ * and the surah that hosts it (Al-Fatihah, never hidden in these runs) is published; every other
+ * lesson (a hidden surah's, Ayat Kursi's segments) has no link into the track
+ * and shows the words "Belum tersedia" (messages/id.json, never typed here) in a label that is
+ * VISIBLE and has nothing to click or focus. As production shows it, no link on the page leads
+ * into a hidden surah. And at the largest text size nothing makes the page scroll sideways (the
+ * line breaks themselves are linebreaks.mjs's); on the phone that size is shot too. Fails the job
+ * otherwise.
+ */
+async function curriculumCheck(page, vp, surahsOn) {
+  const file = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "curriculum.json"), "utf8"));
+  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8"));
+  const mark = msgs.Curriculum?.unavailable;
+  if (!mark) throw new Error("messages/id.json has no Curriculum.unavailable");
+  const slugOf = Object.fromEntries(file.units.map((u) => [u.id, u.slug ?? null]));
+  // Lesson zero's host: the surah whose harakat primer is played there (src/lib/curriculum.ts ZERO_HOST).
+  const zeroHost = (await Promise.all(Object.values(slugOf).filter(Boolean).map(async (slug) => [slug, JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", `${slug}.json`), "utf8").catch(() => "null"))]))).find(([, c]) => c?.primer?.lesson === "0")?.[0] ?? null;
+  const on = (slug) => !!slug && (surahsOn || !HIDDEN_SURAHS.includes(slug));
+  const reachable = (l) => {
+    if (l.id === "0") return !!l.map && on(zeroHost);
+    return on(slugOf[l.unit]) && l.ayah !== undefined && l.segment === undefined && !!l.map;
+  };
+  await page.goto(BASE + CURRICULUM, { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+  const rows = await page.locator("main [data-lesson]").evaluateAll((els) =>
+    els.map((e) => {
+      const status = e.querySelector("[data-lesson-status]");
+      const box = status ? status.getBoundingClientRect() : null;
+      return {
+        id: e.getAttribute("data-lesson"),
+        links: [...e.querySelectorAll('a[href*="/quran/"]')].map((a) => a.getAttribute("href")),
+        status: status && box.width > 0 && box.height > 0 ? (status.textContent ?? "").trim() : null,
+        focusable: status ? status.querySelectorAll("a, button, input, select, textarea, summary, [tabindex]").length : 0,
+      };
+    }),
+  );
+  const problems = [];
+  const want = file.lessons.map((l) => l.id);
+  if (JSON.stringify(rows.map((r) => r.id)) !== JSON.stringify(want)) problems.push(`lists ${rows.length} lesson(s), not the ${want.length} of content/curriculum.json in its order`);
+  let linked = 0;
+  for (const l of file.lessons) {
+    const r = rows.find((x) => x.id === l.id);
+    if (!r) continue;
+    if (reachable(l)) {
+      const href = l.id === "0" ? INTRO : `/belajar/id/quran/${slugOf[l.unit]}/${l.ayah}`;
+      if (JSON.stringify(r.links) !== JSON.stringify([href])) problems.push(`${l.id}: links ${JSON.stringify(r.links)}, expected [${href}]`);
+      else linked++;
+      if (r.status !== null) problems.push(`${l.id}: a lesson that can be opened says "${r.status}"`);
+    } else {
+      if (r.links.length > 0) problems.push(`${l.id}: ${r.links.length} link(s) into the track from a lesson that is not available`);
+      if (r.status !== mark) problems.push(`${l.id}: no visible "${mark}" (got ${JSON.stringify(r.status)})`);
+      if (r.focusable > 0) problems.push(`${l.id}: ${r.focusable} focusable element(s) inside its "${mark}" label`);
+    }
+  }
+  if (linked === 0) problems.push("no lesson is linked");
+  if (!surahsOn) {
+    for (const slug of HIDDEN_SURAHS) {
+      const n = await page.locator(`a[href^="/belajar/id/quran/${slug}"]`).count();
+      if (n > 0) problems.push(`${n} link(s) into the hidden ${slug}`);
+    }
+  }
+  await setTextSizeAttr(page, "sangat-besar");
+  const wide = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth }));
+  if (wide.scroll > wide.inner + 1) problems.push(`scrolls sideways at the largest text size (${wide.scroll} > ${wide.inner})`);
+  if (vp === "phone") {
+    const name = surahsOn ? "kurikulum-semua-surah-sangat-besar" : "kurikulum-sangat-besar";
+    await page.screenshot({ path: `shots/${vp}-${name}.png`, fullPage: true });
+    console.log(`shot ${vp}-${name} (${CURRICULUM}, text size sangat-besar)`);
+  }
+  await setTextSizeAttr(page, null);
+  if (problems.length) throw new Error(`${vp}: curriculum page — ${problems.join("; ")}`);
+  console.log(`  ${vp}: curriculum page ok (${rows.length} lessons in the file's order, ${linked} linked, ${rows.length - linked} "${mark}" as plain text${surahsOn ? "" : ", no link into a hidden surah"})`);
   await page.goto("about:blank");
 }
 
@@ -1189,7 +1285,7 @@ const KARAOKE = { slug: "al-fatihah", step: "w1", line: "al-fatihah:1:w1" };
  * word 1 — the KARAOKE caption (the narrator's current word filled forest, words said in ink,
  * words to come muted) under the large WORD CARD (the word's Arabic · transliteration · "yang
  * artinya …"), the mushaf words numbered with word 1 marked. "Berikutnya ›" jumps whole steps up to
- * the step named "w1" on the stage (toStep: intro → the ayah → what the ayah brings → the harakat primer → the imam says
+ * the step named "w1" on the stage (toStep: intro → the ayah → what the ayah brings, a step per group → the imam says
  * word 1 → its explanation, whatever steps come between), then "↺ Ulangi langkah ini" plays the
  * explanation from its start — the replay control, and a start that holds even when the imam's
  * stream paused the lesson on the way — and the caption must be that line (data-line) with half
@@ -1886,10 +1982,11 @@ function lineFiles(lines, id) {
  * other checks), its remembered place cleared. The narration is answered in the browser
  * (narrationRoute): every request is recorded with its kind ("media": an audio element; "fetch":
  * the page's fetch() ahead) and its times; every fetch() is held back AHEAD_HOLD_MS, so that two
- * made at once would overlap; one file's fetch() is made to fail (503: the lesson map's line,
- * "al-fatihah:1:map", the step two ahead of the first since 2026-10-13, plan L23 — the harakat
- * primer came there before it); and the check holds back two of the PLAYER's own loads (a slow
- * connection for that file). navigator.wakeLock is the recorder above.
+ * made at once would overlap; one file's fetch() is made to fail (503: the lesson map's first
+ * line, "al-fatihah:1:map:new" — what is new in the ayah —, the step two ahead of the first since
+ * 2026-10-13, plan L23 and L26: the harakat primer came there before it, and until the basic
+ * curriculum the map was one step, "map"); and the check holds back two of the PLAYER's own loads
+ * (a slow connection for that file). navigator.wakeLock is the recorder above.
  *   1. A page view alone, AHEAD_IDLE_MS after load: no fetch() of narration at all, nothing but
  *      the idle warm of the first line ("shared:start", by the narration player's preload
  *      element), and no wake lock asked for.
@@ -1902,7 +1999,8 @@ function lineFiles(lines, id) {
  *      time (AHEAD_SETTLE_MS, the app's PREFETCH_SETTLE_MS).
  *   4. While the lesson is still on its first step ("intro": the opening line, then the intro
  *      line, ~36 s): the page fetches the next line of this step (the intro line), then the next
- *      step's (the ayah: "al-fatihah:1:recite"), then the step after's (the lesson map's line) —
+ *      step's (the ayah: "al-fatihah:1:recite"), then the step after's (the lesson map's first
+ *      line) —
  *      ONE AT A TIME (each fetch() starts after the previous was answered); each file once;
  *      nothing but those (never a later step's, never another ayah's); and NO audio element asks
  *      for any of them (the preload element downloads nothing the page fetches: no file twice)
@@ -1913,12 +2011,12 @@ function lineFiles(lines, id) {
  *      all — the page's fetch. The player made none: an object URL never reaches the network.
  *      No loading status either.
  *   6. A FILE THE PAGE COULD NOT FETCH PLAYS FROM THE NETWORK, AND A STALLED LINE STOPS NEW
- *      FETCHES: "Berikutnya ›" twice, to the lesson map's step, whose line's fetch() failed in 4
+ *      FETCHES: "Berikutnya ›" twice, to the lesson map's first step, whose line's fetch() failed in 4
  *      and whose own load is now held back AHEAD_STALL_MS. The player asks the network for it (never
  *      silence: its karaoke caption runs once it is answered), "Memuat suara narator…" shows
  *      meanwhile as it always did, and from that request until it was answered plus the settle
- *      time NO fetch() starts — though one is due (the step after it, the harakat primer), and
- *      comes right after.
+ *      time NO fetch() starts — though one is due (the step after it: what was learnt so far,
+ *      the map's second line), and comes right after.
  *   7. The wake lock through the lesson's life: the browser dropping it while the page is visible
  *      (held since "Mulai") → asked for again at once; "Jeda" releases it; "Lanjutkan" asks again;
  *      dropped again right after that grant → NOT asked again (no loop with a browser that drops
@@ -1957,8 +2055,10 @@ async function aheadChecks(page, vp, index) {
   const shared = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "narration", "shared.json"), "utf8")).lines ?? {};
   const lines = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "narration", "al-fatihah.json"), "utf8")).lines ?? {};
   const INTRO = "al-fatihah:1:intro";
-  // The one line of the step two ahead of the first: what the ayah brings (plan L23).
-  const MAP_1 = "al-fatihah:1:map";
+  // The one line of the step two ahead of the first: what is new in the ayah, the first of the
+  // lesson map's steps (plan L23, L26). The step is named as its line is ("map:new").
+  const MAP_1 = "al-fatihah:1:map:new";
+  const MAP_STEP = MAP_1.replace(/^al-fatihah:1:/, "");
   const startUrl = lineFiles(shared, "shared:start")[0];
   const introFiles = lineFiles(lines, INTRO);
   const reciteFiles = lineFiles(lines, "al-fatihah:1:recite");
@@ -2126,9 +2226,9 @@ async function aheadChecks(page, vp, index) {
     delays.set(map1, AHEAD_STALL_MS);
     const mark6 = timeline.length;
     await forward.click(); // the ayah ("recite")
-    await forward.click(); // what the ayah brings ("map")
-    if (!(await until(pg, async () => (await stage.getAttribute("data-step")) === "map", 5_000))) {
-      throw new Error(`${vp}: two "Berikutnya ›" from the first step did not reach the lesson map's step (on "${await stage.getAttribute("data-step")}")`);
+    await forward.click(); // what is new in the ayah ("map:new")
+    if (!(await until(pg, async () => (await stage.getAttribute("data-step")) === MAP_STEP, 5_000))) {
+      throw new Error(`${vp}: two "Berikutnya ›" from the first step did not reach the lesson map's first step ("${MAP_STEP}"; on "${await stage.getAttribute("data-step")}")`);
     }
     const stream = () => timeline.slice(mark6).find((e) => e.path === map1 && e.type === "media");
     if (!(await until(pg, () => !!stream(), 3_000))) {
@@ -2164,7 +2264,7 @@ async function aheadChecks(page, vp, index) {
     }
     const fetchesAfter = () => timeline.slice(timeline.indexOf(line) + 1).filter((e) => e.type === "fetch");
     if (!(await until(pg, () => fetchesAfter().length > 0, 10_000))) {
-      throw new Error(`${vp}: 10 s after the stalled line played, nothing more was fetched ahead — with nothing due, the wait above shows no closed gate (the step after it, the harakat primer, has narration: was it fetched before? ${timeline.slice(mark2, mark6).map((e) => short(e.path)).join(", ")})`);
+      throw new Error(`${vp}: 10 s after the stalled line played, nothing more was fetched ahead — with nothing due, the wait above shows no closed gate (the step after it, the map's second line, has narration: was it fetched before? ${timeline.slice(mark2, mark6).map((e) => short(e.path)).join(", ")})`);
     }
     const next = fetchesAfter()[0];
     if ((await status.count()) > 0) throw new Error(`${vp}: the loading status is still there while the lesson map's line plays`);
@@ -2268,7 +2368,7 @@ async function aheadChecks(page, vp, index) {
 
 /**
  * The composition animation on the stage's word-card slot (operator 2026-10-10, narration rule 14),
- * on the real page: the harakat primer (frame 2: fathah on its dotted circle, بَ "b + a"), then
+ * on the real pages: the harakat primer in lesson zero (frame 2: fathah on its dotted circle, بَ "b + a"), then
  * word 1 of Al-Fatihah 1 explained by its parts — its first frame [بِ] + [ٱسْمُ], MID-WAY through
  * the change frame (the dhammah fading into kasrah, مُ → مِ, u → i), the change settled, the
  * join (بِٱسْمِ, "bi + ismi → bismi"), and the LAST frame, the joined word exactly as the ayah
@@ -2363,7 +2463,9 @@ async function composedUnits() {
     const ayah = Number(loc.split(":")[1]);
     by.set(ayah, [...(by.get(ayah) ?? []), `word ${loc.split(":")[2]}`]);
   }
-  if (c.primer) by.set(c.primer.ayah, ["primer", ...(by.get(c.primer.ayah) ?? [])]);
+  // The primer is a unit of the lesson that plays it: its own ayah's, or lesson zero's (ayah 0).
+  const plays = c.primer?.lesson === "0" ? ZERO_AYAH : c.primer?.ayah;
+  if (c.primer) by.set(plays, ["primer", ...(by.get(plays) ?? [])]);
   return by;
 }
 
@@ -2382,7 +2484,7 @@ async function composeFitSweep(page, vp, size, ayat, units) {
     for (const ayah of ayat) {
       const want = new Set(units.get(ayah) ?? []);
       if (!want.size) continue;
-      await page.goto(BASE + `/belajar/id/quran/al-fatihah/${ayah}`, { waitUntil: "networkidle" });
+      await page.goto(BASE + lessonPath(ayah), { waitUntil: "networkidle" });
       await page.evaluate(() => document.fonts.ready);
       await page.locator('[data-autoplay="start"]').click();
       await settleScroll(page);
@@ -2476,12 +2578,13 @@ async function composeShots(page, vp, index) {
     throw new Error(`${vp}: the composition never reached ${sel}`);
   };
   try {
-    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    // The harakat primer: LESSON ZERO's, right after its opening line (it opened Al-Fatihah 1,
+    // after the imam's ayah and the lesson map, until 2026-10-13).
+    await page.goto(BASE + INTRO, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
     await page.locator('[data-autoplay="start"]').click();
     await settleScroll(page);
     const replay = page.locator('[data-autoplay="replay"]');
-    // intro → the ayah → what the ayah brings → the harakat primer (Biasa: "Berikutnya ›" jumps whole steps)
     await toStep(page, vp, "primer");
     await setPace("Tunggu saya");
     await replay.click();
@@ -2490,9 +2593,14 @@ async function composeShots(page, vp, index) {
     await page.waitForTimeout(1600);
     await assertComposeLayout(page, vp);
     await assertComposeFits(page, `${vp}: primer`);
-    await shot("autoplay-ayah1-primer");
-    // → the imam says word 1 → its gloss line → its composition
+    await shot("autoplay-pengantar-primer");
+    // Ayah 1: intro → the ayah → what the ayah brings → the imam says word 1 → its gloss line →
+    // its composition (Biasa: "Berikutnya ›" jumps whole steps)
     await setPace("Biasa");
+    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('[data-autoplay="start"]').click();
+    await settleScroll(page);
     await toStep(page, vp, "w1:compose");
     await setPace("Tunggu saya");
     await replay.click();
@@ -2617,7 +2725,8 @@ async function composeShots(page, vp, index) {
  * say), so the lines last as long as the lesson's; the reciters' host is the real CDN, only
  * OBSERVED (watchRecitations) — in step 3 one file's requests are HELD BACK (a route that waits,
  * then goes on to the CDN), nothing is answered here. Which examples: read from the content
- * (content/compose/al-fatihah.json `examples`, content/library.json concepts), never typed.
+ * (content/compose/al-fatihah.json `examples`; what the ayah teaches, in order, from
+ * content/curriculum.json — its lesson's `lines` — with content/library.json), never typed.
  *   1. THE BENTUK DASAR, IN THE BISMI COMPOSITION ("ismu (read by voice + show visual)"): reached
  *      paused (toStep "w1:compose"), the recording of its base form (QS 55:78) has NOT been asked
  *      for — a page that is only looked at, or a step that is not running, asks the reciters' host
@@ -2633,7 +2742,10 @@ async function composeShots(page, vp, index) {
  *      imam…" shows in the bottom panel; after the lesson's own limit (EXAMPLE_LOAD_LIMIT_MS, not
  *      sooner) the example is given up — data-example-state "failed", "Suara contoh ini belum
  *      bisa diputar." — and the lesson, never paused, goes on to the next frame by itself.
- *   3. A CONCEPT'S EXAMPLE: the first concept introduced at this ayah, its line played from its
+ *   3. A CONCEPT'S EXAMPLE: the first thing this ayah's lesson teaches (the curriculum's first
+ *      "Konsep baru" line of the lesson: since the basic curriculum, plan L26, a step with a text
+ *      of its own — majrur — where it was the first Konsep whose first example stood in this
+ *      ayah), its line played from its
  *      start ("↺ Ulangi" on the concept's step); when the line is through the lesson moves BY
  *      ITSELF to the example step: the example card in the word card's slot ("Contoh", the word's
  *      Arabic exactly as content/al-fatihah.json has it, its transliteration and meaning), above
@@ -2659,13 +2771,34 @@ async function exampleChecks(page, vp, index) {
   const ayah1 = lesson.ayat.find((a) => a.ayah === 1);
   const voiced = (loc) => (compose.examples?.[loc] ?? []).find((e) => e.clip);
   const [ismu, allahu] = [voiced("1:1:1"), voiced("1:1:2")];
-  const introduced = lib.concepts.filter((c) => /^1:1:\d+$/.test(c.examples?.[0]?.loc ?? ""));
-  const [concept, after] = introduced;
-  if (!ayah1 || !ismu?.washal || !allahu || !concept || !after) {
-    throw new Error(`${vp}: example check — the content has no voiced bentuk dasar for 1:1:1 (with washal) and 1:1:2, or fewer than two concepts introduced at Al-Fatihah 1`);
+  // What Al-Fatihah 1 teaches, in the order its "Konsep baru" lines are said, and the word each
+  // one's example is (src/lib/autoplay/curriculum.ts taughtIn: a Konsep taught whole shows its own
+  // example in this ayah; a step with a text of its own, or a Konsep with no example here, the
+  // first word of the ayah it occurs on).
+  const curriculum = await read("content/curriculum.json");
+  const lesson1 = curriculum.lessons.find((l) => l.unit === "al-fatihah" && l.ayah === 1);
+  const taught = (lesson1?.lines ?? []).map((l) => {
+    const step = curriculum.steps.find((s) => s.id === l.step);
+    const own = !step?.teach && step?.concept ? lib.concepts.find((c) => c.id === step.concept)?.examples?.find((e) => e.loc.startsWith(`${lesson1.id}:`)) : null;
+    return { id: l.line.replace(/^concept:/, ""), step: l.line, n: own ? Number(own.loc.split(":")[2]) : (l.words[0] ?? null) };
+  });
+  const [concept, after] = taught;
+  if (!ayah1 || !ismu?.washal || !allahu || !concept || !after || !concept.n) {
+    throw new Error(`${vp}: example check — the content has no voiced bentuk dasar for 1:1:1 (with washal) and 1:1:2, or content/curriculum.json gives Al-Fatihah 1 fewer than two “Konsep baru” lines, the first on a word of the ayah`);
   }
-  const word = ayah1.words[Number(concept.examples[0].loc.split(":")[2]) - 1];
-  const lineMs = (id) => lineFiles(lines, id).reduce((n, u) => n + (index.get(u) ?? 0), 0) || 20_000;
+  const word = ayah1.words[concept.n - 1];
+  /** How long line `id` lasts at most: its files' lengths (the manifests'); or, not rendered yet
+   *  — it is then shown caption-only at the reading pace (src/lib/lessonSteps.ts captionMs at
+   *  Biasa: 10 characters a second and 2.5 s to settle per caption part, at least 5 s a part) —
+   *  its characters at that pace plus 5 s for every part it could be cut into (a part holds 180
+   *  characters at most: one per started 100, and one more). Since the basic curriculum (plan
+   *  L26) the first thing Al-Fatihah 1 teaches is a new line, unrendered at first. */
+  const lineMs = (id) => {
+    const files = lineFiles(lines, id).reduce((n, u) => n + (index.get(u) ?? 0), 0);
+    if (files) return files;
+    const chars = String(lines[id]?.display ?? "").length;
+    return chars ? chars * 100 + (Math.ceil(chars / 100) + 1) * 5_000 : 20_000;
+  };
   const served = [];
   const handler = narrationRoute(index, served);
   await page.route(isNarration, handler);
@@ -2810,7 +2943,7 @@ async function exampleChecks(page, vp, index) {
     }
 
     // 3. A concept's line, then its example by itself, then the next concept's line.
-    const conceptStep = `concept:${concept.id}`;
+    const conceptStep = concept.step;
     const exampleId = `${conceptStep}:1`;
     await toStep(page, vp, conceptStep);
     const t3 = Date.now();
@@ -2833,7 +2966,7 @@ async function exampleChecks(page, vp, index) {
     const mine = only && !more.length ? only.url : null;
     if (!mine || !watch.requested(mine)) fail(`the example is this ayah's word, and the ayah's recording (${mine ? recordingName(mine) : "—: content/al-fatihah.json does not give ayah 1 exactly one"}) was never requested`);
     // The word on the mushaf line is marked (its ring), the card clear of the panel, the caption on screen.
-    const n = concept.examples[0].loc.split(":")[2];
+    const n = concept.n;
     const chip = (await stage.locator(`button[data-word="${n}"]`).first().getAttribute("class").catch(() => null)) ?? "";
     if (!chip.includes("ring-forest")) fail(`word ${n} on the mushaf line is not marked while it is the example (class “${chip}”)`);
     const box = async (sel) => {
@@ -2847,7 +2980,7 @@ async function exampleChecks(page, vp, index) {
     await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-example-concept.png` });
     console.log(`shot ${vp}-autoplay-ayah1-example-concept`);
     if (vp === "phone") await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-example-concept-viewport.png` });
-    const nextStep = `concept:${after.id}`;
+    const nextStep = after.step;
     if (!(await until(page, async () => (await attr("data-step")) === nextStep, 15_000 + EXAMPLE_LOAD_LIMIT_MS + EXAMPLE_FAILED_HOLD_MS))) {
       fail(`after the example of ${concept.id} the lesson did not go on to ${nextStep} by itself (step "${await attr("data-step")}", mode ${await middle.getAttribute("data-mode")})`);
     }
@@ -2878,11 +3011,12 @@ async function exampleChecks(page, vp, index) {
  * manifests say) and every request recorded:
  *   1. each option of question 1 shows its terms' Arabic (the plan's text, content/quiz);
  *   2. a WRONG pick: no narration request at all for 2.5 s, and "Belum tepat" on screen;
- *   3. the RIGHT pick: shared:correct ("Benar."), then question 1's explanation line
- *      (al-fatihah:2:ex:label-role:1:why) — requested by its URL when the manifest has its audio,
- *      else shown as the caption (caption-only until it is rendered);
- *   4. question 2: two wrong picks, then "Tunjukkan jawaban": shared:revealed ("Ini jawabannya.")
- *      and question 2's explanation, the same way.
+ *   3. question 1 (it has three options: the reveal needs two wrong picks): a second wrong pick,
+ *      then "Tunjukkan jawaban": shared:revealed ("Ini jawabannya.") and question 1's explanation
+ *      line (al-fatihah:2:ex:label-role:1:why) — requested by its URL when the manifest has its
+ *      audio, else shown as the caption (caption-only until it is rendered);
+ *   4. question 2 (two options since the quiz follows the curriculum): the RIGHT pick:
+ *      shared:correct ("Benar."), then question 2's explanation, the same way.
  * Fails the job otherwise.
  */
 async function quizVoiceCheck(page, vp, index) {
@@ -2960,27 +3094,30 @@ async function quizVoiceCheck(page, vp, index) {
     await exercise.getByText("Belum tepat", { exact: false }).first().waitFor({ state: "visible", timeout: 5_000 });
     console.log("  quiz: a wrong pick plays no narration (Belum tepat on screen)");
 
-    // 3. The right pick: Benar., then the explanation of question 1.
-    mark = served.length;
-    await option(q1.options[0].from).click();
-    const afterCorrect = await said(shared["shared:correct"], mark, "Benar. (shared:correct)");
-    await said(lesson["al-fatihah:2:ex:label-role:1:why"], afterCorrect, "question 1's explanation, after Benar.");
-    await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-quiz-ayah2-role-right.png` });
-    console.log(`shot ${vp}-quiz-ayah2-role-right`);
-
-    // 4. Question 2 (the lesson moves on by itself): two wrong picks, then Tunjukkan jawaban.
-    await exercise.getByText(`Soal 2 dari ${role.questions.length}`).waitFor({ state: "visible", timeout: 30_000 });
-    await page.waitForTimeout(800);
-    await option(q2.options[1].from).click();
+    // 3. Question 1, two wrong picks in all (one is made above), then Tunjukkan jawaban: "Ini
+    //    jawabannya." and the explanation of question 1. (The reveal needs two wrong picks, so it
+    //    is asked of the question with three options: since the quiz plan followed the
+    //    curriculum, question 2 has two, one of them wrong: 2026-10-14.)
+    if (q1.options.length < 3) throw new Error(`${vp}: label-role question 1 of Al-Fatihah 2 has ${q1.options.length} options; the reveal needs a question with three`);
+    await option(q1.options[2].from).click();
     await page.waitForTimeout(400);
-    await option(q2.options[2].from).click();
     const reveal = exercise.locator('[data-guide="exercise:label-role:reveal"]');
     await reveal.waitFor({ state: "visible", timeout: 5_000 });
     mark = served.length;
     await reveal.click();
     const afterRevealed = await said(shared["shared:revealed"], mark, "Ini jawabannya. (shared:revealed)");
-    await said(lesson["al-fatihah:2:ex:label-role:2:why"], afterRevealed, "question 2's explanation, after Ini jawabannya.");
-    console.log("  quiz: right → Benar. + its explanation; Tunjukkan jawaban → Ini jawabannya. + its explanation");
+    await said(lesson["al-fatihah:2:ex:label-role:1:why"], afterRevealed, "question 1's explanation, after Ini jawabannya.");
+
+    // 4. Question 2 (the lesson moves on by itself): the right pick, Benar. and its explanation.
+    await exercise.getByText(`Soal 2 dari ${role.questions.length}`).waitFor({ state: "visible", timeout: 30_000 });
+    await page.waitForTimeout(800);
+    mark = served.length;
+    await option(q2.options[0].from).click();
+    const afterCorrect = await said(shared["shared:correct"], mark, "Benar. (shared:correct)");
+    await said(lesson["al-fatihah:2:ex:label-role:2:why"], afterCorrect, "question 2's explanation, after Benar.");
+    await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-quiz-ayah2-role-right.png` });
+    console.log(`shot ${vp}-quiz-ayah2-role-right`);
+    console.log("  quiz: Tunjukkan jawaban → Ini jawabannya. + its explanation; right → Benar. + its explanation");
   } catch (err) {
     await page.screenshot({ path: `shots/${vp}-quiz-voice-FAILED.png`, fullPage: true }).catch(() => {});
     console.error(`✗ ${vp}: the quiz voice check on Al-Fatihah 2 failed`);
@@ -2993,40 +3130,179 @@ async function quizVoiceCheck(page, vp, index) {
 }
 
 /**
- * The lesson map's two cards (operator 2026-10-13: "at the beginning of the ayat, better to inform
+ * THE WARM-UP, "isim, fi'il, atau huruf?" (operator 2026-10-13: "i think it's better in every ayat
+ * we identify first each words fall into which category: ismu, fi'il or harf. it's kind of
+ * exercise, kind of warming up"; plan L31), on Al-Fatihah 2 — a word of one part, then a word of
+ * two (a huruf jar and the Name), its remembered place cleared, the narration answered in the
+ * browser. Everything expected is read from content/quiz/al-fatihah.json, never typed:
+ *   1. it is the exercise the lesson reaches FIRST, by "Berikutnya ›" from the start, on the step
+ *      "ex:word-kind", and no word has been explained yet (no step "w1" was passed);
+ *   2. question 1 shows its word as ONE piece, the lesson's bytes, in the thick frame
+ *      ([data-asked]), and three answers in the lessons' order, each with its Arabic term;
+ *   3. a wrong pick shows no explanation; the right pick shows the question's sentence
+ *      (content/quiz `why`), the one the narrator says;
+ *   4. the lesson goes on to the next question BY ITSELF, and a word of two parts shows both
+ *      pieces, the one asked in the frame, in the ayah's reading order;
+ *   5. "Lewati latihan" leaves it for the first word.
+ * Shot at question 1 (and the viewport on the phone). Fails the job otherwise.
+ */
+async function wordKindChecks(page, vp, index) {
+  const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
+  const quiz = await read("content/quiz/al-fatihah.json");
+  const warm = quiz.ayat.find((a) => a.ayah === 2).exercises.find((e) => e.key === "word-kind");
+  if (!warm) throw new Error("content/quiz/al-fatihah.json: ayah 2 has no warm-up (word-kind)");
+  const [q1] = warm.questions;
+  const part = warm.questions.find((q) => q.of > 1);
+  if (!part || q1.of !== 1) throw new Error("the warm-up of Al-Fatihah 2 no longer opens with a word of one part and has a word of two: pick another ayah for this check");
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const stage = page.locator('[data-autoplay="stage"]');
+  const exercise = page.locator('[data-autoplay="exercise"] [data-exercise="word-kind"]');
+  const next = page.locator('[data-autoplay="next"]');
+  const option = (kind) => exercise.locator(`[data-option="${kind}"]`);
+  /** The Latin start of a sentence, up to its first Arabic (what innerText surely holds). */
+  const head = (text) => text.split(/\s*[(\u0600-\u06FF]/u)[0].slice(0, 40);
+  const pieces = () =>
+    exercise.locator("[data-kind-piece]").evaluateAll((els) => els.map((e) => ({ part: Number(e.getAttribute("data-kind-piece")), asked: e.getAttribute("data-asked") === "true", ar: e.textContent ?? "", x: e.getBoundingClientRect().left })));
+  try {
+    await page.goto(BASE + AYAH_2, { waitUntil: "networkidle" });
+    // The earlier checks left a remembered place on this ayah ("Lanjutkan dari langkah N").
+    await page.evaluate((key) => localStorage.removeItem(key), "belajar:v1:autoplay:al-fatihah/2");
+    await page.reload({ waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('[data-autoplay="start"]').click();
+    await settleScroll(page);
+    // 1. The first exercise the lesson reaches, before any word.
+    const passed = [];
+    for (let i = 0; i < 20 && !(await exercise.isVisible()); i++) {
+      const at = await stage.getAttribute("data-step");
+      if (at && passed.at(-1) !== at) passed.push(at);
+      if (at?.startsWith("ex:") && at !== "ex:word-kind") break;
+      await next.click();
+      await page.waitForTimeout(250);
+    }
+    await exercise.waitFor({ state: "visible", timeout: 10_000 }).catch(() => {
+      throw new Error(`${vp}: the warm-up never came up from the start of Al-Fatihah 2 (passed: ${passed.join(" → ")})`);
+    });
+    if ((await stage.getAttribute("data-step")) !== "ex:word-kind") throw new Error(`${vp}: the warm-up is on the step "${await stage.getAttribute("data-step")}", not "ex:word-kind"`);
+    if (passed.some((s) => /^w\d/.test(s))) throw new Error(`${vp}: the warm-up came after a word's step (passed: ${passed.join(" → ")}); it opens the lesson`);
+    // 2. Question 1: one piece, the lesson's bytes, framed; three answers with their Arabic.
+    const first = await pieces();
+    if (JSON.stringify(first.map((p) => [p.part, p.asked, p.ar])) !== JSON.stringify([[1, true, q1.ar]])) {
+      throw new Error(`${vp}: question 1 shows ${JSON.stringify(first)}, expected the one piece ${q1.ar} in the frame`);
+    }
+    const kinds = Object.keys(quiz.kinds);
+    const shown = await exercise.locator("[data-option]").evaluateAll((els) => els.map((e) => [e.getAttribute("data-option"), e.textContent ?? ""]));
+    if (JSON.stringify(shown.map((o) => o[0])) !== JSON.stringify(kinds)) throw new Error(`${vp}: the warm-up offers ${JSON.stringify(shown.map((o) => o[0]))}, expected ${JSON.stringify(kinds)}`);
+    for (const [kind, text] of shown) {
+      const ar = /\(([^()]+)\)/.exec(quiz.kinds[kind])?.[1];
+      if (!ar || !text.includes(ar)) throw new Error(`${vp}: the answer "${kind}" does not show its Arabic term (${quiz.kinds[kind]}): “${text}”`);
+    }
+    await stage.screenshot({ path: `shots/${vp}-warm-up.png` });
+    console.log(`shot ${vp}-warm-up`);
+    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-warm-up-viewport.png` });
+    // The exercise waits once its introduction and its options prompt are through (caption-only
+    // until they are rendered: read at reading pace): answer then, as quizVoiceCheck does.
+    const caption = page.locator('[data-autoplay="caption"]');
+    for (let i = 0; i < 400 && (await caption.first().getAttribute("data-line").catch(() => null)) !== "shared:ex:word-kind:options"; i++) {
+      await page.waitForTimeout(150);
+    }
+    await page.waitForTimeout(3_000);
+    // 3. A wrong pick: no explanation. The right one: the question's sentence.
+    const wrong = kinds.find((k) => k !== q1.kind);
+    await option(wrong).click();
+    await page.waitForTimeout(600);
+    if ((await exercise.innerText()).includes(head(q1.why))) throw new Error(`${vp}: a wrong pick (${wrong}) already shows the explanation`);
+    await option(q1.kind).click();
+    if (!(await until(page, async () => (await exercise.innerText()).includes(head(q1.why)), 5_000))) {
+      throw new Error(`${vp}: the right pick (${q1.kind}) does not show the question's sentence (“${head(q1.why)}…”)`);
+    }
+    // 4. On by itself, question by question, to the word of two parts (answered right each time).
+    for (const q of warm.questions.slice(1)) {
+      const here = exercise.locator(`[data-kind-word="${q.word}"][data-kind-part="${q.part}"]`);
+      if (!(await here.waitFor({ state: "attached", timeout: 60_000 }).then(() => true, () => false))) {
+        throw new Error(`${vp}: 60 s after the answer the warm-up had not gone on to question ${q.n} (word ${q.word}, part ${q.part}) by itself`);
+      }
+      if (q.n === part.n) {
+        const both = await pieces();
+        const want = warm.questions.filter((x) => x.word === q.word).map((x) => [x.part, x.part === q.part, x.ar]);
+        if (JSON.stringify(both.map((p) => [p.part, p.asked, p.ar])) !== JSON.stringify(want)) throw new Error(`${vp}: question ${q.n} shows ${JSON.stringify(both)}, expected the pieces ${JSON.stringify(want)}`);
+        // The ayah's reading order: the first part to the RIGHT of the second.
+        if (!(both[0].x > both[1].x)) throw new Error(`${vp}: the parts of word ${q.word} are not drawn right to left (${both.map((p) => Math.round(p.x)).join(", ")})`);
+        await stage.screenshot({ path: `shots/${vp}-warm-up-part.png` });
+        console.log(`shot ${vp}-warm-up-part`);
+        break;
+      }
+      await option(q.kind).click();
+    }
+    // 5. "Lewati latihan": on to the first word.
+    await next.click();
+    if (!(await until(page, async () => /^w1(?::|$)/.test((await stage.getAttribute("data-step")) ?? ""), 8_000))) {
+      throw new Error(`${vp}: "Lewati latihan" on the warm-up led to "${await stage.getAttribute("data-step")}", not to the first word`);
+    }
+    console.log(`  warm-up: first exercise of Al-Fatihah 2 (${warm.questions.length} questions), before its first word; passed ${passed.join(" → ")}`);
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-warm-up-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the warm-up check on Al-Fatihah 2 failed`);
+    console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
+    throw err;
+  } finally {
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
+/**
+ * The lesson map's cards (operator 2026-10-13: "at the beginning of the ayat, better to inform
  * what concept we will learn in this ayat, also explain maybe we skip some concept and will visit
  * later in next ayat … so at the beginning we inform what will be learnt, in the end recap what
- * we've learnt"; "if some concept already done in previous ayat, we say we repeat what we've learnt
- * before"; docs/belajar-plan.md L23), on Al-Fatihah 1 and 2, each one's remembered place cleared,
- * the narration answered in the browser (narrationRoute). What a card must show is read from
- * content/map/al-fatihah.json and messages/id.json, never typed here. Per ayah:
+ * we've learnt"; docs/belajar-plan.md L23 — and, with the basic curriculum, L26: "so the knowledge
+ * is accummulating and repeated"; "but separate new vs already knows concept, this is what new,
+ * this is what we've learnt so far"), on Al-Fatihah 1 and 2, each one's remembered place cleared,
+ * the narration answered in the browser (narrationRoute). ONE GROUP AT A TIME, in step with the
+ * narrator: each group of the opening is a step of the lesson with a line and a card of its own.
+ * What a card must show is read from content/map/al-fatihah.json and messages/id.json, never typed
+ * here. Per ayah:
  *   1. THE OPENING comes right after the imam's ayah: from the step "recite" (reached by name,
- *      paused), one "Berikutnya ›" lands on the step "map". Its card
- *      ([data-autoplay="lesson-map"][data-map="map"]) is on the stage with exactly the map's
- *      groups, in order — "Baru di ayat ini" always, "Mengulang" and "Nanti" only when the ayah has
- *      such concepts (ayah 1: new and later; ayah 2: all three) — each under its heading, each
- *      concept in the file's order under the name the file gives, each repeated concept with the
- *      ayah that taught it ("dari ayat 1"), each postponed one with the ayah that will ("di ayat
- *      2"), and an authored later item with its note (ayah 1: marfu', "mengapa bentuk dasar
- *      berakhir dhammah"). "↺ Ulangi" plays the step: the caption is that step's line (data-line
- *      "al-fatihah:N:map") and says what the manifest shows for it.
+ *      paused), each "Berikutnya ›" lands on the next of "map:new", "map:learnt", "map:later" (a
+ *      group with nothing in it has no step: src/lib/autoplay/lessonMap.ts mapOpening), and the
+ *      one after them on a step that is no map step, the card gone. On each, ONE card
+ *      ([data-autoplay="lesson-map"][data-map=<group>]) is on the stage with exactly that group:
+ *        new     "Baru di ayat ini": the steps the ayah's lesson teaches, in the file's order,
+ *                each under the name the file gives.
+ *        learnt  "Sudah kita pelajari (N hal)", N the whole list so far: under "Kita temui lagi di
+ *                ayat ini (n):" the ones that come up again — up to MAP_HERE_FULL one per row,
+ *                each with a repeat mark, more as one flowing line of their Latin names, each
+ *                carrying its own comma —, then "Tidak ada di ayat ini (n)" for the others.
+ *        later   "Nanti": the steps a later lesson teaches, each with its ayah ("di ayat 3"; up to
+ *                MAP_LATER_FULL one per row, more as one flowing line) — and "Tingkat lanjut (N
+ *                hal)" with the line that says they are not taught at this level.
+ *      "↺ Ulangi" plays the step: the caption is that step's line (data-line
+ *      "al-fatihah:N:map:<group>") and says what the manifest shows for it.
  *   2. THE CLOSING comes right before the recap: on the step "learned" (by name) the card
- *      ([data-map="learned"]) has one group, "Sudah dipelajari", the ayah's new concepts in order,
- *      each with a tick and none with an ayah; its caption is "al-fatihah:N:learned"; and one
- *      "Berikutnya ›" from there lands on "recap".
- *   3. NOTHING STICKS OUT SIDEWAYS, on either card: the card lies within the screen's width, does
+ *      ([data-map="learned"]) has one group, "Baru saja kita pelajari", the ayah's new steps in
+ *      order, each with a tick, and the running total ("Sudah N hal kita pelajari."); its caption
+ *      is "al-fatihah:N:learned"; and one "Berikutnya ›" from there lands on "recap".
+ *   3. NOTHING STICKS OUT SIDEWAYS, on any card: the card lies within the screen's width, does
  *      not scroll sideways, and the page does not either.
- *   4. A PHONE SHOWS THE NEW CONCEPTS ONLY (the opening card; CI 2026-10-13: at 390×844 the
- *      room above the caption panel is 270px, about one group, and the card of ayat 2 put
- *      "Mengulang" and "Nanti" under the panel): below sm the repeated and the postponed groups
- *      are not drawn (they stay in the page's markup, which 1 reads), from sm up they are. The
- *      new concepts are drawn on every screen.
+ *   4. A PHONE'S SMALL ROOM (CI 2026-10-13, base branch: at 390×844 the card has about 270px above
+ *      the caption panel at the normal text size): below sm the names of the learnt steps that do
+ *      NOT come up again and the names of the next-level topics take no box (display none — their
+ *      counts stand for them), from sm up they are drawn; every other list is drawn on every
+ *      screen. And on every screen: nothing on the card is a visually hidden 1px box with text in
+ *      it (the line-break check measures such text, every word "into a 0px line"), and a count
+ *      stands on its heading's row in one piece.
  * Whether the whole card is in view above the bottom panel is MEASURED and reported, not failed: a
- * card with many new concepts can still be taller than the room a phone leaves above the caption.
- * A warning on the run's summary gives the numbers — look at the viewport shots.
+ * warning on the run's summary gives the numbers — look at the viewport shots.
  * Works rendered or not: a map line without audio yet is shown at reading pace (caption-only).
  * Shots: each card (stage; on a phone also the viewport). Fails the job on 1–4.
  */
+/** = src/lib/autoplay/lessonMap.ts MAP_HERE_FULL, MAP_LATER_FULL and MAP_ARABIC_GLOSS, the pattern
+ *  of mapLatinName (lesson-map.test.ts checks they agree). */
+const MAP_HERE_FULL = 3;
+const MAP_LATER_FULL = 2;
+const MAP_ARABIC_GLOSS = / \([^()]*[\u0600-\u06FF][^()]*\)/g;
 async function lessonMapChecks(page, vp, index) {
   const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
   const msgs = (await read("messages/id.json")).Guided;
@@ -3039,90 +3315,187 @@ async function lessonMapChecks(page, vp, index) {
   const middle = page.locator('[data-autoplay="middle"]');
   const replay = page.locator('[data-autoplay="replay"]');
   const next = page.locator('[data-autoplay="next"]');
+  const anyCard = stage.locator('[data-autoplay="lesson-map"]');
   const fail = (m) => {
     throw new Error(`${vp}: lesson map — ${m}`);
   };
   const fill = (message, values) => Object.entries(values).reduce((text, [k, v]) => text.replace(`{${k}}`, String(v)), message);
-  /** Where a repeated ("review") or postponed ("later") concept is taught, as the card says it. */
-  const whereOf = (group, id) => {
-    const c = map.concepts[id];
-    return c.surah === map.surah ? fill(msgs[`map_${group}_ayah`], { n: c.ayah }) : fill(msgs[`map_${group}_surah`], { surah: c.surah, ayah: c.ayah });
+  /** A step's name as the captions show it (the file's), and as a flowing line lists it. */
+  const nameOf = (id) => map.steps[id]?.name ?? fail(`content/map/al-fatihah.json lists the step "${id}" and does not name it`);
+  const latin = (id) => nameOf(id).replace(MAP_ARABIC_GLOSS, "");
+  /** Where a postponed step is taught, as the card says it ("di ayat 3"; with its surah when that
+   *  is another one); nothing for a lesson that is no whole ayah. */
+  const whereOf = (id) => {
+    const m = /^([1-9][0-9]{0,2}):([1-9][0-9]{0,2})$/.exec(map.steps[id]?.lesson ?? "");
+    if (!m) return null;
+    return Number(m[1]) === map.surah ? fill(msgs.map_later_ayah, { n: Number(m[2]) }) : fill(msgs.map_later_surah, { surah: Number(m[1]), ayah: Number(m[2]) });
   };
-  const item = (group, id) => {
-    const c = map.concepts[id];
-    const where = group === "review" || group === "later" ? whereOf(group, id) : null;
-    return { id, text: [c.name, where, c.note].filter(Boolean).join(" "), where, note: c.note ?? null, tick: group === "learned" };
+  const count = (n) => `(${fill(msgs.map_count, { n })})`;
+  /** A name on a row of its own, and names as one flowing line (each but the last with its comma). */
+  const row = (id, { here = null, where = null, mark = false } = {}) => ({ id, text: [nameOf(id), where].filter(Boolean).join(" "), here, where, mark });
+  const flow = (ids, { here = null, where = () => null } = {}) =>
+    ids.map((id, i) => ({ id, text: `${[latin(id), where(id)].filter(Boolean).join(" ")}${i < ids.length - 1 ? "," : ""}`, here, where: null, mark: false }));
+  const none = () => [{ id: null, text: msgs.map_none, here: null, where: null, mark: false }];
+  const group = (g) => ({ count: null, subs: [], lists: [], note: null, total: null, ...g });
+  /** The opening groups an ayah's map has, in the order their steps are played (mapOpening). */
+  const openingOf = (entry) => ["new", ...(entry.learnt.length ? ["learnt"] : []), ...(entry.later.length || entry.lanjut.length ? ["later"] : [])];
+  /** What the card of `kind` ("new" | "learnt" | "later" | "learned") must show for `entry`, on a
+   *  screen below sm (`narrow`) or not. */
+  const expected = (entry, kind, narrow) => {
+    if (kind === "new") {
+      return [group({ group: "new", heading: msgs.map_new, lists: [{ kind: "rows", drawn: true, items: entry.new.length ? entry.new.map((id) => row(id)) : none() }] })];
+    }
+    if (kind === "learnt") {
+      const here = entry.learnt.filter((x) => x.here).map((x) => x.id);
+      const rest = entry.learnt.filter((x) => !x.here).map((x) => x.id);
+      return [
+        group({
+          group: "learnt",
+          heading: msgs.map_learnt,
+          count: count(entry.learnt.length),
+          subs: [{ sub: "here", text: here.length ? fill(msgs.map_here, { n: here.length }) : msgs.map_here_none }, ...(rest.length ? [{ sub: "rest", text: fill(msgs.map_rest, { n: rest.length }) }] : [])],
+          lists: [
+            ...(here.length
+              ? [here.length <= MAP_HERE_FULL ? { kind: "rows", drawn: true, items: here.map((id) => row(id, { here: "true", mark: true })) } : { kind: "flow", drawn: true, items: flow(here, { here: "true" }) }]
+              : []),
+            ...(rest.length ? [{ kind: "flow", drawn: !narrow, items: flow(rest, { here: "false" }) }] : []),
+          ],
+        }),
+      ];
+    }
+    if (kind === "later") {
+      return [
+        ...(entry.later.length
+          ? [
+              group({
+                group: "later",
+                heading: msgs.map_later,
+                lists: [
+                  entry.later.length <= MAP_LATER_FULL
+                    ? { kind: "rows", drawn: true, items: entry.later.map((id) => row(id, { where: whereOf(id) })) }
+                    : { kind: "flow", drawn: true, items: flow(entry.later, { where: whereOf }) },
+                ],
+              }),
+            ]
+          : []),
+        ...(entry.lanjut.length
+          ? [
+              group({
+                group: "lanjut",
+                heading: msgs.map_lanjut,
+                count: count(entry.lanjut.length),
+                lists: [
+                  {
+                    kind: "names",
+                    drawn: !narrow,
+                    items: entry.lanjut.map((id) => ({
+                      id,
+                      text: map.lanjut[id]?.name ?? fail(`content/map/al-fatihah.json lists the next-level topic "${id}" and does not name it`),
+                      here: null,
+                      where: null,
+                      mark: false,
+                    })),
+                  },
+                ],
+                note: msgs.map_lanjut_note,
+              }),
+            ]
+          : []),
+      ];
+    }
+    return [
+      group({
+        group: "learned",
+        heading: msgs.map_learned,
+        lists: [{ kind: "rows", drawn: true, items: entry.new.length ? entry.new.map((id) => row(id, { mark: true })) : none() }],
+        total: fill(msgs.map_total, { n: entry.learnt.length + entry.new.length }),
+      }),
+    ];
   };
-  /** The groups a card of `entry` must show, in order. */
-  const expected = (entry, kind) =>
-    kind === "learned"
-      ? [{ group: "learned", heading: msgs.map_learned, items: entry.new.map((id) => item("learned", id)) }]
-      : [
-          { group: "new", heading: msgs.map_new, items: entry.new.map((id) => item("new", id)) },
-          ...(entry.review.length ? [{ group: "review", heading: msgs.map_review, items: entry.review.map((id) => item("review", id)) }] : []),
-          ...(entry.later.length ? [{ group: "later", heading: msgs.map_later, items: entry.later.map((id) => item("later", id)) }] : []),
-        ];
-  /** The card on the stage as the browser drew it: its groups, its box, whether anything scrolls sideways. */
+  /** The card on the stage as the browser drew it: its groups (each list with whether it takes a
+   *  box), its own box, whether anything scrolls sideways, any 1px box with text, each count
+   *  against its heading. */
   const readCard = (kind) =>
     stage.locator(`[data-autoplay="lesson-map"][data-map="${kind}"]`).first().evaluate((el) => {
       const text = (n) => (n?.textContent ?? "").replace(/\s+/g, " ").trim();
+      const one = (g, sel) => (g.querySelector(sel) ? text(g.querySelector(sel)) : null);
       const r = el.getBoundingClientRect();
       return {
         groups: [...el.querySelectorAll("[data-map-group]")].map((g) => ({
+          count: one(g, "[data-map-count]"),
+          subs: [...g.querySelectorAll("[data-map-sub]")].map((p) => ({ sub: p.getAttribute("data-map-sub"), text: text(p) })),
+          lists: [...g.querySelectorAll("ul")].map((ul) => {
+            const b = ul.getBoundingClientRect();
+            return {
+              kind: ul.hasAttribute("data-map-flow") ? "flow" : ul.hasAttribute("data-map-names") ? "names" : "rows",
+              drawn: b.width > 1 && b.height > 1,
+              items: [...ul.children].map((li) => ({
+                id: li.getAttribute("data-map-item"),
+                text: text(li),
+                here: li.getAttribute("data-map-here"),
+                where: one(li, "[data-map-where]"),
+                mark: !!li.querySelector("svg"),
+              })),
+            };
+          }),
+          note: one(g, "[data-map-note]"),
+          total: one(g, "[data-map-total]"),
           group: g.getAttribute("data-map-group"),
           heading: text(g.querySelector("h3")),
-          items: [...g.querySelectorAll("[data-map-item]")].map((li) => ({
-            id: li.getAttribute("data-map-item"),
-            text: text(li),
-            where: li.querySelector("[data-map-where]") ? text(li.querySelector("[data-map-where]")) : null,
-            note: li.querySelector("[data-map-note]") ? text(li.querySelector("[data-map-note]")) : null,
-            tick: !!li.querySelector("svg"),
-          })),
         })),
+        // A box of a pixel or two with text in it: hidden from the eye, still measured.
+        hiddenText: [...el.querySelectorAll("*")]
+          .filter((n) => {
+            const b = n.getBoundingClientRect();
+            return b.width > 0 && b.height > 0 && b.width <= 2 && b.height <= 2 && text(n) !== "";
+          })
+          .map((n) => text(n).slice(0, 40)),
+        counts: [...el.querySelectorAll("[data-map-count]")].map((c) => {
+          const [h, b] = [c.parentElement?.querySelector("h3")?.getBoundingClientRect(), c.getBoundingClientRect()];
+          return { text: text(c), onHeadingRow: !!h && b.top < h.bottom && b.bottom > h.top, pieces: c.getClientRects().length };
+        }),
         box: { left: r.left, right: r.right, top: r.top, bottom: r.bottom },
         scrollsSideways: el.scrollWidth > el.clientWidth + 1,
         pageScrollsSideways: document.documentElement.scrollWidth > window.innerWidth + 1,
         width: window.innerWidth,
       };
     });
-  /** One card, checked and shot: `kind` "map" | "learned" on the step of that name. */
+  /** The same keys in the same order as `group` above gives them, so two cards compare as text. */
+  const shape = (groups) => JSON.stringify(groups.map((g) => ({ group: g.group, heading: g.heading, count: g.count, subs: g.subs, lists: g.lists, note: g.note, total: g.total })));
+  /** One card, checked and shot: `kind` "new" | "learnt" | "later" on its step "map:<kind>", or
+   *  "learned" on the step of that name. */
   const check = async (ayah, entry, kind) => {
-    const what = `Al-Fatihah ${ayah}, ${kind === "map" ? "the opening" : "the closing"}`;
+    const step = kind === "learned" ? kind : `map:${kind}`;
+    const what = `Al-Fatihah ${ayah}, ${kind === "learned" ? "the closing" : `the opening's “${kind}”`}`;
     const card = stage.locator(`[data-autoplay="lesson-map"][data-map="${kind}"]`);
-    await card.first().waitFor({ state: "visible", timeout: 5_000 }).catch(() => fail(`${what}: on the step "${kind}" no card shows`));
-    if ((await card.count()) !== 1) fail(`${what}: ${await card.count()} cards on the stage`);
+    await card.first().waitFor({ state: "visible", timeout: 5_000 }).catch(() => fail(`${what}: on the step "${step}" no card shows`));
+    if ((await anyCard.count()) !== 1) fail(`${what}: ${await anyCard.count()} lesson-map cards on the stage (one group at a time: one card)`);
     // The step's line, played from its start: the caption is that line, and says what the manifest shows.
-    const id = `al-fatihah:${ayah}:${kind}`;
+    const id = `al-fatihah:${ayah}:${step}`;
     const line = lines[id];
     if (!line?.display) fail(`${what}: content/narration/al-fatihah.json has no line ${id}`);
     await replay.click();
     const caption = page.locator(`[data-autoplay="caption"][data-line="${id}"]`);
     await caption.first().waitFor({ state: "attached", timeout: 10_000 }).catch(() => fail(`${what}: "↺ Ulangi" did not put the line ${id} on the caption`));
-    const head = line.display.split(/\s*[(؀-ۿ]/u)[0].slice(0, 40);
+    const head = line.display.split(/\s*[(\u0600-\u06FF]/u)[0].slice(0, 40);
     if (!(await until(page, async () => (await caption.first().innerText()).replace(/\s+/g, " ").includes(head), 10_000))) {
       fail(`${what}: the caption “${(await caption.first().innerText()).replace(/\s+/g, " ").slice(0, 80)}” does not say “${head}”`);
     }
     // Held there while it is measured (a step that ends would take its card with it).
     if ((await middle.getAttribute("data-mode").catch(() => null)) === "pause") await middle.click();
     await page.waitForTimeout(500);
-    if ((await stage.getAttribute("data-step")) !== kind) fail(`${what}: the lesson left the step "${kind}" for "${await stage.getAttribute("data-step")}" while it was measured`);
+    if ((await stage.getAttribute("data-step")) !== step) fail(`${what}: the lesson left the step "${step}" for "${await stage.getAttribute("data-step")}" while it was measured`);
     const got = await readCard(kind);
-    const want = expected(entry, kind);
-    if (JSON.stringify(got.groups) !== JSON.stringify(want)) {
-      fail(`${what}: the card shows ${JSON.stringify(got.groups)}, expected ${JSON.stringify(want)} (content/map/al-fatihah.json, messages/id.json)`);
-    }
-    // 4. The new concepts only on a phone, every group from sm up.
     const narrow = got.width < 640;
-    const drawn = await card.first().evaluate((el) =>
-      [...el.querySelectorAll("[data-map-group]")].map((g) => {
-        const r = g.getBoundingClientRect();
-        return { group: g.getAttribute("data-map-group"), shown: r.width > 1 && r.height > 1 };
-      }),
-    );
-    for (const g of drawn) {
-      const want = !(narrow && (g.group === "review" || g.group === "later"));
-      if (g.shown !== want) fail(`${what}: at ${got.width}px the group "${g.group}" is ${g.shown ? "drawn" : "not drawn"}; expected ${want ? "drawn" : "not drawn"}`);
+    const want = expected(entry, kind, narrow);
+    if (shape(got.groups) !== shape(want)) {
+      fail(`${what}: at ${got.width}px the card shows ${shape(got.groups)}, expected ${shape(want)} (content/map/al-fatihah.json, messages/id.json)`);
     }
+    // 4. Nothing hidden in a 1px box; a count in one piece on its heading's row.
+    if (got.hiddenText.length) fail(`${what}: text in a visually hidden box (it must take no box at all): ${got.hiddenText.map((t) => `“${t}”`).join(", ")}`);
+    const loose = got.counts.filter((c) => !c.onHeadingRow || c.pieces !== 1);
+    if (loose.length) fail(`${what}: at ${got.width}px a count is not in one piece beside its heading: ${loose.map((c) => `“${c.text}” (${c.onHeadingRow ? "on" : "off"} the heading's row, ${c.pieces} piece(s))`).join(", ")}`);
+    // 3. Nothing sticks out sideways.
     const sideways = [];
     if (got.box.left < -1 || got.box.right > got.width + 1) sideways.push(`the card ${Math.round(got.box.left)}–${Math.round(got.box.right)} is wider than the screen (${got.width})`);
     if (got.scrollsSideways) sideways.push("the card scrolls sideways");
@@ -3131,17 +3504,22 @@ async function lessonMapChecks(page, vp, index) {
     const panel = await page.locator('[data-autoplay="panel"]').first().boundingBox();
     const panelBox = panel ? { top: panel.y, bottom: panel.y + panel.height } : null;
     const inView = !!panelBox && got.box.top >= 0 && got.box.bottom <= panelBox.top + 1;
-    const n = got.groups.reduce((sum, g) => sum + g.items.length, 0);
-    console.log(`  lesson map ${ayah} ${kind}: ${got.groups.map((g) => `${g.heading} (${g.items.length})`).join(" · ")}; card ${fmt(got.box)} · panel ${panelBox ? fmt(panelBox) : "—"}${inView ? "" : " — NOT wholly in view"}`);
+    const drawn = got.groups.flatMap((g) => g.lists.filter((l) => l.drawn));
+    const n = drawn.reduce((sum, l) => sum + l.items.length, 0);
+    const shot = `${vp}-autoplay-ayah${ayah}-${step.replace(":", "-")}`;
+    console.log(
+      `  lesson map ${ayah} ${step}: ${got.groups.map((g) => `${g.heading}${g.count ? ` ${g.count}` : ""} [${g.lists.map((l) => `${l.items.length} ${l.kind}${l.drawn ? "" : ", no box"}`).join("; ")}]`).join(" · ")}; ` +
+        `card ${fmt(got.box)} (${Math.round(got.box.bottom - got.box.top)}px) · panel ${panelBox ? fmt(panelBox) : "—"}${inView ? "" : " — NOT wholly in view"}`,
+    );
     if (!inView) {
       console.log(
-        `::warning title=Belajar lesson map card not wholly in view::${vp}: ${what}: the card (${n} concepts) is at ${fmt(got.box)} and the bottom panel at ${panelBox ? fmt(panelBox) : "—"} ` +
-          `(viewport ${page.viewportSize().height} high): part of it is reached only by scrolling. See shots/${vp}-autoplay-ayah${ayah}-${kind}${vp === "phone" ? "-viewport" : ""}.png`,
+        `::warning title=Belajar lesson map card not wholly in view::${vp}: ${what}: the card (${n} names drawn, ${Math.round(got.box.bottom - got.box.top)}px high) is at ${fmt(got.box)} and the bottom panel at ${panelBox ? fmt(panelBox) : "—"} ` +
+          `(viewport ${page.viewportSize().height} high): part of it is reached only by scrolling. See shots/${shot}${vp === "phone" ? "-viewport" : ""}.png`,
       );
     }
-    await stage.screenshot({ path: `shots/${vp}-autoplay-ayah${ayah}-${kind}.png` });
-    console.log(`shot ${vp}-autoplay-ayah${ayah}-${kind}`);
-    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-autoplay-ayah${ayah}-${kind}-viewport.png` });
+    await stage.screenshot({ path: `shots/${shot}.png` });
+    console.log(`shot ${shot}`);
+    if (vp === "phone") await page.screenshot({ path: `shots/${shot}-viewport.png` });
   };
   try {
     for (const ayah of [1, 2]) {
@@ -3154,13 +3532,23 @@ async function lessonMapChecks(page, vp, index) {
       await page.evaluate(() => document.fonts.ready);
       await page.locator('[data-autoplay="start"]').click();
       await settleScroll(page);
-      // 1. Right after the imam's ayah.
+      // 1. Right after the imam's ayah: one step, one card, per group.
       await toStep(page, vp, "recite");
-      await next.click();
-      if (!(await until(page, async () => (await stage.getAttribute("data-step")) === "map", 5_000))) {
-        fail(`Al-Fatihah ${ayah}: the step after the imam's ayah is "${await stage.getAttribute("data-step")}", not the lesson map's ("map")`);
+      let before = "recite";
+      for (const g of openingOf(entry)) {
+        await next.click();
+        if (!(await until(page, async () => (await stage.getAttribute("data-step")) === `map:${g}`, 5_000))) {
+          fail(`Al-Fatihah ${ayah}: the step after "${before}" is "${await stage.getAttribute("data-step")}", not the lesson map's "map:${g}"`);
+        }
+        await check(ayah, entry, g);
+        before = `map:${g}`;
       }
-      await check(ayah, entry, "map");
+      await next.click();
+      if (!(await until(page, async () => ((await stage.getAttribute("data-step")) ?? before) !== before, 5_000))) fail(`Al-Fatihah ${ayah}: "Berikutnya ›" did not leave the step "${before}"`);
+      const onward = await stage.getAttribute("data-step");
+      if (onward?.startsWith("map:") || onward === "learned" || (await anyCard.count())) {
+        fail(`Al-Fatihah ${ayah}: after the opening's last group ("${before}") the lesson is on "${onward}" with ${await anyCard.count()} lesson-map card(s) on the stage, not on with the ayah`);
+      }
       // 2. Right before the recap.
       await toStep(page, vp, "learned");
       await check(ayah, entry, "learned");
@@ -3172,6 +3560,133 @@ async function lessonMapChecks(page, vp, index) {
   } catch (err) {
     await page.screenshot({ path: `shots/${vp}-autoplay-lesson-map-FAILED.png`, fullPage: true }).catch(() => {});
     console.error(`✗ ${vp}: the lesson map check (Al-Fatihah 1 and 2) failed`);
+    console.error(`  narration requests answered: ${served.length}`);
+    throw err;
+  } finally {
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
+/**
+ * LESSON ZERO in a browser — "Pengantar: harakat dan tiga jenis kata" (the basic curriculum,
+ * kurikulum-dasar.md decision 1, operator-approved 2026-10-13: "A 'lesson zero' with no ayah opens
+ * the course. It teaches harakat and the three kinds of word (kalimah: isim, fi'il, huruf), so
+ * ayah 1 is lighter. The harakat primer and kalimah move out of 1:1 into lesson zero."). Its
+ * narration is answered in the browser (narrationRoute); what it must play is read from the
+ * content (content/curriculum.json lesson "0", content/narration/al-fatihah.json), never typed.
+ *   1. IT IS LISTED FIRST: on the track page and on the Al-Fatihah page the first link into a
+ *      lesson is its card ([data-intro-card] → INTRO), before any ayah's; Al-Fatihah 1 carries the
+ *      one quiet line for someone who lands there first ([data-intro-hint], a link to INTRO), and
+ *      ayah 2 does not.
+ *   2. THE SAME STAGE, WITH NO AYAH ON IT: one "Mulai pelajaran", and no word of a mushaf line
+ *      (no button[data-word]) before the start or while it plays.
+ *   3. ITS STEPS, by name (toStep): "intro" first; "primer" with the harakat primer's figure
+ *      (data-compose-kind "primer") in the card slot; then, for each step the curriculum teaches
+ *      there with a line, "concept:<id>" (its caption is the line "al-fatihah:0:concept:<id>") and
+ *      "concept:<id>:ex" with an example card; then "next". Al-Fatihah 1's lesson has no primer
+ *      step any more (checked on its page by composeShots, which reaches word 1 without one).
+ *   4. THE HAND-OVER: from "next", one "Berikutnya ›" ends the lesson and the page goes on to
+ *      Al-Fatihah 1 by itself — its address, and its stage live — as an ayah goes on to the next.
+ * Shots: the page before "Mulai" (stage; on a phone also the viewport), the primer, the concept
+ * line, its example. Works rendered or not (a line without audio is caption-only). Fails the job
+ * on 1–4.
+ */
+async function introChecks(page, vp, index) {
+  const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
+  const curriculum = await read("content/curriculum.json");
+  const lines = (await read("content/narration/al-fatihah.json")).lines ?? {};
+  const zero = curriculum.lessons.find((l) => l.id === "0");
+  const taught = (zero?.lines ?? []).map((l) => l.line);
+  const fail = (m) => {
+    throw new Error(`${vp}: lesson zero — ${m}`);
+  };
+  if (!taught.length) fail('content/curriculum.json gives lesson "0" no “Konsep baru” line (it has no page)');
+  for (const part of ["intro", "primer:1", ...taught, "next"]) {
+    if (!lines[`al-fatihah:${ZERO_AYAH}:${part}`]) fail(`content/narration/al-fatihah.json has no line al-fatihah:${ZERO_AYAH}:${part}`);
+  }
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const stage = page.locator('[data-autoplay="stage"]');
+  const next = page.locator('[data-autoplay="next"]');
+  const replay = page.locator('[data-autoplay="replay"]');
+  const step = () => stage.getAttribute("data-step");
+  /** The first link into a lesson (lesson zero or an ayah) inside <main>, as a path. */
+  const firstLessonLink = () =>
+    page.locator("main a[href]").evaluateAll((as) => {
+      const paths = as.map((a) => new URL(a.getAttribute("href"), location.href).pathname);
+      return paths.find((p) => /\/quran\/(?:pengantar|[a-z-]+\/\d+)$/.test(p)) ?? null;
+    });
+  const shot = async (name) => {
+    await stage.screenshot({ path: `shots/${vp}-${name}.png` });
+    console.log(`shot ${vp}-${name}`);
+  };
+  try {
+    // 1. Listed first, and pointed at from the first ayah.
+    for (const from of ["/belajar/id/quran", "/belajar/id/quran/al-fatihah"]) {
+      await page.goto(BASE + from, { waitUntil: "networkidle" });
+      const card = page.locator("main a[data-intro-card]");
+      if ((await card.count()) !== 1) fail(`${from}: ${await card.count()} lesson-zero card(s), expected one`);
+      const href = new URL(await card.first().getAttribute("href"), BASE).pathname;
+      if (href !== INTRO) fail(`${from}: the card links ${href}, not ${INTRO}`);
+      const first = await firstLessonLink();
+      if (first !== INTRO) fail(`${from}: the first lesson link is ${first}, not lesson zero's (${INTRO})`);
+    }
+    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    const hint = page.locator("main [data-intro-hint] a");
+    if ((await hint.count()) !== 1 || new URL(await hint.first().getAttribute("href"), BASE).pathname !== INTRO) {
+      fail(`${AYAH_1}: no quiet line that links lesson zero ([data-intro-hint] a → ${INTRO})`);
+    }
+    await page.goto(BASE + AYAH_2, { waitUntil: "networkidle" });
+    if ((await page.locator("[data-intro-hint]").count()) !== 0) fail(`${AYAH_2}: the line for a first-time visitor shows on another ayah than the first`);
+
+    // 2. The same stage, no ayah on it.
+    await page.goto(BASE + INTRO, { waitUntil: "networkidle" });
+    await page.evaluate((key) => localStorage.removeItem(key), `belajar:v1:autoplay:al-fatihah/${ZERO_AYAH}`);
+    await page.reload({ waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    if ((await stage.count()) !== 1) fail(`${INTRO}: no lesson stage`);
+    if ((await stage.locator("button[data-word]").count()) !== 0) fail("its stage shows words of a mushaf line: lesson zero has no ayah");
+    await shot("pengantar-before-start");
+    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-pengantar-before-start-viewport.png` });
+    await page.locator('[data-autoplay="start"]').click();
+    await settleScroll(page);
+
+    // 3. Its steps, by name.
+    if (!(await until(page, async () => (await step()) === "intro", 10_000))) fail(`after "Mulai" the lesson is on "${await step()}", not on its opening line ("intro")`);
+    await toStep(page, vp, "primer");
+    await replay.click();
+    const figure = page.locator('[data-autoplay="composition"][data-compose-kind="primer"]');
+    await figure.first().waitFor({ state: "visible", timeout: 10_000 }).catch(() => fail('on the step "primer" the harakat primer\'s figure does not show'));
+    if ((await stage.locator("button[data-word]").count()) !== 0) fail("a mushaf word shows while the primer plays");
+    await shot("pengantar-primer");
+    for (const part of taught) {
+      await toStep(page, vp, part);
+      await replay.click();
+      const caption = page.locator(`[data-autoplay="caption"][data-line="al-fatihah:${ZERO_AYAH}:${part}"]`);
+      await caption.first().waitFor({ state: "attached", timeout: 10_000 }).catch(() => fail(`on the step "${part}" the caption is not its line al-fatihah:${ZERO_AYAH}:${part}`));
+      await shot(`pengantar-${part.replace(":", "-")}`);
+      await toStep(page, vp, `${part}:ex`);
+      // Reached paused: "↺ Ulangi" plays the step from its start, and its card shows.
+      await replay.click();
+      const example = page.locator('[data-autoplay="example"]');
+      await example.first().waitFor({ state: "visible", timeout: 10_000 }).catch(() => fail(`on the step "${part}:ex" no example card shows`));
+      await shot(`pengantar-${part.replace(":", "-")}-example`);
+    }
+    await toStep(page, vp, "next");
+
+    // 4. On to Al-Fatihah 1 by itself.
+    await next.click();
+    await page.waitForURL(/\/quran\/al-fatihah\/1(\?.*)?$/, { timeout: 20_000 }).catch(() => fail(`from its last step the lesson did not go on to ${AYAH_1} (still at ${page.url()})`));
+    await page.locator('[data-autoplay="panel"]').first().waitFor({ state: "visible", timeout: 15_000 }).catch(() => fail(`${AYAH_1} opened, and its lesson did not start by itself`));
+    const there = await step();
+    if (!there) fail(`${AYAH_1} opened after lesson zero, and its stage is not live`);
+    if (there === "primer") fail("Al-Fatihah 1 still plays the harakat primer");
+    console.log(`  lesson zero ok: listed first on the track and the surah page; intro → primer → ${taught.join(" → ")} (each with its example) → next → Al-Fatihah 1 by itself (on "${there}")`);
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-pengantar-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the lesson zero check failed (on step "${await step().catch(() => null)}")`);
     console.error(`  narration requests answered: ${served.length}`);
     throw err;
   } finally {
@@ -3223,6 +3738,7 @@ try {
       continue;
     }
     if (SURAHS_ON) {
+      await curriculumCheck(page, vp, true);
       await endCardShots(page, vp, true);
       await ctx.close();
       continue;
@@ -3258,12 +3774,16 @@ try {
     await composeShots(page, vp, narration);
     await exampleChecks(page, vp, narration);
     await quizVoiceCheck(page, vp, narration);
+    await wordKindChecks(page, vp, narration);
     await lessonMapChecks(page, vp, narration);
+    await introChecks(page, vp, narration);
     // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).
-    await composeFitSweep(page, vp, "normal", [1], units);
-    await composeFitSweep(page, vp, "besar", [1], units);
-    await composeFitSweep(page, vp, "sangat-besar", [1, 2, 3, 4, 5, 6, 7], units);
+    // Lesson zero (ayah 0: the harakat primer) with ayah 1 at every size; all of them at the largest.
+    await composeFitSweep(page, vp, "normal", [ZERO_AYAH, 1], units);
+    await composeFitSweep(page, vp, "besar", [ZERO_AYAH, 1], units);
+    await composeFitSweep(page, vp, "sangat-besar", [ZERO_AYAH, 1, 2, 3, 4, 5, 6, 7], units);
     await comingSoonCheck(page, vp);
+    await curriculumCheck(page, vp, false);
     await endCardShots(page, vp, false);
     await ctx.close();
   }

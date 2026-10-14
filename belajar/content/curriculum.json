@@ -1,0 +1,3106 @@
+{
+ "version": 1,
+ "units": [
+  {
+   "id": "pengantar",
+   "name": "Pengantar"
+  },
+  {
+   "id": "al-fatihah",
+   "name": "Al-Fatihah",
+   "surah": 1,
+   "slug": "al-fatihah"
+  },
+  {
+   "id": "an-nas",
+   "name": "An-Nas",
+   "surah": 114,
+   "slug": "an-nas"
+  },
+  {
+   "id": "al-falaq",
+   "name": "Al-Falaq",
+   "surah": 113,
+   "slug": "al-falaq"
+  },
+  {
+   "id": "al-ikhlas",
+   "name": "Al-Ikhlas",
+   "surah": 112,
+   "slug": "al-ikhlas"
+  },
+  {
+   "id": "ayat-kursi",
+   "name": "Ayat Kursi",
+   "surah": 2,
+   "ayah": 255
+  }
+ ],
+ "lessons": [
+  {
+   "id": "0",
+   "unit": "pengantar",
+   "steps": [
+    "harakat",
+    "kalimah"
+   ],
+   "before": 0,
+   "after": 2,
+   "lines": [
+    {
+     "line": "concept:kalimah-isim-fiil-huruf",
+     "step": "kalimah",
+     "words": []
+    }
+   ],
+   "map": {
+    "new": [
+     "harakat",
+     "kalimah"
+    ],
+    "learnt": [],
+    "later": [],
+    "lanjut": []
+   }
+  },
+  {
+   "id": "1:1",
+   "unit": "al-fatihah",
+   "surah": 1,
+   "ayah": 1,
+   "steps": [
+    "majrur",
+    "huruf-jar"
+   ],
+   "before": 2,
+   "after": 4,
+   "lines": [
+    {
+     "line": "concept:majrur",
+     "step": "majrur",
+     "words": [
+      1,
+      2,
+      3,
+      4
+     ]
+    },
+    {
+     "line": "concept:huruf-jar",
+     "step": "huruf-jar",
+     "words": [
+      1
+     ]
+    }
+   ],
+   "map": {
+    "new": [
+     "majrur",
+     "huruf-jar"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     }
+    ],
+    "later": [
+     "alif-lam",
+     "naat",
+     "idhafah"
+    ],
+    "lanjut": [
+     "syibhul-jumlah"
+    ]
+   }
+  },
+  {
+   "id": "1:2",
+   "unit": "al-fatihah",
+   "surah": 1,
+   "ayah": 2,
+   "steps": [
+    "jumlah-ismiyyah",
+    "marfu",
+    "jamak-mudzakkar-salim"
+   ],
+   "before": 4,
+   "after": 7,
+   "lines": [
+    {
+     "line": "concept:jumlah-ismiyyah",
+     "step": "jumlah-ismiyyah",
+     "words": [
+      1,
+      2
+     ]
+    },
+    {
+     "line": "concept:marfu",
+     "step": "marfu",
+     "words": [
+      1
+     ]
+    },
+    {
+     "line": "concept:jamak-mudzakkar-salim",
+     "step": "jamak-mudzakkar-salim",
+     "words": [
+      4
+     ]
+    }
+   ],
+   "map": {
+    "new": [
+     "jumlah-ismiyyah",
+     "marfu",
+     "jamak-mudzakkar-salim"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": true
+     }
+    ],
+    "later": [
+     "alif-lam",
+     "naat",
+     "idhafah",
+     "badal"
+    ],
+    "lanjut": [
+     "syibhul-jumlah",
+     "wazan-dan-tashrif"
+    ]
+   }
+  },
+  {
+   "id": "1:3",
+   "unit": "al-fatihah",
+   "surah": 1,
+   "ayah": 3,
+   "steps": [
+    "alif-lam",
+    "naat"
+   ],
+   "before": 7,
+   "after": 9,
+   "lines": [
+    {
+     "line": "concept:alif-lam",
+     "step": "alif-lam",
+     "words": [
+      1,
+      2
+     ]
+    },
+    {
+     "line": "concept:naat",
+     "step": "naat",
+     "words": [
+      1,
+      2
+     ]
+    }
+   ],
+   "map": {
+    "new": [
+     "alif-lam",
+     "naat"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": false
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "wazan-dan-tashrif"
+    ]
+   }
+  },
+  {
+   "id": "1:4",
+   "unit": "al-fatihah",
+   "surah": 1,
+   "ayah": 4,
+   "steps": [
+    "idhafah"
+   ],
+   "before": 9,
+   "after": 10,
+   "lines": [
+    {
+     "line": "concept:idhafah",
+     "step": "idhafah",
+     "words": [
+      1,
+      2,
+      3
+     ]
+    }
+   ],
+   "map": {
+    "new": [
+     "idhafah"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": false
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": true
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "wazan-dan-tashrif",
+     "isim-fail"
+    ]
+   }
+  },
+  {
+   "id": "1:5",
+   "unit": "al-fatihah",
+   "surah": 1,
+   "ayah": 5,
+   "steps": [
+    "dhamir",
+    "fiil-mudhari",
+    "murab-mabni"
+   ],
+   "before": 10,
+   "after": 13,
+   "lines": [
+    {
+     "line": "concept:dhamir",
+     "step": "dhamir",
+     "words": [
+      1,
+      3
+     ]
+    },
+    {
+     "line": "concept:fiil-mudhari",
+     "step": "fiil-mudhari",
+     "words": [
+      2,
+      4
+     ]
+    },
+    {
+     "line": "concept:murab-mabni",
+     "step": "murab-mabni",
+     "words": [
+      1,
+      2
+     ]
+    }
+   ],
+   "map": {
+    "new": [
+     "dhamir",
+     "fiil-mudhari",
+     "murab-mabni"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": false
+     },
+     {
+      "id": "huruf-jar",
+      "here": false
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": true
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": false
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": false
+     }
+    ],
+    "later": [
+     "jumlah-filiyyah",
+     "maful-bih",
+     "athaf"
+    ],
+    "lanjut": [
+     "taqdim-maful",
+     "bab-istifal",
+     "ilal"
+    ]
+   }
+  },
+  {
+   "id": "1:6",
+   "unit": "al-fatihah",
+   "surah": 1,
+   "ayah": 6,
+   "steps": [
+    "jumlah-filiyyah",
+    "maful-bih",
+    "manshub"
+   ],
+   "before": 13,
+   "after": 16,
+   "lines": [
+    {
+     "line": "concept:jumlah-filiyyah",
+     "step": "jumlah-filiyyah",
+     "words": [
+      1
+     ]
+    },
+    {
+     "line": "concept:maful-bih",
+     "step": "maful-bih",
+     "words": [
+      1,
+      2
+     ]
+    },
+    {
+     "line": "concept:manshub",
+     "step": "manshub",
+     "words": [
+      2,
+      3
+     ]
+    }
+   ],
+   "map": {
+    "new": [
+     "jumlah-filiyyah",
+     "maful-bih",
+     "manshub"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": false
+     },
+     {
+      "id": "huruf-jar",
+      "here": false
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": true
+     },
+     {
+      "id": "idhafah",
+      "here": false
+     },
+     {
+      "id": "dhamir",
+      "here": true
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": false
+     }
+    ],
+    "later": [
+     "fiil-amr"
+    ],
+    "lanjut": [
+     "isim-fail",
+     "bab-istifal",
+     "ilal"
+    ]
+   }
+  },
+  {
+   "id": "1:7",
+   "unit": "al-fatihah",
+   "surah": 1,
+   "ayah": 7,
+   "steps": [
+    "isim-maushul",
+    "fiil-madhi",
+    "athaf"
+   ],
+   "before": 16,
+   "after": 19,
+   "lines": [
+    {
+     "line": "concept:isim-maushul",
+     "step": "isim-maushul",
+     "words": [
+      2,
+      3,
+      4
+     ]
+    },
+    {
+     "line": "concept:fiil-madhi",
+     "step": "fiil-madhi",
+     "words": [
+      3
+     ]
+    },
+    {
+     "line": "concept:athaf",
+     "step": "athaf",
+     "words": [
+      8,
+      9
+     ]
+    }
+   ],
+   "map": {
+    "new": [
+     "isim-maushul",
+     "fiil-madhi",
+     "athaf"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": true
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": true
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": true
+     },
+     {
+      "id": "dhamir",
+      "here": true
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": true
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": true
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": true
+     }
+    ],
+    "later": [
+     "badal"
+    ],
+    "lanjut": [
+     "isim-fail",
+     "bab-ifal",
+     "isim-maful",
+     "naib-fail"
+    ]
+   }
+  },
+  {
+   "id": "114:1",
+   "unit": "an-nas",
+   "surah": 114,
+   "ayah": 1,
+   "steps": [
+    "fiil-amr"
+   ],
+   "before": 19,
+   "after": 20,
+   "lines": [
+    {
+     "line": "concept:fiil-amr",
+     "step": "fiil-amr",
+     "words": [
+      1
+     ]
+    }
+   ],
+   "map": {
+    "new": [
+     "fiil-amr"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": true
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": true
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": true
+     },
+     {
+      "id": "dhamir",
+      "here": true
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": true
+     },
+     {
+      "id": "murab-mabni",
+      "here": true
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": true
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "maqul-al-qaul"
+    ]
+   }
+  },
+  {
+   "id": "114:2",
+   "unit": "an-nas",
+   "surah": 114,
+   "ayah": 2,
+   "steps": [
+    "badal"
+   ],
+   "before": 20,
+   "after": 21,
+   "lines": [
+    {
+     "line": "concept:badal",
+     "step": "badal",
+     "words": [
+      1
+     ]
+    }
+   ],
+   "map": {
+    "new": [
+     "badal"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": false
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": true
+     },
+     {
+      "id": "idhafah",
+      "here": true
+     },
+     {
+      "id": "dhamir",
+      "here": false
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": false
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": false
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": false
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "athaf-bayan"
+    ]
+   }
+  },
+  {
+   "id": "114:3",
+   "unit": "an-nas",
+   "surah": 114,
+   "ayah": 3,
+   "steps": [],
+   "before": 21,
+   "after": 21,
+   "lines": [],
+   "map": {
+    "new": [],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": false
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": true
+     },
+     {
+      "id": "idhafah",
+      "here": true
+     },
+     {
+      "id": "dhamir",
+      "here": false
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": false
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": false
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": false
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     },
+     {
+      "id": "badal",
+      "here": true
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "athaf-bayan"
+    ]
+   }
+  },
+  {
+   "id": "114:4",
+   "unit": "an-nas",
+   "surah": 114,
+   "ayah": 4,
+   "steps": [],
+   "before": 21,
+   "after": 21,
+   "lines": [],
+   "map": {
+    "new": [],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": true
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": true
+     },
+     {
+      "id": "idhafah",
+      "here": true
+     },
+     {
+      "id": "dhamir",
+      "here": false
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": true
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": false
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": false
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     },
+     {
+      "id": "badal",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "wazan-dan-tashrif",
+     "sighat-mubalaghah",
+     "rubai-mujarrad"
+    ]
+   }
+  },
+  {
+   "id": "114:5",
+   "unit": "an-nas",
+   "surah": 114,
+   "ayah": 5,
+   "steps": [
+    "jamak-taksir"
+   ],
+   "before": 21,
+   "after": 22,
+   "lines": [],
+   "map": {
+    "new": [
+     "jamak-taksir"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": true
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": true
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": true
+     },
+     {
+      "id": "idhafah",
+      "here": true
+     },
+     {
+      "id": "dhamir",
+      "here": true
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": true
+     },
+     {
+      "id": "murab-mabni",
+      "here": true
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": false
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": true
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": false
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     },
+     {
+      "id": "badal",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "rubai-mujarrad"
+    ]
+   }
+  },
+  {
+   "id": "114:6",
+   "unit": "an-nas",
+   "surah": 114,
+   "ayah": 6,
+   "steps": [
+    "mudzakkar-muannats"
+   ],
+   "before": 22,
+   "after": 23,
+   "lines": [],
+   "map": {
+    "new": [
+     "mudzakkar-muannats"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": true
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": false
+     },
+     {
+      "id": "dhamir",
+      "here": false
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": true
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": false
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": true
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     },
+     {
+      "id": "badal",
+      "here": false
+     },
+     {
+      "id": "jamak-taksir",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "hal"
+    ]
+   }
+  },
+  {
+   "id": "113:1",
+   "unit": "al-falaq",
+   "surah": 113,
+   "ayah": 1,
+   "steps": [],
+   "before": 23,
+   "after": 23,
+   "lines": [],
+   "map": {
+    "new": [],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": true
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": true
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": true
+     },
+     {
+      "id": "dhamir",
+      "here": false
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": true
+     },
+     {
+      "id": "murab-mabni",
+      "here": false
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": true
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": false
+     },
+     {
+      "id": "fiil-amr",
+      "here": true
+     },
+     {
+      "id": "badal",
+      "here": false
+     },
+     {
+      "id": "jamak-taksir",
+      "here": false
+     },
+     {
+      "id": "mudzakkar-muannats",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "wazan-dan-tashrif",
+     "maqul-al-qaul"
+    ]
+   }
+  },
+  {
+   "id": "113:2",
+   "unit": "al-falaq",
+   "surah": 113,
+   "ayah": 2,
+   "steps": [],
+   "before": 23,
+   "after": 23,
+   "lines": [],
+   "map": {
+    "new": [],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": true
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": false
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": true
+     },
+     {
+      "id": "dhamir",
+      "here": false
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": true
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": true
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": true
+     },
+     {
+      "id": "fiil-madhi",
+      "here": true
+     },
+     {
+      "id": "athaf",
+      "here": false
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     },
+     {
+      "id": "badal",
+      "here": false
+     },
+     {
+      "id": "jamak-taksir",
+      "here": false
+     },
+     {
+      "id": "mudzakkar-muannats",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": []
+   }
+  },
+  {
+   "id": "113:3",
+   "unit": "al-falaq",
+   "surah": 113,
+   "ayah": 3,
+   "steps": [
+    "tanwin-nakirah"
+   ],
+   "before": 23,
+   "after": 24,
+   "lines": [],
+   "map": {
+    "new": [
+     "tanwin-nakirah"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": false
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": false
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": true
+     },
+     {
+      "id": "dhamir",
+      "here": false
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": true
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": false
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": true
+     },
+     {
+      "id": "athaf",
+      "here": true
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     },
+     {
+      "id": "badal",
+      "here": false
+     },
+     {
+      "id": "jamak-taksir",
+      "here": false
+     },
+     {
+      "id": "mudzakkar-muannats",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "isim-fail",
+     "zharaf-idza"
+    ]
+   }
+  },
+  {
+   "id": "113:4",
+   "unit": "al-falaq",
+   "surah": 113,
+   "ayah": 4,
+   "steps": [
+    "jamak-muannats-salim"
+   ],
+   "before": 24,
+   "after": 25,
+   "lines": [],
+   "map": {
+    "new": [
+     "jamak-muannats-salim"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": true
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": true
+     },
+     {
+      "id": "dhamir",
+      "here": false
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": false
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": false
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": true
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     },
+     {
+      "id": "badal",
+      "here": false
+     },
+     {
+      "id": "jamak-taksir",
+      "here": false
+     },
+     {
+      "id": "mudzakkar-muannats",
+      "here": false
+     },
+     {
+      "id": "tanwin-nakirah",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "sighat-mubalaghah"
+    ]
+   }
+  },
+  {
+   "id": "113:5",
+   "unit": "al-falaq",
+   "surah": 113,
+   "ayah": 5,
+   "steps": [],
+   "before": 25,
+   "after": 25,
+   "lines": [],
+   "map": {
+    "new": [],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": true
+     },
+     {
+      "id": "huruf-jar",
+      "here": false
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": false
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": true
+     },
+     {
+      "id": "dhamir",
+      "here": false
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": false
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": false
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": true
+     },
+     {
+      "id": "athaf",
+      "here": true
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     },
+     {
+      "id": "badal",
+      "here": false
+     },
+     {
+      "id": "jamak-taksir",
+      "here": false
+     },
+     {
+      "id": "mudzakkar-muannats",
+      "here": false
+     },
+     {
+      "id": "tanwin-nakirah",
+      "here": false
+     },
+     {
+      "id": "jamak-muannats-salim",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "isim-fail",
+     "zharaf-idza"
+    ]
+   }
+  },
+  {
+   "id": "112:1",
+   "unit": "al-ikhlas",
+   "surah": 112,
+   "ayah": 1,
+   "steps": [],
+   "before": 25,
+   "after": 25,
+   "lines": [],
+   "map": {
+    "new": [],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": false
+     },
+     {
+      "id": "huruf-jar",
+      "here": false
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": true
+     },
+     {
+      "id": "marfu",
+      "here": true
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": false
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": false
+     },
+     {
+      "id": "dhamir",
+      "here": true
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": true
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": true
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": false
+     },
+     {
+      "id": "fiil-amr",
+      "here": true
+     },
+     {
+      "id": "badal",
+      "here": false
+     },
+     {
+      "id": "jamak-taksir",
+      "here": false
+     },
+     {
+      "id": "mudzakkar-muannats",
+      "here": false
+     },
+     {
+      "id": "tanwin-nakirah",
+      "here": false
+     },
+     {
+      "id": "jamak-muannats-salim",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "ilal",
+     "maqul-al-qaul",
+     "dhamir-syan",
+     "khabar-jumlah"
+    ]
+   }
+  },
+  {
+   "id": "112:2",
+   "unit": "al-ikhlas",
+   "surah": 112,
+   "ayah": 2,
+   "steps": [],
+   "before": 25,
+   "after": 25,
+   "lines": [],
+   "map": {
+    "new": [],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": false
+     },
+     {
+      "id": "huruf-jar",
+      "here": false
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": true
+     },
+     {
+      "id": "marfu",
+      "here": true
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": true
+     },
+     {
+      "id": "naat",
+      "here": true
+     },
+     {
+      "id": "idhafah",
+      "here": false
+     },
+     {
+      "id": "dhamir",
+      "here": false
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": false
+     },
+     {
+      "id": "murab-mabni",
+      "here": false
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": false
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": false
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     },
+     {
+      "id": "badal",
+      "here": false
+     },
+     {
+      "id": "jamak-taksir",
+      "here": false
+     },
+     {
+      "id": "mudzakkar-muannats",
+      "here": false
+     },
+     {
+      "id": "tanwin-nakirah",
+      "here": false
+     },
+     {
+      "id": "jamak-muannats-salim",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "wazan-dan-tashrif",
+     "khabar-jumlah"
+    ]
+   }
+  },
+  {
+   "id": "112:3",
+   "unit": "al-ikhlas",
+   "surah": 112,
+   "ayah": 3,
+   "steps": [
+    "nafi-lam",
+    "majzum"
+   ],
+   "before": 25,
+   "after": 27,
+   "lines": [
+    {
+     "line": "concept:jazm-lam",
+     "step": "nafi-lam",
+     "words": [
+      1,
+      2,
+      3,
+      4
+     ]
+    }
+   ],
+   "map": {
+    "new": [
+     "nafi-lam",
+     "majzum"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": false
+     },
+     {
+      "id": "huruf-jar",
+      "here": false
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": false
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": false
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": false
+     },
+     {
+      "id": "dhamir",
+      "here": false
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": true
+     },
+     {
+      "id": "murab-mabni",
+      "here": false
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": false
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": false
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": true
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     },
+     {
+      "id": "badal",
+      "here": false
+     },
+     {
+      "id": "jamak-taksir",
+      "here": false
+     },
+     {
+      "id": "mudzakkar-muannats",
+      "here": false
+     },
+     {
+      "id": "tanwin-nakirah",
+      "here": false
+     },
+     {
+      "id": "jamak-muannats-salim",
+      "here": false
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "ilal",
+     "naib-fail",
+     "fiil-majhul"
+    ]
+   }
+  },
+  {
+   "id": "112:4",
+   "unit": "al-ikhlas",
+   "surah": 112,
+   "ayah": 4,
+   "steps": [
+    "kana"
+   ],
+   "before": 27,
+   "after": 28,
+   "lines": [
+    {
+     "line": "concept:kana-wa-akhawatuha",
+     "step": "kana",
+     "words": [
+      2,
+      3,
+      4,
+      5
+     ]
+    }
+   ],
+   "map": {
+    "new": [
+     "kana"
+    ],
+    "learnt": [
+     {
+      "id": "harakat",
+      "here": false
+     },
+     {
+      "id": "kalimah",
+      "here": true
+     },
+     {
+      "id": "majrur",
+      "here": false
+     },
+     {
+      "id": "huruf-jar",
+      "here": true
+     },
+     {
+      "id": "jumlah-ismiyyah",
+      "here": false
+     },
+     {
+      "id": "marfu",
+      "here": true
+     },
+     {
+      "id": "jamak-mudzakkar-salim",
+      "here": false
+     },
+     {
+      "id": "alif-lam",
+      "here": false
+     },
+     {
+      "id": "naat",
+      "here": false
+     },
+     {
+      "id": "idhafah",
+      "here": false
+     },
+     {
+      "id": "dhamir",
+      "here": true
+     },
+     {
+      "id": "fiil-mudhari",
+      "here": true
+     },
+     {
+      "id": "murab-mabni",
+      "here": false
+     },
+     {
+      "id": "jumlah-filiyyah",
+      "here": false
+     },
+     {
+      "id": "maful-bih",
+      "here": false
+     },
+     {
+      "id": "manshub",
+      "here": true
+     },
+     {
+      "id": "isim-maushul",
+      "here": false
+     },
+     {
+      "id": "fiil-madhi",
+      "here": false
+     },
+     {
+      "id": "athaf",
+      "here": true
+     },
+     {
+      "id": "fiil-amr",
+      "here": false
+     },
+     {
+      "id": "badal",
+      "here": false
+     },
+     {
+      "id": "jamak-taksir",
+      "here": false
+     },
+     {
+      "id": "mudzakkar-muannats",
+      "here": false
+     },
+     {
+      "id": "tanwin-nakirah",
+      "here": false
+     },
+     {
+      "id": "jamak-muannats-salim",
+      "here": false
+     },
+     {
+      "id": "nafi-lam",
+      "here": true
+     },
+     {
+      "id": "majzum",
+      "here": true
+     }
+    ],
+    "later": [],
+    "lanjut": [
+     "wazan-dan-tashrif"
+    ]
+   }
+  },
+  {
+   "id": "2:255/1",
+   "unit": "ayat-kursi",
+   "surah": 2,
+   "ayah": 255,
+   "segment": 1,
+   "words": [
+    1,
+    7
+   ],
+   "steps": [
+    "istitsna"
+   ],
+   "before": 28,
+   "after": 29
+  },
+  {
+   "id": "2:255/2",
+   "unit": "ayat-kursi",
+   "surah": 2,
+   "ayah": 255,
+   "segment": 2,
+   "words": [
+    8,
+    12
+   ],
+   "steps": [
+    "la-nafi",
+    "fail-isim"
+   ],
+   "before": 29,
+   "after": 31
+  },
+  {
+   "id": "2:255/3",
+   "unit": "ayat-kursi",
+   "surah": 2,
+   "ayah": 255,
+   "segment": 3,
+   "words": [
+    13,
+    19
+   ],
+   "steps": [],
+   "before": 31,
+   "after": 31
+  },
+  {
+   "id": "2:255/4",
+   "unit": "ayat-kursi",
+   "surah": 2,
+   "ayah": 255,
+   "segment": 4,
+   "words": [
+    20,
+    26
+   ],
+   "steps": [
+    "istifham",
+    "isim-isyarah"
+   ],
+   "before": 31,
+   "after": 33
+  },
+  {
+   "id": "2:255/5",
+   "unit": "ayat-kursi",
+   "surah": 2,
+   "ayah": 255,
+   "segment": 5,
+   "words": [
+    27,
+    32
+   ],
+   "steps": [
+    "zharaf"
+   ],
+   "before": 33,
+   "after": 34
+  },
+  {
+   "id": "2:255/6",
+   "unit": "ayat-kursi",
+   "surah": 2,
+   "ayah": 255,
+   "segment": 6,
+   "words": [
+    33,
+    40
+   ],
+   "steps": [],
+   "before": 34,
+   "after": 34
+  },
+  {
+   "id": "2:255/7",
+   "unit": "ayat-kursi",
+   "surah": 2,
+   "ayah": 255,
+   "segment": 7,
+   "words": [
+    41,
+    44
+   ],
+   "steps": [
+    "kasrah-manshub"
+   ],
+   "before": 34,
+   "after": 35
+  },
+  {
+   "id": "2:255/8",
+   "unit": "ayat-kursi",
+   "surah": 2,
+   "ayah": 255,
+   "segment": 8,
+   "words": [
+    45,
+    47
+   ],
+   "steps": [
+    "mutsanna"
+   ],
+   "before": 35,
+   "after": 36
+  },
+  {
+   "id": "2:255/9",
+   "unit": "ayat-kursi",
+   "surah": 2,
+   "ayah": 255,
+   "segment": 9,
+   "words": [
+    48,
+    50
+   ],
+   "steps": [],
+   "before": 36,
+   "after": 36
+  }
+ ],
+ "steps": [
+  {
+   "id": "harakat",
+   "lesson": "0",
+   "name": "Harakat",
+   "latin": "Harakat",
+   "basics": "harakat",
+   "line": null,
+   "terms": [
+    "harakat",
+    "fathah",
+    "kasrah",
+    "dhammah",
+    "sukun",
+    "tasydid",
+    "tanwin"
+   ]
+  },
+  {
+   "id": "kalimah",
+   "lesson": "0",
+   "name": "Tiga jenis kata",
+   "latin": "Tiga jenis kata",
+   "concept": "kalimah-isim-fiil-huruf",
+   "occurs": {
+    "always": true
+   },
+   "line": "concept:kalimah-isim-fiil-huruf",
+   "terms": [
+    "kalimah",
+    "kalam",
+    "isim",
+    "fiil",
+    "huruf"
+   ]
+  },
+  {
+   "id": "majrur",
+   "lesson": "1:1",
+   "name": "Majrur (مَجْرُور)",
+   "latin": "Majrur",
+   "concept": "tanda-irab",
+   "part": 1,
+   "occurs": {
+    "case": "majrur"
+   },
+   "line": "concept:majrur",
+   "teach": {
+    "title": "Majrur, dan tandanya: kasrah",
+    "summary": "Bunyi akhir banyak kata Arab berubah mengikuti perannya dalam kalimat; perubahan itu disebut i'rab. Salah satu keadaannya adalah majrur: isim yang majrur umumnya berakhir kasrah. Ada tiga sebab sebuah isim menjadi majrur; yang pertama kita pelajari di ayat ini.",
+    "marked": {
+     "title": "[[Majrur|majrur]], dan tandanya: [[kasrah|kasrah]]",
+     "summary": "Bunyi akhir banyak kata Arab berubah mengikuti perannya dalam kalimat; perubahan itu disebut [[i'rab|irab]]. Salah satu keadaannya adalah [[majrur|majrur]]: [[isim|isim]] yang [[majrur|majrur]] umumnya berakhir [[kasrah|kasrah]]. Ada tiga sebab sebuah [[isim|isim]] menjadi [[majrur|majrur]]; yang pertama kita pelajari di ayat ini."
+    },
+    "sources": [
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 6, bab al-I'rab: definisi dan empat keadaan i'rab",
+      "url": "https://shamela.ws/book/11371/2"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 9, fashl al-Mu'rabat: yang di-i'rab dengan harakat dikhafdh dengan kasrah",
+      "url": "https://shamela.ws/book/11371/6"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 22, bab al-Makhfudhat: tiga macam isim yang makhfudh",
+      "url": "https://shamela.ws/book/11371/30"
+     }
+    ]
+   },
+   "terms": [
+    "irab",
+    "majrur",
+    "jar",
+    "khafdh"
+   ]
+  },
+  {
+   "id": "huruf-jar",
+   "lesson": "1:1",
+   "name": "Huruf jar (حَرْف جَرّ)",
+   "latin": "Huruf jar",
+   "concept": "huruf-jar",
+   "line": "concept:huruf-jar",
+   "terms": [
+    "huruf-jar",
+    "isim-majrur",
+    "jar-majrur",
+    "min",
+    "ila",
+    "an-jar",
+    "ala",
+    "fi",
+    "rubba"
+   ]
+  },
+  {
+   "id": "jumlah-ismiyyah",
+   "lesson": "1:2",
+   "name": "Jumlah ismiyyah (جُمْلَة اِسْمِيَّة)",
+   "latin": "Jumlah ismiyyah",
+   "concept": "jumlah-ismiyyah",
+   "line": "concept:jumlah-ismiyyah",
+   "terms": [
+    "jumlah",
+    "jumlah-ismiyyah",
+    "mubtada",
+    "khabar",
+    "ibtida"
+   ]
+  },
+  {
+   "id": "marfu",
+   "lesson": "1:2",
+   "name": "Marfu’ (مَرْفُوع)",
+   "latin": "Marfu'",
+   "concept": "tanda-irab",
+   "part": 2,
+   "occurs": {
+    "case": "marfu"
+   },
+   "line": "concept:marfu",
+   "teach": {
+    "title": "Marfu', dan tandanya: dhammah",
+    "summary": "Keadaan kedua adalah marfu': isim yang marfu' umumnya berakhir dhammah. Mubtada', yang baru kita pelajari, selalu marfu'.",
+    "marked": {
+     "title": "[[Marfu'|marfu]], dan tandanya: [[dhammah|dhammah]]",
+     "summary": "Keadaan kedua adalah [[marfu'|marfu]]: [[isim|isim]] yang [[marfu'|marfu]] umumnya berakhir [[dhammah|dhammah]]. [[Mubtada'|mubtada]], yang baru kita pelajari, selalu [[marfu'|marfu]]."
+    },
+    "sources": [
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 9, fashl al-Mu'rabat: yang di-i'rab dengan harakat dirafa' dengan dhammah",
+      "url": "https://shamela.ws/book/11371/6"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 12, bab al-Mubtada' wal-Khabar: definisi (mubtada' adalah isim yang marfu')",
+      "url": "https://shamela.ws/book/11371/11"
+     }
+    ]
+   },
+   "terms": [
+    "marfu",
+    "rafa"
+   ]
+  },
+  {
+   "id": "jamak-mudzakkar-salim",
+   "lesson": "1:2",
+   "name": "Jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم)",
+   "latin": "Jamak mudzakkar salim",
+   "concept": "jamak-mudzakkar-salim",
+   "line": "concept:jamak-mudzakkar-salim",
+   "terms": [
+    "jamak-mudzakkar-salim",
+    "mufrad"
+   ]
+  },
+  {
+   "id": "alif-lam",
+   "lesson": "1:3",
+   "name": "Alif lam (ال)",
+   "latin": "Alif lam",
+   "occurs": {
+    "qac": "DET"
+   },
+   "line": "concept:alif-lam",
+   "teach": {
+    "title": "Alif lam, penanda isim yang tertentu",
+    "summary": "Alif lam hanya masuk pada isim, dan isim yang diawalinya menjadi tertentu, atau ma'rifah. Nama diri, seperti nama Allah, sudah ma'rifah tanpa alif lam.",
+    "marked": {
+     "title": "Alif lam, penanda [[isim|isim]] yang tertentu",
+     "summary": "Alif lam hanya masuk pada [[isim|isim]], dan [[isim|isim]] yang diawalinya menjadi tertentu, atau [[ma'rifah|marifah]]. Nama diri, seperti nama Allah, sudah [[ma'rifah|marifah]] tanpa alif lam."
+    },
+    "sources": [
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 5, muqaddimah: masuknya alif lam termasuk tanda isim",
+      "url": "https://shamela.ws/book/11371/1"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 14, bab an-Na't: daftar ma'rifah, di antaranya isim 'alam dan isim yang ber-alif lam",
+      "url": "https://shamela.ws/book/11371/15"
+     }
+    ]
+   },
+   "terms": [
+    "marifah"
+   ]
+  },
+  {
+   "id": "naat",
+   "lesson": "1:3",
+   "name": "Na’t (نَعْت)",
+   "latin": "Na't",
+   "concept": "naat",
+   "line": "concept:naat",
+   "terms": [
+    "naat",
+    "manut",
+    "shifah"
+   ]
+  },
+  {
+   "id": "idhafah",
+   "lesson": "1:4",
+   "name": "Idhafah (إِضَافَة)",
+   "latin": "Idhafah",
+   "concept": "idhafah",
+   "line": "concept:idhafah",
+   "terms": [
+    "idhafah",
+    "mudhaf",
+    "mudhaf-ilaih"
+   ]
+  },
+  {
+   "id": "dhamir",
+   "lesson": "1:5",
+   "name": "Dhamir (ضَمِير)",
+   "latin": "Dhamir",
+   "concept": "dhamir",
+   "line": "concept:dhamir",
+   "terms": [
+    "dhamir",
+    "munfashil",
+    "muttashil",
+    "ana",
+    "nahnu",
+    "anta"
+   ]
+  },
+  {
+   "id": "fiil-mudhari",
+   "lesson": "1:5",
+   "name": "Fi’il mudhari’ (فِعْل مُضَارِع)",
+   "latin": "Fi'il mudhari'",
+   "concept": "fiil-mudhari",
+   "line": "concept:fiil-mudhari",
+   "terms": [
+    "fiil-mudhari",
+    "mudhari"
+   ]
+  },
+  {
+   "id": "murab-mabni",
+   "lesson": "1:5",
+   "name": "Mu’rab (مُعْرَب) dan mabni (مَبْنِيّ)",
+   "latin": "Mu'rab dan mabni",
+   "concept": "murab-mabni",
+   "line": "concept:murab-mabni",
+   "terms": [
+    "murab",
+    "mabni",
+    "bina",
+    "mahall"
+   ]
+  },
+  {
+   "id": "jumlah-filiyyah",
+   "lesson": "1:6",
+   "name": "Jumlah fi’liyyah (جُمْلَة فِعْلِيَّة)",
+   "latin": "Jumlah fi'liyyah",
+   "concept": "jumlah-filiyyah",
+   "line": "concept:jumlah-filiyyah",
+   "terms": [
+    "jumlah-filiyyah",
+    "fail",
+    "mustatir"
+   ]
+  },
+  {
+   "id": "maful-bih",
+   "lesson": "1:6",
+   "name": "Maf’ul bih (مَفْعُول بِه)",
+   "latin": "Maf'ul bih",
+   "concept": "maful-bih",
+   "line": "concept:maful-bih",
+   "terms": [
+    "maful-bih",
+    "maful"
+   ]
+  },
+  {
+   "id": "manshub",
+   "lesson": "1:6",
+   "name": "Manshub (مَنْصُوب)",
+   "latin": "Manshub",
+   "concept": "tanda-irab",
+   "part": 3,
+   "occurs": {
+    "case": "manshub"
+   },
+   "line": "concept:manshub",
+   "teach": {
+    "title": "Manshub, dan tandanya: fathah",
+    "summary": "Keadaan ketiga adalah manshub: isim yang manshub umumnya berakhir fathah. Maf'ul bih adalah isim yang manshub. Jadi sebuah isim punya tiga keadaan: marfu', manshub, dan majrur.",
+    "marked": {
+     "title": "[[Manshub|manshub]], dan tandanya: [[fathah|fathah]]",
+     "summary": "Keadaan ketiga adalah [[manshub|manshub]]: [[isim|isim]] yang [[manshub|manshub]] umumnya berakhir [[fathah|fathah]]. [[Maf'ul bih|maful-bih]] adalah [[isim|isim]] yang [[manshub|manshub]]. Jadi sebuah [[isim|isim]] punya tiga keadaan: [[marfu'|marfu]], [[manshub|manshub]], dan [[majrur|majrur]]."
+    },
+    "sources": [
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 9, fashl al-Mu'rabat: yang di-i'rab dengan harakat dinashab dengan fathah",
+      "url": "https://shamela.ws/book/11371/6"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 17, bab al-Maf'ul Bih: definisi",
+      "url": "https://shamela.ws/book/11371/20"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 6, bab al-I'rab: isim punya rafa', nashab, dan khafdh",
+      "url": "https://shamela.ws/book/11371/2"
+     }
+    ]
+   },
+   "terms": [
+    "manshub",
+    "nashab"
+   ]
+  },
+  {
+   "id": "isim-maushul",
+   "lesson": "1:7",
+   "name": "Isim maushul (اِسْم مَوْصُول)",
+   "latin": "Isim maushul",
+   "concept": "isim-maushul",
+   "line": "concept:isim-maushul",
+   "terms": [
+    "isim-maushul",
+    "maushul",
+    "shilah"
+   ]
+  },
+  {
+   "id": "fiil-madhi",
+   "lesson": "1:7",
+   "name": "Fi’il madhi (فِعْل مَاضٍ)",
+   "latin": "Fi'il madhi",
+   "concept": "fiil-madhi",
+   "line": "concept:fiil-madhi",
+   "terms": [
+    "fiil-madhi",
+    "madhi"
+   ]
+  },
+  {
+   "id": "athaf",
+   "lesson": "1:7",
+   "name": "‘Athaf (عَطْف)",
+   "latin": "'Athaf",
+   "concept": "athaf",
+   "line": "concept:athaf",
+   "terms": [
+    "athaf",
+    "huruf-athaf",
+    "athaf-nasaq",
+    "tsumma"
+   ]
+  },
+  {
+   "id": "fiil-amr",
+   "lesson": "114:1",
+   "name": "Fi’il amr (فِعْل أَمْر)",
+   "latin": "Fi'il amr",
+   "concept": "fiil-amr",
+   "line": "concept:fiil-amr",
+   "terms": [
+    "fiil-amr",
+    "amr"
+   ]
+  },
+  {
+   "id": "badal",
+   "lesson": "114:2",
+   "name": "Badal (بَدَل)",
+   "latin": "Badal",
+   "concept": "badal",
+   "line": "concept:badal",
+   "terms": [
+    "badal",
+    "badal-muthabiq",
+    "badal-kull"
+   ]
+  },
+  {
+   "id": "jamak-taksir",
+   "lesson": "114:5",
+   "name": "Jamak taksir",
+   "latin": "Jamak taksir",
+   "line": null,
+   "terms": []
+  },
+  {
+   "id": "mudzakkar-muannats",
+   "lesson": "114:6",
+   "name": "Mudzakkar dan mu'annats",
+   "latin": "Mudzakkar dan mu'annats",
+   "line": null,
+   "terms": [
+    "ta-tanits"
+   ]
+  },
+  {
+   "id": "tanwin-nakirah",
+   "lesson": "113:3",
+   "name": "Tanwin pada isim (اِسْم)",
+   "latin": "Tanwin pada isim",
+   "line": null,
+   "terms": [
+    "nakirah"
+   ]
+  },
+  {
+   "id": "jamak-muannats-salim",
+   "lesson": "113:4",
+   "name": "Jamak mu'annats salim",
+   "latin": "Jamak mu'annats salim",
+   "line": null,
+   "terms": []
+  },
+  {
+   "id": "nafi-lam",
+   "lesson": "112:3",
+   "name": "Huruf nafi yang menjazmkan",
+   "latin": "Huruf nafi yang menjazmkan",
+   "concept": "jazm-lam",
+   "line": "concept:jazm-lam",
+   "terms": [
+    "nafi",
+    "jazim"
+   ]
+  },
+  {
+   "id": "majzum",
+   "lesson": "112:3",
+   "name": "Majzum",
+   "latin": "Majzum",
+   "concept": "tanda-irab",
+   "part": 4,
+   "occurs": {
+    "case": "majzum"
+   },
+   "line": null,
+   "terms": [
+    "majzum",
+    "jazm"
+   ]
+  },
+  {
+   "id": "kana",
+   "lesson": "112:4",
+   "name": "Kana",
+   "latin": "Kana",
+   "concept": "kana-wa-akhawatuha",
+   "line": "concept:kana-wa-akhawatuha",
+   "terms": [
+    "kana",
+    "nawasikh",
+    "yakunu",
+    "laisa",
+    "shara"
+   ]
+  },
+  {
+   "id": "istitsna",
+   "lesson": "2:255/1",
+   "name": "Istitsna'",
+   "latin": "Istitsna'",
+   "line": null,
+   "terms": []
+  },
+  {
+   "id": "la-nafi",
+   "lesson": "2:255/2",
+   "name": "Huruf nafi",
+   "latin": "Huruf nafi",
+   "line": null,
+   "terms": []
+  },
+  {
+   "id": "fail-isim",
+   "lesson": "2:255/2",
+   "name": "Fa’il (فَاعِل) berupa isim (اِسْم)",
+   "latin": "Fa'il berupa isim",
+   "line": null,
+   "terms": []
+  },
+  {
+   "id": "istifham",
+   "lesson": "2:255/4",
+   "name": "Istifham",
+   "latin": "Istifham",
+   "line": null,
+   "terms": []
+  },
+  {
+   "id": "isim-isyarah",
+   "lesson": "2:255/4",
+   "name": "Isim (اِسْم) isyarah",
+   "latin": "Isim isyarah",
+   "line": null,
+   "terms": []
+  },
+  {
+   "id": "zharaf",
+   "lesson": "2:255/5",
+   "name": "Zharaf",
+   "latin": "Zharaf",
+   "line": null,
+   "terms": [
+    "zharaf"
+   ]
+  },
+  {
+   "id": "kasrah-manshub",
+   "lesson": "2:255/7",
+   "name": "Kasrah (كَسْرَة) tanda manshub (مَنْصُوب)",
+   "latin": "Kasrah tanda manshub",
+   "line": null,
+   "terms": []
+  },
+  {
+   "id": "mutsanna",
+   "lesson": "2:255/8",
+   "name": "Mutsanna",
+   "latin": "Mutsanna",
+   "line": null,
+   "terms": []
+  }
+ ],
+ "free": [
+  "nahwu",
+  "sharaf",
+  "hamzah-washal",
+  "ikhfa"
+ ],
+ "lanjut": [
+  "syibhul-jumlah",
+  "wazan-dan-tashrif",
+  "isim-fail",
+  "taqdim-maful",
+  "bab-istifal",
+  "ilal",
+  "bab-ifal",
+  "isim-maful",
+  "naib-fail",
+  "maqul-al-qaul",
+  "dhamir-syan",
+  "khabar-jumlah",
+  "fiil-majhul",
+  "zharaf-idza",
+  "sighat-mubalaghah",
+  "athaf-bayan",
+  "rubai-mujarrad",
+  "hal"
+ ]
+}

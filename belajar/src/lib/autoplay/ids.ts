@@ -17,11 +17,13 @@ import {
 export type LinePart =
   | "intro"
   | "recite"
-  | "map"
+  | `map:${"new" | "learnt" | "later"}`
   | `primer:${number}`
   | `w${number}`
   | `w${number}:compose:${number}`
   | "structure"
+  /** One item of an ayah's structure told item by item (operator 2026-10-13). */
+  | `structure:${number}`
   | `concept:${string}`
   | `ex:${ExerciseKey}:intro`
   | `ex:${ExerciseKey}:${GuidePart}`
@@ -49,13 +51,19 @@ export const promptLineId = (key: ExerciseKey, part: GuidePart): string => `shar
 const SLUG = "[a-z0-9]+(?:-[a-z0-9]+)*";
 const ID = "[a-z0-9]+(?:-[a-z0-9]+)*";
 const EX = EXERCISE_KEYS.join("|");
-const PART = `intro|recite|map|primer:[1-9][0-9]{0,2}|w[1-9][0-9]{0,2}(?::compose:[1-9][0-9]{0,2})?|structure|concept:${ID}|ex:(?:${EX}):(?:[a-z]+(?:_[a-z]+)*|[1-9][0-9]{0,2}:why)|learned|recap|next|done`;
+const PART = `intro|recite|map:(?:new|learnt|later)|primer:[1-9][0-9]{0,2}|w[1-9][0-9]{0,2}(?::compose:[1-9][0-9]{0,2})?|structure(?::[1-9][0-9]{0,2})?|concept:${ID}|ex:(?:${EX}):(?:[a-z]+(?:_[a-z]+)*|[1-9][0-9]{0,2}:why)|learned|recap|next|done`;
 const SHARED = `${SHARED_KEYS.join("|")}|ex:(?:${EX}):(?:${GUIDE_PARTS.join("|")})`;
 /** A split part of a long line: ":a", ":b", … */
 const SPLIT = "(?::[a-z])?";
 
+/** The "ayah" of a line id: an ayah's number — or 0, the place of LESSON ZERO's lines in the
+ *  manifest of the surah that hosts it ("al-fatihah:0:intro"; the basic curriculum's lesson
+ *  with no ayah, decision 1; pipeline/validate_narration.py lesson_zero). */
+export const ZERO_AYAH = 0;
+const AYAH = "(?:0|[1-9][0-9]{0,2})";
+
 /** Every valid line id (a split part "<id>:a" included). */
-export const LINE_ID_RE = new RegExp(`^(?:${SLUG}:[1-9][0-9]{0,2}:(?:${PART})|shared:(?:${SHARED}))${SPLIT}$`);
+export const LINE_ID_RE = new RegExp(`^(?:${SLUG}:${AYAH}:(?:${PART})|shared:(?:${SHARED}))${SPLIT}$`);
 
 export type ParsedLineId = {
   /** The id without a split suffix. */

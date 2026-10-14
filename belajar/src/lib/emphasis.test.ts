@@ -184,19 +184,26 @@ describe("emphasisSpans: what a text emphasises", () => {
     // A transliteration's ‘ain is the term's.
     expect(shown("Konsep baru: ‘Athaf (عَطْف), yaitu kata sambung")).toEqual([["term", "‘Athaf (عَطْف)"]]);
     const concept = (id: string) => CAPTIONS.find(([where]) => where.endsWith(`:concept:${id}`))![1];
-    const name = (id: string) => shown(concept(id)).find(([k]) => k === "term")?.[1];
-    expect(name("dhamir-syan")).toBe("Dhamir (ضَمِير) sya'n");
-    expect(name("khabar-jumlah")).toBe("Khabar (خَبَر) jumlah");
-    expect(name("athaf-bayan")).toBe("‘Athaf (عَطْف) bayan");
+    const nameIn = (caption: string) => shown(caption).find(([k]) => k === "term")?.[1];
+    const name = (id: string) => nameIn(concept(id));
     expect(name("murab-mabni")).toBe("Mu’rab (مُعْرَب) dan mabni (مَبْنِيّ)");
-    expect(name("wazan-dan-tashrif")).toBe("Wazan (وَزْن) dan tashrif (تَصْرِيف)");
-    expect(name("bab-ifal")).toBe("Bab if‘āl (إِفْعَال)");
-    expect(name("fiil-majhul")).toBe("Fi'il majhul");
     expect(name("kana-wa-akhawatuha")).toBe("Kana dan saudaranya");
-    expect(name("hal")).toBe("Hal");
-    expect(name("maqul-al-qaul")).toBe("Maqul al-qaul");
-    expect(name("rubai-mujarrad")).toBe("Ruba'i mujarrad");
-    expect(name("sighat-mubalaghah")).toBe("Shighat mubalaghah");
+    // A step with its own text (the curriculum, 2026-10-13): named the same way.
+    expect(name("majrur")).toBe("Majrur (مَجْرُور)");
+    expect(name("alif-lam")).toBe("Alif lam (ال)");
+    // The same rule on the captions of the records that are next-level since 2026-10-13 (no lesson
+    // says their "Konsep baru" line any more; a lesson map's card still names them this way): each
+    // as its line stood.
+    expect(nameIn("Konsep baru: Dhamir (ضَمِير) sya'n (kata ganti yang artinya “perkara”). Dhamir (ضَمِير) sya'n ialah kata ganti.")).toBe("Dhamir (ضَمِير) sya'n");
+    expect(nameIn("Konsep baru: Khabar (خَبَر) jumlah, yaitu khabar (خَبَر) berupa kalimat.")).toBe("Khabar (خَبَر) jumlah");
+    expect(nameIn("Konsep baru: ‘Athaf (عَطْف) bayan (penjelas yang mengikuti).")).toBe("‘Athaf (عَطْف) bayan");
+    expect(nameIn("Konsep baru: Wazan (وَزْن) dan tashrif (تَصْرِيف), yaitu cetakan kata.")).toBe("Wazan (وَزْن) dan tashrif (تَصْرِيف)");
+    expect(nameIn("Konsep baru: Bab if‘āl (إِفْعَال), yaitu wazan (وَزْن) af‘ala (أَفْعَلَ).")).toBe("Bab if‘āl (إِفْعَال)");
+    expect(nameIn("Konsep baru: Fi'il majhul, yaitu kata kerja pasif.")).toBe("Fi'il majhul");
+    expect(nameIn("Konsep baru: Hal (keterangan keadaan).")).toBe("Hal");
+    expect(nameIn("Konsep baru: Maqul al-qaul (isi perkataan sesudah kata pertama).")).toBe("Maqul al-qaul");
+    expect(nameIn("Konsep baru: Ruba'i mujarrad (kata kerja empat huruf asli).")).toBe("Ruba'i mujarrad");
+    expect(nameIn("Konsep baru: Shighat mubalaghah (bentuk yang artinya “sangat, sering”).")).toBe("Shighat mubalaghah");
     // A title that opens with a description, not the name: nothing ("Huruf yang menafikan …").
     expect(name("jazm-lam")).toBeUndefined();
     expect(shown("Konsep baru — Kalimah: isim, fi'il, huruf (tiga jenis kata): …")).toEqual([["term", "Kalimah"]]);
@@ -354,7 +361,9 @@ describe("emphasisSpans: what a text emphasises", () => {
         expect(has(s, "term", (m.index ?? 0) + m[0].length), `${where}: ${s.slice(m.index ?? 0, (m.index ?? 0) + 60)}`).toBe(true);
       }
     }
-    expect(meanings).toBeGreaterThan(350);
+    // 350 since the basic curriculum (2026-10-13): the wazan exercise's lines and the "Konsep
+    // baru" lines of the next-level records left the lessons.
+    expect(meanings).toBeGreaterThan(330);
     expect(terms).toBeGreaterThan(60);
     expect(roles).toBeGreaterThan(60);
   });
@@ -370,12 +379,15 @@ describe("emphasisSpans: what a text emphasises", () => {
       ["meaning", "“bagi”"],
       ["meaning", "“Dia”"],
     ]);
-    // The real one the operator's example comes from: the gloss “dengan” and the answer.
-    const why = CAPTIONS.find(([where]) => where === "al-fatihah al-fatihah:1:ex:why-harakat:1:why")![1];
-    expect(why).toMatch(/yang artinya “dengan”.*Jadi, kata ini majrur \(مَجْرُور\)\.$/u);
-    expect(shown(why)).toEqual([
-      ["meaning", "“dengan”"],
-      ["term", "majrur (مَجْرُور)"],
+    // A real one: a gloss after "yang artinya" and the answer. (The operator's example was ayah
+    // 1's first why-harakat question, “dengan”; ayah 1 asks no reason since 2026-10-13 — no wrong
+    // option is taught by then — so this is the same kind of line in ayah 2.)
+    const why = CAPTIONS.find(([where]) => where === "al-fatihah al-fatihah:2:ex:sort-case:2:why")![1];
+    expect(why).toMatch(/yang artinya “bagi”.*Jadi, kata ini majrur \(مَجْرُور\)\.$/u);
+    expect(shown(why).filter(([kind]) => kind === "term")).toEqual([["term", "majrur (مَجْرُور)"]]);
+    expect(shown(why).filter(([kind]) => kind === "meaning").slice(0, 2)).toEqual([
+      ["meaning", "“bagi”"],
+      ["meaning", "“tetap”"],
     ]);
     // No term named in a reason ("disebut …") and no sound ("bunyi i") beside an answer.
     expect(shown("Jadi, kata ini majrur (مَجْرُور). Kata seperti ini disebut isim (اِسْم), bunyi i, yang artinya “nama”.")).toEqual([
@@ -892,7 +904,9 @@ describe("alignEmphasis: the karaoke words take the display's emphasis", () => {
           expect(ok, `${slug} ${id}: "${t}" emphasised as ${kinds[i]}`).toBe(true);
         });
       }
-    expect(lines).toBeGreaterThan(300);
-    expect(spans).toBeGreaterThan(200);
+    // Not vacuous; the numbers follow what is rendered (344 lines when every Al-Fatihah line had
+    // its voice, 294 on 2026-10-13 with the reworded lessons waiting for their render).
+    expect(lines).toBeGreaterThan(250);
+    expect(spans).toBeGreaterThan(150);
   });
 });

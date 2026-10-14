@@ -78,13 +78,49 @@ jobs:
       - name: Compositions — validator mutation tests (corpus-free)
         run: python3 pipeline/test_validate_compose.py --no-corpus
 
+      # The basic curriculum (operator 2026-10-13, plan L26: "we distribute the lessons into these
+      # ayats"; "let's focus on the basic first for those ayats/surahs, the more advanced ones
+      # reserved for later in different surah/ayats"; decision 7: at most three new steps per
+      # lesson, and no lesson line may use a term before the lesson that teaches it). ONE place
+      # says which lesson teaches what (pipeline/authored/curriculum.json → content/curriculum.json);
+      # the "Konsep baru" lines, the lesson map, the quiz guard and the app all read it. Checked
+      # here: content/curriculum.json equals a fresh build; every step in one lesson that exists,
+      # at most three a lesson; every Konsep record placed once (taught whole, split into steps, or
+      # next-level: never two, none left out); a term owned by at most one step; a step with a text
+      # of its own has its kitab sources and names no Qur'anic word; the lists derived per written
+      # lesson (its lines, new / learnt so far / later / next-level) are the ones the lessons give.
+      # The term-order check itself runs with the narration and the quizzes, below, against the
+      # list of what is still to be reworded (pipeline/authored/curriculum.pending.json: an entry
+      # that is not found any more fails as well as a use that is not listed). Lesson zero (plan
+      # L29, decision 1: the lesson with no ayah) counts as written once a harakat primer is played
+      # there (content/compose `primer.lesson` "0"): its line and its map are derived like an
+      # ayah's. Before the quizzes, the lesson map and the narration, which read it. Stdlib only,
+      # no network.
+      - name: Curriculum — up to date
+        run: python3 pipeline/build_curriculum.py --check
+      - name: Curriculum — validate
+        run: python3 pipeline/validate_curriculum.py
+      - name: Curriculum — planted-fault tests
+        run: python3 pipeline/test_validate_curriculum.py
+
       # Quizzes (operator 2026-10-10: "make sure all questions in quiz already have lesson
       # beforehand when exploring ayat"): content/quiz equal to a fresh build, and for the authored
       # Al-Fatihah plan every term a question, an option, a bin or a form label needs TAUGHT by the
       # narration lines the lesson plays before it (derived from content/narration, not a hand
       # list); wrong options only from ayat already studied, never two correct options. Its
       # planted-fault tests prove the guard fails on an untaught state, an untaught option and two
-      # correct options. Stdlib only, no network.
+      # correct options. Since the basic curriculum (plan L26) a question that asks a term before
+      # its lesson passes only while it is listed in pipeline/authored/curriculum.pending.json
+      # (and a listed question that is taught by now fails: the list can only shrink), and no
+      # basic lesson asks the wazan exercise (decision 6). Since plan L31 (operator 2026-10-13:
+      # "in every ayat we identify first each words fall into which category: ismu, fi'il or
+      # harf. it's kind of exercise, kind of warming up"): the WARM-UP that opens every ayah of a
+      # surah with a lesson map is derived here — each part of each word once, in order, its
+      # answer the part's QAC tag and in agreement with the lesson's `pos` (a disagreement stops
+      # the build), a sign only where the data shows it and an earlier lesson taught it, the three
+      # answers and its sentence's terms taught by the lessons BEFORE it — and the explanation
+      # shown after any answer (a word's `why_basic`: what the narrator says) is held to TAUGHT
+      # too. Stdlib only, no network.
       - name: Quizzes — up to date
         run: python3 pipeline/build_quiz.py --check
       - name: Quizzes — taught before tested
@@ -109,13 +145,17 @@ jobs:
         run: python3 pipeline/test_validate_ayat.py --no-corpus
 
       # The lesson map (operator 2026-10-13, plan L23: an ayah opens by saying what is new, what it
-      # repeats and what it only teaches later, and closes by saying what it taught): per surah
-      # switched on (pipeline/authored/<slug>.map.json; Al-Fatihah), content/map/<slug>.json equals
-      # a fresh build; new is the ayah's concept lines, review really taught earlier, later really
-      # taught later and on the ayah's words; every name is the one its caption opens with; an
-      # authored later item (marfu' in ayah 1) points at a line that exists, in a later ayah, and
-      # names it. What the two narration lines say against the map is the narration validator's
-      # part, below. Stdlib only, no network.
+      # repeats and what it only teaches later, and closes by saying what it taught — and, with
+      # the basic curriculum, plan L26: "so the knowledge is accummulating and repeated"; "but
+      # separate new vs already knows concept, this is what new, this is what we've learnt so
+      # far"): per surah switched on (pipeline/authored/<slug>.map.json; Al-Fatihah),
+      # content/map/<slug>.json (version 2) equals a fresh build; per ayah its four lists are the
+      # curriculum's — new = the steps its lesson teaches, learnt = EVERY earlier step with the
+      # ones that occur in this ayah marked, later = a later lesson's step that occurs here,
+      # lanjut = the next-level records on its words —, never one step in two of them; every name
+      # is the one its caption opens with and no name says a Qur'anic word. What the map's
+      # narration lines (one per group, and the closing with its running total) say against the
+      # map is the narration validator's part, below. Stdlib only, no network.
       - name: Lesson map — up to date
         run: python3 pipeline/build_map.py --check
       - name: Lesson map — validate
@@ -123,6 +163,16 @@ jobs:
       - name: Lesson map — planted-fault tests
         run: python3 pipeline/test_validate_map.py
 
+      # … and no term before its lesson (plan L26, decision 7): every grammar term a line says —
+      # found in its prose through the pronunciation dictionary, so in any spelling, and through
+      # the term table's own Latin forms where the dictionary has no entry (nafi, zharaf, a form
+      # with -nya) — belongs to a step already taught by then, or the line is listed with that
+      # term in pipeline/authored/curriculum.pending.json; an unlisted use fails, and so does a
+      # listed one that is gone (Al-Fatihah's part of the list is empty since 2026-10-13).
+      # Also here (plan L27–L29): an ayah's structure told item by item (`structure:1…n`, each
+      # lighting its own words, spoken as authored and never split), the narrated `why_basic` of a
+      # word, and the lines of lesson zero (`<slug>:0:…`: intro, the harakat primer, the kalimah
+      # record's line, next), which Al-Fatihah 1 must no longer play.
       - name: Narration — manifests up to date
         run: python3 pipeline/build_narration.py --check
       - name: Narration — validate manifests
@@ -256,6 +306,8 @@ jobs:
           for path in /belajar/id /belajar/en /belajar/id/kredit /belajar/id/konsep \
                       /belajar/id/konsep/harakat /belajar/en/konsep/harakat /belajar/id/konsep/huruf-jar \
                       /belajar/id/quran /belajar/en/quran \
+                      /belajar/id/quran/pengantar /belajar/en/quran/pengantar \
+                      /belajar/id/quran/kurikulum /belajar/en/quran/kurikulum \
                       /belajar/id/quran/al-fatihah /belajar/id/quran/al-fatihah/1 \
                       /belajar/id/quran/al-fatihah/7 /belajar/en/quran/al-fatihah/5; do
             code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
@@ -291,8 +343,42 @@ jobs:
           [[ "$(grep -o 'href="/belajar/id/konsep"' <<<"$hub" | wc -l)" -ge 2 ]]
           track="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran)"
           grep -q 'href="/belajar/id/quran/al-fatihah"' <<<"$track"
+          # Lesson zero, "Pengantar: harakat dan tiga jenis kata" (the basic curriculum's lesson with
+          # no ayah, kurikulum-dasar.md decision 1; plan L27): listed FIRST on the track page and on
+          # the Al-Fatihah page — its card stands before the first ayah link —, its page carries the
+          # same single "Mulai pelajaran" and the narration it plays, and Al-Fatihah 1 points a
+          # first-time visitor at it. Its steps in a browser: screenshots.mjs introChecks.
+          surah_page="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah)"
+          for html in "$track" "$surah_page"; do
+            grep -q 'data-intro-card' <<<"$html" || { echo "✗ no lesson-zero card on the track or the Al-Fatihah page"; exit 1; }
+            first="$(grep -oE 'href="/belajar/id/quran/(pengantar|al-fatihah/[0-9]+)"' <<<"$html" | sed -n 1p || true)"
+            [[ "$first" == 'href="/belajar/id/quran/pengantar"' ]] || { echo "✗ the first lesson link is ${first}, not lesson zero's"; exit 1; }
+          done
+          intro="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/pengantar)"
+          grep -q 'data-autoplay="start"' <<<"$intro" || { echo "✗ /quran/pengantar: no autoplay start button"; exit 1; }
+          grep -q '<span>Mulai pelajaran</span>' <<<"$intro" || { echo "✗ /quran/pengantar: Mulai pelajaran label missing"; exit 1; }
+          grep -q '/belajar/media/narration/kang-nandar/al-fatihah/' <<<"$intro" || { echo "✗ /quran/pengantar carries no narration audio"; exit 1; }
+          grep -q 'href="/belajar/id/quran/al-fatihah/1"' <<<"$intro" || { echo "✗ /quran/pengantar does not lead to Al-Fatihah 1"; exit 1; }
+          if grep -qiE '\b(ketuk|mengetuk|diketuk)\b' <<<"$intro"; then echo "✗ /quran/pengantar: says ketuk (use klik)"; exit 1; fi
+          ayah1="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/1)"
+          grep -q 'data-intro-hint' <<<"$ayah1" || { echo "✗ Al-Fatihah 1 does not point a first-time visitor at lesson zero"; exit 1; }
+          if grep -q 'data-intro-hint' <<<"$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/2)"; then echo "✗ Al-Fatihah 2 carries ayah 1's line about lesson zero"; exit 1; fi
           # Ayah chips on the track page: hub → track → ayah N is two taps.
           grep -q 'href="/belajar/id/quran/al-fatihah/7"' <<<"$track"
+          # The basic curriculum's page (operator, 2026-10-13: "we should also explain this
+          # curriculum in the page"; plan L30): the track links it; it links the lessons a visitor
+          # can reach (this container: Al-Fatihah), says "Belum tersedia" for the others, and says
+          # "klik", never "ketuk". What it lists against content/curriculum.json — every lesson
+          # once, in order, a link only into a published surah, none into a hidden one, rendered or
+          # in the RSC payload — is surahs-smoke.mjs's part (curriculumPage), in both containers.
+          grep -q 'href="/belajar/id/quran/kurikulum"' <<<"$track" || { echo "✗ the track page does not link the curriculum page"; exit 1; }
+          kur="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/kurikulum)"
+          grep -q 'href="/belajar/id/quran/al-fatihah/1"' <<<"$kur" || { echo "✗ the curriculum page does not link Al-Fatihah ayah 1"; exit 1; }
+          # … and lesson zero's row links its page (the gate of its card on the track page: the
+          # surah that hosts it is published, as Al-Fatihah always is in this container).
+          grep -q 'href="/belajar/id/quran/pengantar"' <<<"$kur" || { echo "✗ the curriculum page does not link lesson zero (/quran/pengantar)"; exit 1; }
+          grep -q '>Belum tersedia<' <<<"$kur" || { echo "✗ the curriculum page marks no lesson as Belum tersedia"; exit 1; }
+          if grep -qiE '\b(ketuk|mengetuk|diketuk)\b' <<<"$kur"; then echo "✗ /belajar/id/quran/kurikulum: says ketuk (use klik)"; exit 1; fi
           # The lesson page carries the streamed recitation + the AI-assisted footer. ONE imam
           # everywhere and no reciter setting (operator, 2026-10-13: "better to use alafasy for
           # all? no need to give option to user to change"; plan L21): the page carries Mishary
@@ -446,9 +532,12 @@ jobs:
           # (id + en, every ayah; also as an RSC request, percent-encoded, TAB/LF/CR-mangled, and
           # through the pre-hub 308) answers the module's 404 with none of its ayat in the body;
           # the track page (id, en) shows each of them as a "Segera hadir" card that is no <a>
-          # and links nowhere into them; the hub's "Tersedia sekarang" names Al-Fatihah only; the
-          # concept and word pages show their places as plain text, never a link. Lists every
-          # problem, then fails the step after the restart check below.
+          # and links nowhere into them; the curriculum page (id, en; plan L30) lists every lesson
+          # of content/curriculum.json once, in order, links Al-Fatihah's ayat only, marks every
+          # other lesson "Belum tersedia" as plain text and links nowhere into a hidden surah (it
+          # does NAME them: the curriculum is theirs too); the hub's "Tersedia sekarang" names
+          # Al-Fatihah only; the concept and word pages show their places as plain text, never a
+          # link. Lists every problem, then fails the step after the restart check below.
           surahs_rc=0
           node belajar/scripts/ci/surahs-smoke.mjs --hidden || surahs_rc=$?
           # Migrations are idempotent across restarts.
@@ -469,7 +558,10 @@ jobs:
       # container starts like production (no BELAJAR_WARIS, no BELAJAR_SURAHS),
       # so the shots show what production shows: the hidden waris and Al-Ikhlas
       # addresses' 404, the Mu'awwidzat as "Segera hadir" cards (checked in the
-      # browser: no link, nothing to focus) and the end of Al-Fatihah's lesson
+      # browser: no link, nothing to focus), the curriculum page (plan L30;
+      # checked in the browser: only Al-Fatihah's lessons are links, every other
+      # lesson shows "Belum tersedia", nothing scrolls sideways at the largest
+      # text size) and the end of Al-Fatihah's lesson
       # (checked: "Al-Ikhlas segera hadir", no "Surah berikutnya", no move on).
       # The Ilmu Waris pages and the Mu'awwidzat lessons are shot in their
       # switch-on steps below. The
@@ -515,7 +607,7 @@ jobs:
       # Line breaks (operator, 2026-10-10: "make sure the line break is clean and easy to read,
       # sometime i see wrong line break especially for arabic words"). linebreaks.mjs measures
       # where Chromium REALLY breaks the lines of the real image: every page a learner reaches by
-      # its links (hub, track, each linked surah, every linked ayah closed and with every
+      # its links (hub, track, the curriculum page, each linked surah, every linked ayah closed and with every
       # disclosure open, Konsep and every concept, every Kosakata entry linked from those) and the
       # autoplay lesson step by step (Al-Fatihah 1 with the routed narration, so the karaoke
       # caption; 2 and 7 caption-only, 7 up to its end card; each kind of exercise answered once,
@@ -565,9 +657,11 @@ jobs:
       #   smoke (surahs-smoke.mjs): /belajar/api/surahs lists all four; every surah and ayah page
       #         answers 200, each ayah with the single "Mulai pelajaran" button and the one-click
       #         hint, "klik" never "ketuk"; the pre-hub URLs 308 into them; the track page has no
-      #         "Segera hadir" card and links every surah; the hub lists all four; the concept and
-      #         word pages link into each of them again;
-      #   screenshots (screenshots.mjs --surahs): the track, Al-Ikhlas 1, An-Nas 6, and the end of
+      #         "Segera hadir" card and links every surah; the curriculum page links every written
+      #         lesson (Ayat Kursi and the introduction stay "Belum tersedia"); the hub lists all
+      #         four; the concept and word pages link into each of them again;
+      #   screenshots (screenshots.mjs --surahs): the track, the curriculum page (checked in the
+      #         browser: every written lesson a link), Al-Ikhlas 1, An-Nas 6, and the end of
       #         Al-Fatihah offering "Surah berikutnya: Al-Ikhlas" (checked in the browser);
       #   line breaks (linebreaks.mjs --surahs): the check of the step above on this container,
       #         where the pages a learner reaches by links include every Mu'awwidzat surah and ayah

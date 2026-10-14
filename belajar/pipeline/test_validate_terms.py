@@ -34,6 +34,15 @@ def concept(d, cid):
     return next(c for c in d if c["id"] == cid)
 
 
+def must_change(text: str, old: str, new: str) -> str:
+    """`text` with `old` replaced by `new` — and a loud stop when `old` is not there: a planted
+    fault that no longer plants anything would otherwise only show as MISSED (2026-10-13: an
+    example added to a record moved the one a fault was planted in)."""
+    if old not in text:
+        raise AssertionError(f"the planted fault no longer applies: {old!r} is not in {text!r}")
+    return text.replace(old, new)
+
+
 def term(d, tid):
     return next(t for t in d["terms"] if t["id"] == tid)
 
@@ -115,9 +124,12 @@ CASES = [
      lambda d: concept(d["concepts"], "huruf-jar")["marked"].update(
          summary=concept(d["concepts"], "huruf-jar")["marked"]["summary"].replace("[[majrur|majrur]]", "[[majrur|marfu]]", 1)),
      "the marked text differs from the authored markup"),
+    # The example that glosses a word of the ayah with "yang artinya" (an‘amta, 1:7:3) — found by
+    # its place, not by its position in the list (ihdinā, 1:6:1, joined the record on 2026-10-13).
     ("bare-quote-meaning", "concepts",
-     lambda d: concept(d, "jumlah-filiyyah")["examples"][1].update(
-         note=concept(d, "jumlah-filiyyah")["examples"][1]["note"].replace(" yang artinya “Engkau”", " “Engkau”")),
+     lambda d: next(e for e in concept(d, "jumlah-filiyyah")["examples"] if e["loc"] == "1:7:3").update(
+         note=must_change(next(e for e in concept(d, "jumlah-filiyyah")["examples"] if e["loc"] == "1:7:3")["note"],
+                          " yang artinya “Engkau”", " “Engkau”")),
      "meaning in bare quotes"),
     ("akar-for-bentuk-dasar", "parts",
      lambda d: d["parts"][0]["steps"].__setitem__(1, d["parts"][0]["steps"][1].replace("Bentuk dasar", "Akar", 1)),

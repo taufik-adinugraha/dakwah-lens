@@ -39,10 +39,11 @@ import {
   takeContinue,
   type StorageLike,
 } from "./persist";
-import { buildAutoplaySequence, introducedConcepts, sequenceLineIds } from "./sequence";
+import { taughtIn, type CurriculumFile } from "./curriculum";
+import { buildAutoplaySequence, sequenceLineIds } from "./sequence";
 import { ID_TEXTS } from "./texts";
 import { advanceHoldMs, exampleReadMs, partAt, readMs, settleAfterNarrationMs, settleAfterReciteMs, WORD_REPEAT_GAP_MS } from "./timing";
-import { SHARED_KEYS, type AutoplaySequence, type NarrationManifest, type Pace } from "./types";
+import { OPENING_EXERCISES, SHARED_KEYS, type AutoplaySequence, type NarrationManifest, type Pace } from "./types";
 
 const CONTENT = fileURLToPath(new URL("../../../content/", import.meta.url));
 const { input, errors: loadErrors } = loadCheckInput((rel) => {
@@ -50,8 +51,18 @@ const { input, errors: loadErrors } = loadCheckInput((rel) => {
   return existsSync(path) ? readFileSync(path, "utf8") : null;
 });
 const quizOf = (slug: string, n: number) => quizAyahOf(input.quiz?.[slug], n);
+/** What an ayah's lesson teaches as "Konsep baru": the curriculum's steps (plan L26). */
+const taught = (ayah: Parameters<typeof taughtIn>[2]) => taughtIn(input.curriculum as CurriculumFile, input.concepts, ayah);
 
-/** One ayah's sequence, caption-only unless manifests are given. */
+/** The exercises of an ayah as these tests play them: what FOLLOWS its explanations. The warm-up
+ *  that opens a lesson (types.ts OPENING_EXERCISES, operator 2026-10-13) is left out here — this
+ *  file pins the machine on the steps of a lesson by their place (the first word right after
+ *  the imam's ayah, the first exercise "Dengar dan klik") — and has its own file, with the real
+ *  sequences: src/components/autoplay/warm-up.test.ts. runAutoplayChecks (below) drives every
+ *  lesson WITH its warm-up. */
+const exercisesAfter = (slug: string, n: number) => availableExercises(quizOf(slug, n)).filter((k) => !OPENING_EXERCISES.includes(k));
+
+/** One ayah's sequence, caption-only unless manifests are given (without its warm-up: exercisesAfter). */
 function seqFor(
   slug: string,
   n: number,
@@ -65,8 +76,8 @@ function seqFor(
     surahName: surah.name_id,
     ayahCount: surah.ayat.length,
     ayah,
-    introduced: introducedConcepts(input.concepts, ayah.loc),
-    exercises: availableExercises(quizOf(slug, n)),
+    introduced: taught(ayah),
+    exercises: exercisesAfter(slug, n),
     questions: questionNumbers(quizOf(slug, n)),
     texts: ID_TEXTS,
     narration: m.narration ?? null,
@@ -142,15 +153,17 @@ describe("autoplay sequence", () => {
       "recite_word",
       "explain",
     ]);
-    // The lesson page's order: the new concepts, then the structure that uses them.
+    // The lesson page's order: the new concepts, then the structure that uses them. Which ones
+    // is the curriculum's (plan L26): a whole record, a step's own text (marfu', a part of the
+    // i'rab record), a whole record — and no line for syibhul jumlah, a next-level record.
     expect(kinds.slice(10, 14)).toEqual(["concept", "concept", "concept", "structure"]);
     expect(seq.steps.filter((s) => s.kind === "concept").map((s) => s.id)).toEqual([
       "concept:jumlah-ismiyyah",
-      "concept:syibhul-jumlah",
+      "concept:marfu",
       "concept:jamak-mudzakkar-salim",
     ]);
     // The ayah's quiz (content/quiz, taught before tested since 2026-10-11): marfu' is taught at
-    // its first word, so the case sort comes in; wazan only from ayah 5.
+    // its first word, so the case sort comes in; no wazan exercise at the basic level (decision 6).
     expect(seq.steps.filter((s) => s.kind === "exercise").map((s) => s.exercise?.key)).toEqual([
       "tap-word",
       "sort-case",
@@ -180,7 +193,11 @@ describe("autoplay sequence", () => {
 
   it("waits only at the exercises the page renders (Al-Ikhlas 3 has no graded case endings)", () => {
     const keys = seqFor("al-ikhlas", 3).steps.filter((s) => s.kind === "exercise").map((s) => s.exercise?.key);
-    expect(keys).toEqual(["tap-word", "label-role", "wazn-factory"]);
+    expect(keys).toEqual(["tap-word", "label-role"]);
+    // No basic lesson asks the wazan exercise (kurikulum-dasar.md decision 6, 2026-10-13).
+    for (const surah of input.surahs) {
+      for (const a of surah.ayat) expect(availableExercises(quizOf(surah.slug, a.ayah)), a.loc).not.toContain("wazn-factory");
+    }
   });
 
   it("never puts Arabic script in a caption, and every line id is on the contract", () => {
@@ -202,25 +219,28 @@ describe("autoplay sequence", () => {
   });
 
   it("attaches audio only from same-origin narration paths, and plays a split line part by part", () => {
-    const plain = seqFor("al-fatihah", 2);
+    // Al-Ikhlas: its structure is still ONE line built from the summary, which a long text
+    // splits (an item of a structure told item by item — Al-Fatihah since 2026-10-13 — is never
+    // split: pipeline/validate_narration.py).
+    const plain = seqFor("al-ikhlas", 2);
     const { narration, shared } = withAudio(plain);
-    const st = narration.lines["al-fatihah:2:structure"];
-    delete narration.lines["al-fatihah:2:structure"];
-    narration.lines["al-fatihah:2:structure:a"] = { text: "a", audio: { ...st.audio!, url: "/belajar/media/narration/uji/a.mp3", ms: 1000 } };
-    narration.lines["al-fatihah:2:structure:b"] = { text: "b", audio: { ...st.audio!, url: "/belajar/media/narration/uji/b.mp3", ms: 3000 } };
-    narration.lines["al-fatihah:2:recap"].audio = { url: "https://cdn.example.com/x.mp3", ms: 900, sha256: "a".repeat(64) };
-    const seq = seqFor("al-fatihah", 2, { narration, shared });
+    const st = narration.lines["al-ikhlas:2:structure"];
+    delete narration.lines["al-ikhlas:2:structure"];
+    narration.lines["al-ikhlas:2:structure:a"] = { text: "a", audio: { ...st.audio!, url: "/belajar/media/narration/uji/a.mp3", ms: 1000 } };
+    narration.lines["al-ikhlas:2:structure:b"] = { text: "b", audio: { ...st.audio!, url: "/belajar/media/narration/uji/b.mp3", ms: 3000 } };
+    narration.lines["al-ikhlas:2:recap"].audio = { url: "https://cdn.example.com/x.mp3", ms: 900, sha256: "a".repeat(64) };
+    const seq = seqFor("al-ikhlas", 2, { narration, shared });
     expect(seq.steps.find((s) => s.id === "recap")?.cues[0].audio).toEqual([]);
     const structure = seq.steps.find((s) => s.id === "structure")?.cues[0];
-    expect(structure?.audio.map((a) => a.id)).toEqual(["al-fatihah:2:structure:a", "al-fatihah:2:structure:b"]);
+    expect(structure?.audio.map((a) => a.id)).toEqual(["al-ikhlas:2:structure:a", "al-ikhlas:2:structure:b"]);
     expect(structure?.spoken).toBe("a b");
     expect(plain.steps[0].cues[0].spoken).toBeNull();
 
     const r = runner(seq);
     r.send({ type: "start", reason: "continue", from: firstIdx(seq, "structure") });
-    expect(r.s.activity).toMatchObject({ kind: "narrate", file: "al-fatihah:2:structure:a", offsetMs: 0, totalMs: 4000 });
+    expect(r.s.activity).toMatchObject({ kind: "narrate", file: "al-ikhlas:2:structure:a", offsetMs: 0, totalMs: 4000 });
     r.send(end(r.s.activity!));
-    expect(r.s.activity).toMatchObject({ kind: "narrate", file: "al-fatihah:2:structure:b", offsetMs: 1000, totalMs: 4000 });
+    expect(r.s.activity).toMatchObject({ kind: "narrate", file: "al-ikhlas:2:structure:b", offsetMs: 1000, totalMs: 4000 });
     r.send(end(r.s.activity!));
     expect(r.s.activity).toMatchObject({ kind: "wait", ms: settleAfterNarrationMs("biasa") });
   });
@@ -396,7 +416,7 @@ describe("autoplay machine", () => {
     const seq = seqFor("al-ikhlas", 3);
     const r = runner(seq);
     r.send({ type: "start" });
-    for (const key of ["tap-word", "label-role", "wazn-factory"] as const) r.send({ type: "exercise_done", key });
+    for (const key of ["tap-word", "label-role"] as const) r.send({ type: "exercise_done", key });
     r.until((s) => s.phase === "waiting" || s.phase === "finished" || s.idx === seq.steps.length - 1);
     expect(r.s.phase).not.toBe("waiting");
     expect(seq.steps[r.s.idx].kind).toBe("next");
@@ -496,7 +516,7 @@ describe("a word's opening step: as long as the imam's word when the narrator ex
   it("the engine's own check refuses a step that recites a word again (checks.ts sequenceProblems)", () => {
     const ayah = input.surahs.find((s) => s.slug === "al-fatihah")?.ayat[1];
     if (!ayah) throw new Error("no Al-Fatihah 2");
-    const ctx = { ayah, last: false, exercises: availableExercises(quizOf("al-fatihah", 2)), introduced: introducedConcepts(input.concepts, ayah.loc), compose: null };
+    const ctx = { ayah, last: false, exercises: exercisesAfter("al-fatihah", 2), introduced: taught(ayah), compose: null };
     expect(sequenceProblems(plain, ctx)).toEqual([]);
     // What every composition step did until 2026-10-13, planted on a word's explanation.
     const again = structuredClone(plain);
@@ -760,7 +780,10 @@ describe("word places", () => {
   it("rings the words the structure line names, from the real manifest", () => {
     const narration = input.manifests["al-fatihah"] as NarrationManifest;
     const seq = seqFor("al-fatihah", 4, { narration });
-    const at = firstIdx(seq, "structure");
+    // The second item of ayah 4's structure: "… kata pertama disandarkan kepada kata kedua, dan
+    // kata kedua disandarkan kepada kata ketiga …" (the structure is told item by item since
+    // 2026-10-13; until then one line named the three).
+    const at = seq.steps.findIndex((x) => x.id === "structure:2");
     expect(seq.steps[at].cues[0].refs).toEqual([1, 2, 3]);
     const r = runner(seq);
     r.send({ type: "start", from: at, reason: "continue" });
@@ -851,7 +874,10 @@ describe("narration ids and the spoken-text guard", () => {
     expect(parseLineId("al-fatihah:1:concept:huruf-jar")).toMatchObject({ part: "concept:huruf-jar", split: null });
     expect(parseLineId("shared:ex:sort-case:bins")).toMatchObject({ kind: "shared", key: "ex:sort-case:bins" });
     for (const k of SHARED_KEYS) expect(parseLineId(`shared:${k}`)).not.toBeNull();
-    for (const bad of ["al-fatihah:0:intro", "Al-Fatihah:1:intro", "al-fatihah:1:w", "shared:nope", "al-fatihah:1:ex:tap:intro"]) {
+    // "Ayah 0" is the place of lesson zero's lines in the surah that hosts it (zero.ts).
+    expect(parseLineId("al-fatihah:0:intro")).toMatchObject({ kind: "ayah", slug: "al-fatihah", ayah: 0, part: "intro", split: null });
+    expect(parseLineId("al-fatihah:0:primer:9")).toMatchObject({ ayah: 0, part: "primer:9" });
+    for (const bad of ["al-fatihah:00:intro", "al-fatihah:01:intro", "Al-Fatihah:1:intro", "al-fatihah:1:w", "shared:nope", "al-fatihah:1:ex:tap:intro"]) {
       expect(parseLineId(bad)).toBeNull();
     }
   });
@@ -915,9 +941,12 @@ describe("narration ids and the spoken-text guard", () => {
 
 describe("replay (↺ Ulangi langkah ini)", () => {
   it("plays the current step again from its start, also from a pause, and plays on", () => {
-    const seq = seqFor("al-fatihah", 2);
+    // Al-Ikhlas 1: a structure told in ONE long line, whose caption has several parts (an item
+    // of Al-Fatihah's, told item by item since 2026-10-13, is one short part).
+    const seq = seqFor("al-ikhlas", 1);
     const r = runner(seq);
     const at = firstIdx(seq, "structure");
+    expect(seq.steps[at].cues[0].parts.length).toBeGreaterThan(1);
     r.send({ type: "start", from: at, reason: "continue" });
     const first = r.s.activity;
     expect(first?.kind).toBe("read");
@@ -1168,7 +1197,7 @@ describe("autoplay checks (every ayah of every surah)", () => {
       const report = runAutoplayChecks(input);
       for (const n of report.notes) console.info(`autoplay-check note: ${n}`);
       expect(report.errors).toEqual([]);
-      expect(report.stats.ayat).toBe(22);
+      expect(report.stats.ayat).toBe(23); // 22 ayat and lesson zero
       expect(report.stats.simulatedEvents).toBeGreaterThan(10_000);
     },
     FULL_RUN_TIMEOUT_MS,
