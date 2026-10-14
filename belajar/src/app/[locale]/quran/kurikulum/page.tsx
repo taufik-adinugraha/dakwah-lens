@@ -5,11 +5,12 @@ import { BackLink } from "@/components/BackLink";
 import { CurriculumOutline, NextLevelList } from "@/components/curriculum/CurriculumOutline";
 import { ForestGlow } from "@/components/ForestGlow";
 import { MixedText } from "@/components/library/MixedText";
+import { Link } from "@/i18n/navigation";
 import { CURRICULUM, introOpen } from "@/lib/curriculum";
 import { curriculumOutline } from "@/lib/curriculumOutline";
 import { visibleSurahs } from "@/lib/features";
 import { getConcept, LIBRARY } from "@/lib/library";
-import { curriculumHref, quranHref } from "@/lib/routes";
+import { curriculumHref, quranHref, rumusHref } from "@/lib/routes";
 import { alternatesFor, shareMetadata } from "@/lib/share";
 
 export async function generateMetadata({
@@ -104,6 +105,12 @@ export default async function CurriculumPage({ params }: PageProps<"/[locale]/qu
               <MixedText text={t("intro_later")} />
             </p>
           </div>
+          {/* The header's one link to the cheat sheet (plan L32): a formula for each thing below. */}
+          <p className="mt-3">
+            <Link href={rumusHref()} data-rumus-link="" className="link-text inline-flex min-h-12 items-center text-base font-medium">
+              {t("rumus_link")}
+            </Link>
+          </p>
         </header>
 
         <section className="mt-10" aria-labelledby="urutan">

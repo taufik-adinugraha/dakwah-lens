@@ -99,6 +99,7 @@ describe("every place that lists or links surahs reads the switch", () => {
       "src/app/[locale]/page.tsx",
       "src/app/[locale]/quran/page.tsx",
       "src/app/[locale]/quran/kurikulum/page.tsx",
+      "src/app/[locale]/quran/rumus/page.tsx",
       "src/app/[locale]/konsep/[id]/page.tsx",
       "src/app/[locale]/kosakata/[id]/page.tsx",
       "src/app/[locale]/kredit/page.tsx",
@@ -130,6 +131,7 @@ describe("every place that lists or links surahs reads the switch", () => {
       "src/lib/routes.ts", // the helpers themselves
       "src/app/[locale]/quran/page.tsx", // published surahs only; the others are "Segera hadir" cards
       "src/lib/curriculumOutline.ts", // the curriculum page's lessons: a written ayah of a published surah; the others plain text
+      "src/lib/rumusSheet.ts", // the cheat sheet's example links: only a step whose lesson lessonLink() gives a page (a published surah)
       "src/app/[locale]/kosakata/[id]/page.tsx", // published surahs only; the others plain text
       "src/components/library/ConceptCard.tsx", // surahPublished()
       "src/app/[locale]/quran/[surah]/page.tsx", // within its own surah, reached only when published

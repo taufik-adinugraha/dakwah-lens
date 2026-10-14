@@ -43,7 +43,10 @@
     "p3_body": "Explanations are prepared with AI help from named kitabs. This is learning material, not a fatwa: check the references, and ask a teacher when in doubt.",
     "curriculum_heading": "The basic curriculum",
     "curriculum_body": "The lessons build up step by step: at most {max} new things in each lesson, and what has been learnt is repeated whenever it comes up again. See the order, from the introduction lesson to {last}.",
-    "curriculum_link": "See the basic curriculum"
+    "curriculum_link": "See the basic curriculum",
+    "rumus_heading": "Quick formulas",
+    "rumus_body": "One short formula for each thing learnt, with an example from the lessons and the kitab sentence it rests on.",
+    "rumus_link": "See the quick formulas"
   },
   "Curriculum": {
     "title": "The basic curriculum",
@@ -67,7 +70,8 @@
     "open_segment": "Open the lesson on {unit}, part {n}",
     "open_intro": "Open the introduction lesson",
     "next_heading": "Advanced level",
-    "next_body": "The {n} topics below are not taught at the basic level: all of sharaf (word formation) and some advanced nahwu topics. The basic lessons only name them; click a topic to read its explanation on its Concept page."
+    "next_body": "The {n} topics below are not taught at the basic level: all of sharaf (word formation) and some advanced nahwu topics. The basic lessons only name them; click a topic to read its explanation on its Concept page.",
+    "rumus_link": "Quick formulas for each thing learnt"
   },
   "Breadcrumb": {
     "label": "You are here",
@@ -110,7 +114,32 @@
     "image_alt": "Learn Qur'anic Arabic, from Dakwah-Lens",
     "lesson_image_alt": "{surah} · Ayah {n}: transliteration and translation, Learn Qur'anic Arabic from Dakwah-Lens",
     "curriculum_title": "The basic curriculum",
-    "curriculum_body": "The basic lessons in order: what is new in each lesson, and what has been learnt by then."
+    "curriculum_body": "The basic lessons in order: what is new in each lesson, and what has been learnt by then.",
+    "rumus_title": "Quick formulas for Qur'anic Arabic",
+    "rumus_body": "One short formula for each thing learnt, with an example and the kitab sentence it rests on."
+  },
+  "Rumus": {
+    "title": "Quick formulas (rumus singkat)",
+    "description": "Quick formulas for basic Arabic grammar: one short formula for each thing learnt, with an example from the lessons and the kitab sentence it rests on.",
+    "intro_what": "The quick formulas are a short summary of each thing learnt at the basic level, to keep at hand while reading. Each formula comes with one example from the lessons.",
+    "intro_sources": "Each formula restates one sentence of the kitab named under it, in the “Basis” part, with its page and a quotation of that sentence. A thing with no kitab sentence that can be quoted has no formula yet.",
+    "intro_label": "AI-assisted, not an authoritative fatwa. These formulas are drawn from the kitab named under them; check the references.",
+    "intro_with_lesson": "The quick formulas complement the full explanation in the lessons and on the Concept pages; they do not replace it.",
+    "curriculum_link": "See the order of the lessons in the basic curriculum",
+    "list_heading": "A formula for each thing learnt",
+    "list_help": "The order is that of the lessons. For now {shown, plural, one {# formula is} other {# formulas are}} available of {steps} things to learn; things in readings that are not available yet are marked “Not available yet”.",
+    "unit_meta": "{shown, plural, one {# formula} other {# formulas}} available, {steps, plural, one {# thing} other {# things}} to learn",
+    "taught_in": "Learnt in: {place}",
+    "none": "No formula yet.",
+    "none_hint": "There is no kitab sentence to quote for this yet.",
+    "awas": "Take care:",
+    "example": "Example from the lessons",
+    "example_open": "Open {unit}, ayah {ayah}, word {n}",
+    "basis": "Basis",
+    "page": "p. {page}",
+    "section": "Section:",
+    "shamela": "Open the page on Shamela",
+    "shamela_label": "Open page {page} of {kitab} on Shamela"
   },
   "Credits": {
     "title": "Sources & licences",

@@ -150,6 +150,11 @@ describe("proxy: only the surahs BELAJAR_SURAHS publishes (unset: Al-Fatihah onl
     expect(landing("/belajar/id/quran/kurikulum")).toBe("/belajar/id/quran/kurikulum");
     expect(landing("/belajar/en/quran/kurikulum")).toBe("/belajar/en/quran/kurikulum");
     expect(landing("/belajar/id/quran/kurikulum/og")).toBe("/belajar/id/quran/kurikulum/og");
+    // The cheat sheet (plan L32) the same: its page and card are the track's, never gated, and its
+    // own gate (a formula of a hidden surah is not drawn) is in the page, not the proxy.
+    expect(landing("/belajar/id/quran/rumus")).toBe("/belajar/id/quran/rumus");
+    expect(landing("/belajar/en/quran/rumus")).toBe("/belajar/en/quran/rumus");
+    expect(landing("/belajar/id/quran/rumus/og")).toBe("/belajar/id/quran/rumus/og");
     // Not a lesson: the lesson routes' own 404 (dynamicParams = false), not the gate's.
     expect(landing("/belajar/id/quran/al-baqarah")).toBe("/belajar/id/quran/al-baqarah");
     expect(landing("/belajar/id/quran/al-ikhlasan")).toBe("/belajar/id/quran/al-ikhlasan");

@@ -58,6 +58,11 @@ export function curriculumCard(t: Translate): CardText {
   return { eyebrow: t("track"), title: t("curriculum_title"), body: t("curriculum_body") };
 }
 
+/** The cheat sheet's card (quran/rumus/og/route.ts): like the track's, it names no surah. */
+export function rumusCard(t: Translate): CardText {
+  return { eyebrow: t("track"), title: t("rumus_title"), body: t("rumus_body") };
+}
+
 export function lessonCard(t: Translate, s: SurahContent, a: Ayah): CardText {
   return {
     eyebrow: t("track"),
