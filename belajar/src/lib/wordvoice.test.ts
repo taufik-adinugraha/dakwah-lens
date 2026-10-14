@@ -25,6 +25,12 @@ describe("the plain-letter rule (pipeline/wordvoice.py plain)", () => {
     expect(plainLetters("\u0647\u064f\u062f\u064e\u0649")).toBe("\u0647\u064f\u062f\u064e\u0649");
   });
 
+  it("writes a ta marbuta that carries a vowel as the open ta, and leaves a stop", () => {
+    expect(plainLetters("\u062c\u0650\u0646\u0651\u064e\u0629\u0650")).toBe("\u062c\u0650\u0646\u0651\u064e\u062a\u0650");
+    expect(plainLetters("\u062c\u0646\u0629\u0652")).toBe("\u062c\u0646\u0629\u0652");
+    expect(plainLetters("\u062c\u0646\u0629")).toBe("\u062c\u0646\u0629");
+  });
+
   it("is the Python rule: every text the builder keyed is already plain, and every content word lands on a key", () => {
     for (const t of Object.keys(M.words)) expect(plainLetters(t), t).toBe(t);
     for (const w of lessonWords) expect(M.words[plainLetters(w.ar)], w.loc).toBeDefined();

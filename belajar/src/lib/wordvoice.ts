@@ -26,7 +26,8 @@ export function plainLetters(text: string): string {
     out += TO_LETTER[cp] ?? ch;
   }
   // kasrah + alif maqsura (alladhī, fī) is the long ī: a ya with its dots; after a fathah it stays (hudā)
-  return out.replaceAll("\u0650\u0649", "\u0650\u064a");
+  // a ta marbuta that carries a vowel (al-jinnati) is the open ta: the model reads ة as a final "h"
+  return out.replaceAll("\u0650\u0649", "\u0650\u064a").replace(/\u0629(?=[\u064b-\u0650])/gu, "\u062a");
 }
 
 export type WordVoiceEntry = { audio?: { url: string; ms: number; sha256: string } };

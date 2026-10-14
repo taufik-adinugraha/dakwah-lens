@@ -35,6 +35,11 @@ class PlainLetters(unittest.TestCase):
         self.assertEqual(W.plain("\u0630\u0650\u0649"), "\u0630\u0650\u064A")  # alladhī: ى -> ي
         self.assertEqual(W.plain("\u0647\u064F\u062F\u064E\u0649"), "\u0647\u064F\u062F\u064E\u0649")  # hudā stays
 
+    def test_a_ta_marbuta_with_a_vowel_is_the_open_ta_and_a_stop_stays(self):
+        self.assertEqual(W.plain("\u062C\u0650\u0646\u0651\u064E\u0629\u0650"), "\u062C\u0650\u0646\u0651\u064E\u062A\u0650")  # al-jinnati
+        self.assertEqual(W.plain("\u062C\u0646\u0629\u0652"), "\u062C\u0646\u0629\u0652")  # sukun: a stop
+        self.assertEqual(W.plain("\u062C\u0646\u0629"), "\u062C\u0646\u0629")  # no mark: a stop
+
     def test_ordinary_harakat_are_untouched_and_the_rule_is_idempotent(self):
         w = "بِسْمِ"
         self.assertEqual(W.plain(w), w)
