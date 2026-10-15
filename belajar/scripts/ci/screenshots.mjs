@@ -1957,10 +1957,14 @@ async function warmupChecks(page, vp, index) {
   const stage = page.locator('[data-autoplay="stage"]');
   const middle = page.locator('[data-autoplay="middle"]');
   try {
-    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
-    // The earlier checks left a remembered place on this ayah ("Lanjutkan dari langkah N").
+    // The earlier checks left a remembered place on this ayah ("Lanjutkan dari langkah N"): it is
+    // cleared on a page of the same origin that fetches no lesson media (the Kredit page), so the
+    // lesson page is loaded ONCE — step 1 counts every fetch of its files (two loads would each
+    // fetch them, which says nothing about the page).
+    await page.goto(BASE + "/belajar/id/kredit", { waitUntil: "networkidle" });
     await page.evaluate(() => localStorage.removeItem("belajar:v1:autoplay:al-fatihah/1"));
-    await page.reload({ waitUntil: "networkidle" });
+    if (media.length || seen.length) throw new Error(`${vp}: early fetch — the Kredit page asked for lesson media: ${[...media.map((m) => m.path), ...seen].join(", ")}`);
+    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
     // The recordings of the two pages this check visits: each ayah's one recitation.
     const mine = recitationOf(1).url;
