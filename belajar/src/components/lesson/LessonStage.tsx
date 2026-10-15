@@ -1000,10 +1000,12 @@ export function LessonStage({
               <button
                 type="button"
                 data-autoplay="prev"
+                // Unavailable only where there is nothing before: the lesson's first step, on its
+                // first frame (a step with frames goes back frame by frame; machine.ts hasPrev).
                 onClick={() => {
-                  if (view.index > 0) actions.prev();
+                  if (view.hasPrev) actions.prev();
                 }}
-                aria-disabled={view.index === 0}
+                aria-disabled={!view.hasPrev}
                 className="btn-nav w-full sm:order-1 sm:px-5!"
               >
                 <ChevronLeft aria-hidden className="h-5 w-5" />

@@ -85,11 +85,23 @@
  *    "word", a word's recording); resume tries it again.
  *  - prev/next jump steps (keeping play/pause); after the last step the
  *    state is "finished" and `intent` says where to go (next ayah | end of
- *    the surah).
+ *    the surah). ON A STEP WITH ANIMATION FRAMES (the harakat primer, a
+ *    word's composition; operator report 2026-10-15: on the kasrah frame of
+ *    the primer, "‹ Sebelumnya" went back to the first page and "Berikutnya ›"
+ *    left the primer) they jump FRAMES: a frame is the run of the step's plan
+ *    said or heard over one frame (its lines, then their example beats and
+ *    pauses: frameRuns), the current frame the one the stage shows (frameNow,
+ *    caption.ts stageFrame's rule). "Berikutnya" starts the next frame from its
+ *    first line, "Sebelumnya" the previous one; only on the first frame does
+ *    "Sebelumnya" go to the previous step, and only on the last does
+ *    "Berikutnya" go to the next. In "Tunggu saya"'s held caption plain `next`
+ *    stays "Lanjut" (the next caption); the "Berikutnya ›" control sends
+ *    `next` with `jump`, which moves by frame there too.
  *  - replay ("↺ Ulangi langkah ini", operator 2026-10-10) plays the current
  *    step again from its start — also from a pause, and from "Tunggu saya"'s
- *    Lanjut — and plays on from there. An exercise starts over at its first
- *    control (the stage remounts the exercise itself).
+ *    Lanjut — and plays on from there; on a step with frames, from its first
+ *    frame (the button says "langkah ini", the step). An exercise starts over
+ *    at its first control (the stage remounts the exercise itself).
  *  - EXAMPLE BEATS (operator 2026-10-12: "each explanation should be followed
  *    by examples (visual + voice)"; plan L20; types.ts ExampleBeat): a step's
  *    beat comes right after the line it follows — the stage shows the example
@@ -322,9 +334,13 @@ export type AutoplayEvent =
   /** While wantsIdleTicks(state): silent time passed, in ms (an exercise waiting: its reminders,
    *  then the screen lock's limit; "Tunggu saya" holding a caption: that limit only). */
   | { type: "idle_tick"; ms: number }
+  /** "‹ Sebelumnya": the previous frame of a step with frames, else the previous step. */
   | { type: "prev" }
-  /** "Berikutnya", and "Lanjut" in the "Tunggu saya" mode. */
-  | { type: "next" }
+  /** "Berikutnya" (the next frame of a step with frames, else the next step), and "Lanjut" in the
+   *  "Tunggu saya" mode. `jump`: sent by the "Berikutnya ›" control (the button, Media Session's
+   *  next track) — while "Tunggu saya" holds a caption it moves on by frame on a step with frames,
+   *  where Lanjut (no `jump`) moves on by caption. Elsewhere the two are the same. */
+  | { type: "next"; jump?: boolean }
   /** "↺ Ulangi langkah ini": the current step again, from its start. */
   | { type: "replay" }
   | { type: "set_pace"; pace: Pace };
@@ -529,6 +545,88 @@ function planFor(seq: AutoplaySequence, s: AutoplayState, step: AutoplayStep): A
   return plan;
 }
 
+// ───────────────────────────── frames ─────────────────────────────
+
+/** Does `step` play over animation frames (the harakat primer, a word's composition)? */
+const hasFrames = (step: AutoplayStep) => (step.kind === "primer" || step.kind === "compose") && (step.frames ?? 0) > 1;
+
+/** The frame (1-based) action `a` of `step`'s plan is said or heard over: a line's (its cue's
+ *  `frame`), or an example beat's own (a `base` frame's bentuk dasar); null for anything else (a
+ *  pause, a shared line, the word recited at the end of an ayah's last word). */
+function actionFrame(step: AutoplayStep, a: Action | undefined): number | null {
+  if (a?.t === "example") return step.examples?.[a.x]?.frame ?? null;
+  return a?.t === "say" && "c" in a.ref ? (step.cues[a.ref.c]?.frame ?? null) : null;
+}
+
+/**
+ * The frames of a plan of a step with frames, in play order: each frame's number and the index of
+ * its first action — the first line said over it. A frame runs from there to the next frame's first
+ * action: its lines, the example beats that follow them, the pauses after them (and, on the
+ * composition of an ayah's last word, the word recited after its last line). Empty on any other
+ * step.
+ */
+export function frameRuns(step: AutoplayStep, plan: readonly Action[]): { frame: number; at: number }[] {
+  if (!hasFrames(step)) return [];
+  const out: { frame: number; at: number }[] = [];
+  plan.forEach((a, at) => {
+    const f = actionFrame(step, a);
+    if (f !== null && f !== out.at(-1)?.frame) out.push({ frame: f, at });
+  });
+  return out;
+}
+
+/**
+ * The frame on screen at plan[at] of a step with frames — the rule of caption.ts stageFrame (the
+ * stage draws what this says; ahead.test / frames.test hold the two equal): the frame of the
+ * action there; while the word is recited, or once the plan is through, the last frame; in a
+ * pause, or a shared line, the frame of the action before it, else the one after it.
+ */
+function frameAtPlan(step: AutoplayStep, plan: readonly Action[], at: number): number {
+  const last = step.frames ?? 1;
+  const reciting = (i: number) => {
+    const a = plan[i];
+    return a?.t === "recite" || a?.t === "gap" || (a?.t === "settle" && a.after === "recite");
+  };
+  if (at >= plan.length || reciting(at)) return last;
+  const here = actionFrame(step, plan[at]);
+  if (here !== null) return here;
+  for (let i = at - 1; i >= 0; i--) {
+    const f = actionFrame(step, plan[i]);
+    if (f !== null) return f;
+    if (reciting(i)) return last;
+  }
+  for (let i = at + 1; i < plan.length; i++) {
+    const f = actionFrame(step, plan[i]);
+    if (f !== null) return f;
+    if (reciting(i)) return last;
+  }
+  return 1;
+}
+
+/** The frame the lesson is on (the one the stage shows), or null: not a step with frames, or not
+ *  started / finished. */
+export function frameNow(seq: AutoplaySequence, s: AutoplayState): number | null {
+  if (!s.started || s.phase === "idle" || s.phase === "finished") return null;
+  const step = stepOf(seq, s);
+  return hasFrames(step) ? frameAtPlan(step, s.plan, s.at) : null;
+}
+
+/**
+ * Where "‹ Sebelumnya" (`by` −1) or "Berikutnya ›" (+1) goes inside the current step: the frame
+ * before or after the current one, by the frames of the plan the step gets on entry; null when
+ * there is none — not a step with frames, its first frame going back, its last going on — and the
+ * move is a step's.
+ */
+function frameHop(seq: AutoplaySequence, s: AutoplayState, by: -1 | 1): number | null {
+  const now = frameNow(seq, s);
+  if (now === null) return null;
+  const step = stepOf(seq, s);
+  const runs = frameRuns(step, planFor(seq, entered(seq, s, s.idx), step));
+  const k = runs.findIndex((r) => r.frame === now);
+  if (k === -1) return null;
+  return runs[k + by]?.frame ?? null;
+}
+
 // ───────────────────────────── transitions ─────────────────────────────
 
 /** Starts plan[at] (or completes the step when the plan is through). */
@@ -638,19 +736,29 @@ function finish(seq: AutoplaySequence, s: AutoplayState): AutoplayState {
 
 /**
  * Goes to step `idx`. `run` false: shows it paused. `skipDone`: pass
- * exercises that already reported done (moving forward only).
+ * exercises that already reported done (moving forward only). `fromFrame`
+ * (a step with frames: "‹ Sebelumnya" / "Berikutnya ›" between its frames):
+ * the step's plan as on any entry, started at that frame's first action
+ * (frameRuns) instead of its first — the plan whole, so what the rest of
+ * the step plays, and the look-ahead lists, is the plan from there; shown
+ * paused, the caption is that action's.
  */
 function enter(
   seq: AutoplaySequence,
   s: AutoplayState,
   idx: number,
-  opts: { run: boolean; skipDone: boolean; prefix?: Action[] },
+  opts: { run: boolean; skipDone: boolean; prefix?: Action[]; fromFrame?: number },
 ): AutoplayState {
   const i = entryIndex(seq, s, idx, opts.run && opts.skipDone);
   const base = entered(seq, s, i);
   const plan = [...(opts.prefix ?? []), ...planFor(seq, base, seq.steps[i])];
-  if (!opts.run) return { ...base, plan, phase: "paused", pausedFrom: "running" };
-  return run(seq, { ...base, plan }, false);
+  const at = opts.fromFrame === undefined ? 0 : (frameRuns(seq.steps[i], plan).find((r) => r.frame === opts.fromFrame)?.at ?? 0);
+  if (!opts.run) {
+    const a = plan[at];
+    const caption: CaptionRef = at > 0 && a?.t === "say" ? a.ref : at > 0 && a?.t === "example" ? { x: a.x } : base.caption;
+    return { ...base, plan, at, caption, phase: "paused", pausedFrom: "running" };
+  }
+  return run(seq, { ...base, plan, at }, false);
 }
 
 /** The step `enter` lands on for `idx`: `skipDone` passes the exercises that already reported
@@ -1010,6 +1118,10 @@ function reduce(seq: AutoplaySequence, s: AutoplayState, e: AutoplayEvent): Auto
 
     case "prev": {
       if (s.phase === "idle") return s;
+      // A step with frames: the frame before this one, from its first line (playing, or shown
+      // paused); its first frame goes back a step.
+      const back = frameHop(seq, s, -1);
+      if (back !== null) return enter(seq, s, s.idx, { run: s.phase !== "paused", skipDone: false, fromFrame: back });
       const to = s.phase === "finished" ? s.idx : Math.max(0, s.idx - 1);
       return enter(seq, s, to, { run: s.phase !== "paused", skipDone: false });
     }
@@ -1035,9 +1147,14 @@ function reduce(seq: AutoplaySequence, s: AutoplayState, e: AutoplayEvent): Auto
       const step = stepOf(seq, s);
       // Forward from an open exercise is "Lewati latihan" (skip), never next.
       if (step.kind === "exercise" && isOpen(s.exercise)) return s;
-      if (s.phase === "ready") return proceed(seq, s);
-      if (s.idx >= lastIdx(seq)) return finish(seq, s);
+      // "Lanjut" (a held caption, no `jump`): the next caption — and so on any step without frames.
+      if (s.phase === "ready" && (!e.jump || !hasFrames(step))) return proceed(seq, s);
       const play = s.phase !== "paused";
+      // A step with frames: the frame after this one, from its first line; its last frame goes
+      // on to the next step.
+      const on = frameHop(seq, s, 1);
+      if (on !== null) return enter(seq, s, s.idx, { run: play, skipDone: false, fromFrame: on });
+      if (s.idx >= lastIdx(seq)) return finish(seq, s);
       return enter(seq, s, s.idx + 1, { run: play, skipDone: play });
     }
 
@@ -1132,6 +1249,10 @@ export type AutoplayView = {
   refWords: number[];
   activity: Activity | null;
   canPrev: boolean;
+  /** "‹ Sebelumnya" goes somewhere: a step before this one, or a frame before the current one (on
+   *  the first step too: its second frame goes back to its first). False on the very first frame
+   *  of the lesson — the button is shown unavailable there. */
+  hasPrev: boolean;
   /** False on an exercise step: forward there is "Lewati latihan". */
   canNext: boolean;
   showSkip: boolean;
@@ -1158,6 +1279,7 @@ export function viewAutoplay(seq: AutoplaySequence, s: AutoplayState): AutoplayV
     refWords: s.caption !== "step" && "c" in s.caption ? (step.cues[s.caption.c]?.refs ?? []) : [],
     activity: s.activity,
     canPrev: live,
+    hasPrev: s.idx > 0 || frameHop(seq, s, -1) !== null,
     canNext: live && !openExercise,
     showSkip: live && openExercise,
     showLanjut: s.phase === "ready",
