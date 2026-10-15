@@ -32,6 +32,7 @@ import {
   narrationIndex,
   narrationRoute,
   QURAN_COM_PREFIX,
+  wordVoiceEnds,
   wordVoiceFile,
   wordVoiceIndex,
 } from "./narration-route.mjs";
@@ -1217,6 +1218,8 @@ async function clipChecks(page, vp, index) {
   }
   // The narrator's files: their addresses (paths) → their length in ms.
   const voices = await wordVoiceIndex();
+  // Where the player stops each recording: a Quran.com word at its `end` marker (not the file's length).
+  const stopsAt = await wordVoiceEnds();
   if (!voices.size) throw new Error("content/wordvoice.json names no recording");
   // The diagrams a concept page shows outside "Lihat N kata lainnya" (ConceptCard PARTS_SHOWN = 2):
   // each one's joined word and every tile (a part of a word too) has a button.
@@ -1285,8 +1288,9 @@ async function clipChecks(page, vp, index) {
           if (!bytes.get(b.loc)) fail(`button ${b.i} names ${b.loc}, which is no word of the lessons nor a text of content/library.json \`quran\``);
           if (b.tag !== "BUTTON" || b.type !== "button") fail(`${b.loc}: not a <button type="button">`);
           if (b.height < 47.5) fail(`${b.loc}: ${b.height}px tall (< 48px)`);
-          const prefix = msgs.Clip.play_label.replace("{word}", "");
-          if (!b.label.startsWith(prefix) || b.label.length <= prefix.length) fail(`${b.loc}: aria-label “${b.label}” does not name its word`);
+          // A word is labelled by where its sound comes from: Quran.com's recording, or the AI voice.
+          const prefixes = [msgs.Clip.play_label, msgs.Clip.play_label_qc].map((m) => m.replace("{word}", ""));
+          if (!prefixes.some((p) => b.label.startsWith(p) && b.label.length > p.length)) fail(`${b.loc}: aria-label “${b.label}” does not name its word`);
           if (b.state !== "idle") fail(`${b.loc} says "${b.state}" before any press`);
         }
         if (watch.seen.length || words.seen.length) fail(`a recording was asked for before a press: ${watch.list()} / ${words.list()}`);
@@ -1353,7 +1357,7 @@ async function clipChecks(page, vp, index) {
         }
         const pauses = await page.evaluate(() => window.__clipPauses ?? null);
         if (!pauses) fail("the pause recorder is gone from the page (it navigated?)");
-        const end = lengthB / 1000;
+        const end = (stopsAt.get(fileB) ?? lengthB) / 1000;
         const stop = pauses.filter((c) => c.src && new URL(c.src, BASE).pathname === fileB && !c.wasPaused).pop();
         // A whole file may simply end (no pause()); one the player paused was paused at its length.
         if (stop && (stop.t < end - 0.001 || stop.t > end + STOP_LATE_S)) {

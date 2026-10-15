@@ -87,6 +87,25 @@ export async function wordVoiceIndex() {
   return index;
 }
 
+/** Every recording of content/wordvoice.json → where the player stops it (ms): a Quran.com file
+ *  plays only the word inside it, [start, end] (its trailing silence left out), so it stops at `end`;
+ *  the narrator's recordings play whole (their length). */
+export async function wordVoiceEnds() {
+  const index = new Map();
+  let manifest = null;
+  try {
+    manifest = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "wordvoice.json"), "utf8"));
+  } catch {
+    return index;
+  }
+  for (const entry of Object.values(manifest?.words ?? {})) {
+    const a = entry?.audio;
+    if (!a || typeof a.url !== "string" || !Number.isInteger(a.ms) || a.ms <= 0) continue;
+    index.set(a.url, Number.isInteger(a.end) && a.end > 0 ? a.end : a.ms);
+  }
+  return index;
+}
+
 /** The recording content/wordvoice.json gives the Uthmani word `ar` (its key writes an alif wasla as a plain alif); its path, or null. */
 export async function wordVoiceFile(ar) {
   try {
