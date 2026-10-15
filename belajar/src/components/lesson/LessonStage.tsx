@@ -44,8 +44,9 @@ import { type StageCompose, WordComposition } from "./WordComposition";
 
 /**
  * "▶ Dengar" for a word card (WordCard's optional `listen` slot). It asks
- * the lesson stage to play the word on its one player; a running lesson
- * pauses first.
+ * the lesson stage to play the word — the narrator's recording of it, an AI
+ * voice (operator 2026-10-14), never the imam's recitation cut at the word —
+ * on the lesson's own player; a running lesson pauses first.
  */
 export function WordListenButton({ index, label, detail }: { index: number; label: string; detail: string }) {
   return (
@@ -176,7 +177,7 @@ function LoadingMark({ className }: { className?: string }) {
  * letter as in the ayah (بِ). While the lesson runs, the mushaf line numbers
  * its words (1 rightmost, as "kata pertama") and highlights what the line on
  * screen is about: the whole ayah, the word explained, a concept's words,
- * the imam's current word as he recites. A large word card (Arabic ·
+ * the imam's current word as he recites the ayah. A large word card (Arabic ·
  * transliteration · "yang artinya …") sits above the caption while a word is
  * explained or recited; in its place, the harakat primer and a word's
  * COMPOSITION animation (operator 2026-10-10, narration rule 14: [بِ] +
@@ -193,17 +194,19 @@ function LoadingMark({ className }: { className?: string }) {
  * all rules"; plan L20; src/lib/autoplay/examples.ts): after each "Konsep
  * baru" line the concept's example in this ayah is shown in the word card's
  * slot (ExampleCard: "Contoh", the word big, its transliteration and meaning)
- * and the IMAM recites it, the mushaf line lighting it; in a word's
- * composition, when the bentuk dasar is ringed, the imam recites that base
- * form from where it stands in the Qur'an (its tile filled as he does) — "ismu
- * (read by voice + show visual) … becomes ismi (read by voice + visual)": the
- * joined word is the lesson's own, recited when its step opens and not again at
- * the end, except an ayah's last word, after the line that says the imam stops
- * on it (operator 2026-10-13, plan L24). The beat's caption, in the bottom
- * panel, says what is shown and what is heard ("Contoh: ismu, di QS 55:78 … :
- * bersama kata sebelumnya terdengar “tabārakasmu”."); the narrator says
- * nothing. A clip that takes long shows "Memuat bacaan imam…" like any
- * recitation; one that does not come is given up after a few seconds — the
+ * and it is HEARD, the mushaf line lighting it; in a word's composition, when
+ * the bentuk dasar is ringed, that base form is heard (its tile filled
+ * meanwhile) — "ismu (read by voice + show visual) … becomes ismi (read by
+ * voice + visual)": the joined word is the lesson's own, heard when its step
+ * opens and not again at the end, except an ayah's last word, after the line
+ * that says the recitation stops on it (operator 2026-10-13, plan L24). EVERY
+ * WORD HEARD ON ITS OWN — these, a word's opening step, Dengar dan klik's
+ * word, a word the learner clicks — is the narrator Kang Nandar's recording of
+ * it, an AI voice (operator 2026-10-14; content/wordvoice.json), never a cut of
+ * the imam's recitation; the imam recites whole ayat. The beat's caption, in
+ * the bottom panel, says what is shown ("Contoh: ismu."); the narrator says no
+ * line for it. A recording that takes long shows "Memuat suara narator…"; one
+ * that does not come is given up after a few seconds — the
  * example stays a moment with "Suara contoh ini belum bisa diputar." and the
  * lesson goes on by itself (never a dead stop).
  *
@@ -479,16 +482,22 @@ export function LessonStage({
           {t("recite_failed")}
         </p>
       )}
+      {/* A word's own step whose recording (the narrator's) did not come. */}
+      {view.error === "word" && (
+        <p role="status" className={notice}>
+          {t("word_failed")}
+        </p>
+      )}
       {/* An example whose recording did not come: said, and the lesson goes on by itself. */}
       {beatState === "failed" && (
         <p role="status" data-autoplay="example-failed" className={notice}>
           {t("example_failed")}
         </p>
       )}
-      {/* A word the learner clicked to hear could not stream (only theirs:
-          the lesson's own recitation failing says so above, and a step
-          change or replay hands the player back to the lesson). */}
-      {p.failed && ap.learnerWord && view.error !== "recite" && (
+      {/* A word the learner clicked to hear could not be played (only theirs:
+          the lesson's own sound failing says so above, and a step change or
+          replay hands the voice back to the lesson). */}
+      {ap.learnerFailed && ap.learnerWord && view.error === null && (
         <p role="status" className={notice}>
           {tp("failed")}
         </p>
@@ -532,7 +541,7 @@ export function LessonStage({
       ref={stageRef}
       data-autoplay="stage"
       data-step={live ? step.id : undefined}
-      // The example beat on screen, what the imam recites for it and what it is doing (the CI
+      // The example beat on screen, what is heard for it and what it is doing (the CI
       // checks of plan L20 find a beat by these, never by timing).
       data-example={beat?.beat.id}
       data-example-state={beatState ?? undefined}
@@ -676,14 +685,13 @@ export function LessonStage({
             <MushafLine
               ayah={ayah}
               words={words}
-              activeWord={p.activeWord}
+              activeWord={ap.learnerActive ?? p.activeWord}
               marked={marked}
               numbered
-              canPlay={p.hasWord}
-              onTap={(i) => {
-                actions.takeOverPlayer();
-                p.playWord(i);
-              }}
+              canPlay={ap.canPlayWord}
+              // A word clicked: its recording by the narrator (operator 2026-10-14), never the
+              // imam's recitation cut at the word.
+              onTap={(i) => actions.playWord(i)}
             />
           </div>
         )}
@@ -862,8 +870,8 @@ export function LessonStage({
                   exercise={spec.key}
                   progressId={spec.progressId}
                   data={exercise}
-                  tapWords={words}
-                  tapSource={source}
+                  // Dengar dan klik plays each word's recording by the narrator (operator 2026-10-14).
+                  tapWords={words.map((w) => ({ ...w, voice: seq.wordVoices[w.index - 1] ?? null }))}
                   guided={guided}
                 />
               </div>

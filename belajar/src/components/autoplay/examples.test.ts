@@ -274,12 +274,13 @@ describe("which examples a lesson plays (src/lib/autoplay/examples.ts)", () => {
     expect(ikhlas3.derived.gaps).toEqual([]);
     expect(stops).toEqual(["al-fatihah/1:w4", "al-fatihah/2:w4", "al-fatihah/3:w2", "al-fatihah/4:w3", "al-fatihah/5:w4", "al-fatihah/6:w3", "al-fatihah/7:w9"]);
     // What that line says is true of each of the seven: the pause drops its last harakah (heard.ts),
-    // and its line — the composition's last, over its last frame — says the imam stops on it.
+    // and its line — the composition's last, over its last frame — says the recitation stops on it
+    // (until 2026-10-14 "dan imam berhenti padanya": a word heard on its own is the narrator's now).
     for (const l of fatihah) {
       const last = l.ayah.words[l.ayah.words.length - 1];
       const unit = composeFor("al-fatihah")!.words[last.loc];
       expect([last.loc, waqfDrop(last.ar), unit.lines[unit.lines.length - 1].frame], last.translit).toEqual([last.loc, "harakat", unit.frames.length]);
-      expect(unit.lines[unit.lines.length - 1].say, last.translit).toMatch(/^Ini kata terakhir (ayat|surah), dan imam berhenti padanya/);
+      expect(unit.lines[unit.lines.length - 1].say, last.translit).toMatch(/^Ini kata terakhir (ayat|surah), dan bacaan berhenti padanya/);
       expect(unit.lines.filter((x) => x.frame === unit.frames.length).length, last.translit).toBe(1);
     }
     // … and the stop note stands nowhere else in the file.
@@ -546,10 +547,16 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     // Na't is taught in ayah 3 (the curriculum): its example there is the ayah's first word.
     ["a beat with a word and a clip", 3, (l) => void (beat(l, "concept:naat:1").clip = LIBRARY.clips["1:3:1"]), /exactly one of a word of this ayah and a clip/],
     ["a beat with neither", 3, (l) => void (beat(l, "concept:naat:1").word = null), /exactly one of a word of this ayah and a clip/],
-    // The ayah's recitation: one, the imam's (plan L21; until 2026-10-13 the first of two).
-    ["this ayah's word without a timing in the ayah's recitation", 1, (l) => {
-      l.ctx = { ...l.ctx, ayah: { ...l.ayah, recitation: l.ayah.recitation.map((r) => ({ ...r, segments: r.segments.filter(([w]) => w !== 1) })) } };
-    }, /Alafasy_128kbps has no timing for word 1/],
+    // This ayah's own word as the example: heard as the narrator's recording of it, which the
+    // sequence carries (wordVoices). Until 2026-10-14 the fault here was "no timing in the ayah's
+    // recitation": the imam's cut at the word, which no word step plays any more (operator
+    // 2026-10-14: "for all quran word by word should be replaced by this").
+    ["this ayah's word as an example, with no recording of its own in the sequence", 1, (l) => {
+      (l.seq.wordVoices as (ExampleBeat["clip"])[])[0] = null;
+    }, /concept:majrur:1: word 1 of this ayah has no recording of its own in the sequence/],
+    ["this ayah's word as an example, played from the imam's recitation cut at the word", 1, (l) => {
+      (l.seq.wordVoices as (ExampleBeat["clip"])[])[0] = { url: "https://everyayah.com/data/Alafasy_128kbps/001001.mp3", start: 0, end: 540 };
+    }, /concept:majrur:1: word 1 of this ayah has no recording of its own in the sequence/],
     ["Arabic that is not the content's bytes", 3, (l) => void (example(l, "concept:naat:1").ar = l.ayah.words[1].ar), /is not the content's bytes/],
     ["Arabic script in a caption", 3, (l) => void setCaption(beat(l, "concept:naat:1"), `Contoh: ${l.ayah.words[0].ar}, ar-raḥmāni.`), /carries Arabic script/],
     ["a caption that does not name its example", 3, (l) => void setCaption(beat(l, "concept:naat:1"), "Contoh: kata ke-1."), /does not name the example/],
@@ -1212,56 +1219,82 @@ describe("what the stage draws for a beat (ExampleCard, WordComposition)", () =>
   });
 });
 
-describe("the example clip fetched ahead (warm.ts exampleToWarm)", () => {
-  it("only while the lesson runs, only the clip the current step is about to play, never with Save-Data", () => {
+describe("the next word's or example's recording fetched ahead (warm.ts exampleToWarm)", () => {
+  // Since 2026-10-14 every word heard on its own is the narrator's recording of it, on the example
+  // player — a word's opening step plays its word at once, so the runner asks for the NEXT recording
+  // along the lesson's path: this step's, else the next step's (machine.ts clipsAhead).
+  it("only while the lesson runs, the next recording on the lesson's path (this step's, else the next step's), never with Save-Data", () => {
     const l = fatihah[0];
     // the narrator's recording of the form ismu (a file of the lesson's own media store, not the imam's)
     const ismu = wordVoice(composeFor("al-fatihah")!.words["1:1:1"].forms.ismu.ar)!.url;
     expect(ismu).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\//);
+    const bismi = l.seq.wordVoices[0]!.url;
+    expect(bismi).toBe(wordVoice(l.ayah.words[0].ar)!.url);
     const idx = l.seq.steps.findIndex((s) => s.id === "w1:compose");
-    // A page only looked at; a step without a clip; this ayah's own word as the example.
+    // A page only looked at: nothing.
     expect(exampleToWarm(l.seq, createAutoplayState(l.seq))).toBeNull();
-    expect(exampleToWarm(l.seq, started(l.seq, "biasa"))).toBeNull();
-    expect(exampleToWarm(l.seq, atBeat(l.seq, "concept:majrur:1"))).toBeNull();
-    // The step begins: its clip is asked for while the narrator says the lines before it …
+    // The step before word 1 opens: word 1's recording, which its step plays at once.
+    const opens = l.seq.steps.findIndex((s) => s.id === "w1:recite");
+    const prior = run(l.seq, started(l.seq, "biasa"), (s) => s.idx === opens - 1 && s.activity?.kind === "narrate").at(-1)!;
+    expect([prior.idx, prior.activity?.kind]).toEqual([opens - 1, "narrate"]);
+    expect(exampleToWarm(l.seq, prior)).toBe(bismi);
+    // A concept's example on this ayah's own word: that word's recording.
+    expect(exampleToWarm(l.seq, atBeat(l.seq, "concept:majrur:1"))).toBe(bismi);
+    // The composition step begins: its clip is asked for while the narrator says the lines before it …
     const entered = reduceAutoplay(l.seq, started(l.seq, "biasa", idx - 1), { type: "next" });
     expect([entered.idx, entered.activity?.kind === "recite"]).toEqual([idx, false]);
     expect(exampleToWarm(l.seq, entered)).toBe(ismu);
-    // … not when the browser asks to save data (it loads when its beat plays), not while paused.
+    // … not when the browser asks to save data (it loads when it plays), not while paused.
     expect(exampleToWarm(l.seq, entered, { saveData: true })).toBeNull();
     expect(exampleToWarm(l.seq, entered, { effectiveType: "2g" })).toBeNull();
     expect(exampleToWarm(l.seq, reduceAutoplay(l.seq, entered, { type: "pause" }))).toBeNull();
-    // The runner asks only once the step has wanted it for a moment: stepping through the lesson
+    // The runner asks only once the lesson has wanted it for a moment: stepping through the lesson
     // with "Berikutnya ›" (a click or two a second) fetches nothing, a step that plays does —
     // well before its base frame (the lines before it last 10 s and more).
     expect(EXAMPLE_WARM_DELAY_MS).toBeGreaterThanOrEqual(1000);
     expect(EXAMPLE_WARM_DELAY_MS).toBeLessThanOrEqual(3000);
-    // Played: nothing more to fetch for this step. Failed: not asked for again.
+    // Playing: the player itself refuses to warm then. Played, or failed: the next one along the
+    // path — never the one that failed again.
     const playing = atBeat(l.seq, "w1:base:2");
     expect(exampleToWarm(l.seq, playing)).toBe(ismu);
-    expect(exampleToWarm(l.seq, reduceAutoplay(l.seq, playing, { type: "recite_end", token: playing.activity!.token }))).toBeNull();
-    expect(exampleToWarm(l.seq, reduceAutoplay(l.seq, playing, { type: "recite_error", token: playing.activity!.token }))).toBeNull();
+    for (const after of [
+      reduceAutoplay(l.seq, playing, { type: "recite_end", token: playing.activity!.token }),
+      reduceAutoplay(l.seq, playing, { type: "recite_error", token: playing.activity!.token }),
+    ]) {
+      expect(exampleToWarm(l.seq, after)).not.toBe(ismu);
+    }
   });
 
-  it("over every Al-Fatihah lesson: never a recording but the current step's own clip, and every clip is asked for before its beat", () => {
-    for (const l of fatihah) {
+  it("over every lesson: never the imam's recording nor a narration line, and every recording the example player plays was asked for first", () => {
+    for (const l of every) {
       const asked = new Set<string>();
+      let played = 0;
       for (const s of run(l.seq, started(l.seq, "biasa"))) {
         const url = exampleToWarm(l.seq, s);
-        const own = (l.seq.steps[s.idx].examples ?? []).flatMap((b) => (b.clip ? [b.clip.url] : []));
         if (url !== null) {
-          expect(own, `${l.seq.lessonKey} ${l.seq.steps[s.idx].id}`).toContain(url);
           asked.add(url);
-        }
-        const a = s.activity;
-        if (a?.kind === "recite" && a.target === "clip") expect(asked.has(a.clip.url), `${l.seq.lessonKey} ${a.key}`).toBe(true);
-        // Never this ayah's own recording (the stage's player warms that), never a narration LINE
-        // (the media store holds those under the slug of the surah): only a word's own recording.
-        if (url !== null) {
+          // Never this ayah's own recording (the stage's player warms that), never a narration LINE
+          // (the media store holds those under the slug of the surah): only a word's own recording.
           expect(l.ayah.recitation.some((r) => r.url === url), url).toBe(false);
           expect(url, `${l.seq.lessonKey} ${l.seq.steps[s.idx].id}`).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\/[0-9a-f]{16}-[0-9a-f]{10}\.mp3$/);
+          // … and one the lesson plays in this step or the next.
+          const near = [s.idx, s.idx + 1].flatMap((i) => [
+            ...(l.seq.steps[i]?.examples ?? []).flatMap((b) => (b.clip ? [b.clip.url] : b.word !== null ? [l.seq.wordVoices[b.word - 1]?.url ?? ""] : [])),
+            ...(l.seq.steps[i]?.recite?.target === "word" ? [l.seq.wordVoices[(l.seq.steps[i].recite as { word: number }).word - 1]?.url ?? ""] : []),
+          ]);
+          if (!near.includes(url)) {
+            // (an exercise's word: the one its question asks about)
+            expect(l.seq.steps[s.idx].kind, `${l.seq.lessonKey} ${l.seq.steps[s.idx].id}: ${url}`).toBe("exercise");
+          }
+        }
+        const a = s.activity;
+        if (a?.kind === "recite" && a.target !== "ayah" && a.clip) {
+          played++;
+          // Asked for before it plays — except the very first word of a lesson started on it.
+          expect(asked.has(a.clip.url), `${l.seq.lessonKey} ${l.seq.steps[s.idx].id}: ${a.clip.url}`).toBe(true);
         }
       }
+      expect(played, l.seq.lessonKey).toBeGreaterThan(0);
     }
   });
 });

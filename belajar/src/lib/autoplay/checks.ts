@@ -42,11 +42,18 @@
  *     followed by its example step, every bentuk dasar a composition shows
  *     has its beat — or is listed with the reason (no Qur'anic example
  *     exists, it is the lesson's own word); each beat has its Arabic (the
- *     content's bytes) and a recording (this ayah's word timed in its
- *     recitation, or the clip the content gives), is labelled by what is
+ *     content's bytes) and a recording (the narrator's of this ayah's word,
+ *     or of the form it shows), is labelled by what is
  *     heard (waqf, hamzat washal), is no narration line, and at most two
  *     follow one rule. A beat whose recording cannot be played never stops
- *     the lesson (the machine checks).
+ *     the lesson (the machine checks);
+ *  6. THE WORDS' VOICES (operator 2026-10-14: every Qur'anic word played on its
+ *     own is the narrator Kang Nandar's recording of it, never a cut of the
+ *     imam's recitation; wordVoiceProblems): every word of every lesson ayah
+ *     has its recording in content/wordvoice.json, the sequence carries exactly
+ *     that recording for it, and every step that plays one word plays it — a
+ *     word with no recording is an error here, never a silent fall-back to the
+ *     imam.
  * Pure: file access is injected (loadCheckInput).
  */
 import type { ComposeFile } from "@/content/compose-schema";
@@ -480,6 +487,41 @@ export type ExampleContext = {
 const VOICE_FILE = /^\/belajar\/media\/narration\/kang-nandar\/words\/[0-9a-f]{16}-[0-9a-f]{10}\.mp3$/;
 
 /**
+ * Problems of one ayah's word voices (operator 2026-10-14: "for all quran word by word should be
+ * replaced by this, not using truncated voice from imam"; empty when fine): every word of the
+ * ayah has the narrator's recording of it (`voice`: content/wordvoice.json through
+ * src/lib/wordvoice-core.ts voiceFrom) — a word without one is named, never played from the
+ * imam's recitation instead — the sequence carries exactly that recording for it (wordVoices),
+ * as a whole file of the narration media store, and every step that plays one word plays that
+ * recording (the machine reads wordVoices; transitionProblem checks each activity it issues).
+ */
+export function wordVoiceProblems(
+  seq: AutoplaySequence,
+  ctx: { ayah: { words: readonly { loc: string; ar: string; translit: string }[] }; voice: (ar: string) => ExampleClip | null },
+): string[] {
+  const out: string[] = [];
+  const words = ctx.ayah.words;
+  const voices = seq.wordVoices ?? [];
+  if (voices.length !== words.length) out.push(`the sequence carries ${voices.length} word voice(s) for ${words.length} word(s)`);
+  words.forEach((w, i) => {
+    const where = `word ${i + 1} (${w.loc}, ${w.translit})`;
+    const own = ctx.voice(w.ar);
+    if (!own) {
+      out.push(`${where}: has no recording in content/wordvoice.json (a word heard on its own is the narrator's recording, never the imam's recitation cut at the word)`);
+      return;
+    }
+    if (!VOICE_FILE.test(own.url) || own.start !== 0 || !Number.isInteger(own.end) || own.end <= 0) {
+      out.push(`${where}: its recording ${JSON.stringify(own)} is not a whole file of the narration media store`);
+    }
+    if (JSON.stringify(voices[i] ?? null) !== JSON.stringify(own)) out.push(`${where}: the sequence does not carry its recording`);
+  });
+  for (const st of seq.steps) {
+    if (st.recite?.target === "word" && !voices[st.recite.word - 1]) out.push(`${st.id}: plays word ${st.recite.word}, which has no recording`);
+  }
+  return out;
+}
+
+/**
  * Problems of one ayah's example beats (operator 2026-10-12, plan L20; empty when fine):
  * - COVERAGE: every concept line is followed by its example step, whose first beat is the
  *   concept's example in this ayah; every `base` frame of a composition has its beat, or is
@@ -487,8 +529,8 @@ const VOICE_FILE = /^\/belajar\/media\/narration\/kang-nandar\/words\/[0-9a-f]{1
  *   word ends with the imam reciting its word again, and no word's own line is followed by a
  *   beat (plan L24: recited once, when its step opens);
  * - each beat is one the content gives (examples.ts), in the right step, after the right line;
- *   exactly one recording: this ayah's word, timed in the ayah's recitation, or the clip
- *   the content gives for its key (an EveryAyah file, start before end);
+ *   exactly one recording, the narrator's: this ayah's word, as the sequence's recording of it
+ *   (wordVoices), or the clip of the form it shows (a whole file of content/wordvoice.json);
  * - its Arabic is the content's bytes, its caption is plain on-screen text that names it (no
  *   Arabic script, parts ≤ 180 characters) — and no narration line;
  * - HEARD: an ayah-final word whose last harakah the pause drops says so (and only such a word
@@ -536,16 +578,18 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
           out.push(`${w}: frame ${b.frame} of the composition is not a base frame`);
         }
       }
-      // What is heard: the stage's own recitation of a word of this ayah, or one recording of the narrator's.
+      // What is heard: one recording of the narrator's — a word of this ayah's own (the sequence's
+      // wordVoices), or the clip of another ayah's word or of a form. Never the imam's recitation
+      // cut at the word (operator 2026-10-14).
       if ((b.word === null) === (b.clip === null)) out.push(`${w}: needs exactly one of a word of this ayah and a clip`);
       const last = b.word !== null && b.word === n;
       if (b.word !== null) {
         const word = words[b.word - 1];
         if (!word || word.loc !== b.key) out.push(`${w}: word ${b.word} of this ayah is not ${b.key}`);
-        for (const r of ctx.ayah.recitation) {
-          if (!r.segments.some(([x]) => x === b.word)) out.push(`${w}: ${r.reciter} has no timing for word ${b.word} (nothing would be heard)`);
+        const own = word ? ctx.voice(word.ar) : null;
+        if (!own || JSON.stringify(seq.wordVoices?.[b.word - 1] ?? null) !== JSON.stringify(own)) {
+          out.push(`${w}: word ${b.word} of this ayah has no recording of its own in the sequence (nothing would be heard)`);
         }
-        if (!ctx.ayah.recitation.length) out.push(`${w}: the ayah has no recitation`);
       } else if (b.clip) {
         const c = b.clip;
         if (!VOICE_FILE.test(c.url) || c.start !== 0 || !Number.isInteger(c.end) || c.end <= 0) {
@@ -653,7 +697,14 @@ export function transitionProblem(seq: AutoplaySequence, b: AutoplayState, e: Au
     if (example && (a.error !== null || a.phase !== "running" || a.idx !== b.idx)) return "an example beat that could not be played stopped the lesson";
     const held = a.plan[a.at];
     if (example && !(a.activity?.kind === "wait" && held?.t === "example" && held.failed === true)) return "a failed example beat is not shown for its hold";
-    if (!example && a.error !== "recite") return "a failed recitation of the lesson's own did not pause it";
+    // (Which recording failed is said: "recite", the imam's ayah; "word", a word's recording.)
+    if (!example && b.activity.target === "ayah" && a.error !== "recite") return "a failed recitation of the lesson's own did not pause it";
+    if (!example && b.activity.target !== "ayah" && a.error !== "word") return "a failed recording of the lesson's own word did not pause it";
+  }
+  // One word is played from its recording by the narrator, and from nothing else (operator 2026-10-14).
+  const act = a.activity;
+  if (act && act !== b.activity && act.kind === "recite" && act.target === "word" && JSON.stringify(act.clip) !== JSON.stringify(seq.wordVoices?.[act.word - 1] ?? null)) {
+    return `word ${act.word} is played from ${JSON.stringify(act.clip)}, not its recording`;
   }
   const moved = a.idx > b.idx || (b.phase !== "finished" && a.phase === "finished");
   if (moved) {
@@ -693,7 +744,7 @@ export function driveToEnd(
   seq: AutoplaySequence,
   pace: Pace,
   learner: Learner,
-  reciteMs: (a: Extract<Activity, { kind: "recite" }>) => number = (a) => (a.target === "ayah" ? 6000 : a.target === "clip" ? a.clip.end - a.clip.start : 900),
+  reciteMs: (a: Extract<Activity, { kind: "recite" }>) => number = (a) => (a.target === "ayah" ? 6000 : a.clip ? a.clip.end - a.clip.start : 900),
 ): DriveResult {
   let s = createAutoplayState(seq, { pace });
   const problems: string[] = [];
@@ -1102,7 +1153,8 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
       const compose = composeInputFor(composeFiles.get(surah.slug), ayah);
       // The example beats (operator 2026-10-12, plan L20): derived from the content, as the page does.
       const composeFile = (composeFiles.get(surah.slug) ?? null) as ComposeLike | null;
-      const derived = lessonExamples({ ayah, introduced, compose: composeFile, voice: (ar) => voiceFrom(input.voices ?? { words: {} }, ar), wordAt, zero });
+      const voice = (ar: string) => voiceFrom(input.voices ?? { words: {} }, ar);
+      const derived = lessonExamples({ ayah, introduced, compose: composeFile, voice, wordAt, zero });
       const map = lessonMapInputOf(mapFiles.get(surah.slug), ayah.ayah);
       // A lesson map names the new steps: they are this ayah's concept steps, in that order.
       if (map && JSON.stringify(map.new.map((c) => c.id)) !== JSON.stringify(introduced.map((c) => c.step))) {
@@ -1123,15 +1175,17 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
         examples: derived.examples,
         map,
         zero,
+        voice,
       };
       const seq = buildAutoplaySequence(base);
       if (JSON.stringify(seq) !== JSON.stringify(buildAutoplaySequence(base))) errors.push(`${where}: building the sequence twice differs`);
       stats.steps += seq.steps.length;
       stats.exerciseSteps += seq.steps.filter((x) => x.kind === "exercise").length;
       for (const p of sequenceProblems(seq, { ayah, last, exercises, introduced, compose, map, zero })) errors.push(`${where}: ${p}`);
-      for (const p of exampleProblems(seq, { ayah, introduced, compose: composeFile, derived, voice: (ar) => voiceFrom(input.voices ?? { words: {} }, ar), wordAt, texts, zero })) {
+      for (const p of exampleProblems(seq, { ayah, introduced, compose: composeFile, derived, voice, wordAt, texts, zero })) {
         errors.push(`${where}: ${p}`);
       }
+      for (const p of wordVoiceProblems(seq, { ayah, voice })) errors.push(`${where}: ${p}`);
 
       for (const id of sequenceLineIds(seq)) {
         stats.lines++;
@@ -1149,9 +1203,8 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
       const segments = ayah.recitation[0]?.segments ?? [];
       const reciteMs = (a: Extract<Activity, { kind: "recite" }>) => {
         if (a.target === "ayah") return segments.reduce((m, [, , end]) => Math.max(m, end), 0) || 6000;
-        if (a.target === "clip") return a.clip.end - a.clip.start;
-        const seg = segments.find(([w]) => w === a.word);
-        return seg ? seg[2] - seg[1] : 900;
+        // One word (or an example): its recording's length.
+        return a.clip ? a.clip.end - a.clip.start : 900;
       };
       const synth = syntheticManifests(seq);
       const audioSeq = buildAutoplaySequence({ ...base, narration: synth.narration, shared: synth.shared });

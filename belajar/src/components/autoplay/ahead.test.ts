@@ -875,6 +875,10 @@ async function playLesson(
   await wait(5000);
   const beforeStart = calls.length;
   s = reduceAutoplay(seq, s, { ...start, pace });
+  /** The file the click itself asks for: its first activity, when that is a line with a voice
+   *  (null: the click's line is caption-only, read for its reading time — a line whose new text
+   *  waits for its render, as "shared:start" since 2026-10-14 — so every line plays from a copy). */
+  const clickLine = s.activity?.kind === "narrate" ? s.activity.url : null;
   let n = 0;
   for (; n < (opts.maxStates ?? 5000) && s.phase !== "finished"; n++) {
     const a = s.activity;
@@ -908,7 +912,8 @@ async function playLesson(
       ends = { type: "recite_end", token: a.token };
       // The imam, and at least the reading time the lesson gives the caption beside him (the
       // runner ends a recitation only when both are through): a word, an example beat.
-      lasts = Math.max(a.target === "ayah" ? 6000 : a.target === "clip" ? a.clip.end - a.clip.start : 1200, a.minMs);
+      // (a word or an example: its recording by the narrator, the whole file)
+      lasts = Math.max(a.target === "ayah" ? 6000 : a.clip ? a.clip.end - a.clip.start : 1200, a.minMs);
     } else if (s.phase === "waiting") {
       push();
       ends = { type: "skip" };
@@ -936,7 +941,7 @@ async function playLesson(
   const flyingAtEnd = calls.filter((c) => c.end === null).length;
   p.stop();
   await wait(0);
-  return { s, calls, lines, problems, maxLive, maxHeld, made, beforeStart, aliveAtEnd, flyingAtEnd, aliveAfterStop: alive.size, preloadedFromNetwork, files: new Set(files), sizeOf };
+  return { s, calls, lines, problems, maxLive, maxHeld, made, beforeStart, aliveAtEnd, flyingAtEnd, aliveAfterStop: alive.size, preloadedFromNetwork, files: new Set(files), sizeOf, clickLine };
 }
 
 describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + prefetch.ts, as useAutoplay runs them)", () => {
@@ -961,20 +966,22 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
               expect(r.problems, where).toEqual([]);
               // Nothing before "Mulai".
               expect(r.beforeStart, where).toBe(0);
-              // The first line is asked for by the click itself; every later one was fetched ahead.
+              // The first line is asked for by the click itself (when it has a voice); every later
+              // one was fetched ahead.
               expect(r.lines.length, where).toBeGreaterThan(5);
               const fromNetwork = r.lines.filter((l) => !l.fromCopy);
-              expect(fromNetwork.map((l) => l.url), where).toEqual([r.lines[0].url]);
+              if (r.clickLine !== null) expect(r.lines[0].url, where).toBe(r.clickLine);
+              expect(fromNetwork.map((l) => l.url), where).toEqual(r.clickLine === null ? [] : [r.clickLine]);
               // One fetch at a time; none cancelled (a file that becomes the next line keeps its
               // fetch); the file playing at the start never fetched.
               expect(r.maxLive, where).toBe(1);
               const fetched = r.calls.map((c) => c.url);
               expect(r.calls.filter((c) => c.aborted), where).toEqual([]);
-              expect(fetched, where).not.toContain(r.lines[0].url);
+              if (r.clickLine !== null) expect(fetched, where).not.toContain(r.clickLine);
               // Exactly the lines the lesson then played, in the order it played them: one fetch
               // for each — a file fetched twice only where two lines far apart are the same file
               // (the same words: its copy was let go after the first, measured on ayat 3, 6, 7).
-              const played = r.lines.slice(1).map((l) => l.url);
+              const played = r.lines.slice(r.clickLine === null ? 0 : 1).map((l) => l.url);
               expect(fetched.length, where).toBeLessThanOrEqual(played.length);
               expect(fetched.filter((u, k) => fetched.indexOf(u) === k), where).toEqual(played.filter((u, k) => played.indexOf(u) === k));
               for (const u of new Set(fetched)) expect(fetched.filter((x) => x === u).length, `${where}: ${fileOwner(u)}`).toBeLessThanOrEqual(played.filter((x) => x === u).length);
@@ -1065,7 +1072,7 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
         expect(r.problems).toEqual([]);
         const fetched = r.calls.map((c) => c.url);
         for (const u of fetched) expect(seen, u).toContain(u);
-        expect(r.lines.filter((l) => !l.fromCopy).map((l) => l.url)).toEqual([r.lines[0].url]);
+        expect(r.lines.filter((l) => !l.fromCopy).map((l) => l.url)).toEqual(r.clickLine === null ? [] : [r.clickLine]);
         // At the start: the intro line and the next step's, not the step two steps on — the
         // lesson map's first line (plan L23, L26; the primer's before those steps existed). That
         // line has a file only once it is rendered: until then nothing lies two steps ahead of the
@@ -1122,7 +1129,10 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
     const idle = createAutoplayState(seq);
     const env = { soundLoading: false, heardFor: null as number | null };
     expect(aheadUpdate(seq, idle, env)).toEqual({ wanted: [], path: [], playing: null, open: false, key: null });
-    const s = reduceAutoplay(seq, idle, { type: "start", reason: "fresh" });
+    // The lesson's first line with a voice (the start line is read caption-only while its new text
+    // waits for its render, 2026-10-14: then the intro line is the first file asked for).
+    let s = reduceAutoplay(seq, idle, { type: "start", reason: "fresh" });
+    for (let k = 0; k < 10 && s.activity && s.activity.kind !== "narrate"; k++) s = reduceAutoplay(seq, s, { type: "timer", token: s.activity.token });
     const a = s.activity;
     if (a?.kind !== "narrate") throw new Error("the lesson does not start with a narration line");
     // The opening line was asked for and is not heard yet: closed; it is the file playing.

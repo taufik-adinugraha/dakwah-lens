@@ -15,7 +15,8 @@ import type { AutoplayTexts } from "./types";
 export const ID_TEXTS: AutoplayTexts = {
   intro: ({ surah, ayah, total }) => `${surah}, ayat ${ayah} dari ${total}. Dengarkan, dan perhatikan layar.`,
   recite: "Dengarkan imam membacakan ayat ini. Kata yang sedang dibaca ditandai.",
-  wordIntro: ({ n, translit }) => `Kata ke-${n}: ${translit}. Dengarkan imam membacanya.`,
+  // A word heard on its own is the narrator's recording of it, never the imam's (operator 2026-10-14).
+  wordIntro: ({ n, translit }) => `Kata ke-${n}: ${translit}. Dengarkan kata ini.`,
   meaning: ({ n, gloss }) => `Kata ke-${n} artinya “${gloss}”.`,
   structure: (summary) => `Susunan kalimat ayat ini: ${summary}`,
   // As the narration opens it (pipeline/validate_narration.py STRUCTURE_LEAD).
@@ -31,10 +32,10 @@ export const ID_TEXTS: AutoplayTexts = {
       next: "Klik tombol yang ditandai untuk melanjutkan.",
     },
     "tap-word": {
-      intro: "Latihan: Dengar dan klik. Imam membacakan satu kata dari ayat ini, lalu Anda mengklik kata itu.",
-      // The lesson's imam recites the word by itself: nothing to tap yet.
-      play: "Dengarkan imam membacakan satu kata dari ayat ini.",
-      options: "Sekarang klik kata yang baru saja dibacakan imam.",
+      intro: "Latihan: Dengar dan klik. Satu kata dari ayat ini dibacakan, lalu Anda mengklik kata itu.",
+      // The lesson plays the word by itself (the narrator's recording of it): nothing to tap yet.
+      play: "Dengarkan satu kata dari ayat ini.",
+      options: "Sekarang klik kata yang baru saja dibacakan.",
       reveal: "Coba pilih lagi, atau klik “Tunjukkan jawaban” yang ditandai.",
       // Only in "Tunggu saya": otherwise the next question comes by itself.
       next: "Klik tombol yang ditandai untuk melanjutkan.",
@@ -123,7 +124,7 @@ export const ID_TEXTS: AutoplayTexts = {
     skip: "Lewati latihan",
     lanjut: "Klik Lanjut",
     part: {
-      play: "Dengarkan imam",
+      play: "Dengarkan kata",
       options: "Pilih salah satu",
       words: "1. Pilih kata",
       bins: "2. Pilih kelompok",

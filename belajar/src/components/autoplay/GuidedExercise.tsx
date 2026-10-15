@@ -10,8 +10,7 @@ import { WaznFactory } from "@/components/exercises/WaznFactory";
 import { WhyHarakat } from "@/components/exercises/WhyHarakat";
 import { WordKind } from "@/components/exercises/WordKind";
 import type { QuizAyah } from "@/content/quiz-schema";
-import type { Lexeme, Word } from "@/content/schema";
-import type { RecitationSource } from "@/hooks/useSegmentPlayer";
+import type { Clip, Lexeme, Word } from "@/content/schema";
 import type { ExerciseKey } from "@/lib/autoplay";
 import { planOf } from "@/lib/quiz-plan";
 
@@ -50,16 +49,14 @@ export function GuidedExercise({
   progressId,
   data,
   tapWords,
-  tapSource,
   guided,
 }: {
   exercise: ExerciseKey;
   progressId: string;
   data: StageExerciseData;
-  /** The mushaf words of the ayah (Dengar dan klik). */
-  tapWords: { index: number; ar: string; translit: string; gloss: string }[];
-  /** The ayah's recording (the one imam's) — the one the standalone copy uses. */
-  tapSource: RecitationSource;
+  /** The mushaf words of the ayah (Dengar dan klik), each with the narrator's recording of it
+   *  (what is played: never the imam's recitation cut at the word, operator 2026-10-14). */
+  tapWords: { index: number; ar: string; translit: string; gloss: string; voice: Clip | null }[];
   guided: ExerciseGuide;
 }) {
   const { quiz } = data;
@@ -72,7 +69,7 @@ export function GuidedExercise({
     }
     case "tap-word": {
       const p = planOf(quiz, "tap-word");
-      return p && wrap(<TapWord id={progressId} words={tapWords} questions={p.questions} source={tapSource} guided={guided} compact />);
+      return p && wrap(<TapWord id={progressId} words={tapWords} questions={p.questions} guided={guided} compact />);
     }
     case "why-harakat": {
       const p = planOf(quiz, "why-harakat");

@@ -12,8 +12,10 @@
  *
  * The example beats (operator 2026-10-12: "each explanation should be followed
  * by examples (visual + voice)"; plan L20; src/lib/autoplay/examples.ts) go to
- * every page too: they are the imam's recitation and an on-screen caption in
- * the page's locale, never narration. lessonExamplesFor derives them from the
+ * every page too: they are the narrator's recording of the word or form (the
+ * words' voices, content/wordvoice.json, an AI voice — never a cut of the
+ * imam's recitation, operator 2026-10-14) and an on-screen caption in the
+ * page's locale, never a narration line. lessonExamplesFor derives them from the
  * content; the sequence takes what it needs of them (no Arabic), the stage
  * their drawing (stageExamples: the content's bytes, by beat id).
  */
@@ -72,14 +74,17 @@ export function stageSequence(s: SurahContent, a: Ayah, locale: string): Autopla
     // what it taught before the recap; on every locale — the card lists the steps, the caption
     // follows the narration when there is one.
     map: lessonMapInput(s.slug, a.ayah),
+    // Every word heard on its own (its opening step, an example, Dengar dan klik, a word the
+    // learner clicks) is the narrator's recording of it, never the imam's cut (operator 2026-10-14).
+    voice: wordVoice,
   });
 }
 
 /**
  * LESSON ZERO (the basic curriculum's lesson with no ayah, src/lib/autoplay/zero.ts), for the
  * surah that hosts it (src/lib/curriculum.ts ZERO_HOST): the example beats of the steps it
- * teaches — the kalimah record's first examples, each the imam's clip of its own ayah (there is
- * no ayah here whose own recording could give them) …
+ * teaches — the kalimah record's first examples, each the narrator's recording of that word
+ * (there is no ayah here) …
  */
 export function zeroExamplesFor(s: SurahContent): { examples: LessonExample[]; gaps: ExampleGap[] } {
   return lessonExamples({

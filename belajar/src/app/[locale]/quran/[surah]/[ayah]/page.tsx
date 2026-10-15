@@ -39,6 +39,7 @@ import { ayahHref, introHref, surahHref } from "@/lib/routes";
 import { lessonCard, translationExcerpt } from "@/lib/og/text";
 import { alternatesFor, lessonShareable, pageUrl, shareMetadata } from "@/lib/share";
 import { headwordOf, lessonLookup } from "@/lib/terms";
+import { wordVoice } from "@/lib/wordvoice";
 
 export const dynamicParams = false;
 
@@ -142,11 +143,13 @@ export default async function AyahPage({
   // One imam everywhere, and no reciter setting (operator 2026-10-13: "better to use alafasy for
   // all? no need to give option to user to change"; plan L21): the ayah's one recitation, Mishary
   // Alafasy's (the content has exactly one, schema.ts). Its credit line is on the Kredit page
-  // (kredit/page.tsx). The stage, the standalone "Dengar dan klik" and the word cards' "Dengar"
-  // all play this recording.
+  // (kredit/page.tsx). The stage plays it for the WHOLE ayah. A word heard on its own — the
+  // standalone "Dengar dan klik", a word card's "Dengar", every word step of the stage — is the
+  // narrator Kang Nandar's recording of it, an AI voice (operator 2026-10-14; src/lib/wordvoice.ts),
+  // never this recording cut at the word.
   const [recitation] = a.recitation;
   const source = { url: recitation.url, segments: recitation.segments };
-  const timed = new Set(source.segments.map(([w]) => w));
+  const tapWords = playerWords.map((w) => ({ ...w, voice: wordVoice(w.ar) }));
   // The ayah's quiz (content/quiz, pipeline/build_quiz.py): every exercise asks only what the
   // lesson has taught by this ayah, with wrong options from the ayat already studied (operator
   // 2026-10-10: "make sure all questions in quiz already have lesson beforehand"). The stage and
@@ -331,7 +334,7 @@ export default async function AyahPage({
                       })}
                       lookup={lookup}
                       listen={
-                        timed.has(i + 1) ? (
+                        wordVoice(w.ar) ? (
                           <WordListenButton
                             index={i + 1}
                             label={tp("listen")}
@@ -373,7 +376,7 @@ export default async function AyahPage({
                 <p className="mt-1 max-w-prose text-base text-ink-muted">{t("practice_intro")}</p>
               </div>
               {kindPlan && <WordKind id={`${key}/kind`} words={a.words} questions={kindPlan.questions} kinds={quiz.kinds} />}
-              {tapPlan && <TapWord id={`${key}/tap`} words={playerWords} questions={tapPlan.questions} source={source} />}
+              {tapPlan && <TapWord id={`${key}/tap`} words={tapWords} questions={tapPlan.questions} />}
               {whyPlan && <WhyHarakat id={`${key}/why`} words={a.words} questions={whyPlan.questions} states={quiz.states} />}
               {sortPlan && (
                 <SortCase id={`${key}/sort`} words={a.words} questions={sortPlan.questions} bins={sortPlan.bins} states={quiz.states} />

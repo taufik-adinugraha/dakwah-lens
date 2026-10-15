@@ -5,8 +5,8 @@ import { Volume2 } from "lucide-react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { useImamRate } from "@/hooks/usePace";
-import { useSegmentPlayer, type RecitationSource } from "@/hooks/useSegmentPlayer";
+import type { Clip } from "@/content/schema";
+import { useClipPlayer } from "@/hooks/useClipPlayer";
 import { glossSlot } from "@/lib/emphasis";
 import { seededShuffle } from "@/lib/shuffle";
 
@@ -27,15 +27,15 @@ import {
 } from "./ExerciseShell";
 import { guideMarker, guideTarget, tapWordGuidePart, type ExerciseGuide } from "./guide";
 
-/** Same shape as the lesson player's words (structurally typed). */
-type TapWordItem = { index: number; ar: string; translit: string; gloss: string };
+/** Same shape as the lesson player's words (structurally typed). `voice`: the narrator's
+ *  recording of the word (src/lib/wordvoice.ts), what is played; null: none (not asked). */
+type TapWordItem = { index: number; ar: string; translit: string; gloss: string; voice: Clip | null };
 type Props = {
   id: string;
   /** Every word of the ayah, shown as the chips (mushaf order). */
   words: TapWordItem[];
   /** The words asked about (content/quiz: `n`, the question's number, and `word`, 1-based). */
   questions: readonly { n: number; word: number }[];
-  source: RecitationSource;
   /** Guided mode (see ExerciseShell.tsx). */
   guided?: ExerciseGuide;
   /** Hide the heading and instruction (the stage shows its own). */
@@ -43,16 +43,19 @@ type Props = {
 };
 
 /**
- * "Dengar dan klik" — the imam says one word (seeked inside the streamed
- * ayah recording); the learner taps it. Trains listening-to-text mapping.
- * The mushaf words are shown unaltered, as chips that look tappable; no
- * sound effects. The player lives outside the round so "Ulangi latihan"
- * does not recreate the audio element. It plays at the learner's remembered
- * imam speed, and starting it pauses any other recording on the page (the
- * lesson stage stops its guided lesson), so recordings never overlap.
+ * "Dengar dan klik" — one word of the ayah is heard; the learner taps it.
+ * Trains listening-to-text mapping. The word is the narrator Kang Nandar's
+ * recording of it, an AI voice (operator 2026-10-14: "for all quran word by
+ * word should be replaced by this, not using truncated voice from imam";
+ * src/lib/wordvoice.ts) — never the imam's recitation cut at the word. A word
+ * with no recording is not asked. The mushaf words are shown unaltered, as
+ * chips that look tappable; no sound effects. The player lives outside the
+ * round so "Ulangi latihan" does not recreate the audio element. Starting it
+ * pauses any other recording on the page (the lesson stage stops its guided
+ * lesson), so recordings never overlap.
  *
  * Guided (the autoplay lesson): each question reports its word with "play",
- * and the LESSON's imam recites it on the stage's player (the one the
+ * and the LESSON plays that word's recording on its own player (the one the
  * "Mulai" tap unlocked) — no tap; `guided.heard` says when it has played.
  * "Dengarkan lagi" stays as an optional replay.
  *
@@ -61,24 +64,26 @@ type Props = {
  */
 export function TapWord(props: Props) {
   const { round, restart } = useRestart();
-  const [imamRate] = useImamRate();
   /** The word "Dengarkan kata" last asked for (written in the click handler). */
   const askedRef = useRef<number | null>(null);
   /** The last word that played to its end. Guided mode moves the spotlight
    *  from "Dengarkan kata" to the words only then, so a voiced prompt never
-   *  starts over the imam. */
+   *  starts over the word. */
   const [heard, setHeard] = useState<number | null>(null);
-  const p = useSegmentPlayer(props.source, {
-    rate: imamRate,
-    onFinish: () => setHeard(askedRef.current),
-  });
-  const { playWord } = p;
+  const onEnd = useCallback((key: string) => {
+    if (key === String(askedRef.current)) setHeard(askedRef.current);
+  }, []);
+  const p = useClipPlayer({ onEnd });
+  const { play: playClip } = p;
+  const { words } = props;
   const play = useCallback(
     (index: number) => {
+      const clip = words.find((w) => w.index === index)?.voice;
+      if (!clip) return;
       askedRef.current = index;
-      playWord(index);
+      playClip(String(index), clip);
     },
-    [playWord],
+    [playClip, words],
   );
   const again = useCallback(() => {
     askedRef.current = null;
@@ -101,7 +106,6 @@ function TapWordRound({
   id,
   words,
   questions,
-  source,
   guided,
   compact,
   playWord,
@@ -115,19 +119,19 @@ function TapWordRound({
   onRestart: () => void;
 }) {
   const t = useTranslations("Exercise");
+  // Only a word with a recording can be asked (the checks refuse a lesson word without one).
   const order = useMemo(() => {
-    const timed = new Set(source.segments.map(([w]) => w));
     return seededShuffle(
-      questions.map((x) => x.word).filter((w) => timed.has(w) && words.some((x) => x.index === w)),
+      questions.map((x) => x.word).filter((w) => words.some((x) => x.index === w && x.voice)),
       id,
     );
-  }, [words, questions, id, source]);
+  }, [words, questions, id]);
   const numbers = useMemo(() => order.map((w) => questions.find((x) => x.word === w)?.n ?? 0), [order, questions]);
   const q = useChoiceQuiz(id, order, guided, numbers);
   const focusRef = useStepFocus(q.i, !!guided);
   const empty = order.length < 2;
   const target = order[Math.min(q.i, order.length - 1)];
-  // Heard: by the lesson's imam (guided), or by the learner's own replay.
+  // Heard: played by the lesson (guided), or by the learner's own replay.
   const heardNow = heard === target || guided?.heard === target;
   const part = empty
     ? null

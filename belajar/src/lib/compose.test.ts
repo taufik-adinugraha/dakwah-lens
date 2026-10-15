@@ -247,9 +247,10 @@ describe("the autoplay sequence with compositions", () => {
     }
   });
 
-  // The exception: ar-raḥīmi ends the ayah. The last line of its composition says the imam stops
-  // on it, so its kasrah is not heard — and he then recites it, once more, to be heard doing so.
-  it("the ayah's last word: after the line that says the imam stops on it, he recites it — the joined word 'recited', that line still the caption, no reading time", () => {
+  // The exception: ar-raḥīmi ends the ayah. The last line of its composition says the recitation
+  // stops on it, so its kasrah is not heard — and the word is then heard once more (since
+  // 2026-10-14 the narrator's recording of it, never the imam's cut).
+  it("the ayah's last word: after the line that says the recitation stops on it, it is heard once more — the joined word 'recited', that line still the caption, no reading time", () => {
     for (const narrated of [true, false]) {
       for (const pace of ["biasa", "pelan", "tunggu"] as const) {
         const where = `${narrated ? "narrated" : "caption-only"} ${pace}`;
@@ -280,8 +281,12 @@ describe("the autoplay sequence with compositions", () => {
           expect(viewAutoplay(seq, x).caption.line, where).toBe(lastLine);
           expect(stageMarks(seq, x), where).toEqual({ marked: [4], focus: 4 });
         }
-        // "Tunggu saya": Lanjut at the end of the step (and, caption-only, after each line), as ever.
-        expect(lanjut, where).toBe(pace !== "tunggu" ? 0 : narrated ? 1 : step.cues.reduce((n, c) => n + c.parts.length, 0) + 1);
+        // "Tunggu saya": Lanjut at the end of the step (and after each part of every caption-only
+        // line), as ever. "Narrated" is the shipped manifest, whose lines may wait for a render (the
+        // stop line's text changed 2026-10-14: "dan bacaan berhenti padanya"): those are caption-only.
+        const unvoiced = step.cues.filter((c) => c.audio.length === 0).reduce((n, c) => n + c.parts.length, 0);
+        if (!narrated) expect(unvoiced, where).toBe(step.cues.reduce((n, c) => n + c.parts.length, 0));
+        expect(lanjut, where).toBe(pace !== "tunggu" ? 0 : unvoiced + 1);
         // Then the lesson goes on: no word follows the ayah's last.
         expect(seq.steps[s.idx].id, where).toBe(seq.steps[idx + 1].id);
         expect(s.activity?.kind === "recite", where).toBe(false);
