@@ -588,6 +588,23 @@ forest: the composition that ends on the frame whose note is "imam berhenti di s
 by its last line (`src/lib/composition.ts` `STOP_NOTE`). Keep exactly that note for that frame,
 and write it nowhere else: the build refuses it on any other frame (`composeFileProblems`).
 
+**‹ Sebelumnya / Berikutnya › move frame by frame** on the primer and on every composition
+(operator report 2026-10-15: on the primer's kasrah frame, Sebelumnya went back to the lesson's
+first page and Berikutnya left the primer for "Konsep baru: tiga jenis kalimah"). A frame is the
+run of the step's plan said or heard over it — its lines, then the example beats that follow them
+and the pauses after them (`machine.ts` `frameRuns`); the current frame is the one the stage shows
+(`frameNow`, the rule of `caption.ts` `stageFrame`). Berikutnya starts the next frame from its
+first line, Sebelumnya the previous one, playing or paused as the lesson was; Sebelumnya on the
+first frame goes to the previous step, Berikutnya on the last to the next one, as everywhere. The
+button and Media Session's next track send `next` with `jump`: in "Tunggu saya", while a caption
+waits for Lanjut, Berikutnya moves by frame too, and Lanjut (plain `next`) still moves by caption.
+"↺ Ulangi langkah ini" still plays the whole step from its first frame; "Langkah n dari N" and
+"Lanjutkan dari langkah N" count steps. ‹ Sebelumnya is unavailable only on the lesson's very
+first frame (`viewAutoplay` `hasPrev`). Tests: `src/components/autoplay/frames.test.ts` (every
+frame of every step with frames, every pace and phase, with planted faults) and `ahead.test.ts`
+(the look-ahead and the warmed recordings after a frame jump are what then plays). The CI walks
+press Berikutnya until the STEP changes (`linebreaks.mjs` `leaveStep`, `screenshots.mjs` `toStep`).
+
 **Forms, never typed Arabic.** Each named form says where its bytes come from (`compose.py` has
 the grammar): a lesson word or a slice of it in whole pieces (`{"word": "1:1:1", "pieces": [0,
 1]}` = بِ), a Tanzil token elsewhere (`{"tanzil": "55:78:2"}` = ٱسْمُ, its marfu' base form), a QAC
@@ -966,7 +983,7 @@ narrator and nothing is rendered; `content/narration/*.json` did not change.
   over the narrator or another recording; at least its caption's reading time — the reading
   alone, 10 / 6 characters a second (`timing.ts` `exampleReadMs`, plan L24) —; twice in "Pelan";
   "Tunggu saya" waits for Lanjut after it; pause / resume, "↺ Ulangi langkah ini" and ‹ › work on
-  its step. A recording that fails, or does not sound within 6 s (`EXAMPLE_LOAD_LIMIT_MS`), is
+  its step (on a composition ‹ › move by frame, and a bentuk dasar's beat belongs to its frame). A recording that fails, or does not sound within 6 s (`EXAMPLE_LOAD_LIMIT_MS`), is
   given up: the example stays on screen 3 s with "Suara contoh ini belum bisa diputar." and the
   lesson goes on — never the dead stop of the ayah's own recitation failing. A beat is running
   time for the screen lock, and is never in the narration look-ahead; the clip its step is about

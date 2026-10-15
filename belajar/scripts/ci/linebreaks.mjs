@@ -407,6 +407,23 @@ async function resumeLesson(page) {
   await press(page.locator(MIDDLE).first());
   await page.waitForTimeout(150);
 }
+/** "Berikutnya ›" until the lesson leaves step `n` ("Langkah n dari N") or the page. On a step
+ *  with animation frames (the harakat primer, a word's composition) each press moves ONE frame
+ *  (src/lib/autoplay/machine.ts, operator 2026-10-15), so it is left after as many presses as it
+ *  has frames left; anywhere else one press does. The walk measures steps, not frames. Bounded
+ *  (Al-Fatihah's longest composition has 5 frames, the primer 6). */
+async function leaveStep(page, n) {
+  const from = page.url();
+  for (let i = 0; i < 12; i++) {
+    await press(page.locator('[data-autoplay="next"]'));
+    for (let t = 0; t < 5; t++) {
+      await page.waitForTimeout(100);
+      if (page.url() !== from) return;
+      const at = await stepOf(page);
+      if (!at || at[0] !== n) return;
+    }
+  }
+}
 async function lessonPages(page, vp, index) {
   const answered = new Set();
   for (const [urlPath, narrated] of LESSONS) {
@@ -477,7 +494,7 @@ async function lessonPages(page, vp, index) {
             await measureAllSizes(page, vp, `${urlPath} end card`, STAGE);
           break;
         }
-        await press(page.locator('[data-autoplay="next"]'));
+        await leaveStep(page, at[0]);
       }
     } catch (e) {
       record({ page: urlPath, viewport: vp, size: "-", kind: "check-error", where: "stage", detail: String(e?.stack ?? e), text: "" });

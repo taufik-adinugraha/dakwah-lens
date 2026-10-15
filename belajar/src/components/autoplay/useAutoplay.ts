@@ -751,7 +751,8 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
       dispatch({ type: "resume" });
     });
     set("pause", () => dispatch({ type: "pause" }));
-    set("nexttrack", () => dispatch({ type: forwardIsSkip ? "skip" : "next" }));
+    // The same as the "Berikutnya ›" button (forward(), below): by frame on a step with frames.
+    set("nexttrack", () => dispatch(forwardIsSkip ? { type: "skip" } : { type: "next", jump: true }));
     set("previoustrack", () => dispatch({ type: "prev" }));
     return () => {
       for (const a of ["play", "pause", "nexttrack", "previoustrack"] as const) set(a, null);
@@ -883,10 +884,12 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
       tapped();
       dispatch({ type: "prev" });
     },
-    /** "Berikutnya ›", which is "Lewati latihan" on an open exercise. */
+    /** "Berikutnya ›", which is "Lewati latihan" on an open exercise. `jump`: on a step with
+     *  frames it moves by frame, also while "Tunggu saya" holds a caption (where Lanjut, above,
+     *  moves by caption). */
     forward() {
       tapped();
-      dispatch({ type: view.showSkip ? "skip" : "next" });
+      dispatch(view.showSkip ? { type: "skip" } : { type: "next", jump: true });
     },
     skip() {
       dispatch({ type: "skip" });

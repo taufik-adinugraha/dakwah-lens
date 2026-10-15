@@ -6,10 +6,13 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   aheadUpdate,
+  clipsAhead,
   createAutoplayState,
   createPrefetcher,
   createWakeLockHolder,
   followScreenAwake,
+  frameNow,
+  frameRuns,
   isNarrationUrl,
   keepsScreenAwake,
   leaveScreenAwake,
@@ -44,7 +47,7 @@ import {
 import { SURAHS } from "@/lib/content";
 import { PACES, type Pace } from "@/lib/lessonSteps";
 
-import { stageSequence } from "./build";
+import { stageSequence, zeroSequence } from "./build";
 
 // The two behaviours of operator 2026-10-12 (docs/belajar-plan.md L18), over the lessons the page
 // ships: the screen kept on exactly while a lesson runs, up to its time limit where the lesson
@@ -61,6 +64,9 @@ const WALK_TIMEOUT_MS = 120_000;
 const FATIHAH = SURAHS.find((s) => s.slug === "al-fatihah");
 if (!FATIHAH) throw new Error("no Al-Fatihah");
 const fatihah = FATIHAH.ayat.map((a) => ({ ayah: a.ayah, seq: stageSequence(FATIHAH, a, "id") }));
+/** The lessons with steps that play over animation frames: lesson zero (the harakat primer) and
+ *  Al-Fatihah's ayat (the word compositions). */
+const framedLessons = [{ name: "pengantar", seq: zeroSequence(FATIHAH, "id") }, ...fatihah.map((l) => ({ name: `al-fatihah ${l.ayah}`, seq: l.seq }))];
 
 /** What the stage answers to `s`, as a learner who lets the lesson run would have it: each
  *  activity's end, "Lewati latihan" (or the exercise done) at an exercise waiting, "Lanjut" at a
@@ -86,6 +92,19 @@ function walk(seq: AutoplaySequence, start: Start, pace: Pace, exercise: "skip" 
   let s = createAutoplayState(seq, { pace });
   for (const e of before) s = reduceAutoplay(seq, s, e);
   s = reduceAutoplay(seq, s, { ...start, pace });
+  const states = [s];
+  for (let i = 0; i < 5000; i++) {
+    const e = answer(seq, s, exercise);
+    if (!e) break;
+    s = reduceAutoplay(seq, s, e);
+    states.push(s);
+  }
+  if (s.phase !== "finished") throw new Error(`${seq.lessonKey}: the walk did not finish (phase ${s.phase})`);
+  return states;
+}
+
+/** Every state of the lesson left to run from state `s` (a learner's jump), to its end. */
+function walkOn(seq: AutoplaySequence, s: AutoplayState, exercise: "skip" | "done"): AutoplayState[] {
   const states = [s];
   for (let i = 0; i < 5000; i++) {
     const e = answer(seq, s, exercise);
@@ -1123,6 +1142,103 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
       vi.useRealTimers();
     }
   });
+
+  // ‹ › by FRAME on a step with frames (machine.ts, operator 2026-10-15; frames.test.ts): the
+  // lesson jumps inside a step, to a frame's first line — the copies of the lines it skips leave the
+  // path, those of the frame it lands on are what it plays next.
+  it(
+    "the learner jumps frame by frame (Berikutnya ›, ‹ Sebelumnya) on the primer and the word compositions: the lesson plays on to its end from every jump — copies and fetches as for any jump",
+    async () => {
+      vi.useFakeTimers();
+      try {
+        let jumps = 0;
+        for (const { name, seq } of framedLessons) {
+          for (const pace of PACES) {
+            const where = `${name} ${pace}`;
+            let made = 0;
+            const r = await playLesson(seq, { type: "start", reason: "fresh" }, pace, {
+              bytesPerMs: 20,
+              // On a step with frames, now and then: on, on, back — bounded, so the lesson ends.
+              drive: (s, n) => {
+                if (frameNow(seq, s) === null || made >= 24 || n % 4 !== 1) return null;
+                made++;
+                jumps++;
+                return made % 3 === 0 ? { type: "prev" } : { type: "next", jump: true };
+              },
+            });
+            expect(r.s.phase, where).toBe("finished");
+            expect(r.problems, where).toEqual([]);
+            expect(r.maxLive, where).toBe(1);
+            expect([r.aliveAtEnd, r.flyingAtEnd, r.aliveAfterStop], where).toEqual([0, 0, 0]);
+            expect(made, where).toBeGreaterThan(0);
+          }
+        }
+        expect(jumps).toBeGreaterThan(100);
+      } finally {
+        vi.useRealTimers();
+      }
+    },
+    WALK_TIMEOUT_MS,
+  );
+
+  it(
+    "after a frame jump, the narration listed ahead and the recordings warmed are exactly what the lesson then plays (every frame of every step with frames, both ways, every pace, playing and paused)",
+    () => {
+      let checked = 0;
+      let warmed = 0;
+      for (const { name, seq } of framedLessons) {
+        seq.steps.forEach((step, idx) => {
+          if (!(step.kind === "primer" || step.kind === "compose") || (step.frames ?? 0) < 2) return;
+          for (const pace of PACES) {
+            const entry = reduceAutoplay(seq, createAutoplayState(seq, { pace, idx }), { type: "start", pace, from: idx, reason: "continue" });
+            const runs = frameRuns(step, entry.plan);
+            expect(runs.length, `${name} ${step.id}`).toBe(step.frames);
+            // On each frame's first line: forward and back from there, playing and paused.
+            let s = entry;
+            for (let k = 0; k < runs.length; k++) {
+              expect(frameNow(seq, s), `${name} ${step.id} ${pace}`).toBe(runs[k].frame);
+              const paused = reduceAutoplay(seq, s, { type: "pause" });
+              for (const [how, from] of [["playing", s], ["paused", paused]] as const) {
+                for (const e of [{ type: "next", jump: true }, { type: "prev" }] as AutoplayEvent[]) {
+                  const at = `${name} ${step.id} ${pace} frame ${runs[k].frame} ${how} ${e.type}`;
+                  let jumped = reduceAutoplay(seq, from, e);
+                  // Paused: from the moment the learner presses Lanjutkan there.
+                  if (jumped.phase === "paused") jumped = reduceAutoplay(seq, jumped, { type: "resume" });
+                  const run = walkOn(seq, jumped, "skip");
+                  // The narration ahead, along the path from the frame it landed on (and the steps
+                  // after): exactly the files then played, in order — for that moment and the next.
+                  for (let j = 0; j < Math.min(run.length, 12); j++) {
+                    expect(lookaheadAudio(seq, run[j], { maxBytes: Infinity }), `${at} +${j}`).toEqual(expectedAhead(run, j, LOOKAHEAD_STEPS));
+                  }
+                  // The recordings the example player warms: those this step plays from there on,
+                  // then the next step's — in play order, each once.
+                  const heard: string[] = [];
+                  const stepsSeen: number[] = [];
+                  let last = -1;
+                  for (const x of run) {
+                    if (x.phase === "finished") break;
+                    if (!stepsSeen.includes(x.idx)) stepsSeen.push(x.idx);
+                    if (stepsSeen.length > 2) break;
+                    const a = x.activity;
+                    if (a?.kind === "recite" && a.token !== last && a.target !== "ayah" && a.clip && !heard.includes(a.clip.url)) heard.push(a.clip.url);
+                    if (a) last = a.token;
+                  }
+                  expect(clipsAhead(seq, jumped).map((c) => c.url), at).toEqual(heard);
+                  if (heard.length) warmed++;
+                  checked++;
+                }
+              }
+              s = reduceAutoplay(seq, s, { type: "next", jump: true });
+            }
+          }
+        });
+      }
+      expect(checked).toBeGreaterThan(500);
+      // Not vacuous: most jumps have a recording ahead (a bentuk dasar's, the next word's).
+      expect(warmed).toBeGreaterThan(checked / 2);
+    },
+    WALK_TIMEOUT_MS,
+  );
 
   it("the gate: no new fetch before \"Mulai\", while paused, while a sound is loading or stalled, or before the line just started is heard", () => {
     const { seq } = fatihah[0];

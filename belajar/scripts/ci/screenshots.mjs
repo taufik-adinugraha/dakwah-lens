@@ -126,9 +126,10 @@ async function settleScroll(page) {
  * of clicks (the harakat primer and the composition steps, 2026-10-10, moved every step after them
  * and the karaoke check landed on a composition line). The lesson is paused first ("Jeda"), so it
  * cannot move on by itself between a look and a click (a step that ends on its own just then would
- * be jumped over): each "Berikutnya ›" then enters the next step paused, and the caller starts the
- * step with "↺ Ulangi" (it plays a step from its start, paused or not). Fails naming the steps it
- * passed.
+ * be jumped over): each "Berikutnya ›" then enters the next step paused — on a step with animation
+ * frames (the primer, a composition) the next FRAME, paused (machine.ts, 2026-10-15), so such a step
+ * takes a press per frame —, and the caller starts the step with "↺ Ulangi" (it plays a step from
+ * its start, paused or not). Fails naming the steps it passed.
  */
 async function toStep(page, vp, id) {
   const stage = page.locator('[data-autoplay="stage"]');
@@ -140,7 +141,8 @@ async function toStep(page, vp, id) {
     await page.waitForTimeout(150);
   };
   const seen = [];
-  for (let i = 0; i < 80; i++) {
+  // (Al-Fatihah 7's "learned", the deepest target, is 63 presses away since frames are stepped.)
+  for (let i = 0; i < 120; i++) {
     await pause();
     const at = await stage.getAttribute("data-step");
     if (at === id) return;
@@ -2799,7 +2801,7 @@ async function composeShots(page, vp, index) {
     await assertComposeFits(page, `${vp}: primer`);
     await shot("autoplay-pengantar-primer");
     // Ayah 1: intro → the ayah → what the ayah brings → the imam says word 1 → its gloss line →
-    // its composition (Biasa: "Berikutnya ›" jumps whole steps)
+    // its composition (Biasa; toStep, paused: "Berikutnya ›" lands on its first frame)
     await setPace("Biasa");
     await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
