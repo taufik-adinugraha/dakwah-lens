@@ -10,7 +10,21 @@
  * (plan L11), and nothing claims more than is true however the learner got
  * here.
  */
+import { mapLaterWhere, mapListId, mapPronounId, type MapLaterName } from "./lessonMap";
 import type { AutoplayTexts } from "./types";
+
+/** The sentence about the steps here and taught later, as the narration words it
+ *  (build_narration.py map_later): every one named; one ayah of this surah for all ("…, tetapi
+ *  baru kita bahas di ayat 3."), several ("…: alif lam di ayat 3, na’t di ayat 3, dan idhafah di
+ *  ayat 4."), or one taught elsewhere ("…, tetapi baru kita bahas nanti."). */
+function laterId(later: readonly MapLaterName[]): string {
+  const lead = `Ada ${later.length} hal lagi di ayat ini`;
+  const names = mapListId(later.map((x) => x.name));
+  const where = mapLaterWhere(later);
+  if (where === null) return `${lead}, yaitu ${names}, tetapi baru kita bahas nanti.`;
+  if (where !== "each") return `${lead}, yaitu ${names}, tetapi baru kita bahas di ayat ${where}.`;
+  return `${lead}, tetapi baru kita bahas nanti: ${mapListId(later.map((x) => `${x.name} di ayat ${x.ayah}`))}.`;
+}
 
 export const ID_TEXTS: AutoplayTexts = {
   intro: ({ surah, ayah, total }) => `${surah}, ayat ${ayah} dari ${total}. Dengarkan, dan perhatikan layar.`,
@@ -65,27 +79,41 @@ export const ID_TEXTS: AutoplayTexts = {
       next: "Klik tombol yang ditandai untuk melanjutkan.",
     },
   },
-  // The card beside the caption names the steps (the narration's own lines name them, or a few of
-  // a long group); one caption per group of the card.
+  // One caption per line of the lesson map (lessonMap.ts MAP_LINES), in the narration's own
+  // templates (pipeline/build_narration.py map_new … map_total; README "Peta pelajaran"), with
+  // digits for the counts: operator 2026-10-15, every counted step is named, in teaching order
+  // ("always re-mention what they are"), and what is put aside is followed by the reassurance.
+  // A next-level topic is counted, never named (the card names it).
   lessonMap: {
-    new: ({ new: fresh }) => (fresh ? `Di ayat ini ada ${fresh} hal baru. Daftarnya ada di layar.` : "Di ayat ini tidak ada hal baru."),
-    learnt: ({ learnt, here }) =>
-      `Sebelum ayat ini, kita sudah mempelajari ${learnt} hal. ` +
-      (here ? `Yang kita temui lagi di ayat ini ada ${here}; daftarnya ada di layar.` : "Tidak ada yang kita temui lagi di ayat ini."),
+    new: ({ new: fresh }) => (fresh.length ? `Di ayat ini ada ${fresh.length} hal baru: ${mapListId(fresh)}.` : "Di ayat ini tidak ada hal baru."),
+    learnt: ({ learnt }) => `Sebelum ayat ini, kita sudah mempelajari ${learnt.length} hal, yaitu ${mapListId(learnt)}.`,
+    again: ({ again }) => (again.length ? `Yang kita temui lagi di ayat ini adalah ${mapListId(again)}.` : "Tidak ada yang kita temui lagi di ayat ini."),
     later: ({ later, lanjut }) =>
       [
-        later ? `Ada ${later} hal lagi di ayat ini, tetapi baru kita bahas nanti.` : "",
-        lanjut ? `${later ? "Ada juga" : "Di ayat ini ada"} ${lanjut} hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.` : "",
+        later.length ? laterId(later) : "",
+        lanjut ? `${later.length ? "Ada juga" : "Di ayat ini ada"} ${lanjut} hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.` : "",
       ]
         .filter(Boolean)
         .join(" "),
+    focus: ({ later, lanjut, new: fresh, again }) =>
+      [
+        later
+          ? `Sekarang Anda tidak perlu menghafal ${mapPronounId(later)}${lanjut ? ", dan tidak perlu memikirkan hal tingkat lanjut tadi" : ""}.`
+          : `Sekarang Anda tidak perlu memikirkan ${mapPronounId(lanjut)}.`,
+        fresh.length
+          ? `Mari kita fokus pada pelajaran ${mapListId(fresh)} terlebih dahulu.`
+          : again.length
+            ? `Mari kita fokus mengulang ${mapListId(again)} terlebih dahulu.`
+            : "Mari kita fokus pada ayat ini terlebih dahulu.",
+      ].join(" "),
   },
-  learned: ({ new: fresh, total, here }) =>
-    fresh
-      ? `Di ayat ini kita mempelajari ${fresh} hal baru. Dengan itu, sudah ${total} hal yang kita pelajari.`
-      : here
-        ? `Di ayat ini tidak ada hal baru; kita mengulang ${here} hal yang sudah kita pelajari.`
+  learned: ({ new: fresh, again }) =>
+    fresh.length
+      ? `Di ayat ini kita mempelajari ${fresh.length} hal baru: ${mapListId(fresh)}.`
+      : again.length
+        ? `Di ayat ini tidak ada hal baru; kita mengulang ${again.length} hal yang sudah kita pelajari, yaitu ${mapListId(again)}.`
         : "Di ayat ini tidak ada hal baru.",
+  total: ({ total, fresh }) => `${fresh ? "Dengan itu" : "Sampai ayat ini"}, sudah ${total.length} hal yang kita pelajari, yaitu ${mapListId(total)}.`,
   recap: "Dengarkan sekali lagi seluruh ayatnya, dan ikuti bacaan imam.",
   next: ({ ayah }) => `Pelajaran ayat ini selesai. Berikutnya, ayat ${ayah}.`,
   done: ({ surah }) => `Pelajaran ayat ini selesai. Ini ayat terakhir surah ${surah}.`,

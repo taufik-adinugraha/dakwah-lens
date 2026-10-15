@@ -2648,14 +2648,14 @@
       ]
     },
     "al-fatihah:1:map:learnt": {
-      "text": "Sebelum ayat ini, kita sudah mempelajari dua hal. Yang kita temui lagi di ayat ini ada satu: tiga jenis kata.",
-      "display": "Sebelum ayat ini, kita sudah mempelajari dua hal. Yang kita temui lagi di ayat ini ada satu: tiga jenis kata.",
+      "text": "Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu harakat dan tiga jenis kata.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu harakat dan tiga jenis kata.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4845f34c15d11817.mp3",
-        "ms": 8438,
-        "sha256": "22187e1bb09ba7c9d62f64b0dd396e2221f2e6cbb159b0d83e73ff046da17bb0"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/85ad984c5ae44190.mp3",
+        "ms": 6844,
+        "sha256": "ad7b1ff8c28d0480eaebe450fdfed9f99e1f38dbf82a85f938af7542c7f66b5a"
       },
       "tokens": [
         {
@@ -2665,98 +2665,136 @@
         },
         {
           "t": "ayat",
-          "s": 0.4,
-          "e": 0.64
+          "s": 0.373,
+          "e": 0.56
         },
         {
           "t": "ini,",
-          "s": 0.72,
-          "e": 1.28
+          "s": 0.66,
+          "e": 1.2
         },
         {
           "t": "kita",
-          "s": 1.312,
-          "e": 1.44
+          "s": 1.264,
+          "e": 1.52
         },
         {
           "t": "sudah",
-          "s": 1.493,
-          "e": 1.76
+          "s": 1.573,
+          "e": 1.84
         },
         {
           "t": "mempelajari",
-          "s": 1.8,
-          "e": 2.32
+          "s": 1.88,
+          "e": 2.4
         },
         {
           "t": "dua",
-          "s": 2.4,
+          "s": 2.46,
           "e": 2.64
         },
         {
-          "t": "hal.",
+          "t": "hal,",
           "s": 2.72,
-          "e": 3.44
+          "e": 3.52
         },
         {
-          "t": "Yang",
-          "s": 3.536,
-          "e": 3.92
+          "t": "yaitu",
+          "s": 3.6,
+          "e": 4.24
         },
         {
-          "t": "kita",
-          "s": 3.952,
-          "e": 4.08
+          "t": "harakat",
+          "s": 4.34,
+          "e": 5.12
         },
         {
-          "t": "temui",
-          "s": 4.14,
-          "e": 4.48
-        },
-        {
-          "t": "lagi",
-          "s": 4.544,
-          "e": 4.8
-        },
-        {
-          "t": "di",
-          "s": 4.827,
-          "e": 4.88
-        },
-        {
-          "t": "ayat",
-          "s": 4.933,
-          "e": 5.2
-        },
-        {
-          "t": "ini",
-          "s": 5.26,
-          "e": 5.44
-        },
-        {
-          "t": "ada",
-          "s": 5.5,
-          "e": 5.68
-        },
-        {
-          "t": "satu:",
-          "s": 5.76,
-          "e": 6.96
+          "t": "dan",
+          "s": 5.24,
+          "e": 5.6
         },
         {
           "t": "tiga",
-          "s": 7.04,
-          "e": 7.28
+          "s": 5.68,
+          "e": 5.92
         },
         {
           "t": "jenis",
-          "s": 7.373,
-          "e": 7.84
+          "s": 5.987,
+          "e": 6.32
         },
         {
           "t": "kata.",
-          "s": 7.936,
-          "e": 8.4
+          "s": 6.4,
+          "e": 6.8
+        }
+      ]
+    },
+    "al-fatihah:1:map:again": {
+      "text": "Yang kita temui lagi di ayat ini adalah tiga jenis kata.",
+      "display": "Yang kita temui lagi di ayat ini adalah tiga jenis kata.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/12ab361905e3dba8.mp3",
+        "ms": 3474,
+        "sha256": "c4524b4df59aad41ac4c7b23b6d7f6b3832c1d00f3176b8b95d753cd127cf17b"
+      },
+      "tokens": [
+        {
+          "t": "Yang",
+          "s": 0.0,
+          "e": 0.16
+        },
+        {
+          "t": "kita",
+          "s": 0.192,
+          "e": 0.32
+        },
+        {
+          "t": "temui",
+          "s": 0.38,
+          "e": 0.72
+        },
+        {
+          "t": "lagi",
+          "s": 0.784,
+          "e": 1.04
+        },
+        {
+          "t": "di",
+          "s": 1.093,
+          "e": 1.2
+        },
+        {
+          "t": "ayat",
+          "s": 1.227,
+          "e": 1.44
+        },
+        {
+          "t": "ini",
+          "s": 1.5,
+          "e": 1.68
+        },
+        {
+          "t": "adalah",
+          "s": 1.737,
+          "e": 2.08
+        },
+        {
+          "t": "tiga",
+          "s": 2.16,
+          "e": 2.48
+        },
+        {
+          "t": "jenis",
+          "s": 2.547,
+          "e": 2.88
+        },
+        {
+          "t": "kata.",
+          "s": 2.976,
+          "e": 3.44
         }
       ]
     },
@@ -2960,6 +2998,139 @@
           "t": "dasar.",
           "s": 14.8,
           "e": 15.28
+        }
+      ]
+    },
+    "al-fatihah:1:map:focus": {
+      "text": "Sekarang Anda tidak perlu menghafal ketiganya, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada pelajaran مَجْرُور dan حَرْف جَرّ terlebih dahulu.",
+      "display": "Sekarang Anda tidak perlu menghafal ketiganya, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada pelajaran majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ) terlebih dahulu.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a2d6d4c2d516bc64.mp3",
+        "ms": 11311,
+        "sha256": "9ba8d3bf1b5aaab4ca3ff85255fcfead9173002c91f94e781b204a08b9a2be68"
+      },
+      "tokens": [
+        {
+          "t": "Sekarang",
+          "s": 0.0,
+          "e": 0.48
+        },
+        {
+          "t": "Anda",
+          "s": 0.528,
+          "e": 0.72
+        },
+        {
+          "t": "tidak",
+          "s": 0.76,
+          "e": 0.96
+        },
+        {
+          "t": "perlu",
+          "s": 1.0,
+          "e": 1.28
+        },
+        {
+          "t": "menghafal",
+          "s": 1.312,
+          "e": 1.68
+        },
+        {
+          "t": "ketiganya,",
+          "s": 1.74,
+          "e": 2.88
+        },
+        {
+          "t": "dan",
+          "s": 2.92,
+          "e": 3.04
+        },
+        {
+          "t": "tidak",
+          "s": 3.093,
+          "e": 3.36
+        },
+        {
+          "t": "perlu",
+          "s": 3.42,
+          "e": 3.68
+        },
+        {
+          "t": "memikirkan",
+          "s": 3.74,
+          "e": 4.32
+        },
+        {
+          "t": "hal",
+          "s": 4.4,
+          "e": 4.64
+        },
+        {
+          "t": "tingkat",
+          "s": 4.704,
+          "e": 5.04
+        },
+        {
+          "t": "lanjut",
+          "s": 5.1,
+          "e": 5.36
+        },
+        {
+          "t": "tadi.",
+          "s": 5.4,
+          "e": 5.84
+        },
+        {
+          "t": "Mari",
+          "s": 6.032,
+          "e": 6.8
+        },
+        {
+          "t": "kita",
+          "s": 6.848,
+          "e": 7.04
+        },
+        {
+          "t": "fokus",
+          "s": 7.08,
+          "e": 7.52
+        },
+        {
+          "t": "pada",
+          "s": 7.568,
+          "e": 7.76
+        },
+        {
+          "t": "pelajaran",
+          "s": 7.8,
+          "e": 8.32
+        },
+        {
+          "t": "majrur (مَجْرُور)",
+          "s": 8.36,
+          "e": 8.96
+        },
+        {
+          "t": "dan",
+          "s": 9.1,
+          "e": 9.52
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ)",
+          "s": 9.6,
+          "e": 10.4
+        },
+        {
+          "t": "terlebih",
+          "s": 10.44,
+          "e": 10.72
+        },
+        {
+          "t": "dahulu.",
+          "s": 10.78,
+          "e": 11.28
         }
       ]
     },
@@ -6343,8 +6514,8 @@
       ]
     },
     "al-fatihah:1:structure:4": {
-      "text": "Seluruh ayat ini adalah satu keterangan, dan kata yang diterangkannya tidak diucapkan. Para ulama memperkirakannya, misalnya kata kerja yang artinya aku memulai, sehingga maknanya aku memulai dengan nama Alloh.",
-      "display": "Seluruh ayat ini adalah satu keterangan, dan kata yang diterangkannya tidak diucapkan. Para ulama memperkirakannya, misalnya kata kerja yang artinya “aku memulai”, sehingga maknanya “aku memulai dengan nama Allah”.",
+      "text": "Seluruh ayat ini adalah satu keterangan, tetapi kata yang diterangkannya tidak diucapkan. Karena basmalah adalah kalimat pembuka, para ulama memahaminya antara lain sebagai aku memulai, dan ada pula yang menyesuaikannya dengan pekerjaan yang sedang dimulai. Jadi maknanya: aku memulai dengan nama Alloh.",
+      "display": "Seluruh ayat ini adalah satu keterangan, tetapi kata yang diterangkannya tidak diucapkan. Karena basmalah adalah kalimat pembuka, para ulama memahaminya antara lain sebagai “aku memulai”, dan ada pula yang menyesuaikannya dengan pekerjaan yang sedang dimulai. Jadi maknanya: “aku memulai dengan nama Allah”.",
       "highlight": [
         1,
         2,
@@ -6353,19 +6524,19 @@
       ],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/d17057f464dbd27b.mp3",
-        "ms": 15726,
-        "sha256": "92df6d7933fc57c6739a9bafe1555ce28f5a487bcbfdc0c2b47077b6262c2746"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/5c5b4db2377866df.mp3",
+        "ms": 22439,
+        "sha256": "a24a0b380fdb7d1ec6a257c3728460a06128a035641885f4ebe34c4ca0ac7ae1"
       },
       "tokens": [
         {
           "t": "Seluruh",
           "s": 0.0,
-          "e": 0.4
+          "e": 0.32
         },
         {
           "t": "ayat",
-          "s": 0.453,
+          "s": 0.373,
           "e": 0.64
         },
         {
@@ -6375,133 +6546,198 @@
         },
         {
           "t": "adalah",
-          "s": 0.926,
-          "e": 1.2
+          "s": 0.937,
+          "e": 1.28
         },
         {
           "t": "satu",
-          "s": 1.264,
-          "e": 1.52
+          "s": 1.344,
+          "e": 1.6
         },
         {
           "t": "keterangan,",
-          "s": 1.56,
+          "s": 1.64,
           "e": 2.8
         },
         {
-          "t": "dan",
+          "t": "tetapi",
           "s": 2.86,
-          "e": 3.04
+          "e": 3.36
         },
         {
           "t": "kata",
-          "s": 3.12,
-          "e": 3.44
+          "s": 3.456,
+          "e": 3.84
         },
         {
           "t": "yang",
-          "s": 3.472,
-          "e": 3.6
+          "s": 3.856,
+          "e": 3.92
         },
         {
           "t": "diterangkannya",
-          "s": 3.64,
-          "e": 4.32
-        },
-        {
-          "t": "tidak",
-          "s": 4.387,
+          "s": 3.96,
           "e": 4.72
         },
         {
-          "t": "diucapkan.",
-          "s": 4.773,
-          "e": 5.52
+          "t": "tidak",
+          "s": 4.787,
+          "e": 5.12
         },
         {
-          "t": "Para",
-          "s": 5.728,
-          "e": 6.56
+          "t": "diucapkan.",
+          "s": 5.173,
+          "e": 5.92
+        },
+        {
+          "t": "Karena",
+          "s": 6.36,
+          "e": 7.04
+        },
+        {
+          "t": "basmalah",
+          "s": 7.1,
+          "e": 7.6
+        },
+        {
+          "t": "adalah",
+          "s": 7.646,
+          "e": 7.92
+        },
+        {
+          "t": "kalimat",
+          "s": 7.98,
+          "e": 8.32
+        },
+        {
+          "t": "pembuka,",
+          "s": 8.368,
+          "e": 9.44
+        },
+        {
+          "t": "para",
+          "s": 9.504,
+          "e": 9.76
         },
         {
           "t": "ulama",
-          "s": 6.613,
-          "e": 6.96
-        },
-        {
-          "t": "memperkirakannya,",
-          "s": 7.0,
-          "e": 8.64
-        },
-        {
-          "t": "misalnya",
-          "s": 8.7,
-          "e": 9.2
-        },
-        {
-          "t": "kata",
-          "s": 9.264,
-          "e": 9.52
-        },
-        {
-          "t": "kerja",
-          "s": 9.6,
-          "e": 9.92
-        },
-        {
-          "t": "yang",
-          "s": 9.968,
+          "s": 9.813,
           "e": 10.16
         },
         {
-          "t": "artinya",
-          "s": 10.22,
-          "e": 10.64
+          "t": "memahaminya",
+          "s": 10.2,
+          "e": 10.8
         },
         {
-          "t": "aku",
-          "s": 10.76,
+          "t": "antara",
+          "s": 10.84,
           "e": 11.12
         },
         {
-          "t": "memulai,",
-          "s": 11.2,
-          "e": 12.4
+          "t": "lain",
+          "s": 11.168,
+          "e": 11.36
         },
         {
-          "t": "sehingga",
-          "s": 12.46,
-          "e": 12.88
-        },
-        {
-          "t": "maknanya",
-          "s": 12.94,
-          "e": 13.6
+          "t": "sebagai",
+          "s": 11.44,
+          "e": 12.0
         },
         {
           "t": "aku",
-          "s": 13.74,
-          "e": 14.16
+          "s": 12.18,
+          "e": 12.72
         },
         {
-          "t": "memulai",
-          "s": 14.24,
-          "e": 14.72
+          "t": "memulai,",
+          "s": 12.78,
+          "e": 13.44
         },
         {
-          "t": "dengan",
-          "s": 14.754,
+          "t": "dan",
+          "s": 13.66,
+          "e": 14.32
+        },
+        {
+          "t": "ada",
+          "s": 14.36,
+          "e": 14.48
+        },
+        {
+          "t": "pula",
+          "s": 14.56,
+          "e": 14.88
+        },
+        {
+          "t": "yang",
+          "s": 14.896,
           "e": 14.96
         },
         {
+          "t": "menyesuaikannya",
+          "s": 15.0,
+          "e": 15.76
+        },
+        {
+          "t": "dengan",
+          "s": 15.794,
+          "e": 16.0
+        },
+        {
+          "t": "pekerjaan",
+          "s": 16.053,
+          "e": 16.64
+        },
+        {
+          "t": "yang",
+          "s": 16.672,
+          "e": 16.8
+        },
+        {
+          "t": "sedang",
+          "s": 16.84,
+          "e": 17.12
+        },
+        {
+          "t": "dimulai.",
+          "s": 17.16,
+          "e": 17.68
+        },
+        {
+          "t": "Jadi",
+          "s": 18.24,
+          "e": 18.96
+        },
+        {
+          "t": "maknanya:",
+          "s": 19.02,
+          "e": 19.6
+        },
+        {
+          "t": "aku",
+          "s": 19.88,
+          "e": 20.72
+        },
+        {
+          "t": "memulai",
+          "s": 20.78,
+          "e": 21.28
+        },
+        {
+          "t": "dengan",
+          "s": 21.326,
+          "e": 21.6
+        },
+        {
           "t": "nama",
-          "s": 15.008,
-          "e": 15.2
+          "s": 21.664,
+          "e": 21.92
         },
         {
           "t": "Allah.",
-          "s": 15.28,
-          "e": 15.68
+          "s": 21.973,
+          "e": 22.4
         }
       ]
     },
@@ -6833,14 +7069,14 @@
       ]
     },
     "al-fatihah:1:learned": {
-      "text": "Di ayat ini kita mempelajari dua hal baru: مَجْرُور dan حَرْف جَرّ. Dengan itu, sudah empat hal yang kita pelajari.",
-      "display": "Di ayat ini kita mempelajari dua hal baru: majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ). Dengan itu, sudah empat hal yang kita pelajari.",
+      "text": "Di ayat ini kita mempelajari dua hal baru: مَجْرُور dan حَرْف جَرّ.",
+      "display": "Di ayat ini kita mempelajari dua hal baru: majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/31a3bf2f1415dd80.mp3",
-        "ms": 8829,
-        "sha256": "e5ed44965ed5d0cd13ed8b2ee51e72c106cb65c7acd5468f1b1822e96f482c23"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/99af7b83ea9d1579.mp3",
+        "ms": 6426,
+        "sha256": "ae76f733452ab9bbe602cad98d28d9e88d02ff08fb7bb4ca6ce618f0a596f015"
       },
       "tokens": [
         {
@@ -6860,12 +7096,12 @@
         },
         {
           "t": "kita",
-          "s": 0.688,
-          "e": 0.88
+          "s": 0.72,
+          "e": 1.04
         },
         {
           "t": "mempelajari",
-          "s": 0.94,
+          "s": 1.08,
           "e": 1.6
         },
         {
@@ -6875,68 +7111,121 @@
         },
         {
           "t": "hal",
-          "s": 1.92,
-          "e": 2.16
+          "s": 1.9,
+          "e": 2.08
         },
         {
           "t": "baru:",
-          "s": 2.24,
-          "e": 3.2
+          "s": 2.16,
+          "e": 3.12
         },
         {
           "t": "majrur (مَجْرُور)",
-          "s": 3.24,
-          "e": 3.84
+          "s": 3.16,
+          "e": 4.0
         },
         {
           "t": "dan",
-          "s": 3.94,
-          "e": 4.24
+          "s": 4.12,
+          "e": 4.48
         },
         {
           "t": "huruf jar (حَرْف جَرّ).",
-          "s": 4.32,
-          "e": 5.12
-        },
+          "s": 4.56,
+          "e": 6.4
+        }
+      ]
+    },
+    "al-fatihah:1:map:total": {
+      "text": "Dengan itu, sudah empat hal yang kita pelajari, yaitu harakat, tiga jenis kata, مَجْرُور, dan حَرْف جَرّ.",
+      "display": "Dengan itu, sudah empat hal yang kita pelajari, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), dan huruf jar (حَرْف جَرّ).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/fdb006b7b535e180.mp3",
+        "ms": 8359,
+        "sha256": "6d4ea86d9c58105a1f1fc39a597a74e52c138dd17050fe0a68bc91c6bd1ad2ac"
+      },
+      "tokens": [
         {
           "t": "Dengan",
-          "s": 5.56,
-          "e": 6.16
+          "s": 0.0,
+          "e": 0.24
         },
         {
           "t": "itu,",
-          "s": 6.26,
-          "e": 6.8
+          "s": 0.32,
+          "e": 0.64
         },
         {
           "t": "sudah",
-          "s": 6.84,
-          "e": 7.04
+          "s": 0.733,
+          "e": 1.2
         },
         {
           "t": "empat",
-          "s": 7.093,
-          "e": 7.28
+          "s": 1.253,
+          "e": 1.44
         },
         {
           "t": "hal",
-          "s": 7.36,
-          "e": 7.6
+          "s": 1.52,
+          "e": 1.76
         },
         {
           "t": "yang",
-          "s": 7.632,
-          "e": 7.76
+          "s": 1.792,
+          "e": 1.92
         },
         {
           "t": "kita",
-          "s": 7.824,
-          "e": 8.08
+          "s": 1.968,
+          "e": 2.16
         },
         {
-          "t": "pelajari.",
-          "s": 8.12,
-          "e": 8.8
+          "t": "pelajari,",
+          "s": 2.2,
+          "e": 3.28
+        },
+        {
+          "t": "yaitu",
+          "s": 3.32,
+          "e": 3.68
+        },
+        {
+          "t": "harakat,",
+          "s": 3.74,
+          "e": 4.72
+        },
+        {
+          "t": "tiga",
+          "s": 4.76,
+          "e": 4.96
+        },
+        {
+          "t": "jenis",
+          "s": 5.027,
+          "e": 5.36
+        },
+        {
+          "t": "kata,",
+          "s": 5.44,
+          "e": 6.24
+        },
+        {
+          "t": "majrur (مَجْرُور),",
+          "s": 6.28,
+          "e": 7.28
+        },
+        {
+          "t": "dan",
+          "s": 7.32,
+          "e": 7.44
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ).",
+          "s": 7.52,
+          "e": 8.32
         }
       ]
     },
@@ -7312,14 +7601,14 @@
       ]
     },
     "al-fatihah:2:map:learnt": {
-      "text": "Sebelum ayat ini, kita sudah mempelajari empat hal. Yang kita temui lagi di ayat ini ada tiga, di antaranya حَرْف جَرّ dan مَجْرُور.",
-      "display": "Sebelum ayat ini, kita sudah mempelajari empat hal. Yang kita temui lagi di ayat ini ada tiga, di antaranya huruf jar (حَرْف جَرّ) dan majrur (مَجْرُور).",
+      "text": "Sebelum ayat ini, kita sudah mempelajari empat hal, yaitu harakat, tiga jenis kata, مَجْرُور, dan حَرْف جَرّ.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari empat hal, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), dan huruf jar (حَرْف جَرّ).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/60d11270bbb20e9d.mp3",
-        "ms": 9718,
-        "sha256": "6b4997e18bd6faf28feaaa230d741fdbe5a59645beadd47a63c8091ed0744c91"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/983feb168b871028.mp3",
+        "ms": 8046,
+        "sha256": "ad7871cd27ea7cf5923d6611959483336df32f97a35c331ffa275a679725edaa"
       },
       "tokens": [
         {
@@ -7334,130 +7623,100 @@
         },
         {
           "t": "ini,",
-          "s": 0.66,
-          "e": 1.12
+          "s": 0.64,
+          "e": 1.04
         },
         {
           "t": "kita",
-          "s": 1.168,
-          "e": 1.36
+          "s": 1.088,
+          "e": 1.28
         },
         {
           "t": "sudah",
-          "s": 1.413,
-          "e": 1.68
+          "s": 1.32,
+          "e": 1.52
         },
         {
           "t": "mempelajari",
-          "s": 1.72,
+          "s": 1.56,
+          "e": 2.08
+        },
+        {
+          "t": "empat",
+          "s": 2.133,
           "e": 2.32
         },
         {
-          "t": "empat",
-          "s": 2.373,
-          "e": 2.56
-        },
-        {
-          "t": "hal.",
-          "s": 2.66,
+          "t": "hal,",
+          "s": 2.4,
           "e": 3.04
         },
         {
-          "t": "Yang",
-          "s": 3.232,
-          "e": 4.0
+          "t": "yaitu",
+          "s": 3.08,
+          "e": 3.36
         },
         {
-          "t": "kita",
-          "s": 4.032,
-          "e": 4.16
+          "t": "harakat,",
+          "s": 3.42,
+          "e": 4.4
         },
         {
-          "t": "temui",
-          "s": 4.22,
-          "e": 4.56
+          "t": "tiga",
+          "s": 4.44,
+          "e": 4.64
         },
         {
-          "t": "lagi",
-          "s": 4.624,
-          "e": 4.88
+          "t": "jenis",
+          "s": 4.693,
+          "e": 4.96
         },
         {
-          "t": "di",
-          "s": 4.933,
-          "e": 5.04
+          "t": "kata,",
+          "s": 5.04,
+          "e": 5.84
         },
         {
-          "t": "ayat",
-          "s": 5.093,
-          "e": 5.28
-        },
-        {
-          "t": "ini",
-          "s": 5.36,
-          "e": 5.6
-        },
-        {
-          "t": "ada",
-          "s": 5.68,
-          "e": 5.92
-        },
-        {
-          "t": "tiga,",
-          "s": 5.96,
-          "e": 6.72
-        },
-        {
-          "t": "di",
-          "s": 6.747,
-          "e": 6.8
-        },
-        {
-          "t": "antaranya",
-          "s": 6.86,
-          "e": 7.68
-        },
-        {
-          "t": "huruf jar (حَرْف جَرّ)",
-          "s": 7.84,
-          "e": 8.64
+          "t": "majrur (مَجْرُور),",
+          "s": 5.88,
+          "e": 6.88
         },
         {
           "t": "dan",
-          "s": 8.74,
-          "e": 9.04
+          "s": 6.94,
+          "e": 7.12
         },
         {
-          "t": "majrur (مَجْرُور).",
-          "s": 9.08,
-          "e": 9.68
+          "t": "huruf jar (حَرْف جَرّ).",
+          "s": 7.2,
+          "e": 8.0
         }
       ]
     },
-    "al-fatihah:2:map:later": {
-      "text": "Ada empat hal lagi di ayat ini, di antaranya alif lam dan نَعْت, tetapi baru kita bahas nanti. Ada juga dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
-      "display": "Ada empat hal lagi di ayat ini, di antaranya alif lam (ال) dan na’t (نَعْت), tetapi baru kita bahas nanti. Ada juga dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+    "al-fatihah:2:map:again": {
+      "text": "Yang kita temui lagi di ayat ini adalah tiga jenis kata, مَجْرُور, dan حَرْف جَرّ.",
+      "display": "Yang kita temui lagi di ayat ini adalah tiga jenis kata, majrur (مَجْرُور), dan huruf jar (حَرْف جَرّ).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a06ca3a4e87fb3ea.mp3",
-        "ms": 12434,
-        "sha256": "57f6dc1272a834c640827692de0b5f2a9247829a0441b141bef1540e77d7dd27"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/78b956216d51f02e.mp3",
+        "ms": 5721,
+        "sha256": "6d26b0652c0e4b90ed18e86fdd693b6970e5a12cf372a5a80a7f641e6985257b"
       },
       "tokens": [
         {
-          "t": "Ada",
+          "t": "Yang",
           "s": 0.0,
-          "e": 0.16
+          "e": 0.08
         },
         {
-          "t": "empat",
-          "s": 0.213,
-          "e": 0.4
+          "t": "kita",
+          "s": 0.128,
+          "e": 0.32
         },
         {
-          "t": "hal",
-          "s": 0.46,
+          "t": "temui",
+          "s": 0.36,
           "e": 0.64
         },
         {
@@ -7476,124 +7735,350 @@
           "e": 1.36
         },
         {
-          "t": "ini,",
+          "t": "ini",
           "s": 1.44,
-          "e": 2.08
+          "e": 1.68
         },
         {
-          "t": "di",
-          "s": 2.133,
-          "e": 2.24
+          "t": "adalah",
+          "s": 1.726,
+          "e": 2.0
         },
         {
-          "t": "antaranya",
-          "s": 2.3,
-          "e": 2.96
+          "t": "tiga",
+          "s": 2.12,
+          "e": 2.48
         },
         {
-          "t": "alif lam (ال)",
-          "s": 3.093,
-          "e": 4.08
+          "t": "jenis",
+          "s": 2.533,
+          "e": 2.8
+        },
+        {
+          "t": "kata,",
+          "s": 2.88,
+          "e": 3.84
+        },
+        {
+          "t": "majrur (مَجْرُور),",
+          "s": 3.88,
+          "e": 4.48
         },
         {
           "t": "dan",
-          "s": 4.16,
-          "e": 4.4
+          "s": 4.58,
+          "e": 4.88
         },
         {
-          "t": "na’t (نَعْت),",
-          "s": 4.52,
-          "e": 5.12
-        },
-        {
-          "t": "tetapi",
-          "s": 5.26,
-          "e": 6.0
-        },
-        {
-          "t": "baru",
-          "s": 6.064,
-          "e": 6.32
-        },
-        {
-          "t": "kita",
-          "s": 6.368,
-          "e": 6.56
-        },
-        {
-          "t": "bahas",
-          "s": 6.6,
-          "e": 6.88
-        },
-        {
-          "t": "nanti.",
-          "s": 6.92,
-          "e": 7.36
-        },
+          "t": "huruf jar (حَرْف جَرّ).",
+          "s": 4.92,
+          "e": 5.68
+        }
+      ]
+    },
+    "al-fatihah:2:map:later": {
+      "text": "Ada empat hal lagi di ayat ini, yaitu alif lam, نَعْت, idhofah, dan بَدَل, tetapi baru kita bahas nanti. Ada juga dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "display": "Ada empat hal lagi di ayat ini, yaitu alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dan badal (بَدَل), tetapi baru kita bahas nanti. Ada juga dua hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/615cb09cab99d935.mp3",
+        "ms": 13401,
+        "sha256": "dd88ce74fd4c0aa8dce074df1a0bc2fd2314cf7d9f7a1a9c65bd5dec597a0610"
+      },
+      "tokens": [
         {
           "t": "Ada",
-          "s": 7.56,
-          "e": 8.16
+          "s": 0.0,
+          "e": 0.24
         },
         {
-          "t": "juga",
-          "s": 8.224,
-          "e": 8.48
-        },
-        {
-          "t": "dua",
-          "s": 8.56,
-          "e": 8.8
+          "t": "empat",
+          "s": 0.293,
+          "e": 0.48
         },
         {
           "t": "hal",
-          "s": 8.88,
-          "e": 9.12
+          "s": 0.54,
+          "e": 0.72
         },
         {
-          "t": "tingkat",
-          "s": 9.152,
-          "e": 9.44
-        },
-        {
-          "t": "lanjut,",
-          "s": 9.5,
-          "e": 10.16
-        },
-        {
-          "t": "yang",
-          "s": 10.208,
-          "e": 10.4
-        },
-        {
-          "t": "tidak",
-          "s": 10.453,
-          "e": 10.72
-        },
-        {
-          "t": "kita",
-          "s": 10.768,
-          "e": 10.96
-        },
-        {
-          "t": "bahas",
-          "s": 11.02,
-          "e": 11.36
+          "t": "lagi",
+          "s": 0.784,
+          "e": 1.04
         },
         {
           "t": "di",
-          "s": 11.413,
-          "e": 11.52
+          "s": 1.093,
+          "e": 1.2
+        },
+        {
+          "t": "ayat",
+          "s": 1.253,
+          "e": 1.44
+        },
+        {
+          "t": "ini,",
+          "s": 1.52,
+          "e": 2.16
+        },
+        {
+          "t": "yaitu",
+          "s": 2.2,
+          "e": 2.56
+        },
+        {
+          "t": "alif lam (ال),",
+          "s": 2.64,
+          "e": 3.68
+        },
+        {
+          "t": "na’t (نَعْت),",
+          "s": 3.76,
+          "e": 4.56
+        },
+        {
+          "t": "idhafah (إِضَافَة),",
+          "s": 4.64,
+          "e": 5.36
+        },
+        {
+          "t": "dan",
+          "s": 5.46,
+          "e": 5.76
+        },
+        {
+          "t": "badal (بَدَل),",
+          "s": 5.8,
+          "e": 6.32
+        },
+        {
+          "t": "tetapi",
+          "s": 6.48,
+          "e": 7.12
+        },
+        {
+          "t": "baru",
+          "s": 7.184,
+          "e": 7.44
+        },
+        {
+          "t": "kita",
+          "s": 7.472,
+          "e": 7.6
+        },
+        {
+          "t": "bahas",
+          "s": 7.64,
+          "e": 7.92
+        },
+        {
+          "t": "nanti.",
+          "s": 7.96,
+          "e": 8.401
+        },
+        {
+          "t": "Ada",
+          "s": 8.64,
+          "e": 9.36
+        },
+        {
+          "t": "juga",
+          "s": 9.424,
+          "e": 9.68
+        },
+        {
+          "t": "dua",
+          "s": 9.74,
+          "e": 9.92
+        },
+        {
+          "t": "hal",
+          "s": 9.98,
+          "e": 10.16
         },
         {
           "t": "tingkat",
-          "s": 11.552,
+          "s": 10.208,
+          "e": 10.48
+        },
+        {
+          "t": "lanjut,",
+          "s": 10.54,
+          "e": 11.36
+        },
+        {
+          "t": "yang",
+          "s": 11.392,
+          "e": 11.52
+        },
+        {
+          "t": "tidak",
+          "s": 11.573,
           "e": 11.84
         },
         {
+          "t": "kita",
+          "s": 11.888,
+          "e": 12.08
+        },
+        {
+          "t": "bahas",
+          "s": 12.12,
+          "e": 12.48
+        },
+        {
+          "t": "di",
+          "s": 12.533,
+          "e": 12.64
+        },
+        {
+          "t": "tingkat",
+          "s": 12.672,
+          "e": 12.88
+        },
+        {
           "t": "dasar.",
-          "s": 11.9,
-          "e": 12.4
+          "s": 12.94,
+          "e": 13.36
+        }
+      ]
+    },
+    "al-fatihah:2:map:focus": {
+      "text": "Sekarang Anda tidak perlu menghafal semuanya, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada pelajaran جُمْلَة اِسْمِيَّة, مَرْفُوع, dan جَمْع مُذَكَّر سَالِم terlebih dahulu.",
+      "display": "Sekarang Anda tidak perlu menghafal semuanya, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada pelajaran jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم) terlebih dahulu.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/019abb7d5b170726.mp3",
+        "ms": 14681,
+        "sha256": "802b075c0830ac453048619fe17b7f3213eda37e6bf6837eeaab5224990a9cf6"
+      },
+      "tokens": [
+        {
+          "t": "Sekarang",
+          "s": 0.0,
+          "e": 0.48
+        },
+        {
+          "t": "Anda",
+          "s": 0.544,
+          "e": 0.8
+        },
+        {
+          "t": "tidak",
+          "s": 0.84,
+          "e": 1.04
+        },
+        {
+          "t": "perlu",
+          "s": 1.08,
+          "e": 1.28
+        },
+        {
+          "t": "menghafal",
+          "s": 1.328,
+          "e": 1.92
+        },
+        {
+          "t": "semuanya,",
+          "s": 1.98,
+          "e": 2.64
+        },
+        {
+          "t": "dan",
+          "s": 2.84,
+          "e": 3.44
+        },
+        {
+          "t": "tidak",
+          "s": 3.48,
+          "e": 3.68
+        },
+        {
+          "t": "perlu",
+          "s": 3.72,
+          "e": 3.92
+        },
+        {
+          "t": "memikirkan",
+          "s": 3.96,
+          "e": 4.56
+        },
+        {
+          "t": "hal",
+          "s": 4.64,
+          "e": 4.88
+        },
+        {
+          "t": "tingkat",
+          "s": 4.928,
+          "e": 5.28
+        },
+        {
+          "t": "lanjut",
+          "s": 5.34,
+          "e": 5.6
+        },
+        {
+          "t": "tadi.",
+          "s": 5.64,
+          "e": 6.0
+        },
+        {
+          "t": "Mari",
+          "s": 6.24,
+          "e": 7.2
+        },
+        {
+          "t": "kita",
+          "s": 7.248,
+          "e": 7.44
+        },
+        {
+          "t": "fokus",
+          "s": 7.48,
+          "e": 7.92
+        },
+        {
+          "t": "pada",
+          "s": 7.968,
+          "e": 8.16
+        },
+        {
+          "t": "pelajaran",
+          "s": 8.2,
+          "e": 8.72
+        },
+        {
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 8.96,
+          "e": 10.24
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 10.56,
+          "e": 11.52
+        },
+        {
+          "t": "dan",
+          "s": 11.68,
+          "e": 12.16
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم)",
+          "s": 12.28,
+          "e": 13.76
+        },
+        {
+          "t": "terlebih",
+          "s": 13.82,
+          "e": 14.16
+        },
+        {
+          "t": "dahulu.",
+          "s": 14.22,
+          "e": 14.64
         }
       ]
     },
@@ -11134,16 +11619,16 @@
       ]
     },
     "al-fatihah:2:structure:2": {
-      "text": "Khobar di sini berupa حَرْف جَرّ beserta اِسْم yang مَجْرُور. Keterangan seperti ini bergantung pada kata yang tidak diucapkan; para ulama memperkirakannya, misalnya kata yang artinya tetap, sehingga maknanya segala puji tetap bagi Alloh.",
-      "display": "Khabar (خَبَر) di sini berupa huruf jar (حَرْف جَرّ) beserta isim (اِسْم) yang majrur (مَجْرُور). Keterangan seperti ini bergantung pada kata yang tidak diucapkan; para ulama memperkirakannya, misalnya kata yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”.",
+      "text": "Khobar di sini berupa حَرْف جَرّ beserta اِسْم yang مَجْرُور. Keterangan seperti ini bergantung pada kata yang tidak diucapkan; para ulama memahaminya antara lain sebagai tetap. Jadi maknanya: segala puji tetap bagi Alloh.",
+      "display": "Khabar (خَبَر) di sini berupa huruf jar (حَرْف جَرّ) beserta isim (اِسْم) yang majrur (مَجْرُور). Keterangan seperti ini bergantung pada kata yang tidak diucapkan; para ulama memahaminya antara lain sebagai “tetap”. Jadi maknanya: “segala puji tetap bagi Allah”.",
       "highlight": [
         2
       ],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/e6cc2bd9de1083d4.mp3",
-        "ms": 17554,
-        "sha256": "b618fed7c4af2ee2806b159d45ed604fa387ee2d9572ffa3c3ae0c4488bc49f6"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/d6700474172f154e.mp3",
+        "ms": 16509,
+        "sha256": "8959ec679dd672814907f349d60c49307ea9b3227b87976771c516c23d6e8513"
       },
       "tokens": [
         {
@@ -11159,157 +11644,152 @@
         {
           "t": "sini",
           "s": 0.52,
-          "e": 0.88
+          "e": 0.8
         },
         {
           "t": "berupa",
-          "s": 0.92,
-          "e": 1.28
+          "s": 0.84,
+          "e": 1.2
         },
         {
           "t": "huruf jar (حَرْف جَرّ)",
-          "s": 1.36,
-          "e": 2.32
+          "s": 1.28,
+          "e": 2.08
         },
         {
           "t": "beserta",
-          "s": 2.4,
-          "e": 2.88
+          "s": 2.18,
+          "e": 2.72
         },
         {
           "t": "isim (اِسْم)",
-          "s": 2.92,
+          "s": 2.8,
+          "e": 3.12
+        },
+        {
+          "t": "yang",
+          "s": 3.152,
           "e": 3.28
         },
         {
-          "t": "yang",
-          "s": 3.328,
-          "e": 3.52
-        },
-        {
           "t": "majrur (مَجْرُور).",
-          "s": 3.56,
-          "e": 4.6
+          "s": 3.32,
+          "e": 3.84
         },
         {
           "t": "Keterangan",
-          "s": 4.82,
-          "e": 5.44
+          "s": 4.24,
+          "e": 5.04
         },
         {
           "t": "seperti",
-          "s": 5.49,
-          "e": 5.84
+          "s": 5.09,
+          "e": 5.44
         },
         {
           "t": "ini",
-          "s": 5.9,
-          "e": 6.08
+          "s": 5.5,
+          "e": 5.68
         },
         {
           "t": "bergantung",
-          "s": 6.144,
-          "e": 6.64
+          "s": 5.728,
+          "e": 6.24
         },
         {
           "t": "pada",
-          "s": 6.688,
+          "s": 6.288,
+          "e": 6.48
+        },
+        {
+          "t": "kata",
+          "s": 6.56,
           "e": 6.88
         },
         {
-          "t": "kata",
-          "s": 6.96,
-          "e": 7.28
-        },
-        {
           "t": "yang",
-          "s": 7.312,
-          "e": 7.44
+          "s": 6.912,
+          "e": 7.04
         },
         {
           "t": "tidak",
-          "s": 7.493,
-          "e": 7.76
+          "s": 7.08,
+          "e": 7.28
         },
         {
           "t": "diucapkan;",
-          "s": 7.813,
-          "e": 9.28
+          "s": 7.333,
+          "e": 8.72
         },
         {
           "t": "para",
-          "s": 9.312,
-          "e": 9.44
+          "s": 8.768,
+          "e": 8.96
         },
         {
           "t": "ulama",
-          "s": 9.52,
-          "e": 10.0
+          "s": 9.013,
+          "e": 9.44
         },
         {
-          "t": "memperkirakannya,",
-          "s": 10.04,
-          "e": 11.44
+          "t": "memahaminya",
+          "s": 9.5,
+          "e": 10.24
         },
         {
-          "t": "misalnya",
-          "s": 11.48,
-          "e": 12.0
+          "t": "antara",
+          "s": 10.28,
+          "e": 10.56
         },
         {
-          "t": "kata",
-          "s": 12.08,
-          "e": 12.4
+          "t": "lain",
+          "s": 10.624,
+          "e": 10.88
         },
         {
-          "t": "yang",
-          "s": 12.432,
-          "e": 12.56
+          "t": "sebagai",
+          "s": 10.93,
+          "e": 11.28
         },
         {
-          "t": "artinya",
-          "s": 12.62,
-          "e": 13.04
+          "t": "tetap.",
+          "s": 11.36,
+          "e": 11.76
         },
         {
-          "t": "tetap,",
-          "s": 13.1,
-          "e": 13.92
+          "t": "Jadi",
+          "s": 12.2,
+          "e": 12.96
         },
         {
-          "t": "sehingga",
-          "s": 13.98,
-          "e": 14.56
-        },
-        {
-          "t": "maknanya",
-          "s": 14.62,
-          "e": 15.2
+          "t": "maknanya:",
+          "s": 13.04,
+          "e": 14.12
         },
         {
           "t": "segala",
-          "s": 15.32,
-          "e": 15.84
+          "s": 14.23,
+          "e": 14.72
         },
         {
           "t": "puji",
-          "s": 15.92,
-          "e": 16.32
+          "s": 14.8,
+          "e": 15.2
         },
         {
           "t": "tetap",
-          "s": 16.38,
-          "e": 16.72
+          "s": 15.28,
+          "e": 15.68
         },
         {
           "t": "bagi",
-          "s": 16.784,
-          "e": 17.04
+          "s": 15.744,
+          "e": 16.0
         },
         {
           "t": "Allah.",
-          "s": 17.12,
-          "e": 17.52
+          "s": 16.08,
+          "e": 16.48
         }
       ]
     },
@@ -12684,14 +13164,14 @@
       ]
     },
     "al-fatihah:2:learned": {
-      "text": "Di ayat ini kita mempelajari tiga hal baru: جُمْلَة اِسْمِيَّة, مَرْفُوع, dan جَمْع مُذَكَّر سَالِم. Dengan itu, sudah tujuh hal yang kita pelajari.",
-      "display": "Di ayat ini kita mempelajari tiga hal baru: jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم). Dengan itu, sudah tujuh hal yang kita pelajari.",
+      "text": "Di ayat ini kita mempelajari tiga hal baru: جُمْلَة اِسْمِيَّة, مَرْفُوع, dan جَمْع مُذَكَّر سَالِم.",
+      "display": "Di ayat ini kita mempelajari tiga hal baru: jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/7cd39aec7d461490.mp3",
-        "ms": 11729,
-        "sha256": "c9d00cb7cfab20eab9da259dcf535a2b4c1c68375e15167676650d766efdeef0"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/77264e11b3f3a9b0.mp3",
+        "ms": 9247,
+        "sha256": "ca69dee13650b529dec3badcdce6213275aaad067f0158a9c77b18fb28c24011"
       },
       "tokens": [
         {
@@ -12702,97 +13182,165 @@
         {
           "t": "ayat",
           "s": 0.133,
-          "e": 0.32
+          "e": 0.4
         },
         {
           "t": "ini",
-          "s": 0.38,
-          "e": 0.56
+          "s": 0.48,
+          "e": 0.72
         },
         {
           "t": "kita",
-          "s": 0.608,
-          "e": 0.8
+          "s": 0.8,
+          "e": 1.12
         },
         {
           "t": "mempelajari",
-          "s": 0.86,
-          "e": 1.52
+          "s": 1.18,
+          "e": 1.84
         },
         {
           "t": "tiga",
-          "s": 1.56,
-          "e": 1.76
+          "s": 1.88,
+          "e": 2.16
         },
         {
           "t": "hal",
-          "s": 1.84,
-          "e": 2.08
+          "s": 2.24,
+          "e": 2.48
         },
         {
           "t": "baru:",
-          "s": 2.16,
-          "e": 3.28
+          "s": 2.56,
+          "e": 3.6
         },
         {
           "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 3.32,
-          "e": 4.48
+          "s": 3.64,
+          "e": 4.96
         },
         {
           "t": "marfu’ (مَرْفُوع),",
-          "s": 4.76,
-          "e": 5.6
+          "s": 5.32,
+          "e": 6.32
         },
         {
           "t": "dan",
-          "s": 5.74,
-          "e": 6.16
+          "s": 6.52,
+          "e": 7.12
         },
         {
           "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
-          "s": 6.36,
-          "e": 8.24
-        },
+          "s": 7.32,
+          "e": 9.2
+        }
+      ]
+    },
+    "al-fatihah:2:map:total": {
+      "text": "Dengan itu, sudah tujuh hal yang kita pelajari, yaitu harakat, tiga jenis kata, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, dan جَمْع مُذَكَّر سَالِم.",
+      "display": "Dengan itu, sudah tujuh hal yang kita pelajari, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0bbf545513493a99.mp3",
+        "ms": 13401,
+        "sha256": "899c47e56197f41e41a79a188abf74baf675e92738801dd4d74b8afa7f06fa95"
+      },
+      "tokens": [
         {
           "t": "Dengan",
-          "s": 8.64,
-          "e": 9.28
+          "s": 0.0,
+          "e": 0.24
         },
         {
           "t": "itu,",
-          "s": 9.38,
-          "e": 9.96
+          "s": 0.34,
+          "e": 0.92
         },
         {
           "t": "sudah",
-          "s": 10.007,
-          "e": 10.24
+          "s": 0.967,
+          "e": 1.2
         },
         {
           "t": "tujuh",
-          "s": 10.293,
-          "e": 10.6
+          "s": 1.253,
+          "e": 1.6
         },
         {
           "t": "hal",
-          "s": 10.63,
-          "e": 10.72
+          "s": 1.64,
+          "e": 1.76
         },
         {
           "t": "yang",
-          "s": 10.752,
-          "e": 10.88
+          "s": 1.792,
+          "e": 1.92
         },
         {
           "t": "kita",
-          "s": 10.912,
-          "e": 11.04
+          "s": 1.952,
+          "e": 2.08
         },
         {
-          "t": "pelajari.",
-          "s": 11.08,
-          "e": 11.68
+          "t": "pelajari,",
+          "s": 2.14,
+          "e": 3.2
+        },
+        {
+          "t": "yaitu",
+          "s": 3.24,
+          "e": 3.6
+        },
+        {
+          "t": "harakat,",
+          "s": 3.66,
+          "e": 4.72
+        },
+        {
+          "t": "tiga",
+          "s": 4.76,
+          "e": 4.96
+        },
+        {
+          "t": "jenis",
+          "s": 5.027,
+          "e": 5.36
+        },
+        {
+          "t": "kata,",
+          "s": 5.456,
+          "e": 6.32
+        },
+        {
+          "t": "majrur (مَجْرُور),",
+          "s": 6.36,
+          "e": 7.44
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 7.48,
+          "e": 8.32
+        },
+        {
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 8.56,
+          "e": 9.84
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 10.08,
+          "e": 11.28
+        },
+        {
+          "t": "dan",
+          "s": 11.34,
+          "e": 11.52
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
+          "s": 11.6,
+          "e": 13.36
         }
       ]
     },
@@ -13153,115 +13701,188 @@
       ]
     },
     "al-fatihah:3:map:learnt": {
-      "text": "Sebelum ayat ini, kita sudah mempelajari tujuh hal. Yang kita temui lagi di ayat ini ada dua, di antaranya مَجْرُور.",
-      "display": "Sebelum ayat ini, kita sudah mempelajari tujuh hal. Yang kita temui lagi di ayat ini ada dua, di antaranya majrur (مَجْرُور).",
+      "text": "Sebelum ayat ini, kita sudah mempelajari tujuh hal, yaitu harakat, tiga jenis kata, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, dan جَمْع مُذَكَّر سَالِم.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari tujuh hal, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/fd30d1d875f00a7a.mp3",
-        "ms": 8046,
-        "sha256": "11c406e4c4c1d7fbaae699872e942b6aa14adab96ae9ca23a9b09991b78c0e6f"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/8be4fd1fe5b091a8.mp3",
+        "ms": 12931,
+        "sha256": "45ff37da9b7a406ea413288fc6f7983f62ab5ed91de1f0f26c01ccf929c63b1f"
       },
       "tokens": [
         {
           "t": "Sebelum",
           "s": 0.0,
-          "e": 0.24
+          "e": 0.32
         },
         {
           "t": "ayat",
-          "s": 0.293,
-          "e": 0.56
+          "s": 0.373,
+          "e": 0.64
         },
         {
           "t": "ini,",
-          "s": 0.64,
-          "e": 1.12
+          "s": 0.7,
+          "e": 0.96
         },
         {
           "t": "kita",
-          "s": 1.168,
-          "e": 1.36
+          "s": 1.008,
+          "e": 1.2
         },
         {
           "t": "sudah",
-          "s": 1.413,
-          "e": 1.68
+          "s": 1.253,
+          "e": 1.52
         },
         {
           "t": "mempelajari",
-          "s": 1.74,
-          "e": 2.32
+          "s": 1.58,
+          "e": 2.16
         },
         {
           "t": "tujuh",
-          "s": 2.4,
-          "e": 2.8
+          "s": 2.24,
+          "e": 2.68
         },
         {
-          "t": "hal.",
-          "s": 2.84,
-          "e": 3.04
+          "t": "hal,",
+          "s": 2.73,
+          "e": 2.96
         },
         {
-          "t": "Yang",
-          "s": 3.184,
+          "t": "yaitu",
+          "s": 3.2,
           "e": 3.76
         },
         {
-          "t": "kita",
-          "s": 3.808,
-          "e": 4.0
-        },
-        {
-          "t": "temui",
-          "s": 4.06,
-          "e": 4.4
-        },
-        {
-          "t": "lagi",
-          "s": 4.464,
-          "e": 4.72
-        },
-        {
-          "t": "di",
-          "s": 4.773,
+          "t": "harakat,",
+          "s": 3.82,
           "e": 4.88
         },
         {
-          "t": "ayat",
-          "s": 4.933,
+          "t": "tiga",
+          "s": 4.92,
           "e": 5.12
         },
         {
-          "t": "ini",
-          "s": 5.18,
-          "e": 5.36
+          "t": "jenis",
+          "s": 5.187,
+          "e": 5.52
         },
         {
-          "t": "ada",
-          "s": 5.42,
-          "e": 5.6
+          "t": "kata,",
+          "s": 5.616,
+          "e": 6.08
         },
         {
-          "t": "dua,",
-          "s": 5.68,
-          "e": 6.32
+          "t": "majrur (مَجْرُور),",
+          "s": 6.36,
+          "e": 7.2
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 7.44,
+          "e": 8.32
+        },
+        {
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 8.56,
+          "e": 9.68
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 9.92,
+          "e": 10.72
+        },
+        {
+          "t": "dan",
+          "s": 10.84,
+          "e": 11.2
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
+          "s": 11.28,
+          "e": 12.88
+        }
+      ]
+    },
+    "al-fatihah:3:map:again": {
+      "text": "Yang kita temui lagi di ayat ini adalah tiga jenis kata dan مَجْرُور.",
+      "display": "Yang kita temui lagi di ayat ini adalah tiga jenis kata dan majrur (مَجْرُور).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4980806858ba7ec2.mp3",
+        "ms": 4284,
+        "sha256": "1ce2196ff69708fffd5168c5fb21b514d6d69097e59364a87b87476034e2e874"
+      },
+      "tokens": [
+        {
+          "t": "Yang",
+          "s": 0.0,
+          "e": 0.16
+        },
+        {
+          "t": "kita",
+          "s": 0.192,
+          "e": 0.32
+        },
+        {
+          "t": "temui",
+          "s": 0.38,
+          "e": 0.72
+        },
+        {
+          "t": "lagi",
+          "s": 0.784,
+          "e": 1.04
         },
         {
           "t": "di",
-          "s": 6.373,
-          "e": 6.48
+          "s": 1.093,
+          "e": 1.2
         },
         {
-          "t": "antaranya",
-          "s": 6.54,
-          "e": 7.12
+          "t": "ayat",
+          "s": 1.253,
+          "e": 1.44
+        },
+        {
+          "t": "ini",
+          "s": 1.5,
+          "e": 1.68
+        },
+        {
+          "t": "adalah",
+          "s": 1.726,
+          "e": 2.0
+        },
+        {
+          "t": "tiga",
+          "s": 2.08,
+          "e": 2.4
+        },
+        {
+          "t": "jenis",
+          "s": 2.467,
+          "e": 2.8
+        },
+        {
+          "t": "kata",
+          "s": 2.88,
+          "e": 3.2
+        },
+        {
+          "t": "dan",
+          "s": 3.28,
+          "e": 3.52
         },
         {
           "t": "majrur (مَجْرُور).",
-          "s": 7.24,
-          "e": 8.0
+          "s": 3.56,
+          "e": 4.24
         }
       ]
     },
@@ -13350,6 +13971,109 @@
           "t": "dasar.",
           "s": 5.42,
           "e": 5.92
+        }
+      ]
+    },
+    "al-fatihah:3:map:focus": {
+      "text": "Sekarang Anda tidak perlu memikirkan yang satu ini. Mari kita fokus pada pelajaran alif lam dan نَعْت terlebih dahulu.",
+      "display": "Sekarang Anda tidak perlu memikirkan yang satu ini. Mari kita fokus pada pelajaran alif lam (ال) dan na’t (نَعْت) terlebih dahulu.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/b73612fa2f48b788.mp3",
+        "ms": 7471,
+        "sha256": "2e83ee384e567997789501d0fed32603a113cfb4479cbe527b75a882955c6f89"
+      },
+      "tokens": [
+        {
+          "t": "Sekarang",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "Anda",
+          "s": 0.464,
+          "e": 0.72
+        },
+        {
+          "t": "tidak",
+          "s": 0.76,
+          "e": 0.96
+        },
+        {
+          "t": "perlu",
+          "s": 1.02,
+          "e": 1.28
+        },
+        {
+          "t": "memikirkan",
+          "s": 1.32,
+          "e": 1.84
+        },
+        {
+          "t": "yang",
+          "s": 1.872,
+          "e": 2.0
+        },
+        {
+          "t": "satu",
+          "s": 2.048,
+          "e": 2.24
+        },
+        {
+          "t": "ini.",
+          "s": 2.32,
+          "e": 2.64
+        },
+        {
+          "t": "Mari",
+          "s": 2.8,
+          "e": 3.44
+        },
+        {
+          "t": "kita",
+          "s": 3.488,
+          "e": 3.68
+        },
+        {
+          "t": "fokus",
+          "s": 3.72,
+          "e": 4.16
+        },
+        {
+          "t": "pada",
+          "s": 4.208,
+          "e": 4.4
+        },
+        {
+          "t": "pelajaran",
+          "s": 4.46,
+          "e": 5.04
+        },
+        {
+          "t": "alif lam (ال)",
+          "s": 5.093,
+          "e": 5.76
+        },
+        {
+          "t": "dan",
+          "s": 5.82,
+          "e": 6.0
+        },
+        {
+          "t": "na’t (نَعْت)",
+          "s": 6.08,
+          "e": 6.4
+        },
+        {
+          "t": "terlebih",
+          "s": 6.46,
+          "e": 6.88
+        },
+        {
+          "t": "dahulu.",
+          "s": 6.94,
+          "e": 7.44
         }
       ]
     },
@@ -15734,110 +16458,188 @@
       ]
     },
     "al-fatihah:3:learned": {
-      "text": "Di ayat ini kita mempelajari dua hal baru: alif lam dan نَعْت. Dengan itu, sudah sembilan hal yang kita pelajari.",
-      "display": "Di ayat ini kita mempelajari dua hal baru: alif lam (ال) dan na’t (نَعْت). Dengan itu, sudah sembilan hal yang kita pelajari.",
+      "text": "Di ayat ini kita mempelajari dua hal baru: alif lam dan نَعْت.",
+      "display": "Di ayat ini kita mempelajari dua hal baru: alif lam (ال) dan na’t (نَعْت).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/6a5afefd011fa4fe.mp3",
-        "ms": 9404,
-        "sha256": "b1c3c6102ce5f858853e9cf26236bce447ea4fd5ee9c939276f2e80f5a2704fa"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a012ff3a95c9c5df.mp3",
+        "ms": 6426,
+        "sha256": "b555d3c06247f841685da30549c3a33d009a0ae366a05e716d0230ebce0e7357"
       },
       "tokens": [
         {
           "t": "Di",
           "s": 0.0,
-          "e": 0.16
+          "e": 0.08
         },
         {
           "t": "ayat",
-          "s": 0.187,
+          "s": 0.133,
           "e": 0.32
         },
         {
           "t": "ini",
-          "s": 0.4,
-          "e": 0.64
+          "s": 0.42,
+          "e": 0.72
         },
         {
           "t": "kita",
-          "s": 0.688,
-          "e": 0.88
+          "s": 0.8,
+          "e": 1.12
         },
         {
           "t": "mempelajari",
-          "s": 0.94,
-          "e": 1.52
+          "s": 1.16,
+          "e": 1.76
         },
         {
           "t": "dua",
-          "s": 1.6,
-          "e": 1.84
+          "s": 1.82,
+          "e": 2.0
         },
         {
           "t": "hal",
-          "s": 1.9,
-          "e": 2.08
+          "s": 2.08,
+          "e": 2.32
         },
         {
           "t": "baru:",
-          "s": 2.144,
-          "e": 3.28
+          "s": 2.4,
+          "e": 3.44
         },
         {
           "t": "alif lam (ال)",
-          "s": 3.36,
+          "s": 3.493,
           "e": 4.16
         },
         {
           "t": "dan",
-          "s": 4.26,
-          "e": 4.56
+          "s": 4.28,
+          "e": 4.64
         },
         {
           "t": "na’t (نَعْت).",
-          "s": 4.8,
-          "e": 5.52
-        },
+          "s": 4.76,
+          "e": 6.4
+        }
+      ]
+    },
+    "al-fatihah:3:map:total": {
+      "text": "Dengan itu, sudah sembilan hal yang kita pelajari, yaitu harakat, tiga jenis kata, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, dan نَعْت.",
+      "display": "Dengan itu, sudah sembilan hal yang kita pelajari, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), dan na’t (نَعْت).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/d2d022447029ffa5.mp3",
+        "ms": 15961,
+        "sha256": "66c55576dee333c5e8726a23e4a3acfef82598d59d587a6fe7815a75b5594c0c"
+      },
+      "tokens": [
         {
           "t": "Dengan",
-          "s": 5.96,
-          "e": 6.64
+          "s": 0.0,
+          "e": 0.24
         },
         {
           "t": "itu,",
-          "s": 6.74,
-          "e": 7.28
+          "s": 0.34,
+          "e": 0.72
         },
         {
           "t": "sudah",
-          "s": 7.32,
-          "e": 7.52
+          "s": 0.787,
+          "e": 1.12
         },
         {
           "t": "sembilan",
-          "s": 7.58,
-          "e": 8.0
+          "s": 1.16,
+          "e": 1.52
         },
         {
           "t": "hal",
-          "s": 8.1,
-          "e": 8.4
+          "s": 1.6,
+          "e": 1.84
         },
         {
           "t": "yang",
-          "s": 8.432,
-          "e": 8.56
+          "s": 1.872,
+          "e": 2.0
         },
         {
           "t": "kita",
-          "s": 8.592,
+          "s": 2.048,
+          "e": 2.24
+        },
+        {
+          "t": "pelajari,",
+          "s": 2.28,
+          "e": 3.28
+        },
+        {
+          "t": "yaitu",
+          "s": 3.32,
+          "e": 3.92
+        },
+        {
+          "t": "harakat,",
+          "s": 4.02,
+          "e": 5.2
+        },
+        {
+          "t": "tiga",
+          "s": 5.24,
+          "e": 5.44
+        },
+        {
+          "t": "jenis",
+          "s": 5.507,
+          "e": 5.84
+        },
+        {
+          "t": "kata,",
+          "s": 5.92,
+          "e": 6.8
+        },
+        {
+          "t": "majrur (مَجْرُور),",
+          "s": 6.84,
+          "e": 7.6
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 7.8,
           "e": 8.72
         },
         {
-          "t": "pelajari.",
-          "s": 8.76,
-          "e": 9.36
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 9.04,
+          "e": 10.24
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 10.52,
+          "e": 11.36
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
+          "s": 11.68,
+          "e": 13.36
+        },
+        {
+          "t": "alif lam (ال),",
+          "s": 13.573,
+          "e": 14.8
+        },
+        {
+          "t": "dan",
+          "s": 14.88,
+          "e": 15.12
+        },
+        {
+          "t": "na’t (نَعْت).",
+          "s": 15.28,
+          "e": 15.92
         }
       ]
     },
@@ -16178,130 +16980,208 @@
       ]
     },
     "al-fatihah:4:map:learnt": {
-      "text": "Sebelum ayat ini, kita sudah mempelajari sembilan hal. Yang kita temui lagi di ayat ini ada empat, di antaranya نَعْت, alif lam, dan مَجْرُور.",
-      "display": "Sebelum ayat ini, kita sudah mempelajari sembilan hal. Yang kita temui lagi di ayat ini ada empat, di antaranya na’t (نَعْت), alif lam (ال), dan majrur (مَجْرُور).",
+      "text": "Sebelum ayat ini, kita sudah mempelajari sembilan hal, yaitu harakat, tiga jenis kata, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, dan نَعْت.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari sembilan hal, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), dan na’t (نَعْت).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/eb7031cb101e12d5.mp3",
-        "ms": 11076,
-        "sha256": "595b2d18d64f3be630a55d81cf05130518d94c6c8a96bbda724143443bb60ca3"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/fc445fb512976610.mp3",
+        "ms": 16431,
+        "sha256": "423eee3c6140d8e018b60893edad3c3e134153f261a7c011ac44934a5de0a614"
       },
       "tokens": [
         {
           "t": "Sebelum",
           "s": 0.0,
-          "e": 0.24
+          "e": 0.32
         },
         {
           "t": "ayat",
-          "s": 0.32,
-          "e": 0.56
+          "s": 0.4,
+          "e": 0.64
         },
         {
           "t": "ini,",
-          "s": 0.66,
-          "e": 1.04
+          "s": 0.74,
+          "e": 1.2
         },
         {
           "t": "kita",
-          "s": 1.088,
-          "e": 1.28
+          "s": 1.248,
+          "e": 1.44
         },
         {
           "t": "sudah",
-          "s": 1.32,
-          "e": 1.52
+          "s": 1.493,
+          "e": 1.76
         },
         {
           "t": "mempelajari",
-          "s": 1.58,
-          "e": 2.24
+          "s": 1.8,
+          "e": 2.4
         },
         {
           "t": "sembilan",
-          "s": 2.3,
-          "e": 2.72
+          "s": 2.46,
+          "e": 2.88
         },
         {
-          "t": "hal.",
-          "s": 2.82,
-          "e": 3.64
+          "t": "hal,",
+          "s": 2.98,
+          "e": 3.76
         },
         {
-          "t": "Yang",
-          "s": 3.744,
+          "t": "yaitu",
+          "s": 3.84,
           "e": 4.16
         },
         {
-          "t": "kita",
-          "s": 4.192,
-          "e": 4.32
+          "t": "harakat,",
+          "s": 4.22,
+          "e": 5.28
         },
         {
-          "t": "temui",
-          "s": 4.38,
-          "e": 4.72
+          "t": "tiga",
+          "s": 5.32,
+          "e": 5.52
         },
         {
-          "t": "lagi",
-          "s": 4.784,
-          "e": 5.04
+          "t": "jenis",
+          "s": 5.573,
+          "e": 5.84
         },
         {
-          "t": "di",
-          "s": 5.093,
-          "e": 5.2
-        },
-        {
-          "t": "ayat",
-          "s": 5.253,
-          "e": 5.44
-        },
-        {
-          "t": "ini",
-          "s": 5.52,
-          "e": 5.76
-        },
-        {
-          "t": "ada",
-          "s": 5.84,
-          "e": 6.08
-        },
-        {
-          "t": "empat,",
-          "s": 6.133,
+          "t": "kata,",
+          "s": 5.92,
           "e": 6.88
         },
         {
-          "t": "di",
-          "s": 6.907,
-          "e": 6.96
+          "t": "majrur (مَجْرُور),",
+          "s": 6.92,
+          "e": 7.52
         },
         {
-          "t": "antaranya",
-          "s": 7.02,
-          "e": 7.84
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 7.84,
+          "e": 8.88
         },
         {
-          "t": "na’t (نَعْت),",
-          "s": 8.08,
-          "e": 8.72
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 9.2,
+          "e": 10.4
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 10.72,
+          "e": 11.68
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
+          "s": 12.0,
+          "e": 13.84
         },
         {
           "t": "alif lam (ال),",
-          "s": 8.933,
-          "e": 10.12
+          "s": 14.08,
+          "e": 15.44
         },
         {
           "t": "dan",
-          "s": 10.17,
-          "e": 10.32
+          "s": 15.52,
+          "e": 15.76
         },
         {
-          "t": "majrur (مَجْرُور).",
-          "s": 10.4,
-          "e": 11.04
+          "t": "na’t (نَعْت).",
+          "s": 15.84,
+          "e": 16.4
+        }
+      ]
+    },
+    "al-fatihah:4:map:again": {
+      "text": "Yang kita temui lagi di ayat ini adalah tiga jenis kata, مَجْرُور, alif lam, dan نَعْت.",
+      "display": "Yang kita temui lagi di ayat ini adalah tiga jenis kata, majrur (مَجْرُور), alif lam (ال), dan na’t (نَعْت).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/54a24f7fa699a4d6.mp3",
+        "ms": 6766,
+        "sha256": "a460e115eb8f3c2d91135604c095373590210f4bdd5a459a76786139c8df4f88"
+      },
+      "tokens": [
+        {
+          "t": "Yang",
+          "s": 0.0,
+          "e": 0.16
+        },
+        {
+          "t": "kita",
+          "s": 0.208,
+          "e": 0.4
+        },
+        {
+          "t": "temui",
+          "s": 0.44,
+          "e": 0.8
+        },
+        {
+          "t": "lagi",
+          "s": 0.864,
+          "e": 1.12
+        },
+        {
+          "t": "di",
+          "s": 1.173,
+          "e": 1.28
+        },
+        {
+          "t": "ayat",
+          "s": 1.333,
+          "e": 1.52
+        },
+        {
+          "t": "ini",
+          "s": 1.6,
+          "e": 1.84
+        },
+        {
+          "t": "adalah",
+          "s": 1.886,
+          "e": 2.16
+        },
+        {
+          "t": "tiga",
+          "s": 2.24,
+          "e": 2.56
+        },
+        {
+          "t": "jenis",
+          "s": 2.627,
+          "e": 2.96
+        },
+        {
+          "t": "kata,",
+          "s": 3.04,
+          "e": 4.0
+        },
+        {
+          "t": "majrur (مَجْرُور),",
+          "s": 4.04,
+          "e": 5.12
+        },
+        {
+          "t": "alif lam (ال),",
+          "s": 5.173,
+          "e": 6.08
+        },
+        {
+          "t": "dan",
+          "s": 6.12,
+          "e": 6.24
+        },
+        {
+          "t": "na’t (نَعْت).",
+          "s": 6.28,
+          "e": 6.72
         }
       ]
     },
@@ -16390,6 +17270,89 @@
           "t": "dasar.",
           "s": 4.3,
           "e": 4.8
+        }
+      ]
+    },
+    "al-fatihah:4:map:focus": {
+      "text": "Sekarang Anda tidak perlu memikirkan keduanya. Mari kita fokus pada pelajaran idhofah terlebih dahulu.",
+      "display": "Sekarang Anda tidak perlu memikirkan keduanya. Mari kita fokus pada pelajaran idhafah (إِضَافَة) terlebih dahulu.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/e8f0066b4819f896.mp3",
+        "ms": 6922,
+        "sha256": "f6cb72d04ca78db952ea2a3286fb072922128c9e8ee3a70b10b9ec40e1c977e5"
+      },
+      "tokens": [
+        {
+          "t": "Sekarang",
+          "s": 0.0,
+          "e": 0.48
+        },
+        {
+          "t": "Anda",
+          "s": 0.544,
+          "e": 0.8
+        },
+        {
+          "t": "tidak",
+          "s": 0.84,
+          "e": 1.04
+        },
+        {
+          "t": "perlu",
+          "s": 1.08,
+          "e": 1.36
+        },
+        {
+          "t": "memikirkan",
+          "s": 1.4,
+          "e": 1.92
+        },
+        {
+          "t": "keduanya.",
+          "s": 1.96,
+          "e": 3.04
+        },
+        {
+          "t": "Mari",
+          "s": 3.136,
+          "e": 3.52
+        },
+        {
+          "t": "kita",
+          "s": 3.568,
+          "e": 3.76
+        },
+        {
+          "t": "fokus",
+          "s": 3.84,
+          "e": 4.32
+        },
+        {
+          "t": "pada",
+          "s": 4.384,
+          "e": 4.64
+        },
+        {
+          "t": "pelajaran",
+          "s": 4.68,
+          "e": 5.2
+        },
+        {
+          "t": "idhafah (إِضَافَة)",
+          "s": 5.28,
+          "e": 5.92
+        },
+        {
+          "t": "terlebih",
+          "s": 5.96,
+          "e": 6.32
+        },
+        {
+          "t": "dahulu.",
+          "s": 6.38,
+          "e": 6.88
         }
       ]
     },
@@ -19075,14 +20038,14 @@
       ]
     },
     "al-fatihah:4:learned": {
-      "text": "Di ayat ini kita mempelajari satu hal baru: idhofah. Dengan itu, sudah sepuluh hal yang kita pelajari.",
-      "display": "Di ayat ini kita mempelajari satu hal baru: idhafah (إِضَافَة). Dengan itu, sudah sepuluh hal yang kita pelajari.",
+      "text": "Di ayat ini kita mempelajari satu hal baru: idhofah.",
+      "display": "Di ayat ini kita mempelajari satu hal baru: idhafah (إِضَافَة).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/e298fd833f03c1db.mp3",
-        "ms": 7393,
-        "sha256": "2cd2c344f4a0a36be32f89f0a4885663d5e5a5e99d66f01aae5288ab676d0f90"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/5ab3d0c3ded1cad3.mp3",
+        "ms": 3971,
+        "sha256": "eff21db4829b8e959a6618cf9f0061f4467bff463bb003d05598670e075ef9fc"
       },
       "tokens": [
         {
@@ -19097,78 +20060,161 @@
         },
         {
           "t": "ini",
-          "s": 0.48,
-          "e": 0.72
+          "s": 0.5,
+          "e": 0.8
         },
         {
           "t": "kita",
-          "s": 0.784,
-          "e": 1.04
+          "s": 0.88,
+          "e": 1.2
         },
         {
           "t": "mempelajari",
-          "s": 1.08,
-          "e": 1.6
+          "s": 1.24,
+          "e": 1.76
         },
         {
           "t": "satu",
-          "s": 1.648,
-          "e": 1.84
+          "s": 1.808,
+          "e": 2.0
         },
         {
           "t": "hal",
-          "s": 1.9,
-          "e": 2.08
+          "s": 2.04,
+          "e": 2.16
         },
         {
           "t": "baru:",
-          "s": 2.16,
-          "e": 3.2
+          "s": 2.24,
+          "e": 3.12
         },
         {
           "t": "idhafah (إِضَافَة).",
-          "s": 3.253,
+          "s": 3.2,
           "e": 3.92
-        },
+        }
+      ]
+    },
+    "al-fatihah:4:map:total": {
+      "text": "Dengan itu, sudah sepuluh hal yang kita pelajari, yaitu harakat, tiga jenis kata, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, dan idhofah.",
+      "display": "Dengan itu, sudah sepuluh hal yang kita pelajari, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), dan idhafah (إِضَافَة).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/35112830d729473a.mp3",
+        "ms": 15073,
+        "sha256": "da6ec4581027f48ea981c604ae9038a3547739d855bfee696c70d6c95616bf95"
+      },
+      "tokens": [
         {
           "t": "Dengan",
-          "s": 4.28,
-          "e": 4.8
+          "s": 0.0,
+          "e": 0.24
         },
         {
           "t": "itu,",
-          "s": 4.92,
-          "e": 5.36
+          "s": 0.32,
+          "e": 0.64
         },
         {
           "t": "sudah",
-          "s": 5.413,
-          "e": 5.68
+          "s": 0.693,
+          "e": 0.96
         },
         {
           "t": "sepuluh",
-          "s": 5.74,
-          "e": 6.08
+          "s": 1.02,
+          "e": 1.44
         },
         {
           "t": "hal",
-          "s": 6.14,
-          "e": 6.32
+          "s": 1.48,
+          "e": 1.6
         },
         {
           "t": "yang",
-          "s": 6.352,
-          "e": 6.48
+          "s": 1.632,
+          "e": 1.76
         },
         {
           "t": "kita",
-          "s": 6.512,
-          "e": 6.64
+          "s": 1.808,
+          "e": 2.0
         },
         {
-          "t": "pelajari.",
-          "s": 6.7,
-          "e": 7.36
+          "t": "pelajari,",
+          "s": 2.04,
+          "e": 2.96
+        },
+        {
+          "t": "yaitu",
+          "s": 3.0,
+          "e": 3.36
+        },
+        {
+          "t": "harakat,",
+          "s": 3.42,
+          "e": 4.4
+        },
+        {
+          "t": "tiga",
+          "s": 4.44,
+          "e": 4.64
+        },
+        {
+          "t": "jenis",
+          "s": 4.693,
+          "e": 4.96
+        },
+        {
+          "t": "kata,",
+          "s": 5.056,
+          "e": 5.92
+        },
+        {
+          "t": "majrur (مَجْرُور),",
+          "s": 5.96,
+          "e": 6.96
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 7.0,
+          "e": 7.76
+        },
+        {
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 7.96,
+          "e": 9.12
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 9.32,
+          "e": 10.16
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
+          "s": 10.36,
+          "e": 11.92
+        },
+        {
+          "t": "alif lam (ال),",
+          "s": 12.107,
+          "e": 13.44
+        },
+        {
+          "t": "na’t (نَعْت),",
+          "s": 13.52,
+          "e": 14.12
+        },
+        {
+          "t": "dan",
+          "s": 14.17,
+          "e": 14.32
+        },
+        {
+          "t": "idhafah (إِضَافَة).",
+          "s": 14.4,
+          "e": 15.04
         }
       ]
     },
@@ -19579,115 +20625,203 @@
       ]
     },
     "al-fatihah:5:map:learnt": {
-      "text": "Sebelum ayat ini, kita sudah mempelajari sepuluh hal. Yang kita temui lagi di ayat ini ada dua, di antaranya مَرْفُوع.",
-      "display": "Sebelum ayat ini, kita sudah mempelajari sepuluh hal. Yang kita temui lagi di ayat ini ada dua, di antaranya marfu’ (مَرْفُوع).",
+      "text": "Sebelum ayat ini, kita sudah mempelajari sepuluh hal, yaitu harakat, tiga jenis kata, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, dan idhofah.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari sepuluh hal, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), dan idhafah (إِضَافَة).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/3d167d507c62f348.mp3",
-        "ms": 8986,
-        "sha256": "4ab807fccf9057c79242c604ddc7a9a6ca89c057ceb599b321303dc61b3cf242"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/82aaf97b47d7641a.mp3",
+        "ms": 16118,
+        "sha256": "a640a5743a2a4d38f36d9fbd54aeeaa53460b93f81c677007f43028f56834f8a"
       },
       "tokens": [
         {
           "t": "Sebelum",
           "s": 0.0,
-          "e": 0.32
+          "e": 0.4
         },
         {
           "t": "ayat",
-          "s": 0.373,
+          "s": 0.427,
           "e": 0.64
         },
         {
           "t": "ini,",
           "s": 0.72,
-          "e": 1.04
+          "e": 1.12
         },
         {
           "t": "kita",
-          "s": 1.088,
-          "e": 1.28
+          "s": 1.168,
+          "e": 1.36
         },
         {
           "t": "sudah",
-          "s": 1.32,
-          "e": 1.52
+          "s": 1.4,
+          "e": 1.6
         },
         {
           "t": "mempelajari",
-          "s": 1.56,
+          "s": 1.64,
           "e": 2.16
         },
         {
           "t": "sepuluh",
           "s": 2.2,
-          "e": 2.48
+          "e": 2.68
         },
         {
-          "t": "hal.",
-          "s": 2.56,
-          "e": 2.88
+          "t": "hal,",
+          "s": 2.73,
+          "e": 3.28
         },
         {
-          "t": "Yang",
-          "s": 3.072,
-          "e": 3.84
+          "t": "yaitu",
+          "s": 3.32,
+          "e": 3.68
         },
         {
-          "t": "kita",
-          "s": 3.872,
-          "e": 4.0
+          "t": "harakat,",
+          "s": 3.74,
+          "e": 4.64
         },
         {
-          "t": "temui",
-          "s": 4.06,
-          "e": 4.4
-        },
-        {
-          "t": "lagi",
-          "s": 4.464,
-          "e": 4.72
-        },
-        {
-          "t": "di",
-          "s": 4.773,
+          "t": "tiga",
+          "s": 4.68,
           "e": 4.88
         },
         {
-          "t": "ayat",
+          "t": "jenis",
           "s": 4.933,
           "e": 5.2
         },
         {
-          "t": "ini",
-          "s": 5.26,
-          "e": 5.44
+          "t": "kata,",
+          "s": 5.28,
+          "e": 6.16
         },
         {
-          "t": "ada",
-          "s": 5.48,
-          "e": 5.6
+          "t": "majrur (مَجْرُور),",
+          "s": 6.2,
+          "e": 7.2
         },
         {
-          "t": "dua,",
-          "s": 5.7,
-          "e": 6.4
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 7.24,
+          "e": 8.4
+        },
+        {
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 8.44,
+          "e": 9.44
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 9.64,
+          "e": 10.76
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
+          "s": 10.9,
+          "e": 12.64
+        },
+        {
+          "t": "alif lam (ال),",
+          "s": 12.827,
+          "e": 13.76
+        },
+        {
+          "t": "na’t (نَعْت),",
+          "s": 14.08,
+          "e": 14.8
+        },
+        {
+          "t": "dan",
+          "s": 14.94,
+          "e": 15.36
+        },
+        {
+          "t": "idhafah (إِضَافَة).",
+          "s": 15.467,
+          "e": 16.08
+        }
+      ]
+    },
+    "al-fatihah:5:map:again": {
+      "text": "Yang kita temui lagi di ayat ini adalah tiga jenis kata dan مَرْفُوع.",
+      "display": "Yang kita temui lagi di ayat ini adalah tiga jenis kata dan marfu’ (مَرْفُوع).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4f9f5e410e458e9f.mp3",
+        "ms": 4598,
+        "sha256": "959c707f18d9ce7efacf645b83ac365832b8bba07987275a6a228dabcaaadf63"
+      },
+      "tokens": [
+        {
+          "t": "Yang",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "kita",
+          "s": 0.272,
+          "e": 0.4
+        },
+        {
+          "t": "temui",
+          "s": 0.46,
+          "e": 0.8
+        },
+        {
+          "t": "lagi",
+          "s": 0.864,
+          "e": 1.12
         },
         {
           "t": "di",
-          "s": 6.453,
-          "e": 6.56
+          "s": 1.173,
+          "e": 1.28
         },
         {
-          "t": "antaranya",
-          "s": 6.6,
-          "e": 7.28
+          "t": "ayat",
+          "s": 1.333,
+          "e": 1.6
+        },
+        {
+          "t": "ini",
+          "s": 1.7,
+          "e": 2.0
+        },
+        {
+          "t": "adalah",
+          "s": 2.057,
+          "e": 2.4
+        },
+        {
+          "t": "tiga",
+          "s": 2.48,
+          "e": 2.8
+        },
+        {
+          "t": "jenis",
+          "s": 2.853,
+          "e": 3.12
+        },
+        {
+          "t": "kata",
+          "s": 3.216,
+          "e": 3.6
+        },
+        {
+          "t": "dan",
+          "s": 3.68,
+          "e": 3.92
         },
         {
           "t": "marfu’ (مَرْفُوع).",
-          "s": 7.48,
-          "e": 8.96
+          "s": 4.0,
+          "e": 4.56
         }
       ]
     },
@@ -19891,6 +21025,154 @@
           "t": "dasar.",
           "s": 17.66,
           "e": 18.08
+        }
+      ]
+    },
+    "al-fatihah:5:map:focus": {
+      "text": "Sekarang Anda tidak perlu menghafal ketiganya, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada pelajaran dhomir, fi'il mudhori', serta مُعْرَب dan مَبْنِيّ terlebih dahulu.",
+      "display": "Sekarang Anda tidak perlu menghafal ketiganya, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada pelajaran dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), serta mu’rab (مُعْرَب) dan mabni (مَبْنِيّ) terlebih dahulu.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/74c8d33f5065315b.mp3",
+        "ms": 14028,
+        "sha256": "d83641debff7883f08400ce69fd4ad3fb7bd3b8a9de0385b01c86ec00afc502b"
+      },
+      "tokens": [
+        {
+          "t": "Sekarang",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "Anda",
+          "s": 0.448,
+          "e": 0.64
+        },
+        {
+          "t": "tidak",
+          "s": 0.693,
+          "e": 0.96
+        },
+        {
+          "t": "perlu",
+          "s": 0.98,
+          "e": 1.2
+        },
+        {
+          "t": "menghafal",
+          "s": 1.232,
+          "e": 1.68
+        },
+        {
+          "t": "ketiganya,",
+          "s": 1.72,
+          "e": 3.04
+        },
+        {
+          "t": "dan",
+          "s": 3.08,
+          "e": 3.2
+        },
+        {
+          "t": "tidak",
+          "s": 3.267,
+          "e": 3.6
+        },
+        {
+          "t": "perlu",
+          "s": 3.64,
+          "e": 3.84
+        },
+        {
+          "t": "memikirkan",
+          "s": 3.88,
+          "e": 4.48
+        },
+        {
+          "t": "hal",
+          "s": 4.56,
+          "e": 4.8
+        },
+        {
+          "t": "tingkat",
+          "s": 4.848,
+          "e": 5.2
+        },
+        {
+          "t": "lanjut",
+          "s": 5.24,
+          "e": 5.52
+        },
+        {
+          "t": "tadi.",
+          "s": 5.56,
+          "e": 6.16
+        },
+        {
+          "t": "Mari",
+          "s": 6.336,
+          "e": 7.04
+        },
+        {
+          "t": "kita",
+          "s": 7.104,
+          "e": 7.36
+        },
+        {
+          "t": "fokus",
+          "s": 7.44,
+          "e": 7.76
+        },
+        {
+          "t": "pada",
+          "s": 7.824,
+          "e": 8.08
+        },
+        {
+          "t": "pelajaran",
+          "s": 8.1,
+          "e": 8.56
+        },
+        {
+          "t": "dhamir (ضَمِير),",
+          "s": 8.613,
+          "e": 9.68
+        },
+        {
+          "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
+          "s": 9.733,
+          "e": 10.88
+        },
+        {
+          "t": "serta",
+          "s": 10.987,
+          "e": 11.52
+        },
+        {
+          "t": "mu’rab (مُعْرَب)",
+          "s": 11.6,
+          "e": 12.08
+        },
+        {
+          "t": "dan",
+          "s": 12.12,
+          "e": 12.24
+        },
+        {
+          "t": "mabni (مَبْنِيّ)",
+          "s": 12.32,
+          "e": 12.88
+        },
+        {
+          "t": "terlebih",
+          "s": 12.92,
+          "e": 13.28
+        },
+        {
+          "t": "dahulu.",
+          "s": 13.32,
+          "e": 14.0
         }
       ]
     },
@@ -23857,44 +25139,44 @@
       ]
     },
     "al-fatihah:5:learned": {
-      "text": "Di ayat ini kita mempelajari tiga hal baru: dhomir, fi'il mudhori', serta مُعْرَب dan مَبْنِيّ. Dengan itu, sudah tiga belas hal yang kita pelajari.",
-      "display": "Di ayat ini kita mempelajari tiga hal baru: dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), serta mu’rab (مُعْرَب) dan mabni (مَبْنِيّ). Dengan itu, sudah tiga belas hal yang kita pelajari.",
+      "text": "Di ayat ini kita mempelajari tiga hal baru: dhomir, fi'il mudhori', serta مُعْرَب dan مَبْنِيّ.",
+      "display": "Di ayat ini kita mempelajari tiga hal baru: dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), serta mu’rab (مُعْرَب) dan mabni (مَبْنِيّ).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/06a9d3b5a90c8874.mp3",
-        "ms": 11468,
-        "sha256": "6d571fbc60ce32da69ae7ef8e79ed98339838a1e59f00ae8627a99593f1c8f4a"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/2dcff642cda5f54a.mp3",
+        "ms": 7628,
+        "sha256": "958d57ca9ea039571b038891abf7872b32c501098920d394f06537f91a729391"
       },
       "tokens": [
         {
           "t": "Di",
           "s": 0.0,
-          "e": 0.08
+          "e": 0.16
         },
         {
           "t": "ayat",
-          "s": 0.133,
-          "e": 0.32
+          "s": 0.213,
+          "e": 0.4
         },
         {
           "t": "ini",
-          "s": 0.4,
-          "e": 0.64
+          "s": 0.48,
+          "e": 0.72
         },
         {
           "t": "kita",
-          "s": 0.704,
-          "e": 0.96
+          "s": 0.784,
+          "e": 1.04
         },
         {
           "t": "mempelajari",
-          "s": 1.02,
-          "e": 1.6
+          "s": 1.1,
+          "e": 1.76
         },
         {
           "t": "tiga",
-          "s": 1.68,
+          "s": 1.8,
           "e": 2.0
         },
         {
@@ -23905,82 +25187,190 @@
         {
           "t": "baru:",
           "s": 2.32,
-          "e": 3.36
+          "e": 3.28
         },
         {
           "t": "dhamir (ضَمِير),",
-          "s": 3.387,
+          "s": 3.333,
           "e": 4.32
         },
         {
           "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
           "s": 4.373,
-          "e": 5.36
+          "e": 5.44
         },
         {
           "t": "serta",
-          "s": 5.48,
+          "s": 5.547,
           "e": 6.08
         },
         {
           "t": "mu’rab (مُعْرَب)",
-          "s": 6.16,
-          "e": 6.72
+          "s": 6.2,
+          "e": 6.8
         },
         {
           "t": "dan",
-          "s": 6.82,
-          "e": 7.12
+          "s": 6.86,
+          "e": 7.04
         },
         {
           "t": "mabni (مَبْنِيّ).",
-          "s": 7.2,
-          "e": 7.84
-        },
+          "s": 7.08,
+          "e": 7.6
+        }
+      ]
+    },
+    "al-fatihah:5:map:total": {
+      "text": "Dengan itu, sudah tiga belas hal yang kita pelajari, yaitu harakat, tiga jenis kata, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', serta مُعْرَب dan مَبْنِيّ.",
+      "display": "Dengan itu, sudah tiga belas hal yang kita pelajari, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), serta mu’rab (مُعْرَب) dan mabni (مَبْنِيّ).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/ac7ccc8c561757f8.mp3",
+        "ms": 21629,
+        "sha256": "6acf453f93887f6dd9c9d3c9b75d1ba86fb4524963967809091eb253013c365d"
+      },
+      "tokens": [
         {
           "t": "Dengan",
-          "s": 8.2,
-          "e": 8.72
+          "s": 0.0,
+          "e": 0.24
         },
         {
           "t": "itu,",
-          "s": 8.82,
-          "e": 9.2
+          "s": 0.34,
+          "e": 0.92
         },
         {
           "t": "sudah",
-          "s": 9.267,
-          "e": 9.6
+          "s": 0.967,
+          "e": 1.2
         },
         {
           "t": "tiga",
-          "s": 9.64,
-          "e": 9.84
+          "s": 1.24,
+          "e": 1.44
         },
         {
           "t": "belas",
-          "s": 9.88,
-          "e": 10.08
+          "s": 1.48,
+          "e": 1.68
         },
         {
           "t": "hal",
-          "s": 10.16,
-          "e": 10.4
+          "s": 1.74,
+          "e": 1.92
         },
         {
           "t": "yang",
-          "s": 10.432,
-          "e": 10.56
+          "s": 1.952,
+          "e": 2.08
         },
         {
           "t": "kita",
-          "s": 10.608,
-          "e": 10.8
+          "s": 2.112,
+          "e": 2.24
         },
         {
-          "t": "pelajari.",
-          "s": 10.84,
-          "e": 11.44
+          "t": "pelajari,",
+          "s": 2.3,
+          "e": 3.36
+        },
+        {
+          "t": "yaitu",
+          "s": 3.4,
+          "e": 3.76
+        },
+        {
+          "t": "harakat,",
+          "s": 3.8,
+          "e": 4.8
+        },
+        {
+          "t": "tiga",
+          "s": 4.84,
+          "e": 5.04
+        },
+        {
+          "t": "jenis",
+          "s": 5.107,
+          "e": 5.44
+        },
+        {
+          "t": "kata,",
+          "s": 5.52,
+          "e": 6.48
+        },
+        {
+          "t": "majrur (مَجْرُور),",
+          "s": 6.52,
+          "e": 7.68
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 7.72,
+          "e": 8.96
+        },
+        {
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 9.0,
+          "e": 10.56
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 10.6,
+          "e": 11.84
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
+          "s": 11.88,
+          "e": 13.84
+        },
+        {
+          "t": "alif lam (ال),",
+          "s": 13.893,
+          "e": 14.72
+        },
+        {
+          "t": "na’t (نَعْت),",
+          "s": 15.04,
+          "e": 15.76
+        },
+        {
+          "t": "idhafah (إِضَافَة),",
+          "s": 15.973,
+          "e": 16.96
+        },
+        {
+          "t": "dhamir (ضَمِير),",
+          "s": 17.2,
+          "e": 18.24
+        },
+        {
+          "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
+          "s": 18.4,
+          "e": 19.52
+        },
+        {
+          "t": "serta",
+          "s": 19.64,
+          "e": 20.24
+        },
+        {
+          "t": "mu’rab (مُعْرَب)",
+          "s": 20.36,
+          "e": 20.96
+        },
+        {
+          "t": "dan",
+          "s": 21.0,
+          "e": 21.12
+        },
+        {
+          "t": "mabni (مَبْنِيّ).",
+          "s": 21.16,
+          "e": 21.6
         }
       ]
     },
@@ -24346,39 +25736,39 @@
       ]
     },
     "al-fatihah:6:map:learnt": {
-      "text": "Sebelum ayat ini, kita sudah mempelajari tiga belas hal. Yang kita temui lagi di ayat ini ada empat, di antaranya dhomir, نَعْت, dan alif lam.",
-      "display": "Sebelum ayat ini, kita sudah mempelajari tiga belas hal. Yang kita temui lagi di ayat ini ada empat, di antaranya dhamir (ضَمِير), na’t (نَعْت), dan alif lam (ال).",
+      "text": "Sebelum ayat ini, kita sudah mempelajari tiga belas hal, yaitu harakat, tiga jenis kata, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', serta مُعْرَب dan مَبْنِيّ.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari tiga belas hal, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), serta mu’rab (مُعْرَب) dan mabni (مَبْنِيّ).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a2ca1c35a48aef84.mp3",
-        "ms": 11076,
-        "sha256": "22aa5e16063c6c11ca8c248318bff2926dda11590e79497d2c4e9c6c6ab7028f"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/ec9eca630b4fdf44.mp3",
+        "ms": 22596,
+        "sha256": "768262fec0981b4ff4ad98aea01f6df9826e81ab4b3134157f66ff31c3dd01d6"
       },
       "tokens": [
         {
           "t": "Sebelum",
           "s": 0.0,
-          "e": 0.4
+          "e": 0.32
         },
         {
           "t": "ayat",
-          "s": 0.453,
+          "s": 0.373,
           "e": 0.64
         },
         {
           "t": "ini,",
-          "s": 0.74,
-          "e": 1.2
+          "s": 0.72,
+          "e": 1.12
         },
         {
           "t": "kita",
-          "s": 1.248,
-          "e": 1.44
+          "s": 1.168,
+          "e": 1.36
         },
         {
           "t": "sudah",
-          "s": 1.48,
+          "s": 1.413,
           "e": 1.68
         },
         {
@@ -24393,88 +25783,196 @@
         },
         {
           "t": "belas",
-          "s": 2.62,
-          "e": 2.88
+          "s": 2.6,
+          "e": 2.8
         },
         {
-          "t": "hal.",
-          "s": 2.98,
-          "e": 3.36
+          "t": "hal,",
+          "s": 2.9,
+          "e": 3.28
         },
         {
-          "t": "Yang",
-          "s": 3.52,
-          "e": 4.16
+          "t": "yaitu",
+          "s": 3.56,
+          "e": 4.08
         },
         {
-          "t": "kita",
-          "s": 4.208,
-          "e": 4.4
+          "t": "harakat,",
+          "s": 4.16,
+          "e": 5.28
         },
         {
-          "t": "temui",
-          "s": 4.44,
-          "e": 4.72
+          "t": "tiga",
+          "s": 5.32,
+          "e": 5.52
         },
         {
-          "t": "lagi",
-          "s": 4.784,
-          "e": 5.04
+          "t": "jenis",
+          "s": 5.587,
+          "e": 5.92
         },
         {
-          "t": "di",
-          "s": 5.093,
-          "e": 5.2
+          "t": "kata,",
+          "s": 6.0,
+          "e": 6.96
         },
         {
-          "t": "ayat",
-          "s": 5.253,
-          "e": 5.44
+          "t": "majrur (مَجْرُور),",
+          "s": 7.0,
+          "e": 8.08
         },
         {
-          "t": "ini",
-          "s": 5.54,
-          "e": 5.84
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 8.12,
+          "e": 9.44
         },
         {
-          "t": "ada",
-          "s": 5.92,
-          "e": 6.16
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 9.48,
+          "e": 10.56
         },
         {
-          "t": "empat,",
-          "s": 6.213,
-          "e": 7.04
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 10.84,
+          "e": 11.76
         },
         {
-          "t": "di",
-          "s": 7.067,
-          "e": 7.12
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
+          "s": 12.08,
+          "e": 14.08
         },
         {
-          "t": "antaranya",
-          "s": 7.18,
-          "e": 7.84
-        },
-        {
-          "t": "dhamir (ضَمِير),",
-          "s": 7.973,
-          "e": 9.12
+          "t": "alif lam (ال),",
+          "s": 14.293,
+          "e": 15.92
         },
         {
           "t": "na’t (نَعْت),",
-          "s": 9.2,
-          "e": 10.04
+          "s": 16.0,
+          "e": 16.48
+        },
+        {
+          "t": "idhafah (إِضَافَة),",
+          "s": 16.693,
+          "e": 18.16
+        },
+        {
+          "t": "dhamir (ضَمِير),",
+          "s": 18.24,
+          "e": 19.28
+        },
+        {
+          "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
+          "s": 19.36,
+          "e": 20.4
+        },
+        {
+          "t": "serta",
+          "s": 20.52,
+          "e": 21.12
+        },
+        {
+          "t": "mu’rab (مُعْرَب)",
+          "s": 21.2,
+          "e": 21.76
         },
         {
           "t": "dan",
-          "s": 10.13,
-          "e": 10.4
+          "s": 21.82,
+          "e": 22.0
         },
         {
-          "t": "alif lam (ال).",
-          "s": 10.453,
-          "e": 11.04
+          "t": "mabni (مَبْنِيّ).",
+          "s": 22.08,
+          "e": 22.56
+        }
+      ]
+    },
+    "al-fatihah:6:map:again": {
+      "text": "Yang kita temui lagi di ayat ini adalah tiga jenis kata, alif lam, نَعْت, dan dhomir.",
+      "display": "Yang kita temui lagi di ayat ini adalah tiga jenis kata, alif lam (ال), na’t (نَعْت), dan dhamir (ضَمِير).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a036130ed665013b.mp3",
+        "ms": 7471,
+        "sha256": "54bda12b40bbb373014fe32adf736d64e22327f58f2b12c6e85d277b6215b913"
+      },
+      "tokens": [
+        {
+          "t": "Yang",
+          "s": 0.0,
+          "e": 0.16
+        },
+        {
+          "t": "kita",
+          "s": 0.224,
+          "e": 0.48
+        },
+        {
+          "t": "temui",
+          "s": 0.54,
+          "e": 0.88
+        },
+        {
+          "t": "lagi",
+          "s": 0.944,
+          "e": 1.2
+        },
+        {
+          "t": "di",
+          "s": 1.253,
+          "e": 1.36
+        },
+        {
+          "t": "ayat",
+          "s": 1.387,
+          "e": 1.6
+        },
+        {
+          "t": "ini",
+          "s": 1.68,
+          "e": 1.92
+        },
+        {
+          "t": "adalah",
+          "s": 1.977,
+          "e": 2.32
+        },
+        {
+          "t": "tiga",
+          "s": 2.4,
+          "e": 2.72
+        },
+        {
+          "t": "jenis",
+          "s": 2.787,
+          "e": 3.12
+        },
+        {
+          "t": "kata,",
+          "s": 3.2,
+          "e": 4.24
+        },
+        {
+          "t": "alif lam (ال),",
+          "s": 4.32,
+          "e": 5.68
+        },
+        {
+          "t": "na’t (نَعْت),",
+          "s": 5.76,
+          "e": 6.64
+        },
+        {
+          "t": "dan",
+          "s": 6.68,
+          "e": 6.8
+        },
+        {
+          "t": "dhamir (ضَمِير).",
+          "s": 6.853,
+          "e": 7.44
         }
       ]
     },
@@ -24623,6 +26121,154 @@
           "t": "dasar.",
           "s": 11.68,
           "e": 12.16
+        }
+      ]
+    },
+    "al-fatihah:6:map:focus": {
+      "text": "Sekarang Anda tidak perlu menghafal yang satu ini, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada pelajaran جُمْلَة فِعْلِيَّة, مَفْعُول بِه, dan مَنْصُوب terlebih dahulu.",
+      "display": "Sekarang Anda tidak perlu menghafal yang satu ini, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada pelajaran jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), dan manshub (مَنْصُوب) terlebih dahulu.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/c9cddcaa6c184995.mp3",
+        "ms": 12748,
+        "sha256": "213b0cb725521e65d9721877dacb7fc9b8e156e778daab3fbff68d59c3edb281"
+      },
+      "tokens": [
+        {
+          "t": "Sekarang",
+          "s": 0.0,
+          "e": 0.48
+        },
+        {
+          "t": "Anda",
+          "s": 0.528,
+          "e": 0.72
+        },
+        {
+          "t": "tidak",
+          "s": 0.76,
+          "e": 0.96
+        },
+        {
+          "t": "perlu",
+          "s": 1.0,
+          "e": 1.2
+        },
+        {
+          "t": "menghafal",
+          "s": 1.232,
+          "e": 1.76
+        },
+        {
+          "t": "yang",
+          "s": 1.792,
+          "e": 1.92
+        },
+        {
+          "t": "satu",
+          "s": 1.968,
+          "e": 2.16
+        },
+        {
+          "t": "ini,",
+          "s": 2.22,
+          "e": 3.04
+        },
+        {
+          "t": "dan",
+          "s": 3.1,
+          "e": 3.28
+        },
+        {
+          "t": "tidak",
+          "s": 3.32,
+          "e": 3.52
+        },
+        {
+          "t": "perlu",
+          "s": 3.56,
+          "e": 3.76
+        },
+        {
+          "t": "memikirkan",
+          "s": 3.82,
+          "e": 4.4
+        },
+        {
+          "t": "hal",
+          "s": 4.5,
+          "e": 4.8
+        },
+        {
+          "t": "tingkat",
+          "s": 4.848,
+          "e": 5.2
+        },
+        {
+          "t": "lanjut",
+          "s": 5.24,
+          "e": 5.52
+        },
+        {
+          "t": "tadi.",
+          "s": 5.56,
+          "e": 5.92
+        },
+        {
+          "t": "Mari",
+          "s": 6.112,
+          "e": 6.88
+        },
+        {
+          "t": "kita",
+          "s": 6.928,
+          "e": 7.12
+        },
+        {
+          "t": "fokus",
+          "s": 7.16,
+          "e": 7.52
+        },
+        {
+          "t": "pada",
+          "s": 7.584,
+          "e": 7.84
+        },
+        {
+          "t": "pelajaran",
+          "s": 7.88,
+          "e": 8.4
+        },
+        {
+          "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
+          "s": 8.44,
+          "e": 9.52
+        },
+        {
+          "t": "maf’ul bih (مَفْعُول بِه),",
+          "s": 9.8,
+          "e": 10.88
+        },
+        {
+          "t": "dan",
+          "s": 11.02,
+          "e": 11.44
+        },
+        {
+          "t": "manshub (مَنْصُوب)",
+          "s": 11.48,
+          "e": 11.92
+        },
+        {
+          "t": "terlebih",
+          "s": 11.96,
+          "e": 12.24
+        },
+        {
+          "t": "dahulu.",
+          "s": 12.28,
+          "e": 12.72
         }
       ]
     },
@@ -28734,14 +30380,14 @@
       ]
     },
     "al-fatihah:6:learned": {
-      "text": "Di ayat ini kita mempelajari tiga hal baru: جُمْلَة فِعْلِيَّة, مَفْعُول بِه, dan مَنْصُوب. Dengan itu, sudah enam belas hal yang kita pelajari.",
-      "display": "Di ayat ini kita mempelajari tiga hal baru: jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), dan manshub (مَنْصُوب). Dengan itu, sudah enam belas hal yang kita pelajari.",
+      "text": "Di ayat ini kita mempelajari tiga hal baru: جُمْلَة فِعْلِيَّة, مَفْعُول بِه, dan مَنْصُوب.",
+      "display": "Di ayat ini kita mempelajari tiga hal baru: jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), dan manshub (مَنْصُوب).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/33000c1b17b37d20.mp3",
-        "ms": 10919,
-        "sha256": "ac41f7d50abdb8aa08b6d92613fea52f9e4d44bb0bc14fd8501e6df7cfa0f03e"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/2babd4306c139778.mp3",
+        "ms": 7236,
+        "sha256": "0bfe720af2541906d30e6cff01085b8ddc9c98e7561fd81f82c992a7ee28cbfb"
       },
       "tokens": [
         {
@@ -28756,98 +30402,221 @@
         },
         {
           "t": "ini",
-          "s": 0.38,
-          "e": 0.56
+          "s": 0.42,
+          "e": 0.72
         },
         {
           "t": "kita",
-          "s": 0.608,
-          "e": 0.8
+          "s": 0.8,
+          "e": 1.12
         },
         {
           "t": "mempelajari",
-          "s": 0.86,
-          "e": 1.52
+          "s": 1.16,
+          "e": 1.68
         },
         {
           "t": "tiga",
-          "s": 1.56,
-          "e": 1.84
+          "s": 1.72,
+          "e": 2.0
         },
         {
           "t": "hal",
-          "s": 1.9,
-          "e": 2.08
+          "s": 2.04,
+          "e": 2.16
         },
         {
           "t": "baru:",
-          "s": 2.16,
-          "e": 2.56
+          "s": 2.24,
+          "e": 3.36
         },
         {
           "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
-          "s": 2.84,
-          "e": 4.16
+          "s": 3.4,
+          "e": 4.56
         },
         {
           "t": "maf’ul bih (مَفْعُول بِه),",
-          "s": 4.48,
-          "e": 5.68
+          "s": 4.92,
+          "e": 6.0
         },
         {
           "t": "dan",
-          "s": 5.84,
-          "e": 6.32
+          "s": 6.16,
+          "e": 6.64
         },
         {
           "t": "manshub (مَنْصُوب).",
-          "s": 6.44,
+          "s": 6.72,
           "e": 7.2
-        },
+        }
+      ]
+    },
+    "al-fatihah:6:map:total": {
+      "text": "Dengan itu, sudah enam belas hal yang kita pelajari, yaitu harakat, tiga jenis kata, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, serta مَنْصُوب.",
+      "display": "Dengan itu, sudah enam belas hal yang kita pelajari, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), serta manshub (مَنْصُوب).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/96c495c4a52f8158.mp3",
+        "ms": 29466,
+        "sha256": "1619658b2a4aee0ffddecb6ad9c23772b66b17f003d22776fde9920f85454403"
+      },
+      "tokens": [
         {
           "t": "Dengan",
-          "s": 7.52,
-          "e": 8.0
+          "s": 0.0,
+          "e": 0.24
         },
         {
           "t": "itu,",
-          "s": 8.1,
-          "e": 8.68
+          "s": 0.34,
+          "e": 1.0
         },
         {
           "t": "sudah",
-          "s": 8.727,
-          "e": 8.96
+          "s": 1.06,
+          "e": 1.36
         },
         {
           "t": "enam",
-          "s": 8.992,
-          "e": 9.12
+          "s": 1.424,
+          "e": 1.68
         },
         {
           "t": "belas",
-          "s": 9.18,
-          "e": 9.56
+          "s": 1.72,
+          "e": 1.92
         },
         {
           "t": "hal",
-          "s": 9.61,
-          "e": 9.76
+          "s": 2.0,
+          "e": 2.24
         },
         {
           "t": "yang",
-          "s": 9.792,
-          "e": 9.92
+          "s": 2.272,
+          "e": 2.4
         },
         {
           "t": "kita",
-          "s": 9.968,
-          "e": 10.16
+          "s": 2.448,
+          "e": 2.64
         },
         {
-          "t": "pelajari.",
-          "s": 10.2,
-          "e": 10.88
+          "t": "pelajari,",
+          "s": 2.68,
+          "e": 3.76
+        },
+        {
+          "t": "yaitu",
+          "s": 3.8,
+          "e": 4.4
+        },
+        {
+          "t": "harakat,",
+          "s": 4.52,
+          "e": 5.36
+        },
+        {
+          "t": "tiga",
+          "s": 5.64,
+          "e": 6.08
+        },
+        {
+          "t": "jenis",
+          "s": 6.147,
+          "e": 6.48
+        },
+        {
+          "t": "kata,",
+          "s": 6.56,
+          "e": 7.6
+        },
+        {
+          "t": "majrur (مَجْرُور),",
+          "s": 7.64,
+          "e": 8.88
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 8.92,
+          "e": 9.76
+        },
+        {
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 10.12,
+          "e": 11.52
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 11.88,
+          "e": 13.52
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
+          "s": 13.6,
+          "e": 15.44
+        },
+        {
+          "t": "alif lam (ال),",
+          "s": 15.68,
+          "e": 16.8
+        },
+        {
+          "t": "na’t (نَعْت),",
+          "s": 17.2,
+          "e": 18.0
+        },
+        {
+          "t": "idhafah (إِضَافَة),",
+          "s": 18.24,
+          "e": 19.28
+        },
+        {
+          "t": "dhamir (ضَمِير),",
+          "s": 19.573,
+          "e": 20.64
+        },
+        {
+          "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
+          "s": 20.88,
+          "e": 22.32
+        },
+        {
+          "t": "mu’rab (مُعْرَب)",
+          "s": 22.64,
+          "e": 23.44
+        },
+        {
+          "t": "dan",
+          "s": 23.5,
+          "e": 23.68
+        },
+        {
+          "t": "mabni (مَبْنِيّ),",
+          "s": 23.72,
+          "e": 24.96
+        },
+        {
+          "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
+          "s": 25.0,
+          "e": 26.16
+        },
+        {
+          "t": "maf’ul bih (مَفْعُول بِه),",
+          "s": 26.48,
+          "e": 27.6
+        },
+        {
+          "t": "serta",
+          "s": 27.773,
+          "e": 28.64
+        },
+        {
+          "t": "manshub (مَنْصُوب).",
+          "s": 28.8,
+          "e": 29.44
         }
       ]
     },
@@ -29293,130 +31062,298 @@
       ]
     },
     "al-fatihah:7:map:learnt": {
-      "text": "Sebelum ayat ini, kita sudah mempelajari enam belas hal. Yang kita temui lagi di ayat ini ada sepuluh, di antaranya مَنْصُوب dan جُمْلَة فِعْلِيَّة.",
-      "display": "Sebelum ayat ini, kita sudah mempelajari enam belas hal. Yang kita temui lagi di ayat ini ada sepuluh, di antaranya manshub (مَنْصُوب) dan jumlah fi’liyyah (جُمْلَة فِعْلِيَّة).",
+      "text": "Sebelum ayat ini, kita sudah mempelajari enam belas hal, yaitu harakat, tiga jenis kata, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, serta مَنْصُوب.",
+      "display": "Sebelum ayat ini, kita sudah mempelajari enam belas hal, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), serta manshub (مَنْصُوب).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/f4a6912381714ec2.mp3",
-        "ms": 9561,
-        "sha256": "35b272b7ecef053130f294151026803a8632008af5e75eaf649f697b2071e091"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/820f89c53340e3a6.mp3",
+        "ms": 26828,
+        "sha256": "ca0c77cdebf8364ccf09a886817400e1cdc3aa090823e7a68a6f430bcf898a3c"
       },
       "tokens": [
         {
           "t": "Sebelum",
           "s": 0.0,
-          "e": 0.32
+          "e": 0.24
         },
         {
           "t": "ayat",
-          "s": 0.373,
+          "s": 0.293,
           "e": 0.56
         },
         {
           "t": "ini,",
           "s": 0.62,
-          "e": 0.88
+          "e": 0.96
         },
         {
           "t": "kita",
-          "s": 0.928,
-          "e": 1.12
+          "s": 1.008,
+          "e": 1.2
         },
         {
           "t": "sudah",
-          "s": 1.16,
-          "e": 1.36
+          "s": 1.24,
+          "e": 1.44
         },
         {
           "t": "mempelajari",
-          "s": 1.4,
-          "e": 1.92
+          "s": 1.48,
+          "e": 2.08
         },
         {
           "t": "enam",
-          "s": 1.968,
-          "e": 2.16
+          "s": 2.128,
+          "e": 2.32
         },
         {
           "t": "belas",
-          "s": 2.2,
-          "e": 2.4
+          "s": 2.38,
+          "e": 2.8
         },
         {
-          "t": "hal.",
-          "s": 2.5,
-          "e": 2.88
+          "t": "hal,",
+          "s": 2.86,
+          "e": 3.44
         },
         {
-          "t": "Yang",
-          "s": 3.008,
-          "e": 3.52
+          "t": "yaitu",
+          "s": 3.48,
+          "e": 3.84
         },
         {
-          "t": "kita",
-          "s": 3.552,
-          "e": 3.68
+          "t": "harakat,",
+          "s": 3.88,
+          "e": 4.88
         },
         {
-          "t": "temui",
-          "s": 3.74,
-          "e": 4.08
-        },
-        {
-          "t": "lagi",
-          "s": 4.144,
-          "e": 4.4
-        },
-        {
-          "t": "di",
-          "s": 4.453,
-          "e": 4.56
-        },
-        {
-          "t": "ayat",
-          "s": 4.587,
-          "e": 4.8
-        },
-        {
-          "t": "ini",
-          "s": 4.88,
+          "t": "tiga",
+          "s": 4.92,
           "e": 5.12
         },
         {
-          "t": "ada",
-          "s": 5.2,
-          "e": 5.44
+          "t": "jenis",
+          "s": 5.187,
+          "e": 5.52
         },
         {
-          "t": "sepuluh,",
-          "s": 5.5,
+          "t": "kata,",
+          "s": 5.6,
           "e": 6.56
         },
         {
-          "t": "di",
-          "s": 6.613,
-          "e": 6.72
+          "t": "majrur (مَجْرُور),",
+          "s": 6.6,
+          "e": 7.28
         },
         {
-          "t": "antaranya",
-          "s": 6.78,
-          "e": 7.44
-        },
-        {
-          "t": "manshub (مَنْصُوب)",
+          "t": "huruf jar (حَرْف جَرّ),",
           "s": 7.52,
-          "e": 8.24
-        },
-        {
-          "t": "dan",
-          "s": 8.3,
           "e": 8.48
         },
         {
-          "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة).",
-          "s": 8.52,
-          "e": 9.52
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 8.72,
+          "e": 9.92
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 10.24,
+          "e": 11.2
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
+          "s": 11.48,
+          "e": 14.24
+        },
+        {
+          "t": "alif lam (ال),",
+          "s": 14.453,
+          "e": 15.52
+        },
+        {
+          "t": "na’t (نَعْت),",
+          "s": 15.8,
+          "e": 16.8
+        },
+        {
+          "t": "idhafah (إِضَافَة),",
+          "s": 16.907,
+          "e": 17.68
+        },
+        {
+          "t": "dhamir (ضَمِير),",
+          "s": 17.867,
+          "e": 18.8
+        },
+        {
+          "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
+          "s": 18.987,
+          "e": 20.32
+        },
+        {
+          "t": "mu’rab (مُعْرَب)",
+          "s": 20.56,
+          "e": 21.28
+        },
+        {
+          "t": "dan",
+          "s": 21.4,
+          "e": 21.76
+        },
+        {
+          "t": "mabni (مَبْنِيّ),",
+          "s": 21.8,
+          "e": 22.72
+        },
+        {
+          "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
+          "s": 22.76,
+          "e": 23.84
+        },
+        {
+          "t": "maf’ul bih (مَفْعُول بِه),",
+          "s": 24.16,
+          "e": 25.72
+        },
+        {
+          "t": "serta",
+          "s": 25.793,
+          "e": 26.16
+        },
+        {
+          "t": "manshub (مَنْصُوب).",
+          "s": 26.24,
+          "e": 26.8
+        }
+      ]
+    },
+    "al-fatihah:7:map:again": {
+      "text": "Yang kita temui lagi di ayat ini adalah tiga jenis kata, مَجْرُور, حَرْف جَرّ, جَمْع مُذَكَّر سَالِم, alif lam, idhofah, dhomir, مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, serta مَنْصُوب.",
+      "display": "Yang kita temui lagi di ayat ini adalah tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), idhafah (إِضَافَة), dhamir (ضَمِير), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), serta manshub (مَنْصُوب).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/ea19dfc8671eca9a.mp3",
+        "ms": 15726,
+        "sha256": "5fbb6e86cb6ef5601ce7fa60ba1cdfe2e9ab77f0681fd463b4569260acf9e08a"
+      },
+      "tokens": [
+        {
+          "t": "Yang",
+          "s": 0.0,
+          "e": 0.08
+        },
+        {
+          "t": "kita",
+          "s": 0.128,
+          "e": 0.32
+        },
+        {
+          "t": "temui",
+          "s": 0.38,
+          "e": 0.72
+        },
+        {
+          "t": "lagi",
+          "s": 0.768,
+          "e": 0.96
+        },
+        {
+          "t": "di",
+          "s": 1.013,
+          "e": 1.12
+        },
+        {
+          "t": "ayat",
+          "s": 1.173,
+          "e": 1.36
+        },
+        {
+          "t": "ini",
+          "s": 1.44,
+          "e": 1.68
+        },
+        {
+          "t": "adalah",
+          "s": 1.749,
+          "e": 2.16
+        },
+        {
+          "t": "tiga",
+          "s": 2.24,
+          "e": 2.56
+        },
+        {
+          "t": "jenis",
+          "s": 2.627,
+          "e": 2.96
+        },
+        {
+          "t": "kata,",
+          "s": 3.04,
+          "e": 4.0
+        },
+        {
+          "t": "majrur (مَجْرُور),",
+          "s": 4.04,
+          "e": 4.64
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 4.92,
+          "e": 5.92
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
+          "s": 6.2,
+          "e": 8.08
+        },
+        {
+          "t": "alif lam (ال),",
+          "s": 8.293,
+          "e": 9.48
+        },
+        {
+          "t": "idhafah (إِضَافَة),",
+          "s": 9.573,
+          "e": 10.4
+        },
+        {
+          "t": "dhamir (ضَمِير),",
+          "s": 10.48,
+          "e": 11.04
+        },
+        {
+          "t": "mu’rab (مُعْرَب)",
+          "s": 11.4,
+          "e": 12.24
+        },
+        {
+          "t": "dan",
+          "s": 12.36,
+          "e": 12.72
+        },
+        {
+          "t": "mabni (مَبْنِيّ),",
+          "s": 12.76,
+          "e": 13.68
+        },
+        {
+          "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
+          "s": 13.72,
+          "e": 15.013
+        },
+        {
+          "t": "serta",
+          "s": 15.044,
+          "e": 15.2
+        },
+        {
+          "t": "manshub (مَنْصُوب).",
+          "s": 15.24,
+          "e": 15.68
         }
       ]
     },
@@ -29565,6 +31502,154 @@
           "t": "dasar.",
           "s": 10.64,
           "e": 11.12
+        }
+      ]
+    },
+    "al-fatihah:7:map:focus": {
+      "text": "Sekarang Anda tidak perlu menghafal yang satu ini, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada pelajaran اِسْم مَوْصُول, فِعْل مَاضٍ, dan عَطْف terlebih dahulu.",
+      "display": "Sekarang Anda tidak perlu menghafal yang satu ini, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada pelajaran isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), dan ‘athaf (عَطْف) terlebih dahulu.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/b13d7530f6ddb2a2.mp3",
+        "ms": 12931,
+        "sha256": "8e82ef3c1153b498267c784ae9228b938ecf47813a4d862c37bccb7158d85e9b"
+      },
+      "tokens": [
+        {
+          "t": "Sekarang",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "Anda",
+          "s": 0.448,
+          "e": 0.64
+        },
+        {
+          "t": "tidak",
+          "s": 0.68,
+          "e": 0.88
+        },
+        {
+          "t": "perlu",
+          "s": 0.94,
+          "e": 1.2
+        },
+        {
+          "t": "menghafal",
+          "s": 1.248,
+          "e": 1.76
+        },
+        {
+          "t": "yang",
+          "s": 1.792,
+          "e": 1.92
+        },
+        {
+          "t": "satu",
+          "s": 1.984,
+          "e": 2.24
+        },
+        {
+          "t": "ini,",
+          "s": 2.3,
+          "e": 2.96
+        },
+        {
+          "t": "dan",
+          "s": 3.02,
+          "e": 3.2
+        },
+        {
+          "t": "tidak",
+          "s": 3.253,
+          "e": 3.52
+        },
+        {
+          "t": "perlu",
+          "s": 3.58,
+          "e": 3.84
+        },
+        {
+          "t": "memikirkan",
+          "s": 3.9,
+          "e": 4.56
+        },
+        {
+          "t": "hal",
+          "s": 4.64,
+          "e": 4.88
+        },
+        {
+          "t": "tingkat",
+          "s": 4.944,
+          "e": 5.36
+        },
+        {
+          "t": "lanjut",
+          "s": 5.42,
+          "e": 5.68
+        },
+        {
+          "t": "tadi.",
+          "s": 5.72,
+          "e": 6.16
+        },
+        {
+          "t": "Mari",
+          "s": 6.352,
+          "e": 7.12
+        },
+        {
+          "t": "kita",
+          "s": 7.168,
+          "e": 7.36
+        },
+        {
+          "t": "fokus",
+          "s": 7.44,
+          "e": 7.84
+        },
+        {
+          "t": "pada",
+          "s": 7.888,
+          "e": 8.08
+        },
+        {
+          "t": "pelajaran",
+          "s": 8.12,
+          "e": 8.72
+        },
+        {
+          "t": "isim maushul (اِسْم مَوْصُول),",
+          "s": 8.84,
+          "e": 10.16
+        },
+        {
+          "t": "fi’il madhi (فِعْل مَاضٍ),",
+          "s": 10.2,
+          "e": 11.12
+        },
+        {
+          "t": "dan",
+          "s": 11.22,
+          "e": 11.52
+        },
+        {
+          "t": "‘athaf (عَطْف)",
+          "s": 11.6,
+          "e": 12.0
+        },
+        {
+          "t": "terlebih",
+          "s": 12.06,
+          "e": 12.4
+        },
+        {
+          "t": "dahulu.",
+          "s": 12.46,
+          "e": 12.88
         }
       ]
     },
@@ -37795,120 +39880,258 @@
       ]
     },
     "al-fatihah:7:learned": {
-      "text": "Di ayat ini kita mempelajari tiga hal baru: اِسْم مَوْصُول, فِعْل مَاضٍ, dan عَطْف. Dengan itu, sudah sembilan belas hal yang kita pelajari.",
-      "display": "Di ayat ini kita mempelajari tiga hal baru: isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), dan ‘athaf (عَطْف). Dengan itu, sudah sembilan belas hal yang kita pelajari.",
+      "text": "Di ayat ini kita mempelajari tiga hal baru: اِسْم مَوْصُول, فِعْل مَاضٍ, dan عَطْف.",
+      "display": "Di ayat ini kita mempelajari tiga hal baru: isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), dan ‘athaf (عَطْف).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/079ce43f641aabcb.mp3",
-        "ms": 11468,
-        "sha256": "0758f63dc04f7598cc654d1d7a32535a6071b3f959439fb370704523390edc6e"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/533f98493af53e76.mp3",
+        "ms": 7889,
+        "sha256": "8047e2d095e19c63440db706c9f382f74a7652afa57e33f52858998be504e230"
       },
       "tokens": [
         {
           "t": "Di",
           "s": 0.0,
-          "e": 0.08
+          "e": 0.16
         },
         {
           "t": "ayat",
-          "s": 0.133,
+          "s": 0.213,
           "e": 0.4
         },
         {
           "t": "ini",
-          "s": 0.48,
-          "e": 0.72
+          "s": 0.5,
+          "e": 0.8
         },
         {
           "t": "kita",
-          "s": 0.768,
-          "e": 0.96
+          "s": 0.864,
+          "e": 1.12
         },
         {
           "t": "mempelajari",
-          "s": 1.02,
-          "e": 1.76
+          "s": 1.18,
+          "e": 1.84
         },
         {
           "t": "tiga",
-          "s": 1.8,
-          "e": 2.08
+          "s": 1.88,
+          "e": 2.24
         },
         {
           "t": "hal",
-          "s": 2.14,
-          "e": 2.32
+          "s": 2.3,
+          "e": 2.48
         },
         {
           "t": "baru:",
-          "s": 2.4,
-          "e": 3.44
+          "s": 2.544,
+          "e": 3.68
         },
         {
           "t": "isim maushul (اِسْم مَوْصُول),",
-          "s": 3.48,
-          "e": 4.48
+          "s": 3.72,
+          "e": 5.36
         },
         {
           "t": "fi’il madhi (فِعْل مَاضٍ),",
-          "s": 4.8,
+          "s": 5.4,
           "e": 6.32
         },
         {
           "t": "dan",
-          "s": 6.42,
-          "e": 6.72
+          "s": 6.5,
+          "e": 7.04
         },
         {
           "t": "‘athaf (عَطْف).",
-          "s": 6.84,
-          "e": 7.36
-        },
+          "s": 7.2,
+          "e": 7.84
+        }
+      ]
+    },
+    "al-fatihah:7:map:total": {
+      "text": "Dengan itu, sudah sembilan belas hal yang kita pelajari, yaitu harakat, tiga jenis kata, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, اِسْم مَوْصُول, فِعْل مَاضٍ, serta عَطْف.",
+      "display": "Dengan itu, sudah sembilan belas hal yang kita pelajari, yaitu harakat, tiga jenis kata, majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), manshub (مَنْصُوب), isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), serta ‘athaf (عَطْف).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/38f4cd19afecb3bf.mp3",
+        "ms": 29074,
+        "sha256": "14246d44366c7764e0c1a39df6f512ec79522c78565025ca49d3cf681562f7e3"
+      },
+      "tokens": [
         {
           "t": "Dengan",
-          "s": 7.8,
-          "e": 8.4
+          "s": 0.0,
+          "e": 0.24
         },
         {
           "t": "itu,",
-          "s": 8.5,
-          "e": 8.88
+          "s": 0.32,
+          "e": 0.64
         },
         {
           "t": "sudah",
-          "s": 8.973,
-          "e": 9.44
+          "s": 0.733,
+          "e": 1.2
         },
         {
           "t": "sembilan",
-          "s": 9.5,
-          "e": 9.84
+          "s": 1.24,
+          "e": 1.6
         },
         {
           "t": "belas",
-          "s": 9.88,
-          "e": 10.08
+          "s": 1.62,
+          "e": 1.76
         },
         {
           "t": "hal",
-          "s": 10.16,
-          "e": 10.4
+          "s": 1.84,
+          "e": 2.08
         },
         {
           "t": "yang",
-          "s": 10.432,
-          "e": 10.56
+          "s": 2.112,
+          "e": 2.24
         },
         {
           "t": "kita",
-          "s": 10.608,
-          "e": 10.8
+          "s": 2.288,
+          "e": 2.48
         },
         {
-          "t": "pelajari.",
-          "s": 10.84,
-          "e": 11.44
+          "t": "pelajari,",
+          "s": 2.52,
+          "e": 3.12
+        },
+        {
+          "t": "yaitu",
+          "s": 3.32,
+          "e": 3.76
+        },
+        {
+          "t": "harakat,",
+          "s": 3.82,
+          "e": 4.48
+        },
+        {
+          "t": "tiga",
+          "s": 4.64,
+          "e": 5.04
+        },
+        {
+          "t": "jenis",
+          "s": 5.093,
+          "e": 5.36
+        },
+        {
+          "t": "kata,",
+          "s": 5.44,
+          "e": 5.92
+        },
+        {
+          "t": "majrur (مَجْرُور),",
+          "s": 6.12,
+          "e": 6.88
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 7.12,
+          "e": 8.08
+        },
+        {
+          "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
+          "s": 8.32,
+          "e": 9.52
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 9.68,
+          "e": 10.48
+        },
+        {
+          "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
+          "s": 10.76,
+          "e": 12.48
+        },
+        {
+          "t": "alif lam (ال),",
+          "s": 12.693,
+          "e": 13.6
+        },
+        {
+          "t": "na’t (نَعْت),",
+          "s": 13.96,
+          "e": 14.72
+        },
+        {
+          "t": "idhafah (إِضَافَة),",
+          "s": 14.907,
+          "e": 15.76
+        },
+        {
+          "t": "dhamir (ضَمِير),",
+          "s": 16.0,
+          "e": 16.96
+        },
+        {
+          "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
+          "s": 17.147,
+          "e": 18.4
+        },
+        {
+          "t": "mu’rab (مُعْرَب)",
+          "s": 18.6,
+          "e": 19.28
+        },
+        {
+          "t": "dan",
+          "s": 19.38,
+          "e": 19.68
+        },
+        {
+          "t": "mabni (مَبْنِيّ),",
+          "s": 19.72,
+          "e": 20.32
+        },
+        {
+          "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
+          "s": 20.52,
+          "e": 21.92
+        },
+        {
+          "t": "maf’ul bih (مَفْعُول بِه),",
+          "s": 22.16,
+          "e": 23.36
+        },
+        {
+          "t": "manshub (مَنْصُوب),",
+          "s": 23.6,
+          "e": 24.48
+        },
+        {
+          "t": "isim maushul (اِسْم مَوْصُول),",
+          "s": 24.72,
+          "e": 26.0
+        },
+        {
+          "t": "fi’il madhi (فِعْل مَاضٍ),",
+          "s": 26.24,
+          "e": 27.36
+        },
+        {
+          "t": "serta",
+          "s": 27.507,
+          "e": 28.24
+        },
+        {
+          "t": "‘athaf (عَطْف).",
+          "s": 28.4,
+          "e": 29.04
         }
       ]
     },

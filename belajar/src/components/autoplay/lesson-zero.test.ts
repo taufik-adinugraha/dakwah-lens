@@ -295,7 +295,8 @@ describe("what left Al-Fatihah 1", () => {
     expect(taughtAt(FATIHAH.ayat[0]).map((x) => x.id)).toEqual(["majrur", "huruf-jar"]);
     const map = lessonMapInput("al-fatihah", 1)!;
     expect(map.learnt.map((x) => x.id)).toEqual(CURRICULUM.lessons.find((l) => l.id === LESSON_ZERO)!.steps);
-    expect(LINES["al-fatihah:1:map:learnt"].text).toMatch(/^Sebelum ayat ini, kita sudah mempelajari dua hal\./);
+    // … and named (operator 2026-10-15: "Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu XXX dan YYY").
+    expect(LINES["al-fatihah:1:map:learnt"].text).toBe("Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu harakat dan tiga jenis kata.");
   });
 });
 

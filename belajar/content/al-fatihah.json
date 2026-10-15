@@ -358,7 +358,7 @@
           },
           {
             "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
-            "ref": "hlm. 495–496 (al-Bab ats-Tsani, contoh kedelapan: jumlah basmalah ismiyyah bila diperkirakan ibtidā’ī, pendapat Bashrah; fi'liyyah bila diperkirakan “aku memulai”, pendapat Kufah)",
+            "ref": "hlm. 495–496 (al-Bab ats-Tsani, contoh kedelapan: jumlah basmalah ismiyyah bila diperkirakan ibtidā’ī, pendapat Bashrah; fi'liyyah bila diperkirakan “aku memulai”, pendapat Kufah, yang masyhur dalam kitab tafsir dan i'rab; az-Zamakhsyari memperkirakan kata kerjanya di belakang dan sesuai pekerjaan yang dimulai)",
             "url": "https://shamela.ws/book/6972/483"
           },
           {
@@ -397,7 +397,7 @@
               3,
               4
             ],
-            "say": "Seluruh ayat ini adalah satu keterangan, dan kata yang diterangkannya tidak diucapkan. Para ulama memperkirakannya, misalnya kata kerja yang artinya “aku memulai”, sehingga maknanya “aku memulai dengan nama Allah”."
+            "say": "Seluruh ayat ini adalah satu keterangan, tetapi kata yang diterangkannya tidak diucapkan. Karena basmalah adalah kalimat pembuka, para ulama memahaminya antara lain sebagai “aku memulai”, dan ada pula yang menyesuaikannya dengan pekerjaan yang sedang dimulai. Jadi maknanya: “aku memulai dengan nama Allah”."
           }
         ],
         "marked": {
@@ -900,7 +900,7 @@
             "words": [
               2
             ],
-            "say": "Khabar di sini berupa huruf jar beserta isim yang majrur. Keterangan seperti ini bergantung pada kata yang tidak diucapkan; para ulama memperkirakannya, misalnya kata yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”."
+            "say": "Khabar di sini berupa huruf jar beserta isim yang majrur. Keterangan seperti ini bergantung pada kata yang tidak diucapkan; para ulama memahaminya antara lain sebagai “tetap”. Jadi maknanya: “segala puji tetap bagi Allah”."
           },
           {
             "words": [
@@ -5337,7 +5337,7 @@
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
     "authored_words": "authored/al-fatihah.words.json sha256:7483cc2d5ccafa8265d9354456b36c1db39b3bdc4696b9518a194800d5c02f7f",
-    "authored_structure": "authored/al-fatihah.structure.json sha256:22cafd59cb62f2af6aa87cd0c6174e3d71ae4739c4afb5424853081b3859d849",
+    "authored_structure": "authored/al-fatihah.structure.json sha256:1d26400ecb1d16b88145fae14388b5c629dc54b522013a30e94024d75d40c70b",
     "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:e2513b4878e1704c60d8682e05701a3efb44e32ec5404f2d79a133394e7cf99b",
     "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:1181789ee65c1b2e800270475f1c6264576a0062f8d75290ee2f99af9d2adc5f",
     "pipeline": "belajar/pipeline/build_fatihah.py + facts.py (stdlib only, no LLM)"

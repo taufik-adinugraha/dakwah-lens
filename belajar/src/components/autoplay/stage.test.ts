@@ -104,9 +104,12 @@ describe("autoplay stage: what the lesson page ships", () => {
           }
           // Serialisable for the client component, and not huge. Measured 2026-10-11, with every
           // Al-Fatihah line voiced (karaoke word timings), the word compositions and the quiz
-          // explanations: the longest, Al-Fatihah 7 (nine words), is 141 KB raw / 28 KB gzipped;
-          // the next, ayah 5, 92 KB. The budget keeps ~13% headroom over the longest.
-          expect(JSON.stringify(seq).length).toBeLessThan(160_000);
+          // explanations: the longest, Al-Fatihah 7 (nine words), was 141 KB raw / 28 KB gzipped.
+          // Re-measured 2026-10-16, after the lesson map came to name every step it counts
+          // (operator 2026-10-15; ayah 7's opening names 16 + 10 steps, its total 19, each with
+          // karaoke timings): ayah 7 is 162 KB raw / 33 KB gzipped, the next, ayah 2, 112 KB. The
+          // budget keeps ~14% headroom over the longest, as before.
+          expect(JSON.stringify(seq).length).toBeLessThan(185_000);
         }
       }
     }

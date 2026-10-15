@@ -14,7 +14,7 @@
           { "words": [1], "say": "Kata pertama diawali huruf jar yang artinya “dengan”, sehingga isim sesudahnya, yang artinya “nama”, menjadi majrur. Gabungan seperti ini disebut jar-majrur." },
           { "words": [1, 2], "say": "Kata yang artinya “nama” itu disandarkan kepada kata kedua, sehingga maknanya “nama Allah”. Susunan sandaran ini kita pelajari di ayat keempat." },
           { "words": [2, 3, 4], "say": "Kata ketiga dan kata keempat adalah dua sifat bagi kata kedua, dan keduanya mengikuti akhirannya, yaitu kasrah. Ini kita pelajari di ayat ketiga." },
-          { "words": [1, 2, 3, 4], "say": "Seluruh ayat ini adalah satu keterangan, dan kata yang diterangkannya tidak diucapkan. Para ulama memperkirakannya, misalnya kata kerja yang artinya “aku memulai”, sehingga maknanya “aku memulai dengan nama Allah”." }
+          { "words": [1, 2, 3, 4], "say": "Seluruh ayat ini adalah satu keterangan, tetapi kata yang diterangkannya tidak diucapkan. Karena basmalah adalah kalimat pembuka, para ulama memahaminya antara lain sebagai “aku memulai”, dan ada pula yang menyesuaikannya dengan pekerjaan yang sedang dimulai. Jadi maknanya: “aku memulai dengan nama Allah”." }
         ],
         "sources": [
           { "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)", "ref": "jil. 1, hlm. 9 (i'rab basmalah: dua perkiraan, abtadi’u atau ibtidā’ī, 'keduanya baik'; jumlah basmalah ibtida'iyyah, tidak punya kedudukan i'rab)", "url": "https://tafsir.app/iraab-aldarweesh/1/1" },
@@ -22,7 +22,7 @@
           { "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an", "ref": "QS 1:1 (perkiraan ibtidā’ī; jumlah perkiraan itu ibtida'iyyah; halaman cetak belum diverifikasi)", "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/1" },
           { "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an", "ref": "QS 1:1 (menurut al-Farra' kedudukannya nashab dengan makna “aku memulai”; menurut ulama Bashrah rafa' dengan makna “permulaanku”; halaman cetak belum diverifikasi)", "url": "https://tafsir.app/iraab-alnahas/1/1" },
           { "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun", "ref": "QS 1:1 (ulama Bashrah: kata yang tersirat berupa isim; ulama Kufah: berupa fi'il; halaman cetak belum diverifikasi)", "url": "https://tafsir.app/aldur-almasoon/1/1" },
-          { "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)", "ref": "hlm. 495–496 (al-Bab ats-Tsani, contoh kedelapan: jumlah basmalah ismiyyah bila diperkirakan ibtidā’ī, pendapat Bashrah; fi'liyyah bila diperkirakan “aku memulai”, pendapat Kufah)", "url": "https://shamela.ws/book/6972/483" },
+          { "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)", "ref": "hlm. 495–496 (al-Bab ats-Tsani, contoh kedelapan: jumlah basmalah ismiyyah bila diperkirakan ibtidā’ī, pendapat Bashrah; fi'liyyah bila diperkirakan “aku memulai”, pendapat Kufah, yang masyhur dalam kitab tafsir dan i'rab; az-Zamakhsyari memperkirakan kata kerjanya di belakang dan sesuai pekerjaan yang dimulai)", "url": "https://shamela.ws/book/6972/483" },
           { "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)", "ref": "hlm. 22–23 (Bab al-Makhfudhat min al-Asma': majrur karena huruf, karena idhafah, dan karena mengikuti kata yang majrur)", "url": "https://shamela.ws/book/11371/30" }
         ],
         "status": "draft"
@@ -43,7 +43,7 @@
         ],
         "items": [
           { "words": [1, 2], "say": "Ini jumlah ismiyyah: kata pertama adalah mubtada', yaitu pokok kalimat, dan kata kedua adalah khabar, yaitu berita tentangnya." },
-          { "words": [2], "say": "Khabar di sini berupa huruf jar beserta isim yang majrur. Keterangan seperti ini bergantung pada kata yang tidak diucapkan; para ulama memperkirakannya, misalnya kata yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”." },
+          { "words": [2], "say": "Khabar di sini berupa huruf jar beserta isim yang majrur. Keterangan seperti ini bergantung pada kata yang tidak diucapkan; para ulama memahaminya antara lain sebagai “tetap”. Jadi maknanya: “segala puji tetap bagi Allah”." },
           { "words": [2, 3], "say": "Kata ketiga adalah sifat bagi nama Allah pada kata kedua, sehingga ikut majrur; sebagian ulama menyebutnya pengganti. Sifat seperti ini kita pelajari di ayat ketiga." },
           { "words": [3, 4], "say": "Kata ketiga disandarkan kepada kata keempat, sehingga maknanya “Tuhan seluruh alam”, dan kata keempat menjadi majrur. Susunan sandaran ini kita pelajari di ayat keempat." }
         ],

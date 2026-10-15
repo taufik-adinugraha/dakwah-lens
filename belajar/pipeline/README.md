@@ -61,7 +61,7 @@ python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Ku
 python3 build_map.py               # the lesson maps ../content/map/*.json, for the surahs switched on (see "Peta pelajaran"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi"); stops on a term said before its lesson that authored/curriculum.pending.json does not list (`--write-pending` writes that list: see "Kurikulum")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
-python3 test_validate_narration.py # plants 205 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum and the pending list, each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
+python3 test_validate_narration.py # plants 228 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum and the pending list, each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
 python3 validate_map.py            # the lesson maps: new / learnt so far / later / next-level against the curriculum, the names against the captions
 python3 test_validate_map.py       # plants 39 faults (a step in the wrong group, one taught later listed as learnt, a learnt step left out, `here` on a step that does not occur, a name that says a Qur'anic word, …)
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah), or listed in authored/curriculum.pending.json; exit 1 on any failure
@@ -1300,37 +1300,69 @@ file to draw a card. Read by the narration build and validator, by the page
 (`src/lib/map-content.ts`: zod, then `lessonMapProblems` against the curriculum in TypeScript — a
 file that disagrees with it fails `next build`) and by the engine checks.
 
-**The lines** (`build_narration.map_new` / `map_learnt` / `map_later` / `map_closing`; ids
-`${slug}:${ayah}:map:new`, `:map:learnt`, `:map:later` right after `recite`, each a step of the
-lesson, and `${slug}:${ayah}:learned` right before `recap`; highlight `[]`, no word card; never
-split). A group with nothing in it has no line (`validate_narration.map_opening_parts`; twin
-`lessonMap.ts mapOpening`). A name with a "dan" of its own is joined by ", serta":
+**The lines** (operator 2026-10-15; `build_narration.map_new` / `map_learnt` / `map_again` /
+`map_later` / `map_focus` / `map_closing` / `map_total`; ids `${slug}:${ayah}:map:new`,
+`:map:learnt`, `:map:again`, `:map:later`, `:map:focus` right after `recite`, and
+`${slug}:${ayah}:learned`, `:map:total` right before `recap`; highlight `[]`, no word card; never
+split). The operator's rule: a sentence that COUNTS steps also NAMES every one of them — "Sebelum
+ayat ini, kita sudah mempelajari dua hal, yaitu XXX dan YYY. Yang kita temui lagi di ayat ini adalah
+YYY."; "Dengan itu, sudah empat hal yang kita pelajari, yaitu A, B, C, D" — "similar sentences
+should follow this pattern, always re-mention what they are". No "di antaranya" any more, and no
+"ada satu: X". Every list is in TEACHING ORDER, the order the card lists the steps in (the steps
+met again: until 2026-10-15 the most recent first, a few of them); the running total is the learnt
+steps in teaching order, then the ayah's new ones. A next-level topic is still counted, never named
+(decision 6: the card names it). Since a full list is long (Al-Fatihah 7: sixteen learnt, nineteen
+in all), each such sentence is ONE LINE of its own, so no line is split (MAX_LINE 400 spoken
+characters; the longest, `al-fatihah:7:map:total`, is 321). A step of the lesson keeps its card
+while its lines are said one after the other (src/lib/autoplay/lessonMap.ts `MAP_LINES`: the step
+`map:learnt` says `map:learnt` + `map:again`, `map:later` says `map:later` + `map:focus`, `learned`
+says `learned` + `map:total`). And what an ayah puts aside is followed by a reassurance (operator,
+the same day: "Sekarang Anda tidak perlu menghafal ketiganya, mari kita fokus pada pelajaran XXX
+dan YYY terlebih dahulu" — and the same for the next-level topics, and with nothing new "we focus
+on repeating what we already learnt"). A group with nothing in it has no line
+(`validate_narration.map_opening_parts`, `map_closing_parts`; twin `lessonMap.ts mapOpening`,
+`MAP_LINES`). A name with a "dan" of its own is joined by ", serta". The templates (N, T: the
+counts in words; lists `_names`):
 
-- new: "Di ayat ini ada tiga hal baru: A, B, dan C." / "Di ayat ini tidak ada hal baru."
-- learnt: "Sebelum ayat ini, kita sudah mempelajari empat hal. Yang kita temui lagi di ayat ini
-  ada tiga, di antaranya Y dan X." — named by RECENCY (`validate_narration.named_again`; decision
-  8: "preferring the ones taught most recently"): the most recently taught first, all of them up
-  to three (`MAP_ALL`), else the two most recent (`MAP_NAMED_MORE`); a step that occurs in every
-  ayah (`occurs.always`: tiga jenis kata) is counted and named only when nothing else is met
-  again ("… ada satu: tiga jenis kata."). The count is every step met again, so "di antaranya"
-  is said whenever not all are named. "Tidak ada yang kita temui lagi di ayat ini." when none
-  is. (The card keeps teaching order.)
-- later: up to three are all named, with the ayah that teaches them when that is an ayah of this
-  surah — one ayah for all: "Ada dua hal lagi di ayat ini, yaitu Z dan W, tetapi baru kita bahas
-  di ayat ketiga."; several: "…, tetapi baru kita bahas nanti: Z di ayat ketiga, serta W di ayat
-  ketujuh."; one taught in another surah: "…, yaitu Z, tetapi baru kita bahas nanti." — of more
-  than three, two after "di antaranya". Then "Ada juga dua hal tingkat lanjut, yang tidak kita
-  bahas di tingkat dasar." (alone: "Di ayat ini ada dua hal tingkat lanjut, …"). A next-level
-  topic is never named by the narrator, only counted.
-- closing: "Di ayat ini kita mempelajari tiga hal baru: A, B, dan C. Dengan itu, sudah tujuh hal
-  yang kita pelajari." / "Di ayat ini tidak ada hal baru; kita mengulang dua hal yang sudah kita
-  pelajari."
+| line | when | template |
+|---|---|---|
+| `map:new` | always | "Di ayat ini ada N hal baru: A, B, dan C." · none: "Di ayat ini tidak ada hal baru." |
+| `map:learnt` | something was learnt before | "Sebelum ayat ini, kita sudah mempelajari N hal, yaitu A, B, …, dan P." (every step learnt so far) |
+| `map:again` | with `map:learnt` | "Yang kita temui lagi di ayat ini adalah A dan B." (every one met again; one: "… adalah A.") · none: "Tidak ada yang kita temui lagi di ayat ini." |
+| `map:later` | a step is postponed or a next-level topic is here | postponed, every one named — all taught in ONE ayah of this surah: "Ada N hal lagi di ayat ini, yaitu Z dan W, tetapi baru kita bahas di ayat ketiga."; in several ayat of it: "Ada N hal lagi di ayat ini, tetapi baru kita bahas nanti: Z di ayat ketiga, serta W di ayat ketujuh."; any of them taught in another surah (or no whole ayah): "Ada N hal lagi di ayat ini, yaitu Z dan W, tetapi baru kita bahas nanti." — then the next-level count: "Ada juga N hal tingkat lanjut, yang tidak kita bahas di tingkat dasar." (alone: "Di ayat ini ada N hal tingkat lanjut, …") |
+| `map:focus` | with `map:later` | "Sekarang Anda tidak perlu menghafal ⟨P⟩[, dan tidak perlu memikirkan hal tingkat lanjut tadi]." — ⟨P⟩ by the count of the postponed steps: 1 "yang satu ini", 2 "keduanya", 3 "ketiganya", more "semuanya"; the bracket when next-level topics are there too; next-level topics alone: "Sekarang Anda tidak perlu memikirkan ⟨P⟩." (⟨P⟩ by their count) — then "Mari kita fokus pada pelajaran A dan B terlebih dahulu." (the ayah's new steps, every one; at most three, the curriculum's limit) · nothing new: "Mari kita fokus mengulang A dan B terlebih dahulu." (the steps met again) · nothing new and nothing met again: "Mari kita fokus pada ayat ini terlebih dahulu." |
+| `learned` | always | "Di ayat ini kita mempelajari N hal baru: A, B, dan C." · nothing new: "Di ayat ini tidak ada hal baru; kita mengulang N hal yang sudah kita pelajari, yaitu A dan B." · nothing met again either: "Di ayat ini tidak ada hal baru." |
+| `map:total` | always | "Dengan itu, sudah T hal yang kita pelajari, yaitu A, B, …, dan S." (every step learnt by the end of the ayah) · nothing new: "Sampai ayat ini, sudah T hal …, yaitu …" |
 
-`validate_narration.map_problems` reads the lines back from their captions: each count, which
-steps are named (parsed against the map's names, the longest first), that the new ones are the
-ayah's `concept:*` lines and are named as their own captions name them, each postponed one's
-ayah, that no next-level topic is named, that the closing names what the opening named and its
-total is `learnt + new`.
+Al-Fatihah, all seven ayat, as built (caption forms; the spoken text says each term from Arabic
+script or its respelling, "Narasi"): ayah 1 —
+
+- `map:new` "Di ayat ini ada dua hal baru: majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ)." (kept)
+- `map:learnt` "Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu harakat dan tiga jenis kata."
+- `map:again` "Yang kita temui lagi di ayat ini adalah tiga jenis kata."
+- `map:later` "Ada tiga hal lagi di ayat ini, tetapi baru kita bahas nanti: alif lam (ال) di ayat ketiga,
+  na’t (نَعْت) di ayat ketiga, dan idhafah (إِضَافَة) di ayat keempat. Ada juga satu hal tingkat lanjut,
+  yang tidak kita bahas di tingkat dasar." (kept)
+- `map:focus` "Sekarang Anda tidak perlu menghafal ketiganya, dan tidak perlu memikirkan hal tingkat
+  lanjut tadi. Mari kita fokus pada pelajaran majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ) terlebih dahulu."
+- `learned` "Di ayat ini kita mempelajari dua hal baru: majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ)."
+- `map:total` "Dengan itu, sudah empat hal yang kita pelajari, yaitu harakat, tiga jenis kata, majrur
+  (مَجْرُور), dan huruf jar (حَرْف جَرّ)."
+
+(`python3 build_narration.py --show al-fatihah:7:map` prints the longest ones.)
+
+`validate_narration.map_problems` reads the lines back from their captions: each count; that the
+names after it are EVERY step of the group, in the map's order, each once (a step left out, another
+order, a selection after "di antaranya", a count that disagrees with the names given, the old
+shapes "ada satu: X" / a bare count, all fail with their reason; names parsed against the map's
+names, the longest first); that the new ones are the ayah's `concept:*` lines and are named as their
+own captions name them; each postponed one's ayah; that no next-level topic is named; the
+reassurance's verb, pronoun, next-level clause and focus; that the closing names the new steps and
+the total line every step learnt by then, opening "Dengan itu" exactly when the ayah taught
+something. The caption-only fallback (src/lib/autoplay/texts.ts, a line without a narration display:
+a surah without narration) says the same sentences with digits for the counts and the names without
+their Arabic (lesson-map.test.ts holds it equal to every Al-Fatihah map line's display, the numbers
+aside); the English captions (src/components/autoplay/texts.ts) translate them.
 
 **On the stage** (`LessonMapCard.tsx`, in the word card's slot): ONE GROUP AT A TIME, in step
 with the narrator, so new and already-learnt are never on screen together — "Baru di ayat ini";
@@ -1530,6 +1562,49 @@ python3 render_narration.py --only shared:start
 #   render: … --render --i-approve-spend --voice-id aK834gEOxQEtviMPgurT --voice-name "Kang Nandar" --env-file … --out "$OUT" --only shared:start
 ```
 
+### Every counted step named, and the reassurance (2026-10-15): prepared, NOT rendered
+
+The lines of "The lines" above (operator 2026-10-15) changed the text of 15 lines of Al-Fatihah and added 21
+(`map:again`, `map:focus`, `map:total` of each ayah; `learned` lost its second sentence to
+`map:total`); `map:new` of every ayah and `map:later` of ayat 1 and 3–7 kept their text, and their
+audio. **36 lines have no audio** until the operator approves the render: per ayah `map:learnt`,
+`map:again`, `map:focus`, `learned`, `map:total`, and `al-fatihah:2:map:later` (its four postponed
+steps are all named now, "di antaranya" is gone). Dry run (exactly those, nothing else): **36
+distinct texts, 5,254 characters, about USD 0.42** (eleven_v3 list price, first take), none refused
+— no new dictionary term: every Arabic term they speak is one the narrator already says elsewhere.
+One new Indonesian word sits in a heavy-letter guard's way: "menghafal" (meng- + hafal, the
+operator's own wording) reads as gh + a to `HEAVY_LATIN`, so it is in `validate_narration.NOT_HEAVY`
+with that reason; listen to `al-fatihah:1:map:focus` after the render (it should be plain
+Indonesian "meng-hafal").
+
+```bash
+# must say: 36 distinct texts, 5254 characters
+python3 render_narration.py --surah al-fatihah --only al-fatihah:1:map:learnt \
+    --only al-fatihah:1:map:again --only al-fatihah:1:map:focus --only al-fatihah:1:learned \
+    --only al-fatihah:1:map:total --only al-fatihah:2:map:learnt --only al-fatihah:2:map:again \
+    --only al-fatihah:2:map:later --only al-fatihah:2:map:focus --only al-fatihah:2:learned \
+    --only al-fatihah:2:map:total --only al-fatihah:3:map:learnt --only al-fatihah:3:map:again \
+    --only al-fatihah:3:map:focus --only al-fatihah:3:learned --only al-fatihah:3:map:total \
+    --only al-fatihah:4:map:learnt --only al-fatihah:4:map:again --only al-fatihah:4:map:focus \
+    --only al-fatihah:4:learned --only al-fatihah:4:map:total --only al-fatihah:5:map:learnt \
+    --only al-fatihah:5:map:again --only al-fatihah:5:map:focus --only al-fatihah:5:learned \
+    --only al-fatihah:5:map:total --only al-fatihah:6:map:learnt --only al-fatihah:6:map:again \
+    --only al-fatihah:6:map:focus --only al-fatihah:6:learned --only al-fatihah:6:map:total \
+    --only al-fatihah:7:map:learnt --only al-fatihah:7:map:again --only al-fatihah:7:map:focus \
+    --only al-fatihah:7:learned --only al-fatihah:7:map:total
+# the render: the same command with
+#   --render --i-approve-spend --voice-id aK834gEOxQEtviMPgurT --voice-name "Kang Nandar" --env-file … --out "$OUT"
+# then build_narration.py --check, validate_narration.py, encode_narration.py --check --out "$OUT" --list …,
+# and the upload steps of "Rendering the lines" above.
+```
+
+Until then the 36 lines play caption-only at reading pace (each lesson-map step still says its
+`map:new`, and ayat 1, 3–7 their `map:later`, in the narrator's voice). CI does not need them: the
+pipeline checks and vitest pass either way, `lessonMapChecks` works rendered or not (it reads each
+step's FIRST line's caption), `aheadChecks` follows `al-fatihah:1:map:new` (kept its audio) and, at
+its step 6, the next file due after it — `al-fatihah:1:map:later`, two steps on, kept too — and
+`loadingChecks` uses `shared:start` and word 1.
+
 ## Narasi (guided-lesson narration)
 
 The autoplay lesson ("Mulai" once, then no clicks except exercise answers) speaks an Indonesian
@@ -1570,7 +1645,7 @@ hosts it (intro, primer:k, concept:<id>, next; see "Pelajaran nol"):
 |---|---|---|---|
 | `intro` | every ayah | which ayah, its translation (QuranEnc, in quotes on the caption), how many words | `[0]` |
 | `recite` | every ayah | one line before the imam recites the ayah | `[0]` |
-| `map:new`, `map:learnt`, `map:later` | every ayah of a surah with a lesson map (`content/map/<slug>.json`; "Peta pelajaran"), one line and one step per group; `map:learnt` once anything was learnt, `map:later` when the ayah has a postponed or a next-level topic | what is new in the ayah (named); how many steps were learnt before it and which come up again here (named); what a later lesson teaches (named, with the ayah) and how many next-level topics there are (counted, never named) | `[]`, focus `null` (its card is on the stage) |
+| `map:new`, `map:learnt`, `map:again`, `map:later`, `map:focus` | every ayah of a surah with a lesson map (`content/map/<slug>.json`; "Peta pelajaran"), one step per group, ONE SENTENCE PER LINE (2026-10-15); `map:learnt` + `map:again` once anything was learnt, `map:later` + `map:focus` when the ayah has a postponed or a next-level topic | what is new in the ayah; how many steps were learnt before it, then which come up again here; what a later lesson teaches (with the ayah) and how many next-level topics there are (counted, never named); the reassurance: that need not be learnt now, focus on the new steps — every counted step named, in teaching order | `[]`, focus `null` (its card is on the stage) |
 | `primer:${k}` | the lesson the harakat primer plays in: lesson zero ("ayah 0" of Al-Fatihah) since 2026-10-13, where its lines light nothing | the k-th sentence of the primer's frames | `[]` in lesson zero (no ayah on the stage); in an ayah's lesson the words whose letters its frame shows as they are (بِ: `[1]`); focus `null` |
 | `w${n}` | every word | "Kata ke-n artinya: “gloss”." + the word's `why`, sanitised (its `why_basic` when it has one: see "why_basic") — or, when the word has a composition, + its `lead` ("Kata ini terdiri dari dua bagian."), since the frames say the why part by part | `[n]`, focus = that word |
 | `w${n}:compose:${k}` | a word with a composition | the k-th sentence of its frames (strict: no Qur'anic word, spoken as authored) | `[n]`, focus = that word (the animation takes the card's place) |
@@ -1579,7 +1654,7 @@ hosts it (intro, primer:k, concept:<id>, next; see "Pelajaran nol"):
 | `structure:${k}` | each item of an ayah whose `structure` has `items` (see "Susunan kalimat per butir") | the item's `say`, spoken as authored (strict), the first after "Sekarang susunan kalimatnya." | the item's `words`, focus `null` |
 | `ex:${key}:intro` | each exercise of the ayah's quiz (`content/quiz/<slug>.json`): the warm-up `word-kind` BEFORE the first word's lines (after `map:*` and the primer), every other one after the structure | what the exercise is, how many questions, the case groups of a sort (the form names of a wazan quiz: no basic lesson has one since 2026-10-13) | `[0]` for `tap-word` and `word-kind`, else `[]` |
 | `ex:${key}:${n}:why` | each question n of those exercises | the ONE short explanation of the correct answer, said after "Benar." and after "Ini jawabannya." (operator 2026-10-10): warm-up — its one sentence, built from data in `quiz.py` (the part's place, its kind, the kind's plain meaning, a sign an earlier lesson taught); tap — the word's place and gloss; why / sort — the word's `why_basic` when it has one, else its `why` (+ "Jadi, kata ini <state>." when it does not name the state); role — "Perannya: <role head>." + the `why`; wazan — "Itu bentuk <label>" + its Konsep card's title. Only sourced fields, sanitised like every line | `[]` |
-| `learned` | every ayah of a surah with a lesson map | what the ayah taught: its new steps, as the `map:new` line named them, and the running total ("Dengan itu, sudah tujuh hal yang kita pelajari.") | `[]`, focus `null` |
+| `learned`, `map:total` | every ayah of a surah with a lesson map | what the ayah taught: its new steps, as the `map:new` line named them; then the running total with every step learnt by then ("Dengan itu, sudah empat hal yang kita pelajari, yaitu harakat, tiga jenis kata, majrur, dan huruf jar.") | `[]`, focus `null` |
 | `recap` | every ayah | before the imam recites the ayah again | `[0]` |
 | `next` / `done` | `next` on every ayah but the last, `done` on the last | | `[]` |
 
