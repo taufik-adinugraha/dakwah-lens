@@ -32,6 +32,7 @@ import type { ComposeFile } from "@/content/compose-schema";
 import type { RecitationSource } from "@/hooks/useSegmentPlayer";
 import { Link } from "@/i18n/navigation";
 import { MAP_GROUPS, type AutoplaySequence, type LessonMapInput, type StageExample } from "@/lib/autoplay";
+import type { CurriculumLead } from "@/lib/autoplay/curriculum";
 import { glossSlot } from "@/lib/emphasis";
 import { PACES } from "@/lib/lessonSteps";
 import { ayahHref } from "@/lib/routes";
@@ -40,6 +41,7 @@ import { MushafLine, type PlayerWord } from "./AyahPlayer";
 import { ExampleCard, type ExampleCardState } from "./ExampleCard";
 import { LessonMapCard, type LessonMapCardGroup } from "./LessonMapCard";
 import { StructureItemCard } from "./StructureItemCard";
+import { TermContrastCard } from "./TermContrastCard";
 import { type StageCompose, WordComposition } from "./WordComposition";
 
 /**
@@ -240,6 +242,7 @@ export function LessonStage({
   examples = {},
   marks = null,
   lessonMap = null,
+  leads = {},
 }: {
   seq: AutoplaySequence;
   /** Page title, also the lock-screen title (Media Session). */
@@ -264,6 +267,8 @@ export function LessonStage({
   marks?: ComposeFile["marks"] | null;
   /** This ayah's lesson map (content/map: what is new, learnt so far, taught later, next-level), if the surah has one. */
   lessonMap?: LessonMapInput | null;
+  /** Lesson zero's slides, by step id ("concept:<id>:lead"): the cards each shows (content/curriculum.json). */
+  leads?: Readonly<Record<string, CurriculumLead>>;
 }) {
   const t = useTranslations("Guided");
   const tp = useTranslations("Player");
@@ -336,6 +341,8 @@ export function LessonStage({
   // One item of the sentence structure (operator 2026-10-13): the words it is about, in the word
   // card's slot, while the mushaf line marks them (the item's line lights them).
   const itemWords = live && step.kind === "structure" && step.item ? words.filter((w) => step.item?.words.includes(w.index)) : null;
+  // A slide of lesson zero (operator 2026-10-15: kalimah is one word, the Indonesian kalimat is kalam): its cards.
+  const lead = live ? (leads[step.id] ?? null) : null;
   const showMushaf = !started || (live && !spec);
   const spotGuides = spec ? state.guides.filter((g) => g.target.startsWith("exercise:")) : [];
   const skipGuide = view.showSkip ? state.guides.find((g) => g.target === "skip") : undefined;
@@ -739,6 +746,8 @@ export function LessonStage({
               />
             ) : beat && beatState && beatDrawing && beat.beat.of === "concept" ? (
               <ExampleCard id={beat.beat.id} example={beatDrawing} state={beatState} marks={marks} />
+            ) : lead ? (
+              <TermContrastCard id={step.id} lead={lead} />
             ) : mapGroup && lessonMap ? (
               <LessonMapCard map={lessonMap} group={mapGroup} />
             ) : itemWords && step.item ? (

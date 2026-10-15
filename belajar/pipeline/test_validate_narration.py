@@ -527,6 +527,17 @@ MUTATIONS = [
     ("compose line missing", drop(C1), f"missing line {C1}"),
     ("compose line past the frames' says", add(PAST_W2, "Lagi."), f"unexpected line {PAST_W2}"),
     ("primer line missing", drop("al-fatihah:0:primer:2"), "missing line al-fatihah:0:primer:2"),
+    # lesson zero's slide and the narrator's line over each example (operator 2026-10-15)
+    ("lesson zero's slide line missing", drop("al-fatihah:0:concept:kalimah-isim-fiil-huruf:lead"),
+     "missing line al-fatihah:0:concept:kalimah-isim-fiil-huruf:lead"),
+    ("an example line of lesson zero missing", drop("al-fatihah:0:concept:kalimah-isim-fiil-huruf:ex:3"),
+     "missing line al-fatihah:0:concept:kalimah-isim-fiil-huruf:ex:3"),
+    ("an example line lesson zero does not have", add("al-fatihah:0:concept:kalimah-isim-fiil-huruf:ex:6", "Kata ini adalah isim."),
+     "unexpected line al-fatihah:0:concept:kalimah-isim-fiil-huruf:ex:6"),
+    # a letter's NAME is a whole Arabic word: لَام inside كَلَام (kalam) is no letter, but the letter's name alone is
+    ("a letter's name in a caption, as a whole word", replace_in("al-fatihah:0:concept:kalimah-isim-fiil-huruf:lead", "display",
+                                                                  "kalam (كَلَام)", "huruf لَام"),
+     "caption shows the letter lam by its name (لَام)"),
     ("primer on an ayah the primer does not open", add("al-fatihah:2:primer:1", "Harakat."),
      "unexpected line al-fatihah:2:primer:1"),
     # --- lesson zero (kurikulum-dasar.md decision 1; 2026-10-13): the lesson with no ayah plays the
@@ -556,6 +567,16 @@ MUTATIONS = [
     ("compose caption too long beside the animation", set_display(C1, "Kata pertama. " * 14),
      "beside the animation"),
     ("a syllable the tiles show, spoken", append_text(WBA, " Dibaca bi."), "a syllable the tiles show in transliteration"),
+    # The primer says the sound of its mark frame's own example after "terdengar" (operator 2026-10-15: "jika
+    # dibaca kasrah, maka terdengar bi") — only there (primer_sounds):
+    ("a primer sound said over the bare letter", append_text("al-fatihah:0:primer:5", " Maka terdengar bi."),
+     "al-fatihah:0:primer:5: says 'bi', a syllable the tiles show"),
+    ("a primer sound said without “terdengar”", append_text("al-fatihah:0:primer:6", " Bunyinya bi."),
+     "al-fatihah:0:primer:6: says 'bi', a syllable the tiles show"),
+    ("another frame's primer sound after “terdengar”", append_text("al-fatihah:0:primer:6", " Lalu terdengar bu."),
+     "al-fatihah:0:primer:6: says 'bu', a syllable the tiles show"),
+    ("a longer primer form after “terdengar” (a doubled letter)", append_text("al-fatihah:0:primer:12", " Maka terdengar rra."),
+     "al-fatihah:0:primer:12: says 'rra', a syllable the tiles show"),
     ("a compose line split", split_compose, "is never split"),
     ("letter not as the frame writes it", replace_in(LAM3, "display", "lam (ل)", "lam (لِ)"),
      "the letter as in the ayah is ل"),
@@ -785,8 +806,17 @@ class NarrationValidation(unittest.TestCase):
         # Every other exercise's lines still follow the structure.
         self.assertGreater(ids.index("al-fatihah:1:ex:tap-word:intro"), ids.index("al-fatihah:1:structure:4"))
         zero = [lid for lid in lines if lid.startswith("al-fatihah:0:")]
-        self.assertEqual(zero, ["al-fatihah:0:intro", *[f"al-fatihah:0:primer:{k}" for k in range(1, 10)],
-                                "al-fatihah:0:concept:kalimah-isim-fiil-huruf", "al-fatihah:0:next"])
+        self.assertEqual(zero, ["al-fatihah:0:intro", *[f"al-fatihah:0:primer:{k}" for k in range(1, 15)],
+                                "al-fatihah:0:concept:kalimah-isim-fiil-huruf:lead", "al-fatihah:0:concept:kalimah-isim-fiil-huruf",
+                                *[f"al-fatihah:0:concept:kalimah-isim-fiil-huruf:ex:{k}" for k in range(1, 6)], "al-fatihah:0:next"])
+        # The slide and the example lines are the curriculum's text, said as written, each one file.
+        kal = next(s for s in CURRICULUM["steps"] if s["id"] == "kalimah")
+        self.assertIn("dalam bahasa Arab disebut كَلَام.", lines["al-fatihah:0:concept:kalimah-isim-fiil-huruf:lead"]["text"])
+        for k, _ex in enumerate(kal["examples"], 1):
+            ln = lines[f"al-fatihah:0:concept:kalimah-isim-fiil-huruf:ex:{k}"]
+            self.assertTrue(ln["text"].startswith(("Kata ini", "Tulisan ini")), ln["text"])
+            self.assertLessEqual(len(ln["text"]), 400)
+        self.assertEqual(len(kal["examples"]), 5)
         self.assertEqual(list(lines)[:len(zero)], zero)  # before ayah 1's lines
         for k, ln in enumerate(COMPOSE["al-fatihah"]["primer"]["lines"], 1):
             self.assertEqual(lines[f"al-fatihah:0:primer:{k}"]["frame"], ln["frame"])
@@ -806,11 +836,16 @@ class NarrationValidation(unittest.TestCase):
         self.assertNotIn("frame", lines["al-fatihah:1:w1"])
         # The word line is the gloss and the lead; the why is said part by part in the frames.
         self.assertEqual(lines["al-fatihah:1:w1"]["display"], "Kata pertama artinya: “dengan nama”. Kata ini terdiri dari dua bagian.")
-        # The narrator never says the tiles' syllables; the vowel sounds it may say.
+        # The narrator never says the tiles' syllables; the vowel sounds it may say — and, in the primer, the
+        # sound of a mark frame's own letter after "terdengar" (operator 2026-10-15).
         for lid, ln in lines.items():
             if ":compose:" in lid or ":primer:" in lid:
-                self.assertNotRegex(ln["text"], r"\b(?:bi|ismu|ismi|bismi|ar-rahmanu|ar-rahmani)\b", lid)
+                said = re.sub(r"terdengar (?:ba|bi|bu)\.$", "", ln["text"]) if ":primer:" in lid else ln["text"]
+                self.assertNotRegex(said, r"\b(?:bi|bu|ismu|ismi|bismi|ar-rahmanu|ar-rahmani)\b", lid)
         self.assertIn("bunyinya a", lines["al-fatihah:0:primer:3"]["text"])
+        # the letter alone first, then the same letter with its mark and the sound it gives
+        self.assertIn("Contohnya huruf بَاء ini, tanpa harakat.", lines["al-fatihah:0:primer:5"]["text"])
+        self.assertEqual(lines["al-fatihah:0:primer:6"]["text"], "Jika dibaca كَسْرَة, maka terdengar bi.")
 
     def test_mutations_fail(self):
         for name, mutate, expect in MUTATIONS:
@@ -1290,7 +1325,7 @@ class Dictionary(unittest.TestCase):
         lines = MANIFESTS["al-fatihah"]["lines"]
         self.assertIn("اِسْم, فِعْل, atau حَرْف.", lines["al-fatihah:1:ex:word-kind:intro"]["text"])
         self.assertEqual(lines["al-fatihah:1:ex:word-kind:1:why"]["text"], "Bagian pertama kata pertama adalah حَرْف, yaitu kata tugas.")
-        self.assertNotIn("حَرْف,", lines["al-fatihah:0:primer:4"]["text"])
+        self.assertNotIn("حَرْف,", lines["al-fatihah:0:primer:5"]["text"])
         self.assertEqual(MANIFESTS["shared"]["lines"]["shared:ex:word-kind:options"]["text"], "Pilih jenisnya: اِسْم, فِعْل, atau حَرْف.")
 
     def test_latin_terms_and_pending(self):
@@ -1335,8 +1370,9 @@ class WordPlaces(unittest.TestCase):
         # A primer that opens its own ayah's lesson marks the words whose letters its frame shows
         # as they are (بِ of word 1) — what Al-Fatihah's did until 2026-10-13 …
         own = {**cp, "primer": {k: v for k, v in cp["primer"].items() if k != "lesson"}}
-        self.assertEqual(V.line_view(a, "primer:4", own), ([1], None))
-        self.assertEqual(V.line_view(a, "primer:3", own), ([], None))  # بَ: an edit, not the ayah's letter
+        self.assertEqual(V.line_view(a, "primer:6", own), ([1], None))  # بِ over the kasrah's mark frame
+        self.assertEqual(V.line_view(a, "primer:4", own), ([], None))  # بَ: an edit, not the ayah's letter
+        self.assertEqual(V.line_view(a, "primer:5", own), ([], None))  # ب, the bare letter: an edit too
         # … and one that lesson zero plays marks nothing: there is no ayah on that stage.
         zero = V.lesson_zero(LESSONS["al-fatihah"], cp)
         self.assertEqual((zero["ayah"], zero["words"]), (0, []))

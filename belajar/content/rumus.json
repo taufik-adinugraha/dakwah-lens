@@ -4,8 +4,18 @@
   {
    "step": "kalimah",
    "lesson": "0",
-   "rumus": "Tanda [[isim|isim]]: [[tanwin|tanwin]], alif lam di depannya, kata depan di depannya, dan satu tanda lagi yang kita pelajari di Al-Fatihah ayat 1. Tanda [[fi'il|fiil]]: qad, sin, saufa, atau ta' penanda perempuan yang mati. [[Huruf|huruf]] adalah kata yang tidak punya tanda [[isim|isim]] maupun tanda [[fi'il|fiil]].",
+   "rumus": "[[Kalimah|kalimah]] adalah satu kata; rangkaian kata yang bermakna utuh (dalam bahasa Indonesia: kalimat) disebut [[kalam|kalam]]. Tanda [[isim|isim]]: [[tanwin|tanwin]], alif lam di depannya, kata depan di depannya, dan satu tanda lagi yang kita pelajari di Al-Fatihah ayat 1. Tanda [[fi'il|fiil]]: qad, sin, saufa, atau ta' penanda perempuan yang mati. [[Huruf|huruf]] adalah kata yang tidak punya tanda [[isim|isim]] maupun tanda [[fi'il|fiil]].",
    "sumber": [
+    {
+     "page": "6970/2",
+     "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+     "hlm": "11",
+     "bab": "تعريف الكلمة وأقسامها",
+     "url": "https://shamela.ws/book/6970/2",
+     "quotes": [
+      "الْكَلِمَة قَول مُفْرد"
+     ]
+    },
     {
      "page": "11371/1",
      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
@@ -13,6 +23,7 @@
      "bab": "مدخل",
      "url": "https://shamela.ws/book/11371/1",
      "quotes": [
+      "الكلامُ: هو اللفظُ المُرَكَّبُ المُفيدُ بالوَضْع",
       "فالاسم يُعرَفُ: بالخَفضِ، والتنوينِ، ودخولِ الألف واللام، وحروفِ الخَفضِ",
       "والفعلُ يُعرَفُ بقد، والسِّين، وسَوف، وتاء التأنيث الساكنة",
       "والحرفُ ما لا يَصلُحُ معه دليلُ الاسم ولا دليل الفعل"
@@ -739,6 +750,7 @@
  ],
  "data_versions": {
   "pages": {
+   "6970/2": "922fc0424491ca6d9e6da35c603f4b975c79f38d5d01ed56a9834143f2615f29",
    "6970/15": "e3c8886d5b36d5b3b800867e5d40210c474f73721de2b08b56310f7151bb8afa",
    "11371/1": "a1543cf8dfa4b8d9be343ccbd61950a4ecb5c7b5e40256b0955778e1144f80e4",
    "11371/2": "870935b97942dc099997b554eea6b50980efb56db01b3bdb5044bf22c6086e6d",

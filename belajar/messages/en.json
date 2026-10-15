@@ -333,7 +333,9 @@
     "signs_heading": "The harakat signs",
     "sign_sound": "Sound",
     "sign_example": "Example",
-    "sign_from": "from"
+    "sign_from": "from",
+    "sign_bare": "without this sign",
+    "sign_read": "read with {sign}:"
   },
   "Clip": {
     "play": "Listen",
@@ -355,6 +357,10 @@
     "lemma_caption": "Headword (lemma) as listed in the Quranic Arabic Corpus"
   },
   "Guided": {
+    "lead_label": "Two similar terms",
+    "lead_lang_ar": "Arabic",
+    "lead_lang_id": "Indonesian",
+    "lead_in_arabic": "in Arabic:",
     "title": "Guided lesson",
     "step": "Step {n} of {total}",
     "start": "Start the lesson",
@@ -440,6 +446,7 @@
     "stage_drop": "a letter is not written",
     "stage_whole": "as written in the ayah",
     "stage_overview": "harakat",
+    "stage_bare": "the letter without the mark",
     "stage_mark": "harakat",
     "aria_primer": "Harakat: {marks}. Examples: {examples}."
   },

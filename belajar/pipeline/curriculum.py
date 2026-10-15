@@ -78,7 +78,11 @@ builders read — they never read the authored file):
                   "map": {"new": [id…], "learnt": [{"id", "here"}…], "later": [id…], "lanjut": [record id…]}}],
      "steps":   [{"id", "lesson", "name", "latin", "concept"?, "part"?, "basics"?, "occurs"?,
                   "line": "concept:…" | null, "teach"?: {"title", "summary", "marked": {"title",
-                  "summary"}, "sources"}, "terms": [term id…]}],
+                  "summary"}, "sources"},
+                  # lesson zero's slides of a whole-record step (LEAD_KEYS):
+                  "lead"?: {"say", "cards": [{"lang", "means", "word"?, "term"?: {"id", "latin",
+                  "ar"}}], "sources"}, "examples"?: [{"loc", "say", "about"}],
+                  "terms": [term id…]}],
      "free": [term id…], "lanjut": [record id…]}
 
 A step's `name` is its caption form (dictionary terms with their Arabic, "Majrur (مَجْرُور)") and
@@ -232,6 +236,36 @@ def line_part(step: dict) -> str | None:
     if k == "record":
         return f"concept:{step['concept']}"
     return f"concept:{step['id']}" if k == "teach" else None
+
+
+# LESSON ZERO's slides of a step (operator 2026-10-15): `lead`, said before its "Konsep baru" line
+# ("we need another page/slide to explain that kalimah in Arabic is different: kalimah in Arabic
+# means word, while in bahasa it means sentence/kalimat"), and `examples`, the examples its card
+# shows after the line, each explained by the narrator ("ṣirāṭ, yang artinya jalan, adalah sebuah
+# isim, yaitu nama benda"; "better to provide OTHER examples of isim as nama sifat etc."). Only a
+# step of lesson zero taught as a whole Konsep record has them: in an ayah's lesson the examples
+# are the ayah's own words, which its lines already explain.
+LEAD_KEYS = {"say", "cards", "sources"}
+CARD_LANGS = ("ar", "id")
+EXAMPLE_KEYS = {"loc", "say"}
+# A slide is one narration line, never split (build_narration splits a longer line into :a / :b).
+MAX_SAY = 400
+# The three kinds of word an example's note names, and the narrator's line must name the same.
+KINDS = ("isim", "fi'il", "huruf")
+
+
+def zero_line_parts(step: dict, line: str) -> list[str]:
+    """The narration parts of a step's "Konsep baru" line in lesson zero, in the order said: its
+    slide before it, the line, one line per example after it."""
+    lead = [f"{line}:lead"] if isinstance(step.get("lead"), dict) else []
+    exs = [f"{line}:ex:{k}" for k in range(1, len(step.get("examples") or []) + 1)]
+    return lead + [line] + exs
+
+
+def kinds_in(text: str) -> set[str]:
+    """The kinds of word (isim, fi'il, huruf) a plain text names, as whole words."""
+    t = " " + re.sub(r"[’‘`]", "'", str(text or "")).lower() + " "
+    return {k for k in KINDS if re.search(rf"(?<![\w']){re.escape(k)}(?![\w'])", t)}
 
 
 def teachable(step: dict) -> bool:

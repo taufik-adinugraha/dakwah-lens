@@ -17,6 +17,14 @@
         "note": "[[ṣirāṭa|q:1:7:1]]: [[isim]], nama benda."
       },
       {
+        "loc": "1:6:3",
+        "note": "[[al-mustaqīma|q:1:6:3]]: [[isim]], nama sifat."
+      },
+      {
+        "loc": "1:5:1",
+        "note": "[[iyyāka|q:1:5:1]]: [[isim]], kata ganti."
+      },
+      {
         "loc": "1:5:2",
         "note": "[[na‘budu|q:1:5:2]]: [[fi'il]], kata kerja."
       },
@@ -66,7 +74,7 @@
       },
       {
         "kitab": "Quranic Arabic Corpus 0.4",
-        "ref": "(1:1:1) P + N; (1:5:2) V IMPF; (1:7:1) N; (1:7:8) CONJ + NEG",
+        "ref": "(1:1:1) P + N; (1:5:2) V IMPF; (1:7:1) N; (1:6:3) DET + ADJ; (1:5:1) PRON; (1:7:8) CONJ + NEG",
         "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=1"
       }
     ],

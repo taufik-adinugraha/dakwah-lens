@@ -331,10 +331,17 @@ def lesson_ayat(lesson: dict | None, compose: dict | None) -> list[dict]:
 
 
 def zero_parts(zero: dict, compose: dict | None, curriculum: dict | None) -> list[str]:
-    """The parts of lesson zero's narration, in order."""
+    """The parts of lesson zero's narration, in order: intro, the primer, and for each step it
+    teaches its slide before the "Konsep baru" line ("<line>:lead", the step's `lead`: kalimah is
+    not the Indonesian kalimat, operator 2026-10-15), the line, then one line per example its card
+    shows ("<line>:ex:<k>", the step's `examples`: the narrator explains each, operator
+    2026-10-15) — and next."""
     p = primer_of(compose, CUR.ZERO_AYAH) or {}
-    return (["intro"] + [f"primer:{k}" for k in range(1, len(p.get("lines") or []) + 1)]
-            + [t["line"] for t in taught_lines(zero, curriculum)] + ["next"])
+    taught: list[str] = []
+    for t in taught_lines(zero, curriculum):
+        step = CUR.step_of(curriculum, t["step"]) or {}
+        taught += CUR.zero_line_parts(step, t["line"])
+    return ["intro"] + [f"primer:{k}" for k in range(1, len(p.get("lines") or []) + 1)] + taught + ["next"]
 
 
 def composition_of(compose: dict | None, loc: str) -> dict | None:
@@ -1208,10 +1215,14 @@ def latin_terms(text: str, lex: Lexicon) -> list[str]:
     of first use. Heavy-letter words have their own list (heavy_latin)."""
     masked = HONORIFIC_RE.sub(MASK, lex.mask_spoken(text))
     out: list[str] = []
-    for k, _a, _b, orig in tokens(masked):
+    for k, a, _b, orig in tokens(masked):
         base = k[:-3] if k.endswith("nya") and len(k) > 5 else k
         term = base in GRAMMAR_LATIN or k in GRAMMAR_LATIN
-        letter = base in LETTER_NAMES and (base not in _LETTER_NEEDS_APOSTROPHE or orig.endswith(("'", "’")))
+        # "… maka terdengar ba." is the SOUND b + a the primer teaches (operator 2026-10-15), said as an
+        # Indonesian syllable, not the letter's name (which the dictionary speaks, بَاء): what follows
+        # "terdengar" is heard. Which sounds a line may say there is check_animation_line's (_HEARD).
+        heard = _HEARD.search(masked[:a]) is not None and not orig.endswith(("'", "’"))
+        letter = base in LETTER_NAMES and not heard and (base not in _LETTER_NEEDS_APOSTROPHE or orig.endswith(("'", "’")))
         if (term or letter) and orig not in out:
             out.append(orig)
     return out
@@ -1227,7 +1238,7 @@ def held(text: str, lex: Lexicon) -> list[str]:
 # ------------------------------------------------------------------ checks
 SLUG_ID = re.compile(
     r"^(?P<slug>[a-z-]+):(?P<ayah>0|[1-9]\d*):(?P<part>intro|recite|map:(?:new|learnt|later)|primer:[1-9]\d*|w[1-9]\d*(?::compose:[1-9]\d*)?"
-    r"|structure(?::[1-9]\d*)?|concept:[a-z0-9-]+|learned"
+    r"|structure(?::[1-9]\d*)?|concept:[a-z0-9-]+(?::lead|:ex:[1-9]\d*)?|learned"
     r"|ex:(?:" + "|".join(EXERCISE_KEYS) + r"):(?:[a-z][a-z_]+|[1-9]\d*:why)|recap|next|done)(?::(?P<split>[a-z]))?$"
 )
 SHARED_ID = re.compile(r"^shared:(?P<part>[a-z_]+(?::[a-z-]+:[a-z_]+)?)(?::(?P<split>[a-z]))?$")
@@ -1403,7 +1414,8 @@ def check_display(lid: str, display, text, forms: Forms, lex: Lexicon, focus_ar:
     if errs and errs[0].endswith("empty display"):
         return errs
     for t in lex.terms:
-        if t.letter and t.term in display:
+        # A letter's NAME as a whole Arabic word: لَام inside كَلَام (kalam, 2026-10-15) is not the letter lam.
+        if t.letter and re.search(rf"(?<![؀-ۿ]){re.escape(t.term)}(?![؀-ۿ])", display):
             errs.append(f"{lid}: caption shows the letter {t.head} by its name ({t.term}); show it as in the ayah "
                         f"({lex.shown_letter(t, focus_ar)})")
     for m in lex.display_rx.finditer(display):
@@ -1573,6 +1585,31 @@ def ayah_syllables(ayah: dict, compose: dict | None, own: dict | None) -> set[st
 
 # "Huruf ba' … dibaca ba": a letter's NAME read as the sound of a syllable (the screen shows bi / ba).
 _READ_AS = re.compile(r"\bdibaca ([^\s,.;:!?]+)")
+# The one place a syllable a tile shows is said (operator 2026-10-15: "Contohnya huruf ba'" over ب, then
+# "jika dibaca kasrah, maka terdengar bi" over بِ): a PRIMER line over a `mark` frame says the sound of
+# that frame's own example — one letter with one short vowel and nothing else (بَ بِ بُ: ba, bi, bu) —
+# right after "terdengar". Not a word of the Qur'an: the sound a harakah gives a letter, which is what
+# the primer teaches. Anywhere else, and for any longer form (rra, mā), the rule stands.
+_HEARD = re.compile(r"\bterdengar $")
+PRIMER_SOUND_VOWELS = ("fathah", "kasrah", "dhammah")
+
+
+def primer_sounds(anim: dict | None, frame) -> set[str]:
+    """The syllables a primer line may say after "terdengar" over `frame` (1-based): the folded
+    transliteration of each tile of that `mark` frame that is one letter with one short vowel."""
+    frames = (anim or {}).get("frames") or []
+    if not isinstance(frame, int) or isinstance(frame, bool) or not 1 <= frame <= len(frames):
+        return set()
+    fr = frames[frame - 1]
+    if fr.get("stage") != "mark":
+        return set()
+    out = set()
+    for t in fr.get("tiles") or []:
+        f = ((anim or {}).get("forms") or {}).get(t) or {}
+        ps = COMPOSE.pieces(str(f.get("ar") or ""))
+        if len(ps) == 1 and COMPOSE.marks_of(ps[0]) in ([m] for m in PRIMER_SOUND_VOWELS):
+            out.add(key(str(f.get("translit") or "")))
+    return out
 
 
 def check_animation_line(lid: str, line: dict, ayah: dict | None, part: str, compose: dict | None, lex: "Lexicon",
@@ -1592,7 +1629,9 @@ def check_animation_line(lid: str, line: dict, ayah: dict | None, part: str, com
     text = line.get("text")
     if isinstance(text, str):
         masked = HONORIFIC_RE.sub(MASK, lex.mask_spoken(text))
-        said = [orig for k, _a, _b, orig in tokens(masked) if k in banned or sound(k) in banned]
+        heard = primer_sounds(anim, line.get("frame")) if PRIMER_PART.fullmatch(part) else set()
+        said = [orig for k, a, _b, orig in tokens(masked)
+                if (k in banned or sound(k) in banned) and not (k in heard and _HEARD.search(masked[:a]))]
         if said:
             errs.append(f"{lid}: says {said[0]!r}, a syllable the tiles show in transliteration (the narrator names "
                         "letters and sounds; the imam recites the word)")

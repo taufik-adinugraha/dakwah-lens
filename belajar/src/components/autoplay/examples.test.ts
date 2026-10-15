@@ -1314,14 +1314,15 @@ describe("what the beats add to a lesson", () => {
     // 2026-10-14: every bentuk dasar that is not the lesson's own word is voiced (the narrator's
     // recording of the form, the teaching forms no ayah has included), so 30 beats where there were
     // 26 — 4 more, each about 3.5 s; the three forms that ARE the word stay without one.
-    "Al-Fatihah: 30 beats in its ayat and 3 in lesson zero add about two minutes to its lessons; no lesson more than 45 s",
+    "Al-Fatihah: 30 beats in its ayat add about two minutes to its lessons, no ayah more than 45 s; lesson zero's 5, each with the narrator's line, about a minute",
     () => {
       const report = runAutoplayChecks({ ...input, property: { streams: 0, length: 0 } });
       expect(report.errors).toEqual([]);
       const rows = Object.entries(report.stats.examples).filter(([k]) => k.startsWith("al-fatihah/"));
       expect(rows.map(([k, r]) => [k, r.beats.length])).toEqual([
-        // Lesson zero: the three kinds of word, one recording each (an isim, a fi'il, a huruf with its isim).
-        ["al-fatihah/0", 3],
+        // Lesson zero: three kinds of isim (nama benda, nama sifat, kata ganti), a fi'il and a huruf, one
+        // recording each (operator 2026-10-15; until then the three kinds, one each).
+        ["al-fatihah/0", 5],
         ["al-fatihah/1", 5],
         ["al-fatihah/2", 5],
         ["al-fatihah/3", 2],
@@ -1330,21 +1331,29 @@ describe("what the beats add to a lesson", () => {
         ["al-fatihah/6", 5],
         ["al-fatihah/7", 7],
       ]);
-      for (const [k, r] of rows) {
+      // Lesson zero's examples come with the narrator's line about each (operator 2026-10-15: "ṣirāṭ,
+      // yang artinya jalan, adalah sebuah isim, yaitu nama benda"), and a line about a card that is not
+      // there would point at nothing (rule 21): without its beats the step has no line either, so what
+      // its beats "add" is its five lines too — about 71 s, under a minute and a half.
+      const [, zero] = rows.find(([k]) => k === "al-fatihah/0")!;
+      expect(zero.addedMs.biasa).toBeGreaterThan(5 * 3000 + 30_000);
+      expect(zero.addedMs.biasa).toBeLessThan(90_000);
+      const ayat = rows.filter(([k]) => k !== "al-fatihah/0");
+      for (const [k, r] of ayat) {
         // Every beat: its caption's reading time (2.3 s for the shortest, 23 characters) and the
         // pause after the recording (0.8 s) — a one-line card about 3.5 s, where it was 5.8 s.
         expect(r.addedMs.biasa, k).toBeGreaterThan(r.beats.length * 3000);
         expect(r.addedMs.biasa, k).toBeLessThan(45_000);
         expect(r.addedMs.pelan, k).toBeGreaterThan(r.addedMs.biasa);
-        // On average under 6 s (lesson zero, whose captions say what each word is an example of:
-        // 5.7 s; the longest lesson, ayah 2 with six beats: 28.7 s in all).
+        // On average under 6 s (the longest lesson, ayah 2 with five beats: 24.9 s in all).
         expect(r.addedMs.biasa / r.beats.length, k).toBeLessThan(6_000);
       }
-      // About 143 s in Biasa (2.4 min), where 26 beats added 108 s and, before the basic curriculum
-      // (2026-10-13), 35 added 153 s.
-      const total = rows.reduce((n, [, r]) => n + r.addedMs.biasa, 0);
-      expect(total).toBeGreaterThan(110_000);
-      expect(total).toBeLessThan(160_000);
+      // About 114 s in Biasa over the seven ayat (2026-10-15; with lesson zero's three silent beats it
+      // was about 131 s), where 26 beats added 108 s and, before the basic curriculum (2026-10-13), 35
+      // added 153 s.
+      const total = ayat.reduce((n, [, r]) => n + r.addedMs.biasa, 0);
+      expect(total).toBeGreaterThan(100_000);
+      expect(total).toBeLessThan(150_000);
       expect(total / 60_000 / report.stats.minutes["al-fatihah"].biasa).toBeLessThan(0.05);
     },
     WALK_TIMEOUT_MS,

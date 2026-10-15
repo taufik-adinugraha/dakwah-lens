@@ -349,12 +349,14 @@ class Taught(unittest.TestCase):
         # three of Al-Fatihah 7 that named a term no line taught — "sukun" (1:7:3, twice) and "jar"
         # (1:7:2). Cleared with content the same day, not with an exemption: the harakat primer of
         # lesson zero now names sukun ("… disebut sukun": a teaching line of "ayah 0"), and 1:7:2
-        # has a `why_basic` that says majrur. The list is empty again.
+        # has a `why_basic` that says majrur. The list is empty again. Since 2026-10-15 the primer
+        # shows each sign first on its letter without it, and the line over the bare sin defines it
+        # ("Sukun adalah tanda huruf mati, …": primer:9), as "Fathah adalah …" defines fathah.
         self.assertEqual([k for k in PENDING if k.startswith(f"{SLUG}:")], [])
         first = Q.taught_first(MANIFESTS[SLUG], LESSONS[SLUG], TERMS)
-        self.assertEqual(first["sukun"], (0, "al-fatihah:0:primer:6 (“disebut …”)"))
+        self.assertEqual(first["sukun"], (0, "al-fatihah:0:primer:9 (“… adalah”)"))
         self.assertIn("sukun", self.t[1])
-        without = {**MANIFESTS[SLUG], "lines": {k: v for k, v in MANIFESTS[SLUG]["lines"].items() if k != "al-fatihah:0:primer:6"}}
+        without = {**MANIFESTS[SLUG], "lines": {k: v for k, v in MANIFESTS[SLUG]["lines"].items() if k != "al-fatihah:0:primer:9"}}
         self.assertNotIn("sukun", Q.taught_first(without, LESSONS[SLUG], TERMS))
         self.assertTrue(any("needs 'sukun' (the explanation shown after the answer)" in e for e in run(manifests={**MANIFESTS, SLUG: without})))
         self.assertNotIn("jar", TERMS.ids(next(q for a in QUIZZES[SLUG]["ayat"] if a["ayah"] == 7 for ex in a["exercises"]

@@ -343,9 +343,10 @@ describe("the pages as rendered (server markup, real messages)", () => {
         }
       }
     }
-    // 47 of the 202 rows are an ayah's last word, on 21 concept pages: the rows that used to carry
-    // the note (43) or, for yūlad, the sukun's silence — and none does now
-    expect([rows, pages.size]).toEqual([47, 21]);
+    // 48 of the 204 rows are an ayah's last word, on 22 concept pages: the rows that used to carry
+    // the note (43) or, for yūlad, the sukun's silence — and none does now; the 48th is the kalimah
+    // record's nama-sifat example al-mustaqīma (1:6:3, added 2026-10-15), the last word of its ayah
+    expect([rows, pages.size]).toEqual([48, 22]);
     // the review's two examples: nasta‘īnu "marfu' dengan dhammah" and khalaqa "mabni di atas fathah"
     for (const [id, loc] of [["tanda-irab", "1:5:4"], ["fiil-madhi", "113:2:4"]] as const) {
       const c = LIBRARY.concepts.find((x) => x.id === id);
@@ -365,9 +366,25 @@ describe("the pages as rendered (server markup, real messages)", () => {
       createElement(HarakatChart, {
         signs,
         words: WORD_INFO,
-        labels: { sound: "Bunyi", example: "Contoh", from: "dari", credit: MSG.id.Clip.credit, waqf: MSG.id.Clip.waqf_note },
+        labels: {
+          sound: "Bunyi",
+          example: "Contoh",
+          from: "dari",
+          bare: MSG.id.Concept.sign_bare,
+          read: (sign: string) => MSG.id.Concept.sign_read.replace("{sign}", sign),
+          credit: MSG.id.Clip.credit,
+          waqf: MSG.id.Clip.waqf_note,
+        },
       }),
     );
+    // Each card's example: the letter without its sign first, then with it (operator 2026-10-15:
+    // "Contohnya huruf ba'" over ب, then "jika dibaca kasrah, maka terdengar bi" over بِ).
+    expect(html.match(/data-sign-bare/g)).toHaveLength(signs.length);
+    const kasrah = signs.find((s) => s.term?.id === "kasrah")!;
+    const at = html.search(new RegExp(`data-sign-bare="true"[^>]*>${kasrah.bare}</span>`, "u"));
+    expect(at).toBeGreaterThan(-1);
+    expect(html.indexOf("dibaca kasrah:", at)).toBeGreaterThan(at);
+    expect(html.indexOf(`>${kasrah.letter}<`, at)).toBeGreaterThan(html.indexOf("dibaca kasrah:", at));
     const b = buttonsOf(html);
     expect(b.map((x) => x.loc)).toEqual(signs.map((s) => s.loc));
     expect(b.map((x) => x.label)).toEqual(signs.map((s) => label((WORD_INFO[s.loc] ?? s.word)!.translit)));

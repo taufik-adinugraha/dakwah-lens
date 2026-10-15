@@ -25,7 +25,7 @@ const VOWEL: ReadonlySet<ComposeMark> = new Set(["fathah", "kasrah", "dhammah", 
  * 14): a word explained by its parts — [بِ] + [ٱسْمُ] → the dhammah becomes
  * kasrah (u → i) → written together → the alif drops → [بِسْمِ] — or the
  * harakat primer (each mark on a dotted circle, its sound, an example from
- * the ayah). One FRAME at a time, the one the line on screen is said over
+ * the ayah: first the letter without the mark, then with it). One FRAME at a time, the one the line on screen is said over
  * (caption.ts stageFrame). An ayah's LAST word alone is then recited by the
  * imam once more, over its last frame — the frame that says he stops on it
  * ("recited": the tile filled forest, as the mushaf's active word); every
@@ -401,7 +401,9 @@ function PrimerFrame({
     <div className="flex max-w-full flex-wrap items-stretch justify-center gap-3 sm:gap-6">
       {ms.map((m, i) => {
         const n = name(m);
-        const ex = fr.stage === "mark" ? (ms.length === examples.length ? [examples[i]] : i === 0 ? examples : []) : [];
+        // A `bare` frame shows the letter before the mark (operator 2026-10-15: "Contohnya huruf ba'" over ب),
+        // the `mark` frame after it the same letter with the mark ("… maka terdengar bi" over بِ).
+        const ex = fr.stage === "mark" || fr.stage === "bare" ? (ms.length === examples.length ? [examples[i]] : i === 0 ? examples : []) : [];
         return (
           <div key={m} className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
             <div className="flex flex-col items-center">

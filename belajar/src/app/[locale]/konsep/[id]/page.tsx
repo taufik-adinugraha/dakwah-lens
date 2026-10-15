@@ -78,6 +78,8 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
                 sound: t("sign_sound"),
                 example: t("sign_example"),
                 from: t("sign_from"),
+                bare: t("sign_bare"),
+                read: (sign: string) => t("sign_read", { sign }),
                 credit: tc("credit"),
                 waqf: tc("waqf_note"),
                 sources: tw("sources"),
@@ -114,7 +116,18 @@ function BasicArticle({
   labels,
 }: {
   basic: Basic;
-  labels: { dasar: string; signs: string; sound: string; example: string; from: string; credit: string; waqf: string; sources: string };
+  labels: {
+    dasar: string;
+    signs: string;
+    sound: string;
+    example: string;
+    from: string;
+    bare: string;
+    read: (sign: string) => string;
+    credit: string;
+    waqf: string;
+    sources: string;
+  };
 }) {
   // Its own subject: no "tanda bunyi … " reminders and no links back to itself.
   const sc = new Scope(false);
@@ -143,7 +156,7 @@ function BasicArticle({
         <HarakatChart
           signs={signs}
           words={WORD_INFO}
-          labels={{ sound: labels.sound, example: labels.example, from: labels.from, credit: labels.credit, waqf: labels.waqf }}
+          labels={{ sound: labels.sound, example: labels.example, from: labels.from, bare: labels.bare, read: labels.read, credit: labels.credit, waqf: labels.waqf }}
         />
       </section>
       <div className="mt-6 max-w-prose space-y-4 text-pretty text-base text-ink">

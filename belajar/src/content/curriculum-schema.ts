@@ -42,6 +42,37 @@ export const CurriculumStep = z
       })
       .strict()
       .optional(),
+    /** LESSON ZERO's slide before its "Konsep baru" line (operator 2026-10-15: "kalimah in Arabic
+     *  means word, while in bahasa it means sentence/kalimat"): its line's text (≤ 400 characters,
+     *  one file), the cards it shows (a term with the term table's Arabic, or an Indonesian word)
+     *  and its kitab sources. */
+    lead: z
+      .object({
+        say: z.string().min(15).max(400).regex(/^[^؀-ۿ]+$/),
+        cards: z
+          .array(
+            z
+              .object({
+                lang: z.enum(["ar", "id"]),
+                means: z.string().min(2),
+                word: z.string().min(2).regex(/^[^؀-ۿ]+$/).optional(),
+                term: z.object({ id: Id, latin: z.string().min(2), ar: z.string().regex(/^[؀-ۿ ]+$/) }).strict().optional(),
+              })
+              .strict(),
+          )
+          .min(1)
+          .max(3),
+        sources: z.array(Source).min(1),
+      })
+      .strict()
+      .optional(),
+    /** … and the examples its card shows after the line, each with the narrator's line about it
+     *  (operator 2026-10-15: "ṣirāṭ, yang artinya jalan, adalah sebuah isim, yaitu nama benda") and
+     *  the card's label (`about`, the record's own note without the word). */
+    examples: z
+      .array(z.object({ loc: z.string().regex(/^[1-9][0-9]{0,2}:[1-9][0-9]{0,2}:[1-9][0-9]{0,2}$/), say: z.string().min(10).max(400).regex(/^[^؀-ۿ]+$/), about: z.string().min(3) }).strict())
+      .min(1)
+      .optional(),
     terms: z.array(Id),
   })
   .strict();

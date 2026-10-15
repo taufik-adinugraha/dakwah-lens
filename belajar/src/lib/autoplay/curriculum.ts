@@ -53,7 +53,18 @@ export type CurriculumStep = {
   line: string | null;
   /** Its own text: plain prose, the marked twin (terms by id) and its kitab sources. */
   teach?: { title: string; summary: string; marked: { title: string; summary: string }; sources: CurriculumSource[] };
+  /** LESSON ZERO's slide before its line, and the examples its card shows after it, each with the
+   *  narrator's line (pipeline/curriculum.py LEAD_KEYS; operator 2026-10-15). */
+  lead?: CurriculumLead;
+  examples?: { loc: string; say: string; about: string }[];
   terms: string[];
+};
+
+/** A slide said before a step's "Konsep baru" line: its text, its cards, its sources. */
+export type CurriculumLead = {
+  say: string;
+  cards: { lang: "ar" | "id"; means: string; word?: string; term?: { id: string; latin: string; ar: string } }[];
+  sources: CurriculumSource[];
 };
 
 /** The four lists of a lesson's card (decision 9: new and already-learnt are always apart). */
@@ -290,8 +301,12 @@ export type Taught = {
   words: number[];
   /** Its examples, the one in THIS ayah first (examples.ts takes the first as the example beat):
    *  a record's own examples, its example in this ayah moved to the front; for a step with its
-   *  own text, or a record with no example here, the words it occurs on in this ayah. */
-  examples: { loc: string; note: string }[];
+   *  own text, or a record with no example here, the words it occurs on in this ayah. In lesson
+   *  zero, a step that lists its examples (`CurriculumStep.examples`) has exactly those, each with
+   *  the narrator's line about it (`say`; the line "concept:${id}:ex:${k}"). */
+  examples: { loc: string; note: string; say?: string }[];
+  /** Lesson zero: the slide said before its line ("concept:${id}:lead"), or null. */
+  lead: CurriculumLead | null;
 };
 
 type TaughtConcept = Pick<Concept, "id" | "title" | "summary" | "examples">;
@@ -322,6 +337,7 @@ export function taughtIn(file: Pick<CurriculumFile, "lessons" | "steps">, concep
         sources: step.teach.sources,
         words: line.words,
         examples: own,
+        lead: null,
       });
     } else if (record) {
       const here = record.examples.filter((e) => e.loc.startsWith(`${id}:`));
@@ -336,7 +352,11 @@ export function taughtIn(file: Pick<CurriculumFile, "lessons" | "steps">, concep
         marked: null,
         sources: [],
         words: line.words,
-        examples: [...(here.length ? here : own), ...rest].map((e) => ({ loc: e.loc, note: e.note })),
+        // Lesson zero's own list (each with the narrator's line), else the record's order.
+        examples: step.examples?.length
+          ? step.examples.map((e) => ({ loc: e.loc, note: record.examples.find((x) => x.loc === e.loc)?.note ?? e.about, say: e.say }))
+          : [...(here.length ? here : own), ...rest].map((e) => ({ loc: e.loc, note: e.note })),
+        lead: step.lead ?? null,
       });
     }
   }

@@ -29,6 +29,16 @@ Checks on the AUTHORED file, each stated on its own (authored_problems, speech_p
      the letter lam aside, which the narration says in Indonesian) — so that the narration's
      sanitiser has nothing to turn into a word's place, and what it makes of the text passes the
      narration's own checks;
+  5b. lesson zero's slides of a step (operator 2026-10-15; curriculum.LEAD_KEYS): `lead` and
+     `examples` only on a step of lesson "0" taught as a whole Konsep record; `lead` is {say,
+     cards, sources} — one line of at most curriculum.MAX_SAY characters, plain prose (no markup,
+     no Arabic script), 1–3 cards (an Arabic card names a term; an Indonesian card a Latin word,
+     and may name the term that translates it; every term exists and is this step's or free, so
+     a card shows nothing a later lesson teaches) and at least one source with kitab, ref and url;
+     `examples` are {loc, say}: each loc one of the record's own examples, once, its line at most
+     curriculum.MAX_SAY characters of plain prose naming the kind of word (isim, fi'il, huruf)
+     the record's note on it names; both said by the narrator as written (checked with check 5's
+     rule: no Qur'anic word);
   6. `occurs` is exactly one of {case: marfu | manshub | majrur | majzum}, {qac: a QAC tag},
      {always: true};
   7. a step taught in a lesson whose surah has lessons on disk AND a lesson map
@@ -59,7 +69,7 @@ import validate_narration as V
 from common import CONTENT_DIR, SURAH_BY_NUM, SURAHS
 
 AUTHORED_KEYS = {"_comment", "version", "units", "lessons", "steps", "free", "lanjut"}
-STEP_KEYS = {"id", "lesson", "name", "concept", "part", "basics", "occurs", "teach", "terms"}
+STEP_KEYS = {"id", "lesson", "name", "concept", "part", "basics", "occurs", "teach", "lead", "examples", "terms"}
 TEACH_KEYS = {"title", "summary", "sources"}
 
 
@@ -288,6 +298,19 @@ def authored_problems(authored, lessons: dict[str, dict], library: dict, table: 
                 errs.append(f"{w}: step {sid}: occurs must be one of {{case: {' | '.join(CUR.CASE_STATES)}}}, {{qac: a QAC tag}}, "
                             "{always: true}")
 
+    # --- 5b. lesson zero's slides
+    concepts = {c.get("id"): c for c in library.get("concepts") or [] if isinstance(c, dict)}
+    for s in good:
+        sid = s["id"]
+        if "lead" not in s and "examples" not in s:
+            continue
+        if s["lesson"] != CUR.ZERO or "concept" not in s or "part" in s:
+            errs.append(f"{w}: step {sid}: `lead` and `examples` are lesson zero's slides of a step taught as a whole Konsep "
+                        "record (lesson \"0\", `concept`, no `part`)")
+            continue
+        errs += zero_slide_problems(f"{w}: step {sid}", s, concepts.get(s["concept"]) or {}, by_id, owner,
+                                    set(authored.get("free") or []))
+
     # --- 7. a step of a switched-on surah is teachable
     for s in good:
         surah = CUR.place(s["lesson"])[0] if s["lesson"] in rank else None
@@ -295,6 +318,76 @@ def authored_problems(authored, lessons: dict[str, dict], library: dict, table: 
         if spec and spec.slug in lessons and spec.slug in switched and not CUR.teachable(s):
             errs.append(f"{w}: step {sid_of(s)} is taught in lesson {s['lesson']}, whose surah ({spec.slug}) has a lesson map, and "
                         "has no text: a whole Konsep record (`concept`) or its own `teach`")
+    return errs
+
+
+def _plain_say(x) -> bool:
+    return isinstance(x, str) and bool(x.strip()) and len(" ".join(x.split())) <= CUR.MAX_SAY \
+        and "[[" not in x and not V.ARABIC.search(x)
+
+
+def zero_slide_problems(w: str, s: dict, record: dict, by_id: dict, owner: dict, free) -> list[str]:
+    """Check 5b (module docstring) for one step."""
+    errs: list[str] = []
+    sid = s["id"]
+    if "lead" in s:
+        t = s["lead"]
+        if not isinstance(t, dict) or set(t) != CUR.LEAD_KEYS:
+            return errs + [f"{w}: lead must be {{say, cards, sources}}"]
+        if not _plain_say(t["say"]):
+            errs.append(f"{w}: lead.say must be one line of plain prose (no [[…]] markup, no Arabic script), at most "
+                        f"{CUR.MAX_SAY} characters (a longer line would be split in two files)")
+        srcs = t["sources"]
+        if not isinstance(srcs, list) or not srcs or not all(
+                isinstance(x, dict) and all(isinstance(x.get(k), str) and x[k].strip() for k in ("kitab", "ref", "url")) for x in srcs):
+            errs.append(f"{w}: lead needs at least one source, each with kitab, ref and url")
+        cards = t["cards"]
+        if not isinstance(cards, list) or not 1 <= len(cards) <= 3:
+            errs.append(f"{w}: lead.cards must be one to three cards")
+            cards = []
+        for k, c in enumerate(cards, 1):
+            where = f"{w}: lead.cards[{k}]"
+            if not isinstance(c, dict) or c.get("lang") not in CUR.CARD_LANGS or not set(c) <= {"lang", "term", "word", "means"} \
+                    or not (isinstance(c.get("means"), str) and c["means"].strip()) or V.ARABIC.search(str(c.get("means"))):
+                errs.append(f"{where}: a card is {{lang: ar | id, term?, word?, means}} with an Indonesian meaning")
+                continue
+            if c["lang"] == "ar" and not c.get("term"):
+                errs.append(f"{where}: an Arabic card names a term of the term table (its Arabic is the table's, never typed)")
+            if c["lang"] == "id" and not (isinstance(c.get("word"), str) and c["word"].strip() and not V.ARABIC.search(c["word"])):
+                errs.append(f"{where}: an Indonesian card names its Latin word")
+            if c["lang"] == "ar" and "word" in c:
+                errs.append(f"{where}: an Arabic card shows its term, not a word")
+            tid = c.get("term")
+            if tid is not None:
+                if tid not in by_id or not by_id[tid].get("ar"):
+                    errs.append(f"{where}: term {tid!r} is not a term of authored/library.terms.json with an Arabic spelling")
+                elif owner.get(tid) != sid and tid not in free:
+                    errs.append(f"{where}: term {tid!r} is not this step's own (or free): the card would show a term "
+                                "before the lesson that teaches it")
+    if "examples" in s:
+        exs = s["examples"]
+        notes = {e.get("loc"): e.get("note") or "" for e in record.get("examples") or [] if isinstance(e, dict)}
+        if not isinstance(exs, list) or not exs:
+            return errs + [f"{w}: examples must be a non-empty list of {{loc, say}}"]
+        seen: set[str] = set()
+        for k, e in enumerate(exs, 1):
+            where = f"{w}: examples[{k}]"
+            if not isinstance(e, dict) or set(e) != CUR.EXAMPLE_KEYS:
+                errs.append(f"{where}: an example is {{loc, say}}")
+                continue
+            if e["loc"] not in notes:
+                errs.append(f"{where}: {e['loc']!r} is not one of the record's own examples ({record.get('id')})")
+            elif e["loc"] in seen:
+                errs.append(f"{where}: {e['loc']} is listed twice")
+            seen.add(e["loc"])
+            if not _plain_say(e["say"]):
+                errs.append(f"{where}: say must be one line of plain prose (no [[…]] markup, no Arabic script), at most "
+                            f"{CUR.MAX_SAY} characters")
+            elif e["loc"] in notes:
+                want = CUR.kinds_in(BC.about_of(notes[e["loc"]]))
+                if not want or not want <= CUR.kinds_in(e["say"]):
+                    errs.append(f"{where}: the line must name the kind of word the record's note names "
+                                f"({sorted(want) or 'none named'}); it says {sorted(CUR.kinds_in(e['say']))}")
     return errs
 
 
@@ -326,6 +419,14 @@ def speech_problems(authored: dict, lessons: dict[str, dict], library: dict, nam
     for s in authored.get("steps") or []:
         if isinstance(s.get("teach"), dict):
             errs += [f"authored/curriculum.json: {e}" for e in namer.teach_problems(s)]
+        # Check 5b's last half: lesson zero's slides are said as written, and name no Qur'anic word.
+        says = ([("lead.say", s["lead"].get("say"))] if isinstance(s.get("lead"), dict) else []) + [
+            (f"examples[{k}].say", e.get("say")) for k, e in enumerate(s.get("examples") or [], 1) if isinstance(e, dict)]
+        for key, text in says:
+            bad = namer.quranic_words(str(text or ""))
+            if bad:
+                errs.append(f"authored/curriculum.json: steps[{s['id']}] {key}: names the Qur'anic word(s) {bad} — the narrator "
+                            "never voices one; say “kata ini” over the card that shows it")
         _named, found = namer.step(s)
         for e in found:
             if s["id"] in spoken:

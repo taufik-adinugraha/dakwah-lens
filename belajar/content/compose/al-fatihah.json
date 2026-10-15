@@ -131,6 +131,72 @@
         },
         "label": "m + a panjang",
         "attested": []
+      },
+      "ba": {
+        "ar": "ب",
+        "translit": "b",
+        "src": {
+          "from": {
+            "word": "1:1:1",
+            "pieces": [
+              0,
+              1
+            ]
+          },
+          "ops": [
+            {
+              "remove": "vowel",
+              "piece": 0
+            }
+          ]
+        },
+        "label": "tanpa harakat",
+        "attested": []
+      },
+      "s-bare": {
+        "ar": "س",
+        "translit": "s",
+        "src": {
+          "from": "sin",
+          "ops": [
+            {
+              "remove": "sukun",
+              "piece": 0
+            }
+          ]
+        },
+        "label": "tanpa tanda",
+        "attested": []
+      },
+      "ra": {
+        "ar": "رَ",
+        "translit": "ra",
+        "src": {
+          "from": "rra",
+          "ops": [
+            {
+              "remove": "shaddah",
+              "piece": 0
+            }
+          ]
+        },
+        "label": "r + a",
+        "attested": []
+      },
+      "ma": {
+        "ar": "مَ",
+        "translit": "ma",
+        "src": {
+          "from": "maa",
+          "ops": [
+            {
+              "remove": "small_alif",
+              "piece": 0
+            }
+          ]
+        },
+        "label": "m + a",
+        "attested": []
       }
     },
     "frames": [
@@ -145,12 +211,32 @@
         "words": []
       },
       {
+        "stage": "bare",
+        "tiles": [
+          "ba"
+        ],
+        "marks": [
+          "fathah"
+        ],
+        "words": []
+      },
+      {
         "stage": "mark",
         "tiles": [
           "ba-a"
         ],
         "marks": [
           "fathah"
+        ],
+        "words": []
+      },
+      {
+        "stage": "bare",
+        "tiles": [
+          "ba"
+        ],
+        "marks": [
+          "kasrah"
         ],
         "words": []
       },
@@ -167,6 +253,16 @@
         ]
       },
       {
+        "stage": "bare",
+        "tiles": [
+          "ba"
+        ],
+        "marks": [
+          "dhammah"
+        ],
+        "words": []
+      },
+      {
         "stage": "mark",
         "tiles": [
           "ba-u"
@@ -177,19 +273,58 @@
         "words": []
       },
       {
+        "stage": "bare",
+        "tiles": [
+          "s-bare"
+        ],
+        "marks": [
+          "sukun"
+        ],
+        "words": []
+      },
+      {
         "stage": "mark",
         "tiles": [
-          "sin",
+          "sin"
+        ],
+        "marks": [
+          "sukun"
+        ],
+        "words": [
+          1
+        ]
+      },
+      {
+        "stage": "bare",
+        "tiles": [
+          "ra"
+        ],
+        "marks": [
+          "shaddah"
+        ],
+        "words": []
+      },
+      {
+        "stage": "mark",
+        "tiles": [
           "rra"
         ],
         "marks": [
-          "sukun",
           "shaddah"
         ],
         "words": [
-          1,
           3
         ]
+      },
+      {
+        "stage": "bare",
+        "tiles": [
+          "ma"
+        ],
+        "marks": [
+          "small_alif"
+        ],
+        "words": []
       },
       {
         "stage": "mark",
@@ -215,30 +350,50 @@
       },
       {
         "frame": 2,
-        "say": "Fathah adalah garis kecil miring di atas huruf; bunyinya a. Contohnya huruf ba' ini, dengan fathah."
+        "say": "Fathah adalah garis kecil miring di atas huruf; bunyinya a. Contohnya huruf ba' ini, tanpa harakat."
       },
       {
         "frame": 3,
-        "say": "Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Contohnya huruf ba' ini, dengan kasrah."
+        "say": "Jika dibaca fathah, maka terdengar ba."
       },
       {
         "frame": 4,
-        "say": "Dhammah bentuknya seperti huruf wawu kecil di atas huruf; bunyinya u. Contohnya huruf ba' ini, dengan dhammah."
+        "say": "Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Contohnya huruf ba' ini, tanpa harakat."
       },
       {
         "frame": 5,
-        "say": "Selain harakat, ada tanda lain. Tanda kecil di atas huruf sin ini disebut sukun: ia menandakan huruf mati, dibaca tanpa vokal."
+        "say": "Jika dibaca kasrah, maka terdengar bi."
       },
       {
-        "frame": 5,
+        "frame": 6,
+        "say": "Dhammah bentuknya seperti huruf wawu kecil di atas huruf; bunyinya u. Contohnya huruf ba' ini, tanpa harakat."
+      },
+      {
+        "frame": 7,
+        "say": "Jika dibaca dhammah, maka terdengar bu."
+      },
+      {
+        "frame": 8,
+        "say": "Selain harakat, ada tanda lain. Sukun adalah tanda huruf mati, yaitu huruf yang dibaca tanpa vokal. Contohnya huruf sin ini, tanpa tanda."
+      },
+      {
+        "frame": 9,
+        "say": "Jika diberi sukun, tanda kecil di atasnya ini, maka huruf sin dibaca mati, tanpa vokal."
+      },
+      {
+        "frame": 10,
+        "say": "Ada juga tanda untuk huruf yang dibaca dobel. Contohnya huruf ra' ini, dengan fathah."
+      },
+      {
+        "frame": 11,
         "say": "Tanda seperti huruf w kecil di atas huruf ra' menandakan huruf itu dibaca dobel."
       },
       {
-        "frame": 6,
-        "say": "Satu tanda lagi: alif kecil yang tegak di atas huruf mim ini."
+        "frame": 12,
+        "say": "Satu tanda lagi: alif kecil yang tegak. Contohnya huruf mim ini, dengan fathah; bunyinya a, pendek."
       },
       {
-        "frame": 6,
+        "frame": 13,
         "say": "Huruf kecil seperti ini menandai huruf yang tidak tertulis dalam tulisan asli Al-Qur'an, tetapi wajib dibaca; karena itu bunyi a pada huruf mim itu dibaca panjang."
       }
     ],
@@ -5331,7 +5486,7 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:9adbf70f770cf3b261620c3a550d895809583e961523835feceb5588c4051ea6",
+    "authored_compose": "authored/al-fatihah.compose.json sha256:369622cc7b2ebc2fe5635a6c042717839a31fed5b13a7116823e15a7531ecc7a",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }

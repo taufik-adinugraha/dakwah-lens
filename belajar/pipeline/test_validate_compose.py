@@ -141,8 +141,21 @@ MUTATIONS = [
         "spare", dict(x["words"]["1:1:2"]["forms"]["allahu"]))), "never shown nor used", False),
     ("a primer example from another ayah", setf(lambda x: x["primer"]["forms"]["ba-i"].__setitem__(
         "src", {"word": "1:2:1", "pieces": [3, 4]})), "not from ayah 1:1", False),
-    ("a primer mark frame whose example lacks the mark", setf(lambda x: x["primer"]["frames"][1].__setitem__(
+    # frames[2] is the fathah's mark frame since 2026-10-15 (frames[1] shows the bare ba first)
+    ("a primer mark frame whose example lacks the mark", setf(lambda x: x["primer"]["frames"][2].__setitem__(
         "tiles", ["ba-i"])), "no example tile carries the fathah", False),
+    # the bare letter first, then the same letter with the mark (operator 2026-10-15: "Contohnya huruf ba'" over
+    # ب, then "jika dibaca kasrah, maka terdengar bi" over بِ)
+    ("a bare primer letter that already carries its mark", setf(lambda x: x["primer"]["frames"][1].__setitem__(
+        "tiles", ["ba-a"])), "already carries the mark it shows before", False),
+    ("a bare primer frame not followed by its mark", setf(lambda x: x["primer"]["frames"][1].__setitem__(
+        "marks", ["kasrah"])), "followed by the mark frame of the same marks", False),
+    ("a bare primer frame as the last frame", setf(lambda x: x["primer"]["frames"][-1].update(
+        {"stage": "bare", "tiles": ["ma"]})), "followed by the mark frame of the same marks", False),
+    ("the mark frame after a bare one shows another letter", setf(lambda x: x["primer"]["frames"][7].__setitem__(
+        "tiles", ["ba"])), "is not the bare letter 'ba' with sukun put on", False),
+    ("a bare primer frame with no letter", setf(lambda x: x["primer"]["frames"][9].__setitem__(
+        "tiles", [])), "shows the letter before its mark", False),
     ("the primer's highlighted words not re-derived", setf(lambda x: x["primer"]["frames"][2].__setitem__(
         "words", [2])), "the words each primer frame shows", False),
     # 2026-10-13: the primer is played by lesson zero (`lesson: "0"`), the one lesson with no ayah
@@ -338,6 +351,16 @@ class PiecesAndEdits(unittest.TestCase):
         joined = r["al"]["ar"] + r["rahman"]["ar"]
         self.assertEqual(C.apply_op(C.apply_op(joined, {"remove": "sukun", "piece": 1}), {"add": "shaddah", "piece": 2}),
                          r["ar-rahman"]["ar"])
+
+    def test_without_marks(self):
+        p = CONTENTS[SLUG]["primer"]["forms"]
+        f = {n: x["ar"] for n, x in p.items()}
+        self.assertEqual(C.without_marks(f["ba-i"], ["kasrah"]), f["ba"])
+        self.assertEqual(C.without_marks(f["rra"], ["shaddah"]), f["ra"])
+        self.assertEqual(C.without_marks(f["maa"], ["small_alif"]), f["ma"])
+        self.assertEqual(C.without_marks(f["sin"], ["sukun"]), f["s-bare"])
+        self.assertIsNone(C.without_marks(f["ba"], ["kasrah"]))
+        self.assertIsNone(C.without_marks(f["ba-a"], ["kasrah"]))
 
     def test_chips(self):
         ch = unit(CONTENTS, "1:1:1")["frames"][2]["chips"]

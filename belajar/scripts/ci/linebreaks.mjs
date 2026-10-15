@@ -411,10 +411,10 @@ async function resumeLesson(page) {
  *  with animation frames (the harakat primer, a word's composition) each press moves ONE frame
  *  (src/lib/autoplay/machine.ts, operator 2026-10-15), so it is left after as many presses as it
  *  has frames left; anywhere else one press does. The walk measures steps, not frames. Bounded
- *  (Al-Fatihah's longest composition has 5 frames, the primer 6). */
+ *  (Al-Fatihah's longest composition has 5 frames, the primer 13 since its bare-then-marked examples). */
 async function leaveStep(page, n) {
   const from = page.url();
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 16; i++) {
     await press(page.locator('[data-autoplay="next"]'));
     for (let t = 0; t < 5; t++) {
       await page.waitForTimeout(100);

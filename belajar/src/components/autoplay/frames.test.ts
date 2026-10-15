@@ -196,41 +196,46 @@ function frameNavProblems(
 }
 
 describe("‹ Sebelumnya / Berikutnya › move frame by frame on a step with frames (operator 2026-10-15)", () => {
-  it("the operator's case: the Pengantar's harakat primer, on the kasrah frame", () => {
+  it("the operator's case: the Pengantar's harakat primer, on the kasrah frame (the letter with its mark)", () => {
     const seq = zeroSequence(FATIHAH, "id");
     const idx = seq.steps.findIndex((s) => s.id === "primer");
     const step = seq.steps[idx];
-    expect([idx, step.kind, seq.steps[idx + 1].id]).toEqual([1, "primer", "concept:kalimah-isim-fiil-huruf"]);
-    // overview, fathah, kasrah, dhammah, sukun + shaddah, small alif.
-    expect(step.frames).toBe(6);
+    // Since the bare-then-marked examples (2026-10-15) the kalimah record opens with its own lead
+    // slide; the primer's next step is that.
+    expect([idx, step.kind, seq.steps[idx + 1].id]).toEqual([1, "primer", "concept:kalimah-isim-fiil-huruf:lead"]);
+    // overview, then per mark its bare letter and its marked letter: fathah (2, 3), kasrah (4, 5),
+    // dhammah (6, 7), sukun (8, 9), shaddah (10, 11), small alif (12, 13).
+    const KASRAH = 5;
+    expect(step.frames).toBe(13);
     for (const pace of PACES) {
       const { entry } = statesOn(seq, idx, pace);
       const runs = frameRuns(step, entry.plan);
-      expect(runs.map((r) => r.frame), pace).toEqual([1, 2, 3, 4, 5, 6]);
+      expect(runs.map((r) => r.frame), pace).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
       const lineOf = (f: number) => step.cues.find((c) => c.frame === f)!.line;
-      // Played to the kasrah frame's first line by Berikutnya, twice, from the step's start.
-      let s = reduceAutoplay(seq, entry, { type: "next", jump: true });
-      s = reduceAutoplay(seq, s, { type: "next", jump: true });
-      expect([s.idx, frameNow(seq, s), stageFrame(seq, s)?.frame], pace).toEqual([idx, 3, 3]);
-      expect(viewAutoplay(seq, s).caption.line, pace).toBe(lineOf(3));
-      // Sebelumnya: the fathah frame from its first line — not the first page.
+      // Played to the kasrah frame's first line by Berikutnya, four times, from the step's start.
+      let s = entry;
+      for (let i = 1; i < KASRAH; i++) s = reduceAutoplay(seq, s, { type: "next", jump: true });
+      expect([s.idx, frameNow(seq, s), stageFrame(seq, s)?.frame], pace).toEqual([idx, KASRAH, KASRAH]);
+      expect(viewAutoplay(seq, s).caption.line, pace).toBe(lineOf(KASRAH));
+      // Sebelumnya: the frame before it from its first line (the bare letter of the same mark) —
+      // not the first page.
       const back = reduceAutoplay(seq, s, { type: "prev" });
-      expect([back.idx, frameNow(seq, back), viewAutoplay(seq, back).caption.line], pace).toEqual([idx, 2, lineOf(2)]);
-      // Berikutnya: the dhammah frame — not "Konsep baru: tiga jenis kalimah".
+      expect([back.idx, frameNow(seq, back), viewAutoplay(seq, back).caption.line], pace).toEqual([idx, KASRAH - 1, lineOf(KASRAH - 1)]);
+      // Berikutnya: the next frame (dhammah's bare letter) — not "Konsep baru: tiga jenis kalimah".
       const on = reduceAutoplay(seq, s, { type: "next", jump: true });
-      expect([on.idx, frameNow(seq, on), viewAutoplay(seq, on).caption.line], pace).toEqual([idx, 4, lineOf(4)]);
+      expect([on.idx, frameNow(seq, on), viewAutoplay(seq, on).caption.line], pace).toEqual([idx, KASRAH + 1, lineOf(KASRAH + 1)]);
       // The same paused: it lands paused on that frame, the stage showing it.
       const paused = reduceAutoplay(seq, s, { type: "pause" });
       const pBack = reduceAutoplay(seq, paused, { type: "prev" });
       const pOn = reduceAutoplay(seq, paused, { type: "next" });
-      expect([pBack.phase, pBack.idx, stageFrame(seq, pBack)?.frame, pOn.phase, pOn.idx, stageFrame(seq, pOn)?.frame], pace).toEqual(["paused", idx, 2, "paused", idx, 4]);
+      expect([pBack.phase, pBack.idx, stageFrame(seq, pBack)?.frame, pOn.phase, pOn.idx, stageFrame(seq, pOn)?.frame], pace).toEqual(["paused", idx, KASRAH - 1, "paused", idx, KASRAH + 1]);
       // From the overview Sebelumnya goes to the opening line; from the small alif Berikutnya to
-      // the three kinds of word.
+      // the slide that opens the three kinds of word.
       expect(reduceAutoplay(seq, entry, { type: "prev" }).idx, pace).toBe(idx - 1);
       let lastFrame = s;
-      for (let i = 0; i < 3; i++) lastFrame = reduceAutoplay(seq, lastFrame, { type: "next", jump: true });
-      expect(frameNow(seq, lastFrame), pace).toBe(6);
-      expect(seq.steps[reduceAutoplay(seq, lastFrame, { type: "next", jump: true }).idx].id, pace).toBe("concept:kalimah-isim-fiil-huruf");
+      for (let i = KASRAH; i < 13; i++) lastFrame = reduceAutoplay(seq, lastFrame, { type: "next", jump: true });
+      expect(frameNow(seq, lastFrame), pace).toBe(13);
+      expect(seq.steps[reduceAutoplay(seq, lastFrame, { type: "next", jump: true }).idx].id, pace).toBe("concept:kalimah-isim-fiil-huruf:lead");
       // The step counter stays "Langkah 2" throughout.
       for (const x of [s, back, on, pBack, pOn, lastFrame]) expect(viewAutoplay(seq, x).index, pace).toBe(idx);
     }

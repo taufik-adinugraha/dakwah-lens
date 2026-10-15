@@ -9,7 +9,11 @@
       "ba-u": {"ar": {"from": {"word": "1:1:1", "pieces": [0, 1]}, "ops": [{"mark": 0, "to": "dhammah"}]}, "translit": "bu", "label": "b + u"},
       "sin": {"ar": {"word": "1:1:1", "pieces": [1, 2]}, "translit": "s", "label": "s, mati"},
       "rra": {"ar": {"word": "1:1:3", "pieces": [2, 3]}, "translit": "rra", "label": "r + r + a"},
-      "maa": {"ar": {"word": "1:1:3", "pieces": [4, 5]}, "translit": "mā", "label": "m + a panjang"}
+      "maa": {"ar": {"word": "1:1:3", "pieces": [4, 5]}, "translit": "mā", "label": "m + a panjang"},
+      "ba": {"ar": {"from": {"word": "1:1:1", "pieces": [0, 1]}, "ops": [{"remove": "vowel", "piece": 0}]}, "translit": "b", "label": "tanpa harakat"},
+      "s-bare": {"ar": {"from": "sin", "ops": [{"remove": "sukun", "piece": 0}]}, "translit": "s", "label": "tanpa tanda"},
+      "ra": {"ar": {"from": "rra", "ops": [{"remove": "shaddah", "piece": 0}]}, "translit": "ra", "label": "r + a"},
+      "ma": {"ar": {"from": "maa", "ops": [{"remove": "small_alif", "piece": 0}]}, "translit": "ma", "label": "m + a"}
     },
     "frames": [
       {"stage": "overview", "marks": ["fathah", "kasrah", "dhammah"],
@@ -17,22 +21,30 @@
          "Pertama, harakat, yaitu tanda bunyi pada huruf Arab.",
          "Tiga harakat utama adalah fathah, kasrah, dan dhammah. Bunyinya a, i, dan u."
        ]},
+      {"stage": "bare", "marks": ["fathah"], "tiles": ["ba"],
+       "say": ["Fathah adalah garis kecil miring di atas huruf; bunyinya a. Contohnya huruf ba' ini, tanpa harakat."]},
       {"stage": "mark", "marks": ["fathah"], "tiles": ["ba-a"],
-       "say": ["Fathah adalah garis kecil miring di atas huruf; bunyinya a. Contohnya huruf ba' ini, dengan fathah."]},
+       "say": ["Jika dibaca fathah, maka terdengar ba."]},
+      {"stage": "bare", "marks": ["kasrah"], "tiles": ["ba"],
+       "say": ["Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Contohnya huruf ba' ini, tanpa harakat."]},
       {"stage": "mark", "marks": ["kasrah"], "tiles": ["ba-i"],
-       "say": ["Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Contohnya huruf ba' ini, dengan kasrah."]},
+       "say": ["Jika dibaca kasrah, maka terdengar bi."]},
+      {"stage": "bare", "marks": ["dhammah"], "tiles": ["ba"],
+       "say": ["Dhammah bentuknya seperti huruf wawu kecil di atas huruf; bunyinya u. Contohnya huruf ba' ini, tanpa harakat."]},
       {"stage": "mark", "marks": ["dhammah"], "tiles": ["ba-u"],
-       "say": ["Dhammah bentuknya seperti huruf wawu kecil di atas huruf; bunyinya u. Contohnya huruf ba' ini, dengan dhammah."]},
-      {"stage": "mark", "marks": ["sukun", "shaddah"], "tiles": ["sin", "rra"],
-       "say": [
-         "Selain harakat, ada tanda lain. Tanda kecil di atas huruf sin ini disebut sukun: ia menandakan huruf mati, dibaca tanpa vokal.",
-         "Tanda seperti huruf w kecil di atas huruf ra' menandakan huruf itu dibaca dobel."
-       ]},
+       "say": ["Jika dibaca dhammah, maka terdengar bu."]},
+      {"stage": "bare", "marks": ["sukun"], "tiles": ["s-bare"],
+       "say": ["Selain harakat, ada tanda lain. Sukun adalah tanda huruf mati, yaitu huruf yang dibaca tanpa vokal. Contohnya huruf sin ini, tanpa tanda."]},
+      {"stage": "mark", "marks": ["sukun"], "tiles": ["sin"],
+       "say": ["Jika diberi sukun, tanda kecil di atasnya ini, maka huruf sin dibaca mati, tanpa vokal."]},
+      {"stage": "bare", "marks": ["shaddah"], "tiles": ["ra"],
+       "say": ["Ada juga tanda untuk huruf yang dibaca dobel. Contohnya huruf ra' ini, dengan fathah."]},
+      {"stage": "mark", "marks": ["shaddah"], "tiles": ["rra"],
+       "say": ["Tanda seperti huruf w kecil di atas huruf ra' menandakan huruf itu dibaca dobel."]},
+      {"stage": "bare", "marks": ["small_alif"], "tiles": ["ma"],
+       "say": ["Satu tanda lagi: alif kecil yang tegak. Contohnya huruf mim ini, dengan fathah; bunyinya a, pendek."]},
       {"stage": "mark", "marks": ["small_alif"], "tiles": ["maa"],
-       "say": [
-         "Satu tanda lagi: alif kecil yang tegak di atas huruf mim ini.",
-         "Huruf kecil seperti ini menandai huruf yang tidak tertulis dalam tulisan asli Al-Qur'an, tetapi wajib dibaca; karena itu bunyi a pada huruf mim itu dibaca panjang."
-       ]}
+       "say": ["Huruf kecil seperti ini menandai huruf yang tidak tertulis dalam tulisan asli Al-Qur'an, tetapi wajib dibaca; karena itu bunyi a pada huruf mim itu dibaca panjang."]}
     ],
     "sources": [
       {"kitab": "Pedoman Transliterasi Arab-Latin, SKB Menteri Agama dan Menteri Pendidikan dan Kebudayaan No. 158/1987 dan 0543b/U/1987", "ref": "vokal tunggal: fathah = a, kasrah = i, dammah = u; maddah (vokal panjang): fathah dan alif = ā; syaddah (tasydid) dilambangkan dengan huruf ganda", "url": "https://adab.uin-suka.ac.id/media/dokumen_akademik/01_20210728_PEDOMAN-TRANSLITERASI.pdf"},

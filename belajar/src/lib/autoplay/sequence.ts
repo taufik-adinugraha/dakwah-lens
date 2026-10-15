@@ -121,8 +121,17 @@ export type SequenceInput = {
   voice?: ((ar: string) => ExampleClip | null) | null;
 };
 
-/** What the sequence reads of a taught item (curriculum.ts Taught; a Konsep record fits too). */
-export type TaughtInput = { id: string; title: string; summary: string; words?: readonly number[] };
+/** What the sequence reads of a taught item (curriculum.ts Taught; a Konsep record fits too).
+ *  Lesson zero only: `lead`, the slide said before its line, and `examples` with the narrator's
+ *  line about each (`say`; operator 2026-10-15). */
+export type TaughtInput = {
+  id: string;
+  title: string;
+  summary: string;
+  words?: readonly number[];
+  lead?: { say: string } | null;
+  examples?: readonly { loc: string; say?: string }[];
+};
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim();
 
@@ -404,6 +413,13 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
   for (const c of input.introduced) {
     const summary = latinSentences(c.summary);
     const title = stripArabic(c.title);
+    // Lesson zero: the slide before the line (operator 2026-10-15: "we need another page/slide to
+    // explain that kalimah in Arabic is different: kalimah in Arabic means word, while in bahasa it
+    // means sentence/kalimat"), a step of its own with its cards on the stage (LessonStage).
+    if (zero && c.lead) {
+      const id = `concept:${c.id}:lead` as const;
+      steps.push(step({ id, kind: "concept", cues: [cue(p(id), stripArabic(c.lead.say))], guides: [] }));
+    }
     steps.push(
       step({
         id: `concept:${c.id}`,
@@ -414,9 +430,21 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     );
     // "Each explanation should be followed by examples (visual + voice)": the concept's example
     // in this ayah (and at most one more), a step of its own so that "↺ Ulangi" plays it again.
-    const beats = beatsOf(`concept:${c.id}:ex`, () => -1);
+    // Lesson zero: the narrator explains each example (operator 2026-10-15: "ṣirāṭ, yang artinya
+    // jalan, adalah sebuah isim, yaitu nama benda"): line k, said over example k's card, then its
+    // recording — beat k after cue k.
+    const said = zero ? (c.examples ?? []).filter((e) => !!e.say) : [];
+    const exId = `concept:${c.id}:ex` as const;
+    const beats = said.length
+      ? beatsOf(exId, (e) => {
+          const k = said.findIndex((x) => x.loc === e.key);
+          return k === -1 ? null : k;
+        }).sort((a, b) => a.after - b.after)
+      : beatsOf(exId, () => -1);
     if (beats.length) {
-      steps.push(step({ id: `concept:${c.id}:ex`, kind: "example", cues: [], caption: beats[0].caption, guides: [], examples: beats }));
+      // The line of example n is "<id>:ex:<n>" (n: its place in the curriculum's list).
+      const cues = said.length ? beats.map((b) => cue(p(`${exId}:${b.after + 1}`), stripArabic(said[b.after]?.say ?? ""))) : [];
+      steps.push(step({ id: exId, kind: "example", cues, caption: beats[0].caption, guides: [], examples: said.length ? beats.map((b, k) => ({ ...b, after: k })) : beats }));
     }
   }
 

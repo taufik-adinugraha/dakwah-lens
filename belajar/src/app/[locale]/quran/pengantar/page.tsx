@@ -65,6 +65,9 @@ export default async function IntroPage({ params }: PageProps<"/[locale]/quran/p
     return record ? [record] : [];
   });
   const wordAr = Object.fromEntries(host.ayat.flatMap((x) => x.words.map((w) => [w.loc, w.ar])));
+  // The slide each step says before its line (kalimah is one word, the Indonesian kalimat is kalam:
+  // operator 2026-10-15), by its step id: the cards the stage shows while it is said.
+  const leads = Object.fromEntries(taughtInZero().flatMap((x) => (x.lead ? [[`concept:${x.id}:lead`, x.lead] as const] : [])));
   // The foundation page behind the primer: the basics record the curriculum's lesson zero
   // teaches (its step `basics`: the Harakat page), never a typed id.
   const basics = CURRICULUM.steps.flatMap((x) => (x.lesson === LESSON_ZERO && x.basics ? [x.basics] : []));
@@ -98,6 +101,7 @@ export default async function IntroPage({ params }: PageProps<"/[locale]/quran/p
             examples={examples}
             marks={composeFile?.marks ?? null}
             lessonMap={null}
+            leads={leads}
           />
         </div>
 

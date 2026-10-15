@@ -37,7 +37,7 @@ import en from "../../../messages/en.json";
 import id from "../../../messages/id.json";
 
 import { stageSequence, zeroExamplesFor, zeroSequence } from "./build";
-import { stageExample, stageFrame, stageMarks } from "./caption";
+import { captionCue, stageExample, stageFrame, stageMarks } from "./caption";
 import { narrationFor } from "./manifests";
 import { autoplayTexts } from "./texts";
 
@@ -106,13 +106,15 @@ describe("its sequence, as its page builds it", () => {
     expect(seq.steps.map((s) => [s.id, s.kind])).toEqual([
       ["intro", "intro"],
       ["primer", "primer"],
+      // the slide before the line (operator 2026-10-15: kalimah is one word, the Indonesian kalimat is kalam)
+      [`concept:${KALIMAH}:lead`, "concept"],
       [`concept:${KALIMAH}`, "concept"],
       [`concept:${KALIMAH}:ex`, "example"],
       ["next", "next"],
     ]);
     expect([seq.slug, seq.ayah, seq.lessonKey, seq.nav]).toEqual(["al-fatihah", 0, "al-fatihah/0", { kind: "ayah", slug: "al-fatihah", ayah: 1 }]);
     expect(seq.steps.some((s) => s.recite || s.exercise || s.word !== undefined)).toBe(false);
-    // The primer: its nine lines over its six frames, as the content plans them.
+    // The primer: its fourteen lines over its thirteen frames, as the content plans them.
     const primer = composeFor("al-fatihah")!.primer!;
     const p = seq.steps[1];
     expect([p.frames, p.cues.map((c) => c.frame), p.lines]).toEqual([primer.frames.length, primer.lines.map((l) => l.frame), primer.lines.map((_, k) => `al-fatihah:0:primer:${k + 1}`)]);
@@ -136,11 +138,41 @@ describe("its sequence, as its page builds it", () => {
     expect(sequenceProblems({ ...seq, ayah: 1 }, ctx).join("\n")).toContain("lesson zero's lines are the lines of “ayah 0”");
     const late = { ...seq, steps: [seq.steps[0], seq.steps[2], seq.steps[1], ...seq.steps.slice(3)] };
     expect(sequenceProblems(late, ctx).join("\n")).toContain("the harakat primer is not the step right after lesson zero's opening line");
+    // the slide: left out, or after its line
+    const noLead = { ...seq, steps: seq.steps.filter((s) => !s.id.endsWith(":lead")) };
+    expect(sequenceProblems(noLead, ctx).join("\n")).toContain("are not lesson zero's slides of its steps");
+    const leadAfter = { ...seq, steps: [seq.steps[0], seq.steps[1], seq.steps[3], seq.steps[2], ...seq.steps.slice(4)] };
+    expect(sequenceProblems(leadAfter, ctx).join("\n")).toContain("a slide is the step right before its concept's line");
+    // the example step: a line that is not its beat's, or a beat played before its line
+    const ex = seq.steps.findIndex((s) => s.kind === "example");
+    const swap = (fn: (s: (typeof seq.steps)[number]) => (typeof seq.steps)[number]) => ({ ...seq, steps: seq.steps.map((s, i) => (i === ex ? fn(s) : s)) });
+    const wrongLine = swap((s) => ({ ...s, cues: [s.cues[1], s.cues[0], ...s.cues.slice(2)], lines: [s.lines[1], s.lines[0], ...s.lines.slice(2)] }));
+    expect(sequenceProblems(wrongLine, ctx).join("\n")).toContain("an example step is its example beats (in lesson zero, each after its own line)");
+    const early = swap((s) => ({ ...s, examples: s.examples!.map((b) => ({ ...b, after: -1 })) }));
+    expect(sequenceProblems(early, ctx).join("\n")).toContain("an example step is its example beats (in lesson zero, each after its own line)");
   });
 
   it("its lines are the manifest's “ayah 0” lines, each once, and its two own sentences are the narration's", () => {
     const mine = Object.keys(LINES).filter((k) => k.startsWith("al-fatihah:0:"));
-    expect(mine).toEqual(["al-fatihah:0:intro", ...Array.from({ length: 9 }, (_, k) => `al-fatihah:0:primer:${k + 1}`), `al-fatihah:0:concept:${KALIMAH}`, "al-fatihah:0:next"]);
+    expect(mine).toEqual([
+      "al-fatihah:0:intro",
+      ...Array.from({ length: 14 }, (_, k) => `al-fatihah:0:primer:${k + 1}`),
+      `al-fatihah:0:concept:${KALIMAH}:lead`,
+      `al-fatihah:0:concept:${KALIMAH}`,
+      ...Array.from({ length: 5 }, (_, k) => `al-fatihah:0:concept:${KALIMAH}:ex:${k + 1}`),
+      "al-fatihah:0:next",
+    ]);
+    // The slide's line and each example's: the curriculum's text, as the narration says it (the
+    // terms with their Arabic on screen), each one file (≤ 400 characters, never split).
+    const kalimah = CURRICULUM.steps.find((s) => s.id === "kalimah")!;
+    expect(LINES[`al-fatihah:0:concept:${KALIMAH}:lead`].display).toBe(
+      "Sebelum mengenal tiga jenis kata, perhatikan satu istilah. Kalimah (كَلِمَة) dalam bahasa Arab tidak sama dengan kalimat dalam bahasa Indonesia. Dalam tata bahasa Arab, kalimah (كَلِمَة) berarti satu kata. Rangkaian kata yang bermakna utuh, yang dalam bahasa Indonesia disebut kalimat, dalam bahasa Arab disebut kalam (كَلَام).",
+    );
+    kalimah.examples!.forEach((e, k) => {
+      const line = LINES[`al-fatihah:0:concept:${KALIMAH}:ex:${k + 1}`];
+      expect((line.display ?? "").replace(/ \([^)]*[؀-ۿ][^)]*\)/gu, "")).toBe(e.say.replace(/fi'il/g, "fi’il"));
+      expect(line.text.length, e.loc).toBeLessThanOrEqual(400);
+    });
     for (const k of mine) expect(LINE_ID_RE.test(k), k).toBe(true);
     expect(sequenceLineIds(seq).filter((k) => !k.startsWith("shared:")).sort()).toEqual([...mine].sort());
     // They stand first in the manifest, before ayah 1's.
@@ -163,22 +195,27 @@ describe("its sequence, as its page builds it", () => {
   });
 });
 
-describe("its examples: the narrator's recordings of the record's first examples", () => {
-  it("the three kinds of word, one recording each (an isim, a fi'il, a huruf), each saying which it is: no word of an ayah here to recite", () => {
-    const record = LIBRARY.concepts.find((c) => c.id === KALIMAH)!;
+describe("its examples: the narrator's recordings of the examples the curriculum lists, each explained", () => {
+  it("three kinds of isim, a fi'il and a huruf, one recording each, each saying which it is and explained by the narrator: no word of an ayah here to recite", () => {
+    const kalimah = CURRICULUM.steps.find((s) => s.id === "kalimah")!;
     const derived = zeroExamplesFor(FATIHAH);
     expect(derived.gaps).toEqual([]);
     expect(derived.examples.map((e) => [e.id, e.step, e.key, e.word, e.clip])).toEqual(
-      record.examples.slice(0, MAX_EXAMPLES_ZERO).map((e, k) => [`concept:${KALIMAH}:${k + 1}`, `concept:${KALIMAH}:ex`, e.loc, null, LIBRARY.clips[e.loc]]),
+      kalimah.examples!.map((e, k) => [`concept:${KALIMAH}:${k + 1}`, `concept:${KALIMAH}:ex`, e.loc, null, LIBRARY.clips[e.loc]]),
     );
-    // Operator's audit of lesson zero (2026-10-14): an example of each kind, in the order the line
-    // names them — the huruf last, in bismi with its isim. They are the record's first three,
-    // each the first of its kind with a recording (the narrator's: any word of the record has one;
-    // until 2026-10-14 the imam's cut of wa lā lost its long ā before aḍ-ḍāllīna, which is why a
-    // huruf alone was not on offer).
-    expect(derived.examples.map((e) => e.key)).toEqual(["1:7:1", "1:5:2", "1:1:1"]);
-    // Each says what it is an example of (the stage has no ayah to show it).
-    expect(derived.examples.map((e) => e.about)).toEqual(["isim, nama benda.", "fi'il, kata kerja.", "bi- (huruf) + ism (isim), dua jenis kata dalam satu tulisan."]);
+    expect(derived.examples.length).toBeLessThanOrEqual(MAX_EXAMPLES_ZERO);
+    // Operator 2026-10-15: "better to provide OTHER examples of isim as nama sifat etc." — an isim
+    // that names a thing, one that names a quality, a pronoun; then a fi'il and a huruf (wa lā: two
+    // huruf in one written word). Until then the record's first three (ṣirāṭa, na‘budu, bismi).
+    expect(derived.examples.map((e) => e.key)).toEqual(["1:7:1", "1:6:3", "1:5:1", "1:5:2", "1:7:8"]);
+    // Each says what it is an example of (the stage has no ayah to show it): the card's label.
+    expect(derived.examples.map((e) => e.about)).toEqual([
+      "isim, nama benda.",
+      "isim, nama sifat.",
+      "isim, kata ganti.",
+      "fi'il, kata kerja.",
+      "dua huruf, wa yang artinya “dan”, dan lā yang artinya “bukan”.",
+    ]);
     // Each is the narrator's whole recording of the word's own bytes: no `last`, no stop, no run.
     for (const e of derived.examples) {
       expect(e.clip, e.id).toEqual(wordVoice(WORD_AR[e.key]));
@@ -186,15 +223,22 @@ describe("its examples: the narrator's recordings of the record's first examples
       expect([e.clip?.start, e.clip?.last, e.waqf, e.washal], e.id).toEqual([0, undefined, false, null]);
       expect(e.clip?.url, e.id).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\//);
     }
-    const beats = seq.steps.find((s) => s.kind === "example")!.examples!;
+    const step = seq.steps.find((s) => s.kind === "example")!;
+    const beats = step.examples!;
     expect(beats.map((b) => [b.id, b.key, b.word])).toEqual(derived.examples.map((e) => [e.id, e.key, null]));
     for (const b of beats) expect(b.caption).not.toMatch(/[؀-ۿ]/);
+    // The narrator explains each (operator 2026-10-15: "ṣirāṭ, yang artinya jalan, adalah sebuah isim,
+    // yaitu nama benda"): line k, then example k's recording — the card is on screen from its line on.
+    expect(step.cues.map((c) => c.line)).toEqual(beats.map((_, k) => `al-fatihah:0:concept:${KALIMAH}:ex:${k + 1}`));
+    expect(beats.map((b) => b.after)).toEqual(beats.map((_, k) => k));
     // Not "Contoh lain" (there is no first one here), and no place said in the caption: the card
     // cites it beside the word.
     expect(beats.map((b) => b.caption)).toEqual([
       "Contoh — ṣirāṭa: isim, nama benda.",
+      "Contoh — al-mustaqīma: isim, nama sifat.",
+      "Contoh — iyyāka: isim, kata ganti.",
       "Contoh — na‘budu: fi'il, kata kerja.",
-      "Contoh — bismi: bi- (huruf) + ism (isim), dua jenis kata dalam satu tulisan.",
+      "Contoh — wa lā: dua huruf, wa yang artinya “dan”, dan lā yang artinya “bukan”.",
     ]);
     expect(
       exampleProblems(seq, { ayah: { words: [], recitation: [] }, introduced: taughtInZero(), compose: composeFor("al-fatihah"), derived, voice: wordVoice, wordAt: () => undefined, texts: ID_TEXTS, zero: true })
@@ -204,7 +248,7 @@ describe("its examples: the narrator's recordings of the record's first examples
 });
 
 describe("the lesson left to run", () => {
-  it("plays every line once, shows the primer's frames in order, plays the three recordings, and ends with the way to ayah 1", () => {
+  it("plays every line once, shows the primer's frames in order, plays the five recordings each after its line, and ends with the way to ayah 1", () => {
     for (const pace of ["biasa", "pelan"] as const) {
       const states = run(seq, pace);
       const last = states[states.length - 1];
@@ -214,12 +258,25 @@ describe("the lesson left to run", () => {
       expect(visited, pace).toEqual(seq.steps.map((_, i) => i));
       // Nothing is marked on a mushaf line at any moment.
       for (const s of states) expect(stageMarks(seq, s), pace).toEqual({ marked: [], focus: null });
-      // The primer's frames, 1 … 6.
+      // The primer's frames, 1 … 13 (each mark first on its letter without it, then with it).
       const frames = states.filter((s) => s.idx === 1).map((s) => stageFrame(seq, s)?.frame).filter((f, i, all) => f !== undefined && all[i - 1] !== f);
-      expect(frames, pace).toEqual([1, 2, 3, 4, 5, 6]);
-      // The three examples, each a recording, in order.
+      expect(frames, pace).toEqual(Array.from({ length: 13 }, (_, k) => k + 1));
+      // The five examples, each a recording, in order.
       const clips = states.flatMap((s) => (s.activity?.kind === "recite" && s.activity.target === "clip" ? [stageExample(seq, s)?.beat.key] : []));
-      expect([...new Set(clips)], pace).toEqual(["1:7:1", "1:5:2", "1:1:1"]);
+      expect([...new Set(clips)], pace).toEqual(["1:7:1", "1:6:3", "1:5:1", "1:5:2", "1:7:8"]);
+      // While the narrator explains example k, its card is the one on screen (rule 21: "kata ini" is
+      // the word shown), and its recording follows the line.
+      const said = states.flatMap((s) => {
+        const line = captionCue(seq, s)?.line;
+        return line && /:ex:\d+$/.test(line) && s.activity?.kind !== "recite" ? [[line.split(":").pop(), stageExample(seq, s)?.beat.key]] : [];
+      });
+      expect([...new Map(said.map(([k, key]) => [k, key])).entries()], pace).toEqual([
+        ["1", "1:7:1"],
+        ["2", "1:6:3"],
+        ["3", "1:5:1"],
+        ["4", "1:5:2"],
+        ["5", "1:7:8"],
+      ]);
       // No recitation of an ayah or of a lesson word.
       expect(states.some((s) => s.activity?.kind === "recite" && s.activity.target !== "clip"), pace).toBe(false);
     }

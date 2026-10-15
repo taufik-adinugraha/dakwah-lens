@@ -14,6 +14,10 @@ export type HarakatLabels = {
   example: string;
   /** "dari {word}" is built here: "dari" */
   from: string;
+  /** Under the letter shown without its sign: "tanpa tanda ini" */
+  bare: string;
+  /** Before the letter with its sign: "dibaca {sign}:" — the sign's Latin name filled in here. */
+  read: (sign: string) => string;
   /** Who recites the examples and where the timings come from (Clip.credit). */
   credit: string;
   /** Under a voice button whose word ends its ayah (Clip.waqf_note). */
@@ -23,8 +27,11 @@ export type HarakatLabels = {
 /**
  * The harakat, one card each (operator 2026-10-10: "expect also people dont understand what is
  * kasrah, dhommah, and fathah"): the sign alone, large, on a dotted circle; its name in Latin and
- * Arabic (term table); its sound, place and shape; and an example letter as an ayah writes it —
- * بِ of بِسْمِ is b + i. The sign and the letter are both cut from Tanzil bytes
+ * Arabic (term table); its sound, place and shape; and an example letter, first WITHOUT the sign
+ * and then as an ayah writes it — ب → dibaca kasrah: بِ = b + i, of بِسْمِ (operator 2026-10-15:
+ * "Contohnya huruf ba'" over the bare letter, then "jika dibaca kasrah, maka terdengar bi", the
+ * order the Pengantar's harakat primer follows). The sign, the letter and the bare letter are all
+ * cut from Tanzil bytes
  * (src/lib/terms.ts prepareSigns); the word they come from is a lesson word (`words`) or, where
  * no lesson word lets the sign be heard, another ayah's (the sign's own `word`).
  *
@@ -87,12 +94,27 @@ export function HarakatChart({
                 <p className="text-base text-ink-muted">
                   {s.shape}, {s.place}
                 </p>
-                <p className="mt-1 flex flex-wrap items-baseline gap-x-2">
+                <p className="mt-1 flex flex-wrap items-baseline gap-x-2" data-sign-example>
                   <span className="text-sm text-ink-muted">{labels.example}:</span>
-                  <span lang="ar" dir="rtl" className="quran text-ar-lg text-ink">
-                    {s.letter}
+                  {/* The letter before the sign, then with it: ب → dibaca kasrah: بِ = b + i. */}
+                  <span className="inline-flex items-baseline gap-x-1.5 whitespace-nowrap">
+                    <span lang="ar" dir="rtl" data-sign-bare className="quran text-ar-lg text-ink">
+                      {s.bare}
+                    </span>
+                    <span className="text-sm text-ink-muted">{labels.bare}</span>
                   </span>
-                  <span className="text-base text-ink">= {s.reading}</span>
+                  <span className="inline-flex items-baseline gap-x-1.5 whitespace-nowrap">
+                    <span aria-hidden className="text-forest">
+                      →
+                    </span>
+                    <span className="text-sm text-ink-muted">{labels.read(s.term?.latin ?? "")}</span>
+                  </span>
+                  <span className="inline-flex items-baseline gap-x-2 whitespace-nowrap">
+                    <span lang="ar" dir="rtl" className="quran text-ar-lg text-ink">
+                      {s.letter}
+                    </span>
+                    <span className="text-base text-ink">= {s.reading}</span>
+                  </span>
                   {w ? (
                     <span className="text-sm text-ink-muted">
                       {labels.from}{" "}

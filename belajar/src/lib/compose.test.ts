@@ -92,7 +92,11 @@ describe("content/compose/al-fatihah.json", () => {
     ["the last frame is not the word", (f) => (f.words["1:1:1"].frames[4].tiles = ["bi+ismi"]), /the last frame shows/],
     ["a chip not cut from the forms", (f) => (f.words["1:1:1"].frames[2].chips = [{ from: "\u0645\u064F", to: "\u0645\u064E", marks: ["dhammah", "fathah"] }]), /chips differ/],
     ["a frame no line is said over", (f) => (f.words["1:1:2"].lines = f.words["1:1:2"].lines.filter((l) => l.frame !== 2)), /no line is said while it shows/],
-    ["a primer mark without an example carrying it", (f) => (f.primer!.frames[1].tiles = ["ba-i"]), /no example carries the fathah/],
+    // frames[2] is the fathah's mark frame since 2026-10-15: frames[1] shows the bare ba first
+    ["a primer mark without an example carrying it", (f) => (f.primer!.frames[2].tiles = ["ba-i"]), /no example carries the fathah/],
+    ["a bare primer letter that carries its mark", (f) => (f.primer!.frames[1].tiles = ["ba-a"]), /a bare letter already carries its mark/],
+    ["a bare primer frame not followed by its mark", (f) => (f.primer!.frames[1].marks = ["kasrah"]), /followed by the mark frame of the same marks/],
+    ["a mark frame after a bare one that shows another letter", (f) => (f.primer!.frames[7].tiles = ["ba"]), /not its bare letters with the mark put on/],
     ["an unknown form", (f) => (f.words["1:1:3"].frames[0].tiles = ["al", "nope"]), /not a form/],
     // A join may write one letter in its other shape (عَلَى + هُمْ → عَلَيْهُمْ: alif maqsura → ya'),
     // never another letter.
@@ -343,14 +347,16 @@ describe("the autoplay sequence with compositions", () => {
       if (f && frames.at(-1) !== f.frame) frames.push(f.frame);
       s = reduceAutoplay(seq, s, end(s.activity));
     }
-    // fathah, kasrah, dhammah, sukun + shaddah, then the small upright alif (review 2026-10-10)
-    expect(frames).toEqual([1, 2, 3, 4, 5, 6]);
+    // fathah, kasrah, dhammah, sukun, shaddah, the small upright alif (review 2026-10-10), each first on
+    // its letter without it, then with it (operator 2026-10-15)
+    expect(frames).toEqual(Array.from({ length: 13 }, (_, k) => k + 1));
+    expect(raw.primer!.frames.map((f) => f.stage)).toEqual(["overview", ...Array.from({ length: 6 }, () => ["bare", "mark"]).flat()]);
     // The frames still say which words of ayah 1 their letters come from (بِ of word 1, مَٰ of
     // word 3) — what the primer's lines lit on the mushaf line while ayah 1 played it — and the
     // lines of lesson zero light nothing: its stage has no mushaf line.
-    expect([raw.primer!.frames[2].words, raw.primer!.frames[5].words]).toEqual([[1], [3]]);
+    expect([raw.primer!.frames[4].words, raw.primer!.frames[12].words]).toEqual([[1], [3]]);
     expect(seq.steps[idx].cues.every((q) => q.highlight.length === 0 && q.focus === null)).toBe(true);
     expect(seq.steps[idx].cues.map((q) => q.line)).toEqual(raw.primer!.lines.map((_, k) => `al-fatihah:0:primer:${k + 1}`));
-    expect(raw.primer!.frames[5].marks).toEqual(["small_alif"]);
+    expect(raw.primer!.frames[12].marks).toEqual(["small_alif"]);
   });
 });

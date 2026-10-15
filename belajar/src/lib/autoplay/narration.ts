@@ -301,7 +301,9 @@ export function captionArabicProblems(text: string, dict: Pronunciation | null, 
   const out: string[] = [];
   if (!dict) return ["Arabic script in a caption, and no pronunciation dictionary to check it against"];
   const spokenOnly = dict.terms.filter((t) => ARABIC_SCRIPT.test(t.speak) && !t.display.includes(t.speak));
-  const shown = spokenOnly.filter((t) => text.includes(t.speak)).map((t) => `${t.speak} (shown as "${t.display}")`);
+  // As a whole Arabic word: the letter name لَام inside كَلَام (kalam, 2026-10-15) is not the letter.
+  const whole = (sp: string) => new RegExp(`(?<![\u0600-\u06FF])${sp.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\u0600-\u06FF])`, "u").test(text);
+  const shown = spokenOnly.filter((t) => whole(t.speak)).map((t) => `${t.speak} (shown as "${t.display}")`);
   if (shown.length) out.push(`a spoken-only form on screen: ${shown.join(", ")}`);
   const stray = [...new Set([...text.matchAll(ARABIC_WORD)].map((m) => m[0]))].filter((w) => !allowed.includes(w));
   if (stray.length) out.push(`Arabic from neither the dictionary nor the lesson: ${stray.join(" ")}`);

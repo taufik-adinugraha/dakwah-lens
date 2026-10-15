@@ -97,8 +97,19 @@ describe("the curriculum file is what the lessons give (the app's twin of pipeli
     ]);
     expect(ayahLessonId(1, 0)).toBe(LESSON_ZERO);
     expect(taughtInZero().map((x) => [x.id, x.whole, x.concept, x.words])).toEqual([["kalimah-isim-fiil-huruf", true, "kalimah-isim-fiil-huruf", []]]);
-    // The record's examples in the record's own order: none is "in this ayah".
-    expect(taughtInZero()[0].examples.map((e) => e.loc)).toEqual(LIBRARY.concepts.find((c) => c.id === "kalimah-isim-fiil-huruf")!.examples.map((e) => e.loc));
+    // The examples the step lists for lesson zero (operator 2026-10-15: the narrator explains each; three
+    // kinds of isim, a fi'il, a huruf), in that order, each one of the record's own, its note the
+    // record's and its line the step's; and the slide said before the line.
+    const kalimah = CURRICULUM.steps.find((s) => s.id === "kalimah")!;
+    const record = LIBRARY.concepts.find((c) => c.id === "kalimah-isim-fiil-huruf")!;
+    expect(taughtInZero()[0].examples).toEqual(
+      kalimah.examples!.map((e) => ({ loc: e.loc, note: record.examples.find((x) => x.loc === e.loc)!.note, say: e.say })),
+    );
+    expect(kalimah.examples!.map((e) => e.loc)).toEqual(["1:7:1", "1:6:3", "1:5:1", "1:5:2", "1:7:8"]);
+    expect(taughtInZero()[0].lead).toEqual(kalimah.lead);
+    expect(kalimah.lead!.cards.map((c) => [c.lang, c.term?.id ?? null, c.word ?? null])).toEqual([["ar", "kalimah", null], ["id", "kalam", "kalimat"]]);
+    // … and an ayah's lesson has neither (its examples are its own words).
+    expect(taughtAt(FATIHAH.ayat[0]).every((x) => x.lead === null && x.examples.every((e) => e.say === undefined))).toBe(true);
     // Without a primer played there it has no page, and must have no lists.
     expect(curriculumProblems(CURRICULUM, SURAHS, LIBRARY.concepts, false).join("\n")).toContain("lesson 0 has derived lists and no page");
     expect(deriveLesson(CURRICULUM, { ...FATIHAH.ayat[0], surah: 99 }, LIBRARY.concepts)).toBeNull();

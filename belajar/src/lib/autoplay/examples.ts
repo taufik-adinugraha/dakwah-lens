@@ -58,9 +58,11 @@ export type EndingMark = (typeof ENDING_MARKS)[number];
 /** At most this many example beats per rule (a concept, a bentuk dasar). */
 export const MAX_EXAMPLES_PER_RULE = 2;
 /** … and in lesson zero, where the one concept names three kinds of word (isim, fi'il, huruf):
- *  one example of each, in the record's order (operator's audit of lesson zero, 2026-10-14:
- *  "give general example with showing the words"). */
-export const MAX_EXAMPLES_ZERO = 3;
+ *  the examples the curriculum lists for it, each explained by the narrator — three kinds of isim
+ *  (nama benda, nama sifat, kata ganti), a fi'il and a huruf (operator 2026-10-15: "better to
+ *  provide OTHER examples of isim as nama sifat etc."; until then one of each kind, the record's
+ *  first three: the audit of 2026-10-14, "give general example with showing the words"). */
+export const MAX_EXAMPLES_ZERO = 5;
 
 /** Why a `base` frame of a composition has no voice of its own (pipeline/compose.py UNVOICED). */
 export const UNVOICED_REASON = {
@@ -103,7 +105,7 @@ export type ExampleSource = {
   zero?: boolean;
   /** What this ayah's lesson teaches as "Konsep baru" (curriculum.ts taughtIn): each with its
    *  examples, the one in this ayah first. */
-  introduced: readonly { id: string; examples: readonly { loc: string; note: string }[] }[];
+  introduced: readonly { id: string; examples: readonly { loc: string; note: string; say?: string }[] }[];
   /** content/compose/<slug>.json, or null (a surah without compositions). */
   compose: ComposeLike | null;
   /** The narrator's recording of a form's Arabic (src/lib/wordvoice.ts voiceFrom over

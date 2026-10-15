@@ -18,6 +18,14 @@
           "note": "ṣirāṭa: isim, nama benda."
         },
         {
+          "loc": "1:6:3",
+          "note": "al-mustaqīma: isim, nama sifat."
+        },
+        {
+          "loc": "1:5:1",
+          "note": "iyyāka: isim, kata ganti."
+        },
+        {
           "loc": "1:5:2",
           "note": "na‘budu: fi'il, kata kerja."
         },
@@ -67,7 +75,7 @@
         },
         {
           "kitab": "Quranic Arabic Corpus 0.4",
-          "ref": "(1:1:1) P + N; (1:5:2) V IMPF; (1:7:1) N; (1:7:8) CONJ + NEG",
+          "ref": "(1:1:1) P + N; (1:5:2) V IMPF; (1:7:1) N; (1:6:3) DET + ADJ; (1:5:1) PRON; (1:7:8) CONJ + NEG",
           "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=1"
         }
       ],
@@ -84,6 +92,8 @@
         "bridge": "Kira-kira: [[isim|isim]] mencakup kata benda dan kata sifat, [[fi'il|fiil]] adalah kata kerja, dan [[huruf|huruf]] mirip kata tugas (kata depan, kata sambung). Padanannya tidak persis: kata ganti seperti [[iyyāka|q:1:5:1]], misalnya, dihitung sebagai [[isim|isim]].",
         "notes": [
           "[[ṣirāṭa|q:1:7:1]]: [[isim|isim]], nama benda.",
+          "[[al-mustaqīma|q:1:6:3]]: [[isim|isim]], nama sifat.",
+          "[[iyyāka|q:1:5:1]]: [[isim|isim]], kata ganti.",
           "[[na‘budu|q:1:5:2]]: [[fi'il|fiil]], kata kerja.",
           "[[bismi|q:1:1:1]]: [[bi-|q:1:1:1/1]] ([[huruf|huruf]]) + [[ism|q:55:78:2]] ([[isim|isim]]), dua jenis kata dalam satu tulisan.",
           "[[wa lā|q:1:7:8]]: dua [[huruf|huruf]], [[wa|q:1:7:8/1]] yang artinya “dan”, dan [[lā|q:1:7:8/2]] yang artinya “bukan”.",
@@ -9076,7 +9086,7 @@
       "title": "Harakat: tanda bunyi a, i, u",
       "summary": "Bunyi pendek a, i, dan u dalam tulisan Arab ditandai dengan harakat, yaitu tanda kecil di atas atau di bawah huruf.",
       "explanation": [
-        "Tiga harakat yang paling sering muncul adalah fathah, kasrah, dan dhammah. Fathah berupa garis kecil miring di atas huruf, dibaca a. Kasrah adalah garis yang sama di bawah huruf, dibaca i. Dhammah bentuknya seperti huruf wawu kecil di atas huruf, dibaca u. Huruf pertama Al-Fatihah, ba' pada bismi, memakai kasrah: dibaca bi.",
+        "Tiga harakat yang paling sering muncul adalah fathah, kasrah, dan dhammah. Fathah berupa garis kecil miring di atas huruf, dibaca a. Kasrah adalah garis yang sama di bawah huruf, dibaca i. Dhammah bentuknya seperti huruf wawu kecil di atas huruf, dibaca u. Contohnya huruf ba' tanpa harakat: jika dibaca kasrah, maka terdengar bi, seperti huruf pertama Al-Fatihah, ba' pada bismi.",
         "Sukun berupa bulatan kecil di atas huruf: hurufnya mati, dibaca tanpa vokal, seperti sin sesudah ba' pada bismi. Mushaf yang dipakai di sini (Mushaf Madinah) menulis tanda sukun pada huruf mati yang dibaca jelas, dan sengaja tidak menuliskannya pada huruf mati yang tidak dibaca jelas. Menurut panitia Mushaf Madinah (dinukil ath-Thayyar), bila huruf sesudahnya bertasydid, huruf mati itu dilebur sepenuhnya ke dalamnya (idgham), seperti nun pada yakun sebelum lahū, yang terbaca yakul-lahū; bila tidak, ia dilebur sebagian atau dibaca samar (ikhfa'), seperti nun pada min sebelum syarri. Hurufnya tetap mati; cara membacanya diajarkan dalam ilmu tajwid.",
         "Tanwin adalah harakat yang ditulis dua kali di akhir kata, dibaca dengan tambahan bunyi n: dua fathah dibaca -an, dua kasrah -in, dan dua dhammah -un. Ibnu Hisyam menjelaskan, tanwin adalah nun mati tambahan di akhir kata yang diucapkan tetapi tidak ditulis sebagai huruf.",
         "Tasydid bentuknya seperti huruf w kecil di atas huruf: hurufnya dibaca dobel, seperti b pada rabbi. Harakat huruf itu tetap ditulis bersamanya, di atas atau di bawahnya.",
@@ -9209,7 +9219,7 @@
         "title": "[[Harakat|harakat]]: tanda bunyi a, i, u",
         "summary": "Bunyi pendek a, i, dan u dalam tulisan Arab ditandai dengan [[harakat|harakat]], yaitu tanda kecil di atas atau di bawah huruf.",
         "explanation": [
-          "Tiga [[harakat|harakat]] yang paling sering muncul adalah [[fathah|fathah]], [[kasrah|kasrah]], dan [[dhammah|dhammah]]. [[Fathah|fathah]] berupa garis kecil miring di atas huruf, dibaca a. [[Kasrah|kasrah]] adalah garis yang sama di bawah huruf, dibaca i. [[Dhammah|dhammah]] bentuknya seperti huruf wawu kecil di atas huruf, dibaca u. Huruf pertama Al-Fatihah, [[ba'|q:1:1:1#1]] pada [[bismi|q:1:1:1]], memakai [[kasrah|kasrah]]: dibaca bi.",
+          "Tiga [[harakat|harakat]] yang paling sering muncul adalah [[fathah|fathah]], [[kasrah|kasrah]], dan [[dhammah|dhammah]]. [[Fathah|fathah]] berupa garis kecil miring di atas huruf, dibaca a. [[Kasrah|kasrah]] adalah garis yang sama di bawah huruf, dibaca i. [[Dhammah|dhammah]] bentuknya seperti huruf wawu kecil di atas huruf, dibaca u. Contohnya huruf ba' tanpa [[harakat|harakat]]: jika dibaca [[kasrah|kasrah]], maka terdengar bi, seperti huruf pertama Al-Fatihah, [[ba'|q:1:1:1#1]] pada [[bismi|q:1:1:1]].",
           "[[Sukun|sukun]] berupa bulatan kecil di atas huruf: hurufnya mati, dibaca tanpa vokal, seperti [[sin|q:1:1:1#2]] sesudah [[ba'|q:1:1:1#1]] pada [[bismi|q:1:1:1]]. Mushaf yang dipakai di sini (Mushaf Madinah) menulis tanda [[sukun|sukun]] pada huruf mati yang dibaca jelas, dan sengaja tidak menuliskannya pada huruf mati yang tidak dibaca jelas. Menurut panitia Mushaf Madinah (dinukil ath-Thayyar), bila huruf sesudahnya [[bertasydid|tasydid]], huruf mati itu dilebur sepenuhnya ke dalamnya ([[idgham|idgham]]), seperti nun pada [[yakun|q:112:4:2]] sebelum [[lahū|q:112:4:3]], yang terbaca yakul-lahū; bila tidak, ia dilebur sebagian atau dibaca samar ([[ikhfa'|ikhfa]]), seperti nun pada [[min|q:113:2:1]] sebelum [[syarri|q:113:2:2]]. Hurufnya tetap mati; cara membacanya diajarkan dalam ilmu tajwid.",
           "[[Tanwin|tanwin]] adalah [[harakat|harakat]] yang ditulis dua kali di akhir kata, dibaca dengan tambahan bunyi n: dua [[fathah|fathah]] dibaca -an, dua [[kasrah|kasrah]] -in, dan dua [[dhammah|dhammah]] -un. Ibnu Hisyam menjelaskan, [[tanwin|tanwin]] adalah nun mati tambahan di akhir kata yang diucapkan tetapi tidak ditulis sebagai huruf.",
           "[[Tasydid|tasydid]] bentuknya seperti huruf w kecil di atas huruf: hurufnya dibaca dobel, seperti b pada [[rabbi|q:1:2:3]]. [[Harakat|harakat]] huruf itu tetap ditulis bersamanya, di atas atau di bawahnya.",
@@ -12846,10 +12856,10 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "tanzil": "uthmani-1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8 (only to byte-check «…» quotations in prose)",
     "authored_lexicon": "authored/library.lexicon.json sha256:245f33c8c033af498d332e1c1bc1dda3140c446bc0118f9ebe64512835805d51",
-    "authored_concepts": "authored/library.concepts.json sha256:d6f3dc4002265c4577e35eb9d261c85e7b64fe14bfe293e7e7cdc150f5eca663",
+    "authored_concepts": "authored/library.concepts.json sha256:e89f1d6f937d7968f9e5a23245ea2d75035acae9300d3062e671346e2b615b02",
     "authored_terms": "authored/library.terms.json sha256:9c823ee53ebebcb22cfc37cab4792fa5285cc7443bba7c6a7df3c520084e7e91",
     "shamela_istilah": "129 Shamela pages pinned by text sha256 (sources.json shamela_istilah)",
-    "authored_basics": "authored/library.basics.json sha256:f27842e6d58c634e35eb0566a8caa62ce5734d3768b8e25cd925ace881ef27d6",
+    "authored_basics": "authored/library.basics.json sha256:2dbea8c7915784645cc4e1079f53e029a59aa9264cd28ead2a360b60178c5162",
     "authored_parts": "authored/library.parts.json sha256:a0262681a8b8cd5c47b9e6ea29eb18670a73ea2a0120d7d74db98fd0dacecaf3",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (clips: Konsep example voices)",
     "pipeline": "belajar/pipeline/build_library.py (stdlib only, no LLM)"
