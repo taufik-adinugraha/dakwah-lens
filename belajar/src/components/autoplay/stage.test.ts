@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -239,6 +239,18 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
     // One recording per lesson ayah (until 2026-10-13 two: this counted past 40).
     expect(n).toBe(SURAHS.reduce((sum, s) => sum + s.ayat.length, 0));
     expect(n).toBeGreaterThan(20);
+    // Nothing the pages are built from names an EveryAyah file: not a clip, not a source citation
+    // (the compositions cite "EveryAyah 001001.mp3" and link our unaltered copy of it). CI
+    // 2026-10-15 (PR #116): those 13 citation links still pointed at everyayah.com, so every
+    // Al-Fatihah lesson page carried its ayah's EveryAyah address and surahs-smoke.mjs oneImam
+    // failed. Only the fact cards' popup builds that address, in the browser (src/lib/ayah.ts).
+    const contentFiles = (dir: string): string[] =>
+      readdirSync(join(BELAJAR, dir), { withFileTypes: true }).flatMap((e) =>
+        e.isDirectory() ? contentFiles(join(dir, e.name)) : e.name.endsWith(".json") ? [join(dir, e.name)] : [],
+      );
+    const files = contentFiles("content");
+    expect(files.length).toBeGreaterThan(10);
+    for (const f of files) expect(read(f).includes("everyayah.com/data/"), f).toBe(false);
   });
 
   it("is wired from the runner to the stage's one player, and a page view alone leaves the recording alone", () => {

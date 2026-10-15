@@ -539,7 +539,10 @@ jobs:
           # the same check in surahs-smoke.mjs (oneImam); the open "Pengaturan" panel as a browser
           # draws it in screenshots.mjs (assertNoReciterChoice).
           page="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/1)"
-          grep -qF "https://everyayah.com/data/Alafasy_128kbps/001001.mp3" <<<"$page" || { echo "✗ ayah 1 page does not carry the imam's recording of its ayah"; exit 1; }
+          # Since 2026-10-15 the recording is our unaltered copy of his EveryAyah file
+          # (pipeline/host_media.py), and the page carries no EveryAyah file address at all.
+          grep -qF "/belajar/media/narration/alafasy/001001.mp3" <<<"$page" || { echo "✗ ayah 1 page does not carry the imam's recording of its ayah (our copy)"; exit 1; }
+          if grep -qF "everyayah.com/data/" <<<"$page"; then echo "✗ ayah 1 page carries an EveryAyah file address (lesson recordings are our copies)"; exit 1; fi
           for path in /belajar/id/quran/al-fatihah/1 /belajar/en/quran/al-fatihah/1 /belajar/id/kredit /belajar/en/kredit; do
             html="$(curl -fsS "http://127.0.0.1:3300${path}")"
             if grep -qiE "husary|mu.?allim|<select|data-reciter" <<<"$html"; then echo "✗ ${path}: offers or names a second reciter (one imam, plan L21)"; exit 1; fi

@@ -1485,7 +1485,12 @@ latency (preload before page is opened)". So:
   all. 83 files, 4.90 MB (320 kbps stereo). The imam's ayat likewise: every ayah a lesson recites
   and every ayah a Konsep / composition example clip is cut from, 32 files, 3.95 MB, our copy of
   EveryAyah's `Alafasy_128kbps/<SSS><AAA>.mp3` (`build_surah.everyayah_url` now gives our URL;
-  the quran-align timings time the same file). The fact cards' ayah popup is NOT copied (any of
+  the quran-align timings time the same file). The compositions' source citations of his recording
+  ("Rekaman imam pelajaran: Mishary Alafasy, EveryAyah 001001.mp3", `authored/al-fatihah.compose.json`,
+  13 of them) link our copy too (absolute, https://dakwah-lens.id/belajar/media/narration/alafasy/…:
+  a SourceRef url is a full URL, schema.ts): no file of the content names an EveryAyah address, so a lesson page
+  carries none (`stage.test.ts`; CI `surahs-smoke.mjs` oneImam failed on those 13 links on PR #116).
+  The fact cards' ayah popup is NOT copied (any of
   1,629 ayat; a sample of 40 averaged 342 KB: about 556 MB, past the operator's 60 MB line) and
   still streams from EveryAyah — the only reason `everyayah.com` is still in the CSP's `media-src`
   (`audio.qurancdn.com` and `verses.quran.com` are no longer listed: nothing plays from them).
