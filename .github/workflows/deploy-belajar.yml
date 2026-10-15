@@ -54,6 +54,8 @@ jobs:
   # run of this workflow already passed this exact git tree. `pipeline`: the change touches an
   # input of the lesson content's Python checks (belajar/scripts/check-pipeline-inputs.mjs holds
   # this list to what the pipeline really reads); unknown (no diff available) counts as yes.
+  # `waris`: the Ilmu Waris browser job runs unless every changed file is lesson-engine or lesson
+  # content (LESSON_ONLY below) and none names waris; unknown counts as yes.
   gate:
     runs-on: ubuntu-latest
     permissions:
@@ -63,6 +65,7 @@ jobs:
     outputs:
       tested: ${{ steps.decide.outputs.tested }}
       pipeline: ${{ steps.decide.outputs.pipeline }}
+      waris: ${{ steps.decide.outputs.waris }}
     steps:
       - uses: actions/checkout@v4
 
@@ -73,11 +76,17 @@ jobs:
           EVENT: ${{ github.event_name }}
           PR: ${{ github.event.pull_request.number }}
           BEFORE: ${{ github.event.before }}
+          # Only changes wholly inside the lesson engine / lesson content may skip the `waris` job:
+          # Ilmu Waris shares nothing with them (its code is src/**/waris/**, plus routes, the
+          # Breadcrumb, the messages and the layout, none of which is listed here). Every other
+          # path, any path naming waris, an unknown diff, runs it.
+          LESSON_ONLY: '^belajar/(pipeline/|content/|src/(lib/autoplay/|components/(autoplay|library|surah|lesson|exercises)/|hooks/))'
           PIPELINE_INPUTS: '^(belajar/pipeline/|belajar/content/|belajar/src/(lib|content|components/exercises)/|belajar/scripts/check-|belajar/package|docs/waris-|\.github/workflows/deploy-belajar\.yml)'
         run: |
           set -euo pipefail
           tested=false
           pipeline=true
+          waris=true
           if [[ "$EVENT" == "push" && "$GITHUB_REF" == "refs/heads/main" ]]; then
             tree="$(git rev-parse 'HEAD^{tree}')"
             found="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=belajar-tested-$tree&per_page=10" \
@@ -94,10 +103,14 @@ jobs:
           if [[ -n "$files" ]]; then
             echo "changed files: $(wc -l <<<"$files")"
             if grep -Eq "$PIPELINE_INPUTS" <<<"$files"; then pipeline=true; else pipeline=false; fi
+            outside="$(grep -Ev "$LESSON_ONLY" <<<"$files" || true)"
+            named="$(grep -i waris <<<"$files" || true)"
+            if [[ -z "$outside" && -z "$named" ]]; then waris=false; fi
           fi
           echo "tested=$tested" >> "$GITHUB_OUTPUT"
           echo "pipeline=$pipeline" >> "$GITHUB_OUTPUT"
-          echo "tested=$tested pipeline=$pipeline"
+          echo "waris=$waris" >> "$GITHUB_OUTPUT"
+          echo "tested=$tested pipeline=$pipeline waris=$waris"
 
   verify:
     needs: gate
@@ -990,7 +1003,7 @@ jobs:
   # Ilmu Waris, on a container with the switch on.
   waris:
     needs: [gate, image]
-    if: ${{ !cancelled() && needs.gate.outputs.tested != 'true' && needs.image.result == 'success' }}
+    if: ${{ !cancelled() && needs.gate.outputs.tested != 'true' && needs.gate.outputs.waris == 'true' && needs.image.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -1093,7 +1106,7 @@ jobs:
   # the gate of the push to main that merges the same tree finds it and does not test it again.
   tested:
     needs: [gate, verify, pipeline, shots, linebreaks, surahs, waris]
-    if: ${{ !cancelled() && github.event_name == 'pull_request' && needs.verify.result == 'success' && (needs.pipeline.result == 'success' || (needs.pipeline.result == 'skipped' && needs.gate.outputs.pipeline != 'true')) && needs.shots.result == 'success' && needs.linebreaks.result == 'success' && needs.surahs.result == 'success' && needs.waris.result == 'success' }}
+    if: ${{ !cancelled() && github.event_name == 'pull_request' && needs.verify.result == 'success' && (needs.pipeline.result == 'success' || (needs.pipeline.result == 'skipped' && needs.gate.outputs.pipeline != 'true')) && needs.shots.result == 'success' && needs.linebreaks.result == 'success' && needs.surahs.result == 'success' && (needs.waris.result == 'success' || (needs.waris.result == 'skipped' && needs.gate.outputs.waris != 'true')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -1117,7 +1130,7 @@ jobs:
   # job, or for nothing when this exact tree was already tested on its pull request.
   ship:
     needs: [gate, verify, pipeline, image, shots, linebreaks, surahs, waris]
-    if: ${{ always() && !cancelled() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.image.result == 'success' && (needs.gate.outputs.tested == 'true' || (needs.verify.result == 'success' && (needs.pipeline.result == 'success' || (needs.pipeline.result == 'skipped' && needs.gate.outputs.pipeline != 'true')) && needs.shots.result == 'success' && needs.linebreaks.result == 'success' && needs.surahs.result == 'success' && needs.waris.result == 'success')) }}
+    if: ${{ always() && !cancelled() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.image.result == 'success' && (needs.gate.outputs.tested == 'true' || (needs.verify.result == 'success' && (needs.pipeline.result == 'success' || (needs.pipeline.result == 'skipped' && needs.gate.outputs.pipeline != 'true')) && needs.shots.result == 'success' && needs.linebreaks.result == 'success' && needs.surahs.result == 'success' && (needs.waris.result == 'success' || (needs.waris.result == 'skipped' && needs.gate.outputs.waris != 'true')))) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
