@@ -45,12 +45,29 @@ const SLOT: unknown = new Proxy(
   {},
   { get: (_t, key) => (key === Symbol.toPrimitive ? () => "{x}" : typeof key === "symbol" ? undefined : `{${key}}`) },
 );
+/** The lesson map's templates take LISTS of step names (2026-10-15: every counted step named), a
+ *  postponed one with its ayah: each argument is one named slot that is a list of itself, its
+ *  item a slot with a name and no ayah ("{later}" … "tetapi baru kita bahas nanti"). */
+const LIST_SLOT: unknown = new Proxy(
+  {},
+  {
+    get: (_t, key) => {
+      if (typeof key === "symbol") return undefined;
+      const name = `{${key}}`;
+      return Object.assign([{ name, ayah: null, toString: () => name }], { [Symbol.toPrimitive]: () => name });
+    },
+  },
+);
+/** The templates that take LIST_SLOT. */
+const LIST_TEMPLATE = /\.(?:lessonMap\.[a-z]+|learned|total)$/;
 /** Every caption a text set can give (src/components/autoplay/texts.ts: the captions of lines
  *  without a narration display text): its strings, and its templates with their slots named. */
 function captionTexts(value: unknown, where: string, out: [string, string][] = []): [string, string][] {
   if (typeof value === "string") out.push([where, value]);
-  else if (typeof value === "function") out.push([where, String((value as (...slots: unknown[]) => unknown)(SLOT, SLOT))]);
-  else if (value && typeof value === "object") for (const [k, v] of Object.entries(value)) captionTexts(v, `${where}.${k}`, out);
+  else if (typeof value === "function") {
+    const slot = LIST_TEMPLATE.test(where) ? LIST_SLOT : SLOT;
+    out.push([where, String((value as (...slots: unknown[]) => unknown)(slot, slot))]);
+  } else if (value && typeof value === "object") for (const [k, v] of Object.entries(value)) captionTexts(v, `${where}.${k}`, out);
   return out;
 }
 

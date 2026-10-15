@@ -10,8 +10,9 @@
  *     the CURRICULUM teaches in that ayah's lesson (content/curriculum.json,
  *     plan L26; the file itself held to the lessons); in a surah with a lesson
  *     map (content/map, plan L23, L26) the map's opening steps — one per group
- *     of its card — right after the imam's ayah and the "learned" step right
- *     before the recap, and none anywhere else;
+ *     of its card, each with its lines (MAP_LINES) — right after the imam's
+ *     ayah and the "learned" step right before the recap, and none anywhere
+ *     else;
  *     the harakat primer right after the imam's ayah (after the map steps,
  *     where there are any), and each word's recite → explain → compose (when it
  *     has a composition: one cue per line, frames in order); each word
@@ -69,7 +70,7 @@ import { availableExercises, questionNumbers, type QuizAyahLike } from "./exerci
 import { LINE_ID_RE, manifestParts, parseLineId, promptLineId, ZERO_AYAH } from "./ids";
 import { curriculumProblems, taughtIn, type CurriculumFile } from "./curriculum";
 import { hostsZero, zeroAyah } from "./zero";
-import { lessonMapInputOf, lessonMapProblems, mapOpening, type LessonMapFile, type LessonMapInput } from "./lessonMap";
+import { lessonMapInputOf, lessonMapProblems, MAP_GROUPS, MAP_LINES, mapOpening, type LessonMapFile, type LessonMapInput } from "./lessonMap";
 import {
   createAutoplayState,
   reduceAutoplay,
@@ -296,8 +297,13 @@ export function sequenceProblems(
     out.push(mapped ? "what the ayah taught is not said in the step right before the recap" : "a learned step in a lesson without a lesson map");
   }
   for (const s of [...maps, ...learned]) {
-    const named = s.kind === "learned" ? s.id === "learned" : /^map:(?:new|learnt|later)$/.test(s.id);
-    if (!named || s.cues.length !== 1 || s.cues[0].line !== `${seq.slug}:${seq.ayah}:${s.id}`) out.push(`${s.id}: a lesson map step is its one line`);
+    // Each step says its lines, one sentence each, in order (MAP_LINES; since 2026-10-15 every
+    // counted step is named, so the learnt, later and closing steps have two lines).
+    const group = s.kind === "learned" ? (s.id === "learned" ? "learned" : null) : (MAP_GROUPS.find((g) => s.id === `map:${g}`) ?? null);
+    const want = group ? MAP_LINES[group].map((part) => `${seq.slug}:${seq.ayah}:${part}`) : [];
+    if (!group || JSON.stringify(s.cues.map((c) => c.line)) !== JSON.stringify(want)) {
+      out.push(`${s.id}: a lesson map step is its lines${group ? ` (${want.join(", ")})` : ""}, in order`);
+    }
     if (s.recite || s.examples?.length || s.cues.some((c) => c.highlight.length > 0 || c.focus !== null)) {
       out.push(`${s.id}: a lesson map step recites nothing and marks no word (its card is what the stage shows)`);
     }

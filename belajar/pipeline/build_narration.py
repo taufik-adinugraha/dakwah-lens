@@ -60,12 +60,15 @@ said in the ayah of its first example (5, 3, 1, 1, 8, 2, 6 lines on Al-Fatihah; 
 
 The lesson map (operator 2026-10-13, plan L23 and L26; lessonmap.py, content/map/<slug>.json,
 written by build_map.py before this runs): in a surah that has one, every ayah opens, right after
-"recite", with one line per group of its card — "map:new" (what is new), "map:learnt" (how much
-has been learnt so far, and what of it comes up again here; only once something was learnt),
-"map:later" (what is here and taught later, and how many next-level topics; only when there is
-any) — and gets "learned" right before "recap": what was new, and the running total. Built from
-the map's names (map_new / map_learnt / map_later / map_closing below), read back by
-validate_narration.map_problems. A surah without a map file gets none of them.
+"recite", with one step per group of its card, one sentence per line — "map:new" (what is new);
+"map:learnt" (every step learnt so far, by name) and "map:again" (which of them come up again
+here, by name), only once something was learnt; "map:later" (what is here and taught later, by
+name, and how many next-level topics) and "map:focus" (the reassurance: that need not be learnt
+now, focus on the new steps), only when there is any — and gets "learned" (what was new) and
+"map:total" (the running total, every step by name) right before "recap". Since 2026-10-15 every
+counted group is named whole (operator: "always re-mention what they are"). Built from the map's
+names (map_new / map_learnt / map_again / map_later / map_focus / map_closing / map_total below),
+read back by validate_narration.map_problems. A surah without a map file gets none of them.
 
 No term before its lesson (decision 7; curriculum.too_early): the dictionary terms a line's prose
 uses (Lexicon.latin_matches, before the line is split; each mapped to its library.terms.json id
@@ -780,14 +783,16 @@ def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.T
 # already done in previous ayat, we say we repeat what we've learnt before" — and, with the basic
 # curriculum: "so the knowledge is accummulating and repeated"; "but separate new vs already knows
 # concept, this is what new, this is what we've learnt so far". Per ayah of a surah with
-# content/map/<slug>.json (lessonmap.py): after the imam's recitation one line per group of the
-# card — "map:new", "map:learnt", "map:later" — and "learned" before the recap. Plain sentences for
-# adults and seniors: every NEW step is named (at most three, the curriculum's limit); of the
-# learnt steps that come up again and of the postponed ones the narrator names all up to MAP_ALL,
-# else the first MAP_NAMED_MORE ("di antaranya …"); a next-level topic is counted, never named.
-# The card on the stage lists every one. validate_narration.map_problems reads the lines back.
-MAP_ALL = V.MAP_ALL
-MAP_NAMED_MORE = V.MAP_NAMED_MORE
+# content/map/<slug>.json (lessonmap.py): after the imam's recitation one step per group of the
+# card — "map:new"; "map:learnt" + "map:again"; "map:later" + "map:focus" — and "learned" +
+# "map:total" before the recap. Plain sentences for adults and seniors, one sentence per line.
+# Operator 2026-10-15: a sentence that COUNTS steps NAMES every one ("Sebelum ayat ini, kita
+# sudah mempelajari dua hal, yaitu XXX dan YYY. Yang kita temui lagi di ayat ini adalah YYY.";
+# "Dengan itu, sudah empat hal yang kita pelajari, yaitu A, B, C, D" — "always re-mention what
+# they are"), in teaching order, the order the card lists them in; a next-level topic is still
+# counted, never named (curriculum decision 6). And what the ayah puts aside is followed by a
+# reassurance: "Sekarang Anda tidak perlu menghafal ketiganya, mari kita fokus pada pelajaran XXX
+# dan YYY terlebih dahulu." validate_narration.map_problems reads the lines back.
 
 
 def _names(names: list[str]) -> str:
@@ -799,37 +804,44 @@ def _names(names: list[str]) -> str:
     return ", ".join(names[:-1]) + (", serta " if len(names) > 1 else "") + names[-1]
 
 
+def _said(steps: dict, ids: list[str]) -> str:
+    """The step names of `ids` as a list inside a sentence (their prose names, lower case)."""
+    return _names([V._low(steps[sid]["latin"]) for sid in ids])
+
+
 def map_new(entry: dict, steps: dict) -> str:
     """What is new in this ayah: every step its lesson teaches, by name."""
-    low = lambda sid: V._low(steps[sid]["latin"])  # noqa: E731
     new = entry["new"]
     if not new:
-        return "Di ayat ini tidak ada hal baru."
-    return f"Di ayat ini ada {num_id(len(new))} hal baru: {_names([low(c) for c in new])}."
+        return V._MAP_NONE
+    return f"Di ayat ini ada {num_id(len(new))} hal baru: {_said(steps, new)}."
 
 
-def map_learnt(entry: dict, steps: dict, always: set[str] | frozenset[str] = frozenset()) -> str | None:
-    """How much has been learnt so far, and which of it comes up again in this ayah — the most
-    recently taught first (validate_narration.named_again; `always`: the steps that occur in every
-    ayah, named only when nothing else is met again); None when nothing was learnt before (the
-    first lesson of all)."""
-    low = lambda sid: V._low(steps[sid]["latin"])  # noqa: E731
-    learnt = entry["learnt"]
+def map_learnt(entry: dict, steps: dict) -> str | None:
+    """Every step learnt before this ayah: how many, and each by name, in teaching order; None
+    when nothing was (the first lesson of all)."""
+    learnt = [x["id"] for x in entry["learnt"]]
     if not learnt:
         return None
+    return f"Sebelum ayat ini, kita sudah mempelajari {num_id(len(learnt))} hal, yaitu {_said(steps, learnt)}."
+
+
+def map_again(entry: dict, steps: dict) -> str | None:
+    """Which of the learnt steps come up again in this ayah, every one by name, in teaching order
+    (the order of the card's "Kita temui lagi" rows) — or, plainly, none; None when nothing was
+    learnt before."""
+    if not entry["learnt"]:
+        return None
     again = LM.here_ids(entry)
-    lead = f"Sebelum ayat ini, kita sudah mempelajari {num_id(len(learnt))} hal."
     if not again:
-        return f"{lead} Tidak ada yang kita temui lagi di ayat ini."
-    count = f"Yang kita temui lagi di ayat ini ada {num_id(len(again))}"
-    named, every = V.named_again(entry, always)
-    return f"{lead} {count}{':' if every else ', di antaranya'} {_names([low(c) for c in named])}."
+        return V._MAP_NOT_AGAIN
+    return f"Yang kita temui lagi di ayat ini adalah {_said(steps, again)}."
 
 
 def map_later(entry: dict, steps: dict, surah: int) -> str | None:
-    """What is in this ayah and taught later, each with the ayah that teaches it — then, in ONE
-    sentence, how many next-level topics the ayah has (never their names). None when the ayah has
-    neither."""
+    """What is in this ayah and taught later, every one by name, with where it is taught — then,
+    in ONE sentence, how many next-level topics the ayah has (never their names). None when the
+    ayah has neither."""
     low = lambda sid: V._low(steps[sid]["latin"])  # noqa: E731
     later, lanjut = entry["later"], entry["lanjut"]
     out = []
@@ -837,12 +849,10 @@ def map_later(entry: dict, steps: dict, surah: int) -> str | None:
         lead = f"Ada {num_id(len(later))} hal lagi di ayat ini"
         # Where each will be taught: an ayah of this surah, which the line names; None: elsewhere.
         here = [LM.taught_ayah(steps[c], surah) for c in later]
-        if len(later) > MAP_ALL:
-            out.append(f"{lead}, di antaranya {_names([low(c) for c in later[:MAP_NAMED_MORE]])}, tetapi baru kita bahas nanti.")
-        elif None in here:
-            out.append(f"{lead}, yaitu {_names([low(c) for c in later])}, tetapi baru kita bahas nanti.")
+        if None in here:
+            out.append(f"{lead}, yaitu {_said(steps, later)}, tetapi baru kita bahas nanti.")
         elif len(set(here)) == 1:
-            out.append(f"{lead}, yaitu {_names([low(c) for c in later])}, tetapi baru kita bahas di ayat {ordinal(here[0])}.")
+            out.append(f"{lead}, yaitu {_said(steps, later)}, tetapi baru kita bahas di ayat {ordinal(here[0])}.")
         else:
             out.append(f"{lead}, tetapi baru kita bahas nanti: "
                        f"{_names([f'{low(c)} di ayat {ordinal(a)}' for c, a in zip(later, here)])}.")
@@ -852,17 +862,47 @@ def map_later(entry: dict, steps: dict, surah: int) -> str | None:
     return " ".join(out) or None
 
 
+def map_focus(entry: dict, steps: dict) -> str | None:
+    """The reassurance after map:later (operator 2026-10-15): what the ayah puts aside need not be
+    learnt by heart now — the postponed steps by their count's pronoun ("ketiganya"), the
+    next-level topics alone "memikirkan" (not to worry about), both: the two clauses — then what
+    to focus on: the ayah's new steps by name, or with none the learnt ones it repeats. None when
+    the ayah puts nothing aside."""
+    new, later, lanjut = entry["new"], entry["later"], entry["lanjut"]
+    if not later and not lanjut:
+        return None
+    if later:
+        keep = f"Sekarang Anda tidak perlu menghafal {V.focus_pronoun(len(later))}{V.MAP_ALSO if lanjut else ''}."
+    else:
+        keep = f"Sekarang Anda tidak perlu memikirkan {V.focus_pronoun(len(lanjut))}."
+    again = LM.here_ids(entry)
+    if new:
+        focus = f"Mari kita fokus pada pelajaran {_said(steps, new)} terlebih dahulu."
+    elif again:
+        focus = f"Mari kita fokus mengulang {_said(steps, again)} terlebih dahulu."
+    else:
+        focus = V.MAP_FOCUS_AYAH
+    return f"{keep} {focus}"
+
+
 def map_closing(entry: dict, steps: dict) -> str:
-    """What this ayah taught, by name, and the running total — or, with nothing new, how many
-    learnt steps it repeated."""
-    low = lambda sid: V._low(steps[sid]["latin"])  # noqa: E731
+    """What this ayah taught, by name — or, with nothing new, which learnt steps it repeated."""
     new = entry["new"]
     if not new:
         again = LM.here_ids(entry)
-        return ("Di ayat ini tidak ada hal baru; kita mengulang "
-                f"{num_id(len(again))} hal yang sudah kita pelajari." if again else "Di ayat ini tidak ada hal baru.")
-    return (f"Di ayat ini kita mempelajari {num_id(len(new))} hal baru: {_names([low(c) for c in new])}. "
-            f"Dengan itu, sudah {num_id(LM.learnt_total(entry))} hal yang kita pelajari.")
+        return (f"Di ayat ini tidak ada hal baru; kita mengulang {num_id(len(again))} hal yang sudah kita pelajari, "
+                f"yaitu {_said(steps, again)}." if again else V._MAP_NONE)
+    return f"Di ayat ini kita mempelajari {num_id(len(new))} hal baru: {_said(steps, new)}."
+
+
+def map_total(entry: dict, steps: dict) -> str:
+    """The running total after this ayah, and every step learnt by then by name, in teaching order
+    (operator 2026-10-15: "Dengan itu, sudah empat hal yang kita pelajari, yaitu A, B, C, D")."""
+    total = [x["id"] for x in entry["learnt"]] + list(entry["new"])
+    if not total:
+        raise ValueError("a lesson map entry with nothing learnt and nothing new has no running total")
+    lead = V.MAP_TOTAL_LEAD if entry["new"] else V.MAP_TOTAL_LEAD_NONE
+    return f"{lead}, sudah {num_id(len(total))} hal yang kita pelajari, yaitu {_said(steps, total)}."
 
 
 Line = tuple[str, str, dict | None, str]  # id, prose, ayah (None for shared lines), part
@@ -920,11 +960,12 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
                      f"dari {num_id(n_words)} kata, dan kita akan mempelajarinya satu per satu.")
         add("recite", f"Sekarang dengarkan imam membacakan ayat {ordinal(A)}.")
         # The lesson map (plan L23, L26), for a surah that has one: what this ayah brings, before its
-        # words — one line per group of its card.
+        # words — a step per group of its card, one sentence per line (validate_narration.map_opening_parts).
         mapped = LM.ayah_entry(lessonmap, A)
         if mapped is not None:
-            said = {"map:new": map_new(mapped, lessonmap["steps"]), "map:learnt": map_learnt(mapped, lessonmap["steps"], CUR.always_steps(curriculum or {})),
-                    "map:later": map_later(mapped, lessonmap["steps"], S)}
+            st = lessonmap["steps"]
+            said = {"map:new": map_new(mapped, st), "map:learnt": map_learnt(mapped, st), "map:again": map_again(mapped, st),
+                    "map:later": map_later(mapped, st, S), "map:focus": map_focus(mapped, st)}
             for part in V.map_opening_parts(mapped):
                 add(part, said[part])
         primer = V.primer_of(compose, A)
@@ -975,7 +1016,9 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
         exercise_lines(False)
         # … and what it taught, before the imam recites the ayah once more.
         if mapped is not None:
-            add("learned", map_closing(mapped, lessonmap["steps"]))
+            closing = {"learned": map_closing(mapped, lessonmap["steps"]), "map:total": map_total(mapped, lessonmap["steps"])}
+            for part in V.map_closing_parts(mapped):
+                add(part, closing[part])
         add("recap", f"Dengarkan sekali lagi seluruh ayat {ordinal(A)} dibacakan imam.")
         if A == last:
             add("done", f"Pelajaran ayat {ordinal(A)} selesai. Ini ayat terakhir Surah {name}.")
@@ -1047,7 +1090,7 @@ def build_all(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = N
             parts = split_line(marked, measure=lambda x: len(sp.spoken(x)))
             if part in V.MAP_PARTS and len(parts) > 1:
                 errs.append(f"{lid}: a map / learned line is one line, and this one is longer than {V.MAX_LINE} spoken "
-                            "characters (name fewer steps)")
+                            "characters (every step is named: a list this long needs its own design, see README \"Peta pelajaran\")")
             if V.STRUCTURE_ITEM.fullmatch(part) and len(parts) > 1:
                 errs.append(f"{lid}: a structure item is one line, and this one is longer than {V.MAX_LINE} spoken "
                             "characters (shorten its `say` or make it two items; it is not split here)")

@@ -27,18 +27,22 @@
  * Narration lines are keyed by the step-id contract shared by every part of
  * the autoplay build (and by pipeline/build_narration.py + validate_narration.py):
  *   "${slug}:${ayah}:${part}"   part ∈ intro | recite | map:new | map:learnt |
- *                                      map:later | primer:${k} | w${n} |
+ *                                      map:again | map:later | map:focus |
+ *                                      primer:${k} | w${n} |
  *                                      w${n}:compose:${k} | structure | structure:${k} |
  *                                      concept:${id} |
  *                                      ex:${exerciseKey}:intro |
  *                                      ex:${exerciseKey}:${n}:why |
- *                                      learned | recap | next | done
+ *                                      learned | map:total | recap | next | done
  *   (map:* / learned: the lesson map's lines, only in a surah that has one —
- *    what this ayah brings, said right after the imam's recitation, one line
- *    per group of its card (what is new; what has been learnt so far and comes
- *    up again; what is taught later and how many next-level topics), and what
- *    it taught, said right before the recap; operator 2026-10-13, plan L23 and
- *    L26, content/map/${slug}.json, lessonMap.ts;
+ *    what this ayah brings, said right after the imam's recitation, one step
+ *    per group of its card and one sentence per line (what is new; everything
+ *    learnt so far, then what of it comes up again; what is taught later and
+ *    how many next-level topics, then the reassurance that none of it needs
+ *    learning now), and what it taught, then the running total, said right
+ *    before the recap; every counted step named since 2026-10-15; operator
+ *    2026-10-13, plan L23 and L26, content/map/${slug}.json, lessonMap.ts
+ *    MAP_LINES;
  *    concept:${id}: a "Konsep baru" line of a step the curriculum teaches in
  *    this ayah's lesson — a Konsep record's id (a whole record) or the id of a
  *    step with its own text; content/curriculum.json, curriculum.ts;
@@ -78,6 +82,7 @@
  * so `npx tsx scripts/autoplay-check.ts` can run it without node_modules.
  */
 import type { Pace } from "../lessonSteps";
+import type { MapLaterName } from "./lessonMap";
 
 export type { Pace };
 
@@ -318,8 +323,8 @@ export type StepKind =
   | "recite_ayah"
   /** The lesson map's opening (plan L23, L26): what this ayah brings, ONE step per group of its
    *  card, in step with the narrator — "map:new" (what is new), "map:learnt" (what has been learnt
-   *  so far, and what of it comes up again here), "map:later" (what is taught later, and the
-   *  next-level topics). */
+   *  so far, then what of it comes up again here: lines map:learnt, map:again), "map:later" (what
+   *  is taught later, and the next-level topics, then the reassurance: map:later, map:focus). */
   | "map"
   /** The harakat primer (fathah a, kasrah i, dhammah u, …) opening an ayah. */
   | "primer"
@@ -335,7 +340,8 @@ export type StepKind =
   /** The example(s) of the concept just introduced: no narration line, the word's recording only. */
   | "example"
   | "exercise"
-  /** The lesson map's closing (plan L23, L26): what this ayah taught, and the running total. */
+  /** The lesson map's closing (plan L23, L26): what this ayah taught, and the running total
+   *  (lines learned, map:total). */
   | "learned"
   | "recap"
   | "next"
@@ -450,17 +456,28 @@ export type AutoplayTexts = {
   /** Per exercise: its introduction and the prompt for each control. */
   exercise: Record<ExerciseKey, { intro: string } & Partial<Record<GuidePart, string>>>;
   /** The lesson map's opening without a narration display text (plan L23, L26), one caption per
-   *  group: how many steps are new; how many have been learnt so far and how many of them come
-   *  up again here; how many are taught later and how many belong to the next level. The card
-   *  beside it names them, so the caption does not. */
+   *  LINE (lessonMap.ts MAP_LINES), in the narration's own templates (pipeline/build_narration.py
+   *  map_new … map_total): operator 2026-10-15, a sentence that counts steps names EVERY one, in
+   *  teaching order — the names as the captions say them (lessonMap.ts mapSaidName: Latin, no
+   *  Arabic script). `new`: the steps new here; `learnt`: every step learnt so far; `again`:
+   *  those of them that come up again here (none: [] — "none comes up again"); `later`: the steps
+   *  here and taught later, with this surah's ayah that teaches each (mapLaterWhere), and how many
+   *  next-level topics there are (counted, never named); `focus`: the reassurance after it — how
+   *  many were put aside of each kind, and the ayah's new steps (or, with none, what it repeats)
+   *  to focus on. */
   lessonMap: {
-    new: (a: { new: number }) => string;
-    learnt: (a: { learnt: number; here: number }) => string;
-    later: (a: { later: number; lanjut: number }) => string;
+    new: (a: { new: readonly string[] }) => string;
+    learnt: (a: { learnt: readonly string[] }) => string;
+    again: (a: { again: readonly string[] }) => string;
+    later: (a: { later: readonly MapLaterName[]; lanjut: number }) => string;
+    focus: (a: { later: number; lanjut: number; new: readonly string[]; again: readonly string[] }) => string;
   };
-  /** … and its closing: how many new steps the ayah taught and how many are learnt in all — or,
-   *  with nothing new, how many learnt steps it repeated. */
-  learned: (a: { new: number; total: number; here: number }) => string;
+  /** … and its closing: the new steps the ayah taught, by name — or, with nothing new, the learnt
+   *  steps it repeated ([] — nothing). */
+  learned: (a: { new: readonly string[]; again: readonly string[] }) => string;
+  /** … and the running total after it, every step learnt by then named in teaching order
+   *  (`fresh`: the ayah taught something new — "Dengan itu, …", else "Sampai ayat ini, …"). */
+  total: (a: { total: readonly string[]; fresh: boolean }) => string;
   recap: string;
   next: (a: { ayah: number }) => string;
   done: (a: { surah: string }) => string;

@@ -20,8 +20,9 @@
  * today). lessonMapProblems holds a file to the curriculum at build time (src/lib/map-content.ts)
  * and in the tests; lessonMapInputOf turns one ayah's entry into what the lesson needs: the
  * opening steps of the autoplay sequence — ONE per group, in step with the narrator ("map:new",
- * "map:learnt", "map:later", right after the imam's recitation) —, the closing ("learned", right
- * before the recap), and the card the stage shows with each (LessonMapCard.tsx).
+ * "map:learnt", "map:later", right after the imam's recitation; each with its lines, MAP_LINES)
+ * —, the closing ("learned", right before the recap), and the card the stage shows with each
+ * (LessonMapCard.tsx).
  *
  * Pure (type imports only): scripts/autoplay-check.ts runs it under tsx without node_modules.
  */
@@ -72,8 +73,67 @@ export type LessonMapInput = {
 /** The groups of the opening, in the order their steps are played. */
 export const MAP_GROUPS = ["new", "learnt", "later"] as const;
 export type MapGroup = (typeof MAP_GROUPS)[number];
-/** The closing step and line. */
+/** The closing step and its first line. */
 export const MAP_CLOSING = "learned";
+
+/**
+ * The narration lines of each map step, in play order (the twin of
+ * pipeline/validate_narration.py map_opening_parts / map_closing_parts). Operator 2026-10-15: a
+ * sentence that COUNTS steps also NAMES every one of them ("Dengan itu, sudah empat hal yang kita
+ * pelajari, yaitu A, B, C, D" — "always re-mention what they are"), so a list of sixteen is a line
+ * of its own and each such sentence is ONE line (never split): the learnt step says "map:learnt"
+ * (everything learnt so far) then "map:again" (which of it comes up again here); the later step
+ * "map:later" (what is taught later, and how many next-level topics) then "map:focus" (the
+ * reassurance: none of that needs learning now, focus on the new steps); the closing "learned"
+ * (what was new) then "map:total" (the running total, every step named). One card per step: the
+ * card stays while both its lines are said.
+ */
+export const MAP_LINES = {
+  new: ["map:new"],
+  learnt: ["map:learnt", "map:again"],
+  later: ["map:later", "map:focus"],
+  learned: ["learned", "map:total"],
+} as const satisfies Record<MapGroup | typeof MAP_CLOSING, readonly string[]>;
+
+/** A step's name inside a caption sentence: its Latin name (mapLatinName) with the first letter
+ *  in lower case, after a leading ‘ain too ("‘Athaf (عَطْف)" → "‘athaf") — what the narration's
+ *  prose does with it (pipeline/validate_narration.py _low). */
+export function mapSaidName(name: string): string {
+  const latin = mapLatinName(name);
+  const i = /^['‘’ʼʿʾ`´]\p{L}/u.test(latin) ? 1 : 0;
+  return latin.slice(0, i) + latin.slice(i, i + 1).toLowerCase() + latin.slice(i + 1);
+}
+
+/** Step names as one list inside an Indonesian sentence: "a", "a dan b", "a, b, dan c" — and
+ *  ", serta" for the last join when a name has a "dan" of its own ("dhamir, serta mu’rab dan
+ *  mabni"), so the names stay apart (pipeline/build_narration.py _names). */
+export function mapListId(names: readonly string[]): string {
+  if (names.length <= 1) return names.join("");
+  const last = names.some((n) => / dan /.test(n)) ? "serta" : "dan";
+  if (names.length === 2 && last === "dan") return `${names[0]} dan ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, ${last} ${names[names.length - 1]}`;
+}
+
+/** The reassurance's word for `n` things the ayah puts aside (operator 2026-10-15: "ketiganya /
+ *  keduanya / semuanya … 1: yang satu ini"; validate_narration.py FOCUS_PRONOUN). */
+export const mapPronounId = (n: number): string => (n === 1 ? "yang satu ini" : n === 2 ? "keduanya" : n === 3 ? "ketiganya" : "semuanya");
+
+/** A postponed step as a caption names it: `ayah`, the ayah of THIS surah that teaches it, or null
+ *  (another surah, or a lesson that is no whole ayah). */
+export type MapLaterName = { name: string; ayah: number | null };
+
+/** Where a caption says the postponed steps are taught (pipeline/build_narration.py map_later):
+ *  null — "nanti": one of them is not taught in an ayah of this surah; a number — the one ayah of
+ *  this surah that teaches them all; "each" — each with its own ayah. */
+export function mapLaterWhere(later: readonly MapLaterName[]): number | "each" | null {
+  if (later.some((x) => x.ayah === null)) return null;
+  const at = new Set(later.map((x) => x.ayah));
+  return at.size === 1 ? (later[0].ayah as number) : "each";
+}
+
+/** The postponed steps of a map as the captions name them (this surah's ayah, or none). */
+export const mapLaterNames = (map: Pick<LessonMapInput, "surah" | "later">): MapLaterName[] =>
+  map.later.map((it) => ({ name: mapSaidName(it.name), ayah: it.surah === map.surah ? it.ayah : null }));
 
 /** The opening groups an ayah's map has (the twin of pipeline/validate_narration.py
  *  map_opening_parts): what is new always; what was learnt so far once something was; what is
@@ -89,10 +149,11 @@ export const mapHere = (map: Pick<LessonMapInput, "learnt">) => map.learnt.filte
 export const mapTotal = (map: Pick<LessonMapInput, "learnt" | "new">) => map.learnt.length + map.new.length;
 
 /** Up to this many learnt steps that come up again are listed on the card in full, one per row
- *  with their Arabic — as many as the narrator names in full (validate_narration.py MAP_ALL);
- *  more are a flowing line of their names in Latin. Measured in CI on a 390×844 phone (base
- *  branch, 2026-10-13): the card has about 270px above the caption panel at the normal text size,
- *  less at the larger ones, and one heading with three names is about 265px. */
+ *  with their Arabic (the narrator names every one of them since 2026-10-15, map:again; the card
+ *  is held to the phone's room); more are a flowing line of their names in Latin. Measured in CI
+ *  on a 390×844 phone (base branch, 2026-10-13): the card has about 270px above the caption panel
+ *  at the normal text size, less at the larger ones, and one heading with three names is about
+ *  265px. */
 export const MAP_HERE_FULL = 3;
 
 /** … and up to this many postponed steps, each with its ayah (the next-level topics share their

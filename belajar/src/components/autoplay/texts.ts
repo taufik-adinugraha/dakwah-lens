@@ -16,7 +16,29 @@
  * promises a human review (plan L11). Pure: the page builds the sequence on
  * the server, and stage.test.ts runs the engine's checks with these sets.
  */
-import { ID_TEXTS, type AutoplayTexts } from "@/lib/autoplay";
+import { ID_TEXTS, mapLaterWhere, type AutoplayTexts, type MapLaterName } from "@/lib/autoplay";
+
+const things = (n: number) => (n === 1 ? "thing" : "things");
+
+/** "a", "a and b", "a, b, and c" (the names are the lesson's Latin ones: "mu’rab dan mabni" keeps
+ *  its Indonesian "dan"). */
+const listEn = (names: readonly string[]) =>
+  names.length <= 2 ? names.join(" and ") : `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+
+/** The reassurance's word for what was put aside (the Indonesian yang satu ini / keduanya /
+ *  ketiganya / semuanya). */
+const pronounEn = (n: number) => (n === 1 ? "this one" : n === 2 ? "both of them" : n === 3 ? "all three" : "all of them");
+
+/** The postponed steps, every one named, with where they are taught (ID_TEXTS' rule). */
+function laterEn(later: readonly MapLaterName[]): string {
+  const n = later.length;
+  const lead = `${n} more ${n === 1 ? "thing is" : "things are"} in this ayah`;
+  const where = mapLaterWhere(later);
+  const names = listEn(later.map((x) => x.name));
+  if (where === null) return `${lead}, namely ${names}, but we only cover ${n === 1 ? "it" : "them"} later.`;
+  if (where !== "each") return `${lead}, namely ${names}, but we only cover ${n === 1 ? "it" : "them"} in ayah ${where}.`;
+  return `${lead}, but we only cover them later: ${listEn(later.map((x) => `${x.name} in ayah ${x.ayah}`))}.`;
+}
 
 const ID: AutoplayTexts = {
   ...ID_TEXTS,
@@ -85,26 +107,42 @@ const EN: AutoplayTexts = {
       next: "Click the marked button to continue.",
     },
   },
+  // The Indonesian templates (ID_TEXTS; pipeline/build_narration.py map_new … map_total) in
+  // English: every counted step named, in teaching order, by its Latin name; a next-level topic
+  // counted, never named; the reassurance after what is put aside (operator 2026-10-15).
   lessonMap: {
     new: ({ new: fresh }) =>
-      fresh ? `This ayah has ${fresh} new ${fresh === 1 ? "thing" : "things"} to learn. The list is on the screen.` : "This ayah has nothing new.",
-    learnt: ({ learnt, here }) =>
-      `Before this ayah, we have learnt ${learnt} ${learnt === 1 ? "thing" : "things"}. ` +
-      (here ? `${here} of them ${here === 1 ? "comes" : "come"} up again in this ayah; the list is on the screen.` : "None of them comes up again in this ayah."),
+      fresh.length ? `This ayah has ${fresh.length} new ${things(fresh.length)} to learn: ${listEn(fresh)}.` : "This ayah has nothing new.",
+    learnt: ({ learnt }) => `Before this ayah, we have learnt ${learnt.length} ${things(learnt.length)}, namely ${listEn(learnt)}.`,
+    again: ({ again }) =>
+      again.length === 0
+        ? "None of them comes up again in this ayah."
+        : again.length === 1
+          ? `The one we meet again in this ayah is ${again[0]}.`
+          : `The ones we meet again in this ayah are ${listEn(again)}.`,
     later: ({ later, lanjut }) =>
       [
-        later ? `${later} more ${later === 1 ? "thing is" : "things are"} in this ayah and explained later.` : "",
-        lanjut ? `${later ? "There" : "In this ayah there"} ${lanjut === 1 ? "is" : "are"}${later ? " also" : ""} ${lanjut} advanced ${lanjut === 1 ? "topic" : "topics"}, which the basic level does not cover.` : "",
+        later.length ? laterEn(later) : "",
+        lanjut ? `${later.length ? "There" : "In this ayah there"} ${lanjut === 1 ? "is" : "are"}${later.length ? " also" : ""} ${lanjut} advanced ${lanjut === 1 ? "topic" : "topics"}, which the basic level does not cover.` : "",
       ]
         .filter(Boolean)
         .join(" "),
+    focus: ({ later, lanjut, new: fresh, again }) =>
+      [
+        later ? `You do not need to memorise ${pronounEn(later)} now${lanjut ? ", nor think about the advanced topics" : ""}.` : `You do not need to think about ${pronounEn(lanjut)} now.`,
+        fresh.length ? `Let us focus on ${listEn(fresh)} first.` : again.length ? `Let us focus on going over ${listEn(again)} first.` : "Let us focus on this ayah first.",
+      ].join(" "),
   },
-  learned: ({ new: fresh, total, here }) =>
-    fresh
-      ? `In this ayah we learnt ${fresh} new ${fresh === 1 ? "thing" : "things"}. That makes ${total} learnt so far.`
-      : here
-        ? `This ayah had nothing new; it repeated ${here} ${here === 1 ? "thing" : "things"} we have already learnt.`
+  learned: ({ new: fresh, again }) =>
+    fresh.length
+      ? `In this ayah we learnt ${fresh.length} new ${things(fresh.length)}: ${listEn(fresh)}.`
+      : again.length
+        ? `This ayah had nothing new; it repeated ${again.length} ${things(again.length)} we have already learnt, namely ${listEn(again)}.`
         : "This ayah had nothing new.",
+  total: ({ total, fresh }) =>
+    fresh
+      ? `That makes ${total.length} ${things(total.length)} learnt so far, namely ${listEn(total)}.`
+      : `So far we have learnt ${total.length} ${things(total.length)}, namely ${listEn(total)}.`,
   recap: "Listen to the whole ayah once more, and recite along with the imam.",
   next: ({ ayah }) => `This ayah's lesson is complete. Next: ayah ${ayah}.`,
   done: ({ surah }) => `This ayah's lesson is complete. It is the last ayah of surah ${surah}.`,

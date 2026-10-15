@@ -5,10 +5,12 @@
  *   intro → recite_ayah (imam, whole ayah; mushaf words follow the imam)
  *   → map:new → map:learnt → map:later (only in a surah with a lesson map,
  *     content/map/${slug}.json: what this ayah brings, ONE step per group of
- *     its card, each with its one line — what is new; how much has been learnt
- *     so far and what of it comes up again here (once something was learnt);
- *     what is here and taught later, and how many next-level topics (when
- *     there is any); operator 2026-10-13, plan L23 and L26, lessonMap.ts)
+ *     its card, each with its lines (lessonMap.ts MAP_LINES, one sentence per
+ *     line) — what is new; everything learnt so far, then what of it comes up
+ *     again here (once something was learnt); what is here and taught later,
+ *     and how many next-level topics, then the reassurance that none of it
+ *     needs learning now (when there is any) — every counted step named
+ *     (operator 2026-10-15); operator 2026-10-13, plan L23 and L26)
  *   → primer (the harakat primer, when content/compose opens this ayah with
  *     it: each mark on a dotted circle, its sound, an example from the ayah)
  *   → the warm-up (ex:word-kind, when the ayah's quiz has it — every ayah of
@@ -37,8 +39,8 @@
  *     content/quiz/<slug>.json decides them, and each question's correct
  *     answer has its explanation line, said after "Benar." or "Ini
  *     jawabannya.": operator 2026-10-10)
- *   → learned (with a lesson map: what this ayah taught and the running
- *     total, one line, with its card)
+ *   → learned (with a lesson map: what this ayah taught, then the running
+ *     total with every step named — two lines, one card)
  *   → recap (imam again) → next (to ayah + 1) | done (end of the surah)
  *
  * Every step carries its narration line ids (contract in types.ts), the
@@ -61,7 +63,7 @@ import type { ComposeInput } from "../composition";
 import { latinSentences, splitCaption, stripArabic } from "../lessonSteps";
 import type { ExampleInput } from "./examples";
 import { canonicalExercises, exerciseProgressId } from "./exercises";
-import { mapHere, mapOpening, mapTotal, type LessonMapInput } from "./lessonMap";
+import { MAP_LINES, mapHere, mapLaterNames, mapOpening, mapSaidName, type LessonMapInput, type MapGroup } from "./lessonMap";
 import { explainLineId, lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
 import { lineDisplay, lineMarks, lineSegments, lineText, wordRefs } from "./narration";
 import {
@@ -285,16 +287,23 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
 
   // What this ayah brings, before its words (plan L23, L26): ONE step per group of the card, in
   // step with the narrator (each waits for "Lanjut" in the "Tunggu saya" pace, and "↺ Ulangi"
-  // plays that one group again). The card on the stage lists the steps, so the engine's own
-  // caption (a page without narration) gives their counts only.
+  // plays that one group again), each with its lines (MAP_LINES: one sentence per line since
+  // 2026-10-15). The engine's own captions (a page without narration) say what the narration
+  // says, every counted step named (operator 2026-10-15: "always re-mention what they are").
   const map = input.map ?? null;
+  const said = (items: readonly { name: string }[]) => items.map((it) => mapSaidName(it.name));
   if (map) {
-    const captions = {
-      new: texts.lessonMap.new({ new: map.new.length }),
-      learnt: texts.lessonMap.learnt({ learnt: map.learnt.length, here: mapHere(map).length }),
-      later: texts.lessonMap.later({ later: map.later.length, lanjut: map.lanjut.length }),
+    const again = said(mapHere(map));
+    const captions: Record<(typeof MAP_LINES)[MapGroup][number], string> = {
+      "map:new": texts.lessonMap.new({ new: said(map.new) }),
+      "map:learnt": texts.lessonMap.learnt({ learnt: said(map.learnt) }),
+      "map:again": texts.lessonMap.again({ again }),
+      "map:later": texts.lessonMap.later({ later: mapLaterNames(map), lanjut: map.lanjut.length }),
+      "map:focus": texts.lessonMap.focus({ later: map.later.length, lanjut: map.lanjut.length, new: said(map.new), again }),
     };
-    for (const g of mapOpening(map)) steps.push(step({ id: `map:${g}`, kind: "map", cues: [cue(p(`map:${g}`), captions[g])], guides: [] }));
+    for (const g of mapOpening(map)) {
+      steps.push(step({ id: `map:${g}`, kind: "map", cues: MAP_LINES[g].map((part) => cue(p(part), captions[part])), guides: [] }));
+    }
   }
 
   const primer = input.compose?.primer;
@@ -475,10 +484,14 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
 
   for (const key of asked) if (!OPENING_EXERCISES.includes(key)) steps.push(exerciseStep(key));
 
-  // … and what it taught, before the imam recites the ayah once more.
+  // … and what it taught, then the running total with every step named, before the imam recites
+  // the ayah once more.
   if (map) {
-    const said = texts.learned({ new: map.new.length, total: mapTotal(map), here: mapHere(map).length });
-    steps.push(step({ id: "learned", kind: "learned", cues: [cue(p("learned"), said)], guides: [] }));
+    const closing: Record<(typeof MAP_LINES)["learned"][number], string> = {
+      learned: texts.learned({ new: said(map.new), again: said(mapHere(map)) }),
+      "map:total": texts.total({ total: said([...map.learnt, ...map.new]), fresh: map.new.length > 0 }),
+    };
+    steps.push(step({ id: "learned", kind: "learned", cues: MAP_LINES.learned.map((part) => cue(p(part), closing[part])), guides: [] }));
   }
 
   if (!zero) {

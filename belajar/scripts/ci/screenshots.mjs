@@ -3635,7 +3635,9 @@ async function wordKindChecks(page, vp, index) {
  * is accummulating and repeated"; "but separate new vs already knows concept, this is what new,
  * this is what we've learnt so far"), on Al-Fatihah 1 and 2, each one's remembered place cleared,
  * the narration answered in the browser (narrationRoute). ONE GROUP AT A TIME, in step with the
- * narrator: each group of the opening is a step of the lesson with a line and a card of its own.
+ * narrator: each group of the opening is a step of the lesson with its lines (src/lib/autoplay/
+ * lessonMap.ts MAP_LINES: one, or two since 2026-10-15 — every counted step named, one sentence per
+ * line) and a card of its own.
  * What a card must show is read from content/map/al-fatihah.json and messages/id.json, never typed
  * here. Per ayah:
  *   1. THE OPENING comes right after the imam's ayah: from the step "recite" (reached by name,
@@ -3652,12 +3654,13 @@ async function wordKindChecks(page, vp, index) {
  *        later   "Nanti": the steps a later lesson teaches, each with its ayah ("di ayat 3"; up to
  *                MAP_LATER_FULL one per row, more as one flowing line) — and "Tingkat lanjut (N
  *                hal)" with the line that says they are not taught at this level.
- *      "↺ Ulangi" plays the step: the caption is that step's line (data-line
+ *      "↺ Ulangi" plays the step: the caption is that step's first line (data-line
  *      "al-fatihah:N:map:<group>") and says what the manifest shows for it.
  *   2. THE CLOSING comes right before the recap: on the step "learned" (by name) the card
  *      ([data-map="learned"]) has one group, "Baru saja kita pelajari", the ayah's new steps in
- *      order, each with a tick, and the running total ("Sudah N hal kita pelajari."); its caption
- *      is "al-fatihah:N:learned"; and one "Berikutnya ›" from there lands on "recap".
+ *      order, each with a tick, and the running total ("Sudah N hal kita pelajari."); its first
+ *      caption is "al-fatihah:N:learned" (then "…:map:total", the total with every step named); and
+ *      one "Berikutnya ›" from there lands on "recap".
  *   3. NOTHING STICKS OUT SIDEWAYS, on any card: the card lies within the screen's width, does
  *      not scroll sideways, and the page does not either.
  *   4. A PHONE'S SMALL ROOM (CI 2026-10-13, base branch: at 390×844 the card has about 270px above
