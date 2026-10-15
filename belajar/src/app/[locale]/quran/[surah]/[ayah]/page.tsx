@@ -4,7 +4,7 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { lessonExamplesFor, stageSequence } from "@/components/autoplay/build";
+import { lessonExamplesFor, lessonMediaFor, stageSequence } from "@/components/autoplay/build";
 import { BackLink } from "@/components/BackLink";
 import { LabelRole } from "@/components/exercises/LabelRole";
 import { SortCase } from "@/components/exercises/SortCase";
@@ -175,6 +175,9 @@ export default async function AyahPage({
   // time: captions in the page's locale, narration audio from
   // content/narration/ when it has been rendered.
   const seq = stageSequence(s, a, locale);
+  // What the page fetches ahead, at idle before "Mulai" (src/lib/media-prefetch.ts): this lesson's
+  // recordings, and the next ayah's for the hand-off.
+  const media = lessonMediaFor(s, a, locale, seq);
   // The example beats' drawing (operator 2026-10-12: "each explanation should be followed by
   // examples (visual + voice)"; plan L20): each example's Arabic, exactly the content's bytes, its
   // transliteration and meaning, by beat id; the sequence above carries their captions only.
@@ -298,6 +301,7 @@ export default async function AyahPage({
             exercise={{ words: a.words, lexemes, quiz }}
             compose={compose && (compose.primer || Object.keys(compose.words).length) ? compose : null}
             examples={examples}
+            media={media}
             marks={composeFile?.marks ?? null}
             // The lesson map's card (operator 2026-10-13, plan L23 and L26): what this ayah brings,
             // one group at a time, and what it taught, for a surah that has a map (content/map);

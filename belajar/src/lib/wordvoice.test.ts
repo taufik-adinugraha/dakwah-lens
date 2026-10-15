@@ -46,8 +46,25 @@ describe("the plain-letter rule (pipeline/wordvoice.py plain)", () => {
 describe("a word's recording as a Clip", () => {
   const sample: WordVoiceManifest = { words: { "ال": { audio: { url: "/belajar/media/narration/kang-nandar/words/x.mp3", ms: 950, sha256: "ab".repeat(32) } }, "ب": {} } };
 
-  it("is the whole file, from 0 to its length, found through the plain letters", () => {
-    expect(voiceFrom(sample, "ٱل")).toEqual({ url: "/belajar/media/narration/kang-nandar/words/x.mp3", start: 0, end: 950 });
+  it("is the whole file, from 0 to its length, found through the plain letters (the narrator's)", () => {
+    expect(voiceFrom(sample, "ٱل")).toEqual({ url: "/belajar/media/narration/kang-nandar/words/x.mp3", start: 0, end: 950, source: "elevenlabs" });
+  });
+
+  it("is the word inside Quran.com's file, [start, end], for a word at its place (operator 2026-10-15)", () => {
+    const qc: WordVoiceManifest = {
+      words: { "ال": { source: "quran.com", loc: "1:2:1", audio: { url: "/belajar/media/narration/quran-com/wbw/001_002_001.mp3", ms: 1331, sha256: "ab".repeat(32), start: 328, end: 1316 } } },
+    };
+    expect(voiceFrom(qc, "ٱل")).toEqual({ url: "/belajar/media/narration/quran-com/wbw/001_002_001.mp3", start: 328, end: 1316, source: "quran.com" });
+  });
+
+  it("every lesson word is Quran.com's recording of its place; every Quran.com entry is one word, its loc a place of those bytes", () => {
+    for (const w of lessonWords) expect(M.words[plainLetters(w.ar)]?.source, w.loc).toBe("quran.com");
+    for (const [t, e] of Object.entries(M.words)) {
+      if (e.source !== "quran.com") continue;
+      expect(t.split(" "), t).toHaveLength(1);
+      expect(e.loc, t).toMatch(/^\d{1,3}:\d{1,3}:\d{1,3}$/);
+      expect(e.audio?.url, t).toMatch(/^\/belajar\/media\/narration\/quran-com\/wbw\/\d{3}_\d{3}_\d{3}\.mp3$/);
+    }
   });
 
   it("is null for a text with no recording yet, and for one the manifest does not have", () => {

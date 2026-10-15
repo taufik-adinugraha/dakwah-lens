@@ -158,7 +158,7 @@ describe("the lesson stage's settings panel offers no reciter choice (one imam, 
       expect(src).not.toMatch(/chooseSource|sourceIdx|orderRecitations|RECITER_ORDER|RECITER_LABEL|StageSource|<select\b/);
     }
     expect(player).toContain("export function useSegmentPlayer(\n  source: RecitationSource,");
-    expect(runner).toContain("export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, title: string)");
+    expect(runner).toContain("export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, title: string, media: LessonMedia = NO_MEDIA)");
     // Dengar dan klik takes no recitation at all since 2026-10-14: the word it asks about is the
     // narrator's recording of it (src/lib/wordvoice.ts), never the imam's recitation cut at the word —
     // so it has no reciter to choose either (it used to take the stage's one source).

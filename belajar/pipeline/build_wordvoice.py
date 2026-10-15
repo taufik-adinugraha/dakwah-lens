@@ -3,8 +3,20 @@
 
   build_wordvoice.py                     dry run: what would be voiced, characters, list price; nothing written
   build_wordvoice.py --write             (re)write the manifest from the content, keeping recordings
-  build_wordvoice.py --check [--require-audio]
-                                         CI: the manifest is what --write would produce, and well-formed
+  build_wordvoice.py --check [--require-audio] [--no-network]
+                                         the manifest is what --write would produce, and well-formed; the
+                                         Quran.com fixture covers every place; locally (a Tanzil cache, the
+                                         downloaded copies in out/upstream/quran-com/wbw) also each chosen
+                                         place's Tanzil bytes and each copy's sha256 and length. --no-network
+                                         (CI): shape, hosts, URLs and the fixture only — nothing is read from
+                                         the cache or the network
+  build_wordvoice.py --fetch-quran-com  Quran.com's word list of every ayah a place stands in
+                                         (api.quran.com, read-only: fixtures/quran_com_words.json), then every
+                                         chosen word's file (audio.qurancdn.com, read-only) into
+                                         out/upstream/quran-com/wbw/, measured (sha256, length, the word's
+                                         [start, end] by silencedetect), and the manifest written. Nothing is
+                                         re-encoded: the copy delivered is the upstream file byte for byte
+                                         (host_media.py --deliver)
   build_wordvoice.py --render --i-approve-spend [--env-file F] [--out DIR] [--limit N]
                                          records every text without audio (the spend is the operator's go:
                                          ELEVENLABS_API_KEY from the .env file), trims, encodes the delivery
@@ -121,6 +133,114 @@ def place(final: Path, text: str) -> dict:
     return {"url": W.url_of(text, sha), "ms": duration_ms(named), "sha256": sha}
 
 
+# ---------------------------------------------------------------- Quran.com's word files
+QC_CACHE = W.BELAJAR / "pipeline" / "out" / "upstream" / "quran-com" / "wbw"
+QC_API = "https://api.quran.com/api/v4/verses/by_key/{key}?words=true&word_fields=text_uthmani,audio_url"
+SILENCE = "silencedetect=noise=-45dB:d=0.02"
+UA = {"User-Agent": "dakwah-lens-belajar-pipeline/1 (read-only; https://dakwah-lens.id/belajar)"}
+
+
+def get(url: str) -> bytes:
+    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
+        return r.read()
+
+
+def word_span(path: Path) -> tuple[int, int, int]:
+    """(ms, start, end): the file's length and the word inside it — the leading and trailing
+    silence (below -45 dB for 20 ms or more) left out, TRIM_MARGIN_MS of it kept at each edge."""
+    ms = duration_ms(path)
+    err = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", str(path), "-af", SILENCE, "-f", "null", "-"],
+                         capture_output=True, text=True).stderr
+    starts = [float(x) * 1000 for x in re.findall(r"silence_start: (-?[0-9.]+)", err)]
+    ends = [float(x) * 1000 for x in re.findall(r"silence_end: (-?[0-9.]+)", err)]
+    start, end = 0, ms
+    if starts and starts[0] <= 5 and ends:
+        start = max(0, round(ends[0]) - W.TRIM_MARGIN_MS)
+    if starts and (len(ends) < len(starts) or ends[-1] >= ms - 5) and starts[-1] > start:
+        end = min(ms, round(starts[-1]) + W.TRIM_MARGIN_MS)
+    return ms, start, end
+
+
+def fetch_fixture(inv: dict[str, set[str]]) -> dict:
+    pl = W.places()
+    old = W.load_qc() or {}
+    ayat = dict(old.get("ayat") or {})
+    for k in W.ayat_of_places(pl, inv):
+        if k in ayat:
+            continue
+        data = json.loads(get(QC_API.format(key=k)))
+        ayat[k] = [{"text_uthmani": w["text_uthmani"], "audio_url": w["audio_url"]}
+                   for w in data["verse"]["words"] if w.get("char_type_name") == "word"]
+        print(f"  {k}: {len(ayat[k])} words")
+    keys = sorted(ayat, key=lambda k: tuple(int(x) for x in k.split(":")))
+    return {
+        "_comment": "Written by pipeline/build_wordvoice.py --fetch-quran-com: Quran.com's own word list (words only, in its order) of every ayah a voiced text stands in, as api.quran.com answered on the date below. `audio_url` is the word's file on audio.qurancdn.com — not always the Tanzil word number (41:9). Never edited by hand.",
+        "api": QC_API,
+        "retrieved": old.get("retrieved") if set(keys) == set(old.get("ayat") or {}) and old.get("retrieved") else __import__("datetime").date.today().isoformat(),
+        "ayat": {k: ayat[k] for k in keys},
+    }
+
+
+def measure_qc(manifest: dict, qc: dict, download: bool, cache: Path | None = None) -> list[str]:
+    """Fill (or check) every Quran.com entry's audio from its copy in `cache` (QC_CACHE); returns problems."""
+    errs = []
+    QC_CACHE_ = cache or QC_CACHE
+    if download:
+        QC_CACHE_.mkdir(parents=True, exist_ok=True)
+    for t, e in manifest["words"].items():
+        if e.get("source") != "quran.com":
+            continue
+        up = W.qc_upstream(qc, e["loc"])
+        f = QC_CACHE_ / up.rsplit("/", 1)[1]
+        if download and not f.exists():
+            f.write_bytes(get(up))
+        if not f.exists():
+            if e.get("audio"):
+                continue  # nothing to compare with on this machine
+            errs.append(f"{t!r}: no copy of {up} in {QC_CACHE_} (build_wordvoice.py --fetch-quran-com)")
+            continue
+        sha = hashlib.sha256(f.read_bytes()).hexdigest()
+        if not download and e.get("audio") and e["audio"]["sha256"] != sha:
+            errs.append(f"{t!r}: the pin {e['audio']['sha256'][:12]}… is not the copy in {QC_CACHE_} ({sha[:12]}…): "
+                        "a stale pin, or upstream changed the file")
+            continue
+        ms, start, end = word_span(f)
+        got = {"url": W.qc_url(up), "upstream": up, "ms": ms, "sha256": sha, "start": start, "end": end}
+        if download:
+            e["audio"] = got
+        elif e.get("audio") and e["audio"]["ms"] != ms:
+            errs.append(f"{t!r}: the pin's {e['audio']['ms']} ms is not the copy's {ms} ms")
+        elif e.get("audio") and (e["audio"]["start"], e["audio"]["end"]) != (start, end):
+            errs.append(f"{t!r}: [{e['audio']['start']}, {e['audio']['end']}] is not the measured word [{start}, {end}]")
+    return errs
+
+
+def tanzil_problems(manifest: dict) -> list[str]:
+    """Local only: each chosen place is a Tanzil token (as the lessons number them) whose plain
+    letters are the text, and Quran.com counts the ayah's words as Tanzil does."""
+    try:
+        import common as C
+        I = C.load_sources()
+        T = C.load_tanzil(C.require_pinned(I, "tanzil_uthmani"))
+    except (SystemExit, FileNotFoundError, KeyError):
+        return []
+    qc = W.load_qc() or {}
+    errs = []
+    for k, words in (qc.get("ayat") or {}).items():
+        s, a = (int(x) for x in k.split(":"))
+        n = len(C.lesson_ayah(T, s, a)[0].split(" "))
+        if n != len(words):
+            errs.append(f"{k}: Tanzil has {n} words, Quran.com {len(words)}: the numbering differs")
+    for t, e in manifest["words"].items():
+        if e.get("source") != "quran.com":
+            continue
+        s, a, w = (int(x) for x in e["loc"].split(":"))
+        toks = C.lesson_ayah(T, s, a)[0].split(" ")
+        if not 1 <= w <= len(toks) or W.plain(toks[w - 1]) != t:
+            errs.append(f"{t!r}: Tanzil's word at {e['loc']} is {toks[w - 1] if 1 <= w <= len(toks) else None!r}, not this text")
+    return errs
+
+
 def dry(inv: dict[str, set[str]], unresolved: list[str], manifest: dict | None) -> None:
     have = {t for t, e in ((manifest or {}).get("words") or {}).items() if e.get("audio")}
     by: dict[str, set[str]] = {}
@@ -129,7 +249,8 @@ def dry(inv: dict[str, set[str]], unresolved: list[str], manifest: dict | None) 
             by.setdefault(o, set()).add(t)
     for o, ts in sorted(by.items()):
         print(f"  {o:14s} {len(ts):4d} texts {sum(len(t) for t in ts):6d} chars")
-    todo = [t for t in inv if t not in have]
+    qc = {t for t, e in ((manifest or {}).get("words") or {}).items() if e.get("source") == "quran.com"}
+    todo = [t for t in inv if t not in have and t not in qc]
     chars = sum(len(t) for t in todo)
     print(f"{len(inv)} distinct texts, {len(have)} already recorded, {len(todo)} to record: {chars} characters, "
           f"USD {chars / 1000 * W.PRICE_PER_1K:.2f} at list price ({W.MODEL}, first take, no retakes)")
@@ -153,6 +274,10 @@ def main() -> int:
     ap.add_argument("--tries", type=int, default=5)
     ap.add_argument("--reencode", action="store_true",
                     help="with --render: encode every text again from its master (no API call, no spend)")
+    ap.add_argument("--fetch-quran-com", action="store_true",
+                    help="Quran.com's word lists and word files (read-only downloads, no spend), then write the manifest")
+    ap.add_argument("--no-network", action="store_true",
+                    help="with --check (CI): shape, hosts, URLs and the fixture; no cache, no Tanzil, no copies")
     a = ap.parse_args()
 
     inv, unresolved = W.inventory()
@@ -163,14 +288,39 @@ def main() -> int:
         if manifest is None:
             errs.append("content/wordvoice.json is missing")
         else:
-            errs += W.problems(manifest, inv, a.require_audio)
-            if manifest != W.expected(inv, manifest):
+            qc = W.load_qc()
+            errs += W.fixture_problems(qc, inv)
+            errs += W.problems(manifest, inv, a.require_audio, qc)
+            if manifest != W.expected(inv, manifest, qc):
                 errs.append("content/wordvoice.json is not what build_wordvoice.py --write produces")
+            if not a.no_network and qc:
+                errs += tanzil_problems(manifest)
+                errs += measure_qc(manifest, qc, download=False)
         if errs:
             print("wordvoice manifest problems:\n  " + "\n  ".join(errs[:40]))
             return 1
         n = sum(1 for e in manifest["words"].values() if e.get("audio"))
-        print(f"wordvoice manifest up to date: {len(manifest['words'])} texts, {n} recorded")
+        q = sum(1 for e in manifest["words"].values() if e.get("source") == "quran.com")
+        print(f"wordvoice manifest up to date: {len(manifest['words'])} texts, {n} recorded "
+              f"({q} Quran.com, {len(manifest['words']) - q} the narrator's)"
+              + (" [no network: shape only]" if a.no_network else ""))
+        return 0
+
+    if a.fetch_quran_com:
+        qc = fetch_fixture(inv)
+        W.QC_FIXTURE.write_text(json.dumps(qc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        manifest = W.expected(inv, manifest, qc)
+        errs = W.fixture_problems(qc, inv) + measure_qc(manifest, qc, download=True)
+        W.MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        q = [e for e in manifest["words"].values() if e.get("source") == "quran.com"]
+        size = sum((QC_CACHE / e["audio"]["upstream"].rsplit("/", 1)[1]).stat().st_size for e in q if e.get("audio"))
+        print(f"{len(q)} texts play Quran.com's word file ({size / 1e6:.2f} MB in {QC_CACHE}); "
+              f"{len(manifest['words']) - len(q)} stay the narrator's")
+        for c in W.choice_conflicts(inv, qc):
+            print(f"  conflict: {c}")
+        if errs:
+            print("problems:\n  " + "\n  ".join(errs))
+            return 1
         return 0
 
     if a.qa or a.retake:
@@ -182,7 +332,8 @@ def main() -> int:
         def delivery(t: str) -> Path:
             return out / "delivery" / "kang-nandar" / "words" / manifest["words"][t]["audio"]["url"].rsplit("/", 1)[1]
 
-        flagged = [t for t, e in manifest["words"].items() if e.get("audio") and Q.hissy_tail(delivery(t))]
+        flagged = [t for t, e in manifest["words"].items()
+                   if e.get("source") != "quran.com" and e.get("audio") and Q.hissy_tail(delivery(t))]
         print(f"{len(flagged)} of {len(manifest['words'])} recorded words end in a made-up sound:")
         for t in flagged:
             print(f"  {len(t):3d} chars  {W.file_id(t)}  {', '.join(sorted(inv.get(t, {'?'})))}")
@@ -210,7 +361,7 @@ def main() -> int:
                 print(f"  {fid}: NO clean take in {a.tries} seeds — needs another spelling")
             manifest["words"][t]["audio"] = place(out / "delivery" / "kang-nandar" / "words" / f"{fid}.mp3", t)
             W.MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        files = sorted(p.relative_to(out / "delivery").as_posix() for p in (out / "delivery").rglob("*.mp3"))
+        files = sorted(p.relative_to(out / "delivery").as_posix() for p in (out / "delivery" / "kang-nandar").rglob("*.mp3"))
         (out / "delivery" / "files.txt").write_text("\n".join(files) + "\n", encoding="utf-8")
         print(f"retaken: {sent} characters sent (about USD {sent / 1000 * W.PRICE_PER_1K:.3f})")
         return 0
@@ -226,7 +377,7 @@ def main() -> int:
         (out / "master").mkdir(parents=True, exist_ok=True)
         deliv = out / "delivery" / "kang-nandar" / "words"
         deliv.mkdir(parents=True, exist_ok=True)
-        todo = [t for t, e in manifest["words"].items() if a.reencode or not e.get("audio")]
+        todo = [t for t, e in manifest["words"].items() if e.get("source") != "quran.com" and (a.reencode or not e.get("audio"))]
         if a.reencode:
             gone = [t for t in todo if not (out / "master" / f"{W.file_id(t)}.mp3").exists()]
             if gone:
@@ -244,7 +395,7 @@ def main() -> int:
             encode(master, final, t in W.CUT_TAIL)
             manifest["words"][t]["audio"] = place(final, t)
             W.MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        files = sorted(p.relative_to(out / "delivery").as_posix() for p in (out / "delivery").rglob("*.mp3"))
+        files = sorted(p.relative_to(out / "delivery").as_posix() for p in (out / "delivery" / "kang-nandar").rglob("*.mp3"))
         (out / "delivery" / "files.txt").write_text("\n".join(files) + "\n", encoding="utf-8")
         print(f"recorded {len(todo)} texts, {sent} characters sent (about USD {sent / 1000 * W.PRICE_PER_1K:.2f}); "
               f"delivery list: {out / 'delivery' / 'files.txt'} ({len(files)} files)")

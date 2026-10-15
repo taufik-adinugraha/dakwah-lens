@@ -44,7 +44,7 @@ export default async function CreditsPage({
   // request time.
   const published = new Set(await visibleSurahs());
   const surahs = SURAHS.filter((s) => published.has(s.slug));
-  // The exact credit line of every recording the lesson pages stream (moved
+  // The exact credit line of every recording the lesson pages play (moved
   // here from the lesson stage, operator 2026-10-10), once each, in the
   // order the content lists them.
   const recitationCredits = [
@@ -76,7 +76,19 @@ export default async function CreditsPage({
           </li>
         ))}
       </ul>
-      {/* The narrator's voice of the words and the explanations (src/lib/wordvoice.ts): AI, and said so. */}
+      {/* The words' voice (operator 2026-10-15: "use quran.com, mention the credit"): Quran.com's
+          word-by-word recordings, our unaltered copies (pipeline/host_media.py). */}
+      <section className="mt-8" aria-labelledby="word-recordings">
+        <h2 id="word-recordings" className="text-lg font-semibold text-ink">
+          {t("words_heading")}
+        </h2>
+        <p className="mt-1 max-w-prose text-base text-ink-muted">{t("words_body")}</p>
+        <a href="https://quran.com" className="link-text inline-flex min-h-11 items-center text-sm" rel="noopener">
+          {t("words_link")}
+        </a>
+      </section>
+      {/* The narrator's voice of the explanations and of what has no word recording
+          (src/lib/wordvoice.ts): AI, and said so. */}
       <section className="mt-8" aria-labelledby="narrator-voice">
         <h2 id="narrator-voice" className="text-lg font-semibold text-ink">
           {t("voice_heading")}

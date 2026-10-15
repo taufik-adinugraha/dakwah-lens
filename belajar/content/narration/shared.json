@@ -7,14 +7,14 @@
   },
   "lines": {
     "shared:start": {
-      "text": "Mari kita mulai. Anda cukup mendengarkan dan memperhatikan layar; pelajaran berjalan sendiri, dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an dibacakan imam; kata per kata disuarakan narator dengan suara kecerdasan buatan. Penjelasan ini juga dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan buatan dari kitab-kitab yang disebutkan sumbernya.",
-      "display": "Mari kita mulai. Anda cukup mendengarkan dan memperhatikan layar; pelajaran berjalan sendiri, dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an dibacakan imam; kata per kata disuarakan narator dengan suara kecerdasan buatan. Penjelasan ini juga dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan buatan dari kitab-kitab yang disebutkan sumbernya.",
+      "text": "Mari kita mulai. Anda cukup mendengarkan dan memperhatikan layar; pelajaran berjalan sendiri, dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an dibacakan imam; suara kata per kata dari rekaman Quran.com, kecuali bentuk latihan. Penjelasan ini dan bentuk latihan dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan buatan dari kitab-kitab yang disebutkan sumbernya.",
+      "display": "Mari kita mulai. Anda cukup mendengarkan dan memperhatikan layar; pelajaran berjalan sendiri, dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an dibacakan imam; suara kata per kata dari rekaman Quran.com, kecuali bentuk latihan. Penjelasan ini dan bentuk latihan dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan buatan dari kitab-kitab yang disebutkan sumbernya.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/shared/aeb95f1bb4a92a78.mp3",
-        "ms": 26593,
-        "sha256": "cb5709107a4a933d649f1f357e9604d84c5661fcbdc0a437f5eea9c67417fc72"
+        "url": "/belajar/media/narration/kang-nandar/shared/2ded38ea0f9d2c09.mp3",
+        "ms": 26671,
+        "sha256": "6521fc5bd5a0191a53c2835657c5e0d5ad54d9777b4035fc711b2be89bfd0763"
       },
       "tokens": [
         {
@@ -24,248 +24,263 @@
         },
         {
           "t": "kita",
-          "s": 0.208,
-          "e": 0.4
+          "s": 0.192,
+          "e": 0.32
         },
         {
           "t": "mulai.",
-          "s": 0.44,
+          "s": 0.38,
           "e": 0.8
         },
         {
           "t": "Anda",
-          "s": 1.008,
-          "e": 1.84
+          "s": 0.928,
+          "e": 1.44
         },
         {
           "t": "cukup",
-          "s": 1.92,
-          "e": 2.32
+          "s": 1.5,
+          "e": 1.76
         },
         {
           "t": "mendengarkan",
-          "s": 2.368,
-          "e": 3.12
+          "s": 1.808,
+          "e": 2.48
         },
         {
           "t": "dan",
-          "s": 3.18,
-          "e": 3.36
+          "s": 2.52,
+          "e": 2.64
         },
         {
           "t": "memperhatikan",
-          "s": 3.4,
-          "e": 4.08
+          "s": 2.68,
+          "e": 3.36
         },
         {
           "t": "layar;",
-          "s": 4.14,
-          "e": 5.2
+          "s": 3.4,
+          "e": 4.16
         },
         {
           "t": "pelajaran",
-          "s": 5.24,
-          "e": 5.76
+          "s": 4.2,
+          "e": 4.72
         },
         {
           "t": "berjalan",
-          "s": 5.8,
-          "e": 6.16
+          "s": 4.76,
+          "e": 5.12
         },
         {
           "t": "sendiri,",
-          "s": 6.208,
-          "e": 7.04
+          "s": 5.168,
+          "e": 6.0
         },
         {
           "t": "dan",
-          "s": 7.08,
-          "e": 7.2
+          "s": 6.06,
+          "e": 6.24
         },
         {
           "t": "hanya",
-          "s": 7.28,
-          "e": 7.68
+          "s": 6.293,
+          "e": 6.56
         },
         {
           "t": "latihan",
-          "s": 7.74,
-          "e": 8.16
+          "s": 6.64,
+          "e": 7.12
         },
         {
           "t": "yang",
-          "s": 8.192,
-          "e": 8.32
+          "s": 7.152,
+          "e": 7.28
         },
         {
           "t": "meminta",
-          "s": 8.38,
-          "e": 8.8
+          "s": 7.32,
+          "e": 7.68
         },
         {
           "t": "Anda",
-          "s": 8.848,
-          "e": 9.04
+          "s": 7.728,
+          "e": 7.92
         },
         {
           "t": "mengklik.",
-          "s": 9.088,
-          "e": 9.6
+          "s": 7.952,
+          "e": 8.4
         },
         {
           "t": "Ayat",
-          "s": 9.973,
-          "e": 10.88
+          "s": 8.72,
+          "e": 9.44
         },
         {
           "t": "Al-Qur'an",
-          "s": 10.933,
-          "e": 11.44
+          "s": 9.493,
+          "e": 10.0
         },
         {
           "t": "dibacakan",
-          "s": 11.48,
-          "e": 11.92
+          "s": 10.04,
+          "e": 10.56
         },
         {
           "t": "imam;",
-          "s": 12.0,
+          "s": 10.613,
+          "e": 11.28
+        },
+        {
+          "t": "suara",
+          "s": 11.413,
+          "e": 11.84
+        },
+        {
+          "t": "kata",
+          "s": 11.904,
+          "e": 12.16
+        },
+        {
+          "t": "per",
+          "s": 12.22,
           "e": 12.4
         },
         {
           "t": "kata",
-          "s": 12.576,
-          "e": 13.28
+          "s": 12.48,
+          "e": 12.8
         },
         {
-          "t": "per",
-          "s": 13.32,
-          "e": 13.44
+          "t": "dari",
+          "s": 12.864,
+          "e": 13.12
         },
         {
-          "t": "kata",
-          "s": 13.504,
-          "e": 13.76
+          "t": "rekaman",
+          "s": 13.16,
+          "e": 13.52
         },
         {
-          "t": "disuarakan",
-          "s": 13.82,
-          "e": 14.4
+          "t": "Quran.com,",
+          "s": 13.587,
+          "e": 14.72
         },
         {
-          "t": "narator",
-          "s": 14.44,
-          "e": 14.96
-        },
-        {
-          "t": "dengan",
-          "s": 14.994,
+          "t": "kecuali",
+          "s": 14.773,
           "e": 15.2
         },
         {
-          "t": "suara",
-          "s": 15.253,
+          "t": "bentuk",
+          "s": 15.248,
           "e": 15.52
         },
         {
-          "t": "kecerdasan",
-          "s": 15.573,
+          "t": "latihan.",
+          "s": 15.58,
           "e": 16.16
         },
         {
-          "t": "buatan.",
-          "s": 16.213,
-          "e": 16.72
-        },
-        {
           "t": "Penjelasan",
-          "s": 16.98,
-          "e": 18.16
+          "s": 16.38,
+          "e": 17.44
         },
         {
           "t": "ini",
-          "s": 18.26,
-          "e": 18.56
+          "s": 17.52,
+          "e": 17.76
         },
         {
-          "t": "juga",
-          "s": 18.624,
+          "t": "dan",
+          "s": 17.8,
+          "e": 17.92
+        },
+        {
+          "t": "bentuk",
+          "s": 17.984,
+          "e": 18.32
+        },
+        {
+          "t": "latihan",
+          "s": 18.38,
           "e": 18.88
         },
         {
           "t": "dibacakan",
-          "s": 18.92,
-          "e": 19.44
+          "s": 19.02,
+          "e": 19.92
         },
         {
           "t": "dengan",
-          "s": 19.474,
-          "e": 19.68
+          "s": 19.954,
+          "e": 20.16
         },
         {
           "t": "suara",
-          "s": 19.76,
-          "e": 20.08
+          "s": 20.213,
+          "e": 20.48
         },
         {
           "t": "kecerdasan",
-          "s": 20.107,
-          "e": 20.64
+          "s": 20.533,
+          "e": 21.04
         },
         {
           "t": "buatan,",
-          "s": 20.693,
-          "e": 21.68
+          "s": 21.12,
+          "e": 22.08
         },
         {
           "t": "disusun",
-          "s": 21.74,
-          "e": 22.24
+          "s": 22.14,
+          "e": 22.56
         },
         {
           "t": "dengan",
-          "s": 22.274,
-          "e": 22.48
+          "s": 22.606,
+          "e": 22.88
         },
         {
           "t": "bantuan",
-          "s": 22.56,
-          "e": 23.04
+          "s": 22.92,
+          "e": 23.36
         },
         {
           "t": "kecerdasan",
-          "s": 23.093,
-          "e": 23.6
+          "s": 23.413,
+          "e": 23.92
         },
         {
           "t": "buatan",
-          "s": 23.68,
-          "e": 24.16
+          "s": 23.973,
+          "e": 24.4
         },
         {
           "t": "dari",
-          "s": 24.24,
+          "s": 24.432,
           "e": 24.56
         },
         {
           "t": "kitab-kitab",
-          "s": 24.613,
-          "e": 25.2
+          "s": 24.627,
+          "e": 25.28
         },
         {
           "t": "yang",
-          "s": 25.232,
-          "e": 25.36
+          "s": 25.312,
+          "e": 25.44
         },
         {
           "t": "disebutkan",
-          "s": 25.42,
+          "s": 25.48,
           "e": 26.0
         },
         {
           "t": "sumbernya.",
-          "s": 26.04,
-          "e": 26.56
+          "s": 26.08,
+          "e": 26.64
         }
       ]
     },

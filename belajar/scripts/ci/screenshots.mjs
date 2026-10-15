@@ -23,7 +23,18 @@ import { chromium } from "playwright";
 
 // The narration audio for the karaoke shots (browser-side only), shared with linebreaks.mjs.
 // The workflow copies narration-route.mjs next to this script.
-import { BELAJAR_DIR, isNarration, isWordVoice, narrationIndex, narrationRoute, wordVoiceFile, wordVoiceIndex } from "./narration-route.mjs";
+import {
+  BELAJAR_DIR,
+  isLessonMedia,
+  isNarration,
+  isRecitationCopy,
+  isWordVoice,
+  narrationIndex,
+  narrationRoute,
+  QURAN_COM_PREFIX,
+  wordVoiceFile,
+  wordVoiceIndex,
+} from "./narration-route.mjs";
 
 const BASE = process.env.BASE_URL ?? "http://127.0.0.1:3300";
 // URL shape: plan L9 (hub → /quran track; Konsep/Kosakata at hub level).
@@ -1226,7 +1237,9 @@ async function clipChecks(page, vp, index) {
   ];
   const buttons = page.locator("main button[data-clip]");
   const served = [];
-  const handler = narrationRoute(index, served);
+  // The page's copies of its example files (fetched at idle) are refused, so each press loads the
+  // file on the page's one element as this check knows it (mediaPrefetchChecks checks the copies).
+  const handler = narrationRoute(index, served, { failMediaFetch: true });
   await page.route(isNarration, handler);
   try {
     for (const [urlPath, atLeast, what, pressSecond] of pages) {
@@ -1717,8 +1730,13 @@ async function fatihahRecitations() {
     return only;
   };
   return {
-    recitationOf,
-    hosts: new Set(content.ayat.flatMap((a) => a.recitation.map((r) => new URL(r.url).host))),
+    // A lesson ayah's recitation is our copy since 2026-10-15 (same-origin, under ALAFASY_PREFIX:
+    // watchRecitations matches it by path); the reciters' host left is the ayah popup's.
+    recitationOf: (ayah) => {
+      const r = recitationOf(ayah);
+      return { ...r, url: new URL(r.url, BASE).href };
+    },
+    hosts: new Set(["everyayah.com"]),
   };
 }
 
@@ -1743,8 +1761,10 @@ function watchWordVoices(pg) {
   };
   const seen = [];
   const answered = new Map();
+  // The players' own loads only: the page's fetch() of its copies at idle (src/lib/media-prefetch.ts)
+  // is another request kind, which mediaPrefetchChecks watches.
   const onRequest = (req) => {
-    if (isWord(req.url())) seen.push(req.url());
+    if (isWord(req.url()) && req.resourceType() !== "fetch") seen.push(req.url());
   };
   const onFinished = async (req) => {
     if (!isWord(req.url())) return;
@@ -1776,33 +1796,43 @@ function watchWordVoices(pg) {
  * nothing is intercepted, the real CDN answers. `stop()` ends the watch.
  */
 function watchRecitations(pg, hosts) {
-  const hostOf = (url) => {
+  // A reciters' host (the ayah popup's: everyayah.com), or our own copy of the imam's file
+  // (ALAFASY_PREFIX, same-origin since 2026-10-15: every lesson ayah).
+  const matches = (url) => {
     try {
-      return new URL(url).host;
+      const u = new URL(url);
+      return hosts.has(u.host) || isRecitationCopy(u);
     } catch {
-      return "";
+      return false;
     }
   };
   const seen = [];
+  /** How each request was made, by URL: "fetch" (the page's copy, src/lib/media-prefetch.ts) or "media" (an element). */
+  const kinds = [];
   const answered = new Map();
   const onRequest = (req) => {
-    if (hosts.has(hostOf(req.url()))) seen.push(req.url());
+    if (!matches(req.url())) return;
+    seen.push(req.url());
+    kinds.push({ url: req.url(), type: req.resourceType() });
   };
   const onFinished = async (req) => {
-    if (!hosts.has(hostOf(req.url()))) return;
+    if (!matches(req.url())) return;
     const status = (await req.response().catch(() => null))?.status();
     answered.set(req.url(), status === 200 || status === 206 ? "ok" : `HTTP ${status ?? "?"}`);
   };
   const onFailed = (req) => {
-    if (hosts.has(hostOf(req.url()))) answered.set(req.url(), `failed (${req.failure()?.errorText ?? "?"})`);
+    if (matches(req.url())) answered.set(req.url(), `failed (${req.failure()?.errorText ?? "?"})`);
   };
   pg.on("request", onRequest);
   pg.on("requestfinished", onFinished);
   pg.on("requestfailed", onFailed);
   return {
     seen,
+    kinds,
     answered,
     requested: (url) => seen.filter((u) => u === url).length,
+    /** Requests for `url` made by an audio element (not the page's fetch of its copy). */
+    byElement: (url) => kinds.filter((k) => k.url === url && k.type !== "fetch").length,
     list: () => seen.map((u) => `${recordingName(u)} → ${answered.get(u) ?? "no answer yet"}`).join("\n    ") || "(none)",
     stop: () => {
       pg.off("request", onRequest);
@@ -1852,13 +1882,15 @@ async function handOffToAyah2(pg) {
  * recording is now the NEXT AYAH's: the lesson reaches ayah 2 by itself (the hand-off), with no
  * click on that page, so no click's unlock() play asks for its file; steps 4 and 5 prove on it
  * what the reciter switch proved.
- *   1. a page view alone asks the reciters' host for no recording: none IDLE_SETTLE_MS after the
- *      page has loaded, when its idle preload (the first narration line) has run;
- *   2. after "Mulai", this ayah's recording is requested while the narrator still speaks the
- *      opening line: the stage is on its first step, not yet on the imam's ("recite"). Not proof
- *      of the early fetch by itself (review 2026-10-11): on a first "Mulai" the click's own
- *      unlock() play asks for the file too, as it did before the early fetch existed. Steps 4 and
- *      5 are the proof;
+ *   (Since 2026-10-15 — operator: "no latency (preload before page is opened)"; "we copy to our
+ *   server" — the imam's file is our same-origin copy, and the page fetches it AND every word file
+ *   of the lesson at idle, before "Mulai", as its own copies: src/lib/media-prefetch.ts. Steps 1,
+ *   2 and 4 were rewritten for that; until then a page view asked for nothing.)
+ *   1. a page view alone, IDLE_SETTLE_MS after load: every file of the stage's data-media-plan
+ *      (this ayah's recording and every word / example file) has been fetched as the page's copy,
+ *      once each, no element asked for any, and nothing of ayah 2 yet;
+ *   2. after "Mulai" the lesson is on its first step and no audio element asks for the ayah's
+ *      recording (the stage plays the page's copy);
  *   3. this runner can play the recordings at all (it needs the CDN and the MP3 decoder): on the
  *      imam's step of ayah 1, with the network free, "↺ Ulangi" must make him SOUND. Where the
  *      RUNNER cannot (the CDN did not answer the recording in full, or the browser has no MP3
@@ -1867,17 +1899,12 @@ async function handOffToAyah2(pg) {
  *      did not sound, or the page itself cancelled the fetch (net::ERR_ABORTED), the check fails
  *      (review 2026-10-11: a silent imam is the app's fault then, and nothing else in this job
  *      listens for him);
- *   4. a recording is fetched by the page that plays it, by no other, and by the EARLY FETCH
- *      ALONE (review 2026-10-11: the next ayah's is not fetched ahead from the recap). On the
- *      recap of ayah 1, RECAP_SETTLE_MS in, nothing but ayah 1's recording has been requested: no
- *      other ayah's, and no other reciter's (there is none). The lesson then goes on to ayah 2 by
- *      itself, and that page's player requests ITS recording at once, the lesson still on its
- *      first step — with no click on that page (so no unlock() play) and the imam's step not
- *      reached: nothing but warm() asks for it. Without the early fetch the element waits for a
- *      play (preload "none") and this request does not come. This is every ayah after the first
- *      of a sitting, where the wait was. The lesson is then paused there ("Jeda" plays nothing:
- *      only the clicks that start or move a lesson make the silent play), so it cannot reach the
- *      imam's step by itself before step 5 is ready;
+ *   4. the NEXT ayah's files are fetched from two thirds of the lesson on (nextAyahDue): by the
+ *      recap of ayah 1, RECAP_SETTLE_MS in, ayah 2's recording has been fetched as a copy and no
+ *      third ayah's anything; the lesson then goes on to ayah 2 by itself, and that page asks
+ *      the network for its recording NOT AGAIN (the copy outlives the client-side navigation).
+ *      The lesson is then paused there ("Jeda" plays nothing), so it cannot reach the imam's step
+ *      by itself before step 5 is ready;
  *   5. what the imam's step then plays is what was fetched ahead. For the recording of step 4
  *      (asked for by the early fetch and by nothing else), once the CDN has answered it in full,
  *      every further request to the reciters' host is HELD BACK RECITE_HOLD_MS (a route that
@@ -1900,15 +1927,24 @@ const RECITE_HOLD_MS = 6000;
 const RECAP_SETTLE_MS = 2500;
 async function warmupChecks(page, vp, index) {
   const { recitationOf, hosts } = await fatihahRecitations();
-  const isRecitation = (url) => hosts.has(url.host);
+  // Our copy of the imam's file (same-origin since 2026-10-15), answered by the narration route.
+  const isRecitation = (url) => isRecitationCopy(url);
   const name = recordingName;
-  const { seen, answered, requested, list, stop } = watchRecitations(page, hosts);
-  // Step 5: later requests to the reciters' hosts wait, then go on to the CDN.
+  const { seen, kinds, answered, requested, byElement, list, stop } = watchRecitations(page, hosts);
+  // Every lesson-media request (words and the imam's ayah) with how it was made: the page's fetch()
+  // of its copy ("fetch") or an element's load.
+  const media = [];
+  const onMedia = (req) => {
+    const u = new URL(req.url());
+    if (isLessonMedia(u.pathname)) media.push({ path: u.pathname, type: req.resourceType() });
+  };
+  page.on("request", onMedia);
+  // Step 5: later requests for the imam's file wait, then go on to the narration route.
   const heldBack = [];
   const hold = async (route) => {
     heldBack.push(route.request().url());
     await new Promise((done) => setTimeout(done, RECITE_HOLD_MS));
-    await route.continue().catch(() => {});
+    await route.fallback().catch(() => {});
   };
 
   const served = [];
@@ -1927,31 +1963,35 @@ async function warmupChecks(page, vp, index) {
     const theirs = recitationOf(2).url;
     if (mine === theirs) throw new Error(`${vp}: early fetch — Al-Fatihah 1 and 2 share one recording (${name(mine)}) in content/al-fatihah.json`);
 
-    // 1. A page view alone: nothing of the imam's.
+    // 1. A page view alone, BEFORE "Mulai" (operator 2026-10-15: "no latency (preload before page
+    //    is opened)"; src/lib/media-prefetch.ts): at idle the page fetches its own copy (fetch())
+    //    of this ayah's recording AND of every word / example file of the lesson — the stage's
+    //    data-media-plan, exactly what the sequence plays (media-prefetch.test.ts) — each once,
+    //    no audio element asks for any of them, and nothing of ayah 2's yet.
     await page.waitForTimeout(IDLE_SETTLE_MS);
-    if (seen.length) throw new Error(`${vp}: a page view alone asked the reciters' host for ${seen.map(name).join(", ")} — before "Mulai"`);
-    console.log(`  early fetch 1/5: no request to ${[...hosts].join(", ")} on a page view (two loads, ${IDLE_SETTLE_MS} ms idle)`);
+    const plan = ((await stage.getAttribute("data-media-plan")) ?? "").split(" ").filter(Boolean);
+    const minePath = new URL(mine).pathname;
+    if (!plan.includes(minePath)) throw new Error(`${vp}: the stage's media plan does not list this ayah's recording ${minePath} (plan: ${plan.join(", ") || "none"})`);
+    if (!plan.some((p) => p.startsWith(QURAN_COM_PREFIX))) throw new Error(`${vp}: the stage's media plan lists no Quran.com word file (plan: ${plan.join(", ")})`);
+    const fetchedBefore = new Set(media.filter((m) => m.type === "fetch").map((m) => m.path));
+    const notFetched = plan.filter((p) => !fetchedBefore.has(p));
+    if (notFetched.length) throw new Error(`${vp}: before "Mulai", ${IDLE_SETTLE_MS} ms idle, the page had not fetched ${notFetched.length} of its ${plan.length} lesson files: ${notFetched.join(", ")}`);
+    const twice = plan.filter((p) => media.filter((m) => m.type === "fetch" && m.path === p).length > 1);
+    if (twice.length) throw new Error(`${vp}: fetched more than once before "Mulai": ${twice.join(", ")}`);
+    const byElementBefore = media.filter((m) => m.type !== "fetch");
+    if (byElementBefore.length) throw new Error(`${vp}: before "Mulai" an audio element asked for ${byElementBefore.map((m) => m.path).join(", ")} (the page's copies are what plays)`);
+    if (requested(theirs)) throw new Error(`${vp}: a page view alone fetched ayah 2's recording ${name(theirs)} (the next ayah is fetched from two thirds of the lesson on)`);
+    console.log(`  early fetch 1/5: a page view (${IDLE_SETTLE_MS} ms idle): all ${plan.length} lesson files fetched as the page's copies before "Mulai" (the recitation and ${plan.length - 1} word files), no element load, nothing of ayah 2`);
 
-    // 2. "Mulai": this ayah's recording, while the narrator speaks the opening line.
-    const t0 = Date.now();
-    await Promise.all([
-      page.waitForRequest((r) => r.url() === mine, { timeout: 10_000 }).catch(() => {
-        throw new Error(`${vp}: 10 s after "Mulai" this ayah's recording (${name(mine)}) was not requested (requests: ${seen.map(name).join(", ") || "none"})`);
-      }),
-      page.locator('[data-autoplay="start"]').click(),
-    ]);
-    const askedAfter = Date.now() - t0;
-    const early = await stage.getAttribute("data-step");
-    if (early !== null && early !== "intro") throw new Error(`${vp}: ${name(mine)} was requested only on step "${early}", not while the opening line plays`);
+    // 2. "Mulai": the lesson starts on its first step, and the imam's file is not asked for again
+    //    by any element — the stage plays the page's copy (useSegmentPlayer adopt).
+    await page.locator('[data-autoplay="start"]').click();
     await settleScroll(page);
     const opening = await stage.getAttribute("data-step");
     const line = await page.locator('[data-autoplay="caption"]').first().getAttribute("data-line").catch(() => null);
     if (opening !== "intro") throw new Error(`${vp}: the lesson is on step "${opening}" right after "Mulai" (expected its first step, "intro")`);
-    // Also asked for by the click's own unlock() play: the early fetch alone is shown by 4 and 5.
-    console.log(
-      `  early fetch 2/5: ${name(mine)} requested ${askedAfter} ms after "Mulai", the lesson on step "${opening}" (line ${line ?? "—"}), before the imam's step ` +
-        `(the click's own silent play asks for it too: steps 4 and 5 show the early fetch alone)`,
-    );
+    if (byElement(mine)) throw new Error(`${vp}: after "Mulai" an audio element asked the network for ${name(mine)}, which the page already held`);
+    console.log(`  early fetch 2/5: "Mulai" → step "${opening}" (line ${line ?? "—"}); ${name(mine)} asked for by no element (played from the page's copy)`);
 
     // 3. The imam's step with the network free: can this runner play him at all?
     await toStep(page, vp, "recite");
@@ -2032,25 +2072,29 @@ async function warmupChecks(page, vp, index) {
       notChecked(`the imam's recitation was not heard at all — ${blame}`);
     }
 
-    // 4. A recording is fetched by the page that plays it. Up to the recap: nothing but this
-    //    ayah's. Then the hand-off: ayah 2's player fetches its own at once, by the early fetch alone.
+    // 4. The NEXT ayah is fetched ahead from two thirds of the lesson on (src/lib/media-prefetch.ts
+    //    nextAyahDue): by the recap, ayah 2's recording has been fetched — as the page's copy, by
+    //    no element — and no other ayah's. Then the hand-off: ayah 2's page asks the network for
+    //    it again NOT AT ALL (the copy is kept across the client-side navigation).
     await toStep(page, vp, "recap");
     await page.waitForTimeout(RECAP_SETTLE_MS);
-    const strangers = [...new Set(seen)].filter((u) => u !== mine);
+    const strangers = [...new Set(seen)].filter((u) => u !== mine && u !== theirs);
     if (strangers.length) {
-      throw new Error(`${vp}: on ayah 1, ${RECAP_SETTLE_MS} ms into the recap, recordings this page does not play were requested: ${strangers.map(name).join(", ")} (a recording is fetched by the page that plays it)`);
+      throw new Error(`${vp}: on ayah 1, ${RECAP_SETTLE_MS} ms into the recap, recordings neither this page nor the next plays were requested: ${strangers.map(name).join(", ")}`);
     }
+    if (!kinds.some((k) => k.url === theirs && k.type === "fetch")) {
+      throw new Error(`${vp}: by the recap of ayah 1 the next ayah's recording ${name(theirs)} had not been fetched ahead (requests: ${list()})`);
+    }
+    const before2 = requested(theirs);
     await handOffToAyah2(page);
     const t2 = Date.now();
-    if (!(await until(page, () => requested(theirs) > 0, 5_000))) {
-      throw new Error(
-        `${vp}: 5 s after the lesson went on to ayah 2 by itself, its recording (${name(theirs)}) was not requested (requests: ${seen.map(name).join(", ")}) — ` +
-          `no click was made on that page, so only the early fetch asks for it`,
-      );
-    }
+    await page.waitForTimeout(2_000);
     const askedAfter2 = Date.now() - t2;
+    if (requested(theirs) !== before2) {
+      throw new Error(`${vp}: after the hand-off ayah 2's page asked for its recording ${name(theirs)} again (${requested(theirs) - before2} more request(s)): the copy fetched on ayah 1 was not kept`);
+    }
     const at = await stage.getAttribute("data-step");
-    if (at !== "intro") throw new Error(`${vp}: after the hand-off ${name(theirs)} was requested only on step "${at}", not while the first line plays`);
+    if (at !== "intro") throw new Error(`${vp}: after the hand-off the lesson is on step "${at}", not its first line`);
     // Hold the lesson on its first step until step 5 is ready. "Jeda" plays nothing, so the
     // recording stays asked for by the early fetch alone. (A lesson that is not running needs no
     // holding; that it runs after a hand-off is aheadChecks' to prove.)
@@ -2061,8 +2105,8 @@ async function warmupChecks(page, vp, index) {
     const unknown = [...new Set(seen)].filter((u) => u !== mine && u !== theirs);
     if (unknown.length) throw new Error(`${vp}: recordings neither page plays were requested: ${unknown.map(name).join(", ")} (one imam: each ayah has one recording)`);
     console.log(
-      `  early fetch 4/5: nothing but ${name(mine)} requested on ayah 1 (to its recap); on ayah 2, reached by the lesson itself, ` +
-        `${name(theirs)} requested within ${askedAfter2} ms of its start, the lesson on step "${at}" — no click on that page, before the imam's step: the early fetch alone`,
+      `  early fetch 4/5: on ayah 1 (to its recap) ${name(mine)} and the next ayah's ${name(theirs)} fetched as copies, nothing else; on ayah 2, reached by the lesson itself, ` +
+        `no new request for ${name(theirs)} in ${askedAfter2} ms, the lesson on step "${at}"`,
     );
 
     // 5. That recording was fetched ahead, by nothing else: with the network held back, the
@@ -2108,6 +2152,81 @@ async function warmupChecks(page, vp, index) {
     throw err;
   } finally {
     stop();
+    page.off("request", onMedia);
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
+/**
+ * NO LATENCY ON A WORD (operator 2026-10-15: "just make sure no latency (preload before page is
+ * opened)"; src/lib/media-prefetch.ts), phone. The words are answered in the browser (narrationRoute
+ * stand-ins of the pinned lengths), Save-Data off.
+ *   1. A Konsep page (idhafah), looked at: at idle its example files are fetched as the page's
+ *      copies (fetch()), the first PAGE_PREFETCH_MAX_FILES of them in page order;
+ *   2. pressing its first example button then plays AT ONCE: data-state "playing", its status line
+ *      ([data-clip-status]) never says "Memuat…" in the next 1.5 s, and no audio element asked the
+ *      network for the file (an object URL never reaches it);
+ *   3. the button says where its sound comes from: data-source "quran.com" with the tooltip
+ *      "Rekaman kata dari Quran.com" and "Rekaman Quran.com" in its label, or "elevenlabs" with
+ *      "suara AI".
+ * (The lesson side — every file of the lesson fetched before "Mulai", the next ayah's before the
+ * hand-off — is warmupChecks 1/5 and 4/5.) Outline written 2026-10-15 without a run: the laptop
+ * that wrote it runs no browser; the first CI run is its first run.
+ */
+const PREFETCH_IDLE_MS = 4000;
+async function mediaPrefetchChecks(page, vp, index) {
+  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8"));
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const media = [];
+  const onMedia = (req) => {
+    const u = new URL(req.url());
+    if (isLessonMedia(u.pathname)) media.push({ path: u.pathname, type: req.resourceType() });
+  };
+  page.on("request", onMedia);
+  const fail = (m) => {
+    throw new Error(`${vp}: media prefetch — ${m}`);
+  };
+  try {
+    await page.goto(BASE + "/belajar/id/konsep/idhafah", { waitUntil: "networkidle" });
+    await page.waitForTimeout(PREFETCH_IDLE_MS);
+    const buttons = page.locator("main button[data-clip]");
+    const n = await buttons.count();
+    if (!n) fail("the idhafah page shows no example button");
+    const first = buttons.first();
+    const loc = await first.getAttribute("data-clip");
+    const fetched = media.filter((m) => m.type === "fetch").map((m) => m.path);
+    if (!fetched.length) fail(`nothing was fetched at idle (${PREFETCH_IDLE_MS} ms) for the page's ${n} example buttons`);
+    // 3. the button names its source
+    const source = await first.getAttribute("data-source");
+    const label = (await first.getAttribute("aria-label")) ?? "";
+    const title = (await first.getAttribute("title")) ?? "";
+    if (source === "quran.com") {
+      if (!label.includes("Quran.com") || title !== msgs.Clip.source_qc) fail(`a Quran.com word's button says “${label}” / “${title}”`);
+    } else if (source === "elevenlabs") {
+      if (!label.includes("suara AI") || title !== msgs.Clip.source_ai) fail(`an AI voice's button says “${label}” / “${title}”`);
+    } else fail(`the first button (${loc}) names no source (data-source ${source})`);
+    // 2. the press plays at once, from the page's copy
+    const elementBefore = media.filter((m) => m.type !== "fetch").length;
+    await first.click();
+    const status = first.locator("xpath=following-sibling::*[@data-clip-status]");
+    let loadingSeen = false;
+    for (const end = Date.now() + 1500; Date.now() < end; ) {
+      if (((await status.textContent()) ?? "").includes("Memuat")) loadingSeen = true;
+      await page.waitForTimeout(100);
+    }
+    if (loadingSeen) fail(`pressing ${loc} showed “Memuat…”: the file was not held`);
+    const byElement = media.slice(0).filter((m) => m.type !== "fetch").length - elementBefore;
+    if (byElement) fail(`pressing ${loc} made ${byElement} element request(s) for a file the page had fetched: ${media.filter((m) => m.type !== "fetch").map((m) => m.path).join(", ")}`);
+    console.log(`  media prefetch: idhafah — ${fetched.length} example file(s) fetched at idle; ${loc} (${source}) played with no loading status and no request`);
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-media-prefetch-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`  lesson-media requests (${media.length}):\n    ${media.map((m) => `${m.path} ${m.type}`).join("\n    ") || "(none)"}`);
+    throw err;
+  } finally {
+    page.off("request", onMedia);
     await page.unroute(isNarration, handler);
   }
   await page.goto("about:blank");
@@ -2290,7 +2409,9 @@ async function aheadChecks(page, vp, index) {
   const delays = new Map();
   // The page's copy of the lesson map's line cannot be made (step 6).
   const failFetch = new Set([map1]);
-  const handler = narrationRoute(index, served, { delays, timeline, holdFetchMs: AHEAD_HOLD_MS, failFetch });
+  // The lesson media the page fetches at idle (src/lib/media-prefetch.ts: words, the imam's ayah)
+  // are not narration lines: left out of the timeline these rules are about (mediaPrefetchChecks).
+  const handler = narrationRoute(index, served, { delays, timeline, holdFetchMs: AHEAD_HOLD_MS, failFetch, record: (p) => !isLessonMedia(p) });
   await pg.route(isNarration, handler);
   const stage = pg.locator('[data-autoplay="stage"]');
   const middle = pg.locator('[data-autoplay="middle"]');
@@ -3013,7 +3134,9 @@ async function exampleChecks(page, vp, index) {
     return chars ? chars * 100 + (Math.ceil(chars / 100) + 1) * 5_000 : 20_000;
   };
   const served = [];
-  const handler = narrationRoute(index, served);
+  // The page's copies (fetched at idle, src/lib/media-prefetch.ts) are refused: the beats' players
+  // load their files themselves, which is what steps 1 and 2 hold back and watch.
+  const handler = narrationRoute(index, served, { failMediaFetch: true });
   await page.route(isNarration, handler);
   const watch = watchRecitations(page, new Set(["everyayah.com"]));
   // The narrator's word recordings: observed as the requests are made, answered by `handler`.
@@ -3150,12 +3273,16 @@ async function exampleChecks(page, vp, index) {
         const wait2 = compose.words["1:1:2"].lines.filter((l) => l.frame <= allahu.frame).length * 12_000;
         if (!(await beatShows(heldId, wait2 + 20_000))) fail(`the example ${heldId} never showed in word 2's composition (step "${await attr("data-step")}")`);
         const t2 = Date.now();
-        // A word's recording is the NARRATOR's (the loading kind "narration": "Memuat suara
-        // narator…"), not the imam's: the imam's "Memuat bacaan imam…" is for an ayah's recitation.
-        const status = page.locator('[data-autoplay="loading"][data-kind="narration"]');
-        await status.waitFor({ state: "visible", timeout: 3_000 }).catch(() => fail(`with the narrator's recordings held back, no loading status showed within 3 s of the beat`));
+        // A word's recording is never the imam's ("Memuat bacaan imam…" is for an ayah's
+        // recitation): Quran.com's word (since 2026-10-15; loading kind "word": "Memuat suara
+        // kata…", never "narator") or the AI narrator's (kind "narration": "Memuat suara narator…").
+        const wv = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "wordvoice.json"), "utf8"));
+        const heldQc = wv.words?.[compose.words["1:1:2"].forms[allahu.form].ar.replaceAll("\u0671", "\u0627")]?.source === "quran.com";
+        const [kind, want] = heldQc ? ["word", msgs.loading_word] : ["narration", msgs.loading_narration];
+        const status = page.locator(`[data-autoplay="loading"][data-kind="${kind}"]`);
+        await status.waitFor({ state: "visible", timeout: 3_000 }).catch(() => fail(`with the bentuk dasar's recording held back, no loading status (${kind}) showed within 3 s of the beat`));
         const says = await text(status);
-        if (says !== msgs.loading_narration) fail(`the loading status says “${says}”, expected “${msgs.loading_narration}”`);
+        if (says !== want) fail(`the loading status says “${says}”, expected “${want}”`);
         if (!heldBack.length) fail(`no recording of the narrator was requested at the beat (nothing was held back)`);
         await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-example-loading.png` });
         console.log(`shot ${vp}-autoplay-ayah1-example-loading`);
@@ -3201,7 +3328,7 @@ async function exampleChecks(page, vp, index) {
     if (!first.seen.some((s) => s === "reciting" || s === "failed")) fail(`the lesson never asked the imam for the concept's example (states: ${first.seen.join(" → ") || "none"})`);
     // This ayah's one recording (one imam, plan L21): what the stage's player plays.
     const [only, ...more] = ayah1.recitation;
-    const mine = only && !more.length ? only.url : null;
+    const mine = only && !more.length ? new URL(only.url, BASE).href : null;
     if (!mine || !watch.requested(mine)) fail(`the example is this ayah's word, and the ayah's recording (${mine ? recordingName(mine) : "—: content/al-fatihah.json does not give ayah 1 exactly one"}) was never requested`);
     // The word on the mushaf line is marked (its ring), the card clear of the panel, the caption on screen.
     const n = concept.n;
@@ -4019,6 +4146,7 @@ try {
     await everyMeaningCheck(page, vp, narration);
     if (vp === "phone") await loadingChecks(page, vp, narration);
     if (vp === "phone") await warmupChecks(page, vp, narration);
+    if (vp === "phone") await mediaPrefetchChecks(page, vp, narration);
     if (vp === "phone") await aheadChecks(page, vp, narration);
     await composeShots(page, vp, narration);
     await exampleChecks(page, vp, narration);

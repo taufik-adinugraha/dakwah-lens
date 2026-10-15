@@ -49,10 +49,16 @@ const read = (rel: string) => readFileSync(join(BELAJAR, rel), "utf8");
 const MSG = { id: JSON.parse(read("messages/id.json")), en: JSON.parse(read("messages/en.json")) };
 const CLIPS = LIBRARY.clips;
 const MANIFEST = manifest as WordVoiceManifest;
-/** A recording of content/wordvoice.json: the narrator's file of a text, named by its text's hash and its own checksum. */
+/** A recording of content/wordvoice.json: the narrator's file of a text, named by its text's hash and its own checksum… */
 const VOICE_FILE = /^\/belajar\/media\/narration\/kang-nandar\/words\/([0-9a-f]{16})-([0-9a-f]{10})\.mp3$/;
+/** …or, for a text that is a word at a place in the Qur'an (operator 2026-10-15), our unaltered
+ *  copy of Quran.com's word file, named as upstream names it. */
+const QC_FILE = /^\/belajar\/media\/narration\/quran-com\/wbw\/(\d{3})_(\d{3})_(\d{3})\.mp3$/;
 /** The manifest's recording of a Qur'anic text (any Uthmani string), or undefined. */
 const recordingOf = (ar: string) => MANIFEST.words[plainLetters(ar)]?.audio;
+const sourceOf = (ar: string) => MANIFEST.words[plainLetters(ar)]?.source;
+/** The button's label for the Arabic `ar` (said `word`): where its sound comes from (operator 2026-10-15). */
+const labelOf = (ar: string, word: string, msgs = MSG.id) => (sourceOf(ar) === "quran.com" ? msgs.Clip.play_label_qc : msgs.Clip.play_label).replace("{word}", word);
 /** The Arabic a page shows for a clip key: a lesson word's own bytes, else library.json `quran`. */
 const arabicOf = (key: string) => WORD_INFO[key]?.ar ?? LIBRARY.quran[key];
 /** The clip key of a parts tile: its own q-ref (a whole word, or a part of one). */
@@ -78,9 +84,13 @@ describe("clip lookup (src/lib/clips.ts)", () => {
     expect(CLIP_QREF.source).toBe(QREF.source); // the markup's q-ref grammar, repeated for the browser
   });
 
-  it("finds the narrator's recording of a word, of a letter's word, of a run and of a part; nothing for an unknown word", () => {
+  it("finds the recording of a word (Quran.com's), of a letter's word, of a run and of a part (the narrator's); nothing for an unknown word", () => {
     const bismi = clipFor(CLIPS, "1:1:1")!;
-    expect(bismi).toEqual({ url: expect.stringMatching(VOICE_FILE), start: 0, end: recordingOf(WORD_AR["1:1:1"])!.ms });
+    const rec = recordingOf(WORD_AR["1:1:1"])!;
+    expect(bismi).toEqual({ url: expect.stringMatching(QC_FILE), start: rec.start, end: rec.end, source: "quran.com" });
+    // a run (two words) has no word-by-word file: the narrator's; a part of a word likewise
+    expect(clipFor(CLIPS, "q:55:78:1-2")!.source).toBe("elevenlabs");
+    expect(clipFor(CLIPS, "q:1:1:1/1")!.source).toBe("elevenlabs");
     expect(bismi).toEqual(wordVoice(WORD_AR["1:1:1"]));
     expect(clipFor(CLIPS, "q:1:1:1#1")).toBe(CLIPS["1:1:1"]);
     // ٱسْمُ of QS 55:78, the bentuk dasar of bismi: the form on its own (the imam's cut played it
@@ -97,7 +107,7 @@ describe("clip lookup (src/lib/clips.ts)", () => {
     expect(clipFor(CLIPS, "2:255:1")).toBeNull();
   });
 
-  it("every clip is a whole recording of content/wordvoice.json, of its text: the narrator's file, from 0 to its length", () => {
+  it("every clip is a recording of content/wordvoice.json, of its text: Quran.com's file of a word at its place (the word inside it), else the narrator's whole file", () => {
     // Every Qur'anic text the library shows has its recording (build_wordvoice.py --require-audio).
     expect(Object.keys(CLIPS).sort()).toEqual(Object.keys(LIBRARY.quran).sort());
     expect(Object.keys(CLIPS).length).toBeGreaterThan(80);
@@ -106,19 +116,30 @@ describe("clip lookup (src/lib/clips.ts)", () => {
       const rec = recordingOf(ar);
       expect(rec, key).toBeDefined();
       expect(c, key).toEqual(wordVoice(ar));
-      const m = VOICE_FILE.exec(c.url);
-      expect(m, `${key} ${c.url}`).not.toBeNull();
       expect(c.url, key).toBe(rec!.url);
-      expect(m![2], key).toBe(rec!.sha256.slice(0, 10)); // the address carries the file's checksum
-      expect([c.start, c.end], key).toEqual([0, rec!.ms]);
+      const n = ar.trim().split(/\s+/u).length;
+      if (sourceOf(ar) === "quran.com") {
+        // one word at one place: the file is upstream's, unaltered; the word is [start, end] of it
+        expect(n, key).toBe(1);
+        expect(QC_FILE.test(c.url), `${key} ${c.url}`).toBe(true);
+        expect([c.start, c.end], key).toEqual([rec!.start, rec!.end]);
+        expect(0 <= c.start && c.start < c.end && c.end <= rec!.ms, key).toBe(true);
+      } else {
+        const m = VOICE_FILE.exec(c.url);
+        expect(m, `${key} ${c.url}`).not.toBeNull();
+        expect(m![2], key).toBe(rec!.sha256.slice(0, 10)); // the address carries the file's checksum
+        expect([c.start, c.end], key).toEqual([0, rec!.ms]);
+      }
       expect(Number.isInteger(c.end), key).toBe(true);
       // not a cut of the imam's file: never an EveryAyah address, never a `last` mark
       expect(c.url, key).not.toContain("everyayah");
       expect(c, key).not.toHaveProperty("last");
-      // plausible: at least 150 ms, at most 4 s a word (the longest recording is a run of five words)
-      const n = ar.trim().split(/\s+/u).length;
-      expect(c.end, key).toBeGreaterThanOrEqual(150);
-      expect(c.end, key).toBeLessThanOrEqual(4000 * n);
+      // plausible: at least 150 ms, at most 4 s a word (the longest narrator's recording is a run of
+      // five words); a Quran.com word at most 6.5 s — ad-ḍāllīn (1:7:9), a madd lāzim of six counts
+      // at the end of the surah, is 5.9 s in its file (flagged for the operator's ear, 2026-10-15)
+      const span = c.end - c.start;
+      expect(span, key).toBeGreaterThanOrEqual(150);
+      expect(span, key).toBeLessThanOrEqual(sourceOf(ar) === "quran.com" ? 6500 : 4000 * n);
     }
   });
 
@@ -135,7 +156,9 @@ describe("clip lookup (src/lib/clips.ts)", () => {
     // of the last: it is not a cut of anything)
     expect(LIBRARY.quran["112:1:2-3"]).toBe(`${WORD_AR["112:1:2"]} ${WORD_AR["112:1:3"]}`);
     expect(CLIPS["112:1:2-3"]).toEqual(wordVoice(`${WORD_AR["112:1:2"]} ${WORD_AR["112:1:3"]}`));
-    expect(CLIPS["112:1:2-3"].end).toBeGreaterThan(CLIPS["112:1:3"].end);
+    // no word-by-word file holds two words: a run is the narrator's, each of its words Quran.com's
+    expect(CLIPS["112:1:2-3"].source).toBe("elevenlabs");
+    expect([CLIPS["112:1:2"].source, CLIPS["112:1:3"].source]).toEqual(["quran.com", "quran.com"]);
   });
 });
 
@@ -230,11 +253,11 @@ describe("every rule has an example with Arabic and a voice", () => {
     const card = read("src/components/library/ConceptCard.tsx");
     expect(card).toContain("<ClipButton loc={row.ex.loc}");
     expect(card).toContain("wordVoice(ar)");
-    expect(card).toContain("<ClipPlayerProvider>{card}</ClipPlayerProvider>");
+    expect(card).toContain("<ClipPlayerProvider prefetch={prefetch}>{card}</ClipPlayerProvider>");
     const chart = read("src/components/library/HarakatChart.tsx");
     expect(chart).toContain("<ClipButton loc={s.loc}");
     expect(chart).toContain("wordVoice(w.ar)");
-    expect(chart).toContain("<ClipPlayerProvider>");
+    expect(chart).toContain("<ClipPlayerProvider prefetch={prefetch}>");
     const parts = read("src/components/library/WordParts.tsx");
     expect(parts).toContain("<ClipButton loc={data.loc}");
     expect(parts).toContain("wordVoice(data.word.ar)");
@@ -259,9 +282,9 @@ describe("the pages as rendered (server markup, real messages)", () => {
   const buttonsOf = (html: string) =>
     [
       ...html.matchAll(
-        /<button type="button" data-clip="([^"]+)" data-state="([^"]+)" aria-label="([^"]+)"(?: aria-describedby="([^"]+)")? class="btn-listen">/g,
+        /<button type="button" data-clip="([^"]+)" data-source="([^"]+)"(?: title="([^"]+)")? data-state="([^"]+)" aria-label="([^"]+)"(?: aria-describedby="([^"]+)")? class="btn-listen">/g,
       ),
-    ].map((m) => ({ loc: m[1], state: m[2], label: m[3], describedBy: m[4] ?? null }));
+    ].map((m) => ({ loc: m[1], source: m[2], title: m[3] ?? null, state: m[4], label: m[5], describedBy: m[6] ?? null }));
   /** The notes drawn on a page: [id, kind, text]. */
   const notesOf = (html: string) =>
     [...html.matchAll(/<p id="([^"]+)" data-clip-note="(waqf|washal)"[^>]*>(.*?)<\/p>/g)].map((m) => ({
@@ -269,7 +292,8 @@ describe("the pages as rendered (server markup, real messages)", () => {
       kind: m[2],
       text: m[3].replace(/<[^>]+>/g, ""),
     }));
-  const label = (word: string) => MSG.id.Clip.play_label.replace("{word}", word);
+  /** The label of the button of clip key `loc` (said `word`): Quran.com's word, or the AI narrator's. */
+  const label = (word: string, loc?: string) => (loc ? labelOf(arabicOf(loc), word) : MSG.id.Clip.play_label.replace("{word}", word));
   const labels = { nahwu: "n", sharaf: "s", bridge: "b", examples: "e", more: "m", sources: "r" };
   const card = (id: string, compact = false) =>
     intl(createElement(ConceptCard, { concept: LIBRARY.concepts.find((c) => c.id === id)!, labels, surahs: SURAH_INDEX, wordAr: WORD_AR, page: !compact, compact }));
@@ -284,8 +308,13 @@ describe("the pages as rendered (server markup, real messages)", () => {
         // every button plays the recording of the Arabic the page shows for it (a lesson word, or a
         // part / base form of a diagram)
         expect(wordVoice(arabicOf(b.loc)), `${c.id} ${b.loc}`).not.toBeNull();
+        // the button says where its sound comes from, in its label and its tooltip
+        const qc = sourceOf(arabicOf(b.loc)) === "quran.com";
+        expect([b.source, b.title], `${c.id} ${b.loc}`).toEqual(qc ? ["quran.com", MSG.id.Clip.source_qc] : ["elevenlabs", MSG.id.Clip.source_ai]);
+        expect(b.label.includes("Quran.com"), `${c.id} ${b.loc}`).toBe(qc);
+        expect(b.label.includes("suara AI"), `${c.id} ${b.loc}`).toBe(!qc);
       }
-      for (const e of c.examples) expect(html, `${c.id} ${e.loc}`).toContain(`aria-label="${label(WORD_INFO[e.loc].translit)}"`);
+      for (const e of c.examples) expect(html, `${c.id} ${e.loc}`).toContain(`aria-label="${label(WORD_INFO[e.loc].translit, e.loc)}"`);
       expect(html.split(MSG.id.Clip.credit.slice(0, 12)).length - 1, c.id).toBe(1);
     }
   });
@@ -296,18 +325,20 @@ describe("the pages as rendered (server markup, real messages)", () => {
     // ismu is its own recording: its alif is read, so the button plays "ismu" and says nothing more
     // (until 2026-10-14 it played the run tabāraka-smu and a line said why: alone it played "smu")
     const ismu = buttons.find((b) => b.loc === "55:78:2")!;
-    expect(ismu.label).toBe(label("ismu"));
+    expect(ismu.label).toBe(label("ismu", "55:78:2"));
+    expect(ismu.source).toBe("quran.com"); // a word at its place: QS 55:78
     expect(ismu.describedBy).toBeNull();
     expect(buttons.map((b) => b.loc)).not.toContain("55:78:1-2");
     expect(html).not.toContain("tabārakasmu");
     // bi-, a part of a word, is voiced too (it had no button)
     const bi = buttons.find((b) => b.loc === "1:1:1/1")!;
-    expect(bi.label).toBe(label("bi-"));
+    expect(bi.label).toBe(label("bi-", "1:1:1/1"));
+    expect(bi.source).toBe("elevenlabs"); // a part of a word: the AI narrator's
     expect(bi.describedBy).toBeNull();
-    expect(html).toContain(`aria-label="${label("bismi")}"`);
+    expect(html).toContain(`aria-label="${label("bismi", "1:1:1")}"`);
     // Allāhu likewise, on the same page: itself, not huwallāhu
     const allah = buttons.find((b) => b.loc === "112:1:3")!;
-    expect(allah.label).toBe(label("Allāhu"));
+    expect(allah.label).toBe(label("Allāhu", "112:1:3"));
     expect(buttons.map((b) => b.loc)).not.toContain("112:1:2-3");
     expect(html).not.toContain("huwallāhu");
     // no note of any kind is drawn on the page
@@ -332,7 +363,7 @@ describe("the pages as rendered (server markup, real messages)", () => {
       expect(notesOf(html), c.id).toEqual([]);
       expect(html, c.id).not.toContain(MSG.id.Clip.waqf_note);
       for (const e of c.examples) {
-        const b = buttons.find((x) => x.loc === e.loc && x.label === label(WORD_INFO[e.loc].translit))!;
+        const b = buttons.find((x) => x.loc === e.loc && x.label === label(WORD_INFO[e.loc].translit, e.loc))!;
         expect(b, `${c.id} ${e.loc}`).toBeTruthy();
         expect(b.describedBy, `${c.id} ${e.loc}`).toBeNull();
         // the clip has no `last`, which is what the note was decided from (heard.ts hasWaqfNote)
@@ -387,13 +418,13 @@ describe("the pages as rendered (server markup, real messages)", () => {
     expect(html.indexOf(`>${kasrah.letter}<`, at)).toBeGreaterThan(html.indexOf("dibaca kasrah:", at));
     const b = buttonsOf(html);
     expect(b.map((x) => x.loc)).toEqual(signs.map((s) => s.loc));
-    expect(b.map((x) => x.label)).toEqual(signs.map((s) => label((WORD_INFO[s.loc] ?? s.word)!.translit)));
+    expect(b.map((x) => x.label)).toEqual(signs.map((s) => label((WORD_INFO[s.loc] ?? s.word)!.translit, s.loc)));
     expect(html.match(/role="status"/g)).toHaveLength(signs.length);
     // the tanwin dhammah card: مٌ = m + un "dari سَلَٰمٌ (salāmun)", a word outside the lessons with
     // its own transliteration, where the tanwin is heard (it was أَحَدٌ, heard "aḥad")
     const salam = LIBRARY.quran["97:5:1"];
     expect(html).toContain(`>${salam}</bdi> (salāmun)`);
-    expect(html).toContain(`aria-label="${label("salāmun")}"`);
+    expect(html).toContain(`aria-label="${label("salāmun", "97:5:1")}"`);
     expect(html).not.toContain("aḥadun");
     expect(signs.find((s) => s.loc === "97:5:1")).toMatchObject({ reading: "m + un", word: { ar: salam, translit: "salāmun" } });
     // every card's "dari <word> (<transliteration>)" line
@@ -438,7 +469,8 @@ describe("the clip player's logic (one Audio element per page)", () => {
   });
 
   it("a narrator's recording is the whole file: no seek at its start, played to its length, again from the start", () => {
-    const w = wordVoice(WORD_AR["1:1:1"])!;
+    const w = wordVoice(LIBRARY.quran["1:1:1/1"])!; // bi-, a part of a word: the narrator's
+    expect(w.source).toBe("elevenlabs");
     expect([w.start, w.end > 0]).toEqual([0, true]);
     expect(clipStartSeconds(w)).toBe(0);
     expect(needsSeek(w, 0)).toBe(false); // a fresh file is already at the word's start
@@ -446,6 +478,18 @@ describe("the clip player's logic (one Audio element per page)", () => {
     expect(atClipEnd(w, w.end)).toBe(true);
     expect(needsSeek(w, w.end)).toBe(true); // just ended: from its start again
     expect(endTimerMs(w, w.end - 10)).toBe(10);
+  });
+
+  it("a Quran.com word is played inside its file, unaltered: seek to the word's start, stop at its end", () => {
+    const w = wordVoice(WORD_AR["1:1:1"])!; // bismi: Quran.com's 001_001_001.mp3, the silence around it left out
+    const rec = recordingOf(WORD_AR["1:1:1"])!;
+    expect(w.source).toBe("quran.com");
+    expect([w.start, w.end]).toEqual([rec.start, rec.end]);
+    expect(w.start).toBeGreaterThan(0); // this file opens with silence
+    expect(needsSeek(w, 0)).toBe(true);
+    expect(clipStartSeconds(w)).toBe(rec.start! / 1000);
+    expect(atClipEnd(w, w.end - 1)).toBe(false);
+    expect(atClipEnd(w, w.end)).toBe(true);
   });
 
   it("near the end a timer is set for the end itself, not the next frame (a frame is 16.7 ms; the next word starts 10 ms on)", () => {
@@ -488,9 +532,10 @@ describe("the clip player's logic (one Audio element per page)", () => {
     expect(hook).toMatch(/const onVisibility = \(\) => \{\s*if \(!document\.hidden \|\| a\.paused\) return;[\s\S]*?a\.pause\(\);/);
     // every stop is at or after the end, on the element's own clock (CI measures it on the real page)
     expect(hook.match(/atClipEnd\(/g)).toHaveLength(1);
-    // src only inside play(), which only a press calls
+    // src only inside play(), which only a press calls: the page's copy of the file when it holds
+    // one (useMediaPrefetch, fetched at idle), else the file
     expect(hook.match(/a\.src = /g)).toHaveLength(1);
-    expect(hook).toMatch(/const play = useCallback\(\(key: string, clip: Clip\) => \{[\s\S]*?a\.src = clip\.url/);
+    expect(hook).toMatch(/const play = useCallback\(\(key: string, clip: Clip\) => \{[\s\S]*?const held = mediaSrc\(clip\.url\);[\s\S]*?a\.src = src/);
   });
 
   it("the button: a real button, its aria-label naming the word and starting with its visible word, 48px", () => {
@@ -498,7 +543,9 @@ describe("the clip player's logic (one Audio element per page)", () => {
     expect(button).toContain('type="button"');
     expect(button).toContain("aria-label={label}");
     expect(button).toContain('role="status"');
-    expect(button).toContain('tg("loading_narration")');
+    // the loading line says whose sound loads: a word's (Quran.com) or the narrator's — never "narator" for a Quran.com word
+    expect(button).toContain('tg(qc ? "loading_word" : "loading_narration")');
+    expect(button).toContain('title={qc ? t("source_qc") : clip.source === "elevenlabs" ? t("source_ai") : undefined}');
     expect(read("src/app/globals.css")).toMatch(/@utility btn-listen \{[^}]*min-height: 3rem;/);
     for (const loc of ["id", "en"] as const) {
       const c = MSG[loc].Clip;
@@ -506,25 +553,40 @@ describe("the clip player's logic (one Audio element per page)", () => {
       expect(c.play_label.startsWith(c.play), `${loc} play`).toBe(true);
       expect(c.stop_label.startsWith(c.stop), `${loc} stop`).toBe(true);
       expect(c.retry_label.startsWith(MSG[loc].Ayah.retry), `${loc} retry`).toBe(true);
-      for (const k of ["play_label", "stop_label", "retry_label"]) expect(c[k]).toContain("{word}");
+      for (const k of ["play_label", "stop_label", "retry_label", "play_label_qc", "stop_label_qc", "retry_label_qc"]) expect(c[k]).toContain("{word}");
+      expect(c.play_label_qc.startsWith(c.play), `${loc} play qc`).toBe(true);
+      expect(c.stop_label_qc.startsWith(c.stop), `${loc} stop qc`).toBe(true);
+      expect(c.retry_label_qc.startsWith(MSG[loc].Ayah.retry), `${loc} retry qc`).toBe(true);
+      // a Quran.com word is never called the AI's or the narrator's, and the AI's is said to be AI
+      for (const k of ["play_label_qc", "stop_label_qc", "retry_label_qc", "source_qc"]) {
+        expect(c[k], `${loc} ${k}`).toContain("Quran.com");
+        expect(c[k], `${loc} ${k}`).not.toMatch(/\bAI\b|narat|narrat/i);
+      }
+      expect(c.source_ai, loc).toContain("AI");
+      expect(MSG[loc].Guided.loading_word, loc).not.toMatch(/\bAI\b|narat|narrat/i);
       for (const v of Object.values(c) as string[]) {
         expect(v).not.toMatch(/\b(ketuk|mengetuk|diketuk|tap)\b/i);
         expect(v).not.toMatch(/\b[A-Z]{4,}\b/); // no ALL CAPS emphasis
       }
     }
-    // The voice is the AI narrator's, and the button says so (operator 2026-10-14): never "the imam's recitation".
+    // A part of a word or a form is the AI narrator's, and the button says so (operator 2026-10-14);
+    // a word at its place is Quran.com's (2026-10-15): never "the imam's recitation".
     expect(MSG.id.Clip.play_label.replace("{word}", "bismi")).toBe("Dengarkan suara AI: bismi");
     expect(MSG.en.Clip.play_label.replace("{word}", "bismi")).toBe("Listen to the AI voice: bismi");
     expect(MSG.id.Clip.stop_label.replace("{word}", "bismi")).toBe("Hentikan suara AI: bismi");
     expect(MSG.id.Clip.retry_label.replace("{word}", "bismi")).toBe("Coba lagi, suara AI: bismi");
+    expect(MSG.id.Clip.play_label_qc.replace("{word}", "bismi")).toBe("Dengarkan rekaman Quran.com: bismi");
+    expect(MSG.en.Clip.play_label_qc.replace("{word}", "bismi")).toBe("Listen to the Quran.com recording: bismi");
     for (const loc of ["id", "en"] as const) {
-      for (const k of ["play_label", "stop_label", "retry_label"]) expect(MSG[loc].Clip[k], `${loc} ${k}`).not.toMatch(/imam/i);
-      // the credit names the narrator and says it is AI; no reciter, no recitation host, no aligner
+      for (const k of ["play_label", "stop_label", "retry_label", "play_label_qc", "stop_label_qc", "retry_label_qc"]) expect(MSG[loc].Clip[k], `${loc} ${k}`).not.toMatch(/imam/i);
+      // the credit says the split: Quran.com's word recordings, the AI narrator for the rest; no
+      // reciter of the words named (Quran.com's is not known), no recitation host, no aligner
+      expect(MSG[loc].Clip.credit, loc).toContain("Quran.com");
       expect(MSG[loc].Clip.credit, loc).toContain("AI");
       expect(MSG[loc].Clip.credit, loc).toContain("Kang Nandar");
       expect(MSG[loc].Clip.credit, loc).not.toMatch(/Alafasy|EveryAyah|quran-align|Collin Fair/);
     }
-    expect(MSG.id.Clip.credit).toBe("Suara contoh: dibuat dengan AI (narator Kang Nandar, ElevenLabs), bukan rekaman imam; ayat lengkap dibacakan imam di halaman pelajaran.");
+    expect(MSG.id.Clip.credit).toBe("Suara contoh: kata yang tertulis di Al-Qur'an diperdengarkan dari rekaman kata Quran.com; bagian kata, huruf, bentuk latihan, dan rangkaian beberapa kata dengan suara AI (narator Kang Nandar, ElevenLabs). Ayat lengkap dibacakan imam di halaman pelajaran.");
     // The one line that says what is heard (ClipNote) is the waqf's, in both languages; the washal
     // line is gone with the run it described: a tile is recorded on its own.
     expect(MSG.id.Clip.waqf_note).toBe("Di akhir ayat imam berhenti (waqaf), jadi harakat akhirnya tidak terdengar.");
@@ -536,8 +598,14 @@ describe("the clip player's logic (one Audio element per page)", () => {
       expect(MSG[loc].Credits.voice_heading, loc).toBeTruthy();
       expect(MSG[loc].Credits.voice_body, loc).toContain("Kang Nandar");
       expect(MSG[loc].Credits.voice_body, loc).toContain("AI");
+      // … and whose the word recordings are: Quran.com / Quran Foundation, copied to our server
+      expect(MSG[loc].Credits.words_body, loc).toContain("Quran.com");
+      expect(MSG[loc].Credits.words_body, loc).toContain("Quran Foundation");
     }
-    expect(read("src/app/[locale]/kredit/page.tsx")).toContain('t("voice_body")');
+    const credits = read("src/app/[locale]/kredit/page.tsx");
+    expect(credits).toContain('t("voice_body")');
+    expect(credits).toContain('t("words_body")');
+    expect(credits).toContain('href="https://quran.com"');
     expect(button).toContain('aria-describedby={[noteId, line ? statusId : null].filter(Boolean).join(" ") || undefined}');
     const note = read("src/components/library/ClipNote.tsx");
     expect(note).toContain("data-clip-note={kind}");
@@ -545,7 +613,7 @@ describe("the clip player's logic (one Audio element per page)", () => {
     expect(MSG.id.Guided.loading_recitation).toBe("Memuat bacaan imam…");
   });
 
-  it("CI drives the real pages: no request before a press, the narrator's file, a second press stops the first, no note anywhere, the end by itself", () => {
+  it("CI drives the real pages: the word's file, a second press stops the first, no note anywhere, the end by itself", () => {
     const shots = read("scripts/ci/screenshots.mjs");
     expect(shots).toContain("async function clipChecks(page, vp, index)");
     expect(shots).toContain("[data-clip]");
@@ -563,15 +631,23 @@ describe("the clip player's logic (one Audio element per page)", () => {
     expect(body.length).toBeGreaterThan(2000);
     expect(body).toContain("wordVoiceIndex()");
     expect(body).toContain("watchWordVoices(page)");
-    expect(body).toContain("narrationRoute(index, served)");
+    // the page's copies refused, so each press loads the file on the page's element as the check
+    // knows it (the copies are mediaPrefetchChecks')
+    expect(body).toContain("narrationRoute(index, served, { failMediaFetch: true })");
+    expect(shots).toContain("async function mediaPrefetchChecks(page, vp, index)");
+    expect(shots).toContain("await mediaPrefetchChecks(page, vp, narration);");
     expect(body).toContain('page.locator("main [data-clip-note]").count()');
     expect(body).not.toMatch(/lib\.clips|\.last\b|waqf_note|washal_note|\.washal\.run|everyayah\.com\/data/);
-    // the CI helper that knows where the narrator's files live is the app's: same prefix, the manifest's urls
+    // the CI helper that knows where the word files live is the app's: same prefixes, the manifest's urls
     const route = read("scripts/ci/narration-route.mjs");
     expect(route).toContain('export const WORD_VOICE_PREFIX = `${NARRATION_PREFIX}kang-nandar/words/`;');
+    expect(route).toContain('export const QURAN_COM_PREFIX = `${NARRATION_PREFIX}quran-com/wbw/`;');
     expect(route).toContain("wordvoice.json");
-    // …and every url of the manifest is under that prefix (so the route's stand-ins cover them all)
-    for (const [text, entry] of Object.entries(MANIFEST.words)) expect(entry.audio?.url, text).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\//);
+    // …and every url of the manifest is under one of them (so the route's stand-ins cover them all):
+    // the narrator's files, or our copies of Quran.com's (same-origin since 2026-10-15)
+    for (const [text, entry] of Object.entries(MANIFEST.words)) {
+      expect(entry.audio?.url, text).toMatch(entry.source === "quran.com" ? QC_FILE : /^\/belajar\/media\/narration\/kang-nandar\/words\//);
+    }
   });
 });
 

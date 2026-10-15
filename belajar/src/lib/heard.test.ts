@@ -189,11 +189,14 @@ describe("hamzat washal: a base-form tile is recorded on its own, so its alif is
       const clip = wordVoice(ar);
       expect(clip, t.translit).not.toBeNull();
       expect(LIBRARY.clips[key], t.translit).toEqual(clip);
-      // the run is another recording (a longer one), and the tile does not play it
+      // the run is another recording (the narrator's: no word-by-word file holds two words), and
+      // the tile does not play it; the tile is Quran.com's recording of the word at its place,
+      // recorded on its own (operator 2026-10-15), so its alif is read there too
       const run = LIBRARY.clips[t.washal!.run];
       expect(run, t.translit).toBeTruthy();
       expect(LIBRARY.clips[key], t.translit).not.toEqual(run);
-      expect(run.end, t.translit).toBeGreaterThan(clip!.end);
+      expect(run.url, t.translit).not.toBe(clip!.url);
+      expect([clip!.source, run.source], t.translit).toEqual(["quran.com", "elevenlabs"]);
       // the run's text is the word before it and the word, as the ayah writes them
       const [s, a, w] = key.split(":").map(Number);
       const tokens = tokensOf(s, a)!;

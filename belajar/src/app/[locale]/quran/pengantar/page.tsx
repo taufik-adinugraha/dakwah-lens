@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { zeroExamplesFor, zeroSequence } from "@/components/autoplay/build";
+import { zeroExamplesFor, zeroMediaFor, zeroSequence } from "@/components/autoplay/build";
 import { BackLink } from "@/components/BackLink";
 import { ForestGlow } from "@/components/ForestGlow";
 import { LessonStage } from "@/components/lesson/LessonStage";
@@ -99,6 +99,7 @@ export default async function IntroPage({ params }: PageProps<"/[locale]/quran/p
             exercise={{ words: [], lexemes: [], quiz: quizAyah(host.slug, seq.ayah) }}
             compose={compose}
             examples={examples}
+            media={zeroMediaFor(host, locale, seq)}
             marks={composeFile?.marks ?? null}
             lessonMap={null}
             leads={leads}

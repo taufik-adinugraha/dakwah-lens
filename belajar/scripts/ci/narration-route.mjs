@@ -21,7 +21,21 @@ export const isNarration = (url) => url.pathname.startsWith(NARRATION_PREFIX);
  *  of the Konsep pages and of the lessons' example beats. They are served from the narration media
  *  store, so `isNarration` is true of them and the route below answers them. */
 export const WORD_VOICE_PREFIX = `${NARRATION_PREFIX}kang-nandar/words/`;
-export const isWordVoice = (url) => url.pathname.startsWith(WORD_VOICE_PREFIX);
+/** Since 2026-10-15 a word at its place in the Qur'an plays our unaltered copy of Quran.com's word
+ *  file (content/wordvoice.json source "quran.com", pipeline/host_media.py), and every lesson ayah
+ *  our copy of the imam's EveryAyah file — same-origin, under the narration prefix, so this route
+ *  answers them too (a silent stand-in of the pinned length). Only the fact cards' ayah popup still
+ *  streams from everyayah.com (observed, never stubbed: screenshots.mjs ayahDialogChecks). */
+export const QURAN_COM_PREFIX = `${NARRATION_PREFIX}quran-com/wbw/`;
+export const ALAFASY_PREFIX = `${NARRATION_PREFIX}alafasy/`;
+/** A word recording, whoever's it is: the narrator's or Quran.com's (both under our prefix). */
+export const isWordVoice = (url) => url.pathname.startsWith(WORD_VOICE_PREFIX) || url.pathname.startsWith(QURAN_COM_PREFIX);
+/** A lesson ayah's recitation: our copy of the imam's file. */
+export const isRecitationCopy = (url) => url.pathname.startsWith(ALAFASY_PREFIX);
+/** A recording the page fetches ahead as lesson MEDIA (src/lib/media-prefetch.ts), not a narration
+ *  line of the look-ahead (prefetch.ts): a word's file or the imam's ayah. */
+export const isLessonMedia = (pathname) =>
+  pathname.startsWith(WORD_VOICE_PREFIX) || pathname.startsWith(QURAN_COM_PREFIX) || pathname.startsWith(ALAFASY_PREFIX);
 
 /** Every narration file the manifests point at → its duration (ms): the lines of the narration
  *  manifests (content/narration/*.json) and the narrator's recordings of the words
@@ -37,10 +51,27 @@ export async function narrationIndex() {
     }
   }
   for (const [url, ms] of await wordVoiceIndex()) index.set(url, ms);
+  for (const [url, ms] of await recitationIndex()) index.set(url, ms);
   return index;
 }
 
-/** Every recording of content/wordvoice.json → its duration (ms); empty when the file is not there. */
+/** Our copy of every lesson ayah's recitation → its duration (ms), from the pins of
+ *  pipeline/hosted.json (host_media.py); empty when the file is not there. */
+export async function recitationIndex() {
+  const index = new Map();
+  try {
+    const pins = JSON.parse(await readFile(path.join(BELAJAR_DIR, "pipeline", "hosted.json"), "utf8"));
+    for (const [name, pin] of Object.entries(pins?.alafasy ?? {})) {
+      if (Number.isInteger(pin?.ms) && pin.ms > 0) index.set(`${ALAFASY_PREFIX}${name}`, pin.ms);
+    }
+  } catch {
+    return index;
+  }
+  return index;
+}
+
+/** Every recording of content/wordvoice.json → its FILE's duration (ms; a Quran.com word plays
+ *  [start, end] inside it, so its stand-in must be as long as the file); empty when the file is not there. */
 export async function wordVoiceIndex() {
   const index = new Map();
   let manifest = null;
@@ -131,21 +162,30 @@ function fulfillBytes(route, body, contentType) {
  *   from its own copy gets no second one: an object URL never reaches the network).
  * - `holdFetchMs`: every fetch() request is answered only after that long (the players' loads
  *   are not held), so that fetches made two at a time would visibly overlap.
+ * - `record` (a predicate on the pathname): only those requests go into `timeline`.
+ * - `failMediaFetch`: every fetch() of lesson MEDIA (isLessonMedia: a word's file, the imam's ayah —
+ *   the page's copies fetched at idle, src/lib/media-prefetch.ts) is answered 503, so the page
+ *   holds no copy and its players load each file themselves, as before the prefetch: the checks
+ *   of the players' own loading (clipChecks, exampleChecks) keep their meaning, and the
+ *   prefetch's fallback (a failed copy → the file's URL) is exercised on the way.
  * - `failFetch` (a Set of pathnames, read at each request): a fetch() request for one of them is
  *   answered 503 — the page cannot make its copy of that file, so the line must play from the
  *   network URL as before the look-ahead (the audio element's own request is answered as usual).
  * (Playwright turns the browser's HTTP cache off while a route is set, so every request the
  * browser makes reaches this route.)
  */
-export function narrationRoute(index, served, { delays, timeline, holdFetchMs = 0, failFetch } = {}) {
+export function narrationRoute(index, served, { delays, timeline, holdFetchMs = 0, failFetch, record, failMediaFetch = false } = {}) {
   return async (route) => {
     const req = route.request();
     const { pathname } = new URL(req.url());
     const entry = { path: pathname, type: req.resourceType(), range: req.headers()["range"] ?? null, start: Date.now(), end: null };
-    timeline?.push(entry);
+    // `record` (optional): which requests go into `timeline` (aheadChecks leaves out the lesson
+    // media the page fetches at idle, src/lib/media-prefetch.ts: its narration rules are about lines).
+    if (!record || record(pathname)) timeline?.push(entry);
     const byFetch = entry.type === "fetch";
     try {
-      await answerNarration(route, pathname, index, served, delays, byFetch ? holdFetchMs : 0, byFetch && failFetch?.has(pathname) === true);
+      const fail = byFetch && (failFetch?.has(pathname) === true || (failMediaFetch && isLessonMedia(pathname)));
+      await answerNarration(route, pathname, index, served, delays, byFetch ? holdFetchMs : 0, fail);
     } finally {
       entry.end = Date.now();
     }

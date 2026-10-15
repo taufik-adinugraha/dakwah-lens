@@ -12,7 +12,7 @@ const toArabicDigits = (n: number) =>
 /**
  * The ayah as a mushaf line: every word is a light chip, so it looks
  * clickable; clicking replays just that word (the stage seeks within the
- * streamed recording). The word the imam is reciting is filled forest with
+ * recording, our copy of EveryAyah's file). The word the imam is reciting is filled forest with
  * paper text (7.9:1). Arabic is rendered from content data only, never
  * retyped.
  *

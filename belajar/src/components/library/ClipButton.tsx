@@ -6,18 +6,24 @@ import { useTranslations } from "next-intl";
 import { createContext, type ReactNode, useContext, useId } from "react";
 
 import { useClipPlayer } from "@/hooks/useClipPlayer";
+import { useMediaPrefetch } from "@/hooks/useMediaPrefetch";
 import { type Clip, clipView } from "@/lib/clips";
+import { pageMediaPlan } from "@/lib/media-prefetch";
+import { isQuranCom } from "@/lib/wordvoice-core";
 
 type Player = ReturnType<typeof useClipPlayer>;
 const ClipPlayerContext = createContext<Player | null>(null);
 
 /**
- * The page's one clip player (src/hooks/useClipPlayer.ts: one Audio element, nothing fetched
- * before a press) for the example buttons under it. One per page: the concept page's card
+ * The page's one clip player (src/hooks/useClipPlayer.ts: one Audio element) for the example
+ * buttons under it, and the fetch ahead of their files (`prefetch`, the page's own order). One per page: the concept page's card
  * (ConceptCard) and the Harakat page's signs (HarakatChart) each put one around their examples.
  */
-export function ClipPlayerProvider({ children }: { children: ReactNode }) {
+export function ClipPlayerProvider({ children, prefetch = [] }: { children: ReactNode; prefetch?: readonly (string | null | undefined)[] }) {
   const player = useClipPlayer();
+  // The page's example files, fetched at idle in the order the page shows them (at most
+  // PAGE_PREFETCH_MAX_FILES; nothing with Save-Data): a press then plays at once.
+  useMediaPrefetch({ page: pageMediaPlan(prefetch) });
   return <ClipPlayerContext.Provider value={player}>{children}</ClipPlayerContext.Provider>;
 }
 
@@ -32,17 +38,21 @@ function LoadingMark({ className }: { className?: string }) {
 }
 
 /**
- * The imam's voice next to an example (operator 2026-10-12: "e.g ismu (read by voice + show
- * visual) when combined with harf jar, it becomes ismi (read by voice + visual)… each explanation
- * should be followed by examples (visual + voice)"). The example itself (its Arabic,
- * transliteration and meaning) is drawn by the caller, unchanged; this adds one button:
- * "▶ Dengarkan" plays Mishary Alafasy's recitation of exactly that word, cut from the ayah's
- * streamed recording by its quran-align timing; while it plays the button says "■ Hentikan"; after
- * a failure "↺ Coba lagi", with a plain message beside it. "Memuat bacaan imam…" shows once a load
- * lasts (the lesson's thresholds), and what to do once it is slow.
+ * The voice next to an example (operator 2026-10-12: "e.g ismu (read by voice + show visual)
+ * when combined with harf jar, it becomes ismi (read by voice + visual)… each explanation should
+ * be followed by examples (visual + voice)"). The example itself (its Arabic, transliteration and
+ * meaning) is drawn by the caller, unchanged; this adds one button: "▶ Dengarkan" plays the word's
+ * recording (src/lib/wordvoice.ts: Quran.com's word-by-word recording of a word at its place in
+ * the Qur'an, or the AI narrator's for a part of a word, a form or a run — operator 2026-10-15),
+ * and its label and tooltip say which ("Rekaman Quran.com" / "suara AI"); while it plays the button
+ * says "■ Hentikan"; after a failure "↺ Coba lagi", with a plain message beside it. "Memuat suara
+ * kata…" (Quran.com) or "Memuat suara narator…" shows once a load lasts (the lesson's thresholds),
+ * and what to do once it is slow. A page's example files are fetched ahead at idle
+ * (src/lib/media-prefetch.ts), so in normal use nothing loads at the press.
  *
  * - A real <button>, 48px tall (btn-listen: play is forest, the module's three colours), with an
- *   aria-label naming the word ("Dengarkan bacaan imam: bismi") that starts with its visible word;
+ *   aria-label naming the word and the source ("Dengarkan rekaman Quran.com: bismi"); `title`
+ *   (the tooltip) names the source in full; `data-source` for the CI checks;
  *   the module's focus ring. The status line is a polite live region, always present (empty until
  *   there is something to say), so a screen reader hears the load and the failure.
  * - `loc`: the example's clip key (src/lib/clips.ts clipKey), `data-clip` for the CI checks. The
@@ -75,26 +85,31 @@ export function ClipButton({
   const statusId = `${id}-status`;
   if (!player) return null;
   const view = clipView(player.state, id, player.notice);
+  // Where the sound comes from, said on the button (operator 2026-10-15): Quran.com's recording of
+  // a word at its place in the Qur'an, or the AI narrator's voice (a part of a word, a form, a run).
+  const qc = isQuranCom(clip);
   const line =
     view.line === "failed"
-      ? ta("recite_failed")
+      ? t("failed")
       : view.line === "slow"
         ? ta("loading_slow")
         : view.line === "loading"
-          ? tg("loading_narration")
+          ? tg(qc ? "loading_word" : "loading_narration")
           : null;
   const [label, visible] =
     view.mode === "stop"
-      ? [t("stop_label", { word }), t("stop")]
+      ? [t(qc ? "stop_label_qc" : "stop_label", { word }), t("stop")]
       : view.mode === "retry"
-        ? [t("retry_label", { word }), ta("retry")]
-        : [t("play_label", { word }), t("play")];
+        ? [t(qc ? "retry_label_qc" : "retry_label", { word }), ta("retry")]
+        : [t(qc ? "play_label_qc" : "play_label", { word }), t("play")];
   const Icon = view.mode === "stop" ? Square : view.mode === "retry" ? RotateCcw : Play;
   return (
     <span className={clsx("inline-flex max-w-full flex-wrap items-center gap-y-1", className)}>
       <button
         type="button"
         data-clip={loc}
+        data-source={clip.source ?? "imam"}
+        title={qc ? t("source_qc") : clip.source === "elevenlabs" ? t("source_ai") : undefined}
         data-state={view.mode === "stop" ? "playing" : view.mode === "retry" ? "failed" : "idle"}
         aria-label={label}
         aria-describedby={[noteId, line ? statusId : null].filter(Boolean).join(" ") || undefined}

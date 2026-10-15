@@ -1,0 +1,1359 @@
+{
+ "_comment": "Written by pipeline/build_wordvoice.py --fetch-quran-com: Quran.com's own word list (words only, in its order) of every ayah a voiced text stands in, as api.quran.com answered on the date below. `audio_url` is the word's file on audio.qurancdn.com — not always the Tanzil word number (41:9). Never edited by hand.",
+ "api": "https://api.quran.com/api/v4/verses/by_key/{key}?words=true&word_fields=text_uthmani,audio_url",
+ "retrieved": "2026-10-15",
+ "ayat": {
+  "1:1": [
+   {
+    "text_uthmani": "بِسْمِ",
+    "audio_url": "wbw/001_001_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱللَّهِ",
+    "audio_url": "wbw/001_001_002.mp3"
+   },
+   {
+    "text_uthmani": "ٱلرَّحْمَـٰنِ",
+    "audio_url": "wbw/001_001_003.mp3"
+   },
+   {
+    "text_uthmani": "ٱلرَّحِيمِ",
+    "audio_url": "wbw/001_001_004.mp3"
+   }
+  ],
+  "1:2": [
+   {
+    "text_uthmani": "ٱلْحَمْدُ",
+    "audio_url": "wbw/001_002_001.mp3"
+   },
+   {
+    "text_uthmani": "لِلَّهِ",
+    "audio_url": "wbw/001_002_002.mp3"
+   },
+   {
+    "text_uthmani": "رَبِّ",
+    "audio_url": "wbw/001_002_003.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْعَـٰلَمِينَ",
+    "audio_url": "wbw/001_002_004.mp3"
+   }
+  ],
+  "1:3": [
+   {
+    "text_uthmani": "ٱلرَّحْمَـٰنِ",
+    "audio_url": "wbw/001_003_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱلرَّحِيمِ",
+    "audio_url": "wbw/001_003_002.mp3"
+   }
+  ],
+  "1:4": [
+   {
+    "text_uthmani": "مَـٰلِكِ",
+    "audio_url": "wbw/001_004_001.mp3"
+   },
+   {
+    "text_uthmani": "يَوْمِ",
+    "audio_url": "wbw/001_004_002.mp3"
+   },
+   {
+    "text_uthmani": "ٱلدِّينِ",
+    "audio_url": "wbw/001_004_003.mp3"
+   }
+  ],
+  "1:5": [
+   {
+    "text_uthmani": "إِيَّاكَ",
+    "audio_url": "wbw/001_005_001.mp3"
+   },
+   {
+    "text_uthmani": "نَعْبُدُ",
+    "audio_url": "wbw/001_005_002.mp3"
+   },
+   {
+    "text_uthmani": "وَإِيَّاكَ",
+    "audio_url": "wbw/001_005_003.mp3"
+   },
+   {
+    "text_uthmani": "نَسْتَعِينُ",
+    "audio_url": "wbw/001_005_004.mp3"
+   }
+  ],
+  "1:6": [
+   {
+    "text_uthmani": "ٱهْدِنَا",
+    "audio_url": "wbw/001_006_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱلصِّرَٰطَ",
+    "audio_url": "wbw/001_006_002.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْمُسْتَقِيمَ",
+    "audio_url": "wbw/001_006_003.mp3"
+   }
+  ],
+  "1:7": [
+   {
+    "text_uthmani": "صِرَٰطَ",
+    "audio_url": "wbw/001_007_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱلَّذِينَ",
+    "audio_url": "wbw/001_007_002.mp3"
+   },
+   {
+    "text_uthmani": "أَنْعَمْتَ",
+    "audio_url": "wbw/001_007_003.mp3"
+   },
+   {
+    "text_uthmani": "عَلَيْهِمْ",
+    "audio_url": "wbw/001_007_004.mp3"
+   },
+   {
+    "text_uthmani": "غَيْرِ",
+    "audio_url": "wbw/001_007_005.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْمَغْضُوبِ",
+    "audio_url": "wbw/001_007_006.mp3"
+   },
+   {
+    "text_uthmani": "عَلَيْهِمْ",
+    "audio_url": "wbw/001_007_007.mp3"
+   },
+   {
+    "text_uthmani": "وَلَا",
+    "audio_url": "wbw/001_007_008.mp3"
+   },
+   {
+    "text_uthmani": "ٱلضَّآلِّينَ",
+    "audio_url": "wbw/001_007_009.mp3"
+   }
+  ],
+  "2:3": [
+   {
+    "text_uthmani": "ٱلَّذِينَ",
+    "audio_url": "wbw/002_003_001.mp3"
+   },
+   {
+    "text_uthmani": "يُؤْمِنُونَ",
+    "audio_url": "wbw/002_003_002.mp3"
+   },
+   {
+    "text_uthmani": "بِٱلْغَيْبِ",
+    "audio_url": "wbw/002_003_003.mp3"
+   },
+   {
+    "text_uthmani": "وَيُقِيمُونَ",
+    "audio_url": "wbw/002_003_004.mp3"
+   },
+   {
+    "text_uthmani": "ٱلصَّلَوٰةَ",
+    "audio_url": "wbw/002_003_005.mp3"
+   },
+   {
+    "text_uthmani": "وَمِمَّا",
+    "audio_url": "wbw/002_003_006.mp3"
+   },
+   {
+    "text_uthmani": "رَزَقْنَـٰهُمْ",
+    "audio_url": "wbw/002_003_007.mp3"
+   },
+   {
+    "text_uthmani": "يُنفِقُونَ",
+    "audio_url": "wbw/002_003_008.mp3"
+   }
+  ],
+  "2:5": [
+   {
+    "text_uthmani": "أُو۟لَـٰٓئِكَ",
+    "audio_url": "wbw/002_005_001.mp3"
+   },
+   {
+    "text_uthmani": "عَلَىٰ",
+    "audio_url": "wbw/002_005_002.mp3"
+   },
+   {
+    "text_uthmani": "هُدًۭى",
+    "audio_url": "wbw/002_005_003.mp3"
+   },
+   {
+    "text_uthmani": "مِّن",
+    "audio_url": "wbw/002_005_004.mp3"
+   },
+   {
+    "text_uthmani": "رَّبِّهِمْ ۖ",
+    "audio_url": "wbw/002_005_005.mp3"
+   },
+   {
+    "text_uthmani": "وَأُو۟لَـٰٓئِكَ",
+    "audio_url": "wbw/002_005_007.mp3"
+   },
+   {
+    "text_uthmani": "هُمُ",
+    "audio_url": "wbw/002_005_008.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْمُفْلِحُونَ",
+    "audio_url": "wbw/002_005_009.mp3"
+   }
+  ],
+  "2:30": [
+   {
+    "text_uthmani": "وَإِذْ",
+    "audio_url": "wbw/002_030_001.mp3"
+   },
+   {
+    "text_uthmani": "قَالَ",
+    "audio_url": "wbw/002_030_002.mp3"
+   },
+   {
+    "text_uthmani": "رَبُّكَ",
+    "audio_url": "wbw/002_030_003.mp3"
+   },
+   {
+    "text_uthmani": "لِلْمَلَـٰٓئِكَةِ",
+    "audio_url": "wbw/002_030_004.mp3"
+   },
+   {
+    "text_uthmani": "إِنِّى",
+    "audio_url": "wbw/002_030_005.mp3"
+   },
+   {
+    "text_uthmani": "جَاعِلٌۭ",
+    "audio_url": "wbw/002_030_006.mp3"
+   },
+   {
+    "text_uthmani": "فِى",
+    "audio_url": "wbw/002_030_007.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْأَرْضِ",
+    "audio_url": "wbw/002_030_008.mp3"
+   },
+   {
+    "text_uthmani": "خَلِيفَةًۭ ۖ",
+    "audio_url": "wbw/002_030_009.mp3"
+   },
+   {
+    "text_uthmani": "قَالُوٓا۟",
+    "audio_url": "wbw/002_030_011.mp3"
+   },
+   {
+    "text_uthmani": "أَتَجْعَلُ",
+    "audio_url": "wbw/002_030_012.mp3"
+   },
+   {
+    "text_uthmani": "فِيهَا",
+    "audio_url": "wbw/002_030_013.mp3"
+   },
+   {
+    "text_uthmani": "مَن",
+    "audio_url": "wbw/002_030_014.mp3"
+   },
+   {
+    "text_uthmani": "يُفْسِدُ",
+    "audio_url": "wbw/002_030_015.mp3"
+   },
+   {
+    "text_uthmani": "فِيهَا",
+    "audio_url": "wbw/002_030_016.mp3"
+   },
+   {
+    "text_uthmani": "وَيَسْفِكُ",
+    "audio_url": "wbw/002_030_017.mp3"
+   },
+   {
+    "text_uthmani": "ٱلدِّمَآءَ",
+    "audio_url": "wbw/002_030_018.mp3"
+   },
+   {
+    "text_uthmani": "وَنَحْنُ",
+    "audio_url": "wbw/002_030_019.mp3"
+   },
+   {
+    "text_uthmani": "نُسَبِّحُ",
+    "audio_url": "wbw/002_030_020.mp3"
+   },
+   {
+    "text_uthmani": "بِحَمْدِكَ",
+    "audio_url": "wbw/002_030_021.mp3"
+   },
+   {
+    "text_uthmani": "وَنُقَدِّسُ",
+    "audio_url": "wbw/002_030_022.mp3"
+   },
+   {
+    "text_uthmani": "لَكَ ۖ",
+    "audio_url": "wbw/002_030_023.mp3"
+   },
+   {
+    "text_uthmani": "قَالَ",
+    "audio_url": "wbw/002_030_025.mp3"
+   },
+   {
+    "text_uthmani": "إِنِّىٓ",
+    "audio_url": "wbw/002_030_026.mp3"
+   },
+   {
+    "text_uthmani": "أَعْلَمُ",
+    "audio_url": "wbw/002_030_027.mp3"
+   },
+   {
+    "text_uthmani": "مَا",
+    "audio_url": "wbw/002_030_028.mp3"
+   },
+   {
+    "text_uthmani": "لَا",
+    "audio_url": "wbw/002_030_029.mp3"
+   },
+   {
+    "text_uthmani": "تَعْلَمُونَ",
+    "audio_url": "wbw/002_030_030.mp3"
+   }
+  ],
+  "2:31": [
+   {
+    "text_uthmani": "وَعَلَّمَ",
+    "audio_url": "wbw/002_031_001.mp3"
+   },
+   {
+    "text_uthmani": "ءَادَمَ",
+    "audio_url": "wbw/002_031_002.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْأَسْمَآءَ",
+    "audio_url": "wbw/002_031_003.mp3"
+   },
+   {
+    "text_uthmani": "كُلَّهَا",
+    "audio_url": "wbw/002_031_004.mp3"
+   },
+   {
+    "text_uthmani": "ثُمَّ",
+    "audio_url": "wbw/002_031_005.mp3"
+   },
+   {
+    "text_uthmani": "عَرَضَهُمْ",
+    "audio_url": "wbw/002_031_006.mp3"
+   },
+   {
+    "text_uthmani": "عَلَى",
+    "audio_url": "wbw/002_031_007.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْمَلَـٰٓئِكَةِ",
+    "audio_url": "wbw/002_031_008.mp3"
+   },
+   {
+    "text_uthmani": "فَقَالَ",
+    "audio_url": "wbw/002_031_009.mp3"
+   },
+   {
+    "text_uthmani": "أَنۢبِـُٔونِى",
+    "audio_url": "wbw/002_031_010.mp3"
+   },
+   {
+    "text_uthmani": "بِأَسْمَآءِ",
+    "audio_url": "wbw/002_031_011.mp3"
+   },
+   {
+    "text_uthmani": "هَـٰٓؤُلَآءِ",
+    "audio_url": "wbw/002_031_012.mp3"
+   },
+   {
+    "text_uthmani": "إِن",
+    "audio_url": "wbw/002_031_013.mp3"
+   },
+   {
+    "text_uthmani": "كُنتُمْ",
+    "audio_url": "wbw/002_031_014.mp3"
+   },
+   {
+    "text_uthmani": "صَـٰدِقِينَ",
+    "audio_url": "wbw/002_031_015.mp3"
+   }
+  ],
+  "5:23": [
+   {
+    "text_uthmani": "قَالَ",
+    "audio_url": "wbw/005_023_001.mp3"
+   },
+   {
+    "text_uthmani": "رَجُلَانِ",
+    "audio_url": "wbw/005_023_002.mp3"
+   },
+   {
+    "text_uthmani": "مِنَ",
+    "audio_url": "wbw/005_023_003.mp3"
+   },
+   {
+    "text_uthmani": "ٱلَّذِينَ",
+    "audio_url": "wbw/005_023_004.mp3"
+   },
+   {
+    "text_uthmani": "يَخَافُونَ",
+    "audio_url": "wbw/005_023_005.mp3"
+   },
+   {
+    "text_uthmani": "أَنْعَمَ",
+    "audio_url": "wbw/005_023_006.mp3"
+   },
+   {
+    "text_uthmani": "ٱللَّهُ",
+    "audio_url": "wbw/005_023_007.mp3"
+   },
+   {
+    "text_uthmani": "عَلَيْهِمَا",
+    "audio_url": "wbw/005_023_008.mp3"
+   },
+   {
+    "text_uthmani": "ٱدْخُلُوا۟",
+    "audio_url": "wbw/005_023_009.mp3"
+   },
+   {
+    "text_uthmani": "عَلَيْهِمُ",
+    "audio_url": "wbw/005_023_010.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْبَابَ",
+    "audio_url": "wbw/005_023_011.mp3"
+   },
+   {
+    "text_uthmani": "فَإِذَا",
+    "audio_url": "wbw/005_023_012.mp3"
+   },
+   {
+    "text_uthmani": "دَخَلْتُمُوهُ",
+    "audio_url": "wbw/005_023_013.mp3"
+   },
+   {
+    "text_uthmani": "فَإِنَّكُمْ",
+    "audio_url": "wbw/005_023_014.mp3"
+   },
+   {
+    "text_uthmani": "غَـٰلِبُونَ ۚ",
+    "audio_url": "wbw/005_023_015.mp3"
+   },
+   {
+    "text_uthmani": "وَعَلَى",
+    "audio_url": "wbw/005_023_017.mp3"
+   },
+   {
+    "text_uthmani": "ٱللَّهِ",
+    "audio_url": "wbw/005_023_018.mp3"
+   },
+   {
+    "text_uthmani": "فَتَوَكَّلُوٓا۟",
+    "audio_url": "wbw/005_023_019.mp3"
+   },
+   {
+    "text_uthmani": "إِن",
+    "audio_url": "wbw/005_023_020.mp3"
+   },
+   {
+    "text_uthmani": "كُنتُم",
+    "audio_url": "wbw/005_023_021.mp3"
+   },
+   {
+    "text_uthmani": "مُّؤْمِنِينَ",
+    "audio_url": "wbw/005_023_022.mp3"
+   }
+  ],
+  "6:90": [
+   {
+    "text_uthmani": "أُو۟لَـٰٓئِكَ",
+    "audio_url": "wbw/006_090_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱلَّذِينَ",
+    "audio_url": "wbw/006_090_002.mp3"
+   },
+   {
+    "text_uthmani": "هَدَى",
+    "audio_url": "wbw/006_090_003.mp3"
+   },
+   {
+    "text_uthmani": "ٱللَّهُ ۖ",
+    "audio_url": "wbw/006_090_004.mp3"
+   },
+   {
+    "text_uthmani": "فَبِهُدَىٰهُمُ",
+    "audio_url": "wbw/006_090_006.mp3"
+   },
+   {
+    "text_uthmani": "ٱقْتَدِهْ ۗ",
+    "audio_url": "wbw/006_090_007.mp3"
+   },
+   {
+    "text_uthmani": "قُل",
+    "audio_url": "wbw/006_090_009.mp3"
+   },
+   {
+    "text_uthmani": "لَّآ",
+    "audio_url": "wbw/006_090_010.mp3"
+   },
+   {
+    "text_uthmani": "أَسْـَٔلُكُمْ",
+    "audio_url": "wbw/006_090_011.mp3"
+   },
+   {
+    "text_uthmani": "عَلَيْهِ",
+    "audio_url": "wbw/006_090_012.mp3"
+   },
+   {
+    "text_uthmani": "أَجْرًا ۖ",
+    "audio_url": "wbw/006_090_013.mp3"
+   },
+   {
+    "text_uthmani": "إِنْ",
+    "audio_url": "wbw/006_090_015.mp3"
+   },
+   {
+    "text_uthmani": "هُوَ",
+    "audio_url": "wbw/006_090_016.mp3"
+   },
+   {
+    "text_uthmani": "إِلَّا",
+    "audio_url": "wbw/006_090_017.mp3"
+   },
+   {
+    "text_uthmani": "ذِكْرَىٰ",
+    "audio_url": "wbw/006_090_018.mp3"
+   },
+   {
+    "text_uthmani": "لِلْعَـٰلَمِينَ",
+    "audio_url": "wbw/006_090_019.mp3"
+   }
+  ],
+  "6:126": [
+   {
+    "text_uthmani": "وَهَـٰذَا",
+    "audio_url": "wbw/006_126_001.mp3"
+   },
+   {
+    "text_uthmani": "صِرَٰطُ",
+    "audio_url": "wbw/006_126_002.mp3"
+   },
+   {
+    "text_uthmani": "رَبِّكَ",
+    "audio_url": "wbw/006_126_003.mp3"
+   },
+   {
+    "text_uthmani": "مُسْتَقِيمًۭا ۗ",
+    "audio_url": "wbw/006_126_004.mp3"
+   },
+   {
+    "text_uthmani": "قَدْ",
+    "audio_url": "wbw/006_126_006.mp3"
+   },
+   {
+    "text_uthmani": "فَصَّلْنَا",
+    "audio_url": "wbw/006_126_007.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْـَٔايَـٰتِ",
+    "audio_url": "wbw/006_126_008.mp3"
+   },
+   {
+    "text_uthmani": "لِقَوْمٍۢ",
+    "audio_url": "wbw/006_126_009.mp3"
+   },
+   {
+    "text_uthmani": "يَذَّكَّرُونَ",
+    "audio_url": "wbw/006_126_010.mp3"
+   }
+  ],
+  "9:128": [
+   {
+    "text_uthmani": "لَقَدْ",
+    "audio_url": "wbw/009_128_001.mp3"
+   },
+   {
+    "text_uthmani": "جَآءَكُمْ",
+    "audio_url": "wbw/009_128_002.mp3"
+   },
+   {
+    "text_uthmani": "رَسُولٌۭ",
+    "audio_url": "wbw/009_128_003.mp3"
+   },
+   {
+    "text_uthmani": "مِّنْ",
+    "audio_url": "wbw/009_128_004.mp3"
+   },
+   {
+    "text_uthmani": "أَنفُسِكُمْ",
+    "audio_url": "wbw/009_128_005.mp3"
+   },
+   {
+    "text_uthmani": "عَزِيزٌ",
+    "audio_url": "wbw/009_128_006.mp3"
+   },
+   {
+    "text_uthmani": "عَلَيْهِ",
+    "audio_url": "wbw/009_128_007.mp3"
+   },
+   {
+    "text_uthmani": "مَا",
+    "audio_url": "wbw/009_128_008.mp3"
+   },
+   {
+    "text_uthmani": "عَنِتُّمْ",
+    "audio_url": "wbw/009_128_009.mp3"
+   },
+   {
+    "text_uthmani": "حَرِيصٌ",
+    "audio_url": "wbw/009_128_010.mp3"
+   },
+   {
+    "text_uthmani": "عَلَيْكُم",
+    "audio_url": "wbw/009_128_011.mp3"
+   },
+   {
+    "text_uthmani": "بِٱلْمُؤْمِنِينَ",
+    "audio_url": "wbw/009_128_012.mp3"
+   },
+   {
+    "text_uthmani": "رَءُوفٌۭ",
+    "audio_url": "wbw/009_128_013.mp3"
+   },
+   {
+    "text_uthmani": "رَّحِيمٌۭ",
+    "audio_url": "wbw/009_128_014.mp3"
+   }
+  ],
+  "17:78": [
+   {
+    "text_uthmani": "أَقِمِ",
+    "audio_url": "wbw/017_078_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱلصَّلَوٰةَ",
+    "audio_url": "wbw/017_078_002.mp3"
+   },
+   {
+    "text_uthmani": "لِدُلُوكِ",
+    "audio_url": "wbw/017_078_003.mp3"
+   },
+   {
+    "text_uthmani": "ٱلشَّمْسِ",
+    "audio_url": "wbw/017_078_004.mp3"
+   },
+   {
+    "text_uthmani": "إِلَىٰ",
+    "audio_url": "wbw/017_078_005.mp3"
+   },
+   {
+    "text_uthmani": "غَسَقِ",
+    "audio_url": "wbw/017_078_006.mp3"
+   },
+   {
+    "text_uthmani": "ٱلَّيْلِ",
+    "audio_url": "wbw/017_078_007.mp3"
+   },
+   {
+    "text_uthmani": "وَقُرْءَانَ",
+    "audio_url": "wbw/017_078_008.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْفَجْرِ ۖ",
+    "audio_url": "wbw/017_078_009.mp3"
+   },
+   {
+    "text_uthmani": "إِنَّ",
+    "audio_url": "wbw/017_078_011.mp3"
+   },
+   {
+    "text_uthmani": "قُرْءَانَ",
+    "audio_url": "wbw/017_078_012.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْفَجْرِ",
+    "audio_url": "wbw/017_078_013.mp3"
+   },
+   {
+    "text_uthmani": "كَانَ",
+    "audio_url": "wbw/017_078_014.mp3"
+   },
+   {
+    "text_uthmani": "مَشْهُودًۭا",
+    "audio_url": "wbw/017_078_015.mp3"
+   }
+  ],
+  "20:5": [
+   {
+    "text_uthmani": "ٱلرَّحْمَـٰنُ",
+    "audio_url": "wbw/020_005_001.mp3"
+   },
+   {
+    "text_uthmani": "عَلَى",
+    "audio_url": "wbw/020_005_002.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْعَرْشِ",
+    "audio_url": "wbw/020_005_003.mp3"
+   },
+   {
+    "text_uthmani": "ٱسْتَوَىٰ",
+    "audio_url": "wbw/020_005_004.mp3"
+   }
+  ],
+  "26:24": [
+   {
+    "text_uthmani": "قَالَ",
+    "audio_url": "wbw/026_024_001.mp3"
+   },
+   {
+    "text_uthmani": "رَبُّ",
+    "audio_url": "wbw/026_024_002.mp3"
+   },
+   {
+    "text_uthmani": "ٱلسَّمَـٰوَٰتِ",
+    "audio_url": "wbw/026_024_003.mp3"
+   },
+   {
+    "text_uthmani": "وَٱلْأَرْضِ",
+    "audio_url": "wbw/026_024_004.mp3"
+   },
+   {
+    "text_uthmani": "وَمَا",
+    "audio_url": "wbw/026_024_005.mp3"
+   },
+   {
+    "text_uthmani": "بَيْنَهُمَآ ۖ",
+    "audio_url": "wbw/026_024_006.mp3"
+   },
+   {
+    "text_uthmani": "إِن",
+    "audio_url": "wbw/026_024_008.mp3"
+   },
+   {
+    "text_uthmani": "كُنتُم",
+    "audio_url": "wbw/026_024_009.mp3"
+   },
+   {
+    "text_uthmani": "مُّوقِنِينَ",
+    "audio_url": "wbw/026_024_010.mp3"
+   }
+  ],
+  "33:37": [
+   {
+    "text_uthmani": "وَإِذْ",
+    "audio_url": "wbw/033_037_001.mp3"
+   },
+   {
+    "text_uthmani": "تَقُولُ",
+    "audio_url": "wbw/033_037_002.mp3"
+   },
+   {
+    "text_uthmani": "لِلَّذِىٓ",
+    "audio_url": "wbw/033_037_003.mp3"
+   },
+   {
+    "text_uthmani": "أَنْعَمَ",
+    "audio_url": "wbw/033_037_004.mp3"
+   },
+   {
+    "text_uthmani": "ٱللَّهُ",
+    "audio_url": "wbw/033_037_005.mp3"
+   },
+   {
+    "text_uthmani": "عَلَيْهِ",
+    "audio_url": "wbw/033_037_006.mp3"
+   },
+   {
+    "text_uthmani": "وَأَنْعَمْتَ",
+    "audio_url": "wbw/033_037_007.mp3"
+   },
+   {
+    "text_uthmani": "عَلَيْهِ",
+    "audio_url": "wbw/033_037_008.mp3"
+   },
+   {
+    "text_uthmani": "أَمْسِكْ",
+    "audio_url": "wbw/033_037_009.mp3"
+   },
+   {
+    "text_uthmani": "عَلَيْكَ",
+    "audio_url": "wbw/033_037_010.mp3"
+   },
+   {
+    "text_uthmani": "زَوْجَكَ",
+    "audio_url": "wbw/033_037_011.mp3"
+   },
+   {
+    "text_uthmani": "وَٱتَّقِ",
+    "audio_url": "wbw/033_037_012.mp3"
+   },
+   {
+    "text_uthmani": "ٱللَّهَ",
+    "audio_url": "wbw/033_037_013.mp3"
+   },
+   {
+    "text_uthmani": "وَتُخْفِى",
+    "audio_url": "wbw/033_037_014.mp3"
+   },
+   {
+    "text_uthmani": "فِى",
+    "audio_url": "wbw/033_037_015.mp3"
+   },
+   {
+    "text_uthmani": "نَفْسِكَ",
+    "audio_url": "wbw/033_037_016.mp3"
+   },
+   {
+    "text_uthmani": "مَا",
+    "audio_url": "wbw/033_037_017.mp3"
+   },
+   {
+    "text_uthmani": "ٱللَّهُ",
+    "audio_url": "wbw/033_037_018.mp3"
+   },
+   {
+    "text_uthmani": "مُبْدِيهِ",
+    "audio_url": "wbw/033_037_019.mp3"
+   },
+   {
+    "text_uthmani": "وَتَخْشَى",
+    "audio_url": "wbw/033_037_020.mp3"
+   },
+   {
+    "text_uthmani": "ٱلنَّاسَ",
+    "audio_url": "wbw/033_037_021.mp3"
+   },
+   {
+    "text_uthmani": "وَٱللَّهُ",
+    "audio_url": "wbw/033_037_022.mp3"
+   },
+   {
+    "text_uthmani": "أَحَقُّ",
+    "audio_url": "wbw/033_037_023.mp3"
+   },
+   {
+    "text_uthmani": "أَن",
+    "audio_url": "wbw/033_037_024.mp3"
+   },
+   {
+    "text_uthmani": "تَخْشَىٰهُ ۖ",
+    "audio_url": "wbw/033_037_025.mp3"
+   },
+   {
+    "text_uthmani": "فَلَمَّا",
+    "audio_url": "wbw/033_037_027.mp3"
+   },
+   {
+    "text_uthmani": "قَضَىٰ",
+    "audio_url": "wbw/033_037_028.mp3"
+   },
+   {
+    "text_uthmani": "زَيْدٌۭ",
+    "audio_url": "wbw/033_037_029.mp3"
+   },
+   {
+    "text_uthmani": "مِّنْهَا",
+    "audio_url": "wbw/033_037_030.mp3"
+   },
+   {
+    "text_uthmani": "وَطَرًۭا",
+    "audio_url": "wbw/033_037_031.mp3"
+   },
+   {
+    "text_uthmani": "زَوَّجْنَـٰكَهَا",
+    "audio_url": "wbw/033_037_032.mp3"
+   },
+   {
+    "text_uthmani": "لِكَىْ",
+    "audio_url": "wbw/033_037_033.mp3"
+   },
+   {
+    "text_uthmani": "لَا",
+    "audio_url": "wbw/033_037_034.mp3"
+   },
+   {
+    "text_uthmani": "يَكُونَ",
+    "audio_url": "wbw/033_037_035.mp3"
+   },
+   {
+    "text_uthmani": "عَلَى",
+    "audio_url": "wbw/033_037_036.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْمُؤْمِنِينَ",
+    "audio_url": "wbw/033_037_037.mp3"
+   },
+   {
+    "text_uthmani": "حَرَجٌۭ",
+    "audio_url": "wbw/033_037_038.mp3"
+   },
+   {
+    "text_uthmani": "فِىٓ",
+    "audio_url": "wbw/033_037_039.mp3"
+   },
+   {
+    "text_uthmani": "أَزْوَٰجِ",
+    "audio_url": "wbw/033_037_040.mp3"
+   },
+   {
+    "text_uthmani": "أَدْعِيَآئِهِمْ",
+    "audio_url": "wbw/033_037_041.mp3"
+   },
+   {
+    "text_uthmani": "إِذَا",
+    "audio_url": "wbw/033_037_042.mp3"
+   },
+   {
+    "text_uthmani": "قَضَوْا۟",
+    "audio_url": "wbw/033_037_043.mp3"
+   },
+   {
+    "text_uthmani": "مِنْهُنَّ",
+    "audio_url": "wbw/033_037_044.mp3"
+   },
+   {
+    "text_uthmani": "وَطَرًۭا ۚ",
+    "audio_url": "wbw/033_037_045.mp3"
+   },
+   {
+    "text_uthmani": "وَكَانَ",
+    "audio_url": "wbw/033_037_047.mp3"
+   },
+   {
+    "text_uthmani": "أَمْرُ",
+    "audio_url": "wbw/033_037_048.mp3"
+   },
+   {
+    "text_uthmani": "ٱللَّهِ",
+    "audio_url": "wbw/033_037_049.mp3"
+   },
+   {
+    "text_uthmani": "مَفْعُولًۭا",
+    "audio_url": "wbw/033_037_050.mp3"
+   }
+  ],
+  "37:20": [
+   {
+    "text_uthmani": "وَقَالُوا۟",
+    "audio_url": "wbw/037_020_001.mp3"
+   },
+   {
+    "text_uthmani": "يَـٰوَيْلَنَا",
+    "audio_url": "wbw/037_020_002.mp3"
+   },
+   {
+    "text_uthmani": "هَـٰذَا",
+    "audio_url": "wbw/037_020_003.mp3"
+   },
+   {
+    "text_uthmani": "يَوْمُ",
+    "audio_url": "wbw/037_020_004.mp3"
+   },
+   {
+    "text_uthmani": "ٱلدِّينِ",
+    "audio_url": "wbw/037_020_005.mp3"
+   }
+  ],
+  "41:9": [
+   {
+    "text_uthmani": "۞ قُلْ",
+    "audio_url": "wbw/041_009_002.mp3"
+   },
+   {
+    "text_uthmani": "أَئِنَّكُمْ",
+    "audio_url": "wbw/041_009_003.mp3"
+   },
+   {
+    "text_uthmani": "لَتَكْفُرُونَ",
+    "audio_url": "wbw/041_009_004.mp3"
+   },
+   {
+    "text_uthmani": "بِٱلَّذِى",
+    "audio_url": "wbw/041_009_005.mp3"
+   },
+   {
+    "text_uthmani": "خَلَقَ",
+    "audio_url": "wbw/041_009_006.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْأَرْضَ",
+    "audio_url": "wbw/041_009_007.mp3"
+   },
+   {
+    "text_uthmani": "فِى",
+    "audio_url": "wbw/041_009_008.mp3"
+   },
+   {
+    "text_uthmani": "يَوْمَيْنِ",
+    "audio_url": "wbw/041_009_009.mp3"
+   },
+   {
+    "text_uthmani": "وَتَجْعَلُونَ",
+    "audio_url": "wbw/041_009_010.mp3"
+   },
+   {
+    "text_uthmani": "لَهُۥٓ",
+    "audio_url": "wbw/041_009_011.mp3"
+   },
+   {
+    "text_uthmani": "أَندَادًۭا ۚ",
+    "audio_url": "wbw/041_009_012.mp3"
+   },
+   {
+    "text_uthmani": "ذَٰلِكَ",
+    "audio_url": "wbw/041_009_014.mp3"
+   },
+   {
+    "text_uthmani": "رَبُّ",
+    "audio_url": "wbw/041_009_015.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْعَـٰلَمِينَ",
+    "audio_url": "wbw/041_009_016.mp3"
+   }
+  ],
+  "55:78": [
+   {
+    "text_uthmani": "تَبَـٰرَكَ",
+    "audio_url": "wbw/055_078_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱسْمُ",
+    "audio_url": "wbw/055_078_002.mp3"
+   },
+   {
+    "text_uthmani": "رَبِّكَ",
+    "audio_url": "wbw/055_078_003.mp3"
+   },
+   {
+    "text_uthmani": "ذِى",
+    "audio_url": "wbw/055_078_004.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْجَلَـٰلِ",
+    "audio_url": "wbw/055_078_005.mp3"
+   },
+   {
+    "text_uthmani": "وَٱلْإِكْرَامِ",
+    "audio_url": "wbw/055_078_006.mp3"
+   }
+  ],
+  "74:10": [
+   {
+    "text_uthmani": "عَلَى",
+    "audio_url": "wbw/074_010_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْكَـٰفِرِينَ",
+    "audio_url": "wbw/074_010_002.mp3"
+   },
+   {
+    "text_uthmani": "غَيْرُ",
+    "audio_url": "wbw/074_010_003.mp3"
+   },
+   {
+    "text_uthmani": "يَسِيرٍۢ",
+    "audio_url": "wbw/074_010_004.mp3"
+   }
+  ],
+  "90:3": [
+   {
+    "text_uthmani": "وَوَالِدٍۢ",
+    "audio_url": "wbw/090_003_001.mp3"
+   },
+   {
+    "text_uthmani": "وَمَا",
+    "audio_url": "wbw/090_003_002.mp3"
+   },
+   {
+    "text_uthmani": "وَلَدَ",
+    "audio_url": "wbw/090_003_003.mp3"
+   }
+  ],
+  "97:5": [
+   {
+    "text_uthmani": "سَلَـٰمٌ",
+    "audio_url": "wbw/097_005_001.mp3"
+   },
+   {
+    "text_uthmani": "هِىَ",
+    "audio_url": "wbw/097_005_002.mp3"
+   },
+   {
+    "text_uthmani": "حَتَّىٰ",
+    "audio_url": "wbw/097_005_003.mp3"
+   },
+   {
+    "text_uthmani": "مَطْلَعِ",
+    "audio_url": "wbw/097_005_004.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْفَجْرِ",
+    "audio_url": "wbw/097_005_005.mp3"
+   }
+  ],
+  "112:1": [
+   {
+    "text_uthmani": "قُلْ",
+    "audio_url": "wbw/112_001_001.mp3"
+   },
+   {
+    "text_uthmani": "هُوَ",
+    "audio_url": "wbw/112_001_002.mp3"
+   },
+   {
+    "text_uthmani": "ٱللَّهُ",
+    "audio_url": "wbw/112_001_003.mp3"
+   },
+   {
+    "text_uthmani": "أَحَدٌ",
+    "audio_url": "wbw/112_001_004.mp3"
+   }
+  ],
+  "112:2": [
+   {
+    "text_uthmani": "ٱللَّهُ",
+    "audio_url": "wbw/112_002_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱلصَّمَدُ",
+    "audio_url": "wbw/112_002_002.mp3"
+   }
+  ],
+  "112:3": [
+   {
+    "text_uthmani": "لَمْ",
+    "audio_url": "wbw/112_003_001.mp3"
+   },
+   {
+    "text_uthmani": "يَلِدْ",
+    "audio_url": "wbw/112_003_002.mp3"
+   },
+   {
+    "text_uthmani": "وَلَمْ",
+    "audio_url": "wbw/112_003_003.mp3"
+   },
+   {
+    "text_uthmani": "يُولَدْ",
+    "audio_url": "wbw/112_003_004.mp3"
+   }
+  ],
+  "112:4": [
+   {
+    "text_uthmani": "وَلَمْ",
+    "audio_url": "wbw/112_004_001.mp3"
+   },
+   {
+    "text_uthmani": "يَكُن",
+    "audio_url": "wbw/112_004_002.mp3"
+   },
+   {
+    "text_uthmani": "لَّهُۥ",
+    "audio_url": "wbw/112_004_003.mp3"
+   },
+   {
+    "text_uthmani": "كُفُوًا",
+    "audio_url": "wbw/112_004_004.mp3"
+   },
+   {
+    "text_uthmani": "أَحَدٌۢ",
+    "audio_url": "wbw/112_004_005.mp3"
+   }
+  ],
+  "113:1": [
+   {
+    "text_uthmani": "قُلْ",
+    "audio_url": "wbw/113_001_001.mp3"
+   },
+   {
+    "text_uthmani": "أَعُوذُ",
+    "audio_url": "wbw/113_001_002.mp3"
+   },
+   {
+    "text_uthmani": "بِرَبِّ",
+    "audio_url": "wbw/113_001_003.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْفَلَقِ",
+    "audio_url": "wbw/113_001_004.mp3"
+   }
+  ],
+  "113:2": [
+   {
+    "text_uthmani": "مِن",
+    "audio_url": "wbw/113_002_001.mp3"
+   },
+   {
+    "text_uthmani": "شَرِّ",
+    "audio_url": "wbw/113_002_002.mp3"
+   },
+   {
+    "text_uthmani": "مَا",
+    "audio_url": "wbw/113_002_003.mp3"
+   },
+   {
+    "text_uthmani": "خَلَقَ",
+    "audio_url": "wbw/113_002_004.mp3"
+   }
+  ],
+  "113:3": [
+   {
+    "text_uthmani": "وَمِن",
+    "audio_url": "wbw/113_003_001.mp3"
+   },
+   {
+    "text_uthmani": "شَرِّ",
+    "audio_url": "wbw/113_003_002.mp3"
+   },
+   {
+    "text_uthmani": "غَاسِقٍ",
+    "audio_url": "wbw/113_003_003.mp3"
+   },
+   {
+    "text_uthmani": "إِذَا",
+    "audio_url": "wbw/113_003_004.mp3"
+   },
+   {
+    "text_uthmani": "وَقَبَ",
+    "audio_url": "wbw/113_003_005.mp3"
+   }
+  ],
+  "113:4": [
+   {
+    "text_uthmani": "وَمِن",
+    "audio_url": "wbw/113_004_001.mp3"
+   },
+   {
+    "text_uthmani": "شَرِّ",
+    "audio_url": "wbw/113_004_002.mp3"
+   },
+   {
+    "text_uthmani": "ٱلنَّفَّـٰثَـٰتِ",
+    "audio_url": "wbw/113_004_003.mp3"
+   },
+   {
+    "text_uthmani": "فِى",
+    "audio_url": "wbw/113_004_004.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْعُقَدِ",
+    "audio_url": "wbw/113_004_005.mp3"
+   }
+  ],
+  "113:5": [
+   {
+    "text_uthmani": "وَمِن",
+    "audio_url": "wbw/113_005_001.mp3"
+   },
+   {
+    "text_uthmani": "شَرِّ",
+    "audio_url": "wbw/113_005_002.mp3"
+   },
+   {
+    "text_uthmani": "حَاسِدٍ",
+    "audio_url": "wbw/113_005_003.mp3"
+   },
+   {
+    "text_uthmani": "إِذَا",
+    "audio_url": "wbw/113_005_004.mp3"
+   },
+   {
+    "text_uthmani": "حَسَدَ",
+    "audio_url": "wbw/113_005_005.mp3"
+   }
+  ],
+  "114:1": [
+   {
+    "text_uthmani": "قُلْ",
+    "audio_url": "wbw/114_001_001.mp3"
+   },
+   {
+    "text_uthmani": "أَعُوذُ",
+    "audio_url": "wbw/114_001_002.mp3"
+   },
+   {
+    "text_uthmani": "بِرَبِّ",
+    "audio_url": "wbw/114_001_003.mp3"
+   },
+   {
+    "text_uthmani": "ٱلنَّاسِ",
+    "audio_url": "wbw/114_001_004.mp3"
+   }
+  ],
+  "114:2": [
+   {
+    "text_uthmani": "مَلِكِ",
+    "audio_url": "wbw/114_002_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱلنَّاسِ",
+    "audio_url": "wbw/114_002_002.mp3"
+   }
+  ],
+  "114:3": [
+   {
+    "text_uthmani": "إِلَـٰهِ",
+    "audio_url": "wbw/114_003_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱلنَّاسِ",
+    "audio_url": "wbw/114_003_002.mp3"
+   }
+  ],
+  "114:4": [
+   {
+    "text_uthmani": "مِن",
+    "audio_url": "wbw/114_004_001.mp3"
+   },
+   {
+    "text_uthmani": "شَرِّ",
+    "audio_url": "wbw/114_004_002.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْوَسْوَاسِ",
+    "audio_url": "wbw/114_004_003.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْخَنَّاسِ",
+    "audio_url": "wbw/114_004_004.mp3"
+   }
+  ],
+  "114:5": [
+   {
+    "text_uthmani": "ٱلَّذِى",
+    "audio_url": "wbw/114_005_001.mp3"
+   },
+   {
+    "text_uthmani": "يُوَسْوِسُ",
+    "audio_url": "wbw/114_005_002.mp3"
+   },
+   {
+    "text_uthmani": "فِى",
+    "audio_url": "wbw/114_005_003.mp3"
+   },
+   {
+    "text_uthmani": "صُدُورِ",
+    "audio_url": "wbw/114_005_004.mp3"
+   },
+   {
+    "text_uthmani": "ٱلنَّاسِ",
+    "audio_url": "wbw/114_005_005.mp3"
+   }
+  ],
+  "114:6": [
+   {
+    "text_uthmani": "مِنَ",
+    "audio_url": "wbw/114_006_001.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْجِنَّةِ",
+    "audio_url": "wbw/114_006_002.mp3"
+   },
+   {
+    "text_uthmani": "وَٱلنَّاسِ",
+    "audio_url": "wbw/114_006_003.mp3"
+   }
+  ]
+ }
+}

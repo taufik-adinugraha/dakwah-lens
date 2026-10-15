@@ -66,7 +66,7 @@ REVIEWER_ONLY = {"review_notes"}
 # Mishary Rashid Alafasy's EveryAyah file with its quran-align word timings. validate.py refuses a
 # second one. Until that day the lessons also carried Husary Mu'allim, as a choice in "Pengaturan".
 RECITER = "Alafasy_128kbps"
-RECITER_PROBES = "everyayah_alafasy"  # sources.json input: the measured length of each streamed file
+RECITER_PROBES = "everyayah_alafasy"  # sources.json input: the measured length of each file (the one we copy)
 RECITER_CREDIT = ("Recitation: Mishary Rashid Alafasy via EveryAyah.com · "
                   "Word timings: Collin Fair, quran-align (CC BY 4.0)")
 GAP_WARN_MS = 1500
@@ -77,9 +77,12 @@ warnings: list[str] = []
 
 
 def everyayah_url(s: int, a: int) -> str:
-    """The imam's streamed file of one ayah on EveryAyah ({SSS}{AAA}.mp3; never re-hosted, plan
-    §6.2). The lessons' Recitation.url and the Konsep examples' clips (clips.py) are both this."""
-    return f"https://everyayah.com/data/{RECITER}/{s:03d}{a:03d}.mp3"
+    """The imam's file of one ayah: our unaltered copy of EveryAyah's {SSS}{AAA}.mp3 (operator
+    2026-10-15: "we copy to our server so latency is minimum"; host_media.py pins and delivers it;
+    until then the file was streamed from EveryAyah, plan §6.2). The lessons' Recitation.url and the
+    Konsep examples' clips (clips.py) are both this; the quran-align timings time the same file."""
+    from host_media import alafasy_url
+    return alafasy_url(s, a)
 
 
 def word_segments(entry: dict) -> tuple[list[list[int]], list[tuple[int, int]]]:

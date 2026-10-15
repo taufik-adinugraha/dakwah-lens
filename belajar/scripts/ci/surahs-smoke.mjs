@@ -132,8 +132,9 @@ function chipsNotLinks(where, html, slug, ayah = null) {
  * no need to give option to user to change"; docs/belajar-plan.md L21). Read from the WHOLE
  * response of a lesson's ayah page — server HTML, RSC payload and the message catalogue next-intl
  * puts into every page's scripts:
- *   - the content gives the ayah exactly one recitation, Mishary Alafasy's EveryAyah file, and the
- *     page carries that address (what the stage plays) and no other recording of that host;
+ *   - the content gives the ayah exactly one recitation, our copy of Mishary Alafasy's EveryAyah
+ *     file (since 2026-10-15), and the page carries that address (what the stage plays) and no
+ *     other reciter's recording;
  *   - nothing names the reciter the lessons carried beside him until that day (Husary Mu'allim):
  *     no option, no note, no message, no recording;
  *   - the page has no dropdown (the reciter choice was the module's only <select>) and the stage
@@ -145,14 +146,16 @@ const IMAM = "Alafasy_128kbps";
 function oneImam(where, html, slug, ayah) {
   const a = SURAH[slug].ayat.find((x) => x.ayah === ayah);
   const recs = a?.recitation ?? [];
-  const want = `https://everyayah.com/data/${IMAM}/${String(SURAH[slug].surah).padStart(3, "0")}${String(ayah).padStart(3, "0")}.mp3`;
+  // Our unaltered copy of the imam's EveryAyah file (operator 2026-10-15; pipeline/host_media.py).
+  const want = `/belajar/media/narration/alafasy/${String(SURAH[slug].surah).padStart(3, "0")}${String(ayah).padStart(3, "0")}.mp3`;
   if (recs.length !== 1 || recs[0].reciter !== IMAM || recs[0].url !== want) {
     fail(where, `content/${slug}.json gives ayah ${ayah} ${JSON.stringify(recs.map((r) => r.url))}, expected exactly [${want}] (one imam)`);
     return 0;
   }
   if (!html.includes(want)) fail(where, `the page does not carry the imam's recording of this ayah (${want})`);
-  const others = [...new Set([...html.matchAll(/https:\/\/everyayah\.com\/data\/[A-Za-z0-9_]+\/\d{6}\.mp3/g)].map((m) => m[0]))].filter((u) => !u.includes(`/data/${IMAM}/`));
-  if (others.length) fail(where, `carries a recording that is not the imam's: ${others.slice(0, 3).join(", ")}`);
+  // No other reciter's file, ours or EveryAyah's (a lesson page carries no EveryAyah address at all now).
+  const others = [...new Set([...html.matchAll(/https:\/\/everyayah\.com\/data\/[A-Za-z0-9_]+\/\d{6}\.mp3|\/belajar\/media\/narration\/(?!alafasy\/|quran-com\/|kang-nandar\/)[a-z-]+\/\d{6}\.mp3/g)].map((m) => m[0]))];
+  if (others.length) fail(where, `carries a recording that is not the imam's copy: ${others.slice(0, 3).join(", ")}`);
   const named = /husary|mu.?allim/i.exec(html);
   if (named) fail(where, `names another reciter: "…${html.slice(Math.max(0, named.index - 50), named.index + 40)}…"`);
   if (/<select\b|<option\b/i.test(html)) fail(where, "has a dropdown (<select>): the reciter choice is back");

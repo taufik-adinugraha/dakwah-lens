@@ -49,8 +49,8 @@ const plain = (text: string): Token[] => [{ kind: "text", text }];
  * Every example is followed by its voice (operator 2026-10-12: "each explanation should be followed
  * by examples (visual + voice)", "not only for harakah, but also for all rules"): an example row's
  * "▶ Dengarkan" plays the imam reciting that very word, and a parts diagram voices its bentuk dasar
- * and the joined word (WordParts); library.json `clips`, one player for the card
- * (ClipPlayerProvider), nothing fetched before a press. `compact` shows no example, so no player.
+ * and the joined word (WordParts); one player for the card (ClipPlayerProvider), the files fetched
+ * ahead at idle (src/lib/media-prefetch.ts). `compact` shows no example, so no player.
  *
  * And each voice is labelled by what is HEARD (review 2026-10-12): an example row keeps its word
  * (the lesson's own), but where that word ends its ayah the imam stops, so its final harakah or
@@ -240,7 +240,12 @@ export function ConceptCard({
     </article>
   );
   // One player for the card's example voices (a page shows one concept card in full).
-  return compact ? card : <ClipPlayerProvider>{card}</ClipPlayerProvider>;
+  // Fetched ahead at idle, nearest first: the example rows' words, then the parts diagrams' tiles.
+  const prefetch = [
+    ...examples.map((r) => r.clip?.url),
+    ...parts.flatMap((p) => [wordVoice(p.word.ar)?.url, ...p.tiles.map((x) => wordVoice(x.ar)?.url)]),
+  ];
+  return compact ? card : <ClipPlayerProvider prefetch={prefetch}>{card}</ClipPlayerProvider>;
 }
 
 function ExampleRow({

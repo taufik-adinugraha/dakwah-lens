@@ -195,7 +195,7 @@ describe("its sequence, as its page builds it", () => {
   });
 });
 
-describe("its examples: the narrator's recordings of the examples the curriculum lists, each explained", () => {
+describe("its examples: the word recordings of the examples the curriculum lists, each explained by the narrator", () => {
   it("three kinds of isim, a fi'il and a huruf, one recording each, each saying which it is and explained by the narrator: no word of an ayah here to recite", () => {
     const kalimah = CURRICULUM.steps.find((s) => s.id === "kalimah")!;
     const derived = zeroExamplesFor(FATIHAH);
@@ -216,12 +216,14 @@ describe("its examples: the narrator's recordings of the examples the curriculum
       "fi'il, kata kerja.",
       "dua huruf, wa yang artinya “dan”, dan lā yang artinya “bukan”.",
     ]);
-    // Each is the narrator's whole recording of the word's own bytes: no `last`, no stop, no run.
+    // Each is Quran.com's recording of the word's own bytes at its place (operator 2026-10-15): the
+    // word inside our unaltered copy of the file; no `last`, no stop, no run. Wa lā (1:7:8) is ONE
+    // written word, one word file, not a run of two (its two huruf are written as one word).
     for (const e of derived.examples) {
       expect(e.clip, e.id).toEqual(wordVoice(WORD_AR[e.key]));
       expect(e.clip, e.id).not.toBeNull();
-      expect([e.clip?.start, e.clip?.last, e.waqf, e.washal], e.id).toEqual([0, undefined, false, null]);
-      expect(e.clip?.url, e.id).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\//);
+      expect([e.clip?.source, e.clip?.last, e.waqf, e.washal], e.id).toEqual(["quran.com", undefined, false, null]);
+      expect(e.clip?.url, e.id).toMatch(/^\/belajar\/media\/narration\/quran-com\/wbw\/\d{3}_\d{3}_\d{3}\.mp3$/);
     }
     const step = seq.steps.find((s) => s.kind === "example")!;
     const beats = step.examples!;

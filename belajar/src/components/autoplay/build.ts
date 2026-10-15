@@ -12,9 +12,10 @@
  *
  * The example beats (operator 2026-10-12: "each explanation should be followed
  * by examples (visual + voice)"; plan L20; src/lib/autoplay/examples.ts) go to
- * every page too: they are the narrator's recording of the word or form (the
- * words' voices, content/wordvoice.json, an AI voice — never a cut of the
- * imam's recitation, operator 2026-10-14) and an on-screen caption in the
+ * every page too: they are the recording of the word or form (the words'
+ * voices, content/wordvoice.json: Quran.com's word recording of a word at its
+ * place, the AI narrator's for a part, a letter, a built form or a run — never
+ * a cut of the imam's recitation, operators 2026-10-14/15) and an on-screen caption in the
  * page's locale, never a narration line. lessonExamplesFor derives them from the
  * content; the sequence takes what it needs of them (no Arabic), the stage
  * their drawing (stageExamples: the content's bytes, by beat id).
@@ -25,6 +26,7 @@ import { composeFor, composeInput } from "@/lib/compose-content";
 import { SURAHS } from "@/lib/content";
 import { taughtAt, taughtInZero } from "@/lib/curriculum";
 import { lessonMapInput } from "@/lib/map-content";
+import { lessonMediaPlan } from "@/lib/media-prefetch";
 import { quizAyah } from "@/lib/quiz-content";
 import { wordVoice } from "@/lib/wordvoice";
 
@@ -117,4 +119,27 @@ export function zeroSequence(s: SurahContent, locale: string): AutoplaySequence 
     examples: zeroExamplesFor(s).examples,
     map: null,
   });
+}
+
+/**
+ * The recordings fetched ahead for the lesson of `a` (src/lib/media-prefetch.ts, operator
+ * 2026-10-15: "no latency (preload before page is opened)"): its own plan (its recitation, every
+ * word and example file its sequence plays) and the next ayah's of the same surah, which the
+ * lesson fetches from two thirds of the way on; `seq`: the sequence the page already built.
+ */
+export function lessonMediaFor(s: SurahContent, a: Ayah, locale: string, seq: AutoplaySequence): { ayah: string[]; next: string[] } {
+  const next = s.ayat.find((x) => x.ayah === a.ayah + 1);
+  return {
+    ayah: lessonMediaPlan(seq, a.recitation[0]?.url ?? null),
+    next: next ? lessonMediaPlan(stageSequence(s, next, locale), next.recitation[0]?.url ?? null) : [],
+  };
+}
+
+/** … and lesson zero's: no ayah of its own, so its example files; then the first ayah's lesson. */
+export function zeroMediaFor(s: SurahContent, locale: string, seq: AutoplaySequence): { ayah: string[]; next: string[] } {
+  const first = s.ayat[0];
+  return {
+    ayah: lessonMediaPlan(seq, null),
+    next: first ? lessonMediaPlan(stageSequence(s, first, locale), first.recitation[0]?.url ?? null) : [],
+  };
 }

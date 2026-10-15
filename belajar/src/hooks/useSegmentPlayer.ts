@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { type AudioLoading, mediaLoading, type MediaEventType } from "@/lib/autoplay/loading";
 
+import { mediaSrc } from "./useMediaPrefetch";
+
 export type Segment = [word: number, startMs: number, endMs: number];
 /** An ayah's recording and its word timings: the one imam's (Mishary Alafasy; operator 2026-10-13,
  *  plan L21: "better to use alafasy for all? no need to give option to user to change"), so a
@@ -54,7 +56,7 @@ const markUnlocked = (a: HTMLAudioElement) => {
 };
 
 /**
- * One streamed ayah file + its word timings (quran-align).
+ * One ayah file (our copy of EveryAyah's, same-origin since 2026-10-15) + its word timings (quran-align).
  *
  * - "Play a word" SEEKS within the ayah recording and stops at the word's end
  *   — no cut audio files are ever created (plan §6.1 A3: we stream, we don't
@@ -124,6 +126,8 @@ export function useSegmentPlayer(
   const beginRef = useRef<(() => void) | null>(null);
   const stopAtRef = useRef<number | null>(null);
   const segmentsRef = useRef<Segment[]>([]);
+  /** The ayah's recording (its URL; the element may point at the page's copy of it, adopt). */
+  const sourceUrlRef = useRef<string | null>(null);
   const rateRef = useRef<PlaybackRate>(1);
   /** Where a paused whole-ayah playback stopped; null = start from 0. */
   const resumeAtRef = useRef<number | null>(null);
@@ -276,6 +280,7 @@ export function useSegmentPlayer(
   // Point the element at the ayah's recording: fetched on play, or ahead of it by warm().
   useEffect(() => {
     segmentsRef.current = source.segments;
+    sourceUrlRef.current = source.url;
     const a = audioRef.current;
     if (!a) return;
     askedRef.current = false;
@@ -283,7 +288,9 @@ export function useSegmentPlayer(
     stopAtRef.current = null;
     resumeAtRef.current = null;
     warmedRef.current = null;
-    a.src = source.url;
+    // The copy the page fetched ahead (useMediaPrefetch: our copy of the imam's file, same-origin),
+    // else the file itself.
+    a.src = mediaSrc(source.url);
     // A src swap resets the element's rate; re-apply the learner's choice.
     a.playbackRate = rateRef.current;
     a.preservesPitch = true;
@@ -427,8 +434,30 @@ export function useSegmentPlayer(
    * decided on; a no-op while the element points elsewhere, and once done for a file (each file
    * once, until the element is pointed anew).
    */
+  /**
+   * Point the element at the copy of its recording the page now holds (useMediaPrefetch), in
+   * place of the file's URL — only while nothing has been asked of it (paused at its start, not
+   * unlocking, nothing loaded beyond what preload "none" allows): a play under way, or a file the
+   * element already buffers, is never swapped. No-op when no copy is held.
+   */
+  const adopt = useCallback(() => {
+    const a = audioRef.current;
+    const url = sourceUrlRef.current;
+    if (!a || !url) return;
+    const held = mediaSrc(url);
+    if (held === url || a.getAttribute("src") === held) return;
+    if (!a.paused || askedRef.current || unlockingRef.current || a.currentTime > 0 || a.getAttribute("src") !== url) return;
+    if (a.readyState > HTMLMediaElement.HAVE_METADATA) return;
+    a.src = held;
+    warmedRef.current = null;
+    a.playbackRate = rateRef.current;
+    a.preservesPitch = true;
+  }, []);
+
   const warm = useCallback((url: string) => {
     const a = audioRef.current;
+    // A held copy is in the page's memory already: nothing to fetch.
+    if (a && a.getAttribute("src") === mediaSrc(url) && mediaSrc(url) !== url) return;
     if (!a || a.getAttribute("src") !== url || warmedRef.current === url) return;
     warmedRef.current = url;
     a.preload = "auto";
@@ -470,6 +499,8 @@ export function useSegmentPlayer(
     unlock,
     /** Fetch the recording ahead of its first play (the lesson has started). */
     warm,
+    /** Point the idle element at the page's copy of its recording, once held. */
+    adopt,
     /** A play asked for is sounding right now. */
     flowing,
   };
