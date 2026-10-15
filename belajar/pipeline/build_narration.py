@@ -639,8 +639,8 @@ SHARED_TEXT = {
     # No "fatwa" here: the page footer carries "Dibantu AI, bukan fatwa otoritatif" (operator,
     # 2026-10-10). Nothing promises a human review.
     "start": ("Mari kita mulai. Anda cukup mendengarkan dan memperhatikan layar; pelajaran berjalan sendiri, "
-              "dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an dibacakan oleh imam; kata-kata yang "
-              "dibacakan satu per satu disuarakan oleh narator dengan suara kecerdasan buatan. "
+              "dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an dibacakan imam; kata per kata "
+              "disuarakan narator dengan suara kecerdasan buatan. "
               "Penjelasan ini juga dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan "
               "buatan dari kitab-kitab yang disebutkan sumbernya."),
     "resume": "Kita lanjutkan pelajaran dari langkah terakhir.",
