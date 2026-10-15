@@ -23,7 +23,7 @@ import { chromium } from "playwright";
 
 // The narration audio for the karaoke shots (browser-side only), shared with linebreaks.mjs.
 // The workflow copies narration-route.mjs next to this script.
-import { BELAJAR_DIR, isNarration, isWordVoice, narrationIndex, narrationRoute, wordVoiceIndex } from "./narration-route.mjs";
+import { BELAJAR_DIR, isNarration, isWordVoice, narrationIndex, narrationRoute, wordVoiceFile, wordVoiceIndex } from "./narration-route.mjs";
 
 const BASE = process.env.BASE_URL ?? "http://127.0.0.1:3300";
 // URL shape: plan L9 (hub → /quran track; Konsep/Kosakata at hub level).
@@ -3022,7 +3022,11 @@ async function exampleChecks(page, vp, index) {
   let release = () => {};
   const gate = new Promise((done) => (release = done));
   const heldBack = [];
-  const isHeld = isWordVoice;
+  // Only the recording of word 2's bentuk dasar is held back (set before step 2): the lesson's own
+  // word steps play the narrator's word recordings too (step 3, 2026-10-15), and holding those
+  // would stall the steps that lead to the beat instead of the beat.
+  let heldFile = null;
+  const isHeld = (u) => isWordVoice(u) && u.pathname === heldFile;
   const hold = async (route) => {
     heldBack.push(Date.now());
     await gate;
@@ -3068,7 +3072,10 @@ async function exampleChecks(page, vp, index) {
     const baseId = `w1:base:${ismu.frame}`;
     await toStep(page, vp, "w1:compose");
     await page.waitForTimeout(800);
-    if (words.seen.length) fail(`a recording of the narrator was requested before its step played (requests: ${words.list()})`);
+    // The lesson's own word steps play the narrator's recordings (step 3), and the next one is
+    // fetched while the narrator speaks the step before it: what was asked so far is any of the
+    // content's word recordings, nothing else.
+    for (const f of askedWords()) if (!voices.has(f)) fail(`a request for ${f}, which content/wordvoice.json does not name, before the base frame (requests: ${words.list()})`);
     const t1 = Date.now();
     await replay.click();
     const untilBase = compose.words["1:1:1"].lines.filter((l) => l.frame <= ismu.frame).length;
@@ -3086,7 +3093,9 @@ async function exampleChecks(page, vp, index) {
     if (!words.seen.length) fail(`at the base frame the narrator's recording of the bentuk dasar had not been requested (requests: ${words.list()})`);
     const recordings = askedWords();
     for (const f of recordings) if (!voices.has(f)) fail(`the base example asked for ${f}, which content/wordvoice.json does not name`);
-    if (recordings.length !== 1) fail(`the base example asked for ${recordings.length} recordings, expected its own one: ${words.list()}`);
+    const baseFile = await wordVoiceFile(compose.words["1:1:1"].forms[ismu.form].ar);
+    if (!baseFile) fail(`content/wordvoice.json has no recording of the bentuk dasar ${ismu.form}`);
+    if (!recordings.includes(baseFile)) fail(`the base example's own recording (${baseFile}) had not been requested (requests: ${words.list()})`);
     const said = await text(caption);
     for (const part of [msgs.example_tag, compose.words["1:1:1"].forms[ismu.form].translit, `QS ${ismu.loc.split(":").slice(0, 2).join(":")}`]) {
       if (!said.includes(part)) fail(`the base example's caption “${said}” does not say “${part}”`);
@@ -3130,6 +3139,8 @@ async function exampleChecks(page, vp, index) {
     // 2. A recording that does not come: the status, then given up — the lesson goes on.
     if (vp === "phone") {
       const heldId = `w2:base:${allahu.frame}`;
+      heldFile = await wordVoiceFile(compose.words["1:1:2"].forms[allahu.form].ar);
+      if (!heldFile) fail(`content/wordvoice.json has no recording of the bentuk dasar ${allahu.form}`);
       await page.route(isHeld, hold);
       try {
         await toStep(page, vp, "w2:compose");

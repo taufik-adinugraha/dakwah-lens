@@ -56,6 +56,16 @@ export async function wordVoiceIndex() {
   return index;
 }
 
+/** The recording content/wordvoice.json gives the Uthmani word `ar` (its key writes an alif wasla as a plain alif); its path, or null. */
+export async function wordVoiceFile(ar) {
+  try {
+    const manifest = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "wordvoice.json"), "utf8"));
+    return manifest?.words?.[ar.replaceAll("\u0671", "\u0627")]?.audio?.url ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** A silent WAV (8 kHz, mono, 8-bit PCM: 0x80 is silence) of `ms` milliseconds. */
 function silentWav(ms) {
   const rate = 8000;
