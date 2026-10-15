@@ -75,13 +75,16 @@ export type ExampleHandlers = {
 };
 
 /**
- * The imam's voice of a lesson's EXAMPLE from another ayah (operator 2026-10-12: "each explanation
- * should be followed by examples (visual + voice)"; plan L20): ONE Audio element (never rendered)
- * that plays [start, end) of one word, or one run, of that ayah's streamed EveryAyah recording
- * and stops there — the way the Konsep pages' example buttons do (useClipPlayer; the same pure
+ * The lesson's player of EVERY WORD heard on its own (operator 2026-10-14: "for all quran word by
+ * word should be replaced by this, not using truncated voice from imam"): ONE Audio element (never
+ * rendered) that plays one recording of the narrator Kang Nandar's — a word of this ayah (its
+ * opening step, the ayah's last word once more, Dengar dan klik's word, a word the learner
+ * clicks), or an example beat's word or form (operator 2026-10-12: "each explanation should be
+ * followed by examples (visual + voice)"; plan L20) — from `start` to `end` (the whole file:
+ * src/lib/wordvoice.ts), the way the Konsep pages' example buttons do (useClipPlayer; the same pure
  * rules, src/lib/clips.ts), but driven by the lesson instead of a press: the lesson's state
- * machine asks for one clip at a time (a recite activity, target "clip") and waits for its end.
- * The stage's own recitation player cannot play it: its element holds THIS ayah's recording.
+ * machine asks for one recording at a time (a recite activity, target "word" or "clip") and waits
+ * for its end. The stage's own recitation player plays the imam's WHOLE ayah only.
  *
  * - `play(clip, handlers)` plays the clip from its start and returns its stop function; the
  *   handlers of a stopped clip are dropped, so a late event can never report for it.
@@ -93,10 +96,10 @@ export type ExampleHandlers = {
  *   The element is kept across ayah pages, so the hand-off needs no new tap.
  * - `warm(url)`: fetches a recording ahead of its clip, into this very element (when: warm.ts
  *   exampleToWarm). Nothing plays, nothing is reported.
- * - `loading`: from the moment a clip is asked for until the imam is heard, and while it stalls
- *   (loading.ts): the stage says "Memuat bacaan imam…" once it lasts. `flowing()`: the clip is
- *   sounding right now (the lesson gives up on an example that does not start,
- *   timing.ts EXAMPLE_LOAD_LIMIT_MS).
+ * - `loading`: from the moment a clip is asked for until it is heard, and while it stalls
+ *   (loading.ts, kind "narration"): the stage says "Memuat suara narator…" once it lasts.
+ *   `flowing()`: the clip is sounding right now (the lesson gives up on an example that does not
+ *   start, timing.ts EXAMPLE_LOAD_LIMIT_MS).
  * - One recording at a time on the page (AUDIO_START_EVENT): starting pauses every other player,
  *   and another player starting stops the clip (`onInterrupted`).
  * - `rate`: the learner's speed for the imam ("Kecepatan imam"), pitch preserved.
@@ -128,7 +131,7 @@ export function useExamplePlayer(opts: { rate?: PlaybackRate } = {}) {
       timer = null;
     };
     const load = (type: MediaEventType) => {
-      const at = { kind: "recitation" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
+      const at = { kind: "narration" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
       setLoading((prev) => mediaLoading(prev, type, at));
     };
     /** Ends the clip playing now: its handlers are dropped first, so nothing reports twice. */

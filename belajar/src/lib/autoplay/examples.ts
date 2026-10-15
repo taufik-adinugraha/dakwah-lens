@@ -63,11 +63,9 @@ export const MAX_EXAMPLES_PER_RULE = 2;
 export const MAX_EXAMPLES_ZERO = 3;
 
 /** Why a `base` frame of a composition has no voice of its own (pipeline/compose.py UNVOICED). */
-export const UNVOICED_REASON: Readonly<Record<string, string>> = {
-  own: "the bentuk dasar is this very word, which the imam recites when its step opens",
-  unattested: "no word of the Qur'an has these bytes (a teaching form)",
-  unheard: "the Qur'an has these bytes, but in no place are they heard as shown",
-};
+export const UNVOICED_REASON = {
+  own: "the bentuk dasar is this very word, which the lesson recites when its step opens",
+} as const;
 
 /** One entry of content/compose/<slug>.json `examples[loc]` (src/content/compose-schema.ts). */
 export type ComposeExampleLike = {
@@ -100,17 +98,18 @@ type WordLike = Pick<Ayah["words"][number], "loc" | "ar" | "translit" | "gloss" 
 export type ExampleSource = {
   ayah: { surah: number; ayah: number; words: readonly WordLike[] };
   /** A lesson with NO ayah (lesson zero): a concept's examples are then all words of other
-   *  places, so each is the imam's clip of its own ayah — the record's first
-   *  MAX_EXAMPLES_ZERO that have one and do not end their ayah (there the imam's stop
-   *  changes what is heard) — and each says what it is an example of (`about`). */
+   *  places, so each is the narrator's recording of the word — the record's first
+   *  MAX_EXAMPLES_ZERO that have one — and each says what it is an example of (`about`). */
   zero?: boolean;
   /** What this ayah's lesson teaches as "Konsep baru" (curriculum.ts taughtIn): each with its
    *  examples, the one in this ayah first. */
   introduced: readonly { id: string; examples: readonly { loc: string; note: string }[] }[];
   /** content/compose/<slug>.json, or null (a surah without compositions). */
   compose: ComposeLike | null;
-  /** content/library.json `clips`: the imam's voice of every concept example. */
-  clips: Readonly<Record<string, ExampleClip>>;
+  /** The narrator's recording of a form's Arabic (src/lib/wordvoice.ts voiceFrom over
+   *  content/wordvoice.json), or null: every example that is not a word of this ayah (which the
+   *  stage's own player recites) plays it. Never a cut of the imam's recitation. */
+  voice: (ar: string) => ExampleClip | null;
   /** A lesson word of any surah, by loc: a concept's example in another ayah. */
   wordAt: (loc: string) => { ar: string; translit: string; gloss: string } | undefined;
 };
@@ -131,8 +130,8 @@ export type LessonExample = {
   clip: ExampleClip | null;
   translit: string;
   gloss: string | null;
-  /** Where the example stands in the Qur'an. */
-  place: { surah: number; ayah: number };
+  /** Where the example stands in the Qur'an; null for a teaching form no ayah has. */
+  place: { surah: number; ayah: number } | null;
   /** It ends its ayah and the imam's stop drops its last harakah (heard.ts hasWaqfNote). */
   waqf: boolean;
   /** Played with the word before it: what is heard. */
@@ -189,26 +188,35 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
         const form = unit.forms[e.form];
         const step = `w${n}:compose`;
         if (!form) continue;
-        if (!e.clip || !e.key || !e.loc) {
-          gaps.push({ step, rule: `bentuk dasar ${form.translit}`, why: UNVOICED_REASON[e.unvoiced ?? ""] ?? `no voice (${e.unvoiced ?? "?"})` });
+        // The base form IS the lesson's own word (al-ḥamdu, na‘budu): the lesson recites it when
+        // its step opens, and a second recording right after would be a repeat (compose.py
+        // `unvoiced: "own"`; listed as a rule without an example beat, with that reason).
+        if (e.unvoiced === "own") {
+          gaps.push({ step, rule: `bentuk dasar ${form.translit}`, why: UNVOICED_REASON.own });
           continue;
         }
-        const at = placeOf(e.loc);
-        // A base form that is another word of this very ayah, played alone: the stage's own player.
-        const own = e.key === e.loc ? (numberOf.get(e.loc) ?? null) : null;
+        // Any other form is recorded as it is written, a teaching form no ayah has included: the
+        // imam's cut of an attested one ("ismu" from tabāraka-smu) lost its hamzat washal, and an
+        // unattested one had no voice at all (compose.py `unvoiced`).
+        const clip = src.voice(form.ar);
+        if (!clip) {
+          gaps.push({ step, rule: `bentuk dasar ${form.translit}`, why: "the form has no recording (content/wordvoice.json)" });
+          continue;
+        }
+        const at = e.loc ? placeOf(e.loc) : null;
         examples.push({
           id: `w${n}:base:${e.frame}`,
           of: "base",
           step,
           frame: e.frame,
-          key: e.key,
-          word: own,
-          clip: own === null ? e.clip : null,
+          key: `${w.loc}#${e.form}`,
+          word: null,
+          clip,
           translit: form.translit,
           gloss: form.gloss ?? null,
-          place: { surah: at.surah, ayah: at.ayah },
+          place: at ? { surah: at.surah, ayah: at.ayah } : null,
           waqf: false,
-          washal: e.washal ? { before: e.washal.before, heard: e.washal.heard } : null,
+          washal: null,
           ar: form.ar,
           ending: null,
           about: null,
@@ -223,8 +231,8 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
     const n = first ? numberOf.get(first.loc) : undefined;
     const step = `concept:${c.id}:ex`;
     if (src.zero) {
-      const picks = c.examples.filter((x) => !!src.clips[x.loc] && !src.clips[x.loc].last && !!src.wordAt(x.loc)).slice(0, MAX_EXAMPLES_ZERO);
-      if (!picks.length) gaps.push({ step, rule: c.id, why: "the lesson has no ayah, and the concept has no example whose clip does not end its ayah" });
+      const picks = c.examples.filter((x) => !!src.wordAt(x.loc) && !!src.voice(src.wordAt(x.loc)!.ar)).slice(0, MAX_EXAMPLES_ZERO);
+      if (!picks.length) gaps.push({ step, rule: c.id, why: "the lesson has no ayah, and none of the concept's examples has a recording" });
       picks.forEach((x, k) => {
         const word = src.wordAt(x.loc)!;
         const at = placeOf(x.loc);
@@ -235,7 +243,7 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
           frame: null,
           key: x.loc,
           word: null,
-          clip: src.clips[x.loc],
+          clip: src.voice(word.ar),
           translit: word.translit,
           gloss: word.gloss,
           place: { surah: at.surah, ayah: at.ayah },
@@ -276,8 +284,8 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
     if (!(last && drop !== "none" && claims)) continue;
     // The example is about an ending that is not heard here: one more, where it is.
     const other = c.examples.slice(1).find((x) => {
-      const clip = src.clips[x.loc];
-      return !!clip && !clip.last && !!src.wordAt(x.loc);
+      const w2 = src.wordAt(x.loc);
+      return !!w2 && !!src.voice(w2.ar);
     });
     const word = other ? src.wordAt(other.loc) : undefined;
     if (!other || !word) {
@@ -285,15 +293,14 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
       continue;
     }
     const at = placeOf(other.loc);
-    const own = numberOf.get(other.loc) ?? null;
     examples.push({
       id: `concept:${c.id}:2`,
       of: "concept",
       step,
       frame: null,
       key: other.loc,
-      word: own,
-      clip: own === null ? src.clips[other.loc] : null,
+      word: null,
+      clip: src.voice(word.ar),
       translit: word.translit,
       gloss: word.gloss,
       place: { surah: at.surah, ayah: at.ayah },

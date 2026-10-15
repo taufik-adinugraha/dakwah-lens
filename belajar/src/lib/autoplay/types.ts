@@ -10,11 +10,19 @@
  * EXAMPLE BEATS (operator 2026-10-12: "each explanation should be followed by
  * examples (visual + voice)", "not only for harakah, but also for all rules";
  * plan L20; which examples: examples.ts): after a rule is explained the stage
- * shows one example of it and the IMAM recites it — a word of this ayah on
- * the stage's own recitation player, a word or run of another ayah as a clip
- * of that ayah's streamed recording (ExampleClip). A beat has NO narration
- * line: its caption is on-screen text only (AutoplayTexts.example), so the
- * narrator still never voices a Qur'anic word and nothing is rendered for it.
+ * shows one example of it and it is HEARD — the narrator Kang Nandar's own
+ * recording of that word or form (content/wordvoice.json, an AI voice;
+ * operator 2026-10-14), never a cut of the imam's recitation. A beat has NO
+ * narration line: its caption is on-screen text only (AutoplayTexts.example),
+ * and nothing is rendered for it here (the word's recording already exists).
+ *
+ * EVERY QUR'ANIC WORD PLAYED ON ITS OWN (operator 2026-10-14: "for all quran word
+ * by word should be replaced by this, not using truncated voice from imam"): a
+ * word's opening step, the ayah's last word once more, an example beat, the
+ * word Dengar dan klik asks about, a word the learner clicks — each is that
+ * word's recording by the narrator (AutoplaySequence.wordVoices), played on
+ * the lesson's example player. The imam (Mishary Alafasy) recites WHOLE ayat
+ * only: the recitation step and the recap, the mushaf line following him.
  *
  * Narration lines are keyed by the step-id contract shared by every part of
  * the autoplay build (and by pipeline/build_narration.py + validate_narration.py):
@@ -265,11 +273,11 @@ export type Cue = {
 
 // ───────────────────────────── Example beats ─────────────────────────────
 
-/** The imam's voice of an example in another ayah: that ayah's streamed recording (the one
- *  imam's, plan L21) and [start, end) of the word (or run) in it, in ms, from the pinned quran-align
- *  timings (content/library.json `clips`, content/compose `examples`; pipeline/clips.py). `last`:
- *  the word ends its ayah, where the imam stops. Nothing is cut or stored: the player seeks and
- *  stops (src/hooks/useExamplePlayer.ts). */
+/** A recording the example player plays from `start` to `end` (ms): since 2026-10-14 the
+ *  narrator's recording of a word or form, whole — {url, start: 0, end: its length}
+ *  (src/lib/wordvoice.ts, content/wordvoice.json). Until then [start, end) of a word in an ayah's
+ *  streamed EveryAyah recording (`last`: it ended its ayah). The player seeks and stops
+ *  (src/hooks/useExamplePlayer.ts). */
 export type ExampleClip = { url: string; start: number; end: number; last?: boolean };
 
 /** What an example beat exemplifies: a concept just introduced, or the bentuk dasar a composition's
@@ -290,8 +298,9 @@ export type ExampleBeat = {
   after: number;
   /** The clip key of what is recited: a word ("1:1:1") or a run ("55:78:1-2"). */
   key: string;
-  /** A word of THIS ayah (1-based): recited on the stage's own recitation player and lit on the
-   *  mushaf line; null: another ayah's, `clip`. Exactly one of `word` and `clip` is set. */
+  /** A word of THIS ayah (1-based): lit on the mushaf line, and heard as that word's recording
+   *  (AutoplaySequence.wordVoices); null: another ayah's word or a form, `clip` (its recording).
+   *  Exactly one of `word` and `clip` is set. */
   word: number | null;
   clip: ExampleClip | null;
   /** The composition frame on screen while it plays (a base example), else null. */
@@ -315,13 +324,13 @@ export type StepKind =
   | "recite_word"
   | "explain"
   /** A word explained by its parts, over its animation; its last line is said
-   *  over the last frame, the joined word. No recitation of its own (the imam
-   *  said the word at "recite_word", plan L24) — except the ayah's last word,
-   *  recited once more after the line that says he stops on it. */
+   *  over the last frame, the joined word. No recitation of its own (the word
+   *  was heard at "recite_word", plan L24) — except the ayah's last word,
+   *  heard once more after the line that says the recitation stops on it. */
   | "compose"
   | "structure"
   | "concept"
-  /** The example(s) of the concept just introduced: no narration line, the imam only. */
+  /** The example(s) of the concept just introduced: no narration line, the word's recording only. */
   | "example"
   | "exercise"
   /** The lesson map's closing (plan L23, L26): what this ayah taught, and the running total. */
@@ -372,9 +381,10 @@ export type AutoplayStep = {
   frames?: number;
   /** That word's loc ("1:2:3"). */
   loc?: string;
-  /** The imam's recitation, played after the cues (never during them): the whole ayah
-   *  (recite_ayah, recap) or the step's word — recite_word, the one time a word is recited,
-   *  and the composition of the ayah's last word, which is recited once more (plan L24). */
+  /** What is recited after the cues (never during them): the whole ayah by the imam
+   *  (recite_ayah, recap), or the step's word, as the narrator's recording of it (wordVoices) —
+   *  recite_word, the one time a word is heard, and the composition of the ayah's last word,
+   *  which is heard once more (plan L24). */
   recite?: ReciteTarget;
   exercise?: ExerciseSpec;
   /** The step's example beats, each after the cue it names (operator 2026-10-12, plan L20). */
@@ -404,6 +414,12 @@ export type AutoplaySequence = {
   nav: NavIntent;
   /** True when at least one line of this sequence has narration audio. */
   hasAudio: boolean;
+  /** The narrator's recording of each word of the ayah (index = word − 1; src/lib/wordvoice.ts,
+   *  content/wordvoice.json): what every step that plays ONE word plays (operator 2026-10-14) —
+   *  never the imam's recitation cut at the word. null: the word has no recording, which the
+   *  checks refuse (checks.ts wordVoiceProblems); the lesson then plays nothing for it. Empty in
+   *  lesson zero (no ayah). */
+  wordVoices: readonly (ExampleClip | null)[];
 };
 
 // ───────────────────────────── Texts ─────────────────────────────
@@ -417,7 +433,7 @@ export type AutoplayTexts = {
   intro: (a: { surah: string; ayah: number; total: number }) => string;
   /** Before the imam recites the whole ayah. */
   recite: string;
-  /** While the imam recites one word. */
+  /** While a word is heard by itself (the narrator's recording of it). */
   wordIntro: (a: { n: number; translit: string; gloss: string }) => string;
   /** Opens a word's explanation; the content's "why" sentence follows. */
   meaning: (a: { n: number; translit: string; gloss: string }) => string;
@@ -462,6 +478,8 @@ export type AutoplayTexts = {
     zero: (a: { translit: string; surah: number; ayah: number; about: string }) => string;
     /** The bentuk dasar a composition shows, where it stands in the Qur'an. */
     base: (a: { translit: string; surah: number; ayah: number }) => string;
+    /** A bentuk dasar no ayah has (a teaching form): named, with no place. */
+    form: (a: { translit: string }) => string;
     /** Added when the example ends its ayah and the imam's stop drops its last harakah. */
     waqf: string;
     /** Added when a word that starts with hamzat washal is played with the word before it. */

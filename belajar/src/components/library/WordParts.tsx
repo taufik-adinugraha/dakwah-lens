@@ -1,12 +1,11 @@
 import { ArrowDown, ArrowRight, Plus } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
 
-import { type Clip, clipFor, clipKey } from "@/lib/clips";
-import { hasWaqfNote } from "@/lib/heard";
+import { clipKey } from "@/lib/clips";
+import { wordVoice } from "@/lib/wordvoice";
 import { letters, type PartsChange, type PreparedParts, soundAfterSign } from "@/lib/terms";
 
 import { ClipButton } from "./ClipButton";
-import { ClipNote, clipNoteId } from "./ClipNote";
 import { MarkCircle } from "./MarkCircle";
 import { MixedText } from "./MixedText";
 import { TermText } from "./TermText";
@@ -19,11 +18,6 @@ export type WordPartsLabels = {
   change: (c: PartsChange) => string;
   /** "tidak ditulis" (a letter of a part the word does not write) */
   notWritten: string;
-  /** Under a voice button whose word ends its ayah: "Di akhir ayat imam berhenti (waqaf), …". */
-  waqf: string;
-  /** Under the voice of a tile played with the word before it: "Di tengah bacaan, alif di awal
-   *  kata ini tidak dibaca: bersama kata sebelumnya terdengar “tabārakasmu”." */
-  washal: (heard: string) => string;
 };
 
 /**
@@ -38,36 +32,16 @@ export type WordPartsLabels = {
  * letter's shape. Each change is named by where it is, shown on dotted circles with its names and
  * sounds, then the steps (which give each part's meaning with "yang artinya").
  *
- * The imam's voice (operator 2026-10-12: "ismu (read by voice + show visual) when combined with
- * harf jar, it becomes ismi (read by voice + visual)"): a tile that is a whole word — the part's
- * bentuk dasar as an ayah writes it, ٱسْمُ of QS 55:78 — carries "▶ Dengarkan" with that word's
- * recitation, and so does the joined word (بِسْمِ, the ayah's own); a part that is only a piece of
- * a word (bi-, -hum) has none, since no imam recites it alone (pipeline/clips.py). `clips`:
- * library.json's (src/lib/clips.ts), played by the page's ClipPlayerProvider.
- *
- * What is HEARD (review 2026-10-12): ٱسْمُ cut alone from tabāraka-smu played "smu", because in
- * mid-recitation its hamzat washal is not read — the very thing step 3 of the diagram explains
- * ("Alif di awal ismu adalah hamzah washal: ia hanya dibaca bila bacaan dimulai dari kata itu").
- * Such a tile (library.json `washal`, derived by the build: its word starts with ٱ and is not its
- * ayah's first) plays the run with the word before it, its button names what is heard
- * ("tabārakasmu") and one line under it says so. A word that ends its ayah would get the waqf
- * line the example rows have (the build lets no base-form tile be one). `scope`: the page's
- * concept id, for the notes' ids.
+ * The voice (operator 2026-10-12: "ismu (read by voice + show visual) when combined with harf jar,
+ * it becomes ismi (read by voice + visual)"): every tile — a whole word (ٱسْمُ of QS 55:78), a
+ * part of one (bi-, -hum, -ta) — and the joined word (بِسْمِ) carries "▶ Dengarkan" with the
+ * narrator's recording of exactly the form it shows (src/lib/wordvoice.ts; operator 2026-10-14: the
+ * truncations of the imam's recitation were "not clean", and a part of a word cannot be cut from
+ * it at all). So a tile has no "what is heard" note: ٱسْمُ is recorded on its own, and said whole.
+ * Played by the page's ClipPlayerProvider.
  */
-export function WordParts({
-  data,
-  labels,
-  clips = {},
-  scope = "parts",
-}: {
-  data: PreparedParts;
-  labels: WordPartsLabels;
-  clips?: Readonly<Record<string, Clip>>;
-  scope?: string;
-}) {
-  const wordClip = clipFor(clips, data.loc);
-  const here = `${scope}-parts-${data.loc}`;
-  const wordWaqfId = hasWaqfNote(wordClip, data.word.ar) ? clipNoteId(here, "word") : undefined;
+export function WordParts({ data, labels }: { data: PreparedParts; labels: WordPartsLabels }) {
+  const wordClip = wordVoice(data.word.ar);
   return (
     <figure className="rounded-2xl border-[1.5px] border-teal-line bg-paper p-4 sm:p-6">
       <div role="group" aria-label={labels.parts} className="flex flex-col items-center gap-2">
@@ -80,7 +54,7 @@ export function WordParts({
                 dropped={t.dropped}
                 translit={t.translit}
                 notWritten={labels.notWritten}
-                voice={tileVoice(clips, t, clipNoteId(here, `tile-${i + 1}`), labels)}
+                voice={tileVoice(t)}
               >
                 <TermText tokens={t.label} links={false} />
               </Tile>
@@ -93,12 +67,7 @@ export function WordParts({
           translit={data.word.translit}
           result
           voice={
-            wordClip ? (
-              <>
-                <ClipButton loc={data.loc} clip={wordClip} word={data.word.translit} noteId={wordWaqfId} className="justify-center" />
-                {wordWaqfId ? <ClipNote id={wordWaqfId} kind="waqf" text={labels.waqf} icon={false} className={TILE_NOTE} /> : null}
-              </>
-            ) : null
+            wordClip ? <ClipButton loc={data.loc} clip={wordClip} word={data.word.translit} className="justify-center" /> : null
           }
         />
       </div>
@@ -137,33 +106,14 @@ export function WordParts({
   );
 }
 
-/** A note under a tile's button: left-aligned lines in the centred tile, never wider than a
- *  short paragraph (the tile grows with it, up to its row), at the size of the tile's label. */
-const TILE_NOTE = "mt-2 max-w-[19rem] text-left text-sm";
-
-/** The voice of a tile: its clip's button, or null for a part of a word (no clip). A tile with
- *  `washal` plays its run (the word before it + the word), is named by what is heard, and says so
- *  under the button. */
-function tileVoice(
-  clips: Readonly<Record<string, Clip>>,
-  t: PreparedParts["tiles"][number],
-  id: string,
-  labels: WordPartsLabels,
-): ReactNode {
-  // Already a clip key (a word, or the run "55:78:1-2"): looked up as it is.
-  const key = t.washal?.run ?? clipKey(t.q);
-  const clip = key ? (clips[key] ?? null) : null;
-  if (!clip || !key) return null;
-  const washalId = t.washal ? `${id}-washal` : null;
-  const waqfId = hasWaqfNote(clip, t.ar) ? `${id}-waqf` : null;
-  const notes = [washalId, waqfId].filter(Boolean).join(" ");
-  return (
-    <>
-      <ClipButton loc={key} clip={clip} word={t.washal?.heard ?? t.translit} noteId={notes || undefined} className="justify-center" />
-      {t.washal && washalId ? <ClipNote id={washalId} kind="washal" text={labels.washal(t.washal.heard)} icon={false} className={TILE_NOTE} /> : null}
-      {waqfId ? <ClipNote id={waqfId} kind="waqf" text={labels.waqf} icon={false} className={TILE_NOTE} /> : null}
-    </>
-  );
+/** The voice of a tile: the narrator's recording of the tile's own form (a word, or a part of one:
+ *  bi-, -ta), or null when it has none. The tile that used to play the imam's run with the word
+ *  before it (ٱسْمُ, "tabārakasmu") now plays the form it shows: a recording of a word on its own
+ *  has no hamzat washal to lose, so there is no "what is heard" note to add. */
+function tileVoice(t: PreparedParts["tiles"][number]): ReactNode {
+  const clip = wordVoice(t.ar);
+  if (!clip) return null;
+  return <ClipButton loc={clipKey(t.q) ?? t.q} clip={clip} word={t.translit} className="justify-center" />;
 }
 
 function Tile({

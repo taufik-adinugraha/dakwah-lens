@@ -9,11 +9,19 @@ import { SURAHS, WORD_AR } from "./content";
 import { hasWaqfNote, signNotHeard, waqfDrop } from "./heard";
 import { LIBRARY } from "./library";
 import { QREF } from "./terms";
+import { plainLetters, wordVoice } from "./wordvoice";
 
 // What the learner HEARS (review 2026-10-12 of the example voices): the Harakat card for tanwin
 // showed دٌ = d + un "dari أَحَدٌ (aḥadun)" and played "aḥad"; 47 of 200 concept example rows are an
 // ayah's last word, several with a note about the very ending the imam does not pronounce there.
 // An example is chosen and labelled by tajwid, not only by its bytes.
+//
+// Since 2026-10-14 the Konsep pages' word voices are the narrator's recordings of each word on its
+// own (src/lib/wordvoice.ts), not cuts of the imam's recitation: a word is said whole whether or not
+// it ends its ayah, and a base form is said as it is written. So the words here are about (a) the rule
+// that still decides what the lesson says of an ayah's last word, which the imam recites on the
+// stage's own player (waqfDrop, hasWaqfNote, examples.ts), (b) the Harakat card's choice of an example
+// where its sign is heard (signNotHeard), and (c) that no Konsep button carries a note any more.
 
 const BELAJAR = fileURLToPath(new URL("../../", import.meta.url));
 const FIXTURE = JSON.parse(readFileSync(join(BELAJAR, "pipeline/fixtures/clips_outside_lessons.json"), "utf8")) as {
@@ -57,17 +65,18 @@ describe("what a pause drops (waqfDrop; pipeline/clips.py pause_drop is the same
 });
 
 describe("the waqf note is decided from the data: `last` and the word's ending", () => {
-  it("library.json marks `last` exactly on the clips whose word ends its ayah", () => {
+  it("no Konsep clip is marked `last`: the narrator says a word whole, whether or not the ayah ends there", () => {
     let n = 0;
     for (const [key, c] of Object.entries(LIBRARY.clips)) {
+      expect(c, key).not.toHaveProperty("last");
+      expect(hasWaqfNote(c, LIBRARY.quran[key]), key).toBe(false);
+      // count the words and runs that END their ayah (a letter or a part is no word's end), among the
+      // ayat the content or the fixture holds: the imam would have stopped on each of them
+      if (key.includes("#") || key.includes("/")) continue;
       const [s, a, w, w2] = key.split(/[:-]/).map(Number);
-      const tokens = tokensOf(s, a);
-      expect(tokens, key).not.toBeNull();
-      expect(c.last === true, key).toBe(tokens!.length === (w2 ?? w));
-      expect(c.last, key).not.toBe(false); // true or absent
-      if (c.last) n++;
+      if (tokensOf(s, a)?.length === (w2 ?? w)) n++;
     }
-    expect(n).toBe(22);
+    expect(n).toBe(49);
   });
 
   it("planted: no `last`, no note; `last` on a word that loses nothing, no note; a run is judged by its last word", () => {
@@ -82,17 +91,21 @@ describe("the waqf note is decided from the data: `last` and the word's ending",
     expect(hasWaqfNote({ last: true }, `${WORD_AR["112:3:3"]} ${WORD_AR["112:3:4"]}`)).toBe(false); // … yūlad
   });
 
-  it("47 of the 202 concept example rows are an ayah's last word, on 21 concept pages; 43 carry the note", () => {
+  it("47 of the 202 concept example rows are an ayah's last word, on 21 concept pages; 43 would have lost their harakah to the imam's stop, and none carries a note now", () => {
     const rows = LIBRARY.concepts.flatMap((c) => c.examples.map((e) => ({ id: c.id, loc: e.loc })));
-    const last = rows.filter((r) => LIBRARY.clips[r.loc]?.last);
+    const last = rows.filter((r) => isLast(r.loc));
     expect(rows).toHaveLength(202); // 200 until ihdinā (1:6:1) joined jumlah fi'liyyah, 2026-10-13; ṣirāṭa (1:7:1) joined Kalimah 2026-10-14
-    expect(last.map((r) => r.loc).every(isLast)).toBe(true);
-    expect(rows.filter((r) => isLast(r.loc))).toHaveLength(last.length);
     expect(last).toHaveLength(47);
     expect(new Set(last.map((r) => r.id)).size).toBe(21);
-    const noted = last.filter((r) => hasWaqfNote(LIBRARY.clips[r.loc], WORD_AR[r.loc]));
-    expect(noted).toHaveLength(43);
-    expect([...new Set(last.filter((r) => !noted.includes(r)).map((r) => r.loc))]).toEqual(["112:3:4"]);
+    // what the stop does to them: 43 lose a harakah or tanwin, yūlad (112:3:4) loses nothing
+    expect(last.filter((r) => waqfDrop(WORD_AR[r.loc]) === "harakat")).toHaveLength(43);
+    expect([...new Set(last.filter((r) => waqfDrop(WORD_AR[r.loc]) !== "harakat").map((r) => r.loc))]).toEqual(["112:3:4"]);
+    // … but a row's button plays the narrator's whole word, which has no `last`: no note on any row
+    for (const r of rows) {
+      const clip = wordVoice(WORD_AR[r.loc]);
+      expect(clip, `${r.id} ${r.loc}`).not.toBeNull();
+      expect(hasWaqfNote(clip, WORD_AR[r.loc]), `${r.id} ${r.loc}`).toBe(false);
+    }
   });
 });
 
@@ -111,6 +124,7 @@ describe("a Harakat sign card's sign is heard where its example is (signNotHeard
       expect(tokens, sg.example).not.toBeNull();
       expect(signNotHeard(sg.marks, n, w, tokens!), `${sg.marks} ${sg.example}`).toBeNull();
       // and its word is not an ayah's last at all today, so no card needs the waqf line
+      expect(isLast(clipKey(sg.example)!), sg.example).toBe(false);
       expect(LIBRARY.clips[clipKey(sg.example)!].last, sg.example).toBeUndefined();
     }
   });
@@ -141,61 +155,87 @@ describe("a Harakat sign card's sign is heard where its example is (signNotHeard
   });
 });
 
-describe("hamzat washal: a base-form tile mid-ayah is played with the word before it", () => {
+describe("hamzat washal: a base-form tile is recorded on its own, so its alif is read and nothing needs saying", () => {
   const tiles = LIBRARY.parts.flatMap((p) => p.tiles.map((t) => ({ loc: p.loc, ...t })));
+  /** The whole-word tiles that start with ٱ and are not their ayah's first word: the ones the imam's
+   *  recitation reads without that alif (ismu after tabāraka, Allāhu after huwa). */
+  const startsWithWasl = (t: (typeof tiles)[number]) => {
+    const key = clipKey(t.q);
+    const whole = key !== null && !t.q.includes("/");
+    const [, , w] = (key ?? "0:0:0").split(":").map(Number);
+    return whole && LIBRARY.quran[key!].startsWith("\u0671") && w > 1;
+  };
 
-  it("derived from the bytes: exactly the whole-word tiles that start with ٱ and are not their ayah's first word", () => {
-    for (const t of tiles) {
-      const key = clipKey(t.q);
-      const whole = key !== null && !t.q.includes("/");
-      const [, , w] = (key ?? "0:0:0").split(":").map(Number);
-      const needs = whole && LIBRARY.quran[key!].startsWith("\u0671") && w > 1;
-      expect(t.washal !== undefined, `${t.loc} ${t.q}`).toBe(needs);
-    }
+  it("derived from the bytes: exactly the whole-word tiles that start with ٱ and are not their ayah's first word — ismu and Allāhu", () => {
+    for (const t of tiles) expect(t.washal !== undefined, `${t.loc} ${t.q}`).toBe(startsWithWasl(t));
+    expect(tiles.filter(startsWithWasl).map((t) => t.translit)).toEqual(["ismu", "Allāhu"]);
+    // the build still records the run the imam would have played (library.json `washal`); the page
+    // does not use it
     expect(tiles.filter((t) => t.washal).map((t) => [t.translit, t.washal])).toEqual([
       ["ismu", { run: "55:78:1-2", before: "tabāraka", heard: "tabārakasmu" }],
       ["Allāhu", { run: "112:1:2-3", before: "huwa", heard: "huwallāhu" }],
     ]);
   });
 
-  it("the run is the word before + the word, its clip spans both, and the heard form joins their transliterations", () => {
-    for (const t of tiles) {
-      if (!t.washal) continue;
+  it("each plays the recording of the form itself, with its alif written as a letter — not the run with the word before it", () => {
+    for (const t of tiles.filter(startsWithWasl)) {
       const key = clipKey(t.q)!;
+      const ar = LIBRARY.quran[key];
+      // the voice model is sent the alif as a plain letter (src/lib/wordvoice-core.ts): "ismu", not "smu"
+      expect(plainLetters(ar).startsWith("\u0627"), t.translit).toBe(true);
+      const clip = wordVoice(ar);
+      expect(clip, t.translit).not.toBeNull();
+      expect(LIBRARY.clips[key], t.translit).toEqual(clip);
+      // the run is another recording (a longer one), and the tile does not play it
+      const run = LIBRARY.clips[t.washal!.run];
+      expect(run, t.translit).toBeTruthy();
+      expect(LIBRARY.clips[key], t.translit).not.toEqual(run);
+      expect(run.end, t.translit).toBeGreaterThan(clip!.end);
+      // the run's text is the word before it and the word, as the ayah writes them
       const [s, a, w] = key.split(":").map(Number);
-      expect(t.washal.run).toBe(`${s}:${a}:${w - 1}-${w}`);
       const tokens = tokensOf(s, a)!;
-      expect(LIBRARY.quran[t.washal.run]).toBe(`${tokens[w - 2]} ${tokens[w - 1]}`);
-      expect(LIBRARY.quran[`${s}:${a}:${w - 1}`]).toBe(tokens[w - 2]);
-      expect(t.washal.heard).toBe(t.washal.before + t.translit.slice(1));
-      expect(LIBRARY.clips[t.washal.run]).toBeTruthy();
-      expect(LIBRARY.clips[key] === undefined || LIBRARY.concepts.some((c) => c.examples.some((e) => e.loc === key)), key).toBe(true);
+      expect(LIBRARY.quran[t.washal!.run], t.translit).toBe(`${tokens[w - 2]} ${tokens[w - 1]}`);
+      expect(t.washal!.heard, t.translit).toBe(t.washal!.before + t.translit.slice(1));
     }
     // a lesson word before it brings the lesson's own transliteration
     expect(SURAHS.find((x) => x.surah === 112)!.ayat[0].words[1].translit).toBe("huwa");
   });
 
-  it("no base-form tile is an ayah's last word (its ending is what the diagram shows)", () => {
+  it("no tile — a whole word or a part — is said with a stop or a run: every tile's voice is its own text, whole", () => {
     for (const t of tiles) {
-      const key = t.washal?.run ?? clipKey(t.q);
-      if (key) expect(LIBRARY.clips[key].last, `${t.loc} ${t.q}`).toBeUndefined();
+      const key = clipKey(t.q)!;
+      expect(key, `${t.loc} ${t.q}`).not.toContain("-");
+      const clip = LIBRARY.clips[key];
+      expect(clip, `${t.loc} ${t.q}`).toEqual(wordVoice(LIBRARY.quran[key]));
+      expect(hasWaqfNote(clip, LIBRARY.quran[key]), `${t.loc} ${t.q}`).toBe(false);
     }
   });
 });
 
 describe("the ayat outside the lessons: the committed fixture", () => {
-  it("holds exactly the ayat of the clips no lesson covers, and every such clip is its quran-align timing", () => {
+  // pipeline/fixtures/clips_outside_lessons.json is the build's: the Tanzil line and the quran-align
+  // segments of the ayat the imam's cuts came from, outside the lessons. The cuts are gone from the
+  // pages (the narrator records each word), so what these tests still use of it is the Tanzil line:
+  // the words of the Harakat cards' examples that stand in an ayah no lesson has (signNotHeard).
+  it("holds the Tanzil line of every ayah outside the lessons that a Harakat card's example stands in, and its word is the library's bytes", () => {
+    const lessons = new Set(SURAHS.map((s) => s.surah));
+    const outside = LIBRARY.basics.flatMap((b) => b.signs.map((sg) => clipKey(sg.example)!)).filter((k) => !lessons.has(Number(k.split(":")[0])));
+    expect(outside).toEqual(["97:5:1"]);
+    for (const key of outside) {
+      const [s, a, w] = key.split(":").map(Number);
+      const line = FIXTURE.ayat[`${s}:${a}`];
+      expect(line, key).toBeDefined();
+      expect(line.tanzil.split(" ")[w - 1], key).toBe(LIBRARY.quran[key]);
+      expect(tokensOf(s, a), key).toEqual(line.tanzil.split(" "));
+    }
+  });
+
+  it("every word of the library outside the lessons has its recording (the imam's alignment is no longer what makes one)", () => {
     const lessons = new Set(SURAHS.map((s) => s.surah));
     const outside = Object.keys(LIBRARY.clips).filter((k) => !lessons.has(Number(k.split(":")[0])));
-    expect([...new Set(outside.map((k) => k.split(":").slice(0, 2).join(":")))].sort()).toEqual(Object.keys(FIXTURE.ayat).sort());
-    expect(outside).toEqual(["2:5:2", "5:23:6", "26:24:2", "55:78:1-2", "97:5:1"]);
-    for (const key of outside) {
-      const [s, a, w, w2] = key.split(/[:-]/).map(Number);
-      const segs = FIXTURE.ayat[`${s}:${a}`].segments;
-      const seg = (word: number) => segs.find(([from, to]) => from === word - 1 && to === word)!;
-      expect([LIBRARY.clips[key].start, LIBRARY.clips[key].end], key).toEqual([seg(w)[2], seg(w2 ?? w)[3]]);
-      const tokens = FIXTURE.ayat[`${s}:${a}`].tanzil.split(" ");
-      expect(LIBRARY.quran[key], key).toBe(tokens.slice(w - 1, w2 ?? w).join(" "));
-    }
+    expect(outside.length).toBeGreaterThan(10);
+    for (const key of outside) expect(LIBRARY.clips[key], key).toEqual(wordVoice(LIBRARY.quran[key]));
+    // …among them the five the imam's cuts used to cover, which had to be aligned to be voiced
+    for (const key of ["2:5:2", "5:23:6", "26:24:2", "55:78:2", "97:5:1"]) expect(outside, key).toContain(key);
   });
 });

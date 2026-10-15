@@ -639,8 +639,9 @@ SHARED_TEXT = {
     # No "fatwa" here: the page footer carries "Dibantu AI, bukan fatwa otoritatif" (operator,
     # 2026-10-10). Nothing promises a human review.
     "start": ("Mari kita mulai. Anda cukup mendengarkan dan memperhatikan layar; pelajaran berjalan sendiri, "
-              "dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an selalu dibacakan oleh imam. "
-              "Penjelasan ini dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan "
+              "dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an dibacakan imam; kata per kata "
+              "disuarakan narator dengan suara kecerdasan buatan. "
+              "Penjelasan ini juga dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan "
               "buatan dari kitab-kitab yang disebutkan sumbernya."),
     "resume": "Kita lanjutkan pelajaran dari langkah terakhir.",
     # A wrong pick is not voiced (operator 2026-10-10: "give narration/voice only for the correct
@@ -660,9 +661,11 @@ _NEXT = "Klik tombol yang diberi tanda untuk melanjutkan."
 SHARED_EX_TEXT = {
     # The warm-up (operator 2026-10-13): three buttons, one answer.
     (Q.WARMUP, "options"): "Pilih jenisnya: isim, fi'il, atau huruf.",
-    # The lesson's imam recites the word by itself (no click): the learner only answers.
-    ("tap-word", "play"): "Dengarkan imam membacakan satu kata dari ayat ini.",
-    ("tap-word", "options"): "Sekarang klik kata yang tadi dibacakan imam.",
+    # The lesson plays the word by itself (no click): the learner only answers. A word heard on its
+    # own is the narrator's recording of it, never the imam's (operator 2026-10-14), so the prompt
+    # names no reciter.
+    ("tap-word", "play"): "Dengarkan satu kata dari ayat ini.",
+    ("tap-word", "options"): "Sekarang klik kata yang tadi dibacakan.",
     ("why-harakat", "options"): "Pilih alasan yang membuat akhir kata ini dibaca seperti itu.",
     ("sort-case", "words"): "Klik satu kata yang ingin Anda kelompokkan.",
     ("sort-case", "bins"): "Sekarang klik kelompok akhiran yang cocok untuk kata itu.",
@@ -703,7 +706,7 @@ def ex_intro(ex: dict, terms: Q.Terms) -> str:
         return (f"Latihan bentuk-bentuk kata, {c} soal. {which} Bentuk-bentuk ini kata Arab hasil tashrif, bukan "
                 "kutipan ayat.")
     return {
-        "tap-word": (f"Latihan dengar dan klik. Imam akan membacakan {c} kata dari ayat ini satu per satu, "
+        "tap-word": (f"Latihan dengar dan klik. Akan dibacakan {c} kata dari ayat ini satu per satu, "
                      "dalam urutan acak. Setiap kali, klik kata yang Anda dengar."),
         "why-harakat": (f"Latihan kenapa harakat ini, {c} soal. Setiap soal menampilkan satu kata; pilih alasan "
                         "yang membuat akhirnya dibaca seperti itu."),

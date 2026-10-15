@@ -320,14 +320,16 @@ export type ComposeInput = {
 };
 
 /**
- * The note of the frame on which the imam stops: the last frame of the composition of an ayah's
- * LAST word (content/compose, "whole", the word as the ayah writes it), whose line says what is
- * heard there ("Ini kata terakhir ayat, dan imam berhenti padanya, jadi kasrah ini hanya terlihat
- * dalam tulisan, tidak terdengar."). The autoplay lesson lets the imam recite that word once more
- * right after that line (operator 2026-10-13, plan L24: the one word recited twice) — so the note
- * is load-bearing: composeFileProblems refuses it anywhere else.
+ * The note of the frame on which the recitation stops: the last frame of the composition of an
+ * ayah's LAST word (content/compose, "whole", the word as the ayah writes it), whose line says what
+ * is heard there ("Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi kasrah ini hanya
+ * terlihat dalam tulisan, tidak terdengar."). The autoplay lesson plays that word once more right
+ * after that line (operator 2026-10-13, plan L24: the one word heard twice) — so the note is
+ * load-bearing: composeFileProblems refuses it anywhere else. Until 2026-10-14 "imam berhenti di
+ * sini": a word heard on its own is the narrator's recording now, never the imam's (the fact is
+ * the ayah's recitation's, which the imam recites).
  */
-export const STOP_NOTE = "imam berhenti di sini";
+export const STOP_NOTE = "bacaan berhenti di sini";
 
 /** Does this composition end on the stop frame, its last line said over it? */
 export function endsOnStop(c: Pick<Composition, "frames" | "lines">): boolean {

@@ -1356,6 +1356,35 @@ the lesson map's first line of ayah 1 (`al-fatihah:1:map:new`) as the file fetch
 and needs it rendered. Every pipeline check, the vitest suite and the other browser checks pass
 rendered or not (a line without audio is caption-only by design).
 
+### The words are the narrator's (2026-10-14): the lines that said "imam" of a single word
+
+Operator 2026-10-14: every Qur'anic word played on its own is the narrator Kang Nandar's recording
+of it (content/wordvoice.json, "Suara contoh" / src/lib/wordvoice.ts), never a cut of the imam's
+recitation; whole ayat stay the imam's. The lines that said the IMAM recites or stops on one word
+were reworded, and only those: `shared:ex:tap-word:play` ("Dengarkan satu kata dari ayat ini."),
+`shared:ex:tap-word:options` ("… yang tadi dibacakan."), every `ex:tap-word:intro` ("Akan dibacakan
+N kata …"), the seven stop lines of Al-Fatihah's compositions ("… dan bacaan berhenti padanya, …",
+with the frame note "bacaan berhenti di sini", composition.ts STOP_NOTE) and `shared:start`
+("Ayat Al-Qur'an dibacakan oleh imam; kata-kata yang dibacakan satu per satu disuarakan oleh
+narator dengan suara kecerdasan buatan."), which is now longer than MAX_LINE and split into
+`shared:start:a` and `:b`. The lines about the whole ayah ("Sekarang dengarkan imam membacakan
+ayat …", the recap) are unchanged. 17 lines of Al-Fatihah and shared lost their audio (12 distinct
+texts, 1,551 characters, about USD 0.12); the Mu'awwidzat's `ex:tap-word:intro` lines were never
+rendered. Until the render: those lines are caption-only, and `loadingChecks` / `aheadChecks`
+(browser) stop at `shared:start:a`, which they need rendered. The dry run of exactly those lines,
+and nothing else (every other line keeps its audio and is not selected):
+
+```bash
+python3 render_narration.py --only shared:start --only shared:ex:tap-word:play --only shared:ex:tap-word:options \
+    --only al-fatihah:1:ex:tap-word:intro --only al-fatihah:2:ex:tap-word:intro --only al-fatihah:3:ex:tap-word:intro \
+    --only al-fatihah:4:ex:tap-word:intro --only al-fatihah:5:ex:tap-word:intro --only al-fatihah:6:ex:tap-word:intro \
+    --only al-fatihah:1:w4:compose:4 --only al-fatihah:2:w4:compose:9 --only al-fatihah:3:w2:compose:5 \
+    --only al-fatihah:4:w3:compose:4 --only al-fatihah:5:w4:compose:3 --only al-fatihah:6:w3:compose:7 \
+    --only al-fatihah:7:w9:compose:8
+# must say: 12 distinct texts, 1551 characters. The render is the same command with
+#   --render --i-approve-spend --voice-id aK834gEOxQEtviMPgurT --voice-name "Kang Nandar" --env-file … --out "$OUT"
+```
+
 ## Narasi (guided-lesson narration)
 
 The autoplay lesson ("Mulai" once, then no clicks except exercise answers) speaks an Indonesian

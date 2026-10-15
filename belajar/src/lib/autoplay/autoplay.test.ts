@@ -505,7 +505,8 @@ describe("a word's opening step: as long as the imam's word when the narrator ex
   it("the sequence: each word recited by one step, its opening one; its caption names the word", () => {
     expect(plain.steps[W1]).toMatchObject({ id: "w1:recite", kind: "recite_word", cues: [], recite: { target: "word", word: 1 } });
     const word1 = input.surahs.find((s) => s.slug === "al-fatihah")?.ayat[1].words[0];
-    expect(caption).toBe(`Kata ke-1: ${word1?.translit}. Dengarkan imam membacanya.`);
+    // (until 2026-10-14 "Dengarkan imam membacanya.": the word is the narrator's recording now)
+    expect(caption).toBe(`Kata ke-1: ${word1?.translit}. Dengarkan kata ini.`);
     for (const seq of [plain, narrated]) {
       expect(seq.steps.filter((s) => s.recite?.target === "word").map((s) => s.id)).toEqual(["w1:recite", "w2:recite", "w3:recite", "w4:recite"]);
       // An explain step neither recites nor carries a beat that would (until 2026-10-13: "w1:word").

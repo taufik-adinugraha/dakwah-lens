@@ -68,12 +68,13 @@ import {
 export const CONTINUE_PARAM = "lanjut";
 
 /** Window event a word card's "Dengar" button sends; the stage plays the
- *  word on its one player (so word cards never start a second recording). */
+ *  word's recording by the narrator on the lesson's example player (so word
+ *  cards never start a second recording). */
 export const PLAY_WORD_EVENT = "belajar:play-word";
 
 /** After the learner starts a recording of their own (e.g. "Dengarkan
  *  lagi" in an exercise), idle reminders hold off this long, so a reminder
- *  never cuts the imam short. */
+ *  never cuts a word short. */
 const FOREIGN_QUIET_MS = 4000;
 
 const noopSubscribe = () => () => {};
@@ -130,20 +131,31 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  * (src/lib/autoplay/machine.ts) plus everything that touches the browser.
  *
  * - Executes `state.activity` — exactly ONE at a time: a narration file
- *   (useNarrationPlayer), the imam's recitation (the stage's one
- *   useSegmentPlayer, so the mushaf line follows the imam), a reading timer
- *   or a silent pause — and answers with that activity's token. Narration
- *   and recitation therefore never overlap.
+ *   (useNarrationPlayer), the imam's recitation of the WHOLE ayah (the
+ *   stage's one useSegmentPlayer, so the mushaf line follows the imam), ONE
+ *   word's recording by the narrator (useExamplePlayer; below), a reading
+ *   timer or a silent pause — and answers with that activity's token.
+ *   Narration and recitation therefore never overlap.
+ * - EVERY QUR'ANIC WORD PLAYED ON ITS OWN is the narrator Kang Nandar's
+ *   recording of it (operator 2026-10-14: "for all quran word by word should
+ *   be replaced by this, not using truncated voice from imam … because in
+ *   some parts the truncation are not clean"; AutoplaySequence.wordVoices,
+ *   content/wordvoice.json, an AI voice): a word's opening step and "Pelan"'s
+ *   second hearing, the ayah's last word once more, Dengar dan klik's word,
+ *   an example beat, a word card's "Dengar" and a word clicked on the mushaf
+ *   line. Never a cut of the imam's recitation, and no fall-back to one: a
+ *   word without a recording is refused by the checks, and reported failed
+ *   here. While it loads the panel says "Memuat suara narator…".
  * - Exercises: forwards the guided exercise's answers, done and control
  *   reports; sends idle_tick once a second while one waits in silence (its
  *   reminders, then the screen lock's time limit), and while "Tunggu saya"
  *   holds a caption for "Lanjut" (that limit only: the lesson waits on).
- *   Dengar dan klik's word is recited here, on the stage's player (the one
- *   "Mulai" unlocked); the learner's own replay of it ends that recitation
+ *   Dengar dan klik's word is played here, on the example player (the one
+ *   "Mulai" unlocked); the learner's own replay of it ends that word
  *   instead of pausing the lesson.
  * - The learner's own sound (a mushaf word, a word card's
- *   Dengar) pauses the lesson; a "Dengarkan kata" inside an exercise only
- *   ends the narration it cut short.
+ *   Dengar: the word's recording, on the example player) pauses the lesson;
+ *   a "Dengarkan kata" inside an exercise only ends the narration it cut short.
  * - Browser blocked the sound (autoplay policy, e.g. after a reload): the
  *   lesson pauses and asks for one click on "Lanjutkan".
  * - The karaoke caption: while a narration file with word timings plays,
@@ -177,17 +189,17 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  *   let go after two minutes of silence; the lesson waits on.
  * - EXAMPLE BEATS (operator 2026-10-12: "each explanation should be followed
  *   by examples (visual + voice)"; plan L20; machine.ts): a recite activity
- *   that names a beat. A word of this ayah plays on the stage's player like
- *   any word; a word of ANOTHER ayah is a clip on the example player
- *   (useExamplePlayer: its own kept element, unlocked in the same "Mulai" tap
- *   as the others). The beat ends when the clip has ended and its caption
- *   has had its reading time. It is never a dead stop: a recording that fails,
- *   or does not sound within EXAMPLE_LOAD_LIMIT_MS, is reported as
- *   recite_error and the machine moves on; "Memuat bacaan imam…" shows
- *   meanwhile as for any recitation. The clip the current step is about to
- *   play is fetched ahead on the example player (warm.ts exampleToWarm: only
- *   while the lesson runs, never with Save-Data) — a recitation, so the
- *   narration look-ahead never lists it.
+ *   that names a beat — a word of this ayah or of another, or a form — whose
+ *   recording plays on the example player (useExamplePlayer: its own kept
+ *   element, unlocked in the same "Mulai" tap as the others), as every word
+ *   does. The beat ends when the recording has ended and its caption has had
+ *   its reading time. It is never a dead stop: a recording that fails, or
+ *   does not sound within EXAMPLE_LOAD_LIMIT_MS, is reported as recite_error
+ *   and the machine moves on; "Memuat suara narator…" shows meanwhile. The
+ *   next word's or example's recording along the lesson's path (this step's,
+ *   else the next step's: a word's step opens with its word) is fetched ahead
+ *   on the example player (warm.ts exampleToWarm: only while the lesson runs,
+ *   never with Save-Data); the narration look-ahead lists lines only.
  * - Remembers the step per ayah; hands off to the next ayah; Media Session
  *   (lock screen, earphones) play/pause/next/previous.
  * - Never scrolls the page.
@@ -209,11 +221,19 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
   /** How often the learner replayed a step (keys the stage's exercise, so a
    *  replayed exercise starts over). */
   const [replays, setReplays] = useState(0);
-  /** The learner played a word on the stage's player themselves (a mushaf
-   *  word or a word card's "Dengar"), and nothing has taken the player back
-   *  since: only then is a failed stream THEIR word ("klik kata itu sekali
-   *  lagi"); the lesson's own recitation failing has its own notice. */
+  /** The learner played a word themselves (a mushaf word or a word card's
+   *  "Dengar"), and nothing has taken the lesson back since. */
   const [learnerWord, setLearnerWord] = useState(false);
+  /** The word the learner asked for could not be played (its recording failed, or it has none):
+   *  "klik kata itu sekali lagi". The lesson's own sound failing has its own notice. */
+  const [learnerFailed, setLearnerFailed] = useState(false);
+  /** The word (1-based) the learner's own play is sounding now, lit on the mushaf line; null: none. */
+  const [learnerActive, setLearnerActive] = useState<number | null>(null);
+  /** The example player plays the LEARNER's word now (not the lesson's own): its start is the
+   *  learner's own recording, which the lesson waits for (one voice at a time). */
+  const learnerClipRef = useRef(false);
+  /** Stops the learner's word (resume: the lesson takes the voice back). */
+  const learnerStopRef = useRef<(() => void) | null>(null);
   const savedIdx = useSyncExternalStore(
     noopSubscribe,
     () => readSavedIndex(browserStorage("local"), seq),
@@ -260,14 +280,16 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
     rate: imamRate,
     onFinish: () => finishRef.current?.(),
     onError: (reason) => errorRef.current?.(reason),
-    // Another recording on the page paused the imam mid-activity (e.g. the
-    // standalone Dengar dan klik below the stage): pause the lesson like
-    // "Jeda", so it neither moves on nor waits for audio that won't end —
-    // except an exercise's word, which the learner's own replay just said.
+    // Another recording on the page paused the imam mid-ayah (e.g. the
+    // standalone Dengar dan klik below the stage, a word the learner
+    // clicked): pause the lesson like "Jeda", so it neither moves on nor
+    // waits for audio that won't end.
     onInterrupt: () => interruptRef.current?.(),
   });
-  const { playWord, playAll, restart, pause: pauseAudio, unlock, warm: warmPlayer, flowing } = player;
-  // The example player: clips of OTHER ayat (an example beat), at the learner's speed for the imam.
+  // (Only the whole ayah plays on it: a word is the narrator's recording, on the example player.)
+  const { playAll, restart, pause: pauseAudio, unlock, warm: warmPlayer } = player;
+  // The example player: every word heard on its own (the narrator's recording of it; operator
+  // 2026-10-14), at the learner's chosen speed.
   const examplePlayer = useExamplePlayer({ rate: imamRate });
   const { play: playExample, unlock: unlockExample, warm: warmExample, flowing: exampleFlowing, owns: ownsExample } = examplePlayer;
   // The imam's recitation streams from the provider's CDN (next.config.ts RECITATION_HOSTS): a
@@ -310,10 +332,10 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
 
   // Latest player functions for the executor, which must not restart its
   // activity when they change identity.
-  const playerRef = useRef({ playWord, playAll, restart, pauseAudio, unlock, flowing, playExample, unlockExample, exampleFlowing });
+  const playerRef = useRef({ playAll, restart, pauseAudio, unlock, playExample, unlockExample, exampleFlowing });
   useEffect(() => {
-    playerRef.current = { playWord, playAll, restart, pauseAudio, unlock, flowing, playExample, unlockExample, exampleFlowing };
-  }, [playWord, playAll, restart, pauseAudio, unlock, flowing, playExample, unlockExample, exampleFlowing]);
+    playerRef.current = { playAll, restart, pauseAudio, unlock, playExample, unlockExample, exampleFlowing };
+  }, [playAll, restart, pauseAudio, unlock, playExample, unlockExample, exampleFlowing]);
 
   // ── The executor: one activity at a time ──
   const activity = state.activity;
@@ -370,75 +392,122 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
     }
 
     const p = playerRef.current;
-    if (activity.target === "clip") {
-      // An example beat's word of another ayah: its clip, on the example player. Ends when the
-      // clip has ended AND its caption has had its reading time; never a dead stop — a recording
-      // that fails, or does not sound in time, is given up (the machine shows the example a
-      // moment longer and goes on).
+    if (activity.target !== "ayah") {
+      // ONE word (operator 2026-10-14: "for all quran word by word should be replaced by this, not
+      // using truncated voice from imam"): a word of this ayah — its opening step, the ayah's last
+      // word once more, Dengar dan klik's word, an example beat on it — or an example beat's word
+      // or form of another ayah. Always the narrator's recording of it (`clip`), on the example
+      // player; never the imam's recitation cut at the word, and no fall-back to it: a word with no
+      // recording is reported failed (the checks refuse one). Ends when the recording has ended
+      // AND minMs has passed (a caption's reading time where the machine asks for one; 0 for a
+      // word the narrator explains next: the step ends with the word, plan L24).
+      // - An example beat is never a dead stop: a recording that fails, or does not sound in time,
+      //   is given up (the machine shows the example a moment longer and goes on). A word's own
+      //   step that fails pauses the lesson (the machine's error "word"; "Lanjutkan" retries).
+      // - Dengar dan klik's word: the learner's own replay of it ends it (it is heard), and it
+      //   waits for that replay to stop before it starts (one voice at a time).
+      // - The browser refusing sound pauses the lesson and asks for one click, as for any sound.
+      const clip = activity.clip;
+      const quiz = activity.target === "word" && activity.inExercise === true;
+      const beat = activity.target === "clip" || activity.example !== undefined;
       let live = true;
       let heard = false;
       let read = activity.minMs <= 0;
+      let stop: (() => void) | null = null;
+      let watch: number | null = null;
       const timers: number[] = [];
       const settle = () => {
         if (!live || !heard || !read) return;
         live = false;
         dispatch({ type: "recite_end", token });
       };
-      const giveUp = () => {
+      const fail = () => {
         if (!live) return;
         live = false;
         dispatch({ type: "recite_error", token });
       };
-      const stop = p.playExample(activity.clip, {
-        onEnd: () => {
-          heard = true;
-          settle();
-        },
-        onError: (reason) => {
-          if (!live) return;
-          if (reason === "blocked") {
-            live = false;
-            setBlocked(true);
-            dispatch({ type: "pause" });
-          } else giveUp();
-        },
-        // Another recording started (the learner clicked a word): pause, like "Jeda".
-        onInterrupted: () => {
-          if (live) dispatch({ type: "pause" });
-        },
-      });
-      if (!read) {
-        timers.push(
-          window.setTimeout(() => {
-            read = true;
+      const begin = () => {
+        if (!live) return;
+        if (!clip) {
+          timers.push(window.setTimeout(fail, 0));
+          return;
+        }
+        // The lesson's own sound on the example player (not the learner's word).
+        learnerClipRef.current = false;
+        stop = p.playExample(clip, {
+          onEnd: () => {
+            heard = true;
             settle();
-          }, activity.minMs),
-        );
+          },
+          onError: (reason) => {
+            if (!live) return;
+            if (reason === "blocked") {
+              live = false;
+              setBlocked(true);
+              dispatch({ type: "pause" });
+            } else fail();
+          },
+          onInterrupted: () => {
+            if (!live) return;
+            if (quiz) {
+              // The learner replayed the exercise's word themselves: it is heard.
+              heard = true;
+              read = true;
+              settle();
+            } else {
+              // Another recording started (the learner clicked a word): pause, like "Jeda".
+              dispatch({ type: "pause" });
+            }
+          },
+        });
+        if (!read) {
+          timers.push(
+            window.setTimeout(() => {
+              read = true;
+              settle();
+            }, activity.minMs),
+          );
+        }
+        // An example beat never holds the lesson: once a second, has the recording come? Past the
+        // limit, one that is neither heard nor sounding (it never started, or stalled for good) is
+        // given up.
+        if (beat) {
+          const since = Date.now();
+          watch = window.setInterval(() => {
+            if (exampleGivesUp(Date.now() - since, { heard, flowing: p.exampleFlowing() })) fail();
+          }, EXAMPLE_WATCH_MS);
+        }
+      };
+      const other = foreignRef.current;
+      const waitFor = quiz && other && !other.paused && !other.ended ? other : null;
+      const go = () => {
+        waitFor?.removeEventListener("pause", go);
+        waitFor?.removeEventListener("ended", go);
+        begin();
+      };
+      if (waitFor) {
+        waitFor.addEventListener("pause", go);
+        waitFor.addEventListener("ended", go);
+      } else {
+        begin();
       }
-      // Once a second: has the clip come? Past the limit, one that is neither heard nor
-      // sounding (it never started, or stalled for good) is given up.
-      const since = Date.now();
-      const watch = window.setInterval(() => {
-        if (exampleGivesUp(Date.now() - since, { heard, flowing: p.exampleFlowing() })) giveUp();
-      }, EXAMPLE_WATCH_MS);
       return () => {
         live = false;
-        window.clearInterval(watch);
+        waitFor?.removeEventListener("pause", go);
+        waitFor?.removeEventListener("ended", go);
+        if (watch !== null) window.clearInterval(watch);
         timers.forEach((id) => window.clearTimeout(id));
-        stop();
+        stop?.();
       };
     }
 
-    // The imam: ends when the audio has ended AND minMs has passed. minMs is a caption's reading
-    // time where the machine asks for one — a caption-only lesson, an example beat — and 0 for a
-    // word the narrator explains next: that step ends with the imam's word (operator 2026-10-13,
-    // plan L24; it used to hold every word for its caption, five to ten seconds of silence).
-    const quiz = activity.target === "word" && activity.inExercise === true;
+    // The imam, the whole ayah (the recitation step, the recap): ends when the audio has ended AND
+    // minMs has passed (a caption's reading time in a caption-only lesson). Paused mid-ayah, he
+    // continues where he stopped (`resume`).
     let live = true;
     let heard = false;
     let read = activity.minMs <= 0;
     const timers: number[] = [];
-    let watch: number | null = null;
     const settle = () => {
       if (!live || !heard || !read) return;
       live = false;
@@ -461,76 +530,27 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
       }
     };
     interruptRef.current = () => {
-      if (!reciteLiveRef.current) return;
-      if (quiz) {
-        // The learner replayed the exercise's word themselves: it is heard.
-        heard = true;
-        read = true;
-        settle();
-      } else {
-        dispatch({ type: "pause" });
-      }
+      if (reciteLiveRef.current) dispatch({ type: "pause" });
     };
-    const begin = () => {
-      if (!live) return;
-      reciteLiveRef.current = true;
-      ownerRef.current = token;
-      if (activity.target === "word") {
-        // No timing for this word in the recording: the activity lasts its
-        // minimum only (a caption's reading time; none where a voice follows).
-        if (!p.playWord(activity.word)) heard = true;
-      } else if (activity.resume) {
-        p.playAll();
-      } else {
-        p.restart();
-      }
-      if (!read) {
-        timers.push(
-          window.setTimeout(() => {
-            read = true;
-            settle();
-          }, activity.minMs),
-        );
-      } else if (heard) {
-        timers.push(window.setTimeout(settle, 0));
-      }
-      // An example beat (this ayah's own word as the example of a rule) never holds the lesson:
-      // past the limit, a recording that is neither heard nor sounding is given up.
-      if (activity.target === "word" && activity.example !== undefined) {
-        const since = Date.now();
-        watch = window.setInterval(() => {
-          if (!live || !exampleGivesUp(Date.now() - since, { heard, flowing: p.flowing() })) return;
-          live = false;
-          reciteLiveRef.current = false;
-          dispatch({ type: "recite_error", token });
-        }, EXAMPLE_WATCH_MS);
-      }
-    };
-    // An exercise's word waits for the learner's own replay to stop (one
-    // voice at a time), as narration lines do.
-    const other = foreignRef.current;
-    const waitFor = quiz && other && !other.paused && !other.ended ? other : null;
-    const go = () => {
-      waitFor?.removeEventListener("pause", go);
-      waitFor?.removeEventListener("ended", go);
-      begin();
-    };
-    if (waitFor) {
-      waitFor.addEventListener("pause", go);
-      waitFor.addEventListener("ended", go);
-    } else {
-      begin();
+    reciteLiveRef.current = true;
+    ownerRef.current = token;
+    if (activity.resume) p.playAll();
+    else p.restart();
+    if (!read) {
+      timers.push(
+        window.setTimeout(() => {
+          read = true;
+          settle();
+        }, activity.minMs),
+      );
     }
     return () => {
       live = false;
       reciteLiveRef.current = false;
-      waitFor?.removeEventListener("pause", go);
-      waitFor?.removeEventListener("ended", go);
       finishRef.current = null;
       errorRef.current = null;
       interruptRef.current = null;
       timers.forEach((id) => window.clearTimeout(id));
-      if (watch !== null) window.clearInterval(watch);
       // Stop the imam only if this activity still owns the playback (not
       // when the learner just started a word of their own).
       if (ownerRef.current === token) {
@@ -661,11 +681,12 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
     return () => window.clearInterval(id);
   }, [ticking]);
 
-  // The learner's own recordings (not the narration, not the lesson's imam).
+  // The learner's own recordings (not the narration, not the lesson's imam or its words; a word the
+  // learner asked for on the example player is theirs).
   useEffect(() => {
     const onStart = (e: Event) => {
       const el = (e as CustomEvent<HTMLAudioElement>).detail;
-      if (ownsNarration(el) || ownsExample(el) || reciteLiveRef.current) return;
+      if (ownsNarration(el) || (ownsExample(el) && !learnerClipRef.current) || reciteLiveRef.current) return;
       foreignAtRef.current = Date.now();
       foreignRef.current = el instanceof HTMLAudioElement ? el : null;
     };
@@ -742,19 +763,51 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
     navigator.mediaSession.playbackState = phase === "paused" || phase === "finished" ? "paused" : "playing";
   }, [started, phase]);
 
-  // "Dengar" on a word card: the stage's player, so audio never overlaps.
+  /** The learner plays word `n` themselves (a word card's "Dengar", a word clicked on the mushaf
+   *  line): the narrator's recording of it on the example player — never the imam's recitation cut
+   *  at the word (operator 2026-10-14). A running lesson pauses first; one voice at a time (the
+   *  imam's ayah stops as the word starts, AUDIO_START_EVENT). */
+  const playLearnerWord = useCallback(
+    (n: number) => {
+      const clip = seq.wordVoices[n - 1] ?? null;
+      setLearnerWord(true);
+      setLearnerFailed(false);
+      dispatch({ type: "pause" });
+      if (!clip) {
+        setLearnerFailed(true);
+        return;
+      }
+      learnerClipRef.current = true;
+      setLearnerActive(n);
+      const done = () => setLearnerActive((x) => (x === n ? null : x));
+      learnerStopRef.current = playerRef.current.playExample(clip, {
+        onEnd: done,
+        onError: (reason) => {
+          done();
+          if (reason === "failed") setLearnerFailed(true);
+        },
+        onInterrupted: done,
+      });
+    },
+    [seq],
+  );
+  /** Stops the learner's own word, if it plays: the lesson takes the voice back. */
+  const stopLearnerWord = () => {
+    learnerStopRef.current?.();
+    learnerStopRef.current = null;
+    setLearnerActive(null);
+  };
+
+  // "Dengar" on a word card: the word's recording, so audio never overlaps.
   useEffect(() => {
     const onPlayWord = (e: Event) => {
       const n = (e as CustomEvent<number>).detail;
       if (typeof n !== "number") return;
-      ownerRef.current = null;
-      setLearnerWord(true);
-      dispatch({ type: "pause" });
-      playerRef.current.playWord(n);
+      playLearnerWord(n);
     };
     window.addEventListener(PLAY_WORD_EVENT, onPlayWord);
     return () => window.removeEventListener(PLAY_WORD_EVENT, onPlayWord);
-  }, []);
+  }, [playLearnerWord]);
 
   // ── The caption on screen ── (caption.ts: the karaoke words or the
   // display text with audio, the engine's caption part without), what the
@@ -769,13 +822,15 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
   const lineHasVoice = lineVoiced(seq, state);
 
   // ── Loading: the current activity's sound, asked for and not flowing yet ──
+  // (a word is the narrator's recording on the example player: "Memuat suara narator…"; only the
+  // whole ayah is the imam's, "Memuat bacaan imam…")
   const loading =
     activity?.kind === "narrate"
       ? narrationLoading
       : activity?.kind === "recite"
-        ? activity.target === "clip"
-          ? examplePlayer.loading
-          : player.loading
+        ? activity.target === "ayah"
+          ? player.loading
+          : examplePlayer.loading
         : null;
   const loadingNotice = useLoadingNotice(loading);
   // "Menyiapkan pelajaran…": from the click until its first line is heard — or shown at once
@@ -794,6 +849,7 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
   const tapped = () => {
     setBlocked(false);
     setLearnerWord(false);
+    setLearnerFailed(false);
     playerRef.current.unlock();
     // The example player's element too: a clip of another ayah plays later, with no tap.
     playerRef.current.unlockExample();
@@ -811,9 +867,10 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
       dispatch({ type: "pause" });
     },
     resume() {
-      // The learner's own listening on the stage's player stops: the lesson
-      // takes the voice back (a paused recitation keeps its spot).
+      // The learner's own listening stops: the lesson takes the voice back (a paused recitation
+      // keeps its spot).
       playerRef.current.pauseAudio();
+      stopLearnerWord();
       tapped();
       dispatch({ type: "resume" });
     },
@@ -850,6 +907,10 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
       ownerRef.current = null;
       setLearnerWord(true);
       dispatch({ type: "pause" });
+    },
+    /** The learner clicks word `n` (1-based) to hear it: its recording by the narrator. */
+    playWord(n: number) {
+      playLearnerWord(n);
     },
     answered(key: ExerciseKey, correct: boolean, question?: number) {
       dispatch({ type: "answered", key, correct, question });
@@ -893,8 +954,14 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
     lineHasVoice,
     /** Replays so far (the stage keys its exercise with it). */
     replays,
-    /** The learner's own word is on the stage's player (see learnerWord). */
+    /** The learner played a word themselves (see learnerWord). */
     learnerWord,
+    /** The word the learner asked for could not be played: the stage says so. */
+    learnerFailed,
+    /** The word the learner's own play is sounding now (the mushaf line lights it), else null. */
+    learnerActive,
+    /** Word `n` (1-based) has a recording the learner can play. */
+    canPlayWord: (n: number) => !!seq.wordVoices[n - 1],
     /** For the stage's polite live region: the line's sanitised spoken
      *  text, "" while the imam or the narration speaks. */
     announcement,

@@ -1,4 +1,4 @@
-import { type Clip, clipFor } from "@/lib/clips";
+import { wordVoice } from "@/lib/wordvoice";
 import { hasWaqfNote } from "@/lib/heard";
 import type { PreparedSign } from "@/lib/terms";
 
@@ -50,20 +50,18 @@ export function HarakatChart({
   signs,
   words,
   labels,
-  clips = {},
 }: {
   signs: PreparedSign[];
   /** Lesson word by loc (content bytes): the example's word and its transliteration. */
   words: Record<string, { ar: string; translit: string }>;
   labels: HarakatLabels;
-  clips?: Readonly<Record<string, Clip>>;
 }) {
   return (
     <ClipPlayerProvider>
       <ul className="grid gap-3 sm:grid-cols-2">
         {signs.map((s, i) => {
           const w = words[s.loc] ?? s.word;
-          const clip = clipFor(clips, s.loc);
+          const clip = w?.ar ? wordVoice(w.ar) : null;
           const waqfId = hasWaqfNote(clip, w?.ar) ? clipNoteId(`sign-${i + 1}`, s.loc) : undefined;
           return (
             <li key={i} className="flex flex-wrap items-start gap-x-4 gap-y-3 rounded-2xl border-[1.5px] border-teal-line bg-white p-4">

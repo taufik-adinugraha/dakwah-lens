@@ -154,8 +154,8 @@
          ]},
         {"stage": "change", "tiles": ["ar-rahimi"], "from": "ar-rahimu", "to": "ar-rahimi",
          "say": ["Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini menjadi kasrah, bunyi i, karena kata ini sifat kedua bagi kata kedua."]},
-        {"stage": "whole", "tiles": ["ar-rahimi"], "note": "imam berhenti di sini",
-         "say": ["Ini kata terakhir ayat, dan imam berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."]}
+        {"stage": "whole", "tiles": ["ar-rahimi"], "note": "bacaan berhenti di sini",
+         "say": ["Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."]}
       ],
       "sources": [
         {"kitab": "Quranic Arabic Corpus 0.4", "ref": "(1:1:4:*) dua bagian: DET {l (alif lam ta'rif) dan ADJ STEM", "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=1"},
@@ -282,8 +282,8 @@
            "Sebabnya, kata ini diperlakukan seperti jamak laki-laki beraturan, yang memakai huruf ya' sebagai pengganti kasrah ketika majrur.",
            "Dalam bentuk dasarnya, jamak seperti ini memakai huruf wawu, bunyi u panjang, di tempat huruf ya' itu."
          ]},
-        {"stage": "whole", "tiles": ["al-alamina"], "note": "imam berhenti di sini",
-         "say": ["Ini kata terakhir ayat, dan imam berhenti padanya: fathah, bunyi a, pada huruf nun terakhir tidak terdengar, tetapi huruf ya' sebelumnya terdengar."]}
+        {"stage": "whole", "tiles": ["al-alamina"], "note": "bacaan berhenti di sini",
+         "say": ["Ini kata terakhir ayat, dan bacaan berhenti padanya: fathah, bunyi a, pada huruf nun terakhir tidak terdengar, tetapi huruf ya' sebelumnya terdengar."]}
       ],
       "sources": [
         {"kitab": "Quranic Arabic Corpus 0.4", "ref": "(1:2:4:*) dua bagian: DET {lo (alif lam ta'rif, lam bersukun) dan N STEM LEM:Ea`lamiyn, MP GEN", "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=2"},
@@ -351,8 +351,8 @@
            "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini akhirnya kasrah, bunyi i.",
            "Sebabnya, kata ini sifat berikutnya bagi nama Allah di ayat kedua."
          ]},
-        {"stage": "whole", "tiles": ["ar-rahimi"], "note": "imam berhenti di sini",
-         "say": ["Ini kata terakhir ayat, dan imam berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."]}
+        {"stage": "whole", "tiles": ["ar-rahimi"], "note": "bacaan berhenti di sini",
+         "say": ["Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."]}
       ],
       "sources": [
         {"kitab": "Quranic Arabic Corpus 0.4", "ref": "(1:3:2:*) dua bagian: DET {l (alif lam ta'rif) dan ADJ STEM; lam tanpa sukun, huruf sesudahnya bersyaddah", "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=3"},
@@ -424,8 +424,8 @@
          ]},
         {"stage": "change", "tiles": ["ad-dini"], "from": "ad-dinu", "to": "ad-dini",
          "say": ["Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini kasrah, bunyi i, karena kata ini juga mudhaf ilaih bagi kata kedua."]},
-        {"stage": "whole", "tiles": ["ad-dini"], "note": "imam berhenti di sini",
-         "say": ["Ini kata terakhir ayat, dan imam berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."]}
+        {"stage": "whole", "tiles": ["ad-dini"], "note": "bacaan berhenti di sini",
+         "say": ["Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."]}
       ],
       "sources": [
         {"kitab": "Quranic Arabic Corpus 0.4", "ref": "(1:4:3:*) dua bagian: DET {l (alif lam ta'rif) dan N STEM; lam tanpa sukun, huruf sesudahnya bersyaddah", "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=4"},
@@ -529,8 +529,8 @@
          "say": ["Huruf nun di awalnya juga menunjukkan pelakunya: “kami”."]},
         {"stage": "base", "tiles": ["nastainu"], "focus": "nastainu",
          "say": ["Akhirnya dhammah, bunyi u, tetap dalam bentuk dasarnya, dengan alasan yang sama: tidak didahului kata yang mengubahnya."]},
-        {"stage": "whole", "tiles": ["nastainu"], "note": "imam berhenti di sini",
-         "say": ["Ini kata terakhir ayat, dan imam berhenti padanya, jadi dhammah ini hanya terlihat dalam tulisan, tidak terdengar."]}
+        {"stage": "whole", "tiles": ["nastainu"], "note": "bacaan berhenti di sini",
+         "say": ["Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi dhammah ini hanya terlihat dalam tulisan, tidak terdengar."]}
       ],
       "sources": [
         {"kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)", "ref": "jil. 1, hlm. 14 (al-I'rab: na‘budu dan nasta‘īnu fi'il mudhari' marfu')", "url": "https://tafsir.app/iraab-aldarweesh/1/5"},
@@ -641,8 +641,8 @@
            "Di sini akhirnya menjadi fathah, bunyi a, karena kata ini sifat, atau na't, bagi kata kedua.",
            "Sifat mengikuti kata yang disifatinya, seperti di ayat pertama: kata kedua berakhir fathah dan memakai alif lam, maka kata ini juga."
          ]},
-        {"stage": "whole", "tiles": ["al-mustaqima"], "note": "imam berhenti di sini",
-         "say": ["Ini kata terakhir ayat, dan imam berhenti padanya, jadi fathah ini hanya terlihat dalam tulisan, tidak terdengar."]}
+        {"stage": "whole", "tiles": ["al-mustaqima"], "note": "bacaan berhenti di sini",
+         "say": ["Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi fathah ini hanya terlihat dalam tulisan, tidak terdengar."]}
       ],
       "sources": [
         {"kitab": "Quranic Arabic Corpus 0.4", "ref": "(1:6:3:*) dua bagian: DET Al+ (alif lam) dan ADJ STEM ACT PCPL (X) LEM:m~usotaqiym", "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=6"},
@@ -941,8 +941,8 @@
            "Kata ini majrur karena disambungkan dengan huruf wawu kepada kata keenam, dan kata yang disambungkan mengikuti akhiran kata itu.",
            "Sebagian ulama menyambungkannya kepada kata kelima; hasilnya sama, majrur."
          ]},
-        {"stage": "whole", "tiles": ["ad-dallina"], "note": "imam berhenti di sini",
-         "say": ["Ini kata terakhir surah, dan imam berhenti padanya: fathah, bunyi a, pada huruf nun terakhir tidak terdengar, tetapi huruf ya' sebelumnya terdengar."]}
+        {"stage": "whole", "tiles": ["ad-dallina"], "note": "bacaan berhenti di sini",
+         "say": ["Ini kata terakhir surah, dan bacaan berhenti padanya: fathah, bunyi a, pada huruf nun terakhir tidak terdengar, tetapi huruf ya' sebelumnya terdengar."]}
       ],
       "sources": [
         {"kitab": "Quranic Arabic Corpus 0.4", "ref": "(1:7:9:*) dua bagian: DET Al+ (alif lam) dan N STEM ACT PCPL MP GEN (jamak, majrur)", "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"},

@@ -25,8 +25,8 @@ const ID: AutoplayTexts = {
     skip: "Klik untuk melewati",
     lanjut: "Klik di sini bila siap",
     part: {
-      // The lesson's imam plays the word: listening, not clicking.
-      play: "Dengarkan imam",
+      // The lesson plays the word (the narrator's recording of it): listening, not clicking.
+      play: "Dengarkan kata",
       options: "Klik salah satu",
       words: "1. Klik satu kata",
       bins: "2. Klik kelompoknya",
@@ -39,7 +39,7 @@ const ID: AutoplayTexts = {
 const EN: AutoplayTexts = {
   intro: ({ surah, ayah, total }) => `${surah}, ayah ${ayah} of ${total}. Listen, and watch the screen.`,
   recite: "Listen to the imam recite this ayah. The word being recited is marked.",
-  wordIntro: ({ n, translit }) => `Word ${n}: ${translit}. Listen to the imam recite it.`,
+  wordIntro: ({ n, translit }) => `Word ${n}: ${translit}. Listen to it.`,
   meaning: ({ n, gloss }) => `Word ${n} means “${gloss}”.`,
   structure: (summary) => `How this ayah's sentence is built: ${summary}`,
   structureItems: (item) => `Now how its sentence is built. ${item}`,
@@ -54,9 +54,9 @@ const EN: AutoplayTexts = {
       next: "Click the marked button to continue.",
     },
     "tap-word": {
-      intro: "Practice: Listen and click. The imam recites one word of this ayah, then you click that word.",
-      play: "Listen to the imam recite one word of this ayah.",
-      options: "Now click the word the imam just recited.",
+      intro: "Practice: Listen and click. One word of this ayah is read out, then you click that word.",
+      play: "Listen to one word of this ayah.",
+      options: "Now click the word you just heard.",
       reveal: "Try again, or click the marked “Show the answer”.",
       next: "Click the marked button to continue.",
     },
@@ -116,6 +116,7 @@ const EN: AutoplayTexts = {
     other: ({ translit, surah, ayah }) => `Another example: ${translit}, in QS ${surah}:${ayah}.`,
     zero: ({ translit, surah, ayah }) => `Example: ${translit}, in QS ${surah}:${ayah}.`,
     base: ({ translit, surah, ayah }) => `Example: ${translit}, in QS ${surah}:${ayah}.`,
+    form: ({ translit }) => `Example of the base form: ${translit}.`,
     waqf: "The imam stops at the end of the ayah, so its last vowel is not heard.",
     washal: ({ heard }) => `With the word before it you hear “${heard}”, because its first alif is not read.`,
   },
@@ -135,7 +136,7 @@ const EN: AutoplayTexts = {
     skip: "Click to skip",
     lanjut: "Click here when ready",
     part: {
-      play: "Listen to the imam",
+      play: "Listen to the word",
       options: "Click one of these",
       words: "1. Click a word",
       bins: "2. Click its group",

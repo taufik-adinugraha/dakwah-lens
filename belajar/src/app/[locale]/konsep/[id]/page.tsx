@@ -143,7 +143,6 @@ function BasicArticle({
         <HarakatChart
           signs={signs}
           words={WORD_INFO}
-          clips={LIBRARY.clips}
           labels={{ sound: labels.sound, example: labels.example, from: labels.from, credit: labels.credit, waqf: labels.waqf }}
         />
       </section>

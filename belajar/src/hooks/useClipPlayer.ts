@@ -34,9 +34,17 @@ const isAbort = (e: unknown) => e instanceof DOMException && e.name === "AbortEr
  * - `notice`: the loading line ("Memuat bacaan imam…" after LOADING_SHOW_MS, what to do after
  *   LOADING_SLOW_MS; src/lib/autoplay/loading.ts), from the element's events as the ayah popup's.
  * - A failed file is loaded anew on the next press (the button says "Coba lagi").
+ * - `onEnd(key)`: the clip of `key` played to its end (Dengar dan klik: the word is heard).
  */
-export function useClipPlayer() {
+export function useClipPlayer(opts: { onEnd?: (key: string) => void } = {}) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  /** The latest onEnd (read by the element's handlers, which are set up once). */
+  const onEndRef = useRef(opts.onEnd);
+  useEffect(() => {
+    onEndRef.current = opts.onEnd;
+  }, [opts.onEnd]);
+  /** The key of the clip asked for (what onEnd names). */
+  const keyRef = useRef<string | null>(null);
   /** The clip asked for: the loop stops the element at its end. */
   const clipRef = useRef<Clip | null>(null);
   /** A play the learner asked for is under way: only its errors are a failed clip. */
@@ -58,7 +66,7 @@ export function useClipPlayer() {
       timer = null;
     };
     const load = (type: MediaEventType) => {
-      const at = { kind: "recitation" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
+      const at = { kind: "narration" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
       setLoading((prev) => mediaLoading(prev, type, at));
     };
     /** Stops the element once it has reached the clip's end. True when there is nothing more to
@@ -71,6 +79,7 @@ export function useClipPlayer() {
       askedRef.current = false;
       a.pause();
       dispatch({ type: "end" });
+      if (keyRef.current !== null) onEndRef.current?.(keyRef.current);
       return true;
     };
     /** Near the end: a timer for the predicted end itself (a frame may come up to 16.7 ms late).
@@ -116,10 +125,12 @@ export function useClipPlayer() {
       dispatch({ type: "interrupt" });
     };
     const onEnded = () => {
+      const asked = askedRef.current;
       askedRef.current = false;
       load("ended");
       halt();
       dispatch({ type: "end" });
+      if (asked && keyRef.current !== null) onEndRef.current?.(keyRef.current);
     };
     const onEmptied = () => load("emptied");
     const onError = () => {
@@ -178,6 +189,7 @@ export function useClipPlayer() {
     const a = audioRef.current;
     if (!a) return;
     clipRef.current = clip;
+    keyRef.current = key;
     if (a.getAttribute("src") !== clip.url) a.src = clip.url;
     else if (a.error) a.load(); // a file that failed is loaded anew (useSegmentPlayer revive)
     if (needsSeek(clip, a.currentTime * 1000)) a.currentTime = clipStartSeconds(clip);
@@ -204,5 +216,5 @@ export function useClipPlayer() {
     [state, play, stop],
   );
 
-  return { state, notice, press, stop };
+  return { state, notice, press, play, stop };
 }

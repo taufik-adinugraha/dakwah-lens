@@ -3,12 +3,12 @@ import { useTranslations } from "next-intl";
 
 import type { Clip, Concept } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
-import { clipFor } from "@/lib/clips";
+import { wordVoice } from "@/lib/wordvoice";
 import { WORD_INFO } from "@/lib/content";
 import { surahPublished } from "@/lib/features";
 import { glossSlot } from "@/lib/emphasis";
 import { hasWaqfNote } from "@/lib/heard";
-import { getBasic, LIBRARY, parseLoc, partsFor, TERMS } from "@/lib/library";
+import { getBasic, parseLoc, partsFor, TERMS } from "@/lib/library";
 import { ayahHref, conceptHref } from "@/lib/routes";
 import { annotate, noteWithoutWord, type PartsChange, prepareParts, Scope, soundsOf, titleParts, type Token } from "@/lib/terms";
 
@@ -106,8 +106,9 @@ export function ConceptCard({
         sc.shown.add(`q:${ex.loc}`); // the row shows the word in Arabic itself
         const raw = mk?.notes[i] ?? ex.note;
         const note = mk ? annotate(info ? noteWithoutWord(raw, info.translit) : raw, sc, TERMS) : plain(ex.note);
-        const clip = clipFor(LIBRARY.clips, ex.loc);
-        // The imam stops on an ayah's last word: its final harakah is not heard there.
+        // The narrator's recording of the word's own bytes (src/lib/wordvoice.ts): said whole, so
+        // there is no "the imam stops here" note to add.
+        const clip = ar ? wordVoice(ar) : null;
         const waqfId = hasWaqfNote(clip, ar) ? clipNoteId(concept.id, ex.loc) : undefined;
         return [{ ex, s, ayah, word, info, ar, note, clip, waqfId }];
       });
@@ -115,8 +116,6 @@ export function ConceptCard({
   const partsLabels = {
     parts: t("parts_heading"),
     notWritten: t("parts_not_written"),
-    waqf: tc("waqf_note"),
-    washal: (heard: string) => tc("washal_note", { heard }),
     change: (c: PartsChange) =>
       c.where === "end"
         ? t("parts_change_end", { part: c.part })
@@ -171,7 +170,7 @@ export function ConceptCard({
           </h2>
           <div className="mt-3 space-y-5">
             {parts.slice(0, PARTS_SHOWN).map((p) => (
-              <WordParts key={p.loc} data={p} labels={partsLabels} clips={LIBRARY.clips} scope={concept.id} />
+              <WordParts key={p.loc} data={p} labels={partsLabels} />
             ))}
           </div>
           {parts.length > PARTS_SHOWN && (
@@ -182,7 +181,7 @@ export function ConceptCard({
               </summary>
               <div className="space-y-5 pb-2">
                 {parts.slice(PARTS_SHOWN).map((p) => (
-                  <WordParts key={p.loc} data={p} labels={partsLabels} clips={LIBRARY.clips} scope={concept.id} />
+                  <WordParts key={p.loc} data={p} labels={partsLabels} />
                 ))}
               </div>
             </details>

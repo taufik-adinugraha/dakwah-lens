@@ -23,6 +23,7 @@ import { taughtAt } from "@/lib/curriculum";
 import { lessonMapInput } from "@/lib/map-content";
 import { quizAyah } from "@/lib/quiz-content";
 import { SURAH_SLUGS } from "@/lib/routes";
+import { wordVoice } from "@/lib/wordvoice";
 
 import { lessonExamplesFor, stageSequence } from "./build";
 import { NARRATED_SLUGS, narrationFor, SHARED_NARRATION } from "./manifests";
@@ -89,6 +90,8 @@ describe("autoplay stage: what the lesson page ships", () => {
             examples: lessonExamplesFor(s, a).examples,
             // The lesson map's steps, in a surah that has one (plan L23, L26).
             map: lessonMapInput(s.slug, a.ayah),
+            // Every word heard on its own is the narrator's recording of it (operator 2026-10-14).
+            voice: wordVoice,
           });
           expect(JSON.stringify(seq)).toBe(JSON.stringify(direct));
           // Every line the Indonesian stage can speak has its manifest text

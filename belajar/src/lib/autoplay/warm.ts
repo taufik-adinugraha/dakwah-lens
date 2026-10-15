@@ -32,22 +32,24 @@
  * The recordings still stream from the provider and are stored nowhere on our server (the Kredit
  * page's promise): only the moment the learner's browser asks for them moved.
  *
- * AN EXAMPLE'S CLIP FROM ANOTHER AYAH (operator 2026-10-12, plan L20; exampleToWarm) is a
- * recitation too, never narration: the look-ahead (lookahead.ts) does not list it. It is fetched
- * on the example player's own element, by the same rule of thumb as above and no sooner: only
- * while the lesson RUNS, and only the clip the CURRENT step is about to play — asked for when
- * that step begins, while the narrator says the lines before it (a composition's first lines
- * last 10 s and more) — never a later step's, never another ayah's lesson's. Unlike the ayah's own
- * recording, the lesson can go on without an example, so with Save-Data or a 2G-class connection
- * (loading.ts savesData) it is not fetched ahead at all: it loads when its beat plays, and is
- * skipped if it does not come (timing.ts EXAMPLE_LOAD_LIMIT_MS). And only once the step has been
- * the one wanting it for EXAMPLE_WARM_DELAY_MS (the runner's timer): a learner who steps through
- * the lesson with "Berikutnya ›" asks the reciters' host for nothing on the way.
+ * A WORD'S OR AN EXAMPLE'S RECORDING (operator 2026-10-12, plan L20; since 2026-10-14 every word
+ * heard on its own is the narrator's recording of it, content/wordvoice.json; exampleToWarm) is
+ * fetched on the example player's own element — the element that plays it — and never by the
+ * narration look-ahead (lookahead.ts lists narration LINES). Only while the lesson RUNS, and only
+ * the NEXT recording along the lesson's own path (machine.ts clipsAhead): one the current step
+ * still plays, else the one the next step plays — a word's opening step plays its word at once,
+ * so that word is asked for while the narrator still speaks the step before it. Never further
+ * ahead, never another ayah's lesson's. The files are small (a word is a second or so of 64 kbps
+ * narration, ~10 KB), and the lesson can go on without an example, so with Save-Data or a
+ * 2G-class connection (loading.ts savesData) nothing is fetched ahead: a recording loads when it
+ * plays (an example is skipped if it does not come, timing.ts EXAMPLE_LOAD_LIMIT_MS). And only
+ * once the lesson has wanted that recording for EXAMPLE_WARM_DELAY_MS (the runner's timer): a
+ * learner who steps through the lesson with "Berikutnya ›" fetches nothing on the way.
  *
  * Pure (no React, no DOM): unit-tested (warm.test.ts).
  */
 import { savesData, type ConnectionHints } from "./loading";
-import { lessonRuns, type AutoplayState } from "./machine";
+import { clipsAhead, lessonRuns, type AutoplayState } from "./machine";
 import type { AutoplaySequence } from "./types";
 
 export type RecitationWarmInput = {
@@ -64,22 +66,15 @@ export function recitationToWarm(i: RecitationWarmInput): string | null {
   return i.started ? i.currentUrl || null : null;
 }
 
-/** How long a step must have wanted its example clip before the runner asks for it (above). */
+/** How long the lesson must have wanted a recording before the runner asks for it (above). */
 export const EXAMPLE_WARM_DELAY_MS = 1200;
 
 /**
- * The recording of the example clip the lesson in state `s` wants fetched ahead on the example
- * player; null: none. The next clip of another ayah that the CURRENT step still plays (an example
- * that failed is not asked for again). Rules: the head of this file.
+ * The recording the lesson in state `s` wants fetched ahead on the example player; null: none. The
+ * next word's or example's recording along the lesson's path, in this step or the next (an
+ * example that failed is not asked for again). Rules: the head of this file.
  */
 export function exampleToWarm(seq: AutoplaySequence, s: AutoplayState, conn?: ConnectionHints | null): string | null {
   if (!lessonRuns(s) || savesData(conn)) return null;
-  const beats = seq.steps[s.idx]?.examples;
-  if (!beats) return null;
-  for (const a of s.plan.slice(s.at)) {
-    if (a.t !== "example" || a.failed) continue;
-    const clip = beats[a.x]?.clip;
-    if (clip) return clip.url;
-  }
-  return null;
+  return clipsAhead(seq, s)[0]?.url ?? null;
 }

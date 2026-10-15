@@ -15,21 +15,22 @@
  *     a surah with a lesson map: "isim, fi'il, atau huruf?" for each part of
  *     each word; operator 2026-10-13, types.ts OPENING_EXERCISES). It WAITS
  *     for the learner like every exercise
- *   → for every word: recite_word (imam, that word — the one time he says
- *     it, but for the ayah's last word: operator 2026-10-13, plan L24) +
+ *   → for every word: recite_word (that word, the narrator's recording of it
+ *     — wordVoices, operator 2026-10-14; the one time it is heard, but for
+ *     the ayah's last word: operator 2026-10-13, plan L24) +
  *     explain (w${n}: the gloss and the word's why — or, when the word has a
  *     composition, the gloss and its lead) + compose (w${n}:compose, only for a
  *     word with a composition: one line per sentence of its frames, the
  *     animation in the word card's slot, the last line over the joined word;
  *     operator 2026-10-10, narration rule 14) — then straight to the next
- *     word. The ayah's LAST word alone is recited once more, at the end of its
- *     composition: its last line says the imam stops on it and what is not
- *     heard there (composition.ts STOP_NOTE), and no next word follows
+ *     word. The ayah's LAST word alone is heard once more, at the end of its
+ *     composition: its last line says the recitation stops on it and what is
+ *     not heard there (composition.ts STOP_NOTE), and no next word follows
  *   → concept (each step the CURRICULUM teaches in this ayah's lesson that
  *     has a text — a whole Konsep record or a step's own — at most three;
  *     operator-approved 2026-10-13, plan L26, curriculum.ts), each followed by
- *     its example step (its example in this ayah, recited by the
- *     imam; operator 2026-10-12, plan L20, examples.ts) → structure
+ *     its example step (its example in this ayah, heard as the narrator's
+ *     recording of it; operator 2026-10-12, plan L20, examples.ts) → structure
  *     (the lesson page's order, and the narration's: the structure line
  *     uses the terms the concept lines introduce)
  *   → the other exercises the page renders, in page order (each WAITS for the learner;
@@ -51,8 +52,8 @@
  * examples (visual + voice)"; which ones: examples.ts lessonExamples) ride on
  * the steps: a compose step's bentuk dasar after the last line of its `base`
  * frame, and a concept's example(s) as an "example" step right after the concept
- * step. A beat has a caption (AutoplayTexts.example) and what the imam
- * recites; no narration line, so no manifest and no render knows of it.
+ * step. A beat has a caption (AutoplayTexts.example) and what is heard (a
+ * word's recording); no narration line, so no manifest and no render knows of it.
  */
 import type { Ayah } from "@/content/schema";
 
@@ -72,6 +73,7 @@ import {
   type AutoplayTexts,
   type Cue,
   type ExampleBeat,
+  type ExampleClip,
   type ExerciseKey,
   type Guide,
   type GuidePart,
@@ -114,6 +116,9 @@ export type SequenceInput = {
   /** This ayah's lesson map (lessonMap.ts lessonMapInputOf), when its surah has one: then the
    *  sequence gets its map steps and its "learned" step (plan L23, L26). */
   map?: LessonMapInput | null;
+  /** The narrator's recording of a word's Arabic (src/lib/wordvoice.ts wordVoice): what every step
+   *  that plays one word of this ayah plays (wordVoices). Absent: no word has one. */
+  voice?: ((ar: string) => ExampleClip | null) | null;
 };
 
 /** What the sequence reads of a taught item (curriculum.ts Taught; a Konsep record fits too). */
@@ -229,15 +234,17 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     (input.examples ?? []).flatMap((e) => {
       const at = e.step === id ? after(e) : null;
       if (at === null || (e.word === null) === (e.clip === null)) return [];
-      const where = { translit: e.translit, surah: e.place.surah, ayah: e.place.ayah };
+      const where = e.place ? { translit: e.translit, surah: e.place.surah, ayah: e.place.ayah } : null;
       const lead =
         e.of === "base"
-          ? texts.example.base(where)
+          ? where
+            ? texts.example.base(where)
+            : texts.example.form({ translit: e.translit })
           : e.word !== null
             ? texts.example.word({ n: e.word, translit: e.translit })
             : e.about !== null
-              ? texts.example.zero({ ...where, about: e.about })
-              : texts.example.other(where);
+              ? texts.example.zero({ translit: e.translit, surah: e.place?.surah ?? 0, ayah: e.place?.ayah ?? 0, about: e.about })
+              : texts.example.other(where ?? { translit: e.translit, surah: 0, ayah: 0 });
       const caption = clean(stripArabic([lead, e.washal ? texts.example.washal({ heard: e.washal.heard }) : "", e.waqf ? texts.example.waqf : ""].filter(Boolean).join(" ")));
       return [{ id: e.id, of: e.of, after: at, key: e.key, word: e.word, clip: e.clip, frame: e.frame, caption, parts: splitCaption(caption) }];
     });
@@ -379,8 +386,8 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
           guides: [card, wordGuide],
           word: wn,
           loc: w.loc,
-          // The ayah's last word, after the line that says the imam stops on it: recited once
-          // more, that line still the caption. No other composition ends with the imam (L24).
+          // The ayah's last word, after the line that says the recitation stops on it: heard once
+          // more, that line still the caption. No other composition ends with its word (L24).
           ...(comp.stop ? { recite: { target: "word" as const, word: wn } } : {}),
           frames: comp.frames,
           ...withBeats(
@@ -484,6 +491,8 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     lanjutGuide: { target: "lanjut", label: texts.guide.lanjut },
     nav: last ? { kind: "surah_end", slug } : { kind: "ayah", slug, ayah: n + 1 },
     hasAudio,
+    // Every word heard on its own is the narrator's recording of it (operator 2026-10-14).
+    wordVoices: ayah.words.map((w) => input.voice?.(w.ar) ?? null),
   };
 }
 
