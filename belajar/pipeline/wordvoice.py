@@ -31,7 +31,41 @@ content/wordvoice.json:
   16 hex digits of sha256(plain text), sum = the first 10 of the file's own sha256.
 
 The imam's recitation of WHOLE ayat is not touched (the karaoke the lessons follow, the recap).
-This module reads content only: no corpus, no cache, nothing outside pipeline/ and content/.
+This module reads content only: no corpus, no cache, nothing outside pipeline/ and content/
+(the local checks of build_wordvoice.py add the Tanzil file and the downloaded copies).
+
+QURAN.COM'S OWN RECORDING OF A WORD (operator 2026-10-15, after listening to the narrator's word
+takes: "still lacking"; "use quran.com, mention the credit"; then "they will allow us to copy and
+distribute for educational non-profit purposes; we copy to our server so latency is minimum").
+Every text that is A WORD AT A REAL PLACE IN THE QUR'AN plays Quran.com's word-by-word recording
+of that place (audio.qurancdn.com/wbw/…), copied UNALTERED to our media store
+(/belajar/media/narration/quran-com/wbw/<the upstream file name>; sha256 = upstream's, no
+re-encode: trimming is only the [start, end] markers below). Everything else keeps the narrator's
+recording: parts of words (bi-, -hum, -ta), letters, teaching forms built by edits (ismi,
+bi+ismi), runs of several words (no word-by-word file holds two words), anything with no place.
+
+  A text's place (`quran_com_choice`) comes from the CONTENT, never a search: the places the
+  content itself puts those bytes — a lesson word (its loc), a composition form that quotes a
+  whole word ({"word": loc} / {"tanzil": loc}, no pieces), a composition example's bentuk dasar
+  (its loc), a Konsep word (library.json `quran`, a whole-word key). A form built by edits is
+  not placed by the `attested` list (operator 2026-10-15: "teaching forms built by ops such as
+  ismi, bi+ismi" stay the narrator's) — it reaches Quran.com only when its bytes are ALSO one of
+  the places above (the manifest is keyed by the text). Of a text's places:
+    1. the AYAH-FINAL ones, when there are any (the recording is then the stop form the lessons
+       describe at an ayah's end);
+    2. else, and among those, the first in lesson order (curriculum.json: lesson words, then the
+       compositions' forms and examples of that lesson), then the Konsep words in mushaf order.
+  Whether a place ends its ayah is Quran.com's own word list of the ayah
+  (fixtures/quran_com_words.json, fetched by build_wordvoice.py --fetch-quran-com from
+  api.quran.com; its count is Tanzil's, checked locally). The FILE is the word's position,
+  wbw/<SSS>_<AAA>_<WWW>.mp3 (qc_upstream) — not the API's `audio_url`, which in 9 of the 40 ayat
+  counts pause marks / a rub' al-hizb sign and names files the CDN does not have (41:9 word 13:
+  the API says _015, a 404; the CDN's _013 is the word).
+
+  words[<plain text>] = {"source": "quran.com", "loc": "1:1:1", "audio": {url, upstream, ms,
+  sha256, start, end}}: `url` our copy, `upstream` where it was copied from, `ms` the file's
+  length, `start`/`end` the word inside it (silence trimmed by ffmpeg silencedetect, 30 ms kept).
+  words[<plain text>] = {"source": "elevenlabs", say?, seed?, cut?, "audio": {url, ms, sha256}}.
 """
 from __future__ import annotations
 
@@ -43,6 +77,17 @@ from pathlib import Path
 BELAJAR = Path(__file__).resolve().parent.parent
 CONTENT = BELAJAR / "content"
 MANIFEST = CONTENT / "wordvoice.json"
+QC_FIXTURE = BELAJAR / "pipeline" / "fixtures" / "quran_com_words.json"
+VERSION = 2
+
+# ---------------------------------------------------------------- Quran.com's word recordings
+QC_UPSTREAM = "https://audio.qurancdn.com/"
+QC_PREFIX = "/belajar/media/narration/quran-com/wbw/"
+QC_FILE = re.compile(r"wbw/(\d{3})_(\d{3})_(\d{3})\.mp3")
+SOURCES = ("quran.com", "elevenlabs")
+QC_AUDIO_KEYS = {"url", "upstream", "ms", "sha256", "start", "end"}
+TRIM_MARGIN_MS = 30
+_WORD_LOC = re.compile(r"\d{1,3}:\d{1,3}:\d{1,3}")
 
 VOICE_ID = "aK834gEOxQEtviMPgurT"
 VOICE_NAME = "Kang Nandar"
@@ -226,27 +271,178 @@ def inventory(content: Path = CONTENT) -> tuple[dict[str, set[str]], list[str]]:
     return out, unresolved
 
 
+# ---------------------------------------------------------------- a text's place in the Qur'an (Quran.com)
+def _lesson_order(content: Path) -> dict[str, int]:
+    cur = _load(content / "curriculum.json")
+    ids = [l["id"] for l in cur.get("lessons") or [] if re.fullmatch(r"\d{1,3}:\d{1,3}", str(l.get("id")))]
+    return {k: i for i, k in enumerate(ids)}
+
+
+def places(content: Path = CONTENT) -> dict[str, list[tuple[tuple, str, str]]]:
+    """{plain text: [(rank, loc, origin), …]}: every place the content itself puts those bytes as a
+    WHOLE word (module docstring). rank: (0, lesson, word) a lesson word; (1, lesson, word) a
+    composition form quoting a whole word or a composition example; (2, s, a, w) a Konsep word."""
+    order = _lesson_order(content)
+    out: dict[str, list[tuple[tuple, str, str]]] = {}
+
+    def lesson_of(loc: str) -> tuple[int, int]:
+        s, a, w = (int(x) for x in loc.split(":"))
+        return order.get(f"{s}:{a}", len(order)), w
+
+    def add(ar: str, loc: str, origin: str, rank: tuple) -> None:
+        if ar and _WORD_LOC.fullmatch(loc or ""):
+            out.setdefault(plain(ar), []).append((rank, loc, origin))
+
+    for f in sorted(content.glob("*.json")):
+        data = _load(f)
+        if not isinstance(data, dict) or not isinstance(data.get("ayat"), list):
+            continue
+        for a in data["ayat"]:
+            for w in a.get("words") or []:
+                if isinstance(w, dict) and w.get("loc") and w.get("ar"):
+                    add(w["ar"], w["loc"], "lesson-word", (0, *lesson_of(w["loc"])))
+    for f in sorted((content / "compose").glob("*.json")):
+        comp = _load(f)
+        for wl, unit in (comp.get("words") or {}).items():
+            forms = unit.get("forms") or {}
+            for name, form in forms.items():
+                sp = form.get("src")
+                if isinstance(sp, dict) and len(sp) == 1 and set(sp) <= {"word", "tanzil"}:
+                    add(form.get("ar", ""), sp.get("word") or sp.get("tanzil"), f"compose-form {wl} {name}", (1, *lesson_of(wl)))
+            for ex in (comp.get("examples") or {}).get(wl) or []:
+                form = forms.get(ex.get("form")) or {}
+                if ex.get("loc"):
+                    add(form.get("ar", ""), ex["loc"], f"compose-example {wl} {ex.get('form')}", (1, *lesson_of(wl)))
+    library = _load(content / "library.json")
+    for k, ar in (library.get("quran") or {}).items():
+        if _WORD_LOC.fullmatch(k):
+            s, a, w = (int(x) for x in k.split(":"))
+            add(ar, k, "konsep-word", (2, s, a, w))
+    return out
+
+
+def load_qc(path: Path = QC_FIXTURE) -> dict | None:
+    return _load(path) if path.exists() else None
+
+
+def qc_word(qc: dict | None, loc: str) -> dict | None:
+    """Quran.com's word at `loc` (its own list of the ayah, words only), or None."""
+    s, a, w = (int(x) for x in loc.split(":"))
+    words = ((qc or {}).get("ayat") or {}).get(f"{s}:{a}")
+    return words[w - 1] if words and 1 <= w <= len(words) else None
+
+
+def qc_final(qc: dict | None, loc: str) -> bool:
+    s, a, w = (int(x) for x in loc.split(":"))
+    words = ((qc or {}).get("ayat") or {}).get(f"{s}:{a}") or []
+    return bool(words) and w == len(words)
+
+
+def ayat_of_places(pl: dict[str, list[tuple[tuple, str, str]]], inv: dict[str, set[str]]) -> list[str]:
+    """Every ayah (S:A) a place of a voiced text stands in: the ayat the fixture must hold."""
+    keys = {":".join(loc.split(":")[:2]) for t, ps in pl.items() if t in inv for _, loc, _ in ps}
+    return sorted(keys, key=lambda k: tuple(int(x) for x in k.split(":")))
+
+
+def quran_com_choice(inv: dict[str, set[str]], qc: dict | None, content: Path = CONTENT) -> dict[str, str]:
+    """{plain text: loc} for every voiced text that is a word at a real place (module docstring:
+    the ayah-final places first, then lesson order, then the Konsep words in mushaf order). A text
+    whose ayah is not in the fixture yet has no place (build_wordvoice.py --fetch-quran-com)."""
+    pl = places(content)
+    out: dict[str, str] = {}
+    for t in sorted(inv):
+        ps = [p for p in pl.get(t, []) if qc_word(qc, p[1]) is not None]
+        if not ps:
+            continue
+        finals = [p for p in ps if qc_final(qc, p[1])]
+        out[t] = min(finals or ps)[1]
+    return out
+
+
+def choice_conflicts(inv: dict[str, set[str]], qc: dict | None, content: Path = CONTENT) -> list[str]:
+    """Texts whose places both end an ayah and stand inside one: the ayah-final recording is
+    chosen, and plays where the same bytes stand mid-ayah too (reported, never silent)."""
+    pl = places(content)
+    out = []
+    for t in sorted(inv):
+        ps = [p for p in pl.get(t, []) if qc_word(qc, p[1]) is not None]
+        fin = sorted({p[1] for p in ps if qc_final(qc, p[1])})
+        mid = sorted({p[1] for p in ps if not qc_final(qc, p[1])})
+        if fin and mid:
+            out.append(f"{t!r}: ends its ayah at {', '.join(fin)}; inside an ayah at {', '.join(mid)}")
+    return out
+
+
+def qc_upstream(qc: dict | None, loc: str) -> str | None:
+    """The CDN's file of the word at `loc`: wbw/<SSS>_<AAA>_<WWW>.mp3 by the word's position in
+    Quran.com's list (= the Tanzil number: fixture_problems). Not the API's `audio_url`, which in
+    41:9 counts a rub' al-hizb sign and a pause mark and names files the CDN does not have
+    (wbw/041_009_015.mp3 and _016 answer 404; the CDN holds _001 … _014, one per word — checked
+    2026-10-15)."""
+    if qc_word(qc, loc) is None:
+        return None
+    s, a, w = (int(x) for x in loc.split(":"))
+    return f"{QC_UPSTREAM}wbw/{s:03d}_{a:03d}_{w:03d}.mp3"
+
+
+def qc_numbering_notes(qc: dict | None) -> list[str]:
+    """The ayat whose API audio_url is not the word's position (reported, see qc_upstream)."""
+    out = []
+    for k, words in ((qc or {}).get("ayat") or {}).items():
+        s, a = (int(x) for x in k.split(":"))
+        off = [i for i, w in enumerate(words, 1) if w.get("audio_url") != f"wbw/{s:03d}_{a:03d}_{i:03d}.mp3"]
+        if off:
+            out.append(f"{k}: the API's audio_url is not the word's position for words {off[0]}–{off[-1]} (the CDN file by position is used)")
+    return out
+
+
+def qc_url(upstream: str) -> str:
+    """Our copy of an upstream word file: the same file name under QC_PREFIX."""
+    return QC_PREFIX + upstream.rsplit("/", 1)[1]
+
+
 # ---------------------------------------------------------------- the manifest
-def expected(inv: dict[str, set[str]], previous: dict | None) -> dict:
+def expected(inv: dict[str, set[str]], previous: dict | None, qc: dict | None | bool = True) -> dict:
+    """The manifest the content gives. `qc`: the Quran.com fixture (True: the committed one; None:
+    none, every text is the narrator's). A recording is carried over from `previous` only while it
+    is still of what would be played: the narrator's while what was sent is unchanged, Quran.com's
+    while its place and upstream file are."""
+    if qc is True:
+        qc = load_qc()
+    choice = quran_com_choice(inv, qc) if qc else {}
     prev = ((previous or {}).get("words")) or {}
     words = {}
     for t in sorted(inv):
-        entry = {}
+        old = prev.get(t) if isinstance(prev.get(t), dict) else {}
+        if t in choice:
+            entry: dict = {"source": "quran.com", "loc": choice[t]}
+            up = qc_upstream(qc, choice[t])
+            a = old.get("audio") if old.get("source") == "quran.com" and old.get("loc") == choice[t] else None
+            if isinstance(a, dict) and a.get("upstream") == up and a.get("url") == qc_url(up):
+                entry["audio"] = a
+            words[t] = entry
+            continue
+        entry = {"source": "elevenlabs"}
         if say_of(t) != t:
             entry["say"] = say_of(t)
         if seed_of(t) is not None:
             entry["seed"] = seed_of(t)
         if t in CUT_TAIL:
             entry["cut"] = "tail"
-        old = prev.get(t) if isinstance(prev.get(t), dict) else {}
         # a recording is kept only while what was sent for it is still what would be sent
-        if old.get("audio") and old.get("say") == entry.get("say") and old.get("seed") == entry.get("seed") and old.get("cut") == entry.get("cut"):
+        if (old.get("source", "elevenlabs") == "elevenlabs" and old.get("audio") and old.get("say") == entry.get("say")
+                and old.get("seed") == entry.get("seed") and old.get("cut") == entry.get("cut")):
             entry["audio"] = old["audio"]
         words[t] = entry
     return {
-        "_comment": "GENERATED by pipeline/build_wordvoice.py from the lesson and library content: one recording per distinct plain-letter text (pipeline/wordvoice.py). Do not edit.",
-        "version": 1,
+        "_comment": "GENERATED by pipeline/build_wordvoice.py from the lesson and library content: one recording per distinct plain-letter text (pipeline/wordvoice.py) — Quran.com's word-by-word recording of the text's place in the Qur'an (copied unaltered to our media store), or the narrator's (ElevenLabs) for a part of a word, a letter, a teaching form or a run. Do not edit.",
+        "version": VERSION,
         "voice": {"id": VOICE_ID, "name": VOICE_NAME, "model": MODEL, "settings": dict(VOICE_SETTINGS)},
+        "quran_com": {
+            "credit": "Word-by-word recordings: Quran.com / Quran Foundation (https://quran.com), copied unaltered to our server for non-profit educational use",
+            "upstream": QC_UPSTREAM,
+            "prefix": QC_PREFIX,
+        },
         "words": words,
     }
 
@@ -255,15 +451,54 @@ def load_manifest(path: Path = MANIFEST) -> dict | None:
     return _load(path) if path.exists() else None
 
 
-def problems(manifest: dict | None, inv: dict[str, set[str]], require_audio: bool = False) -> list[str]:
+def _qc_audio_problems(t: str, e: dict, choice: dict[str, str], qc: dict | None) -> list[str]:
+    out: list[str] = []
+    loc = e.get("loc")
+    if t not in choice:
+        return [f"{t!r}: source quran.com, but the text is a word at no place in the content (a part, a letter, a built form or a run is the narrator's)"]
+    if loc != choice[t]:
+        out.append(f"{t!r}: loc {loc!r} is not the place the rule chooses ({choice[t]})")
+    for k in ("say", "seed", "cut"):
+        if k in e:
+            out.append(f"{t!r}: a Quran.com recording has no {k!r} (that is what is sent to ElevenLabs)")
+    a = e.get("audio")
+    if a is None:
+        return out
+    if not isinstance(a, dict) or set(a) != QC_AUDIO_KEYS:
+        return out + [f"{t!r}: audio has keys {sorted(a) if isinstance(a, dict) else a!r} (expected {', '.join(sorted(QC_AUDIO_KEYS))})"]
+    up = qc_upstream(qc, choice[t])
+    if not str(a["upstream"]).startswith(QC_UPSTREAM) or not QC_FILE.search(str(a["upstream"])):
+        out.append(f"{t!r}: upstream {a['upstream']!r} is not a word file on {QC_UPSTREAM}wbw/")
+    elif a["upstream"] != up:
+        out.append(f"{t!r}: upstream {a['upstream']} is not Quran.com's file of {choice[t]} ({up}, fixtures/quran_com_words.json)")
+    if not str(a["url"]).startswith(QC_PREFIX):
+        out.append(f"{t!r}: url {a['url']!r} is not under {QC_PREFIX} (our copy of Quran.com's file)")
+    elif a["url"] != qc_url(str(a["upstream"])):
+        out.append(f"{t!r}: url {a['url']} is not the upstream file's name under {QC_PREFIX}")
+    if not re.fullmatch(r"[0-9a-f]{64}", str(a["sha256"])):
+        out.append(f"{t!r}: sha256 is not 64 hex digits")
+    ms, s0, s1 = a["ms"], a["start"], a["end"]
+    if not all(isinstance(x, int) and not isinstance(x, bool) for x in (ms, s0, s1)):
+        out.append(f"{t!r}: ms/start/end {ms!r}/{s0!r}/{s1!r} are not whole milliseconds")
+    elif not (0 <= s0 < s1 <= ms) or not MIN_MS <= s1 - s0 <= MAX_MS:
+        out.append(f"{t!r}: [{s0}, {s1}] of {ms} ms is not a plausible word inside its file ({MIN_MS}–{MAX_MS} ms)")
+    return out
+
+
+def problems(manifest: dict | None, inv: dict[str, set[str]], require_audio: bool = False, qc: dict | None | bool = True) -> list[str]:
     if manifest is None:
         return ["content/wordvoice.json is missing"]
+    if qc is True:
+        qc = load_qc()
+    choice = quran_com_choice(inv, qc) if qc else {}
     out: list[str] = []
-    if manifest.get("version") != 1:
-        out.append(f"version {manifest.get('version')!r} (expected 1)")
-    want = expected(inv, None)["voice"]
-    if manifest.get("voice") != want:
+    if manifest.get("version") != VERSION:
+        out.append(f"version {manifest.get('version')!r} (expected {VERSION})")
+    want = expected(inv, None, qc)
+    if manifest.get("voice") != want["voice"]:
         out.append("the voice block differs from wordvoice.py (voice, model or settings changed: re-render)")
+    if manifest.get("quran_com") != want["quran_com"]:
+        out.append("the quran_com block (credit, upstream, prefix) differs from wordvoice.py")
     have = manifest.get("words") or {}
     for t in sorted(set(inv) - set(have)):
         out.append(f"a text the content shows has no entry: {t!r} ({', '.join(sorted(inv[t]))})")
@@ -272,15 +507,27 @@ def problems(manifest: dict | None, inv: dict[str, set[str]], require_audio: boo
     for t, e in have.items():
         if t != plain(t):
             out.append(f"{t!r} is not in plain letters (wordvoice.plain)")
-        if isinstance(e, dict) and (e.get("say") != (say_of(t) if say_of(t) != t else None) or e.get("seed") != seed_of(t) or e.get("cut") != ("tail" if t in CUT_TAIL else None)):
+        if not isinstance(e, dict) or e.get("source") not in SOURCES:
+            out.append(f"{t!r}: source {e.get('source') if isinstance(e, dict) else e!r} is not one of {', '.join(SOURCES)}")
+            continue
+        if e["source"] == "quran.com":
+            out += _qc_audio_problems(t, e, choice, qc)
+            if e.get("audio") is None and require_audio:
+                out.append(f"{t!r} has no recording (build_wordvoice.py --fetch-quran-com)")
+            continue
+        if t in choice:
+            out.append(f"{t!r}: the narrator's, but the text is a word at {choice[t]} (Quran.com's recording: build_wordvoice.py --write)")
+        if "loc" in e:
+            out.append(f"{t!r}: a narrator's recording has no loc")
+        if e.get("say") != (say_of(t) if say_of(t) != t else None) or e.get("seed") != seed_of(t) or e.get("cut") != ("tail" if t in CUT_TAIL else None):
             out.append(f"{t!r}: say/seed {e.get('say')!r}/{e.get('seed')!r} differ from wordvoice.py (the rule or an override changed: record it again)")
-        a = e.get("audio") if isinstance(e, dict) else None
+        a = e.get("audio")
         if a is None:
             if require_audio:
                 out.append(f"{t!r} has no recording")
             continue
-        if set(a) != {"url", "ms", "sha256"}:
-            out.append(f"{t!r}: audio has keys {sorted(a)} (expected url, ms, sha256)")
+        if not isinstance(a, dict) or set(a) != {"url", "ms", "sha256"}:
+            out.append(f"{t!r}: audio has keys {sorted(a) if isinstance(a, dict) else a!r} (expected url, ms, sha256)")
             continue
         if not re.fullmatch(r"[0-9a-f]{64}", str(a["sha256"])):
             out.append(f"{t!r}: sha256 is not 64 hex digits")
@@ -289,3 +536,38 @@ def problems(manifest: dict | None, inv: dict[str, set[str]], require_audio: boo
         if not isinstance(a["ms"], int) or not MIN_MS <= a["ms"] <= MAX_MS:
             out.append(f"{t!r}: {a['ms']!r} ms is not a plausible length ({MIN_MS}–{MAX_MS})")
     return out
+
+
+def fixture_problems(qc: dict | None, inv: dict[str, set[str]], content: Path = CONTENT) -> list[str]:
+    """The Quran.com fixture without the network: it holds every ayah a place stands in, each a
+    list of words with a wbw audio_url of that ayah, and every chosen place's word is the text
+    (folded: the consonant skeleton; Quran.com and Tanzil write the Uthmani marks differently)."""
+    if qc is None:
+        return ["fixtures/quran_com_words.json is missing (build_wordvoice.py --fetch-quran-com)"]
+    out: list[str] = []
+    ayat = qc.get("ayat") or {}
+    for k in ayat_of_places(places(content), inv):
+        if k not in ayat:
+            out.append(f"fixtures/quran_com_words.json has no word list of {k}")
+    for k, words in ayat.items():
+        s, a = (int(x) for x in k.split(":"))
+        for i, w in enumerate(words, 1):
+            m = QC_FILE.fullmatch(str(w.get("audio_url")))
+            if not m or (int(m.group(1)), int(m.group(2))) != (s, a):
+                out.append(f"fixtures/quran_com_words.json {k} word {i}: audio_url {w.get('audio_url')!r} is not a wbw file of {k}")
+    for t, loc in quran_com_choice(inv, qc, content).items():
+        w = qc_word(qc, loc)
+        if fold(w.get("text_uthmani", "")) != fold(t):
+            out.append(f"{t!r}: Quran.com's word at {loc} is {w.get('text_uthmani')!r} (another word: the numbering differs)")
+    return out
+
+
+_FOLD_DROP = re.compile("[\u0610-\u061A\u064B-\u065F\u06D6-\u06ED\u0640\u06DE\u06E9\u200C\u200D\u00A0 ]")
+_FOLD_LETTER = str.maketrans({"\u0670": "\u0627", "\u0671": "\u0627", "\u0623": "\u0627", "\u0625": "\u0627", "\u0622": "\u0627",
+                              "\u0649": "\u064A", "\u0629": "\u062A", "\u06CC": "\u064A"})
+
+
+def fold(s: str) -> str:
+    """Consonant skeleton (search only): marks, tatweel, pause signs and spaces dropped; alif forms
+    (the dagger alif among them), the dotless ya and the ta marbuta unified."""
+    return _FOLD_DROP.sub("", s or "").translate(_FOLD_LETTER)

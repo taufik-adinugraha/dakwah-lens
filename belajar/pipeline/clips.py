@@ -4,15 +4,15 @@ e.g ismu (read by voice + show visual) when combined with harf jar, it becomes i
 visual). in principel, each explanation should be followed by examples (visual + voice)" — "not
 only for harakah, but also for all rules").
 
-A clip is one ayah's streamed recording and the place of one word (or one run of words) in it:
-`{"url": <EveryAyah file of that ayah>, "start": ms, "end": ms}` and `"last": true` when its (last)
+A clip is one ayah's recording and the place of one word (or one run of words) in it:
+`{"url": <our copy of the EveryAyah file of that ayah>, "start": ms, "end": ms}` and `"last": true` when its (last)
 word ends the ayah, keyed by the word's location ("5:23:6", or "55:78:1-2" for a run). The voice is
 the IMAM, never the narrator: Mishary Alafasy (`Alafasy_128kbps`, the module's one imam, plan L7 and
 L21), the very files and the very timing convention the lessons use — the pinned quran-align
 release, read through build_surah.word_segments (segment [wordStart0, wordEndExclusive0, startMs,
 endMs] → word wordStart0 + 1, the Tanzil token index of common.lesson_ayah) and
-build_surah.everyayah_url. Nothing is cut, copied or stored: the browser seeks within the streamed
-file and stops at `end` (src/hooks/useClipPlayer.ts), the way the lesson plays one word
+build_surah.everyayah_url. Nothing is cut or re-encoded: the file is EveryAyah's, copied unaltered
+to our media store (host_media.py, operator 2026-10-15), and the browser seeks within it and stops at `end` (src/hooks/useClipPlayer.ts), the way the lesson plays one word
 (src/hooks/useSegmentPlayer.ts).
 
 Which examples (`wanted`), in the order the pages show them:

@@ -80,12 +80,13 @@ describe.each(EXPECTED)("$name content (build-time invariants)", ({ slug, surah,
   // One imam everywhere, and no reciter setting (operator 2026-10-13, plan L21: "better to use
   // alafasy for all? no need to give option to user to change"). Until then this asked only that
   // Alafasy be AMONG an ayah's reciters (toContain): Husary Mu'allim was the other.
-  it("streams this surah's recitation from ONE imam: every ayah has exactly one recitation, Mishary Alafasy's", () => {
+  it("plays this surah's recitation from ONE imam: every ayah has exactly one recitation, Mishary Alafasy's (our copy of EveryAyah's file)", () => {
     const nnn = String(surah).padStart(3, "0");
     for (const a of s.ayat) {
       expect(a.recitation.map((r) => r.reciter), a.loc).toEqual(["Alafasy_128kbps"]);
       const [r] = a.recitation;
-      expect(r.url).toBe(`https://everyayah.com/data/Alafasy_128kbps/${nnn}${String(a.ayah).padStart(3, "0")}.mp3`);
+      // our unaltered copy, same-origin (operator 2026-10-15: "we copy to our server so latency is minimum")
+      expect(r.url).toBe(`/belajar/media/narration/alafasy/${nnn}${String(a.ayah).padStart(3, "0")}.mp3`);
       expect(r.credit).toBe("Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)");
     }
   });

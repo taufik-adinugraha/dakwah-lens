@@ -19,8 +19,10 @@
  * Pure (no React, no DOM): unit-tested with fake timers (loading.test.ts).
  */
 
-/** Whose sound is loading: the narrator's voice or the imam's recitation. */
-export type LoadingKind = "narration" | "recitation";
+/** Whose sound is loading: the narrator's voice (its explanations, and a word recording of the
+ *  AI narrator's), the imam's recitation, or a word's Quran.com recording ("Memuat suara kata…":
+ *  never "narator" or "AI" for it, operator 2026-10-15). */
+export type LoadingKind = "narration" | "recitation" | "word";
 
 /** Sound asked for and not flowing yet: whose, and since when (Date.now() milliseconds). */
 export type AudioLoading = { kind: LoadingKind; sinceMs: number };

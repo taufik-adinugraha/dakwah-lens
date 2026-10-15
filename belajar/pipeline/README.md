@@ -67,6 +67,9 @@ python3 test_validate_map.py       # plants 39 faults (a step in the wrong group
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah), or listed in authored/curriculum.pending.json; exit 1 on any failure
 python3 test_validate_quiz.py      # plants 53 faults (an untaught state, an untaught option, two correct options, an untaught question not listed, a listed one that is taught, the wazan exercise in a basic lesson; an explanation shown that names an untaught term; the warm-up: a pos that disagrees with the QAC tag, a part left out, a wrong answer, a sign before its lesson, an edited sentence), each must fail
 python3 render_narration.py        # DRY RUN: characters and cost; never calls the API without --render --i-approve-spend
+python3 build_wordvoice.py --check # the word voices (content/wordvoice.json): Quran.com's word file of every word at a place, the narrator's for the rest; locally also Tanzil and the downloaded copies (CI: --require-audio --no-network); --fetch-quran-com refreshes the fixture and the copies (read-only downloads)
+python3 test_validate_wordvoice.py # plants 28 manifest faults (a Quran.com entry for a part or a run, another place, another host, our copy under the narrator's prefix, a missing entry, …) + the place rule, the fixture, a stale pin, the hosted pins
+python3 host_media.py --check      # every hosted recording the content references (our copies of the imam's ayat and of Quran.com's words) is pinned (CI: --no-network); --fetch pins new ones, --deliver writes out/delivery + files-hosted.txt (see "Hosted recordings")
 python3 encode_narration.py --check # the delivered audio (64 kbps mono) on disk is what the manifests describe (add --reencode to encode the masters again and compare); needs ffmpeg and pipeline/out, so not in CI (see "Narasi", Delivery)
 ```
 
@@ -156,6 +159,11 @@ a machine whose cache predates them). `cache/` is git-ignored.
 | `build_quiz.py` | 2 | Writes `belajar/content/quiz/<slug>.json`; `--show <slug> <ayah>` prints one ayah's questions |
 | `validate_quiz.py` | 6 | The quiz guard: fresh build, the rules, TAUGHT(ayah) ⊇ REQUIRED(question) or the question listed in `authored/curriculum.pending.json` (both ways), the narration's exercise lines; prints the per-ayah quiz, what each ayah teaches and the tolerated list |
 | `test_validate_quiz.py` | 6 | Planted-fault tests for the guard + unit tests of TAUGHT, the cause classes, the labels and the shuffle port |
+| `wordvoice.py` | — | The word voices: the plain-letter rule, the inventory, a text's PLACE in the Qur'an (`places`, `quran_com_choice`: ayah-final first, then lesson order, then the Konsep words), the manifest (`expected`) and its checks (`problems`, `fixture_problems`) |
+| `build_wordvoice.py` | 2/4 | Writes / checks `content/wordvoice.json`; `--fetch-quran-com` (the fixture from api.quran.com, the word files from audio.qurancdn.com, measured); `--render` the narrator's takes (spend) |
+| `fixtures/quran_com_words.json` | — | Written by `build_wordvoice.py --fetch-quran-com`: Quran.com's word list of every ayah a voiced text stands in (text_uthmani, audio_url, retrieval date). Never edited by hand |
+| `host_media.py` | 4 | Our unaltered copies of the recordings we did not make (the imam's ayat, Quran.com's words): the references in the content, the pins, the delivery and its upload list |
+| `hosted.json` | — | Written by `host_media.py --fetch`: the pins (upstream URL, sha256, bytes, ms) of our copies of the imam's ayat; a lesson ayah's equals `sources.json`'s |
 
 ## Inputs (see `sources.json` for the pinned sha256 values)
 
@@ -168,7 +176,7 @@ a machine whose cache predates them). `cache/` is git-ignored.
 | `quranenc_indonesian_affairs` | QuranEnc API: sura 1 (top-level fields, unchanged) and suras 112, 113, 114 (`suras` map, one pinned file each, same endpoint), plus the translations list for the version and title | 1.0.1 as reported by `translations/list` |
 | `quranenc_indonesian_affairs_quran` | The same translation for every sura 1..114 (the fact cards' ayah popup: the facts locate ayat in 103 suras), one pinned file per sura in `cache/quranenc/`; a file another input pins too must carry the same pin | 1.0.1 (sura 1's translations list) |
 | `quranenc_sura_names` | QuranEnc's Indonesian sura list (`/id/browse/indonesian_affairs`), cached and pinned as the extracted `number\|ayat\|arabic\|name` text (the HTML carries tokens); ayah counts checked against Tanzil | `text_sha256` |
-| `everyayah_alafasy` | The 22 streamed MP3s (the imam's file of each of the 22 lesson ayat), downloaded only to measure their length (never committed or served); url pattern `{SSS}{AAA}.mp3` | per-file sha256 + duration |
+| `everyayah_alafasy` | The 22 MP3s of the imam (his file of each of the 22 lesson ayat), downloaded to measure their length; since 2026-10-15 also the files our server serves, unaltered (`host_media.py`: their pins must equal these; never committed); url pattern `{SSS}{AAA}.mp3` | per-file sha256 + duration |
 
 **Tanzil download options.** On tanzil.net/download the four checkboxes (pause marks, sajdah
 signs, rub-el-hizb signs, tatweel before superscript alef) are left unticked, so every
@@ -332,8 +340,9 @@ Translation - Ministry of Religious Affairs"); it is **not** labelled "Kemenag 2
 
 **One entry per ayah: one imam everywhere, and no reciter setting** (operator 2026-10-13, plan
 L21: "better to use alafasy for all? no need to give option to user to change"). The entry is
-Mishary Rashid Alafasy's file of the ayah, streamed from EveryAyah (`Alafasy_128kbps`;
-`build_surah.RECITER`), in a `recitation` list of exactly one (`schema.ts`: `.length(1)`, and the
+Mishary Rashid Alafasy's file of the ayah from EveryAyah (`Alafasy_128kbps`;
+`build_surah.RECITER`) — since 2026-10-15 our unaltered copy of it, `/belajar/media/narration/alafasy/<SSS><AAA>.mp3`
+("Hosted recordings" below; until then streamed from EveryAyah), in a `recitation` list of exactly one (`schema.ts`: `.length(1)`, and the
 reciter's id is the only value its enum has). `validate.py` (check 3) refuses a second reciter in
 an ayah, another reciter in the imam's place, another reciter's file or credit line in the imam's
 entry, and another reciter's quran-align member or EveryAyah probes pinned in `sources.json`;
@@ -430,7 +439,8 @@ QuranEnc footnotes); the app serves it one ayah at a time from `GET /belajar/api
 
 The recitation is not in the file: the dialog streams Mishary Alafasy's file of the ayah from
 EveryAyah (`Alafasy_128kbps/SSSAAA.mp3`, the lessons' one imam and URL scheme), only once the
-learner presses play, never stored on our server.
+learner presses play, never stored on our server. (The lessons play our copies since 2026-10-15;
+the popup does not: its 1,629 ayat average 342 KB, about 556 MB — "Hosted recordings".)
 
 ## Shared library: Kosakata (lexicon) and Akar (roots)
 
@@ -1202,7 +1212,7 @@ learnt" of things no lesson had taught, and the kalimah record's line was said n
   lesson; `src/lib/autoplay/zero.ts` (`zeroAyah`, `hostsZero`, `primerAyah`),
   `buildAutoplaySequence({ zero: true })` — intro → primer → `concept:<id>:lead` (the slide, when
   the step has one) → `concept:<id>` → `concept:<id>:ex` (the step's examples, each the narrator's
-  line and then the narrator's recording of the word) → next, which leads to ayah 1 like an ayah to the next. Listed first on the
+  line and then the word's recording: Quran.com's, since 2026-10-15, for all five) → next, which leads to ayah 1 like an ayah to the next. Listed first on the
   track page and on Al-Fatihah's page; Al-Fatihah 1 says "Belum mengenal harakat? Mulai dari
   Pengantar."
 
@@ -1439,6 +1449,85 @@ python3 render_narration.py --only shared:start --only shared:ex:tap-word:play -
     --only al-fatihah:7:w9:compose:8
 # must say: 12 distinct texts, 1551 characters. The render is the same command with
 #   --render --i-approve-spend --voice-id aK834gEOxQEtviMPgurT --voice-name "Kang Nandar" --env-file … --out "$OUT"
+```
+
+### The words are Quran.com's (2026-10-15), and the recordings are on our server
+
+Operator 2026-10-15, after listening to the narrator's word takes: "still lacking"; "use
+quran.com, mention the credit"; then "it's on me, they will allow us to copy and distribute for
+educational non-profit purposes; we copy to our server so latency is minimum"; "just make sure no
+latency (preload before page is opened)". So:
+
+- **Every text that is a word at a real place in the Qur'an plays Quran.com's (Quran Foundation)
+  word-by-word recording of that place** (`wordvoice.py`, module docstring). The place comes from
+  the content, never a search: a lesson word, a composition form quoting a whole word, a
+  composition example's bentuk dasar, a Konsep word (library.json `quran`, whole-word keys). Of a
+  text's places, an AYAH-FINAL one first (its recording is then the stop form the lessons
+  describe), else the first in lesson order (curriculum.json), else the Konsep words in mushaf
+  order. A form built by edits is not placed by its `attested` list (operator: "teaching forms
+  built by ops such as ismi, bi+ismi" stay the narrator's). 2026-10-15: **83 of 193 texts** are
+  Quran.com's — every one of the 65 lesson words, and the Konsep words and bentuk dasar with a
+  place (ismu → 55:78:2, ar-raḥmānu → 20:5:1, …); **110 stay the narrator's**: 51 runs of several
+  words (no word file holds two words), 19 parts of words (bi-, -hum, -ta, …, also where those
+  bytes are a word elsewhere: لَا, هُمْ; 2 of them also a Harakat card's letter), 15 more letters
+  of the Harakat cards, and 25 composition forms with no place (built by edits: ismi, bi+ismi,
+  raḥmān, maliku, aṣ-ṣirāṭu, al-mustaqīmu, al-maghḍūbu …; pieces: ḥamdu, ihdi …). No text has
+  places both ending an ayah and inside one (`wordvoice.choice_conflicts` is empty).
+- **The file is the word's POSITION, not the API's `audio_url`**: in 9 of the 40 ayat
+  (2:5, 2:30, 5:23, 6:90, 6:126, 17:78, 26:24, 33:37, 41:9) api.quran.com counts pause marks /
+  a rub' al-hizb sign and names files the CDN does not have (wbw/041_009_015.mp3 and _016 answer
+  404; the CDN holds one file per word, _001 … _014 — checked for all nine, 2026-10-15). The one
+  chosen place among them, 41:9:13 (rabbu), plays wbw/041_009_013.mp3. Every chosen place's word
+  in the fixture is the text (folded skeleton), and Quran.com counts each ayah's words as Tanzil
+  does (`build_wordvoice.py --check`, locally).
+- **Unaltered.** A word plays [start, end] of its file (`audio.start`/`end`: the leading and
+  trailing silence under -45 dB left out, 30 ms kept); the file itself is upstream's, sha256 and
+  all. 83 files, 4.90 MB (320 kbps stereo). The imam's ayat likewise: every ayah a lesson recites
+  and every ayah a Konsep / composition example clip is cut from, 32 files, 3.95 MB, our copy of
+  EveryAyah's `Alafasy_128kbps/<SSS><AAA>.mp3` (`build_surah.everyayah_url` now gives our URL;
+  the quran-align timings time the same file). The compositions' source citations of his recording
+  ("Rekaman imam pelajaran: Mishary Alafasy, EveryAyah 001001.mp3", `authored/al-fatihah.compose.json`,
+  13 of them) link our copy too (absolute, https://dakwah-lens.id/belajar/media/narration/alafasy/…:
+  a SourceRef url is a full URL, schema.ts): no file of the content names an EveryAyah address, so a lesson page
+  carries none (`stage.test.ts`; CI `surahs-smoke.mjs` oneImam failed on those 13 links on PR #116).
+  The fact cards' ayah popup is NOT copied (any of
+  1,629 ayat; a sample of 40 averaged 342 KB: about 556 MB, past the operator's 60 MB line) and
+  still streams from EveryAyah — the only reason `everyayah.com` is still in the CSP's `media-src`
+  (`audio.qurancdn.com` and `verses.quran.com` are no longer listed: nothing plays from them).
+- **Fetched before it is asked for** (`src/lib/media-prefetch.ts`): an ayah page fetches its
+  recitation and every word / example file of the lesson at idle, before "Mulai" (3–13 files,
+  135 KB – 1.04 MB per ayah; Al-Fatihah 7 is the largest: 13 files, ~1,039 KB; lesson zero, the
+  Pengantar, its 5 kalimah examples' word files, ~355 KB — wa lā, 1:7:8, is one written word and
+  one Quran.com file, not a run), the next ayah's
+  from two thirds of the lesson on; a Konsep / Harakat page its example files (at most 12). Not
+  with Save-Data / 2G.
+
+Paths: `/belajar/media/narration/quran-com/wbw/<SSS>_<AAA>_<WWW>.mp3` and
+`/belajar/media/narration/alafasy/<SSS><AAA>.mp3`, under the prefix Caddy already serves from
+`/srv/dakwah-lens/data/belajar-media/narration` with `Cache-Control: public, max-age=31536000,
+immutable` (deploy/Caddyfile `@narration`): nothing to configure. The names are upstream's, not
+content-hashed, so a file is never replaced under its name: should upstream change one, its pin
+fails first, and the copy gets a new name.
+
+```bash
+# The word voices and their places (no spend; --fetch-quran-com only reads api.quran.com and audio.qurancdn.com):
+python3 build_wordvoice.py --fetch-quran-com   # fixture + copies in out/upstream/quran-com/wbw + the manifest
+python3 build_wordvoice.py --check             # + Tanzil bytes of every place, every copy against its pin
+python3 host_media.py --fetch                  # the imam's copies (lesson ayat from fetch.py's cache), pinned in hosted.json
+python3 host_media.py --check
+python3 host_media.py --deliver --out "$OUT"   # $OUT/delivery/{alafasy,quran-com/wbw}/… + $OUT/delivery/files-hosted.txt
+```
+
+The narration's opening line said the words were the narrator's AI voice: `shared:start` now reads
+"… Ayat Al-Qur'an dibacakan imam; suara kata per kata dari rekaman Quran.com, kecuali bentuk
+latihan. Penjelasan ini dan bentuk latihan dibacakan dengan suara kecerdasan buatan, …" (399
+characters: one file, MAX_LINE 400). It lost its audio (caption-only until rendered, and the
+browser checks that follow it, `loadingChecks` / `aheadChecks`, stop there until then). The dry
+run of exactly that line must say 1 distinct text, 399 characters, USD 0.03:
+
+```bash
+python3 render_narration.py --only shared:start
+#   render: … --render --i-approve-spend --voice-id aK834gEOxQEtviMPgurT --voice-name "Kang Nandar" --env-file … --out "$OUT" --only shared:start
 ```
 
 ## Narasi (guided-lesson narration)
@@ -1856,6 +1945,17 @@ bad=0; while read -r f; do
   served=$(curl -fsS "https://dakwah-lens.id/belajar/media/narration/$f" | shasum -a 256 | cut -d' ' -f1)
   [ "$served" = "$(shasum -a 256 "$f" | cut -d' ' -f1)" ] || { echo "NOT SERVED AS LISTED: $f"; bad=$((bad+1)); }
 done < files.txt; echo "$bad of $(wc -l < files.txt | tr -d ' ') listed files are not served as listed"
+
+# 4b. The same for our copies of the recordings we did not make (host_media.py): every file in
+#     out/delivery/files-hosted.txt (the imam's ayat, Quran.com's words) uploaded with step 3's
+#     command and that list, and served byte for byte (step 4's loop with files-hosted.txt).
+python3 host_media.py --check && python3 host_media.py --deliver --out out
+cd out/delivery
+COPYFILE_DISABLE=1 tar --no-mac-metadata -cf - -T files-hosted.txt | ssh <vm-host> 'sudo -n -u deploy tar -x --skip-old-files -C /srv/dakwah-lens/data/belajar-media/narration'
+bad=0; while read -r f; do
+  served=$(curl -fsS "https://dakwah-lens.id/belajar/media/narration/$f" | shasum -a 256 | cut -d' ' -f1)
+  [ "$served" = "$(shasum -a 256 "$f" | cut -d' ' -f1)" ] || { echo "NOT SERVED AS LISTED: $f"; bad=$((bad+1)); }
+done < files-hosted.txt; echo "$bad of $(wc -l < files-hosted.txt | tr -d ' ') listed files are not served as listed"
 
 # 5. Only now merge and deploy.
 ```

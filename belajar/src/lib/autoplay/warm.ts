@@ -29,8 +29,10 @@
  * the file twice on a browser that does not share media between elements. So a recording is asked
  * for by the page that plays it, and by no other.
  *
- * The recordings still stream from the provider and are stored nowhere on our server (the Kredit
- * page's promise): only the moment the learner's browser asks for them moved.
+ * Since 2026-10-15 the recordings are our unaltered copies on our own server (operator: "we copy to
+ * our server so latency is minimum"; pipeline/host_media.py), and the page fetches a lesson's files
+ * at idle before "Mulai" (src/lib/media-prefetch.ts) — the rules above are the stage element's own,
+ * which then mostly plays the page's copy.
  *
  * A WORD'S OR AN EXAMPLE'S RECORDING (operator 2026-10-12, plan L20; since 2026-10-14 every word
  * heard on its own is the narrator's recording of it, content/wordvoice.json; exampleToWarm) is

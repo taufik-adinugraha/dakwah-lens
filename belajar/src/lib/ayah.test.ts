@@ -58,13 +58,18 @@ describe("the ayah popup's locations (operator 2026-10-12)", () => {
     expect(recitationUrl("115:1")).toBeNull();
   });
 
-  it("names exactly the file every lesson already streams for that ayah: the lesson's one recitation, the same imam", () => {
+  it("names, for a lesson ayah, the very EveryAyah file the lesson's copy was made from: the same recording, the same imam", () => {
+    // Since 2026-10-15 a lesson plays our unaltered copy of that file (pipeline/host_media.py,
+    // pipeline/hosted.json `upstream`); the popup, which can open any of its 1,629 ayat, still
+    // streams from EveryAyah.
+    const hosted = JSON.parse(read("pipeline/hosted.json")) as { alafasy: Record<string, { upstream: string }> };
     let n = 0;
     for (const s of SURAHS) {
       for (const a of s.ayat) {
         // One imam (plan L21): the popup's file of a lesson ayah IS the lesson's recording.
         expect(a.recitation.map((r) => r.reciter), a.loc).toEqual([RECITER]);
-        expect(recitationUrl(a.loc), a.loc).toBe(a.recitation[0].url);
+        const copy = a.recitation[0].url;
+        expect(recitationUrl(a.loc), a.loc).toBe(hosted.alafasy[copy.slice(copy.lastIndexOf("/") + 1)].upstream);
         n++;
       }
     }
@@ -226,7 +231,9 @@ describe("the popup in the code (no data file in a page, no link out, the house 
     expect(MSG.id.Ayah.text_failed).toContain(`klik “${MSG.id.Ayah.retry}”`);
     expect(MSG.id.Guided.loading_recitation).toBe("Memuat bacaan imam…");
     expect(read("src/components/surah/AyahDialog.tsx")).toContain('tg("loading_recitation")');
-    // The Kredit page's note stays true: recordings stream from the provider, nothing stored here.
-    expect(MSG.id.Credits.streaming_note).toContain("langsung dari server penyedia rekaman");
+    // The Kredit page's note stays true: the popup's recordings come straight from EveryAyah (the
+    // lessons' and the Konsep pages' are our copies since 2026-10-15).
+    expect(MSG.id.Credits.streaming_note).toContain("langsung dari server EveryAyah");
+    expect(MSG.en.Credits.streaming_note).toContain("directly from EveryAyah");
   });
 });

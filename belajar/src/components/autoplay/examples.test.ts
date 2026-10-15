@@ -317,7 +317,8 @@ describe("which examples a lesson plays (src/lib/autoplay/examples.ts)", () => {
     ]);
     expect(far[1].clip).toEqual(wordVoice(WORDS.get("112:4:5")!.ar));
     expect(far[1].clip).not.toHaveProperty("last");
-    expect(far[1].clip?.url).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\//);
+    // its recording: Quran.com's file of the word at the place wordvoice.py chose (operator 2026-10-15)
+    expect(far[1].clip?.url).toMatch(/^\/belajar\/media\/narration\/(quran-com\/wbw|kang-nandar\/words)\//);
     // … and with no recording of that one, the next: a form with none is skipped, never played
     const unvoiced = (ar: string) => (ar === WORDS.get("112:4:5")!.ar ? null : wordVoice(ar));
     const next = derive(["112:4:5", "112:4:4"], unvoiced).examples.filter((e) => e.of === "concept");
@@ -512,10 +513,22 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
       b.frame = 3;
       b.after = 4;
     }, /differs from the example the content gives/],
-    // A recording is the manifest's, whole: the file, from 0, to its length (the lesson's own list
-    // shifted with it, so only "the recording of this form" can tell the last of these).
-    ["a recording that does not start at 0 (a cut)", 1, (l) => {
-      const clip = { ...beat(l, "w1:base:2").clip!, start: 40 };
+    // A recording is the manifest's: the narrator's whole file (from 0, to its length) or the word
+    // inside Quran.com's file, exactly where the manifest puts it (the lesson's own list shifted
+    // with it, so only "the recording of this form" can tell the last of these). ismu is Quran.com's
+    // (55:78:2) since 2026-10-15.
+    ["a recording that does not start where the manifest says (a cut)", 1, (l) => {
+      const clip = { ...beat(l, "w1:base:2").clip!, start: beat(l, "w1:base:2").clip!.start + 40 };
+      beat(l, "w1:base:2").clip = clip;
+      example(l, "w1:base:2").clip = clip;
+    }, /w1:base:2: its clip is not the recording of ismu/],
+    ["a narrator's recording that does not start at 0 (a cut)", 1, (l) => {
+      const clip = { ...beat(l, "w1:base:2").clip!, url: "/belajar/media/narration/kang-nandar/words/0123456789abcdef-0123456789.mp3", source: "elevenlabs" as const, start: 40 };
+      beat(l, "w1:base:2").clip = clip;
+      example(l, "w1:base:2").clip = clip;
+    }, /w1:base:2: clip .* is not a whole recording of content\/wordvoice\.json/],
+    ["a Quran.com recording under the narrator's prefix (the source and the file disagree)", 1, (l) => {
+      const clip = { ...beat(l, "w1:base:2").clip!, url: "/belajar/media/narration/kang-nandar/words/055_078_002.mp3" };
       beat(l, "w1:base:2").clip = clip;
       example(l, "w1:base:2").clip = clip;
     }, /w1:base:2: clip .* is not a whole recording of content\/wordvoice\.json/],
@@ -876,9 +889,9 @@ describe("how the lesson plays an example beat (machine.ts)", () => {
             // The screen stays on (the lesson runs), and nothing of it is narration to fetch ahead.
             expect([lessonRuns(s), screenAwake(s)], at).toEqual([true, "on"]);
             for (const u of [...lookaheadAudio(l.seq, s), ...audioAhead(l.seq, s, 3).flat().map((f) => f.url), nextNarration(l.seq, s) ?? ""]) {
-              expect(u.includes("everyayah"), `${at}: ${u}`).toBe(false);
-              // … nor an example's recording: exampleToWarm asks for that one, when its step opens
-              expect(u.includes("/kang-nandar/words/"), `${at}: ${u}`).toBe(false);
+              expect(u.includes("everyayah") || u.includes("/alafasy/"), `${at}: ${u}`).toBe(false);
+              // … nor an example's recording: exampleToWarm and the page's media plan fetch those
+              expect(u.includes("/kang-nandar/words/") || u.includes("/quran-com/"), `${at}: ${u}`).toBe(false);
             }
           });
           const want = beatsOf(l.seq).flatMap(({ beat: b }) => (pace === "pelan" ? [b.id, b.id] : [b.id]));
@@ -896,7 +909,7 @@ describe("how the lesson plays an example beat (machine.ts)", () => {
     for (const l of fatihah) {
       for (const s of run(l.seq, started(l.seq, "biasa"))) {
         for (const u of lookaheadAudio(l.seq, s)) {
-          expect(clips.has(u) || !u.startsWith("/belajar/media/narration/") || u.includes("/kang-nandar/words/"), `${l.seq.lessonKey} ${u}`).toBe(false);
+          expect(clips.has(u) || !u.startsWith("/belajar/media/narration/") || /\/(kang-nandar\/words|quran-com|alafasy)\//.test(u), `${l.seq.lessonKey} ${u}`).toBe(false);
           lists++;
         }
       }
@@ -1225,9 +1238,10 @@ describe("the next word's or example's recording fetched ahead (warm.ts exampleT
   // along the lesson's path: this step's, else the next step's (machine.ts clipsAhead).
   it("only while the lesson runs, the next recording on the lesson's path (this step's, else the next step's), never with Save-Data", () => {
     const l = fatihah[0];
-    // the narrator's recording of the form ismu (a file of the lesson's own media store, not the imam's)
+    // the recording of the form ismu (a file of the lesson's own media store, not the imam's): since
+    // 2026-10-15 our copy of Quran.com's file of the word at QS 55:78
     const ismu = wordVoice(composeFor("al-fatihah")!.words["1:1:1"].forms.ismu.ar)!.url;
-    expect(ismu).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\//);
+    expect(ismu).toMatch(/^\/belajar\/media\/narration\/quran-com\/wbw\/055_078_002\.mp3$/);
     const bismi = l.seq.wordVoices[0]!.url;
     expect(bismi).toBe(wordVoice(l.ayah.words[0].ar)!.url);
     const idx = l.seq.steps.findIndex((s) => s.id === "w1:compose");
@@ -1276,7 +1290,7 @@ describe("the next word's or example's recording fetched ahead (warm.ts exampleT
           // Never this ayah's own recording (the stage's player warms that), never a narration LINE
           // (the media store holds those under the slug of the surah): only a word's own recording.
           expect(l.ayah.recitation.some((r) => r.url === url), url).toBe(false);
-          expect(url, `${l.seq.lessonKey} ${l.seq.steps[s.idx].id}`).toMatch(/^\/belajar\/media\/narration\/kang-nandar\/words\/[0-9a-f]{16}-[0-9a-f]{10}\.mp3$/);
+          expect(url, `${l.seq.lessonKey} ${l.seq.steps[s.idx].id}`).toMatch(/^\/belajar\/media\/narration\/(kang-nandar\/words\/[0-9a-f]{16}-[0-9a-f]{10}|quran-com\/wbw\/\d{3}_\d{3}_\d{3})\.mp3$/);
           // … and one the lesson plays in this step or the next.
           const near = [s.idx, s.idx + 1].flatMap((i) => [
             ...(l.seq.steps[i]?.examples ?? []).flatMap((b) => (b.clip ? [b.clip.url] : b.word !== null ? [l.seq.wordVoices[b.word - 1]?.url ?? ""] : [])),

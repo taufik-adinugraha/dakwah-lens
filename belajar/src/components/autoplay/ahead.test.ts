@@ -1399,8 +1399,11 @@ describe("wiring that only the source can show (operator 2026-10-12)", () => {
     expect(ci).toContain(`const AHEAD_SETTLE_MS = ${PREFETCH_SETTLE_MS};`);
     expect(ci).toContain(`const WAKE_REASK_MIN_HELD_MS = ${WAKE_REASK_MIN_HELD_MS};`);
     // It holds the players' own loads back, makes one fetch() fail, and counts each file's requests.
-    expect(ci).toContain("narrationRoute(index, served, { delays, timeline, holdFetchMs: AHEAD_HOLD_MS, failFetch })");
-    expect(read("scripts/ci/narration-route.mjs")).toContain("export function narrationRoute(index, served, { delays, timeline, holdFetchMs = 0, failFetch } = {})");
+    expect(ci).toContain("narrationRoute(index, served, { delays, timeline, holdFetchMs: AHEAD_HOLD_MS, failFetch, record: (p) => !isLessonMedia(p) })");
+    expect(read("scripts/ci/narration-route.mjs")).toContain("export function narrationRoute(index, served, { delays, timeline, holdFetchMs = 0, failFetch, record, failMediaFetch = false } = {})");
+    // the lesson media the page fetches at idle (src/lib/media-prefetch.ts) are not narration lines:
+    // left out of the timeline these look-ahead rules are about
+    expect(read("scripts/ci/narration-route.mjs")).toContain("if (!record || record(pathname)) timeline?.push(entry);");
     // The CSP refuses eval: no waitForFunction call in the CI scripts.
     for (const f of ["scripts/ci/screenshots.mjs", "scripts/ci/narration-route.mjs"]) expect(read(f)).not.toMatch(/\.waitForFunction\(/);
   });

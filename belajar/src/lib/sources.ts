@@ -233,10 +233,17 @@ export const SOURCES: Source[] = [
   },
   {
     name: "Bacaan Syaikh Mishary Rasyid Alafasy",
-    role: "Bacaan imam (diputar langsung dari EveryAyah.com, tidak disimpan di server kami)",
-    licence: "Diputar dari server penyedia; hak rekaman tetap pada pemiliknya",
+    role: "Bacaan imam setiap ayat di pelajaran: rekaman EveryAyah.com, disalin tanpa diubah ke server kami untuk keperluan pendidikan nirlaba (jendela ayat dari kartu “Tahukah Anda?” memutarnya langsung dari EveryAyah.com)",
+    licence: "Hak rekaman tetap pada pemiliknya; disalin untuk keperluan pendidikan nirlaba",
     credit: "Recitation: Mishary Rashid Alafasy via EveryAyah.com",
     url: "https://everyayah.com",
+  },
+  {
+    name: "Rekaman kata demi kata Quran.com (Quran Foundation)",
+    role: "Suara setiap kata Al-Qur'an yang diperdengarkan satu per satu: rekaman Quran.com, disalin tanpa diubah ke server kami untuk keperluan pendidikan nirlaba",
+    licence: "Hak rekaman tetap pada pemiliknya; disalin untuk keperluan pendidikan nirlaba",
+    credit: "Word-by-word recordings: Quran.com",
+    url: "https://quran.com",
   },
   {
     name: "QuranEnc — Terjemahan Indonesia (Kementerian Agama)",

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -155,7 +155,7 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
   // the last step) and that no lesson opens with the imam. That the stage is handed this ayah's
   // recording and no other's is the wiring test's below, and the browser check's in CI.
   it(
-    "every lesson: nothing asked for on a page view; once started it stays asked for on every step, and no lesson opens with the imam",
+    "every lesson: the stage's element asks for nothing on a page view (the page's own copy is fetched at idle: media-prefetch.test.ts); once started it stays asked for on every step, and no lesson opens with the imam",
     () => {
       let lessons = 0;
       for (const s of SURAHS) {
@@ -167,7 +167,8 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
             const where = `${s.slug} ${a.ayah} [${locale}]`;
             // One recording, so nothing else the lesson could ask for: no second reciter's.
             expect(a.recitation, where).toHaveLength(1);
-            expect(source, where).toMatch(/^https:\/\/everyayah\.com\/data\/Alafasy_128kbps\/\d{6}\.mp3$/);
+            // our unaltered copy of the EveryAyah file (operator 2026-10-15; pipeline/host_media.py)
+            expect(source, where).toMatch(/^\/belajar\/media\/narration\/alafasy\/\d{6}\.mp3$/);
             const idle = createAutoplayState(seq);
             expect(want(idle), where).toBeNull();
 
@@ -217,18 +218,20 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
     }
   });
 
-  it("every recording is on a host the page's CSP lets media reach (next.config.ts), over https", () => {
-    // A recording on any other host would neither be fetched ahead nor play: media-src refuses it.
+  it("every lesson recording is our same-origin copy (media-src 'self'), and the CSP lists only the popup's host (next.config.ts)", () => {
+    // Since 2026-10-15 the imam's ayat are our unaltered copies of EveryAyah's files
+    // (pipeline/host_media.py), under the narration media prefix; the fact cards' popup alone still
+    // streams from EveryAyah (src/lib/ayah.ts), so that host — and no other — stays in media-src.
     const config = read("next.config.ts");
     const list = /const RECITATION_HOSTS = \[([^\]]+)\]/.exec(config)?.[1] ?? "";
     const hosts = [...list.matchAll(/"(https:\/\/[^"]+)"/g)].map((m) => m[1]);
-    expect(hosts.length).toBeGreaterThan(0);
+    expect(hosts).toEqual(["https://everyayah.com"]);
     expect(config).toContain("`media-src 'self' blob: ${RECITATION_HOSTS.join(\" \")}`");
     let n = 0;
     for (const s of SURAHS) {
       for (const a of s.ayat) {
         for (const r of a.recitation) {
-          expect(hosts, `${s.slug} ${a.ayah} ${r.reciter}`).toContain(new URL(r.url).origin);
+          expect(r.url, `${s.slug} ${a.ayah} ${r.reciter}`).toBe(`/belajar/media/narration/alafasy/${String(s.surah).padStart(3, "0")}${String(a.ayah).padStart(3, "0")}.mp3`);
           n++;
         }
       }
@@ -236,6 +239,18 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
     // One recording per lesson ayah (until 2026-10-13 two: this counted past 40).
     expect(n).toBe(SURAHS.reduce((sum, s) => sum + s.ayat.length, 0));
     expect(n).toBeGreaterThan(20);
+    // Nothing the pages are built from names an EveryAyah file: not a clip, not a source citation
+    // (the compositions cite "EveryAyah 001001.mp3" and link our unaltered copy of it). CI
+    // 2026-10-15 (PR #116): those 13 citation links still pointed at everyayah.com, so every
+    // Al-Fatihah lesson page carried its ayah's EveryAyah address and surahs-smoke.mjs oneImam
+    // failed. Only the fact cards' popup builds that address, in the browser (src/lib/ayah.ts).
+    const contentFiles = (dir: string): string[] =>
+      readdirSync(join(BELAJAR, dir), { withFileTypes: true }).flatMap((e) =>
+        e.isDirectory() ? contentFiles(join(dir, e.name)) : e.name.endsWith(".json") ? [join(dir, e.name)] : [],
+      );
+    const files = contentFiles("content");
+    expect(files.length).toBeGreaterThan(10);
+    for (const f of files) expect(read(f).includes("everyayah.com/data/"), f).toBe(false);
   });
 
   it("is wired from the runner to the stage's one player, and a page view alone leaves the recording alone", () => {
@@ -259,7 +274,7 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
     expect(page).toContain("const [recitation] = a.recitation;");
     expect(page).toContain("source={source}");
     const stage = read("src/components/lesson/LessonStage.tsx");
-    expect(stage).toContain("useAutoplay(seq, source, title)");
+    expect(stage).toContain("useAutoplay(seq, source, title, media)");
     expect(runner).toContain("const reciteUrl = source.url;");
     // The CI check finds the recording in the content (the ayah's one recitation: the stage has
     // no reciter to name any more, so no data-reciter), and tells that the imam is really

@@ -278,7 +278,9 @@ export type Cue = {
  *  (src/lib/wordvoice.ts, content/wordvoice.json). Until then [start, end) of a word in an ayah's
  *  streamed EveryAyah recording (`last`: it ended its ayah). The player seeks and stops
  *  (src/hooks/useExamplePlayer.ts). */
-export type ExampleClip = { url: string; start: number; end: number; last?: boolean };
+/** `source`: a word's recording is Quran.com's or the AI narrator's (src/lib/wordvoice.ts), which
+ *  the stage's loading line and the word buttons say; absent on the imam's clips. */
+export type ExampleClip = { url: string; start: number; end: number; last?: boolean; source?: "quran.com" | "elevenlabs" };
 
 /** What an example beat exemplifies: a concept just introduced, or the bentuk dasar a composition's
  *  `base` frame shows. (Until 2026-10-13 also "word": the lesson's own word recited again after

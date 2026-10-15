@@ -100,7 +100,7 @@ type WordLike = Pick<Ayah["words"][number], "loc" | "ar" | "translit" | "gloss" 
 export type ExampleSource = {
   ayah: { surah: number; ayah: number; words: readonly WordLike[] };
   /** A lesson with NO ayah (lesson zero): a concept's examples are then all words of other
-   *  places, so each is the narrator's recording of the word — the record's first
+   *  places, so each is the word's recording (content/wordvoice.json) — the record's first
    *  MAX_EXAMPLES_ZERO that have one — and each says what it is an example of (`about`). */
   zero?: boolean;
   /** What this ayah's lesson teaches as "Konsep baru" (curriculum.ts taughtIn): each with its
@@ -108,7 +108,7 @@ export type ExampleSource = {
   introduced: readonly { id: string; examples: readonly { loc: string; note: string; say?: string }[] }[];
   /** content/compose/<slug>.json, or null (a surah without compositions). */
   compose: ComposeLike | null;
-  /** The narrator's recording of a form's Arabic (src/lib/wordvoice.ts voiceFrom over
+  /** The recording of a form's Arabic, Quran.com's or the narrator's (src/lib/wordvoice.ts voiceFrom over
    *  content/wordvoice.json), or null: every example that is not a word of this ayah (which the
    *  stage's own player recites) plays it. Never a cut of the imam's recitation. */
   voice: (ar: string) => ExampleClip | null;

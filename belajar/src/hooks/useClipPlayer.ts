@@ -6,6 +6,7 @@ import { type AudioLoading, mediaLoading, type MediaEventType } from "@/lib/auto
 import { atClipEnd, type Clip, CLIP_IDLE, clipReducer, clipStartSeconds, endTimerMs, needsSeek, pressAction } from "@/lib/clips";
 
 import { useRecitationNotice } from "./useAyahRecitation";
+import { discardMedia, mediaSrc } from "./useMediaPrefetch";
 import { AUDIO_START_EVENT, isBlocked } from "./useSegmentPlayer";
 
 /** play() rejects with AbortError when a new file or a pause interrupts it: routine. */
@@ -14,8 +15,8 @@ const isAbort = (e: unknown) => e instanceof DOMException && e.name === "AbortEr
 /**
  * The static pages' example voices (operator 2026-10-12: "each explanation should be followed by
  * examples (visual + voice)"): ONE Audio element for the page (created after mount, never
- * rendered), which plays one example's clip — [start, end) of one word in an ayah's streamed
- * EveryAyah recording (src/lib/clips.ts) — and stops there, the way the lesson plays one word
+ * rendered), which plays one example's clip — a word's recording (src/lib/wordvoice.ts: the
+ * narrator's whole file, or the word inside our copy of Quran.com's file) — and stops there, the way the lesson plays one word
  * (useSegmentPlayer.playWord: seek, play, stop at the word's end).
  *
  * - The stop (review 2026-10-12): checked every animation frame, and once the end is within
@@ -24,8 +25,9 @@ const isAbort = (e: unknown) => e instanceof DOMException && e.name === "AbortEr
  *   currentTime has reached the end, never before. Frames do not run in a hidden tab, where the
  *   rest of the ayah would play on: `timeupdate` (about four a second, hidden or not) is the
  *   backstop, and a tab that becomes hidden stops the clip at once.
- * - Nothing reaches the reciter's host before a press: `preload` is "none" and the element has no
- *   `src` until a press sets it (privacy, mobile data). Nothing is cut or stored here.
+ * - The element itself loads nothing before a press (`preload` "none", no `src` until a press sets
+ *   it); the page fetches its example files ahead at idle (useMediaPrefetch, since 2026-10-15: every
+ *   file is same-origin, our copies), and a press plays the copy held (mediaSrc) — no wait.
  * - One clip at a time: pressing another example plays that one (the element moves to its file
  *   or its place), so the first stops; pressing the playing one stops it.
  * - Never over another player, both ways, through the module's audio-start event
@@ -190,7 +192,11 @@ export function useClipPlayer(opts: { onEnd?: (key: string) => void } = {}) {
     if (!a) return;
     clipRef.current = clip;
     keyRef.current = key;
-    if (a.getAttribute("src") !== clip.url) a.src = clip.url;
+    // The copy the page fetched ahead (useMediaPrefetch), else the file itself; a copy that failed
+    // is let go, and the file is asked for (a retry is a press, so it reaches here again).
+    const held = mediaSrc(clip.url);
+    const src = a.error && a.getAttribute("src") === held && held !== clip.url ? (discardMedia(clip.url), clip.url) : held;
+    if (a.getAttribute("src") !== src) a.src = src;
     else if (a.error) a.load(); // a file that failed is loaded anew (useSegmentPlayer revive)
     if (needsSeek(clip, a.currentTime * 1000)) a.currentTime = clipStartSeconds(clip);
     askedRef.current = true;

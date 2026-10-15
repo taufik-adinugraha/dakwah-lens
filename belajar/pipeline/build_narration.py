@@ -637,11 +637,13 @@ def split_line(text: str, max_len: int = V.MAX_LINE, measure=len) -> list[str]:
 # ------------------------------------------------------------------ the lines
 SHARED_TEXT = {
     # No "fatwa" here: the page footer carries "Dibantu AI, bukan fatwa otoritatif" (operator,
-    # 2026-10-10). Nothing promises a human review.
+    # 2026-10-10). Nothing promises a human review. Who voices what (operator 2026-10-15): whole
+    # ayat the imam, each word Quran.com's recording, a practice form no ayah has (al-maghḍūbu …:
+    # wordvoice.py) the AI narrator — kept one line under MAX_LINE (a split broke CI before).
     "start": ("Mari kita mulai. Anda cukup mendengarkan dan memperhatikan layar; pelajaran berjalan sendiri, "
-              "dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an dibacakan imam; kata per kata "
-              "disuarakan narator dengan suara kecerdasan buatan. "
-              "Penjelasan ini juga dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan "
+              "dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an dibacakan imam; suara kata per kata "
+              "dari rekaman Quran.com, kecuali bentuk latihan. "
+              "Penjelasan ini dan bentuk latihan dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan "
               "buatan dari kitab-kitab yang disebutkan sumbernya."),
     "resume": "Kita lanjutkan pelajaran dari langkah terakhir.",
     # A wrong pick is not voiced (operator 2026-10-10: "give narration/voice only for the correct

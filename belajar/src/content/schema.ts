@@ -117,8 +117,10 @@ export type Word = z.infer<typeof Word>;
 export const Recitation = z.object({
   /** The imam's id on EveryAyah: the only value there is. */
   reciter: z.enum(["Alafasy_128kbps"]),
-  /** Streamed, never re-hosted (plan §6.2). */
-  url: z.string().url(),
+  /** Our unaltered copy of the EveryAyah file of the ayah, same-origin (operator 2026-10-15: "we
+   *  copy to our server so latency is minimum"; pipeline/host_media.py pins it). Until then it was
+   *  streamed from EveryAyah (plan §6.2). */
+  url: z.string().regex(/^\/belajar\/media\/narration\/alafasy\/\d{6}\.mp3$/),
   /** quran-align segments: [wordIndex (1-based), startMs, endMs]. */
   segments: z.array(z.tuple([z.number().int().positive(), z.number().int().nonnegative(), z.number().int().positive()])),
   credit: z.string(),
@@ -431,20 +433,23 @@ export type Root = z.infer<typeof Root>;
 
 /**
  * The imam's voice of one example a static page shows (operator 2026-10-12: "each explanation
- * should be followed by examples (visual + voice)"): Mishary Alafasy's recording of the ayah,
- * streamed from EveryAyah (never stored here), and the word's place in it, [start, end) in ms,
+ * should be followed by examples (visual + voice)"): Mishary Alafasy's recording of the ayah, our
+ * unaltered copy of the EveryAyah file (pipeline/host_media.py), and the word's place in it, [start, end) in ms,
  * from the pinned quran-align timings the lessons use. The browser seeks to `start` and stops at
  * `end` (src/hooks/useClipPlayer.ts). Built by pipeline/build_library.py (clips.py), checked by
  * pipeline/validate_clips.py.
  */
 export const Clip = z.object({
-  url: z.string().url().regex(/^https:\/\/everyayah\.com\/data\/Alafasy_128kbps\/\d{6}\.mp3$/),
+  url: z.string().regex(/^\/belajar\/media\/narration\/alafasy\/\d{6}\.mp3$/),
   start: z.number().int().nonnegative(),
   end: z.number().int().positive(),
   /** true (never false) when the clip's word is its ayah's last, from the ayah's word count: the
    *  imam stops there (waqf), so a final harakah or tanwin is not pronounced, and the page says so
    *  beside the button (src/lib/heard.ts). */
   last: z.boolean().optional(),
+  /** Set only on a WORD's recording (src/lib/wordvoice.ts, never in library.json): Quran.com's
+   *  word-by-word file or the AI narrator's — what the button says it plays. */
+  source: z.enum(["quran.com", "elevenlabs"]).optional(),
 });
 export type Clip = z.infer<typeof Clip>;
 

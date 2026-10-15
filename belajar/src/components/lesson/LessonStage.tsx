@@ -23,7 +23,7 @@ import { CaptionView } from "@/components/autoplay/CaptionView";
 import { EXERCISE_TITLE_KEY, GuidedExercise, type StageExerciseData } from "@/components/autoplay/GuidedExercise";
 import { type Offscreen, Spotlight } from "@/components/autoplay/Spotlight";
 import { SurahEndCard } from "@/components/autoplay/SurahEndCard";
-import { continueToAyah, PLAY_WORD_EVENT, useAutoplay } from "@/components/autoplay/useAutoplay";
+import { continueToAyah, type LessonMedia, PLAY_WORD_EVENT, useAutoplay } from "@/components/autoplay/useAutoplay";
 import { type SurahRef, useUpNext } from "@/components/autoplay/useUpNext";
 import { guideSelector } from "@/components/exercises/guide";
 import { MixedText } from "@/components/library/MixedText";
@@ -243,6 +243,7 @@ export function LessonStage({
   marks = null,
   lessonMap = null,
   leads = {},
+  media,
 }: {
   seq: AutoplaySequence;
   /** Page title, also the lock-screen title (Media Session). */
@@ -269,6 +270,8 @@ export function LessonStage({
   lessonMap?: LessonMapInput | null;
   /** Lesson zero's slides, by step id ("concept:<id>:lead"): the cards each shows (content/curriculum.json). */
   leads?: Readonly<Record<string, CurriculumLead>>;
+  /** The recordings fetched ahead: this lesson's and the next ayah's (src/lib/media-prefetch.ts). */
+  media?: LessonMedia;
 }) {
   const t = useTranslations("Guided");
   const tp = useTranslations("Player");
@@ -276,7 +279,7 @@ export function LessonStage({
   /** The word card's "yang artinya “…”", its gloss emphasised (glossSlot). */
   const cardMeaning = (gloss: string) => glossSlot((g) => t("card_meaning", { gloss: g }), gloss);
   const uid = useId();
-  const ap = useAutoplay(seq, source, title);
+  const ap = useAutoplay(seq, source, title, media);
   const { state, view, actions, player: p } = ap;
   const upNext = useUpNext(following);
   // "Mulai" clicked and its first line not heard yet: the stage before "Mulai" stays, its button
@@ -532,7 +535,7 @@ export function LessonStage({
           >
             <LoadingMark className="mt-0.5 text-forest" />
             <span className="min-w-0 text-pretty">
-              {ln.slow ? t("loading_slow") : ln.kind === "narration" ? t("loading_narration") : t("loading_recitation")}
+              {ln.slow ? t("loading_slow") : ln.kind === "narration" ? t("loading_narration") : ln.kind === "word" ? t("loading_word") : t("loading_recitation")}
             </span>
           </p>
         </div>
@@ -553,6 +556,9 @@ export function LessonStage({
       data-example={beat?.beat.id}
       data-example-state={beatState ?? undefined}
       data-example-clip={beat?.beat.key}
+      // What the page fetches ahead for this lesson (src/lib/media-prefetch.ts), for the CI check
+      // that every file of it is asked for before "Mulai" (screenshots.mjs warmupChecks).
+      data-media-plan={media?.ayah.join(" ") || undefined}
       className="stage-card scroll-mt-2 overflow-x-clip"
     >
       <h2 id={`${uid}-guided`} className="sr-only">

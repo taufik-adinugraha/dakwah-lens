@@ -1,0 +1,197 @@
+{
+ "_comment": "Written by pipeline/host_media.py --fetch: the pins of our unaltered copies of Mishary Rashid Alafasy's recitation (EveryAyah), one per ayah the content plays. Quran.com's word files are pinned in content/wordvoice.json. Never edited by hand.",
+ "alafasy": {
+  "001001.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/001001.mp3",
+   "sha256": "8808f3fc313d9df87b6090ee9efc8c11859da58b0100ad92621c5ee9a93d7280",
+   "bytes": 146830,
+   "ms": 6087
+  },
+  "001002.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/001002.mp3",
+   "sha256": "7056ff0c287ee428272e12d16fb8f10b2786487f5d553841a828396750906b6b",
+   "bytes": 89988,
+   "ms": 5590
+  },
+  "001003.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/001003.mp3",
+   "sha256": "3bd5bb13dcdf6ab178b6c6cb2810ad2aaac8d4dfb371e553ca78021f56c93abd",
+   "bytes": 74523,
+   "ms": 4624
+  },
+  "001004.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/001004.mp3",
+   "sha256": "dca0c09844dd0e9ebf558b25a24352ae8517a9543094d0b1380e962b2bac201a",
+   "bytes": 74941,
+   "ms": 4650
+  },
+  "001005.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/001005.mp3",
+   "sha256": "7828eb8f7400b04181d2c08885b9409dbe18037e4e4cfa08153692f25bb252fd",
+   "bytes": 107960,
+   "ms": 6713
+  },
+  "001006.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/001006.mp3",
+   "sha256": "44afd93fa73f7fe363c75146a9b28c59a2cbdbf70bfb7ed71d823ed51c5b6327",
+   "bytes": 89988,
+   "ms": 5590
+  },
+  "001007.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+   "sha256": "6165fc6954e63686f556a8049c0d5231d6dbe812158da9b63e6d5f7191b1320e",
+   "bytes": 212450,
+   "ms": 13244
+  },
+  "002005.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/002005.mp3",
+   "sha256": "569b576358b0256c8ed63f47640970d42a0f54e6f5a314ee9f645d08570f1a02",
+   "bytes": 182357,
+   "ms": 11363
+  },
+  "005023.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/005023.mp3",
+   "sha256": "c107b1dbdae8327a932b19f74fda1d88174b7801e1585b839ccc61c82e44df67",
+   "bytes": 441491,
+   "ms": 27559
+  },
+  "006126.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/006126.mp3",
+   "sha256": "53eeb8fbf36fd9962d92533744a13fec5f551694a353bc61e6e47ec80909ecbd",
+   "bytes": 223317,
+   "ms": 13923
+  },
+  "020005.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/020005.mp3",
+   "sha256": "4560957518691ba684877daf25f3cfa78352e42cd43fc32ee53161438f68831d",
+   "bytes": 72016,
+   "ms": 4467
+  },
+  "026024.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/026024.mp3",
+   "sha256": "6e1a0b9b1fb8ce74d9edee933eb13f0aca3655a0029ee0f79e48aa8c2035cea3",
+   "bytes": 218301,
+   "ms": 13610
+  },
+  "037020.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/037020.mp3",
+   "sha256": "3455de258c5478c32de0223e70d7191c6a9d1e8ef15c360c3cd309d04f60772d",
+   "bytes": 125932,
+   "ms": 7837
+  },
+  "041009.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/041009.mp3",
+   "sha256": "37d2592607e86e4b8b2f576616d893f947a83f5cac900adbb3f0f9ac264a626b",
+   "bytes": 288100,
+   "ms": 17972
+  },
+  "055078.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/055078.mp3",
+   "sha256": "183d46bffe47502417a0fc4cdd979ad4fbe77b78947a84de2c2460faeb485063",
+   "bytes": 164802,
+   "ms": 10266
+  },
+  "074010.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/074010.mp3",
+   "sha256": "8727bbed7871c9162e6439ff2afd1eae35673e4b787226904db27a0a604fa941",
+   "bytes": 91242,
+   "ms": 5669
+  },
+  "097005.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/097005.mp3",
+   "sha256": "5cc50e32e57e1c9cd603d65622f214b1c9fd85a3971aa70a41f88702e151352d",
+   "bytes": 84136,
+   "ms": 5224
+  },
+  "112001.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/112001.mp3",
+   "sha256": "8166d4ae6fbdae1748e215d5b31dbbf246530da0e849f1488ac35316488f1caf",
+   "bytes": 48192,
+   "ms": 2978
+  },
+  "112002.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/112002.mp3",
+   "sha256": "52fd57829c924926152df2175343d115aecbf3b83632f853cb94356697421eee",
+   "bytes": 41087,
+   "ms": 2534
+  },
+  "112003.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/112003.mp3",
+   "sha256": "b50ce19c51314817e9a4885de55ad332a19585e0e221dbec86b98405a08400c4",
+   "bytes": 48192,
+   "ms": 2978
+  },
+  "112004.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/112004.mp3",
+   "sha256": "67a565d4951ff5956a8299eb84cf57b5e0d44374dba8e24c9f0175cb4309b68e",
+   "bytes": 78285,
+   "ms": 4859
+  },
+  "113001.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/113001.mp3",
+   "sha256": "36b36414695bfc69cf038c2060bcd73c4845cd6cce1fb8179de3ce43718b58d0",
+   "bytes": 56133,
+   "ms": 3474
+  },
+  "113002.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/113002.mp3",
+   "sha256": "4ca15d21ebe9888142d29c3580bf62a9062513c04f4c7f222a89a00676252943",
+   "bytes": 58641,
+   "ms": 3631
+  },
+  "113003.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/113003.mp3",
+   "sha256": "e0ee7929798463fdf1c41c93204bb1917f1304819d76cd6911c6d3df773de1a4",
+   "bytes": 81211,
+   "ms": 5042
+  },
+  "113004.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/113004.mp3",
+   "sha256": "aa34657feaf7ea666ec62f253d2458b98c3cb01835f8c915da0b58ef4c87ed2c",
+   "bytes": 96675,
+   "ms": 6008
+  },
+  "113005.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/113005.mp3",
+   "sha256": "c83d3988ef8809ea0bfd107f62732d1e9b8697bb26ee8004ea514b9301389fe8",
+   "bytes": 91242,
+   "ms": 5669
+  },
+  "114001.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/114001.mp3",
+   "sha256": "85f84b7f45d8249a94265f5453997a3e55fc027763114b8df91b15fa39c0e484",
+   "bytes": 98347,
+   "ms": 6113
+  },
+  "114002.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/114002.mp3",
+   "sha256": "522638668af16887a5a514d92903c1172d8afa28622eeb90f7d8550b56c6eae2",
+   "bytes": 84972,
+   "ms": 5277
+  },
+  "114003.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/114003.mp3",
+   "sha256": "b07db0b577e3f14304b7279cea34c9b261fe55d6a31c58e33657279d19ec1309",
+   "bytes": 86226,
+   "ms": 5355
+  },
+  "114004.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/114004.mp3",
+   "sha256": "3a3ae4ed53b7cf5123c5bf01842be316657c509e4306ae3f7270e8fb612fb8e9",
+   "bytes": 128440,
+   "ms": 7993
+  },
+  "114005.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/114005.mp3",
+   "sha256": "bbc6d4bdabc7350738bba1309eaed60389de12c9e8284de316878318b8f32ec1",
+   "bytes": 127186,
+   "ms": 7915
+  },
+  "114006.mp3": {
+   "upstream": "https://everyayah.com/data/Alafasy_128kbps/114006.mp3",
+   "sha256": "99047f038edf3db4ce4914f0d935d46693f8b95ca00316ecf2457002e457c2f9",
+   "bytes": 132620,
+   "ms": 8255
+  }
+ }
+}

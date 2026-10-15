@@ -101,7 +101,7 @@ LIBRARY = CONTENT_DIR / "library.json"
 # validate_curriculum.py checks it; until this line this validator took it for a surah nobody
 # registered — found on the first run with the corpus cache after it was added, CI running
 # neither). And the cheat sheet (content/rumus.json, 2026-10-14: build_rumus.py, validate_rumus.py).
-NOT_LESSONS = {LIBRARY.name, "curriculum.json", "rumus.json"}
+NOT_LESSONS = {LIBRARY.name, "curriculum.json", "rumus.json", "wordvoice.json"}
 CONTENT_TS_PATH = CONTENT_TS
 ROUTES_TS_PATH = ROUTES_TS
 AUTHORED = PIPELINE / "authored"
@@ -966,7 +966,7 @@ def check_lesson(spec, data: dict, ctx: dict) -> tuple[list[tuple[str, str]], se
                 fail(f"{rp}: no duration probe in sources.json")
             elif segs and segs[-1][2] > probe["duration_ms"]:
                 fail(f"{rp}: last segment ends after the streamed file ({segs[-1][2]} > {probe['duration_ms']} ms)")
-            if rc["url"] != f"https://everyayah.com/data/{RECITER}/{s:03d}{a:03d}.mp3":
+            if rc["url"] != f"/belajar/media/narration/alafasy/{s:03d}{a:03d}.mp3":  # our copy (host_media.py)
                 fail(f"{rp}: unexpected url {rc['url']}")
             if "quran-align (CC BY 4.0)" not in rc["credit"]:
                 fail(f"{rp}: credit line lacks the quran-align attribution")

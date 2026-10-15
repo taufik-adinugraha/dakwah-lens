@@ -6,6 +6,7 @@ import { type AudioLoading, mediaLoading, type MediaEventType } from "@/lib/auto
 import { atClipEnd, clipStartSeconds, endTimerMs, needsSeek } from "@/lib/clips";
 import type { ExampleClip } from "@/lib/autoplay/types";
 
+import { discardMedia, mediaSrc } from "./useMediaPrefetch";
 import { AUDIO_START_EVENT, isBlocked, type PlaybackRate, type PlayError } from "./useSegmentPlayer";
 
 /** play() rejects with AbortError when a new file or a pause interrupts it: routine. */
@@ -97,14 +98,17 @@ export type ExampleHandlers = {
  * - `warm(url)`: fetches a recording ahead of its clip, into this very element (when: warm.ts
  *   exampleToWarm). Nothing plays, nothing is reported.
  * - `loading`: from the moment a clip is asked for until it is heard, and while it stalls
- *   (loading.ts, kind "narration"): the stage says "Memuat suara narator…" once it lasts.
+ *   (loading.ts, kind "word" for a Quran.com recording, "narration" for the AI narrator's): the
+ *   stage says "Memuat suara kata…" / "Memuat suara narator…" once it lasts — in normal use never,
+ *   the page having fetched the lesson's word files ahead (useMediaPrefetch).
  *   `flowing()`: the clip is sounding right now (the lesson gives up on an example that does not
  *   start, timing.ts EXAMPLE_LOAD_LIMIT_MS).
  * - One recording at a time on the page (AUDIO_START_EVENT): starting pauses every other player,
  *   and another player starting stops the clip (`onInterrupted`).
  * - `rate`: the learner's speed for the imam ("Kecepatan imam"), pitch preserved.
- * - Nothing is cut, copied or stored: the recording streams from the reciter's host, and when the
- *   page goes the element lets go of it (no further fetch).
+ * - Nothing is cut or re-encoded: the file is ours (the narrator's, or our unaltered copy of
+ *   Quran.com's, same-origin), played from the page's copy when it holds one (useMediaPrefetch);
+ *   when the page goes the element lets go of it (no further fetch).
  */
 export function useExamplePlayer(opts: { rate?: PlaybackRate } = {}) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -131,7 +135,9 @@ export function useExamplePlayer(opts: { rate?: PlaybackRate } = {}) {
       timer = null;
     };
     const load = (type: MediaEventType) => {
-      const at = { kind: "narration" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
+      // A Quran.com word loads as "the word's sound", the AI narrator's as the narrator's.
+      const kind = currentRef.current?.clip.source === "quran.com" ? ("word" as const) : ("narration" as const);
+      const at = { kind, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
       setLoading((prev) => mediaLoading(prev, type, at));
     };
     /** Ends the clip playing now: its handlers are dropped first, so nothing reports twice. */
@@ -255,7 +261,14 @@ export function useExamplePlayer(opts: { rate?: PlaybackRate } = {}) {
 
   /** Points the element at `url` (a new file resets the speed: put back). */
   const point = useCallback((a: HTMLAudioElement, url: string) => {
-    if (a.getAttribute("src") !== url) a.src = url;
+    // The copy the page fetched ahead (useMediaPrefetch), else the file; a copy the element failed
+    // on is let go, and the file itself is asked for.
+    let src = mediaSrc(url);
+    if (a.error && src !== url && a.getAttribute("src") === src) {
+      discardMedia(url);
+      src = url;
+    }
+    if (a.getAttribute("src") !== src) a.src = src;
     else if (a.error) a.load(); // a file that failed is loaded anew (useSegmentPlayer revive)
     a.playbackRate = rateRef.current;
     a.preservesPitch = true;
@@ -344,7 +357,7 @@ export function useExamplePlayer(opts: { rate?: PlaybackRate } = {}) {
         pendingWarmRef.current = url;
         return;
       }
-      if (a.getAttribute("src") === url && !a.error) {
+      if ((a.getAttribute("src") === url || a.getAttribute("src") === mediaSrc(url)) && !a.error) {
         a.preload = "auto";
         return;
       }

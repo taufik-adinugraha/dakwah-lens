@@ -97,7 +97,7 @@ CASES = [
      lambda d: d["clips"].__setitem__("1:1", d["clips"]["1:1:1"]), "key must be s:a:w"),
     # --- 2. each clip
     ("url-of-another-ayah", "library",
-     lambda d: d["clips"]["1:1:2"].update(url="https://everyayah.com/data/Alafasy_128kbps/001002.mp3"),
+     lambda d: d["clips"]["1:1:2"].update(url="/belajar/media/narration/alafasy/001002.mp3"),
      "is not Alafasy_128kbps's file of 1:1"),
     ("url-of-another-reciter", "library",
      lambda d: d["clips"]["1:1:2"].update(url="https://everyayah.com/data/Husary_Muallim_128kbps/001001.mp3"),
@@ -137,14 +137,14 @@ CASES = [
      "the page shows"),
     # --- 4. an ayah without a lesson: the committed fixture (corpus-free, so CI catches these too)
     ("outside-clip-next-word", "library", lambda d: d["clips"]["5:23:6"].update(start=5250, end=6050),
-     "clips[5:23:6]: {'url': 'https://everyayah.com/data/Alafasy_128kbps/005023.mp3', 'start': 5250, 'end': 6050} is not "
+     "clips[5:23:6]: {'url': '/belajar/media/narration/alafasy/005023.mp3', 'start': 5250, 'end': 6050} is not "
      "the clip the fixture's quran-align entry of 5:23 gives"),
     ("outside-run-shifted", "library", lambda d: d["clips"]["55:78:1-2"].update(start=1060),
      "is not the clip the fixture's quran-align entry of 55:78 gives"),
     ("outside-clip-off-by-10ms", "library", lambda d: d["clips"]["97:5:1"].update(end=d["clips"]["97:5:1"]["end"] + 10),
      "is not the clip the fixture's quran-align entry of 97:5 gives"),
     ("outside-clip-other-ayah-file", "library",
-     lambda d: d["clips"]["26:24:2"].update(url="https://everyayah.com/data/Alafasy_128kbps/026023.mp3"),
+     lambda d: d["clips"]["26:24:2"].update(url="/belajar/media/narration/alafasy/026023.mp3"),
      "is not Alafasy_128kbps's file of 26:24"),
     ("outside-bytes-another-token", "library", lambda d: d["quran"].__setitem__("2:5:2", d["quran"]["1:1:1"]),
      "but the fixture's Tanzil token(s) at the clip's index are"),
@@ -274,7 +274,7 @@ class TestClipRules(unittest.TestCase):
         self.assertFalse(C.is_last(55, 78, 6))  # no lesson: its count comes from the Tanzil line
 
     def test_plausible_lengths(self):
-        url = "https://everyayah.com/data/Alafasy_128kbps/001007.mp3"
+        url = "/belajar/media/narration/alafasy/001007.mp3"  # our copy of EveryAyah's file (host_media.py)
         ok = lambda key, start, end, **kw: C.clip_problems(key, {"url": url, "start": start, "end": end, **kw}) == []
         self.assertTrue(ok("1:7:9", 6640, 12320, last=True))  # 5,680 ms, the ayah's last word
         self.assertFalse(ok("1:7:9", 6640, 12320))  # the same length without `last`: the 4 s cap

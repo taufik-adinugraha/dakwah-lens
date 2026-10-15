@@ -61,7 +61,9 @@ OTHER_RECITER = "Husary_Muallim_128kbps"
 def second_reciter(ay) -> dict:
     """A recitation entry of another reciter for `ay`, shaped as the lessons shipped one."""
     imam = ay["recitation"][0]
-    return {"reciter": OTHER_RECITER, "url": imam["url"].replace(imam["reciter"], OTHER_RECITER),
+    # our copy's address names the imam (".../alafasy/SSSAAA.mp3", host_media.py): another reciter's
+    # file is EveryAyah's of that reciter
+    return {"reciter": OTHER_RECITER, "url": f"https://everyayah.com/data/{OTHER_RECITER}/{imam['url'].rsplit('/', 1)[1]}",
             "segments": copy.deepcopy(imam["segments"]),
             "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · "
                       "Word timings: Collin Fair, quran-align (CC BY 4.0)"}
@@ -265,7 +267,12 @@ MULTI = [
      lambda d: set_(ayah(d, 1), "recitation", []), "no recitation"),
     ("the imam's entry streams another reciter's file", "surah",
      lambda d: set_(ayah(d, 1)["recitation"][0], "url",
-                    ayah(d, 1)["recitation"][0]["url"].replace("Alafasy_128kbps", OTHER_RECITER)), "unexpected url"),
+                    f"https://everyayah.com/data/{OTHER_RECITER}/001001.mp3"), "unexpected url"),
+    ("the imam's entry streams EveryAyah's file instead of our copy", "surah",
+     lambda d: set_(ayah(d, 1)["recitation"][0], "url",
+                    "https://everyayah.com/data/Alafasy_128kbps/001001.mp3"), "unexpected url"),
+    ("the imam's entry names our copy of another ayah", "surah",
+     lambda d: set_(ayah(d, 1)["recitation"][0], "url", "/belajar/media/narration/alafasy/001002.mp3"), "unexpected url"),
     ("the imam's entry carries another reciter's credit line", "surah",
      lambda d: set_(ayah(d, 1)["recitation"][0], "credit", second_reciter(ayah(d, 1))["credit"]),
      "credit line lacks the imam's attribution pinned in sources.json"),

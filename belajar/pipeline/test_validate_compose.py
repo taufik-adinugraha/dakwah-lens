@@ -247,7 +247,7 @@ MUTATIONS = [
     ("a fixture line that is not the Tanzil line", in_fixture(swap_fixture_words), "41:9 is not the pinned Tanzil line", True),
     ("a derived form's voice that is not the build's choice (another place of the same bytes)",
      voice("1:7:5", lambda e: e.update(loc="4:95:6", key="4:95:6", clip={
-         "url": "https://everyayah.com/data/Alafasy_128kbps/004095.mp3", "start": 4430, "end": 5020})),
+         "url": "/belajar/media/narration/alafasy/004095.mp3", "start": 4430, "end": 5020})),
      "differs from a fresh build_compose.py run", True),
 ]
 

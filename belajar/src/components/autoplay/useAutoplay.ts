@@ -4,6 +4,8 @@ import { useCallback, useEffect, useReducer, useRef, useState, useSyncExternalSt
 import { preconnect } from "react-dom";
 
 import { useExamplePlayer } from "@/hooks/useExamplePlayer";
+import { subscribeMedia, useMediaPrefetch } from "@/hooks/useMediaPrefetch";
+import { nextAyahDue } from "@/lib/media-prefetch";
 import { useNarrationPlayer } from "@/hooks/useNarrationPlayer";
 import { readPace, useImamRate, usePace } from "@/hooks/usePace";
 import { useWakeLock } from "@/hooks/useWakeLock";
@@ -204,7 +206,12 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  *   (lock screen, earphones) play/pause/next/previous.
  * - Never scrolls the page.
  */
-export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, title: string) {
+/** The recordings fetched ahead for this lesson (src/lib/media-prefetch.ts): this ayah's plan and
+ *  the next ayah's (empty when there is no next ayah). Computed by the page on the server. */
+export type LessonMedia = { ayah: readonly string[]; next: readonly string[] };
+const NO_MEDIA: LessonMedia = { ayah: [], next: [] };
+
+export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, title: string, media: LessonMedia = NO_MEDIA) {
   const router = useRouter();
   const { pace, setPace: storePace } = usePace();
   const [imamRate, setImamRate] = useImamRate();
@@ -292,10 +299,9 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
   // 2026-10-14), at the learner's chosen speed.
   const examplePlayer = useExamplePlayer({ rate: imamRate });
   const { play: playExample, unlock: unlockExample, warm: warmExample, flowing: exampleFlowing, owns: ownsExample } = examplePlayer;
-  // The imam's recitation streams from the provider's CDN (next.config.ts RECITATION_HOSTS): a
-  // preconnect hint to its host (the connection set up ahead, operator 2026-10-11) — never a
-  // preload of the recording itself before "Mulai": learners on mobile data pay for every byte.
-  // React hoists it into <head>, once per origin.
+  // An absolute recording URL (another host) gets a preconnect hint to it (operator 2026-10-11).
+  // Since 2026-10-15 the imam's file is our same-origin copy (src/lib/media-prefetch.ts fetches it
+  // at idle), so there is no other origin and no hint; kept for a source on another host.
   const reciteUrl = source.url;
   const reciteOrigin = originOf(reciteUrl);
   if (reciteOrigin) preconnect(reciteOrigin);
@@ -614,6 +620,24 @@ export function useAutoplay(seq: AutoplaySequence, source: RecitationSource, tit
   // (nextLinePreload).
   const nextUrl = nextNarration(seq, state);
   const soundLoading = narrationLoading !== null || player.loading !== null || examplePlayer.loading !== null;
+
+  // ── The lesson's recordings, fetched before they are asked for ── (operator 2026-10-15: "just
+  // make sure no latency (preload before page is opened)"; rules: src/lib/media-prefetch.ts). At
+  // the first idle moment after the page opens — before "Mulai" — this ayah's recitation and every
+  // word and example file the lesson plays; from two thirds of the lesson on (or its end) the
+  // next ayah's, so the hand-off waits for nothing. A new fetch starts only while no sound the
+  // lesson asked for is loading and the narration line just started has been heard.
+  const lineHeard = state.activity?.kind !== "narrate" || heardFor === state.activity.token;
+  const mediaGate = !soundLoading && lineHeard;
+  const nextDue = nextAyahDue(state, seq.steps.length);
+  useMediaPrefetch({ ayah: media.ayah, next: nextDue ? media.next : [] }, mediaGate);
+  // The stage's element points at the ayah's file from its mount; once the page holds its copy
+  // (and nothing has been asked of the element yet), at the copy.
+  const { adopt } = player;
+  useEffect(() => {
+    adopt();
+    return subscribeMedia(adopt);
+  }, [adopt, source]);
   useEffect(() => {
     const p = prefetchRef.current;
     const conn = (navigator as Navigator & { connection?: ConnectionHints }).connection;

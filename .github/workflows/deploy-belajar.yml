@@ -338,11 +338,19 @@ jobs:
       - name: Example voices — validator mutation tests (corpus-free)
         run: python3 pipeline/test_validate_clips.py --no-corpus
       # One recording per Qur'anic word and form (pipeline/wordvoice.py): the manifest is derived
-      # from the lesson and library content, so a new word with no entry fails here.
+      # from the lesson and library content, so a new word with no entry fails here. A word at a
+      # place in the Qur'an plays Quran.com's word file (operator 2026-10-15), its place and file
+      # from the committed fixture (pipeline/fixtures/quran_com_words.json); --no-network: no
+      # Tanzil cache, no downloaded copies here (the local run checks both).
       - name: Word voices — manifest up to date
-        run: python3 pipeline/build_wordvoice.py --check --require-audio
+        run: python3 pipeline/build_wordvoice.py --check --require-audio --no-network
       - name: Word voices — planted-fault tests
         run: python3 pipeline/test_validate_wordvoice.py
+      # Our unaltered copies of the imam's ayat (EveryAyah) and of Quran.com's word files
+      # (pipeline/host_media.py): every hosted URL the content references is pinned and well
+      # named. Whether each file is ON THE SERVER is "Before a deploy" (README), never CI.
+      - name: Hosted recordings — every reference pinned
+        run: python3 pipeline/host_media.py --check --no-network
 
       # Ilmu Waris M1 (docs/waris-plan.md §10). Research-phase parity: the
       # belajar copies of the test vectors and of dalil.json must equal the
@@ -531,7 +539,10 @@ jobs:
           # the same check in surahs-smoke.mjs (oneImam); the open "Pengaturan" panel as a browser
           # draws it in screenshots.mjs (assertNoReciterChoice).
           page="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/1)"
-          grep -qF "https://everyayah.com/data/Alafasy_128kbps/001001.mp3" <<<"$page" || { echo "✗ ayah 1 page does not carry the imam's recording of its ayah"; exit 1; }
+          # Since 2026-10-15 the recording is our unaltered copy of his EveryAyah file
+          # (pipeline/host_media.py), and the page carries no EveryAyah file address at all.
+          grep -qF "/belajar/media/narration/alafasy/001001.mp3" <<<"$page" || { echo "✗ ayah 1 page does not carry the imam's recording of its ayah (our copy)"; exit 1; }
+          if grep -qF "everyayah.com/data/" <<<"$page"; then echo "✗ ayah 1 page carries an EveryAyah file address (lesson recordings are our copies)"; exit 1; fi
           for path in /belajar/id/quran/al-fatihah/1 /belajar/en/quran/al-fatihah/1 /belajar/id/kredit /belajar/en/kredit; do
             html="$(curl -fsS "http://127.0.0.1:3300${path}")"
             if grep -qiE "husary|mu.?allim|<select|data-reciter" <<<"$html"; then echo "✗ ${path}: offers or names a second reciter (one imam, plan L21)"; exit 1; fi

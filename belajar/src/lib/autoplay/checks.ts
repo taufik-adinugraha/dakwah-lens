@@ -501,16 +501,26 @@ export type ExampleContext = {
   zero?: boolean;
 };
 
-/** A recording of content/wordvoice.json: the narrator's file of a word, from its start, whole. */
+/** A recording of content/wordvoice.json: the narrator's file of a word, from its start, whole… */
 const VOICE_FILE = /^\/belajar\/media\/narration\/kang-nandar\/words\/[0-9a-f]{16}-[0-9a-f]{10}\.mp3$/;
+/** …or our unaltered copy of Quran.com's word file (operator 2026-10-15), the word inside it. */
+const QURAN_COM_FILE = /^\/belajar\/media\/narration\/quran-com\/wbw\/\d{3}_\d{3}_\d{3}\.mp3$/;
+
+/** A word recording as content/wordvoice.json hands it out (src/lib/wordvoice-core.ts voiceFrom):
+ *  the narrator's whole file, or the word inside a Quran.com file; never the imam's recitation. */
+export function isWordRecording(c: ExampleClip): boolean {
+  if (!Number.isInteger(c.start) || !Number.isInteger(c.end) || c.start < 0 || c.end <= c.start) return false;
+  if (c.source === "quran.com") return QURAN_COM_FILE.test(c.url);
+  return VOICE_FILE.test(c.url) && c.start === 0;
+}
 
 /**
  * Problems of one ayah's word voices (operator 2026-10-14: "for all quran word by word should be
  * replaced by this, not using truncated voice from imam"; empty when fine): every word of the
- * ayah has the narrator's recording of it (`voice`: content/wordvoice.json through
+ * ayah has its recording (Quran.com's or the narrator's; `voice`: content/wordvoice.json through
  * src/lib/wordvoice-core.ts voiceFrom) — a word without one is named, never played from the
  * imam's recitation instead — the sequence carries exactly that recording for it (wordVoices),
- * as a whole file of the narration media store, and every step that plays one word plays that
+ * as a word recording of the narration media store (isWordRecording), and every step that plays one word plays that
  * recording (the machine reads wordVoices; transitionProblem checks each activity it issues).
  */
 export function wordVoiceProblems(
@@ -528,8 +538,8 @@ export function wordVoiceProblems(
       out.push(`${where}: has no recording in content/wordvoice.json (a word heard on its own is the narrator's recording, never the imam's recitation cut at the word)`);
       return;
     }
-    if (!VOICE_FILE.test(own.url) || own.start !== 0 || !Number.isInteger(own.end) || own.end <= 0) {
-      out.push(`${where}: its recording ${JSON.stringify(own)} is not a whole file of the narration media store`);
+    if (!isWordRecording(own)) {
+      out.push(`${where}: its recording ${JSON.stringify(own)} is not a word recording of the narration media store`);
     }
     if (JSON.stringify(voices[i] ?? null) !== JSON.stringify(own)) out.push(`${where}: the sequence does not carry its recording`);
   });
@@ -612,7 +622,7 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
         }
       } else if (b.clip) {
         const c = b.clip;
-        if (!VOICE_FILE.test(c.url) || c.start !== 0 || !Number.isInteger(c.end) || c.end <= 0) {
+        if (!isWordRecording(c)) {
           out.push(`${w}: clip ${JSON.stringify(c)} is not a whole recording of content/wordvoice.json`);
         }
         const given = ctx.voice(d.ar);

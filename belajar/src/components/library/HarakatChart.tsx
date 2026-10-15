@@ -63,8 +63,13 @@ export function HarakatChart({
   words: Record<string, { ar: string; translit: string }>;
   labels: HarakatLabels;
 }) {
+  // The signs' example words, fetched ahead at idle in the chart's order.
+  const prefetch = signs.map((s) => {
+    const w = words[s.loc] ?? s.word;
+    return w?.ar ? wordVoice(w.ar)?.url : null;
+  });
   return (
-    <ClipPlayerProvider>
+    <ClipPlayerProvider prefetch={prefetch}>
       <ul className="grid gap-3 sm:grid-cols-2">
         {signs.map((s, i) => {
           const w = words[s.loc] ?? s.word;

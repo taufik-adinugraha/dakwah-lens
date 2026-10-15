@@ -25,15 +25,21 @@ import { stageSequence } from "./build";
 // Operator 2026-10-14: "for all quran word by word should be replaced by this, not using truncated
 // voice from imam … because in some parts the truncation are not clean". Every Qur'anic WORD the
 // lesson plays on its own — a word's opening step and "Pelan"'s second hearing, the ayah's last
-// word once more, an example beat on this ayah's word, Dengar dan klik's word — is the narrator Kang
-// Nandar's recording of it (content/wordvoice.json, an AI voice); the imam (Mishary Alafasy) recites
-// WHOLE ayat only. Pinned here over the lessons the page ships: what the sequence carries, what the
+// word once more, an example beat on this ayah's word, Dengar dan klik's word — is its own recording
+// (content/wordvoice.json): since 2026-10-15 Quran.com's word-by-word recording of a word at its place
+// (our unaltered copy), the narrator Kang Nandar's AI voice for a form no place has; the imam (Mishary
+// Alafasy) recites WHOLE ayat only. Pinned here over the lessons the page ships: what the sequence carries, what the
 // machine plays, and that a word without a recording fails the checks instead of falling back.
 
 const BELAJAR = fileURLToPath(new URL("../../../", import.meta.url));
 const read = (rel: string) => readFileSync(join(BELAJAR, rel), "utf8");
 const M = manifest as WordVoiceManifest;
 const VOICE_FILE = /^\/belajar\/media\/narration\/kang-nandar\/words\/[0-9a-f]{16}-[0-9a-f]{10}\.mp3$/;
+/** Our unaltered copy of Quran.com's file of a word at its place (operator 2026-10-15). */
+const QC_FILE = /^\/belajar\/media\/narration\/quran-com\/wbw\/\d{3}_\d{3}_\d{3}\.mp3$/;
+/** A word recording as content/wordvoice.json gives it: Quran.com's word inside its file, or the narrator's whole file. */
+const isWordRecording = (c: ExampleClip | null | undefined) =>
+  !!c && (c.source === "quran.com" ? QC_FILE.test(c.url) && c.start >= 0 && c.end > c.start : VOICE_FILE.test(c.url) && c.start === 0);
 const LESSON_SURAHS = ["al-fatihah", "al-ikhlas", "al-falaq", "an-nas"];
 
 const lessons = SURAHS.flatMap((s) => s.ayat.map((a) => ({ s, a, seq: stageSequence(s, a, "id") })));
@@ -86,8 +92,10 @@ describe("every word heard on its own is the narrator's recording of it, never t
       a.words.forEach((w, i) => {
         const v = seq.wordVoices[i];
         expect(v, w.loc).toEqual(wordVoice(w.ar));
-        expect(v?.url, w.loc).toMatch(VOICE_FILE);
-        expect(v?.start, w.loc).toBe(0);
+        // a lesson word stands at its place: Quran.com's recording of it (operator 2026-10-15)
+        expect(v?.source, w.loc).toBe("quran.com");
+        expect(v?.url, w.loc).toMatch(QC_FILE);
+        expect(isWordRecording(v), w.loc).toBe(true);
         // Never a file of the ayah's recitation.
         for (const r of a.recitation) expect(v?.url, w.loc).not.toBe(r.url);
       });
@@ -109,11 +117,10 @@ describe("every word heard on its own is the narrator's recording of it, never t
           expect(["recite_ayah", "recap"], `${a.loc} ${step.id}`).toContain(step.kind);
           continue;
         }
-        // A word (or an example beat's word / form): a whole recording of the narrator's.
+        // A word (or an example beat's word / form): a word recording — Quran.com's, or the narrator's whole file.
         expect(r.clip, `${a.loc} ${step.id}`).not.toBeNull();
-        expect(r.clip!.url, `${a.loc} ${step.id}`).toMatch(VOICE_FILE);
-        expect(r.clip!.url, `${a.loc} ${step.id}`).not.toMatch(/everyayah/);
-        expect(r.clip!.start, `${a.loc} ${step.id}`).toBe(0);
+        expect(isWordRecording(r.clip), `${a.loc} ${step.id} ${r.clip!.url}`).toBe(true);
+        expect(r.clip!.url, `${a.loc} ${step.id}`).not.toMatch(/everyayah|alafasy/);
         if (r.target === "word") {
           words++;
           expect(r.clip, `${a.loc} ${step.id} word ${r.word}`).toEqual(seq.wordVoices[r.word - 1]);

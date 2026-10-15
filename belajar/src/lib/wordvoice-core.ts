@@ -1,13 +1,16 @@
 /**
  * The voice of a Qur'anic word or form (operator 2026-10-14: "for all quran word by word should be
  * replaced by this, not using truncated voice from imam … because in some parts the truncation are
- * not clean"). One recording per word, by the narrator Kang Nandar (eleven_multilingual_v2), the
- * word written in PLAIN LETTERS — pipeline/wordvoice.py is the builder and the long explanation of
- * why; content/wordvoice.json the result. Pure: no React, no DOM.
+ * not clean"). One recording per word: since 2026-10-15 (operator: the narrator's word takes were
+ * "still lacking"; "use quran.com, mention the credit") Quran.com's word-by-word recording of every
+ * text that is a word at a real place in the Qur'an, and the narrator Kang Nandar's
+ * (eleven_multilingual_v2, the word written in PLAIN LETTERS) for the rest — pipeline/wordvoice.py
+ * is the builder and the long explanation of why; content/wordvoice.json the result. Pure: no
+ * React, no DOM.
  *
  * The pure part (no JSON import): the rule and the lookup, for the example engine and its checker.
- * A recording is handed out as a `Clip` {url, start: 0, end: ms}, the shape the page's clip player
- * already plays (src/hooks/useClipPlayer.ts), so nothing downstream learns a new kind of source.
+ * A recording is handed out as a `Clip` {url, start, end, source}, the shape the page's clip player
+ * already plays (src/hooks/useClipPlayer.ts); `source` only tells the buttons what to call it.
  */
 import type { Clip } from "@/content/schema";
 
@@ -48,12 +51,29 @@ export function plainLetters(text: string): string {
   return out.replaceAll("\u0650\u0649", "\u0650\u064a").replace(/\u0629(?=[\u064b-\u0650])/gu, "\u062a");
 }
 
-export type WordVoiceEntry = { audio?: { url: string; ms: number; sha256: string } };
+/** Where a word's recording comes from (pipeline/wordvoice.py, operator 2026-10-15): Quran.com's
+ *  word-by-word recording of the word's place in the Qur'an (copied unaltered to our media store),
+ *  or the narrator Kang Nandar's AI voice (ElevenLabs) for a part of a word, a letter, a teaching
+ *  form or a run — what each word button says it plays ("Rekaman Quran.com" / "suara AI"). */
+export type VoiceSource = "quran.com" | "elevenlabs";
+
+export type WordVoiceEntry = {
+  source?: VoiceSource;
+  loc?: string;
+  audio?: { url: string; ms: number; sha256: string; start?: number; end?: number; upstream?: string };
+};
 export type WordVoiceManifest = { words: Readonly<Record<string, WordVoiceEntry>> };
 
-/** The recording of `ar` (any Uthmani string of the content), as a Clip; null: none yet. */
+/** The recording of `ar` (any Uthmani string of the content), as a Clip; null: none yet. A
+ *  Quran.com file plays the word inside it, [start, end] (its silence left out, the file itself
+ *  unaltered); the narrator's file is the word alone, from 0 to its length. */
 export function voiceFrom(manifest: WordVoiceManifest, ar: string): Clip | null {
-  const a = manifest.words[plainLetters(ar)]?.audio;
-  return a ? { url: a.url, start: 0, end: a.ms } : null;
+  const e = manifest.words[plainLetters(ar)];
+  const a = e?.audio;
+  if (!a) return null;
+  if (e.source === "quran.com") return { url: a.url, start: a.start ?? 0, end: a.end ?? a.ms, source: "quran.com" };
+  return { url: a.url, start: 0, end: a.ms, source: "elevenlabs" };
 }
 
+/** The recording is Quran.com's (a word at its place in the Qur'an), not the AI narrator's. */
+export const isQuranCom = (c: { source?: VoiceSource } | null | undefined): boolean => c?.source === "quran.com";

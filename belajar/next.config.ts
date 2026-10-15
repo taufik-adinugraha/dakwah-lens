@@ -14,14 +14,15 @@ const isProd = process.env.NODE_ENV === "production";
  * its own line of defence: an XSS here could make credentialed requests to the
  * main app. Keep it strict and free of user-generated HTML.
  *
- * media-src: recitation is STREAMED from the reciters' CDNs (stream-only until
- * we own a recording — plan §6.2); everything else is same-origin.
+ * media-src: same-origin for every recording the lessons and the Konsep pages
+ * play — since 2026-10-15 the imam's ayat (EveryAyah) and the word recordings
+ * (Quran.com) are our unaltered copies under /belajar/media/narration/
+ * (operator: "we copy to our server so latency is minimum";
+ * pipeline/host_media.py). The one exception is the fact cards' ayah popup
+ * (src/lib/ayah.ts), which can open any of 1,629 ayat and still streams them
+ * from EveryAyah. Quran.com's hosts are no longer listed: nothing plays from them.
  */
-const RECITATION_HOSTS = [
-  "https://everyayah.com",
-  "https://verses.quran.com",
-  "https://audio.qurancdn.com",
-];
+const RECITATION_HOSTS = ["https://everyayah.com"];
 
 const csp = [
   "default-src 'self'",
