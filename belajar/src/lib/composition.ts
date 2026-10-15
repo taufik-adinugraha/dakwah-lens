@@ -268,6 +268,22 @@ export function unitProblems(
         if (!fr.tiles.some((t) => (get(t) ?? "").includes(c))) out.push(`${f}: no example carries the ${m}`);
       }
     }
+    // The letter before its mark, then the same letter with it (operator 2026-10-15: "Contohnya huruf
+    // ba'" over ب, then "jika dibaca kasrah, maka terdengar bi" over بِ; pipeline/compose.py bare_problems).
+    if (fr.stage === "bare") {
+      const ms = (fr.marks ?? []).map((m) => MARKS[m as MarkName]).filter(Boolean);
+      const next = u.frames[i + 1];
+      if (!fr.tiles.length) out.push(`${f}: a bare frame shows the letter before its mark`);
+      if (fr.tiles.some((t) => ms.some((c) => (get(t) ?? "").includes(c)))) out.push(`${f}: a bare letter already carries its mark`);
+      if (!next || next.stage !== "mark" || JSON.stringify(next.marks ?? []) !== JSON.stringify(fr.marks ?? [])) {
+        out.push(`${f}: a bare frame is followed by the mark frame of the same marks`);
+      } else if (
+        next.tiles.length !== fr.tiles.length ||
+        next.tiles.some((t, k) => withoutMarks(get(t) ?? "", ms) !== get(fr.tiles[k]))
+      ) {
+        out.push(`${f}: the next frame's letters are not its bare letters with the mark put on`);
+      }
+    }
     if (!u.lines.some((l) => l.frame === i + 1)) out.push(`${f}: no line is said while it shows`);
   });
   // Lines follow the frames in order.
@@ -279,6 +295,16 @@ export function unitProblems(
     const last = u.frames[u.frames.length - 1];
     const shown = last.tiles.map((t) => get(t) ?? "").join("");
     if (shown !== wordAr) out.push(`${where}: the last frame shows ${shown}, not the word ${wordAr}`);
+  }
+  return out;
+}
+
+/** `ar` with one of each mark taken off (the letter before them), or null when one is missing. */
+function withoutMarks(ar: string, marks: readonly string[]): string | null {
+  let out = ar;
+  for (const c of marks) {
+    if (!out.includes(c)) return null;
+    out = out.replace(c, "");
   }
   return out;
 }

@@ -29,8 +29,9 @@ import { Clip, ReviewStatus, SourceRef, WordLoc } from "./schema";
 export const ComposeMark = z.enum(["fathah", "kasrah", "dhammah", "fathatain", "dhammatain", "kasratain", "sukun", "shaddah", "small_alif"]);
 export type ComposeMark = z.infer<typeof ComposeMark>;
 
-/** parts · base · change · join · drop · whole (a word); overview · mark (the primer). */
-export const ComposeStage = z.enum(["parts", "base", "change", "join", "drop", "whole", "overview", "mark"]);
+/** parts · base · change · join · drop · whole (a word); overview · bare · mark (the primer: `bare`
+ *  shows the letter before the mark, the `mark` frame after it the same letter with it). */
+export const ComposeStage = z.enum(["parts", "base", "change", "join", "drop", "whole", "overview", "bare", "mark"]);
 export type ComposeStage = z.infer<typeof ComposeStage>;
 
 export const ComposeForm = z.object({

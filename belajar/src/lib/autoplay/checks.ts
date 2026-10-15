@@ -249,7 +249,7 @@ export function sequenceProblems(
     ayah: Pick<Ayah, "words" | "structure">;
     last: boolean;
     exercises: readonly ExerciseKey[];
-    introduced: readonly { id: string }[];
+    introduced: readonly { id: string; lead?: unknown }[];
     compose?: ComposeInput | null;
     /** This ayah's lesson map (plan L23), or null / absent: its surah has none. */
     map?: LessonMapInput | null;
@@ -351,8 +351,20 @@ export function sequenceProblems(
     const i = firstAfter(k);
     if (i !== -1 && i < lastWord) out.push(`${k} comes before the words are explained`);
   }
-  const concepts = steps.filter((s) => s.kind === "concept").map((s) => s.id);
+  // A step's slide before its line (lesson zero: kalimah is not the Indonesian kalimat, operator
+  // 2026-10-15) is a concept step "concept:<id>:lead" right before "concept:<id>", one line.
+  const isLead = (s: AutoplayStep) => s.kind === "concept" && s.id.endsWith(":lead");
+  const concepts = steps.filter((s) => s.kind === "concept" && !isLead(s)).map((s) => s.id);
   if (JSON.stringify(concepts) !== JSON.stringify(ctx.introduced.map((c) => `concept:${c.id}`))) out.push("concept steps differ from the steps the curriculum teaches here");
+  const leads = steps.filter(isLead).map((s) => s.id);
+  const wantLeads = zero ? ctx.introduced.filter((c) => c.lead).map((c) => `concept:${c.id}:lead`) : [];
+  if (JSON.stringify(leads) !== JSON.stringify(wantLeads)) out.push(`slide steps ${JSON.stringify(leads)} are not lesson zero's slides of its steps ${JSON.stringify(wantLeads)}`);
+  for (const id of leads) {
+    const at = steps.findIndex((s) => s.id === id);
+    const s = steps[at];
+    if (steps[at + 1]?.id !== id.slice(0, -":lead".length)) out.push(`${id}: a slide is the step right before its concept's line`);
+    if (s.cues.length !== 1 || s.cues[0].line !== `${seq.slug}:${seq.ayah}:${id}`) out.push(`${id}: a slide is its one line`);
+  }
   const ex = steps.filter((s) => s.kind === "exercise").map((s) => s.exercise?.key);
   if (JSON.stringify(ex) !== JSON.stringify([...ctx.exercises])) out.push(`exercise steps ${JSON.stringify(ex)} differ from the page's ${JSON.stringify(ctx.exercises)}`);
   // The sentence structure (operator 2026-10-13): told item by item where the ayah has items —
@@ -405,7 +417,13 @@ export function sequenceProblems(
     }
     if (JSON.stringify(s.lines) !== JSON.stringify(s.cues.map((c) => c.line))) out.push(`${s.id}: lines differ from cues`);
     if (s.kind !== "recite_word" && s.kind !== "example" && s.cues.length === 0) out.push(`${s.id}: no narration line`);
-    if (s.kind === "example" && (s.cues.length > 0 || !s.examples?.length)) out.push(`${s.id}: an example step is its example beats and nothing else`);
+    // An example step is its beats; in lesson zero each beat may come with the narrator's line about it
+    // ("<id>:<k>", said before its beat k; operator 2026-10-15), one line per beat.
+    const explained = zero && s.cues.length > 0 && s.cues.length === (s.examples?.length ?? 0) &&
+      s.cues.every((c, k) => c.line === `${seq.slug}:${seq.ayah}:${s.id}:${k + 1}` && s.examples?.[k]?.after === k);
+    if (s.kind === "example" && ((s.cues.length > 0 && !explained) || !s.examples?.length)) {
+      out.push(`${s.id}: an example step is its example beats (in lesson zero, each after its own line) and nothing else`);
+    }
     for (const g of s.guides) if (!g.label.trim()) out.push(`${s.id}: a spotlight without a label`);
     for (const c of s.cues) {
       if (!LINE_ID_RE.test(c.line)) out.push(`${s.id}: line id "${c.line}" breaks the contract`);
@@ -567,7 +585,9 @@ export function exampleProblems(seq: AutoplaySequence, ctx: ExampleContext): str
       // Where it plays.
       if (b.of === "concept") {
         const before = seq.steps[i - 1];
-        if (s.kind !== "example" || s.id !== d.step || b.after !== -1) out.push(`${w}: a concept's example plays in its own example step`);
+        // after no line, or (lesson zero) after its own line: the step's cue of the same number
+        const own = s.cues.length ? s.examples?.indexOf(b) : -1;
+        if (s.kind !== "example" || s.id !== d.step || b.after !== own) out.push(`${w}: a concept's example plays in its own example step`);
         else if (before?.kind !== "concept" || `${before.id}:ex` !== s.id) out.push(`${w}: its example step does not follow its concept's line`);
       } else {
         const cue = s.cues[b.after];

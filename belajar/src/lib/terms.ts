@@ -126,6 +126,13 @@ export function marksOf(letter: string, names: readonly string[]): string {
   return [...letter].filter((ch) => names.includes(MARK_NAME[ch] ?? "")).join("");
 }
 
+/** The letter without the named marks: the letter as it is before the sign is put on (operator
+ *  2026-10-15: "Contohnya huruf ba'" over ب, then "jika dibaca kasrah, maka terdengar bi" over بِ),
+ *  e.g. بِ − kasrah → ب, بِّ − shaddah → بِ. Cut from the ayah's bytes, never typed. */
+export function withoutMarks(letter: string, names: readonly string[]): string {
+  return [...letter].filter((ch) => !names.includes(MARK_NAME[ch] ?? "")).join("");
+}
+
 /** The vowel marks of a letter (everything but shaddah), e.g. مُ → U+064F. */
 export function vowelOf(letter: string): string {
   return [...letter].filter((ch) => MARK_NAME[ch] && MARK_NAME[ch] !== "shaddah").join("");
@@ -691,6 +698,8 @@ export type PreparedSign = {
   mark: string;
   /** The example letter as the ayah writes it, and the word it comes from (`loc`). */
   letter: string;
+  /** That letter without the sign (withoutMarks): shown first, then the letter with it. */
+  bare: string;
   loc: string;
   /** That word when it is NOT a lesson word (سَلَٰمٌ of QS 97:5, where the tanwin is heard): its
    *  Tanzil bytes (library.json `quran`) and the sign's own transliteration; null for a lesson
@@ -716,6 +725,7 @@ export function prepareSigns(
       term: lookup.terms.get(s.term) ?? null,
       mark: marksOf(letter, s.marks),
       letter,
+      bare: withoutMarks(letter, s.marks),
       loc,
       word: s.translit && ar ? { ar, translit: s.translit } : null,
       sound: s.sound,

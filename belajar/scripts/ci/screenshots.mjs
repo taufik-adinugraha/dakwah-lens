@@ -3901,6 +3901,15 @@ async function introChecks(page, vp, index) {
     if ((await stage.locator("button[data-word]").count()) !== 0) fail("a mushaf word shows while the primer plays");
     await shot("pengantar-primer");
     for (const part of taught) {
+      // A slide before the line (operator 2026-10-15: kalimah is one word, the Indonesian kalimat is
+      // kalam): its step "<part>:lead" shows its cards in the word card's slot.
+      if (lines[`al-fatihah:${ZERO_AYAH}:${part}:lead`]) {
+        await toStep(page, vp, `${part}:lead`);
+        await replay.click();
+        const cards = page.locator('[data-autoplay="term-contrast"]');
+        await cards.first().waitFor({ state: "visible", timeout: 10_000 }).catch(() => fail(`on the step "${part}:lead" the slide's cards do not show`));
+        await shot(`pengantar-${part.replace(":", "-")}-lead`);
+      }
       await toStep(page, vp, part);
       await replay.click();
       const caption = page.locator(`[data-autoplay="caption"][data-line="al-fatihah:${ZERO_AYAH}:${part}"]`);

@@ -34,6 +34,7 @@
     { "term": "أَلِف لَام", "speak": "alif lam", "display": "alif lam (ال)", "rule": "the article, named by its two letters with a fixed Latin respelling (أَلِف is refused in Arabic script, see alif); caption shows the article as on screen", "approved": "pending-ear-check 2026-10-10 — operator waived the pre-render review" },
     { "term": "فَتْحَة", "speak": "فَتْحَة", "display": "fathah (فَتْحَة)", "rule": "Arabic script", "approved": "2026-10-10" },
     { "term": "كَلِمَة", "speak": "كَلِمَة", "display": "kalimah (كَلِمَة)", "rule": "Arabic script", "approved": "2026-10-10" },
+    { "term": "كَلَام", "speak": "كَلَام", "display": "kalam (كَلَام)", "rule": "from the verified term table (library.terms.json kalam: Ajurrumiyyah hlm. 5, Qathr an-Nada hlm. 12); no heavy letter (rule 9), so Arabic script; added 2026-10-15 for lesson zero's slide that kalimah is one word and the Indonesian kalimat is kalam (operator 2026-10-15)", "approved": "pending-ear-check 2026-10-15 — new term; the operator has not heard it yet" },
     { "term": "اِسْم", "speak": "اِسْم", "display": "isim (اِسْم)", "rule": "Arabic script", "approved": "2026-10-10" },
     { "term": "اِسْم مَجْرُور", "speak": "اِسْم مَجْرُور", "display": "isim majrur (اِسْم مَجْرُور)", "rule": "Arabic script", "approved": "2026-10-10" },
     { "term": "فِعْل", "speak": "فِعْل", "display": "fi’il (فِعْل)", "rule": "Arabic script", "approved": "2026-10-10" },

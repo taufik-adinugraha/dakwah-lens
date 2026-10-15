@@ -138,6 +138,44 @@ def teach_record(step: dict, by_id: dict, by_form: dict) -> dict:
     }
 
 
+def about_of(note: str) -> str:
+    """A record example's note without the word it opens with ("na‘budu: fi'il, kata kerja." →
+    "fi'il, kata kerja."), as plain text — src/lib/autoplay/examples.ts aboutOf, the card's label."""
+    plain = TERMS.strip(note)
+    i = plain.find(": ")
+    return plain[i + 2:].strip() if i > 0 else plain.strip()
+
+
+def term_card(tid: str, by_id: dict) -> dict:
+    """A term on a slide's card: its id, Latin and Arabic (the term table's; never typed here)."""
+    t = by_id.get(tid) or {}
+    return {"id": tid, "latin": t.get("latin"), "ar": t.get("ar")}
+
+
+def lead_record(step: dict, by_id: dict) -> dict:
+    """A lesson-zero step's slide (curriculum.LEAD_KEYS) as the app reads it: its line's text, the
+    cards it shows (each term with the table's Arabic) and its sources."""
+    t = step["lead"]
+    cards = []
+    for c in t.get("cards") or []:
+        card = {"lang": c["lang"], "means": c["means"]}
+        if c.get("word"):
+            card["word"] = c["word"]
+        if c.get("term"):
+            card["term"] = term_card(c["term"], by_id)
+        cards.append(card)
+    return {"say": " ".join(t["say"].split()), "cards": cards, "sources": [dict(x) for x in t.get("sources") or []]}
+
+
+def example_records(step: dict, library: dict) -> list[dict]:
+    """A lesson-zero step's examples: each with its line's text and the card's label (`about`,
+    from the record's own note on that example)."""
+    rec = next((c for c in library.get("concepts") or [] if c.get("id") == step.get("concept")), None) or {}
+    notes = {e["loc"]: e.get("note") or "" for e in rec.get("examples") or []}
+    return [{"loc": e["loc"], "say": " ".join(e["say"].split()), "about": about_of(notes.get(e["loc"], ""))}
+            for e in step.get("examples") or []]
+
+
 def build(authored: dict, lessons: dict[str, dict], library: dict, table: dict, namer: Namer) -> dict:
     """content/curriculum.json (curriculum.py, "THE BUILT FILE")."""
     by_id, by_form = TERMS.term_index(table)
@@ -180,6 +218,10 @@ def build(authored: dict, lessons: dict[str, dict], library: dict, table: dict, 
         rec["line"] = CUR.line_part(s)
         if isinstance(s.get("teach"), dict):
             rec["teach"] = teach_record(s, by_id, by_form)
+        if isinstance(s.get("lead"), dict):
+            rec["lead"] = lead_record(s, by_id)
+        if isinstance(s.get("examples"), list):
+            rec["examples"] = example_records(s, library)
         rec["terms"] = list(s.get("terms") or [])
         out_steps.append(rec)
     return {"version": CUR.VERSION, "units": units, "lessons": out_lessons, "steps": out_steps,

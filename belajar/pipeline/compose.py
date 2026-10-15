@@ -47,6 +47,10 @@ line "${slug}:${ayah}:w${n}:compose:${k}", primer lines "${slug}:${ayah}:primer:
     whole    the word as the ayah writes it (a note on how it is read, e.g. at a pause)
   primer only:
     overview the marks side by side ("marks"), each with its sound
+    bare     a mark ("marks") beside example letters ("tiles") that do NOT carry it yet: the
+             letter as it is before the mark (operator 2026-10-15: "Contohnya huruf ba'" over ب,
+             then "jika dibaca kasrah, maka terdengar bi" over بِ). The next frame is a `mark`
+             frame with the same marks whose every tile is this frame's tile with them put on
     mark     one or two marks ("marks") with examples ("tiles") that carry them
 
 The checks (`problems`) run in two modes: with the pinned corpus (local: Tanzil and QAC bytes,
@@ -135,7 +139,7 @@ BASE_ENDINGS = ("dhammah", "dhammatain")
 SAME_LETTER = {("\u0649", "\u064a"), ("\u064a", "\u0649")}
 
 WORD_STAGES = ("parts", "base", "change", "join", "drop", "whole")
-PRIMER_STAGES = ("overview", "mark")
+PRIMER_STAGES = ("overview", "bare", "mark")
 FORM_KEYS = {"ar", "translit", "label", "gloss"}
 FRAME_KEYS = {"stage", "tiles", "marks", "focus", "from", "to", "cause", "note", "silent", "base_mark", "letters", "say"}
 # The frame keys the built file carries (all but `say`, which becomes `lines`).
@@ -1113,6 +1117,39 @@ def unit_problems(unit: dict, words: dict[str, str], corpus: Corpus | None, w: s
     return errs
 
 
+def without_marks(ar: str, marks: list[str]) -> str | None:
+    """`ar` with one of each of `marks` taken off (the letter as it was before them), or None when
+    it does not carry one of them."""
+    for m in marks:
+        if m not in MARKS or MARKS[m] not in ar:
+            return None
+        ar = ar.replace(MARKS[m], "", 1)
+    return ar
+
+
+def bare_problems(f: str, fr: dict, nxt: dict | None, ar) -> list[str]:
+    """A primer `bare` frame (module docstring): its example letters do not carry its marks yet,
+    and the next frame puts exactly those marks on exactly those letters — so the learner sees the
+    letter first and then the same letter with the mark, and hears what it does to the sound."""
+    errs: list[str] = []
+    ms = [m for m in fr.get("marks") or [] if m in MARKS]
+    tiles = fr.get("tiles") or []
+    if not tiles:
+        return [f"{f}: a bare frame shows the letter before its mark"]
+    for t in tiles:
+        if any(MARKS[m] in (ar(t) or "") for m in ms):
+            errs.append(f"{f}: the bare letter {t!r} already carries the mark it shows before")
+    if not nxt or nxt.get("stage") != "mark" or list(nxt.get("marks") or []) != list(fr.get("marks") or []):
+        return errs + [f"{f}: a bare frame is followed by the mark frame of the same marks"]
+    after = nxt.get("tiles") or []
+    if len(after) != len(tiles):
+        return errs + [f"{f}: the mark frame after it shows {len(after)} tiles for its {len(tiles)} bare letters"]
+    for t, u in zip(tiles, after):
+        if without_marks(ar(u) or "", ms) != ar(t):
+            errs.append(f"{f}: the next frame's {u!r} is not the bare letter {t!r} with {', '.join(ms)} put on")
+    return errs
+
+
 def stage_problems(unit: dict, w: str, *, kind: str, word_ar: str | None, corpus: Corpus | None,
                    words: dict[str, str], ayah: dict | None) -> list[str]:
     errs: list[str] = []
@@ -1201,7 +1238,7 @@ def stage_problems(unit: dict, w: str, *, kind: str, word_ar: str | None, corpus
         elif st == "whole":
             if len(tiles) != 1:
                 errs.append(f"{f}: whole shows the word as one tile")
-        elif st in ("overview", "mark"):
+        elif st in ("overview", "bare", "mark"):
             ms = fr.get("marks") or []
             if not ms or any(m not in EXPLAINED_MARKS for m in ms) or len(set(ms)) != len(ms):
                 errs.append(f"{f}: marks must name marks from {EXPLAINED_MARKS}")
@@ -1211,6 +1248,8 @@ def stage_problems(unit: dict, w: str, *, kind: str, word_ar: str | None, corpus
                 for m in ms:
                     if m in MARKS and not any(MARKS[m] in ar(t) for t in tiles):
                         errs.append(f"{f}: no example tile carries the {m}")
+            if st == "bare":
+                errs += bare_problems(f, fr, frames[k] if k < len(frames) else None, ar)
         if st not in ("overview",) and kind == "word" and not tiles:
             errs.append(f"{f}: shows no tile")
         if "base_mark" in fr and (st != "base" or fr["base_mark"] not in VOWELS):

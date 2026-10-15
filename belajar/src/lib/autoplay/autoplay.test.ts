@@ -1114,6 +1114,8 @@ describe("the pronunciation dictionary", () => {
     expect(captionArabicProblems("Akhirnya kasrah (كَسْرَة), huruf jar (حَرْف جَرّ) ba’ (بِ).", dict, allowed)).toEqual([]);
     expect(captionArabicProblems("Kata pertama: بِسْمِ.", dict, allowed)).toEqual([]);
     expect(captionArabicProblems("huruf بَاء", dict, allowed).join(" ")).toMatch(/spoken-only/);
+    // a letter's name as a whole word only: لَام inside the term kalam (كَلَام) is not the letter lam
+    expect(captionArabicProblems("disebut kalam (كَلَام).", dict, allowed).join(" ")).not.toMatch(/spoken-only/);
     expect(captionArabicProblems("kata الرحمن", dict, allowed).join(" ")).toMatch(/neither the dictionary nor the lesson/);
     expect(captionArabicProblems("tanpa huruf Arab", null, allowed)).toEqual([]);
   });

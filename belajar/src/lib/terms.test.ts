@@ -28,6 +28,8 @@ import {
   stripMarked,
   titleParts,
   type Token,
+  vowelOf,
+  withoutMarks,
 } from "./terms";
 
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
@@ -160,6 +162,22 @@ describe("letters and marks, cut from the ayah's bytes", () => {
     const kasrah = prepareSigns(LIBRARY.basics[0].signs, TERMS).find((s) => s.term?.id === "kasrah")!;
     expect(kasrah.letter).toBe(letterOf(WORD_AR["1:1:1"], 1)); // the operator's بِ = b + i
     expect(marksOf(kasrah.letter, ["kasrah"])).toBe(kasrah.mark);
+    // the letter before its sign (operator 2026-10-15: ب first, then "jika dibaca kasrah, maka terdengar bi")
+    expect(kasrah.bare).toBe([...kasrah.letter][0]);
+    expect(withoutMarks(kasrah.letter, ["fathah"])).toBe(kasrah.letter); // another sign: nothing taken off
+  });
+
+  it("each sign's bare letter is its example letter without that sign and nothing else", () => {
+    for (const s of prepareSigns(LIBRARY.basics[0].signs, TERMS)) {
+      expect(s.bare).not.toBe(s.letter);
+      expect(s.bare + s.mark).toHaveLength(s.letter.length);
+      expect([...s.mark].some((ch) => s.bare.includes(ch))).toBe(false);
+      // the base letter is kept, and every other mark (the kasrah under the doubled ba' of rabbi) stays
+      expect([...s.bare][0]).toBe([...s.letter][0]);
+      expect([...s.letter].filter((ch) => !s.mark.includes(ch)).join("")).toBe(s.bare);
+    }
+    const tasydid = prepareSigns(LIBRARY.basics[0].signs, TERMS).find((s) => s.term?.id === "tasydid")!;
+    expect(vowelOf(tasydid.bare)).toBe(vowelOf(tasydid.letter));
   });
 
   it("the sounds of the Harakat page name a, i, u", () => {

@@ -46,14 +46,14 @@ python3 validate_ayat.py           # the popup data against Tanzil, QuranEnc, th
 python3 test_validate_ayat.py      # plants 28 faults (a missing or extra entry, another ayah's bytes, a stale pin, a name the cards spell otherwise, …) (CI: --no-corpus)
 python3 build_compose.py           # word compositions + harakat primer + the imam's voice of each bentuk dasar ../content/compose/*.json, and fixtures/compose_examples.json (see "Komposisi kata"); after build_library.py, whose library.json it reads
 python3 validate_compose.py        # composition checks against the corpus, the example voices included (CI: --no-corpus); exit 1 on any failure
-python3 test_validate_compose.py   # plants 65 faults in copies of the compositions and of the examples' fixture (a base frame without its voice, a hamzat-washal form played alone, a clip shifted to the next word, a word that ends its ayah, an untrue reason, …), each must fail (CI: --no-corpus, 60 of them)
+python3 test_validate_compose.py   # plants 72 faults in copies of the compositions and of the examples' fixture (a base frame without its voice, a hamzat-washal form played alone, a clip shifted to the next word, a word that ends its ayah, an untrue reason, …), each must fail (CI: --no-corpus, 66 of them)
 python3 validate_terms.py          # Konsep terms in Arabic script + inline markup (CI: --no-corpus); see "Konsep"
 python3 test_validate_terms.py     # plants 54 faults (retyped term, unmarked term, wrong word bytes, a ref whose Latin names other bytes, ketuk, a gloss variant whose ref does not resolve, Arabic typed by hand, a marked lesson or Kosakata twin that drifted, …)
 python3 validate_clips.py          # the imam's voice of every Konsep example: library.json `clips` (CI: --no-corpus); see "Suara contoh"
 python3 test_validate_clips.py     # plants 58 faults (an example with no voice, an unwanted clip, another ayah's or reciter's file, a word's timing off by one in a lesson or outside the lessons, an implausible length, a Harakat sign that is not heard where its example is, an ayah's last word without `last`, a hamzat-washal tile played alone, a fixture that drifted, a stale pin, …) (CI: --no-corpus)
 python3 build_curriculum.py        # the curriculum ../content/curriculum.json from authored/curriculum.json (see "Kurikulum"); after the lessons and the library, BEFORE the quizzes, the lesson map and the narration, which read it
 python3 validate_curriculum.py     # the curriculum: every step in one lesson, at most three a lesson, every Konsep placed once, term owners, a step's own text and sources, the lists derived per lesson; prints the table; exit 1 on any failure
-python3 test_validate_curriculum.py # plants 74 faults (a step in two lessons, a fourth step, a record placed twice or not at all, a term with two owners, a text with no source or with a Qur'anic word, a derived list that drifted, …), each must fail
+python3 test_validate_curriculum.py # plants 87 faults (a step in two lessons, a fourth step, a record placed twice or not at all, a term with two owners, a text with no source or with a Qur'anic word, a derived list that drifted, a lesson-zero slide on an ayah's step, a card showing a later lesson's term, an example the record does not have, …), each must fail
 python3 build_rumus.py             # the cheat sheet ../content/rumus.json from authored/rumus.json (see "Rumus singkat"): the kitab's own words quoted from the pinned pages; after build_curriculum.py and build_surah.py; `--check` compares, `--check --no-corpus` (CI) takes the quotes from the file
 python3 validate_rumus.py          # the cheat sheet: every formula's terms against its lesson, every quote the pinned page's own bytes (CI: --no-corpus); see "Rumus singkat"
 python3 test_validate_rumus.py     # plants 40 faults (a typed quote, an anchor not on its page or found twice, a term of a later lesson, a pointer to an earlier step, Qur'anic Arabic in a formula, a step missing or listed twice, the wrong example, a changed pin …) + unit tests of the folding, the term rule, the pointers and the coverage (`--no-corpus` skips the 2 faults only the cache can catch)
@@ -61,7 +61,7 @@ python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Ku
 python3 build_map.py               # the lesson maps ../content/map/*.json, for the surahs switched on (see "Peta pelajaran"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi"); stops on a term said before its lesson that authored/curriculum.pending.json does not list (`--write-pending` writes that list: see "Kurikulum")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
-python3 test_validate_narration.py # plants 197 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum and the pending list, each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
+python3 test_validate_narration.py # plants 205 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum and the pending list, each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
 python3 validate_map.py            # the lesson maps: new / learnt so far / later / next-level against the curriculum, the names against the captions
 python3 test_validate_map.py       # plants 39 faults (a step in the wrong group, one taught later listed as learnt, a learnt step left out, `here` on a step that does not occur, a name that says a Qur'anic word, …)
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah), or listed in authored/curriculum.pending.json; exit 1 on any failure
@@ -625,8 +625,16 @@ written in its other shape, the alif maqsura of عَلَى as ya' before a prono
 pieces written but not read), `drop` (a piece left out in writing), `whole` (the word as written,
 with a note); any frame may pin, in `letters` ([form, piece]), the piece its lines' letter terms
 show (the doubled لِّ of ٱلضَّآلِّينَ, not the article's lam);
-the primer has `overview` (marks with their sounds) and `mark` (one or two marks with example
-tiles carrying them, taken from the ayah's own letters when they are slices). Each frame has
+the primer has `overview` (marks with their sounds), `bare` (a mark beside the example letter
+WITHOUT it) and `mark` (one or two marks with example tiles carrying them, taken from the ayah's
+own letters when they are slices). Since 2026-10-15 every mark is shown in two frames, the letter
+first and then the letter with the mark (operator: the definition, then "Contohnya huruf ba'"
+over ب, then "jika dibaca kasrah, maka terdengar bi" over بِ): a `bare` frame is followed by the
+`mark` frame of the same marks, whose every tile is the bare tile with exactly those marks put on
+(`compose.bare_problems`, `src/lib/composition.ts`); the bare letter is a deterministic edit of
+the marked one (`{"from": "sin", "ops": [{"remove": "sukun", "piece": 0}]}`: ب, س, رَ, مَ), never
+typed. Lesson zero's primer: the overview, then fathah, kasrah, dhammah (ب → بَ بِ بُ), sukun
+(س → سْ), syaddah (رَ → رَّ), the small alif (مَ → مَٰ): 13 frames, 14 lines. Each frame has
 `say`: the sentences narrated while it shows (one manifest line each; caption ≤ 170 characters
 beside the animation — longer: two sentences), an optional `note` (≤ 60 characters, on screen).
 The LAST frame of a word shows the word exactly as the ayah writes it. A word's composition may
@@ -650,7 +658,12 @@ heavy letter + a without its respelling (rule 9: "mushaf" too).
 Qur'anic word in any spelling (strict: the build stops instead of replacing it; name a word by its
 place, "kata pertama", or its meaning, "kata yang artinya “nama”"); never a syllable the tiles show
 in transliteration (bi, ismu, ismi, ar-raḥmānu …: the screen shows them, the imam recites the
-word), nor one of another word of the same ayah ("hum"), in any spelling; never a letter's name
+word), nor one of another word of the same ayah ("hum"), in any spelling — with ONE exception
+(operator 2026-10-15: "jika dibaca kasrah, maka terdengar bi"): a primer line over a `mark` frame
+may say that frame's own example after "terdengar" when it is one letter with one short vowel
+(بَ بِ بُ: ba, bi, bu; `validate_narration.primer_sounds`), and there the syllable is a sound,
+not the letter's name, for the Latin-term check too (`latin_terms`); a longer form (rra, mā),
+another frame's syllable, or the syllable without "terdengar" still fails; never a letter's name
 read as a sound ("dibaca ba"); the narrator says vowel SOUNDS ("bunyi a", "i", "u"), letter names
 ("huruf mim", "huruf ra'", "alif lam" — spoken from the dictionary: مِيم, رَاء; alif and the article
 in a fixed respelling, since أَلِف is the front of ٱلْفَلَقِ) and the dictionary's terms written by
@@ -1139,8 +1152,9 @@ learnt" of things no lesson had taught, and the kalimah record's line was said n
   says who PLAYS it. `validate_narration.primer_of(compose, ayah)` gives it to "ayah 0" only, so
   Al-Fatihah 1 no longer plays it. One source: the primer is not copied anywhere.
 - **Its lines** are the lines of "ayah 0" of that surah, in that surah's own manifest
-  (`validate_narration.lesson_zero`, `zero_parts`): `al-fatihah:0:intro`, `:primer:1` … `:primer:9`,
-  `:concept:kalimah-isim-fiil-huruf`, `:next` — first in the file. In the surah's manifest and
+  (`validate_narration.lesson_zero`, `zero_parts`): `al-fatihah:0:intro`, `:primer:1` … `:primer:14`,
+  `:concept:kalimah-isim-fiil-huruf:lead`, `:concept:kalimah-isim-fiil-huruf`,
+  `:concept:kalimah-isim-fiil-huruf:ex:1` … `:ex:5`, `:next` — first in the file. In the surah's manifest and
   not one of their own because a recorded file is named by its text and lives in its manifest's
   folder: five primer lines and the kalimah line moved there with their text and kept their
   audio. Nothing is lit (no ayah on that stage: `highlight` `[]`, `focus` `null`).
@@ -1153,7 +1167,32 @@ learnt" of things no lesson had taught, and the kalimah record's line was said n
   pertama surah itu.", "… pada kata ketiga ayat itu."). The third of them (`primer:6`) also
   NAMES sukun since the same day ("Tanda kecil di atas huruf sin disebut sukun: ia menandakan
   huruf mati, …"): the harakat step owns the term, later lines say it, and until then no line
-  had named it (the quiz guard found it: "Kuis").
+  had named it (the quiz guard found it: "Kuis"). Since 2026-10-15 the primer shows each sign on
+  its letter without it first (see "Komposisi kata"): the line over the bare sin defines it,
+  "Sukun adalah tanda huruf mati, …" (`primer:9`, which the quiz guard reads as teaching it).
+- **Its slides** (operator 2026-10-15; `curriculum.LEAD_KEYS`, check 5b of
+  `validate_curriculum.py`): a step of lesson zero taught as a whole record may carry `lead` — a
+  slide said BEFORE its "Konsep baru" line ("<line>:lead") — and `examples` — the examples its card
+  shows after the line, each with the narrator's line about it ("<line>:ex:<k>"). The kalimah step
+  has both. `lead` ("we need another page/slide to explain that kalimah in Arabic is different:
+  kalimah in Arabic means word, while in bahasa it means sentence/kalimat"): kalimah (كَلِمَة) is one
+  word; a string of words with a complete meaning, Indonesian "kalimat", is kalam (كَلَام) —
+  Qathr an-Nada hlm. 11 «al-kalimah qaul mufrad» (and Ibnu Hisyam's note that in the language,
+  not the term, kalimah is also used of meaningful sentences) and Ajurrumiyyah hlm. 5 «al-kalam
+  huwa al-lafzh al-murakkab al-mufid bil-wadh'»; the cheat sheet quotes both sentences from the
+  pinned pages. Its two cards (`src/components/lesson/TermContrastCard.tsx`, in the word card's
+  slot): "Bahasa Arab · كَلِمَة · kalimah · “satu kata”" and "Bahasa Indonesia · kalimat ·
+  “rangkaian kata yang bermakna utuh” · dalam bahasa Arab: kalam (كَلَام)" — each term the term
+  table's Arabic, never typed; a card may name only a term the step owns or a free one.
+  `examples` (operator: "ṣirāṭ, yang artinya jalan, adalah sebuah isim, yaitu nama benda"; "better
+  to provide OTHER examples of isim as nama sifat etc."): ṣirāṭa (isim, nama benda),
+  al-mustaqīma (isim, nama sifat), iyyāka (isim, kata ganti), na‘budu (fi'il, kata kerja), wa lā
+  (two huruf) — each one of the record's own examples (al-mustaqīma and iyyāka joined the record
+  that day, with their QAC tags ADJ and PRON), its line naming the kind of word the record's note
+  names, the word itself never voiced ("Kata ini, yang artinya “jalan”, adalah isim, yaitu nama
+  benda."): the example step plays line k over example k's card, then example k's recording
+  (beat k after cue k; `src/lib/autoplay/sequence.ts`, `checks.ts`). Each line ≤ 400 characters,
+  one file. The new term كَلَام is in `pronunciation.json` as "pending-ear-check 2026-10-15".
 - **The curriculum** marks lesson "0" as written when a primer is played there
   (`curriculum.zero_written`, `written`): its `lines` (the kalimah record's line, no word to
   light) and its `map` (`new`: harakat, kalimah; nothing learnt, postponed or next-level). The
@@ -1161,9 +1200,9 @@ learnt" of things no lesson had taught, and the kalimah record's line was said n
   `curriculum.ayah_lesson(surah, 0)` is `"0"`, so the term check holds its lines to lesson "0".
 - **The app**: `/quran/pengantar` (`src/lib/routes.ts introHref`), the same stage as an ayah's
   lesson; `src/lib/autoplay/zero.ts` (`zeroAyah`, `hostsZero`, `primerAyah`),
-  `buildAutoplaySequence({ zero: true })` — intro → primer → `concept:<id>` →
-  `concept:<id>:ex` (the record's first two examples, each the imam's clip of its own ayah:
-  1:1:1 and 1:5:2) → next, which leads to ayah 1 like an ayah to the next. Listed first on the
+  `buildAutoplaySequence({ zero: true })` — intro → primer → `concept:<id>:lead` (the slide, when
+  the step has one) → `concept:<id>` → `concept:<id>:ex` (the step's examples, each the narrator's
+  line and then the narrator's recording of the word) → next, which leads to ayah 1 like an ayah to the next. Listed first on the
   track page and on Al-Fatihah's page; Al-Fatihah 1 says "Belum mengenal harakat? Mulai dari
   Pengantar."
 

@@ -895,7 +895,17 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
             add0(f"primer:{k}", san.prose(ln["say"], S, Z, strict=f"{slug}:{Z}:primer:{k}"))
         for t in V.taught_lines(zero, curriculum):
             title, summary = CUR.taught_text(curriculum, library, t["step"])
+            step = CUR.step_of(curriculum, t["step"]) or {}
+            # The step's slide before its line (curriculum.LEAD_KEYS: kalimah is one word, the
+            # Indonesian kalimat is kalam; operator 2026-10-15), said as written: strict.
+            if isinstance(step.get("lead"), dict):
+                part = f"{t['line']}:lead"
+                add0(part, san.prose(step["lead"]["say"], S, Z, strict=f"{slug}:{Z}:{part}"))
             add0(t["line"], f"{V.TITLE_LEAD} {_cap(san.prose(title, S, Z))}. {san.prose(summary, S, Z)}")
+            # … and the narrator's line over each example its card shows, in the order shown.
+            for k, ex in enumerate(step.get("examples") or [], 1):
+                part = f"{t['line']}:ex:{k}"
+                add0(part, san.prose(ex["say"], S, Z, strict=f"{slug}:{Z}:{part}"))
         add0("next", ZERO_NEXT.format(surah=name))
     for a in lesson["ayat"]:
         A = a["ayah"]

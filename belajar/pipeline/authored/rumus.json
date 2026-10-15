@@ -3,11 +3,18 @@
  "version": 1,
  "steps": {
   "kalimah": {
-   "rumus": "Tanda [[isim]]: [[tanwin]], alif lam di depannya, kata depan di depannya, dan satu tanda lagi yang kita pelajari {{di:majrur}}. Tanda [[fi'il]]: qad, sin, saufa, atau ta' penanda perempuan yang mati. [[Huruf]] adalah kata yang tidak punya tanda [[isim]] maupun tanda [[fi'il]].",
+   "rumus": "[[Kalimah]] adalah satu kata; rangkaian kata yang bermakna utuh (dalam bahasa Indonesia: kalimat) disebut [[kalam]]. Tanda [[isim]]: [[tanwin]], alif lam di depannya, kata depan di depannya, dan satu tanda lagi yang kita pelajari {{di:majrur}}. Tanda [[fi'il]]: qad, sin, saufa, atau ta' penanda perempuan yang mati. [[Huruf]] adalah kata yang tidak punya tanda [[isim]] maupun tanda [[fi'il]].",
    "sumber": [
+    {
+     "page": "6970/2",
+     "match": [
+      "الكلمة قول مفرد"
+     ]
+    },
     {
      "page": "11371/1",
      "match": [
+      "الكلام هو اللفظ المركب المفيد بالوضع",
       "فالاسم يعرف بالخفض والتنوين ودخول الالف واللام وحروف الخفض",
       "والفعل يعرف بقد والسين وسوف وتاء التانيث الساكنة",
       "والحرف ما لا يصلح معه دليل الاسم ولا دليل الفعل"

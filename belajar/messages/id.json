@@ -333,7 +333,9 @@
     "signs_heading": "Tanda-tanda harakat",
     "sign_sound": "Bunyi",
     "sign_example": "Contoh",
-    "sign_from": "dari"
+    "sign_from": "dari",
+    "sign_bare": "tanpa tanda ini",
+    "sign_read": "dibaca {sign}:"
   },
   "Clip": {
     "play": "Dengarkan",
@@ -355,6 +357,10 @@
     "lemma_caption": "Bentuk dasar (lema) menurut Quranic Arabic Corpus"
   },
   "Guided": {
+    "lead_label": "Dua istilah yang mirip",
+    "lead_lang_ar": "Bahasa Arab",
+    "lead_lang_id": "Bahasa Indonesia",
+    "lead_in_arabic": "dalam bahasa Arab:",
     "title": "Pelajaran dipandu",
     "step": "Langkah {n} dari {total}",
     "start": "Mulai pelajaran",
@@ -440,6 +446,7 @@
     "stage_drop": "ada huruf yang tidak ditulis",
     "stage_whole": "seperti tertulis di ayat",
     "stage_overview": "harakat",
+    "stage_bare": "huruf tanpa tanda",
     "stage_mark": "harakat",
     "aria_primer": "Harakat: {marks}. Contoh: {examples}."
   },

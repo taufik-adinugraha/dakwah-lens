@@ -91,14 +91,17 @@ describe("the waqf note is decided from the data: `last` and the word's ending",
     expect(hasWaqfNote({ last: true }, `${WORD_AR["112:3:3"]} ${WORD_AR["112:3:4"]}`)).toBe(false); // … yūlad
   });
 
-  it("47 of the 202 concept example rows are an ayah's last word, on 21 concept pages; 43 would have lost their harakah to the imam's stop, and none carries a note now", () => {
+  it("48 of the 204 concept example rows are an ayah's last word, on 22 concept pages; 44 would have lost their harakah to the imam's stop, and none carries a note now", () => {
     const rows = LIBRARY.concepts.flatMap((c) => c.examples.map((e) => ({ id: c.id, loc: e.loc })));
     const last = rows.filter((r) => isLast(r.loc));
-    expect(rows).toHaveLength(202); // 200 until ihdinā (1:6:1) joined jumlah fi'liyyah, 2026-10-13; ṣirāṭa (1:7:1) joined Kalimah 2026-10-14
-    expect(last).toHaveLength(47);
-    expect(new Set(last.map((r) => r.id)).size).toBe(21);
-    // what the stop does to them: 43 lose a harakah or tanwin, yūlad (112:3:4) loses nothing
-    expect(last.filter((r) => waqfDrop(WORD_AR[r.loc]) === "harakat")).toHaveLength(43);
+    // 200 until ihdinā (1:6:1) joined jumlah fi'liyyah, 2026-10-13; ṣirāṭa (1:7:1) joined Kalimah 2026-10-14;
+    // al-mustaqīma (1:6:3, nama sifat — its ayah's last word) and iyyāka (1:5:1, kata ganti) joined Kalimah
+    // 2026-10-15, the isim examples lesson zero explains (operator: "better to provide OTHER examples of isim")
+    expect(rows).toHaveLength(204);
+    expect(last).toHaveLength(48);
+    expect(new Set(last.map((r) => r.id)).size).toBe(22);
+    // what the stop does to them: 44 lose a harakah or tanwin, yūlad (112:3:4) loses nothing
+    expect(last.filter((r) => waqfDrop(WORD_AR[r.loc]) === "harakat")).toHaveLength(44);
     expect([...new Set(last.filter((r) => waqfDrop(WORD_AR[r.loc]) !== "harakat").map((r) => r.loc))]).toEqual(["112:3:4"]);
     // … but a row's button plays the narrator's whole word, which has no `last`: no note on any row
     for (const r of rows) {

@@ -2567,6 +2567,69 @@
     "always": true
    },
    "line": "concept:kalimah-isim-fiil-huruf",
+   "lead": {
+    "say": "Sebelum mengenal tiga jenis kata, perhatikan satu istilah. Kalimah dalam bahasa Arab tidak sama dengan kalimat dalam bahasa Indonesia. Dalam tata bahasa Arab, kalimah berarti satu kata. Rangkaian kata yang bermakna utuh, yang dalam bahasa Indonesia disebut kalimat, dalam bahasa Arab disebut kalam.",
+    "cards": [
+     {
+      "lang": "ar",
+      "means": "satu kata",
+      "term": {
+       "id": "kalimah",
+       "latin": "kalimah",
+       "ar": "كَلِمَة"
+      }
+     },
+     {
+      "lang": "id",
+      "means": "rangkaian kata yang bermakna utuh",
+      "word": "kalimat",
+      "term": {
+       "id": "kalam",
+       "latin": "kalam",
+       "ar": "كَلَام"
+      }
+     }
+    ],
+    "sources": [
+     {
+      "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+      "ref": "hlm. 11, Ta'rif al-Kalimah wa Aqsamuha: «al-kalimah qaul mufrad», kalimah adalah satu ucapan tunggal; Ibnu Hisyam menjelaskan bahwa itulah maknanya dalam istilah (al-ishthilah), sedangkan dalam bahasa (al-lughah) kata itu juga dipakai untuk rangkaian kalimat yang bermakna",
+      "url": "https://shamela.ws/book/6970/2"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 5, muqaddimah: «al-kalam huwa al-lafzh al-murakkab al-mufid bil-wadh'», kalam adalah ucapan yang tersusun dari kata-kata dan memberi makna",
+      "url": "https://shamela.ws/book/11371/1"
+     }
+    ]
+   },
+   "examples": [
+    {
+     "loc": "1:7:1",
+     "say": "Kata ini, yang artinya “jalan”, adalah isim, yaitu nama benda.",
+     "about": "isim, nama benda."
+    },
+    {
+     "loc": "1:6:3",
+     "say": "Kata ini, yang artinya “yang lurus”, juga isim, tetapi nama sifat: ia menyebut sifat sesuatu, bukan bendanya.",
+     "about": "isim, nama sifat."
+    },
+    {
+     "loc": "1:5:1",
+     "say": "Kata ini, yang artinya “hanya kepada Engkau”, juga isim, yaitu kata ganti: kata yang dipakai sebagai pengganti nama.",
+     "about": "isim, kata ganti."
+    },
+    {
+     "loc": "1:5:2",
+     "say": "Kata ini, yang artinya “kami menyembah”, adalah fi'il, yaitu kata kerja: ia menyebut suatu perbuatan dan waktu terjadinya.",
+     "about": "fi'il, kata kerja."
+    },
+    {
+     "loc": "1:7:8",
+     "say": "Tulisan ini memuat dua kata, dan keduanya adalah huruf, yaitu kata tugas: yang pertama artinya “dan”, yang kedua artinya “bukan”. Keduanya baru bermakna utuh bersama kata sesudahnya.",
+     "about": "dua huruf, wa yang artinya “dan”, dan lā yang artinya “bukan”."
+    }
+   ],
    "terms": [
     "kalimah",
     "kalam",

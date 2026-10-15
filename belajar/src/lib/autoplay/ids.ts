@@ -25,6 +25,9 @@ export type LinePart =
   /** One item of an ayah's structure told item by item (operator 2026-10-13). */
   | `structure:${number}`
   | `concept:${string}`
+  /** Lesson zero: a step's slide before its line, and the narrator's line over its example n. */
+  | `concept:${string}:lead`
+  | `concept:${string}:ex:${number}`
   | `ex:${ExerciseKey}:intro`
   | `ex:${ExerciseKey}:${GuidePart}`
   | `ex:${ExerciseKey}:${number}:why`
@@ -51,7 +54,7 @@ export const promptLineId = (key: ExerciseKey, part: GuidePart): string => `shar
 const SLUG = "[a-z0-9]+(?:-[a-z0-9]+)*";
 const ID = "[a-z0-9]+(?:-[a-z0-9]+)*";
 const EX = EXERCISE_KEYS.join("|");
-const PART = `intro|recite|map:(?:new|learnt|later)|primer:[1-9][0-9]{0,2}|w[1-9][0-9]{0,2}(?::compose:[1-9][0-9]{0,2})?|structure(?::[1-9][0-9]{0,2})?|concept:${ID}|ex:(?:${EX}):(?:[a-z]+(?:_[a-z]+)*|[1-9][0-9]{0,2}:why)|learned|recap|next|done`;
+const PART = `intro|recite|map:(?:new|learnt|later)|primer:[1-9][0-9]{0,2}|w[1-9][0-9]{0,2}(?::compose:[1-9][0-9]{0,2})?|structure(?::[1-9][0-9]{0,2})?|concept:${ID}(?::lead|:ex:[1-9][0-9]{0,2})?|ex:(?:${EX}):(?:[a-z]+(?:_[a-z]+)*|[1-9][0-9]{0,2}:why)|learned|recap|next|done`;
 const SHARED = `${SHARED_KEYS.join("|")}|ex:(?:${EX}):(?:${GUIDE_PARTS.join("|")})`;
 /** A split part of a long line: ":a", ":b", … */
 const SPLIT = "(?::[a-z])?";
