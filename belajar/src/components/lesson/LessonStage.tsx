@@ -991,8 +991,9 @@ export function LessonStage({
                 </button>
               </div>
               {/* The current step again, from its start — also while
-                  paused (it plays on from there). Phones show the short
-                  word; the name is always the full "Ulangi langkah ini". */}
+                  paused (it plays on from there). The button says just
+                  "Ulangi" on every screen (operator 2026-10-18); a screen
+                  reader still hears the full name, "Ulangi langkah ini". */}
               <button
                 type="button"
                 data-autoplay="replay"
@@ -1001,12 +1002,7 @@ export function LessonStage({
                 className="btn-replay w-full min-h-14! px-3! sm:order-3 sm:px-5!"
               >
                 <RotateCcw aria-hidden className="h-5 w-5" />
-                <span aria-hidden className="sm:hidden">
-                  {t("replay_short")}
-                </span>
-                <span aria-hidden className="hidden sm:inline">
-                  {t("replay")}
-                </span>
+                <span aria-hidden>{t("replay_short")}</span>
               </button>
             </div>
             {/* Row 2: ‹ Sebelumnya and Berikutnya › (or "Lewati latihan"), one colour for moving
