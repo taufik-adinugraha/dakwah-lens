@@ -643,6 +643,44 @@ CLASS_WITHHELD = {
     "gayor": "a word meaning “bukan” / “selain” is an isim by its place (always annexed: al-Jadwal, Darwisy, as-Samin; "
              "ar-Raghib: negation or exception), not a nama benda",
 }
+# AN ISIM THAT NAMES, TITLES OR DESCRIBES ALLAH says the kind alone (operator 2026-10-17: "when ism
+# is related to Allah, dont say it's nama benda"; "just say, it's ism."): "Kata ketiga, yaitu رَبِّ
+# (rabbi), yang artinya “Tuhan”, adalah isim (اِسْم)." — no class at all: not "nama benda" (a
+# thing), and no other class put in its place. Keyed by the word's PLACE, because the context
+# decides: aḥad is about Allah in 112:1:4 ("Yang Maha Esa") and not in 112:4:5 ("sesuatu", “seorang
+# pun”), so only the first is listed; each entry carries the QAC lemma of its isim part, which
+# allah_kind_only_problems holds against the lesson word (a typo or a moved word fails the build).
+# The Name itself (QAC_LAFAZ) and the participles (māliki) already said the kind alone; māliki is
+# listed too, so its rule does not rest on the participle tag alone. NOT listed, on purpose (the
+# operator's own example, 2026-10-17): ar-raḥmāni and ar-raḥīmi (1:1:3-4, 1:3:1-2) keep "nama
+# sifat": they are attributes of Allah, QAC ADJ, and an attribute is accurately a sifat.
+ALLAH_KIND_ONLY: dict[str, tuple[str, str]] = {
+    "1:2:3": ("rab~", "rabbi, “Tuhan”: a title of Allah (rabb al-‘ālamīn)"),
+    "1:4:1": ("ma`lik", "māliki, “Pemilik”: a title of Allah (māliki yaumi ad-dīn)"),
+    "112:1:4": (">aHad", "aḥadun, “Yang Maha Esa”: said of Allah (Allāhu aḥad); 112:4:5's aḥadun is not"),
+    "112:2:2": ("S~amad", "aṣ-ṣamadu: a Name of Allah (Allāhu aṣ-ṣamad)"),
+    "113:1:3": ("rab~", "the rabbi of birabbi, “kepada Tuhan”: a title of Allah (rabb al-falaq)"),
+    "114:1:3": ("rab~", "the rabbi of birabbi, “kepada Tuhan”: a title of Allah (rabb an-nās)"),
+    "114:2:1": ("malik", "maliki, “Raja”: a title of Allah (malik an-nās)"),
+    "114:3:1": ("<ila`h", "ilāhi, “sembahan”: said of Allah (ilāh an-nās)"),
+}
+
+
+def allah_kind_only_problems(lessons: dict[str, dict]) -> list[str]:
+    """ALLAH_KIND_ONLY against the lessons: each place is a lesson word, and one of its QAC parts is
+    an isim with the listed lemma."""
+    words = {w["loc"]: w for lesson in lessons.values() for a in lesson.get("ayat") or [] for w in a.get("words") or []}
+    errs = []
+    for loc, (lemma, _why) in ALLAH_KIND_ONLY.items():
+        w = words.get(loc)
+        if w is None:
+            errs.append(f"quiz.ALLAH_KIND_ONLY {loc}: no lesson word at that place")
+            continue
+        segs = CUR.qac_segments(w) or []
+        if not any(QAC_KIND.get(s[0]) == "isim" and f"LEM:{lemma}" in s for s in segs):
+            errs.append(f"quiz.ALLAH_KIND_ONLY {loc} ({w.get('translit')}): no isim part with the QAC lemma {lemma!r} "
+                        f"(its QAC line: {[s[0] + ' ' + next((f for f in s if f.startswith('LEM:')), '') for s in segs]})")
+    return errs
 QAC_PARTICIPLE = "PCPL"
 # The kinds as the record's notes and summary write them.
 KIND_LATIN = {"isim": "isim", "fiil": "fi'il", "huruf": "huruf"}
@@ -712,15 +750,19 @@ def kind_classes(library: dict) -> dict[str, str]:
 def part_class(p: dict, classes: dict[str, str]) -> str | None:
     """THE rule of which class a part's sentence names (above): its QAC tag's class, if the
     Kalimah record teaches one — never for the Name of Allah, a noun QAC marks as a participle,
-    or a lemma of CLASS_WITHHELD (gair). None: the sentence says the kind alone."""
+    a lemma of CLASS_WITHHELD (gair), or an isim of ALLAH_KIND_ONLY at its place (a Name, title or
+    description of Allah: "just say, it's ism"). None: the sentence says the kind alone."""
     if p["lafaz"] or (p["tag"] == "N" and p["participle"]) or p.get("lemma") in CLASS_WITHHELD:
+        return None
+    at = ALLAH_KIND_ONLY.get(p.get("loc", ""))
+    if at is not None and p.get("kind") == "isim" and p.get("lemma") == at[0]:
         return None
     return classes.get(p["tag"])
 
 
 def word_parts(lesson: dict, w: dict) -> list[dict]:
     """The parts of a lesson word the warm-up asks, in order: [{part, of, ar, tag, kind, article,
-    lafaz (the Name of Allah), participle (QAC PCPL), lemma (QAC LEM)}].
+    lafaz (the Name of Allah), participle (QAC PCPL), lemma (QAC LEM), loc (the word's place)}].
     Raises QuizError where the QAC line and the lesson's `pos` disagree, a tag has no kind, or
     the lesson does not carry a compound word's parts."""
     loc = w["loc"]
@@ -756,7 +798,8 @@ def word_parts(lesson: dict, w: dict) -> list[dict]:
                             "segments (`segments`: build_surah.py writes them for a word whose part the marked prose names)")
         bytes_ = ["".join(pieces[i] for i in g["segs"]) for g in groups]
     return [{"part": k, "of": len(groups), "ar": ar, "tag": g["tag"], "kind": QAC_KIND[g["tag"]], "article": g["article"],
-             "lafaz": g["lafaz"], "participle": g["participle"], "lemma": g["lemma"]} for k, (g, ar) in enumerate(zip(groups, bytes_), 1)]
+             "lafaz": g["lafaz"], "participle": g["participle"], "lemma": g["lemma"], "loc": loc}
+            for k, (g, ar) in enumerate(zip(groups, bytes_), 1)]
 
 
 def sign_steps(cur: dict) -> dict[str, str | None]:
@@ -801,7 +844,8 @@ def part_named(w: dict, p: dict, comp: dict | None) -> tuple[str, str, str, str 
         ismi → bismi: the part سْمِ is ٱسْمِ (ismi), whose hamzat washal the join drops); with the
         form's gloss.
     None for the Name of Allah (its sentence says the kind and stops) and for a part no form names
-    (ʿalaihim, 1:7:4: the composition has ʿalā and hum, not the bytes عَلَيْ and هِمْ)."""
+    (the front عَلَيْ of ʿalaihim, 1:7:4 and 1:7:7: the composition has ʿalā, not those bytes; its
+    back هِمْ is the form `him` of both since 2026-10-17)."""
     if p["lafaz"]:
         return None
     if p["of"] == 1:
@@ -1284,7 +1328,8 @@ def warmup_problems(ex: dict | None, lesson: dict, ayah: dict, library: dict, te
             errs.append(f"{at}: names the class {q.get('class')!r}, and the part's QAC tag gives {w.get('class')!r} — the class "
                         "the Kalimah record teaches for that tag (its examples: nama benda N, nama sifat ADJ, kata ganti PRON; its "
                         "summary: kata kerja, kata tugas); none for another tag, the Name of Allah, a participle noun or a "
-                        "word of quiz.CLASS_WITHHELD (gair)")
+                        "word of quiz.CLASS_WITHHELD (gair), nor for a Name, title or description of Allah (quiz.ALLAH_KIND_ONLY: rabbi, "
+                        "aṣ-ṣamadu, ilāhi …: “just say, it's ism”)")
         # The defect the operator named (2026-10-17): the kind's general definition instead of this
         # part's class ("adalah isim, yaitu nama benda, orang, atau sifat").
         general = f", yaitu {general_meanings.get(q.get('kind'), '')}"

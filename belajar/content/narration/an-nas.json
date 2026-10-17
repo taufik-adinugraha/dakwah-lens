@@ -515,8 +515,8 @@
       "focus": null
     },
     "an-nas:4:w1": {
-      "text": "Kata pertama, yaitu min, artinya: dari. Kata ini, yaitu min, yang artinya dari, adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung.",
-      "display": "Kata pertama, yaitu مِن (min), artinya: “dari”. Kata ini, yaitu مِن (min), yang artinya “dari”, adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
+      "text": "Kata pertama, yaitu min, artinya: dari. Kata ini adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung.",
+      "display": "Kata pertama, yaitu مِن (min), artinya: “dari”. Kata ini adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
       "highlight": [
         1
       ],
@@ -719,8 +719,8 @@
       "focus": "114:5:2"
     },
     "an-nas:5:w3": {
-      "text": "Kata ketiga, yaitu fi, artinya: ke dalam. Kata ini, yaitu fi, yang artinya di dalam, adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata ketiga dan keempat bergantung pada kata kedua.",
-      "display": "Kata ketiga, yaitu فِى (fī), artinya: “ke dalam”. Kata ini, yaitu فِى (fī), yang artinya “di dalam”, adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata ketiga dan keempat bergantung pada kata kedua.",
+      "text": "Kata ketiga, yaitu fi, artinya: ke dalam. Kata ini adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata ketiga dan keempat bergantung pada kata kedua.",
+      "display": "Kata ketiga, yaitu فِى (fī), artinya: “ke dalam”. Kata ini adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata ketiga dan keempat bergantung pada kata kedua.",
       "highlight": [
         3
       ],

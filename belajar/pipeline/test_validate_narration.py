@@ -293,6 +293,26 @@ HEAVY = heavy_line()
 # A line whose caption names a word it does not say (a heavy letter: ṣirāṭa), and ayah 1's first
 # structure item as authored (it names بِ and ٱسْمِ, said).
 SHOWN_ONLY = "al-fatihah:7:w1"
+SHOWN_ISIM = "al-fatihah:6:w2:compose:1"  # "isim (اِسْم)," then the shown-only ", yaitu صِرَٰط (ṣirāṭ)," (2026-10-17)
+
+
+def merge_shown_token(lid):
+    """The shown-only piece glued back onto the word that already shows Arabic: ONE karaoke word
+    "isim (اِسْم), yaitu صِرَٰط (ṣirāṭ)," with two Arabic units, as rendered 2026-10-17."""
+    def f(m, *_):
+        toks = line(m, lid)["tokens"]
+        k = next(i for i, tk in enumerate(toks) if tk["t"] == "isim (اِسْم),")
+        toks[k:k + 2] = [{**toks[k], "t": toks[k]["t"] + " " + toks[k + 1]["t"]}]
+    return f
+
+
+def retime_shown_token(lid):
+    """The shown-only token given a time of its own (made up: no spoken character has it)."""
+    def f(m, *_):
+        toks = line(m, lid)["tokens"]
+        k = next(i for i, tk in enumerate(toks) if tk["t"].startswith("yaitu "))
+        toks[k] = {**toks[k], "e": round(toks[k]["e"] + 0.001, 3)}
+    return f
 ITEM11_SAY = LESSONS["al-fatihah"]["ayat"][0]["structure"]["items"][0]["say"]
 
 
@@ -467,9 +487,9 @@ def first_sentence_only(lid):
 
 def split_map(m, *_):
     lines = m["al-fatihah"]["lines"]
-    old = lines.pop(L2)
-    lines[L2 + ":a"] = dict(old)
-    lines[L2 + ":b"] = dict(old)
+    old = lines.pop(G2)
+    lines[G2 + ":a"] = dict(old)
+    lines[G2 + ":b"] = dict(old)
 
 
 # (name, mutation(manifests, lessons, pronunciation data, compositions, lesson maps, curriculum,
@@ -622,6 +642,26 @@ MUTATIONS = [
      f"{W}: names a word by its place and meaning only ('Kata ketiga dan keempat, yang artinya')"),
     ("a structure item by a place the build cannot name (kata itu)", item_say(1, 2, "Kata itu, yang artinya “nama”, disandarkan kepada kata kedua."),
      "names a word by its place and meaning only ('Kata itu, yang artinya')"),
+    # a part (a composition's tile) named by its kind and meaning only, and a word named twice
+    # (operator 2026-10-17, "Sibling lines")
+    ("a composition part by its kind and meaning only, as until 2026-10-17", unname("al-fatihah:1:w3:compose:2"),
+     "al-fatihah:1:w3:compose:2: names a part by its kind and meaning only ('Bagian kedua adalah isim (اِسْم)'"),
+    ("… a heavy-letter part, its caption-only name taken out",
+     both("al-fatihah:6:w2:compose:1", "isim (اِسْم), yaitu صِرَٰط (ṣirāṭ), yang", "isim (اِسْم) yang", "اِسْم, yang", "اِسْم yang"),
+     "al-fatihah:6:w2:compose:1: names a part by its kind and meaning only ('Alif lam (ٱل) bersambung dengan isim (اِسْم)'"),
+    ("… the second part of a join line",
+     both("al-fatihah:7:w7:compose:1", "dhamir (ضَمِير), yaitu هِمْ (him), yang", "dhamir (ضَمِير) yang", "dhomir, yaitu him, yang", "dhomir yang"),
+     "al-fatihah:7:w7:compose:1: names a part by its kind and meaning only ('bersambung dengan dhamir (ضَمِير)'"),
+    ("… in the composition's own say", compose_say("1:7:4", 7, "Dhamir yang artinya “mereka” ini merujuk kepada kata kedua: merekalah yang diberi nikmat."),
+     "al-fatihah:7:w4:compose:7: names a part by its kind and meaning only ('Dhamir (ضَمِير)'"),
+    ("a word named twice in its own line, as until 2026-10-17 (An-Nas 4)",
+     both("an-nas:4:w1", "Kata ini adalah", "Kata ini, yaitu مِن (min), yang artinya “dari”, adalah", "Kata ini adalah",
+          "Kata ini, yaitu min, yang artinya dari, adalah"),
+     "an-nas:4:w1: names 'مِن (min)' twice in one line"),
+    ("a word named in two parts of one split line, as until 2026-10-17 (Al-Falaq 3)",
+     both("al-falaq:3:structure:b", "dengan kata kerja tempat frasa ini bergantung,", "dengan kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”",
+          "dengan kata kerja tempat frasa ini bergantung,", "dengan kata a'udzu yang artinya aku berlindung"),
+     "al-falaq:3:structure: names 'أَعُوذُ (a‘ūżu)' in more than one of its parts"),
     ("a comparison with an earlier ayah", more(W, "Sama seperti di ayat pertama."),
      f"{W}: points back at an earlier ayah ('ayat pertama')"),
     ("“ayat sebelumnya”", more("al-ikhlas:2:structure:b", "Ia menegaskan isi ayat sebelumnya."),
@@ -646,6 +686,12 @@ MUTATIONS = [
      "bi is a simple word, said as it is written: write {{1:1:1/bi}}"),
     ("a shown-only word without its token (the karaoke drops it)", with_audio(SHOWN_ONLY, voice=True, tweak=drop_shown_piece),
      f"{SHOWN_ONLY}: tokens do not join"),
+    # one karaoke word, at most one Arabic unit at its end (rule 15; coordinator 2026-10-17: the
+    # rendered "isim (اِسْم), yaitu صِرَٰط (ṣirāṭ)," could break inside one karaoke word)
+    ("a shown-only piece glued to a word that shows Arabic, as rendered 2026-10-17", merge_shown_token(SHOWN_ISIM),
+     f"{SHOWN_ISIM}: tokens are not the karaoke words of the spoken text"),
+    ("… its own token with a time made up", retime_shown_token(SHOWN_ISIM),
+     f"{SHOWN_ISIM}: token 'yaitu صِرَٰط (ṣirāṭ),', a shown-only piece, does not have the timing"),
     # a take ElevenLabs cut short (operator 2026-10-17: "the voice is cut slightly before the sentence
     # finished"; al-fatihah:0:primer:1 ended 111 ms before its own last word)
     ("a take cut short (111 ms, as al-fatihah:0:primer:1 was)", with_audio(AUD, tweak=cut_by(111)),
@@ -731,7 +777,7 @@ MUTATIONS = [
     ("letter not as the frame writes it", replace_in(LAM3, "display", "huruf ل ", "huruf لِ "),
      "the letter as in the ayah is ل"),
     ("composition changed, narration stale",
-     compose_say("1:1:1", 1, "Bagian pertama adalah huruf jar yang artinya “dengan”."), "out of date"),
+     compose_say("1:1:1", 1, "Bagian pertama adalah huruf jar, yaitu {{1:1:1/bi}}."), "out of date"),
     ("Qur'anic word in a composition's say",
      compose_say("1:1:1", 1, "Bagian pertama adalah bi- dan ismi."), "names the Qur'anic word(s)"),
     # --- the sentence structure as separate items (operator 2026-10-13: "can we make this kind of
@@ -745,7 +791,8 @@ MUTATIONS = [
     ("an item lighting another item's words", set_field(S12, "highlight", [2, 3, 4]), "not what the stage shows"),
     ("an item with a word card", set_field(S12, "focus", "1:1:2"), "not what the stage shows"),
     ("a structure item split", split_item, "a structure item is never split"),
-    ("the lead said before a later item", both(S12, "Kata ", "Sekarang susunan kalimatnya. Kata "), "out of date"),
+    ("the lead said before a later item", both(S12, "Isim (اِسْم) itu", "Sekarang susunan kalimatnya. Isim (اِسْم) itu", "اِسْم itu",
+                                                      "Sekarang susunan kalimatnya. اِسْم itu"), "out of date"),
     ("an item changed in the content, narration stale", item_say(1, 2, "Kata pertama disandarkan kepada kata kedua."), "out of date"),
     ("an item's words changed in the content, narration stale", item_words(1, 2, [1, 2, 3]), "out of date"),
     ("the items taken out of the content: the ayah is told from its summary", no_items(4), "missing line al-fatihah:4:structure"),
@@ -808,10 +855,9 @@ MUTATIONS = [
     ("the doubled lam not as the frame pins it", replace_in(W79, "display", f"huruf {LAM79} ", f"huruf {LAM79_BARE} "),
      f"the letter as in the ayah is {LAM79}"),
     # --- the lesson map (plan L23, L26): after the imam's recitation one step per group of the
-    # card, one sentence per line ("map:new"; "map:learnt", "map:again"; "map:later", "map:focus"),
+    # card, one sentence per line ("map:new"; "map:again" — the step "map:learnt"; "map:later", "map:focus"),
     # and "learned", "map:total" before the recap. Since 2026-10-15 a counted group is named whole.
     ("map:new line missing", drop(N1), f"missing line {N1}"),
-    ("map:learnt line missing", drop(L3), f"missing line {L3}"),
     ("map:again line missing", drop(G3), f"missing line {G3}"),
     ("map:later line missing (an ayah with next-level topics only)", drop(T3), f"missing line {T3}"),
     ("map:focus line missing", drop(F3), f"missing line {F3}"),
@@ -835,25 +881,22 @@ MUTATIONS = [
     ("a name that is no step of the map", both(N4, "idhafah (إِضَافَة)", "isim (اِسْم)", "idhofah", "اِسْم"),
      "are not a list of the map's step names"),
     ("map:new says more than what is new", more(N1, "Mari kita mulai."), "does not say, in one sentence, how many steps are new"),
-    # what has been learnt so far: the count, then EVERY step by name, in teaching order
-    ("the count of steps learnt so far", both(L2, "mempelajari empat hal,", "mempelajari lima hal,"),
-     "says lima step(s) learnt so far, the lesson map has 4"),
-    ("a learnt step left out of the names", both(L2, "yaitu harakat, tiga jenis kata,", "yaitu tiga jenis kata,"),
-     "names ['kalimah', 'majrur', 'huruf-jar'] as step(s) learnt so far; the lesson map gives "
-     "['harakat', 'kalimah', 'majrur', 'huruf-jar'] (harakat left out)"),
-    ("the learnt steps named in another order", both(L1, "yaitu harakat, serta tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف)", "yaitu tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), serta harakat",
-                                                     "yaitu harakat, serta tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف", "yaitu tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, serta harakat"),
-     "(another order: the map's is teaching order)"),
-    ("a count that disagrees with the names given", both(L1, "mempelajari dua hal", "mempelajari tiga hal"),
-     "says tiga step(s) learnt so far and names 2: the count and the names disagree"),
-    ("the bare count of before 2026-10-15 (no names)",
-     both(L2, ", yaitu harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), majrur (مَجْرُور), serta huruf jar (حَرْف جَرّ).", ".",
-          ", yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, serta حَرْف جَرّ.", "."),
-     f"{L2}: says how many step(s) learnt so far there are and does not name them"),
-    ("a selection of the learnt steps (“di antaranya”)", both(L2, ", yaitu harakat, tiga jenis kata, ", ", di antaranya "),
-     "says “di antaranya”: every one of the step(s) learnt so far is named"),
-    ("what comes up again said in the learnt line, as until 2026-10-15", more(L1, "Yang kita temui lagi di ayat ini adalah tiga jenis kata."),
-     "does not say, in one sentence, how many steps have been learnt so far and which"),
+    # what has been learnt so far: since 2026-10-17 said only in the closing's running total (the
+    # operator removed the opening's line: "better to remove this line in every ayat beginning:
+    # 'Sebelum ayat ini, kita sudah mempelajari XX hal, yaitu …'") — its protections hold there
+    ("the learnt-so-far line back at an ayah's opening, as until 2026-10-17",
+     add(L3, "Sebelum ayat ini, kita sudah mempelajari tujuh hal, yaitu harakat, tiga jenis kata, majrur, huruf jar, jumlah ismiyyah, marfu', dan jamak mudzakkar salim."),
+     f"{L3}: says how many steps were learnt before this ayah"),
+    ("… or put in front of what comes up again",
+     both(G2, "Dari yang sudah kita pelajari, yang", "Sebelum ayat ini, kita sudah mempelajari empat hal. Dari yang sudah kita pelajari, yang"),
+     f"{G2}: says how many steps were learnt before this ayah"),
+    ("what comes up again worded as it was after that line (not on its own)",
+     both(G1, "Dari yang sudah kita pelajari, yang kita temui", "Yang kita temui"),
+     f"{G1}: does not stand on its own"),
+    ("a running total whose count disagrees with the names given", both(S1, "sudah empat hal", "sudah lima hal"),
+     f"{S1}: says lima step(s) learnt in all"),
+    ("a selection of the running total (“di antaranya”)", both(S1, ", yaitu harakat, tiga jenis kata, ", ", di antaranya "),
+     "says “di antaranya”: every one of the step(s) learnt in all is named"),
     # what of it comes up again here: every one by name, in teaching order
     ("the old shape “ada satu: …”", both(G1, "adalah harakat, serta", "ada satu: harakat, serta"),
      f"{G1}: counts the learnt steps that come up again (“ada …”) instead of naming every one"),
@@ -1002,11 +1045,12 @@ class NarrationValidation(unittest.TestCase):
         # frames' lines (rule 14). The harakat primer stood between them until 2026-10-13; it is
         # lesson zero's now.
         # … and, since the same day, the warm-up that opens the lesson stands before the first word.
-        self.assertEqual(ids[1:8], ["al-fatihah:1:recite", "al-fatihah:1:map:new", "al-fatihah:1:map:learnt", "al-fatihah:1:map:again",
+        # (The learnt-so-far line "map:learnt" stood before map:again until 2026-10-17.)
+        self.assertEqual(ids[1:7], ["al-fatihah:1:recite", "al-fatihah:1:map:new", "al-fatihah:1:map:again",
                                     "al-fatihah:1:map:later", "al-fatihah:1:map:focus", "al-fatihah:1:ex:word-kind:intro"])
         warm = [lid for lid in ids if ":ex:word-kind:" in lid]
         self.assertEqual(warm, ["al-fatihah:1:ex:word-kind:intro", *[f"al-fatihah:1:ex:word-kind:{n}:why" for n in range(1, 6)]])
-        self.assertEqual(ids[7 + len(warm)], "al-fatihah:1:w1")
+        self.assertEqual(ids[6 + len(warm)], "al-fatihah:1:w1")
         # Every other exercise's lines still follow the structure.
         self.assertGreater(ids.index("al-fatihah:1:ex:tap-word:intro"), ids.index("al-fatihah:1:structure:4"))
         zero = [lid for lid in lines if lid.startswith("al-fatihah:0:")]
@@ -1114,7 +1158,6 @@ class LessonMapLines(unittest.TestCase):
 
     def test_wording(self):
         n = lambda new: B.map_new(self.entry(new), self.S)  # noqa: E731
-        k = lambda again="", rest="": B.map_learnt(self.entry("", again, rest), self.S)  # noqa: E731
         g = lambda again="", rest="": B.map_again(self.entry("", again, rest), self.S)  # noqa: E731
         t = lambda later="", lanjut=0: B.map_later(self.entry("", "", "", later, lanjut), self.S, 1)  # noqa: E731
         f = lambda new="", again="", later="", lanjut=0: B.map_focus(self.entry(new, again, "", later, lanjut), self.S)  # noqa: E731
@@ -1126,21 +1169,17 @@ class LessonMapLines(unittest.TestCase):
         self.assertEqual(n("ab"), "Di ayat ini ada dua hal baru: na't dan badal.")
         self.assertEqual(n("abd"), "Di ayat ini ada tiga hal baru: na't, badal, dan idhafah.")
         self.assertEqual(n("ac"), "Di ayat ini ada dua hal baru: na't, serta mu'rab dan mabni.")
-        # what has been learnt so far: the count, then EVERY step by name, in the map's (teaching)
-        # order — the operator's own example (2026-10-15): "Sebelum ayat ini, kita sudah
-        # mempelajari dua hal, yaitu XXX dan YYY. Yang kita temui lagi di ayat ini adalah YYY."
-        self.assertIsNone(k())  # nothing learnt before: no line
-        self.assertEqual(k("", "ab"), "Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu na't dan badal.")
-        self.assertEqual(k("z", "a"), "Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu tiga jenis kata dan na't.")
-        self.assertEqual(k("zabd", "ce"), "Sebelum ayat ini, kita sudah mempelajari enam hal, yaitu tiga jenis kata, na't, badal, idhafah, "
-                                          "mu'rab dan mabni, serta fi'il amr.")
-        # … and its own line, what of it comes up again: every one by name (no "ada satu: X", no
-        # "di antaranya"), or plainly none
+        # what has been learnt so far is no opening line since 2026-10-17 (operator: "better to remove
+        # this line in every ayat beginning: 'Sebelum ayat ini, kita sudah mempelajari XX hal'"); the
+        # running total says it, at the close (map_total)
+        self.assertFalse(hasattr(B, "map_learnt"))
+        # what of it comes up again: every one by name (no "ada satu: X", no "di antaranya"), or plainly
+        # none — on its own, saying what it picks from
         self.assertIsNone(g())
         self.assertEqual(g("", "ab"), "Tidak ada yang kita temui lagi di ayat ini.")
-        self.assertEqual(g("a", "z"), "Yang kita temui lagi di ayat ini adalah na't.")
-        self.assertEqual(g("zab", "d"), "Yang kita temui lagi di ayat ini adalah tiga jenis kata, na't, dan badal.")
-        self.assertEqual(g("zabde"), "Yang kita temui lagi di ayat ini adalah tiga jenis kata, na't, badal, idhafah, dan fi'il amr.")
+        self.assertEqual(g("a", "z"), "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah na't.")
+        self.assertEqual(g("zab", "d"), "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah tiga jenis kata, na't, dan badal.")
+        self.assertEqual(g("zabde"), "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah tiga jenis kata, na't, badal, idhafah, dan fi'il amr.")
         # what is taught later: every one named; one ayah, several ayat of this surah, another surah
         self.assertIsNone(t())
         self.assertEqual(t("b"), "Ada satu hal lagi di ayat ini, yaitu badal, tetapi baru akan diajarkan lebih lengkap di ayat ketujuh.")
@@ -1184,9 +1223,9 @@ class LessonMapLines(unittest.TestCase):
             s()
         # which lines an ayah has
         self.assertEqual(V.map_opening_parts(self.entry("a")), ["map:new"])
-        self.assertEqual(V.map_opening_parts(self.entry("a", "", "b")), ["map:new", "map:learnt", "map:again"])
+        self.assertEqual(V.map_opening_parts(self.entry("a", "", "b")), ["map:new", "map:again"])
         self.assertEqual(V.map_opening_parts(self.entry("", "", "", "b")), ["map:new", "map:later", "map:focus"])
-        self.assertEqual(V.map_opening_parts(self.entry("", "z", "", "", 1)), ["map:new", "map:learnt", "map:again", "map:later", "map:focus"])
+        self.assertEqual(V.map_opening_parts(self.entry("", "z", "", "", 1)), ["map:new", "map:again", "map:later", "map:focus"])
         self.assertEqual(V.map_opening_parts(None), [])
         self.assertEqual(V.map_closing_parts(self.entry("a")), ["learned", "map:total"])
         self.assertEqual(V.map_closing_parts(None), [])
@@ -1216,7 +1255,7 @@ class LessonMapLines(unittest.TestCase):
         lines = {}
         for a in mp["ayat"]:
             base = f"x:{a['ayah']}"
-            said = {"map:new": B.map_new(a, self.S), "map:learnt": B.map_learnt(a, self.S), "map:again": B.map_again(a, self.S),
+            said = {"map:new": B.map_new(a, self.S), "map:again": B.map_again(a, self.S),
                     "map:later": B.map_later(a, self.S, 1), "map:focus": B.map_focus(a, self.S),
                     "learned": B.map_closing(a, self.S), "map:total": B.map_total(a, self.S)}
             for part in [*V.map_opening_parts(a), *V.map_closing_parts(a)]:
@@ -1285,9 +1324,8 @@ class LessonMapLines(unittest.TestCase):
         # running total — every counted step named (2026-10-15).
         self.assertEqual([lines[f"al-fatihah:1:{p}"]["display"] for p in V.MAP_PARTS], [
             "Di ayat ini ada dua hal baru: majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ).",
-            "Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu harakat, serta tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), "
+            "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, serta tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), "
             "dan huruf (حَرْف).",
-            "Yang kita temui lagi di ayat ini adalah harakat, serta tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف).",
             "Ada tiga hal lagi di ayat ini, tetapi baru akan diajarkan lebih lengkap nanti: alif lam (ال) di ayat ketiga, na’t (نَعْت) "
             "di ayat ketiga, dan idhafah (إِضَافَة) di ayat keempat. Ada juga satu hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
             "Sekarang Anda tidak perlu menghafal ketiganya, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada "
@@ -1356,11 +1394,12 @@ class LessonMapLines(unittest.TestCase):
             if audio is not None:
                 self.assertEqual(audio["url"], V.delivery_url(MANIFESTS["al-fatihah"]["voice"], "al-fatihah", lines[lid]["text"], audio["sha256"]), lid)
         # … and a composition line whose text did not change kept its own (word 1 of ayah 1's
-        # second, the karaoke check's), and most of the 150-odd composition lines — the ones
+        # third, its base form; the second, until 2026-10-17 — it names its tile since, "Sibling
+        # lines", a new text), and most of the 150-odd composition lines — the ones
         # reworded since (2026-10-13: no term before its lesson; 2026-10-17: the review, rules 26
         # and 29) wait for a render, like any new text. (Until 2026-10-17 the word lines too: since,
         # each names its word, "Kata pertama, yaitu بِسْمِ (bismi), artinya: …", a new text.)
-        self.assertIn("audio", lines["al-fatihah:1:w1:compose:2"])
+        self.assertIn("audio", lines["al-fatihah:1:w1:compose:3"])
         compose_lines = [ln for lid, ln in lines.items() if re.fullmatch(r"al-fatihah:\d:w\d:compose:\d+", lid)]
         self.assertGreater(sum("audio" in ln for ln in compose_lines), 0.6 * len(compose_lines))
         text = "Konsep baru: نَعْت, yaitu sifat."
@@ -1441,7 +1480,7 @@ class LessonMapLines(unittest.TestCase):
         is_map = lambda lid: lid.split(":", 2)[2] in V.MAP_PARTS if lid.count(":") >= 2 and not lid.startswith("shared:") else False  # noqa: E731
         for name in with_map:
             added = [lid for lid in with_map[name] if lid not in without[name]]
-            self.assertEqual(len(added), 49 if name == "al-fatihah" else 0, name)
+            self.assertEqual(len(added), 42 if name == "al-fatihah" else 0, name)  # 7 ayat × 6 (map:learnt removed 2026-10-17)
             self.assertTrue(all(is_map(lid) for lid in added))
             # … and every other line is what it was without the map, in the same order.
             self.assertEqual({k: v for k, v in with_map[name].items() if k not in added}, without[name], name)
@@ -1466,8 +1505,9 @@ class LessonMapLines(unittest.TestCase):
         new = [lid for lid in built["an-nas"] if lid not in MANIFESTS["an-nas"]["lines"]]
         self.assertEqual(sorted(new), sorted(f"an-nas:{n}:{p}" for n in range(1, 7) for p in V.MAP_PARTS))
         self.assertEqual(built["an-nas"]["an-nas:1:map:new"]["display"], "Di ayat ini ada satu hal baru: fi’il amr (فِعْل أَمْر).")
-        self.assertTrue(built["an-nas"]["an-nas:1:map:learnt"]["display"].startswith(
-            "Sebelum ayat ini, kita sudah mempelajari sembilan belas hal, yaitu harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), majrur (مَجْرُور), "))
+        self.assertNotIn("an-nas:1:map:learnt", built["an-nas"])  # the learnt-so-far line, removed 2026-10-17
+        self.assertTrue(built["an-nas"]["an-nas:1:map:again"]["display"].startswith(
+            "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), "))
         self.assertEqual(built["an-nas"]["an-nas:3:map:new"]["display"], "Di ayat ini tidak ada hal baru.")
         # (six until 2026-10-17: harakat is met again in every ayah, operator addition A)
         self.assertTrue(built["an-nas"]["an-nas:3:learned"]["display"].startswith("Di ayat ini tidak ada hal baru; kita mengulang tujuh hal"))
@@ -1477,7 +1517,7 @@ class LessonMapLines(unittest.TestCase):
         self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=maps, curriculum=cur), [])
 
     def test_rendered_map_lines_pass(self):
-        # With the delivered file's audio and its tokens on each of the 49 lines, the validator
+        # With the delivered file's audio and its tokens on each of the 42 lines, the validator
         # accepts them and a rebuild keeps them (the text did not change). A line without audio (the
         # lines of 2026-10-13's curriculum, until the operator renders them) gets a stand-in here,
         # so this holds before and after the render.
@@ -1490,14 +1530,14 @@ class LessonMapLines(unittest.TestCase):
                 if "audio" not in ln:
                     ln["audio"] = {"url": V.delivery_url(man["voice"], "al-fatihah", ln["text"], SHA), "ms": len(ln["text"]) * 50 + 500, "sha256": SHA}
                     ln["tokens"] = fake_tokens(ln["text"], None, ln.get("display"))
-        self.assertEqual(seen, 49)
+        self.assertEqual(seen, 42)
         self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=LESSONMAP), [])
         rebuilt = B.manifest(B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, V.load_quiz(), LESSONMAP)["al-fatihah"], man, LEX, FORMS,
                              V.letters_for("al-fatihah", LESSONS, FORMS, COMPOSE, LIBRARY))
         self.assertEqual(B.dump(rebuilt), B.dump(man))
 
     def test_unrendered_map_lines_pass(self):
-        # The same 49 lines BEFORE a render — no audio, no tokens — are caption-only by design and
+        # The same 42 lines BEFORE a render — no audio, no tokens — are caption-only by design and
         # still valid, whatever the manifest on disk holds today.
         m = copy.deepcopy(MANIFESTS)
         stripped = 0
@@ -1506,7 +1546,7 @@ class LessonMapLines(unittest.TestCase):
                 stripped += 1
                 ln.pop("audio", None)
                 ln.pop("tokens", None)
-        self.assertEqual(stripped, 49)
+        self.assertEqual(stripped, 42)
         self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=LESSONMAP), [])
 
 
@@ -1638,8 +1678,78 @@ class Dictionary(unittest.TestCase):
         new = B.retext_tokens(old, line, LEX, None)
         self.assertEqual([(t["t"], t["s"]) for t in new], [("Akhirnya", 0.0), ("dibaca", 0.5), ("kasrah (كَسْرَة).", 1.0)])
 
+    def test_a_shown_only_piece_beside_arabic_is_its_own_token(self):
+        # One karaoke word holds at most one Arabic unit, at its end (rule 15; the TS textUnits test):
+        # the shown-only ", yaitu صِرَٰط (ṣirāṭ)," after "isim (اِسْم)" is a token of its own, with
+        # the timing of the word it is shown with (2026-10-17: rendered as ONE token, the line could
+        # break inside it). Beside a plain word it still joins that word ("Kata pertama, yaitu …").
+        ln = MANIFESTS["al-fatihah"]["lines"][SHOWN_ISIM]
+        named, cuts = V.named_in_display(ln["display"]), LEX.text_cuts(ln["display"])
+        entries = LEX.token_entries(ln["text"], None, named, cuts)
+        texts = [t for t, _i in entries]
+        k = texts.index("isim (اِسْم),")
+        self.assertEqual(texts[k + 1], "yaitu صِرَٰط (ṣirāṭ),")
+        self.assertEqual(entries[k][1], entries[k + 1][1])  # one spoken word, two karaoke words
+        toks = LEX.tokens(ln["text"], [i * 0.05 for i in range(len(ln["text"]))], [i * 0.05 + 0.04 for i in range(len(ln["text"]))],
+                          None, named, cuts)
+        self.assertEqual((toks[k]["s"], toks[k]["e"]), (toks[k + 1]["s"], toks[k + 1]["e"]))
+        self.assertEqual(" ".join(t["t"] for t in toks), LEX.render_display(ln["text"], None, named, cuts))
+        # A kept render's tokens of the old shape (one token per spoken word) take the new shape with
+        # their timings unchanged, and the new shape stays as it is.
+        old = [dict(t) for t in ln["tokens"]]
+        merged = old[:k] + [{**old[k], "t": old[k]["t"] + " " + old[k + 1]["t"]}] + old[k + 2:]
+        timing = lambda ts: [(x["s"], x["e"]) for x in ts]  # noqa: E731
+        again = B.retext_tokens(merged, ln, LEX, None)
+        self.assertEqual(timing(again), timing(old))
+        self.assertEqual(again, B.retext_tokens(old, ln, LEX, None))
+        self.assertEqual([x["t"] for x in again], [t for t, _i in entries])
+        # Beside a plain word, as before: the piece joins it.
+        plain = MANIFESTS["al-fatihah"]["lines"][SHOWN_ONLY]
+        p_entries = LEX.token_entries(plain["text"], None, V.named_in_display(plain["display"]), LEX.text_cuts(plain["display"]))
+        self.assertIn("pertama, yaitu صِرَٰطَ (ṣirāṭa),", [t for t, _i in p_entries])
+        # Every rendered token of every manifest: at most one Arabic run, and nothing but its
+        # transliteration and punctuation after it.
+        ar = "؀-ۿ"
+        for man in MANIFESTS.values():
+            for lid, l in man["lines"].items():
+                for tk in l.get("tokens") or []:
+                    runs = re.findall(rf"[{ar}]+(?:\s+[{ar}]+)*", tk["t"])
+                    self.assertLessEqual(len(runs), 1, f"{lid}: {tk['t']!r}")
+                    if runs:
+                        tail = tk["t"][tk["t"].rindex(runs[-1]) + len(runs[-1]):]
+                        self.assertRegex(tail, r"^\)?(?: \([^()]*\))?[)”»,.;:!?]*$", f"{lid}: {tk['t']!r}")
+
 
 class WordPlaces(unittest.TestCase):
+    def test_named_once(self):
+        # The why of a word's own line names the word once: the line has just named it (operator
+        # 2026-10-17, "Sibling lines"); a quiz explanation, which says the why alone, keeps the name.
+        why = "Kata ini, yaitu {{114:4:1}}, yang artinya “dari”, adalah huruf jar yang mabni."
+        self.assertEqual(B.named_once(why, "114:4:1"), "Kata ini adalah huruf jar yang mabni.")
+        self.assertEqual(B.named_once(why, "114:5:3"), why)  # another word: left as it is
+        self.assertEqual(B.named_once("Kata ini, yaitu {{!1:6:2}}, yang artinya “jalan”, adalah isim.", "1:6:2"),
+                         "Kata ini adalah isim.")
+        self.assertEqual(B.named_once("Akhirnya kasrah, karena kata ini, yaitu {{114:4:1}}, yang artinya “dari”, …", "114:4:1"),
+                         "Akhirnya kasrah, karena kata ini, yaitu {{114:4:1}}, yang artinya “dari”, …")  # not the why's opening
+        w = MANIFESTS["an-nas"]["lines"]["an-nas:4:w1"]["display"]
+        self.assertEqual(V.named_twice(w), [])
+        self.assertTrue(w.startswith("Kata pertama, yaitu مِن (min), artinya: “dari”. Kata ini adalah huruf jar"))
+        why = MANIFESTS["an-nas"]["lines"]["an-nas:4:ex:label-role:1:why"]["display"]
+        self.assertIn("Kata ini, yaitu مِن (min), yang artinya “dari”, adalah", why)
+
+    def test_part_meaning_only(self):
+        f = V.part_meaning_only
+        self.assertEqual(f("Bagian kedua adalah isim (اِسْم) yang artinya “Maha Pengasih”."), ["Bagian kedua adalah isim (اِسْم)"])
+        self.assertEqual(f("Bagian kedua adalah isim (اِسْم), yaitu رَحْمَٰن (raḥmān), yang artinya “Maha Pengasih”."), [])
+        self.assertEqual(f("Huruf jar (حَرْف جَرّ), yaitu عَلَى (‘alā), yang artinya “atas”, bersambung dengan dhamir (ضَمِير) "
+                           "yang artinya “mereka”."), ["bersambung dengan dhamir (ضَمِير)"])
+        # the line's own word ("kata ini", named on the line before) and a phrase are no part
+        self.assertEqual(f("Kata ini adalah kata penghubung yang artinya “orang-orang yang”; maknanya baru lengkap."), [])
+        self.assertEqual(f("misalnya بِٱسْمِ (bismi) di awal Surah Al-'Alaq, dalam ungkapan yang artinya “dengan nama Tuhanmu”."), [])
+        # every composition line of Al-Fatihah, as built: none
+        bad = {lid: f(ln["display"]) for lid, ln in MANIFESTS["al-fatihah"]["lines"].items() if ":compose:" in lid and f(ln["display"])}
+        self.assertEqual(bad, {})
+
     def test_word_places(self):
         self.assertEqual(V.word_places("Kata pertama artinya “x”; kata ketiga dan keempat, lalu kata kedua sampai keempat."),
                          [1, 3, 4, 2])
@@ -2539,7 +2649,7 @@ class SpeechAndRender(unittest.TestCase):
         self.assertEqual(br("al-fatihah:2:w1", "baru akan diajarkan lebih lengkap di ayat keenam"), [])
         self.assertEqual(br("al-fatihah:3:w1", "Di ayat ketiga ini"), [])
         self.assertEqual(br("al-ikhlas:3:structure:a", "seperti dalam Surah Al-Fatihah ayat dua"), [])
-        self.assertEqual(br("al-fatihah:3:map:learnt", "Sebelum ayat ini, kita sudah mempelajari … di ayat pertama"), [])
+        self.assertEqual(br("al-fatihah:3:map:total", "Sampai ayat ini, sudah … di ayat pertama"), [])
         self.assertEqual(br("al-fatihah:0:primer:1", "ayat pertama"), [])
         for man in MANIFESTS.values():
             for lid, ln in man["lines"].items():

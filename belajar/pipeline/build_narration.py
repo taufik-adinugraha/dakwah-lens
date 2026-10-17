@@ -66,13 +66,15 @@ said in the ayah of its first example (5, 3, 1, 1, 8, 2, 6 lines on Al-Fatihah; 
 The lesson map (operator 2026-10-13, plan L23 and L26; lessonmap.py, content/map/<slug>.json,
 written by build_map.py before this runs): in a surah that has one, every ayah opens, right after
 "recite", with one step per group of its card, one sentence per line — "map:new" (what is new);
-"map:learnt" (every step learnt so far, by name) and "map:again" (which of them come up again
-here, by name), only once something was learnt; "map:later" (what is here and taught later, by
+"map:again" (which of the steps learnt so far come up again here, by name, standing on its own),
+only once something was learnt — until 2026-10-17 after "map:learnt", every step learnt so far by
+count and name, which the operator removed ("better to remove this line in every ayat
+beginning"): the count of what was learnt is said only in "map:total"; "map:later" (what is here and taught later, by
 name, and how many next-level topics) and "map:focus" (the reassurance: that need not be learnt
 now, focus on the new steps), only when there is any — and gets "learned" (what was new) and
 "map:total" (the running total, every step by name) right before "recap". Since 2026-10-15 every
 counted group is named whole (operator: "always re-mention what they are"). Built from the map's
-names (map_new / map_learnt / map_again / map_later / map_focus / map_closing / map_total below),
+names (map_new / map_again / map_later / map_focus / map_closing / map_total below),
 read back by validate_narration.map_problems. A surah without a map file gets none of them.
 
 No term before its lesson (decision 7; curriculum.too_early): the dictionary terms a line's prose
@@ -833,6 +835,15 @@ def said_why(w: dict, san: Sanitiser, S: int, A: int, i: int, where: str) -> str
     return san.prose(w["why"], S, A, i)
 
 
+def named_once(why: str, loc: str) -> str:
+    """The why of a word's own line, which has just named the word ("Kata pertama, yaitu مِن (min),
+    artinya: “dari”."): its "Kata ini, yaitu <the same word>, yang artinya “…”," — what name_places
+    makes of the why's "Min (“dari”) adalah …", right for a quiz explanation that says the why alone
+    — would name the word a second time in one line (operator 2026-10-17, "Sibling lines"), so the
+    apposition and its meaning go: "Kata ini adalah huruf jar …". validate_narration "named twice"."""
+    return re.sub(rf"^([Kk]ata ini), (?:yaitu )?\{{\{{!?{re.escape(loc)}\}}\}}, (?:yang )?artinya “[^”]*”, ", r"\1 ", why)
+
+
 def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.Terms, S: int,
            lesson: dict | None = None, compose: dict | None = None) -> str:
     """The ONE short line that explains a question's correct answer, said after "Benar." and after
@@ -893,7 +904,7 @@ def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.T
 # curriculum: "so the knowledge is accummulating and repeated"; "but separate new vs already knows
 # concept, this is what new, this is what we've learnt so far". Per ayah of a surah with
 # content/map/<slug>.json (lessonmap.py): after the imam's recitation one step per group of the
-# card — "map:new"; "map:learnt" + "map:again"; "map:later" + "map:focus" — and "learned" +
+# card — "map:new"; "map:again" (the step "map:learnt"); "map:later" + "map:focus" — and "learned" +
 # "map:total" before the recap. Plain sentences for adults and seniors, one sentence per line.
 # Operator 2026-10-15: a sentence that COUNTS steps NAMES every one ("Sebelum ayat ini, kita
 # sudah mempelajari dua hal, yaitu XXX dan YYY. Yang kita temui lagi di ayat ini adalah YYY.";
@@ -926,25 +937,17 @@ def map_new(entry: dict, steps: dict) -> str:
     return f"Di ayat ini ada {num_id(len(new))} hal baru: {_said(steps, new)}."
 
 
-def map_learnt(entry: dict, steps: dict) -> str | None:
-    """Every step learnt before this ayah: how many, and each by name, in teaching order; None
-    when nothing was (the first lesson of all)."""
-    learnt = [x["id"] for x in entry["learnt"]]
-    if not learnt:
-        return None
-    return f"Sebelum ayat ini, kita sudah mempelajari {num_id(len(learnt))} hal, yaitu {_said(steps, learnt)}."
-
-
 def map_again(entry: dict, steps: dict) -> str | None:
     """Which of the learnt steps come up again in this ayah, every one by name, in teaching order
     (the order of the card's "Kita temui lagi" rows) — or, plainly, none; None when nothing was
-    learnt before."""
+    learnt before. It stands on its own (operator 2026-10-17: the learnt-so-far line before it was
+    removed, so it says what it picks from: "Dari yang sudah kita pelajari, …")."""
     if not entry["learnt"]:
         return None
     again = LM.here_ids(entry)
     if not again:
         return V._MAP_NOT_AGAIN
-    return f"Yang kita temui lagi di ayat ini adalah {_said(steps, again)}."
+    return f"{V._MAP_AGAIN_LEAD} {_said(steps, again)}."
 
 
 def map_later(entry: dict, steps: dict, surah: int) -> str | None:
@@ -1073,7 +1076,7 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
         mapped = LM.ayah_entry(lessonmap, A)
         if mapped is not None:
             st = lessonmap["steps"]
-            said = {"map:new": map_new(mapped, st), "map:learnt": map_learnt(mapped, st), "map:again": map_again(mapped, st),
+            said = {"map:new": map_new(mapped, st), "map:again": map_again(mapped, st),
                     "map:later": map_later(mapped, st, S), "map:focus": map_focus(mapped, st)}
             for part in V.map_opening_parts(mapped):
                 add(part, said[part])
@@ -1101,7 +1104,7 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
             # بِسْمِ (bismi), artinya: …"; until 2026-10-17 its place and meaning only).
             gloss = f"Kata {ordinal(i)}, yaitu {V.named_markup(w['loc'], w['ar'], w['translit'])}, artinya: “{V.fold(w['gloss'])}”."
             if comp is None:
-                add(f"w{i}", f"{gloss} {said_why(w, san, S, A, i, f'{base}:w{i}')}")
+                add(f"w{i}", f"{gloss} {named_once(said_why(w, san, S, A, i, f'{base}:w{i}'), w['loc'])}")
                 continue
             # The frames say the why part by part (rule 14): the word line is the gloss and the lead.
             lead = san.prose(comp["lead"], S, A, i, strict=f"{base}:w{i} lead") if comp.get("lead") else ""
@@ -1248,12 +1251,26 @@ def retext_tokens(tokens: list, line: dict, lex: V.Lexicon, focus_ar: str | None
     changed display form needs no new render); unchanged when the words no longer line up."""
     named = V.named_in_display(line.get("display"))
     runs = lex.runs(line["text"], named)
-    if len(runs) != len(tokens) or not all(isinstance(t, dict) for t in tokens):
+    if not all(isinstance(t, dict) for t in tokens):
         return tokens
     # Each word shown only (a heavy-letter word, never said) goes into the token it falls in or
-    # follows, with that token's timing: none is made up (Lexicon._pieces).
-    pieces = lex._pieces(line["text"], focus_ar, named, lex.text_cuts(line.get("display")))
-    return [{**tk, "t": t} for tk, t in zip(tokens, pieces)]
+    # follows, with that token's timing — or, beside a word that already shows Arabic, is a token
+    # of its own with that same timing: none is made up (Lexicon.token_entries).
+    entries = lex.token_entries(line["text"], focus_ar, named, lex.text_cuts(line.get("display")))
+    if len(tokens) == len(runs):
+        spoken = tokens  # one token per spoken word: the take's own
+    elif len(tokens) == len(entries):
+        # Already with tokens of their own: each spoken word's is the first of its run's entries
+        # that is the run's own (the same timing is on all of them).
+        spoken = [None] * len(runs)
+        for tk, (_t, i) in zip(tokens, entries):
+            if spoken[i] is None:
+                spoken[i] = tk
+        if any(tk is None for tk in spoken):
+            return tokens
+    else:
+        return tokens
+    return [{**spoken[i], "t": t} for t, i in entries]
 
 
 def manifest(lines: dict[str, dict], old: dict | None, lex: V.Lexicon, forms: V.Forms,

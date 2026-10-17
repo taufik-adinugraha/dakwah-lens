@@ -12,7 +12,7 @@
         ],
         "items": [
           { "words": [1], "say": "Kata pertama diawali huruf jar, yaitu {{1:1:1/bi}} yang artinya “dengan”, sehingga isim sesudahnya, yaitu {{1:1:1/ismi}} yang artinya “nama”, menjadi majrur. Gabungan seperti ini disebut jar-majrur." },
-          { "words": [1, 2], "say": "Kata {{1:1:1/ismi}} yang artinya “nama” itu disandarkan kepada kata kedua, {{1:1:2}}, sehingga maknanya “nama Allah”. Susunan sandaran ini baru akan diajarkan lebih lengkap di ayat keempat." },
+          { "words": [1, 2], "say": "Isim itu disandarkan kepada kata kedua, {{1:1:2}}, sehingga maknanya “nama Allah”. Susunan sandaran ini baru akan diajarkan lebih lengkap di ayat keempat." },
           { "words": [2, 3, 4], "say": "Kata ketiga dan kata keempat adalah dua sifat bagi kata kedua, dan keduanya mengikuti akhirannya, yaitu kasrah. Konsep ini baru akan diajarkan lebih lengkap di ayat ketiga." },
           { "words": [1, 2, 3, 4], "say": "Seluruh ayat ini adalah satu keterangan, tetapi kata yang diterangkannya tidak diucapkan. Karena basmalah adalah kalimat pembuka, para ulama memahaminya antara lain sebagai “aku memulai”, dan ada pula yang menyesuaikannya dengan pekerjaan yang sedang dimulai. Jadi maknanya: “aku memulai dengan nama Allah”." }
         ],

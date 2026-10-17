@@ -3711,7 +3711,8 @@ async function wordKindChecks(page, vp, index) {
  *                MAP_LATER_FULL one per row, more as one flowing line) — and "Tingkat lanjut (N
  *                hal)" with the line that says they are not taught at this level.
  *      "↺ Ulangi" plays the step: the caption is that step's first line (data-line
- *      "al-fatihah:N:map:<group>") and says what the manifest shows for it.
+ *      "al-fatihah:N:map:<group>"; for "learnt" "…:map:again" since 2026-10-17) and says what the
+ *      manifest shows for it.
  *   2. THE CLOSING comes right before the recap: on the step "learned" (by name) the card
  *      ([data-map="learned"]) has one group, "Baru saja kita pelajari", the ayah's new steps in
  *      order, each with a tick, and the running total ("Sudah N hal kita pelajari."); its first
@@ -3903,8 +3904,10 @@ async function lessonMapChecks(page, vp, index) {
     const card = stage.locator(`[data-autoplay="lesson-map"][data-map="${kind}"]`);
     await card.first().waitFor({ state: "visible", timeout: 5_000 }).catch(() => fail(`${what}: on the step "${step}" no card shows`));
     if ((await anyCard.count()) !== 1) fail(`${what}: ${await anyCard.count()} lesson-map cards on the stage (one group at a time: one card)`);
-    // The step's line, played from its start: the caption is that line, and says what the manifest shows.
-    const id = `al-fatihah:${ayah}:${step}`;
+    // The step's first line, played from its start: the caption is that line, and says what the manifest
+    // shows. The step "map:learnt" opens with "map:again" since 2026-10-17 (the operator removed its
+    // learnt-so-far line, "Sebelum ayat ini, kita sudah mempelajari …"; lessonMap.ts MAP_LINES).
+    const id = `al-fatihah:${ayah}:${kind === "learnt" ? "map:again" : step}`;
     const line = lines[id];
     if (!line?.display) fail(`${what}: content/narration/al-fatihah.json has no line ${id}`);
     await replay.click();

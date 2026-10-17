@@ -71,7 +71,7 @@ def check(lessons: dict[str, dict], library: dict, terms: Q.Terms, quizzes: dict
     `pending`: authored/curriculum.pending.json `quiz` (default: from disk); `curriculum`:
     content/curriculum.json and `mapped`: the surahs whose lesson map is switched on (both
     default: from disk) — what the warm-up is derived with."""
-    errs: list[str] = []
+    errs: list[str] = Q.allah_kind_only_problems(lessons)
     if fresh is None:
         try:
             fresh = BQ.build_all(lessons, library, terms, curriculum=curriculum, mapped=mapped)

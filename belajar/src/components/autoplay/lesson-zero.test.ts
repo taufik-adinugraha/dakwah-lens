@@ -307,9 +307,13 @@ describe("what left Al-Fatihah 1", () => {
     expect(taughtAt(FATIHAH.ayat[0]).map((x) => x.id)).toEqual(["majrur", "huruf-jar"]);
     const map = lessonMapInput("al-fatihah", 1)!;
     expect(map.learnt.map((x) => x.id)).toEqual(CURRICULUM.lessons.find((l) => l.id === LESSON_ZERO)!.steps);
-    // … and named (operator 2026-10-15: "Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu XXX dan YYY").
-    // … the three kinds with their members (operator 2026-10-17: "add in parenthesis what are tiga jenis kata").
-    expect(LINES["al-fatihah:1:map:learnt"].text).toBe("Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu harakat, serta tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف.");
+    // … and named where they come up again, the three kinds with their members (operator 2026-10-17: "add in
+    // parenthesis what are tiga jenis kata"); the count of what was learnt is no longer said at the opening
+    // (operator 2026-10-17: "better to remove this line in every ayat beginning").
+    expect(LINES["al-fatihah:1:map:learnt"]).toBeUndefined();
+    expect(LINES["al-fatihah:1:map:again"].text).toBe(
+      "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, serta tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف.",
+    );
   });
 });
 

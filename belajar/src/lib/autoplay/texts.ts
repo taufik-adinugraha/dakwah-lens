@@ -87,8 +87,10 @@ export const ID_TEXTS: AutoplayTexts = {
   // A next-level topic is counted, never named (the card names it).
   lessonMap: {
     new: ({ new: fresh }) => (fresh.length ? `Di ayat ini ada ${fresh.length} hal baru: ${mapListId(fresh)}.` : "Di ayat ini tidak ada hal baru."),
-    learnt: ({ learnt }) => `Sebelum ayat ini, kita sudah mempelajari ${learnt.length} hal, yaitu ${mapListId(learnt)}.`,
-    again: ({ again }) => (again.length ? `Yang kita temui lagi di ayat ini adalah ${mapListId(again)}.` : "Tidak ada yang kita temui lagi di ayat ini."),
+    // The learnt-so-far count is said only in the closing recap (map:total): operator 2026-10-17,
+    // "better to remove this line in every ayat beginning" — the learnt step says what comes up again.
+    again: ({ again }) =>
+      again.length ? `Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah ${mapListId(again)}.` : "Tidak ada yang kita temui lagi di ayat ini.",
     later: ({ later, lanjut }) =>
       [
         later.length ? laterId(later) : "",

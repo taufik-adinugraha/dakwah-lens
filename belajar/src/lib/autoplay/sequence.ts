@@ -6,8 +6,8 @@
  *   → map:new → map:learnt → map:later (only in a surah with a lesson map,
  *     content/map/${slug}.json: what this ayah brings, ONE step per group of
  *     its card, each with its lines (lessonMap.ts MAP_LINES, one sentence per
- *     line) — what is new; everything learnt so far, then what of it comes up
- *     again here (once something was learnt); what is here and taught later,
+ *     line) — what is new; what of what was learnt so far comes up again here
+ *     (once something was learnt; the learnt-so-far count only in the closing); what is here and taught later,
  *     and how many next-level topics, then the reassurance that none of it
  *     needs learning now (when there is any) — every counted step named
  *     (operator 2026-10-15); operator 2026-10-13, plan L23 and L26)
@@ -301,7 +301,6 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     const again = said(mapHere(map));
     const captions: Record<(typeof MAP_LINES)[MapGroup][number], string> = {
       "map:new": texts.lessonMap.new({ new: said(map.new) }),
-      "map:learnt": texts.lessonMap.learnt({ learnt: said(map.learnt) }),
       "map:again": texts.lessonMap.again({ again }),
       "map:later": texts.lessonMap.later({ later: mapLaterNames(map), lanjut: map.lanjut.length }),
       "map:focus": texts.lessonMap.focus({ later: map.later.length, lanjut: map.lanjut.length, new: said(map.new), again }),

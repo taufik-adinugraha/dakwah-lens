@@ -380,7 +380,7 @@
               1,
               2
             ],
-            "say": "Kata {{1:1:1/ismi}} yang artinya “nama” itu disandarkan kepada kata kedua, {{1:1:2}}, sehingga maknanya “nama Allah”. Susunan sandaran ini baru akan diajarkan lebih lengkap di ayat keempat."
+            "say": "Isim itu disandarkan kepada kata kedua, {{1:1:2}}, sehingga maknanya “nama Allah”. Susunan sandaran ini baru akan diajarkan lebih lengkap di ayat keempat."
           },
           {
             "words": [
@@ -589,7 +589,7 @@
             }
           ],
           "status": "draft",
-          "why_basic": "Akhirnya kasrah karena didahului huruf jar yang artinya “bagi”. Keterangan ini bergantung pada kata yang tidak diucapkan, yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”.",
+          "why_basic": "Akhirnya kasrah karena didahului huruf jar, yaitu {{1:2:2/li}}, yang artinya “bagi”. Keterangan ini bergantung pada kata yang tidak diucapkan, yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”.",
           "marked": {
             "why": "Akhirnya [[kasrah|kasrah]] karena didahului [[huruf jar|huruf-jar]] [[li-|q:1:2:2/1]]; [[jar-majrur|jar-majrur]] ini bergantung pada [[khabar|khabar]] yang tidak disebut (misalnya “tetap”).",
             "role": "[[khabar|khabar]] ([[jar-majrur|jar-majrur]])",
@@ -1976,7 +1976,7 @@
             }
           ],
           "status": "draft",
-          "why_basic": "Kata kerja perintah yang bermakna doa ini mabni, ditandai dengan dibuangnya huruf ya' di akhirnya; fa'il kata ini tersirat, yaitu “Engkau”, dan dhamir yang artinya “kami” adalah maf'ul bih baginya.",
+          "why_basic": "Kata kerja perintah yang bermakna doa ini mabni, ditandai dengan dibuangnya huruf ya' di akhirnya; fa'il kata ini tersirat, yaitu “Engkau”, dan dhamir, yaitu {{1:6:1/na}}, yang artinya “kami”, adalah maf'ul bih baginya.",
           "marked": {
             "why": "[[Fi'il amr|fiil-amr]] yang bermakna doa ini [[mabni|mabni]] dengan dibuangnya huruf ya' di akhir; pelakunya tersirat (“Engkau”), dan [[-nā|q:1:6:1/2]], yang artinya “kami”, adalah objeknya.",
             "role": "[[fi'il amr|fiil-amr]] (doa) + [[maf'ul bih|maful-bih]] pertama ([[-nā|q:1:6:1/2]]); [[fa'il|fail]] tersimpan: “Engkau”",
@@ -5336,8 +5336,8 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
-    "authored_words": "authored/al-fatihah.words.json sha256:abda5b9a8fc0a27ef4ef6e0f4354b403dacc066d221e38c30b3bdd86f933fc59",
-    "authored_structure": "authored/al-fatihah.structure.json sha256:e2249b1e2a154af5315075692e5bac7ea2ee4211043432664f0757e93952c3d0",
+    "authored_words": "authored/al-fatihah.words.json sha256:ed247cb6ffa8dcae73dfe4b92be8f09dcae954ae22f5a86a40cca3dd2bb07e00",
+    "authored_structure": "authored/al-fatihah.structure.json sha256:b88af717a96cfe2bc34ffcc5dcccbda33e1b6503f14acb2c26a9e2acfea56d49",
     "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:e2513b4878e1704c60d8682e05701a3efb44e32ec5404f2d79a133394e7cf99b",
     "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:1181789ee65c1b2e800270475f1c6264576a0062f8d75290ee2f99af9d2adc5f",
     "pipeline": "belajar/pipeline/build_fatihah.py + facts.py (stdlib only, no LLM)"

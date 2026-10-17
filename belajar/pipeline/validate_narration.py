@@ -15,15 +15,15 @@ What it enforces (README "Narasi" has the reasons):
   the ayah); `highlight` the word numbers of the ayah the stage highlights ([0] the whole ayah, []
   none); `focus` the word ("1:1:3") of the large word card, or null.
 - Ids follow the contract: "${slug}:${ayah}:${part}" with part in intro | recite | map:new |
-  map:learnt | map:again | map:later | map:focus | primer:${k} | w${n} | w${n}:compose:${k} | structure | structure:${k} | concept:${id} |
+  map:again | map:later | map:focus | primer:${k} | w${n} | w${n}:compose:${k} | structure | structure:${k} | concept:${id} |
   ex:${exerciseKey}:${lineKey} | ex:${exerciseKey}:${n}:why | learned | map:total | recap | next | done, and
   "shared:${key}" in shared.json. A line longer than MAX_LINE is split into "<id>:a", "<id>:b", …
   (at least two parts, letters contiguous from a, never next to the unsplit id); a primer or
   compose line is never split (one line per animation frame's sentence), nor a map or learned
   line (one line with its card).
 - Coverage: every ayah has intro, recite, the map's opening lines when the surah has a lesson map
-  (content/map/<slug>.json: map:new always, map:learnt and map:again when something was learnt
-  before, map:later and map:focus when a step is postponed or a next-level topic is present),
+  (content/map/<slug>.json: map:new always, map:again when something was learnt before (the
+  learnt-so-far line "map:learnt" went 2026-10-17), map:later and map:focus when a step is postponed or a next-level topic is present),
   primer:1…k when
   content/compose/<slug>.json opens the ayah with the harakat primer, one w${n} per word followed
   by w${n}:compose:1…k when the word has a composition (one per `say` of its frames), structure,
@@ -48,9 +48,12 @@ What it enforces (README "Narasi" has the reasons):
   they are") a sentence that counts steps names EVERY one, in teaching order, and the count is the
   number of names: "map:new" says how many steps are NEW and names every one (at most three, the
   curriculum's limit) — they are the steps of that ayah's concept:* lines, in that order, each
-  named as its "Konsep baru: …" caption names it. "map:learnt" says how many steps have been
-  learnt SO FAR and names them all; "map:again" names every one of them that comes up again in
-  this ayah ("Yang kita temui lagi di ayat ini adalah …") — or, plainly, that none does.
+  named as its "Konsep baru: …" caption names it. "map:again" names every step learnt so far that comes up again
+  in this ayah, standing on its own ("Dari yang sudah kita pelajari, yang kita temui lagi di ayat
+  ini adalah …") — or, plainly, that none does. The count of everything learnt so far is said only
+  in the closing "map:total" (operator 2026-10-17: "better to remove this line in every ayat
+  beginning: 'Sebelum ayat ini, kita sudah mempelajari XX hal, yaitu …'"); a line in that shape
+  fails (map_problems).
   "map:later" names every step present here and taught LATER, with the ayah that will teach it,
   and gives the COUNT of the next-level topics: a next-level name is never spoken. "map:focus"
   follows it: what was put aside need not be learnt now (its pronoun by the count: yang satu ini,
@@ -367,7 +370,7 @@ def map_opening_parts(entry: dict | None) -> list[str]:
     since 2026-10-15: every step is named, and a list of sixteen is a line of its own.)"""
     if entry is None:
         return []
-    return (["map:new"] + (["map:learnt", "map:again"] if entry.get("learnt") else [])
+    return (["map:new"] + (["map:again"] if entry.get("learnt") else [])
             + (["map:later", "map:focus"] if entry.get("later") or entry.get("lanjut") else []))
 
 
@@ -437,12 +440,13 @@ WHOLE_AYAH = [0]
 # what is put aside is followed by a reassurance ("Sekarang Anda tidak perlu menghafal ketiganya,
 # mari kita fokus pada pelajaran XXX dan YYY terlebih dahulu"). A full list of sixteen steps is a
 # line of its own, so each such sentence is its own line (never split, each ≤ MAX_LINE): the
-# learnt step says "map:learnt" then "map:again" (what of it comes up here), the later step
+# learnt step says "map:again" (what of what was learnt comes up here; until 2026-10-17 after
+# "map:learnt", the count of everything learnt so far, which the operator removed), the later step
 # "map:later" then "map:focus" (the reassurance), the closing step "learned" then "map:total"
-# (the running total, every step named). build_narration.map_new / map_learnt / map_again /
+# (the running total, every step named). build_narration.map_new / map_again /
 # map_later / map_focus / map_closing / map_total write the lines; map_problems below reads them
 # back against content/map.
-MAP_OPENING = ("map:new", "map:learnt", "map:again", "map:later", "map:focus")
+MAP_OPENING = ("map:new", "map:again", "map:later", "map:focus")
 MAP_CLOSING = ("learned", "map:total")
 MAP_PARTS = (*MAP_OPENING, *MAP_CLOSING)
 # The pronoun the reassurance uses for what the line before it put aside (operator 2026-10-15:
@@ -897,6 +901,39 @@ _ORDS = "|".join(sorted(ORDINAL_NUM, key=len, reverse=True))
 PLACE_MEANING_SAN = re.compile(rf"\b([Kk]ata) ({_ORDS}|ini)(?: (dan|sampai) (?:kata )?({_ORDS}))?(,?) (yang )?(artinya|berarti)\b")
 PLACE_MEANING = re.compile(rf"\b(?:[Kk]ata (?:{_ORDS}|ini|itu)(?: (?:dan|sampai) (?:kata )?(?:{_ORDS}))?|[Yy]ang (?:{_ORDS})),? "
                            r"(?:yang )?(?:artinya|berarti)\b")
+# A PART of a word named by its kind and its meaning only, in a composition line (operator
+# 2026-10-17, "Sibling lines": "Bagian kedua adalah isim yang artinya “Maha Pengasih”" names the
+# tile on the stage by what it is and what it means, not by itself — "Bagian kedua adalah isim,
+# yaitu رَحْمَٰن (raḥmān), yang artinya …", as "Bagian pertama adalah huruf jar, yaitu بِ (bi), yang
+# artinya “dengan”" already did): each "(yang) artinya" of a `:compose:` line whose stretch since
+# the clause's start (or the meaning before it) holds a kind word and no named word. "Kata ini
+# adalah kata penghubung yang artinya …" (the line's own word, named on the line before) and a
+# phrase ("ungkapan yang artinya …") hold no kind word.
+PART_KIND = re.compile(r"\b(?:[Ii]sim|[Ff]i[’']il|[Dd]hamir|[Hh]uruf(?: jar)?|[Aa]khiran|[Kk]ata (?:benda|kerja|ganti))\b")
+_MEANS = re.compile(r"\b(?:yang )?artinya\b")
+
+
+def part_meaning_only(display: str) -> list[str]:
+    """The stretches of a composition caption that name a part by its kind and its meaning only."""
+    out, start = [], 0
+    for m in _MEANS.finditer(display):
+        b = max([start] + [x.end() for x in re.finditer(r"[.;:]", display[:m.start()])])
+        seg = display[b:m.start()]
+        if PART_KIND.search(seg) and not NAMED_SHOWN.search(seg):
+            out.append(seg.strip(" ,"))
+        q = re.match(r":? ?“[^”]*”", display[m.end():])
+        start = m.end() + (q.end() if q else 0)
+    return out
+
+
+def named_twice(display) -> list[str]:
+    """The named words a caption names more than once (operator 2026-10-17, "Sibling lines": "Kata
+    pertama, yaitu مِن (min), artinya: “dari”. Kata ini, yaitu مِن (min), yang artinya …" names the
+    word twice in one line; the second naming goes)."""
+    if not isinstance(display, str):
+        return []
+    names = [m.group() for m in NAMED_SHOWN.finditer(display)]
+    return sorted({n for n in names if names.count(n) > 1})
 # A back-reference to an earlier ayah (operator 2026-10-17, rule 29: "A lesson stands on its own
 # screen: no back-references to earlier ayat"; "remove the comparison, keep the sentence
 # complete"): "seperti di ayat pertama", "bagi kata … di ayat kedua", "ayat sebelumnya". A citation
@@ -1077,6 +1114,9 @@ _CONT = f"\\w{AR_MARKS}'‘’ʼ`´\\-"  # characters that continue a word on ei
 HEAVY_A = re.compile("[صضطظقخغ](?:\u0651?[\u064E\u064B]|[\u064E\u064B]\u0651|\u0627)")
 ARABIC_WORD = re.compile("[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]+")
 AR_LETTERS = "\u0621-\u065f\u0670-\u06ff"  # Arabic letters and their marks (a shown letter in brackets)
+# A karaoke word that already shows Arabic: a shown-only piece next to it is a karaoke word of its own
+# (Lexicon.token_entries; one Arabic unit per karaoke word, at its end).
+KARAOKE_OWN_PIECE = re.compile(f"[{AR_LETTERS}]")
 MASK = "istilah"  # what a dictionary term becomes for the word guard (a plain Indonesian word)
 _LETTER_CHARS = [chr(x) for x in range(0x0621, 0x064B)] + ["\u0671"]  # the letters (and ٱ), no marks
 
@@ -1350,23 +1390,53 @@ class Lexicon:
         return " ".join(self._pieces(text, focus_ar, named, cuts))
 
     def _pieces(self, text: str, focus_ar, named, cuts) -> list[str]:
-        """Each spoken word (runs) as the caption shows it, with the shown-only pieces put back: a
-        piece joins the word it falls in (": X" before a full stop) or the one before it (", yaitu
-        X," after "kedua") — shown while that word is heard, with that word's timing."""
+        """The karaoke words' texts (token_entries)."""
+        return [t for t, _i in self.token_entries(text, focus_ar, named, cuts)]
+
+    def token_entries(self, text: str, focus_ar, named, cuts) -> list[tuple[str, int]]:
+        """Each spoken word (runs) as the caption shows it, with the shown-only pieces put back, as
+        (the karaoke word's text, the index of the run whose timing it takes). A piece joins the
+        word it falls in (": X" before a full stop) or the one before it (", yaitu X," after
+        "kedua") — shown while that word is heard, with that word's timing. Except where that word
+        already shows Arabic (a term, "isim (اِسْم)", or a named word): one karaoke word holds at
+        most one Arabic unit, at its end (operator 2026-10-17, rule 15, clean line breaks; the TS
+        textUnits test), so there the piece is a karaoke word of its own, cut from the word at the
+        piece's first space — "isim (اِسْم)," + "yaitu صِرَٰط (ṣirāṭ)," — with the SAME timing as the
+        spoken word: shown while it is heard, as before, and no time made up (KARAOKE_OWN_PIECE)."""
         spans = self._spans(text, named)
         runs = self.runs(text, named)
         out = [self._render(text, a, b, spans, focus_ar) for a, b in runs]
+        # Per run: the pieces split off before it and after it (each a karaoke word of its own).
+        before: list[list[str]] = [[] for _ in runs]
+        after: list[list[str]] = [[] for _ in runs]
         for pos, piece in sorted(cuts, key=lambda c: c[0], reverse=True):
             i = max((k for k, (a, _b) in enumerate(runs) if a <= pos), default=0)
             a, b = runs[i] if runs else (0, 0)
+            own = bool(runs) and bool(KARAOKE_OWN_PIECE.search(out[i]))
             if pos >= b:
-                out[i] = out[i] + piece
+                sp = piece.find(" ")
+                if own and sp >= 0 and piece[sp + 1:].strip():
+                    out[i] = out[i] + piece[:sp]
+                    after[i].insert(0, piece[sp + 1:])
+                else:
+                    out[i] = out[i] + piece
             elif pos <= a:
-                out[i] = piece.rstrip() + " " + out[i] if piece.rstrip() == piece else piece + out[i]
+                if own and piece.rstrip() != piece:
+                    before[i].append(piece.rstrip())
+                else:
+                    out[i] = piece.rstrip() + " " + out[i] if piece.rstrip() == piece else piece + out[i]
             else:  # inside the word: before its last (b - pos) characters, punctuation as spoken
                 k = len(out[i]) - (b - pos)
-                out[i] = out[i][:k] + piece + out[i][k:]
-        return out
+                sp = piece.find(" ")
+                if own and sp >= 0 and piece[sp + 1:].strip():
+                    after[i].insert(0, piece[sp + 1:] + out[i][k:])
+                    out[i] = out[i][:k] + piece[:sp]
+                else:
+                    out[i] = out[i][:k] + piece + out[i][k:]
+        entries: list[tuple[str, int]] = []
+        for i, t in enumerate(out):
+            entries += [(p, i) for p in before[i]] + [(t, i)] + [(p, i) for p in after[i]]
+        return entries
 
     def tokens(self, text: str, starts: list[float], ends: list[float], focus_ar: str | None = None,
                named=(), cuts=()) -> list[dict]:
@@ -1377,8 +1447,8 @@ class Lexicon:
         if len(starts) != len(text) or len(ends) != len(text):
             raise ValueError("alignment does not match the text character for character")
         runs = self.runs(text, named)
-        return [{"t": t, "s": round(starts[a], 3), "e": round(ends[b - 1], 3)}
-                for t, (a, b) in zip(self._pieces(text, focus_ar, named, cuts), runs)]
+        return [{"t": t, "s": round(starts[runs[i][0]], 3), "e": round(ends[runs[i][1] - 1], 3)}
+                for t, i in self.token_entries(text, focus_ar, named, cuts)]
 
     def _said_with_holes(self, display: str) -> tuple[str, list[str]]:
         """What a caption says (see speech_of_display), each shown-only word a placeholder still in
@@ -1587,7 +1657,7 @@ def held(text: str, lex: Lexicon) -> list[str]:
 
 # ------------------------------------------------------------------ checks
 SLUG_ID = re.compile(
-    r"^(?P<slug>[a-z-]+):(?P<ayah>0|[1-9]\d*):(?P<part>intro|recite|map:(?:new|learnt|again|later|focus|total)|primer:[1-9]\d*|w[1-9]\d*(?::compose:[1-9]\d*)?"
+    r"^(?P<slug>[a-z-]+):(?P<ayah>0|[1-9]\d*):(?P<part>intro|recite|map:(?:new|again|later|focus|total)|primer:[1-9]\d*|w[1-9]\d*(?::compose:[1-9]\d*)?"
     r"|structure(?::[1-9]\d*)?|concept:[a-z0-9-]+(?::lead|:ex:[1-9]\d*)?|learned"
     r"|ex:(?:" + "|".join(EXERCISE_KEYS) + r"):(?:[a-z][a-z_]+|[1-9]\d*:why)|recap|next|done)(?::(?P<split>[a-z]))?$"
 )
@@ -1796,6 +1866,14 @@ def check_display(lid: str, display, text, forms: Forms, lex: Lexicon, focus_ar:
     if m:
         errs.append(f"{lid}: names a word by its place and meaning only ({m.group()!r}): show and say the word itself "
                     "too, “kata ketiga, yaitu <the word>, yang artinya …” (rule 26; the markup {{s:a:w}})")
+    if ":compose:" in lid:
+        for seg in part_meaning_only(display):
+            errs.append(f"{lid}: names a part by its kind and meaning only ({seg!r} … artinya): show and say the part "
+                        "itself, “isim, yaitu <the form>, yang artinya …” (the frame's tile, the markup {{s:a:w/form}}; "
+                        "operator 2026-10-17)")
+    for w in named_twice(display):
+        errs.append(f"{lid}: names {w!r} twice in one line: name it once (“Kata ini adalah …” after the word line's "
+                    "“Kata pertama, yaitu …”; operator 2026-10-17)")
     for ref in back_references(lid, display):
         errs.append(f"{lid}: points back at an earlier ayah ({ref!r}): remove the comparison, keep the sentence "
                     "complete (rule 29, operator 2026-10-17)")
@@ -1955,6 +2033,20 @@ def check_tokens(lid: str, toks, audio, text, lex: Lexicon, focus_ar: str | None
         joined, want = " ".join(tk["t"] for tk in toks), lex.render_display(text, focus_ar, named, cuts)
         if joined != want:
             errs.append(f"{lid}: tokens do not join to the display rendering of the spoken text ({joined!r} ≠ {want!r})")
+        else:
+            # … and are its karaoke words one by one: a shown-only piece beside a word that already
+            # shows Arabic is a word of its own (token_entries), with that word's timing exactly.
+            entries = lex.token_entries(text, focus_ar, named, cuts)
+            if [tk["t"] for tk in toks] != [t for t, _i in entries]:
+                errs.append(f"{lid}: tokens are not the karaoke words of the spoken text ({[tk['t'] for tk in toks]!r} ≠ "
+                            f"{[t for t, _i in entries]!r}): a karaoke word holds at most one Arabic unit, at its end — a "
+                            "shown-only piece beside a word that shows Arabic is a token of its own (build_narration.py)")
+            else:
+                own: dict[int, tuple] = {}
+                for tk, (_t, i) in zip(toks, entries):
+                    if own.setdefault(i, (tk["s"], tk["e"])) != (tk["s"], tk["e"]):
+                        errs.append(f"{lid}: token {tk['t']!r}, a shown-only piece, does not have the timing of the "
+                                    f"word it is shown with ({own[i]}): no time is made up")
     return errs
 
 
@@ -2193,6 +2285,14 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
     rx = SHARED_ID if name == "shared" else SLUG_ID
     groups, gerrs = _split_groups(list(lines), rx, name)
     errs += gerrs
+    # A line split into :a, :b, … is one text: a word is named once in it all (named_twice).
+    for base, letters in groups.items():
+        parts = [lines.get(f"{base}:{x}") for x in letters]
+        if len(parts) > 1 and all(isinstance(p, dict) and isinstance(p.get("display"), str) for p in parts):
+            for w in named_twice(" ".join(p["display"] for p in parts)):
+                if not any(w in named_twice(p["display"]) for p in parts):
+                    errs.append(f"{base}: names {w!r} in more than one of its parts ({', '.join(letters)}): one line "
+                                "names a word once (operator 2026-10-17)")
     ayat = {a["ayah"]: a for a in lesson_ayat(lesson, compose)}
     for lid, line in lines.items():
         if not isinstance(line, dict) or not LINE_KEYS <= set(line) or set(line) - LINE_KEYS - LINE_OPTIONAL:
@@ -2317,13 +2417,16 @@ _MAP_JOIN = re.compile(r", serta |, dan | serta | dan |, ")
 _MAP_PLACE = re.compile(rf" di ayat ({ORDINAL})")
 _MAP_NEW = re.compile(r"^Di ayat ini ada (?P<n>[a-z ]+?) hal baru: (?P<list>.+)\.$")
 _MAP_NONE = "Di ayat ini tidak ada hal baru."
-# "map:learnt": the count, then EVERY step learnt so far by name (2026-10-15). The bare count of
-# before ("… mempelajari dua hal.") still matches, with no list: the error then says so.
-_MAP_SOFAR = re.compile(r"^Sebelum ayat ini, kita sudah mempelajari (?P<n>[a-z ]+?) hal(?:, (?P<some>yaitu|di antaranya) (?P<list>.+))?\.$")
+# The opening's learnt-so-far line, removed 2026-10-17 (operator: "better to remove this line in
+# every ayat beginning"): a line of this shape anywhere fails; the count is map:total's alone.
+_MAP_SOFAR_SAID = re.compile(r"\bSebelum ayat ini, kita sudah mempelajari\b")
 # "map:again": every step met again by name — or, plainly, none. The shapes of before ("ada satu:
 # X", "ada tiga, di antaranya X dan Y") are read too, so a line in them fails with its reason.
-_MAP_AGAIN = re.compile(r"^Yang kita temui lagi di ayat ini adalah (?P<list>.+)\.$")
-_MAP_AGAIN_OLD = re.compile(r"^Yang kita temui lagi di ayat ini ada [a-z ]+?(?:, di antaranya|:) .+\.$")
+_MAP_AGAIN_LEAD = "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah"
+_MAP_AGAIN = re.compile(rf"^{_MAP_AGAIN_LEAD} (?P<list>.+)\.$")
+# … as it was worded after the learnt-so-far line, which it no longer follows.
+_MAP_AGAIN_BARE = re.compile(r"^Yang kita temui lagi di ayat ini adalah .+\.$")
+_MAP_AGAIN_OLD = re.compile(r"^(?:Dari yang sudah kita pelajari, yang|Yang) kita temui lagi di ayat ini ada [a-z ]+?(?:, di antaranya|:) .+\.$")
 _MAP_NOT_AGAIN = "Tidak ada yang kita temui lagi di ayat ini."
 _MAP_LATER = re.compile(rf"^Ada (?P<n>[a-z ]+?) hal lagi di ayat ini, (?P<some>di antaranya|yaitu) (?P<list>.+), tetapi baru akan "
                         rf"diajarkan lebih lengkap (?:di ayat (?P<ayah>{ORDINAL})|nanti)\.$")
@@ -2466,18 +2569,13 @@ def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict, curricul
             else:
                 errs += _map_count(lid, "new step(s)", m, new)
                 errs += _map_names(lid, "new step(s)", m.group("list"), new, known, count_value(m.group("n")))
-        # --- what has been learnt so far, every step by name
-        lid = f"{base}:map:learnt"
-        shown = _field_of(lines, lid, "display")
-        if shown:
-            m = _MAP_SOFAR.match(shown)
-            if not learnt:
-                errs.append(f"{lid}: nothing was learnt before this ayah, and it has a line that says so")
-            elif not m or not _one_sentence(shown):
-                errs.append(f"{lid}: does not say, in one sentence, how many steps have been learnt so far and which "
-                            "(what comes up again is the next line, map:again)")
-            else:
-                errs += _map_all_named(lid, "step(s) learnt so far", m, learnt, known)
+        # --- the learnt-so-far line is gone (operator 2026-10-17): not under its id, nor in any line
+        for lid in [x for x in lines if x.startswith(f"{base}:")]:
+            shown = _field_of(lines, lid, "display")
+            if shown and _MAP_SOFAR_SAID.search(shown):
+                errs.append(f"{lid}: says how many steps were learnt before this ayah (“Sebelum ayat ini, kita sudah "
+                            "mempelajari …”): that line was removed from every ayah's opening (operator 2026-10-17); the "
+                            "count is said only in the closing, map:total")
         # --- what of it comes up again here, every step by name
         lid = f"{base}:map:again"
         shown = _field_of(lines, lid, "display")
@@ -2488,9 +2586,12 @@ def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict, curricul
             elif not again:
                 if shown != _MAP_NOT_AGAIN:
                     errs.append(f"{lid}: no learnt step comes up again in this ayah, and the line does not say so plainly")
+            elif _MAP_AGAIN_BARE.match(shown):
+                errs.append(f"{lid}: does not stand on its own (“Yang kita temui lagi …” followed the learnt-so-far line, "
+                            f"removed 2026-10-17): say “{_MAP_AGAIN_LEAD} …”")
             elif _MAP_AGAIN_OLD.match(shown):
                 errs.append(f"{lid}: counts the learnt steps that come up again (“ada …”) instead of naming every one "
-                            "(“Yang kita temui lagi di ayat ini adalah …”, 2026-10-15)")
+                            f"(“{_MAP_AGAIN_LEAD} …”, 2026-10-15)")
             elif not m or not _one_sentence(shown):
                 errs.append(f"{lid}: does not name, in one sentence, the learnt steps that come up again here "
                             f"({len(again)} in the lesson map)")

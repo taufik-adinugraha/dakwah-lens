@@ -592,7 +592,7 @@
         },
         {
           "frame": 1,
-          "say": "Bagian kedua adalah sebuah isim, atau kata benda, yang artinya “nama”."
+          "say": "Bagian kedua adalah sebuah isim, atau kata benda, yaitu {{1:1:1/ismu}}, yang artinya “nama”."
         },
         {
           "frame": 2,
@@ -948,7 +948,7 @@
         },
         {
           "frame": 1,
-          "say": "Bagian kedua adalah isim yang artinya “Maha Pengasih”."
+          "say": "Bagian kedua adalah isim, yaitu {{1:1:3/rahman}}, yang artinya “Maha Pengasih”."
         },
         {
           "frame": 2,
@@ -1187,7 +1187,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Alif lam bersambung dengan isim yang artinya “Maha Penyayang”."
+          "say": "Alif lam bersambung dengan isim, yaitu {{1:1:4/rahim}}, yang artinya “Maha Penyayang”."
         },
         {
           "frame": 1,
@@ -1315,7 +1315,7 @@
         },
         {
           "frame": 1,
-          "say": "Bagian kedua adalah isim yang artinya “pujian”."
+          "say": "Bagian kedua adalah isim, yaitu {{1:2:1/hamdu}}, yang artinya “pujian”."
         },
         {
           "frame": 2,
@@ -1797,7 +1797,7 @@
         },
         {
           "frame": 1,
-          "say": "Bagian kedua adalah isim yang artinya “seluruh alam”."
+          "say": "Bagian kedua adalah isim, yaitu {{1:2:4/alamina}}, yang artinya “seluruh alam”."
         },
         {
           "frame": 2,
@@ -2041,7 +2041,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Susunannya: alif lam bersambung dengan isim yang artinya “Maha Pengasih”."
+          "say": "Susunannya: alif lam bersambung dengan isim, yaitu {{1:3:1/rahman}}, yang artinya “Maha Pengasih”."
         },
         {
           "frame": 1,
@@ -2280,7 +2280,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Alif lam bersambung dengan isim yang artinya “Maha Penyayang”."
+          "say": "Alif lam bersambung dengan isim, yaitu {{1:3:2/rahim}}, yang artinya “Maha Penyayang”."
         },
         {
           "frame": 1,
@@ -2719,7 +2719,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Alif lam bersambung dengan isim yang artinya “pembalasan”."
+          "say": "Alif lam bersambung dengan isim, yaitu {{1:4:3/din}}, yang artinya “pembalasan”."
         },
         {
           "frame": 1,
@@ -3241,11 +3241,11 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Bagian pertama adalah fi'il, atau kata kerja, dalam bentuk perintah, yang artinya “tunjukilah”."
+          "say": "Bagian pertama adalah fi'il, atau kata kerja, dalam bentuk perintah, yaitu {{1:6:1/ihdi}}, yang artinya “tunjukilah”."
         },
         {
           "frame": 1,
-          "say": "Bagian kedua adalah dhamir, yaitu kata ganti yang menempel, yang artinya “kami”."
+          "say": "Bagian kedua adalah dhamir, atau kata ganti yang menempel, yaitu {{1:6:1/na}}, yang artinya “kami”."
         },
         {
           "frame": 2,
@@ -3495,7 +3495,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Alif lam bersambung dengan isim yang artinya “jalan”."
+          "say": "Alif lam bersambung dengan isim, yaitu {{!1:6:2/sirat}}, yang artinya “jalan”."
         },
         {
           "frame": 1,
@@ -3511,7 +3511,7 @@
         },
         {
           "frame": 3,
-          "say": "Sebabnya, kata ini menjadi objek kedua dari kata pertama; objek pertamanya adalah dhamir yang artinya “kami”."
+          "say": "Sebabnya, kata ini menjadi objek kedua dari kata pertama; objek pertamanya adalah dhamir, yaitu {{1:6:1/na}}, yang artinya “kami”."
         },
         {
           "frame": 3,
@@ -3723,7 +3723,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Alif lam bersambung dengan isim yang artinya “yang lurus”."
+          "say": "Alif lam bersambung dengan isim, yaitu {{!1:6:3/mustaqim}}, yang artinya “yang lurus”."
         },
         {
           "frame": 1,
@@ -4138,11 +4138,11 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Bagian pertama adalah fi'il, kata kerja bentuk lampau, yang artinya “telah memberi nikmat”."
+          "say": "Bagian pertama adalah fi'il, kata kerja bentuk lampau, yaitu {{1:7:3/anam}}, yang artinya “telah memberi nikmat”."
         },
         {
           "frame": 1,
-          "say": "Bagian kedua adalah dhamir yang artinya “Engkau”, yaitu pelakunya."
+          "say": "Bagian kedua adalah dhamir, yaitu {{1:7:3/ta}}, yang artinya “Engkau”, sebagai pelakunya."
         },
         {
           "frame": 1,
@@ -4266,6 +4266,20 @@
           "gloss": "kepada mereka",
           "attested": []
         },
+        "him": {
+          "ar": "هِمْ",
+          "translit": "him",
+          "src": {
+            "word": "1:7:4",
+            "pieces": [
+              3,
+              null
+            ]
+          },
+          "label": "dhamir",
+          "gloss": "mereka",
+          "attested": []
+        },
         "alaihim": {
           "ar": "عَلَيْهِمْ",
           "translit": "‘alaihim",
@@ -4342,11 +4356,11 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Bagian pertama adalah huruf jar yang artinya “kepada”."
+          "say": "Bagian pertama adalah huruf jar, yaitu {{1:7:4/ala}}, yang artinya “kepada”."
         },
         {
           "frame": 1,
-          "say": "Bagian kedua adalah dhamir yang artinya “mereka”; asal bunyi huruf ha' di awalnya adalah u."
+          "say": "Bagian kedua adalah dhamir, yaitu {{1:7:4/hum}}, yang artinya “mereka”; asal bunyi huruf ha' di awalnya adalah u."
         },
         {
           "frame": 2,
@@ -4366,7 +4380,7 @@
         },
         {
           "frame": 4,
-          "say": "Dhamir yang artinya “mereka” ini merujuk kepada kata kedua: merekalah yang diberi nikmat."
+          "say": "Dhamir ini, yaitu {{1:7:4/him}}, yang artinya “mereka”, merujuk kepada kata kedua: merekalah yang diberi nikmat."
         }
       ],
       "sources": [
@@ -4704,7 +4718,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Alif lam bersambung dengan isim yang artinya “yang dimurkai”."
+          "say": "Alif lam bersambung dengan isim, yaitu {{!1:7:6/magdub}}, yang artinya “yang dimurkai”."
         },
         {
           "frame": 1,
@@ -4851,7 +4865,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Huruf jar yang artinya “atas” bersambung dengan dhamir yang artinya “mereka”."
+          "say": "Huruf jar, yaitu {{1:7:7/ala}}, yang artinya “atas”, bersambung dengan dhamir, yaitu {{1:7:7/him}}, yang artinya “mereka”."
         },
         {
           "frame": 1,
@@ -5218,7 +5232,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Alif lam bersambung dengan isim yang artinya “orang-orang yang sesat”."
+          "say": "Alif lam bersambung dengan isim, yaitu {{!1:7:9/dallina}}, yang artinya “orang-orang yang sesat”."
         },
         {
           "frame": 1,
@@ -5505,7 +5519,7 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:3ec3d485c21df2c6c82ad2ca1864c229cc662f8589bf64c4163f1c9cb8217a1f",
+    "authored_compose": "authored/al-fatihah.compose.json sha256:ecd52b2dfd3e6f0a53d41520bf40401da43e0b494bab74cca44b621395856376",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }

@@ -26,7 +26,7 @@
  *
  * Narration lines are keyed by the step-id contract shared by every part of
  * the autoplay build (and by pipeline/build_narration.py + validate_narration.py):
- *   "${slug}:${ayah}:${part}"   part ∈ intro | recite | map:new | map:learnt |
+ *   "${slug}:${ayah}:${part}"   part ∈ intro | recite | map:new |
  *                                      map:again | map:later | map:focus |
  *                                      primer:${k} | w${n} |
  *                                      w${n}:compose:${k} | structure | structure:${k} |
@@ -36,8 +36,8 @@
  *                                      learned | map:total | recap | next | done
  *   (map:* / learned: the lesson map's lines, only in a surah that has one —
  *    what this ayah brings, said right after the imam's recitation, one step
- *    per group of its card and one sentence per line (what is new; everything
- *    learnt so far, then what of it comes up again; what is taught later and
+ *    per group of its card and one sentence per line (what is new; what of what was
+ *    learnt so far comes up again; what is taught later and
  *    how many next-level topics, then the reassurance that none of it needs
  *    learning now), and what it taught, then the running total, said right
  *    before the recap; every counted step named since 2026-10-15; operator
@@ -322,8 +322,8 @@ export type StepKind =
   | "intro"
   | "recite_ayah"
   /** The lesson map's opening (plan L23, L26): what this ayah brings, ONE step per group of its
-   *  card, in step with the narrator — "map:new" (what is new), "map:learnt" (what has been learnt
-   *  so far, then what of it comes up again here: lines map:learnt, map:again), "map:later" (what
+   *  card, in step with the narrator — "map:new" (what is new), "map:learnt" (what of what was learnt
+   *  so far comes up again here: line map:again; the learnt-so-far line went 2026-10-17), "map:later" (what
    *  is taught later, and the next-level topics, then the reassurance: map:later, map:focus). */
   | "map"
   /** The harakat primer (fathah a, kasrah i, dhammah u, …) opening an ayah. */
@@ -459,15 +459,14 @@ export type AutoplayTexts = {
    *  LINE (lessonMap.ts MAP_LINES), in the narration's own templates (pipeline/build_narration.py
    *  map_new … map_total): operator 2026-10-15, a sentence that counts steps names EVERY one, in
    *  teaching order — the names as the captions say them (lessonMap.ts mapSaidName: Latin, no
-   *  Arabic script). `new`: the steps new here; `learnt`: every step learnt so far; `again`:
-   *  those of them that come up again here (none: [] — "none comes up again"); `later`: the steps
+   *  Arabic script). `new`: the steps new here; `again`: the steps learnt so far that come up again
+   *  here, said on their own since 2026-10-17 (the learnt-so-far count only in `total`) (none: [] — "none comes up again"); `later`: the steps
    *  here and taught later, with this surah's ayah that teaches each (mapLaterWhere), and how many
    *  next-level topics there are (counted, never named); `focus`: the reassurance after it — how
    *  many were put aside of each kind, and the ayah's new steps (or, with none, what it repeats)
    *  to focus on. */
   lessonMap: {
     new: (a: { new: readonly string[] }) => string;
-    learnt: (a: { learnt: readonly string[] }) => string;
     again: (a: { again: readonly string[] }) => string;
     later: (a: { later: readonly MapLaterName[]; lanjut: number }) => string;
     focus: (a: { later: number; lanjut: number; new: readonly string[]; again: readonly string[] }) => string;

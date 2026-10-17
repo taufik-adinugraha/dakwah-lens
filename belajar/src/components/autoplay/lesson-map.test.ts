@@ -297,10 +297,9 @@ describe("the lesson map in the autoplay sequence", () => {
           const said = (part: string) => seq.steps.flatMap((s) => s.cues).find((c) => c.line === `al-fatihah:${a.ayah}:${part}`)!.caption;
           const named = (items: readonly { name: string }[]) => items.map((it) => mapSaidName(it.name));
           expect(said("map:new"), where).toContain(String(map.new.length));
-          expect(said("map:learnt"), where).toContain(String(map.learnt.length));
           expect(said("map:later"), where).toContain(String(map.lanjut.length));
           expect(said("map:total"), where).toContain(String(mapTotal(map)));
-          for (const [part, items] of [["map:new", map.new], ["map:learnt", map.learnt], ["map:again", mapHere(map)], ["map:later", map.later], ["map:focus", map.new], ["learned", map.new], ["map:total", [...map.learnt, ...map.new]]] as const) {
+          for (const [part, items] of [["map:new", map.new], ["map:again", mapHere(map)], ["map:later", map.later], ["map:focus", map.new], ["learned", map.new], ["map:total", [...map.learnt, ...map.new]]] as const) {
             for (const n of named(items)) expect(said(part), `${where} ${part}`).toContain(n);
           }
           for (const it of map.lanjut) expect(said("map:later") + said("map:focus"), where).not.toContain(mapLatinName(it.name));
@@ -365,7 +364,7 @@ describe("the lesson map in the autoplay sequence", () => {
         checked++;
       }
     }
-    expect(checked).toBe(49);
+    expect(checked).toBe(42); // six lines an ayah since 2026-10-17 (the learnt-so-far line removed)
   });
 
   it("the engine's captions name every step, in every locale's set", () => {
@@ -374,7 +373,8 @@ describe("the lesson map in the autoplay sequence", () => {
       const said = [
         texts.lessonMap.new({ new: ["majrur", "huruf jar"] }),
         texts.lessonMap.new({ new: [] }),
-        texts.lessonMap.learnt({ learnt: ["harakat", "tiga jenis kata"] }),
+        // (the learnt-so-far count: since 2026-10-17 only in the closing total — the opening's line went)
+        texts.total({ total: ["harakat", "tiga jenis kata"], fresh: false }),
         texts.lessonMap.again({ again: ["tiga jenis kata"] }),
         texts.lessonMap.again({ again: [] }),
         texts.lessonMap.later({ later: later([3, 3, 4]), lanjut: 1 }),
@@ -407,8 +407,11 @@ describe("the lesson map in the autoplay sequence", () => {
     }
     // The Indonesian set is the narration's wording (build_narration.py; the operator's examples).
     const t = AUTOPLAY_TEXT_SETS.id;
-    expect(t.lessonMap.learnt({ learnt: ["harakat", "tiga jenis kata"] })).toBe("Sebelum ayat ini, kita sudah mempelajari 2 hal, yaitu harakat dan tiga jenis kata.");
-    expect(t.lessonMap.again({ again: ["tiga jenis kata"] })).toBe("Yang kita temui lagi di ayat ini adalah tiga jenis kata.");
+    // The opening's learnt-so-far line was removed (operator 2026-10-17: "better to remove this line in
+    // every ayat beginning"): no such template, and what comes up again stands on its own.
+    expect("learnt" in t.lessonMap).toBe(false);
+    expect(t.lessonMap.again({ again: ["tiga jenis kata"] })).toBe("Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah tiga jenis kata.");
+    expect(t.lessonMap.again({ again: [] })).toBe("Tidak ada yang kita temui lagi di ayat ini.");
     expect(t.lessonMap.later({ later: later([3, 3, 4]), lanjut: 1 })).toBe(
       "Ada 3 hal lagi di ayat ini, tetapi baru akan diajarkan lebih lengkap nanti: alif lam di ayat 3, na’t di ayat 3, dan idhafah di ayat 4. Ada juga 1 hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
     );
@@ -494,7 +497,7 @@ describe("the lesson map in the autoplay sequence", () => {
     expect([seq.steps[w.idx].id, w.phase]).toEqual(["map:new", "ready"]);
   });
 
-  it("Al-Fatihah's manifest has the seven lines for every ayah, and no other surah's has any", () => {
+  it("Al-Fatihah's manifest has the six lines for every ayah, and no other surah's has any", () => {
     const parts = [...MAP_LINES.new, ...MAP_LINES.learnt, ...MAP_LINES.later, ...MAP_LINES.learned];
     for (const s of SURAHS) {
       const lines = Object.keys(narrationFor(s.slug)!.lines).filter((l) => /:(?:map:[a-z]+|learned)(?::[a-z])?$/.test(l));
@@ -504,6 +507,11 @@ describe("the lesson map in the autoplay sequence", () => {
     expect(LINE_ID_RE.test("al-fatihah:1:map")).toBe(false);
     expect(LINE_ID_RE.test("al-fatihah:1:map:review")).toBe(false);
     for (const p of ["again", "focus", "total"]) expect(LINE_ID_RE.test(`al-fatihah:1:map:${p}`), p).toBe(true);
+    // … nor the learnt-so-far line the operator removed (2026-10-17: "better to remove this line in every
+    // ayat beginning: 'Sebelum ayat ini, kita sudah mempelajari XX hal, yaitu …'"); its STEP stays, "map:learnt".
+    expect(LINE_ID_RE.test("al-fatihah:1:map:learnt")).toBe(false);
+    expect(MAP_LINES.learnt).toEqual(["map:again"]);
+    for (const l of Object.values(narrationFor("al-fatihah")!.lines)) expect(l.display ?? "").not.toMatch(/Sebelum ayat ini, kita sudah mempelajari/);
   });
 });
 

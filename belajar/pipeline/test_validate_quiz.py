@@ -170,6 +170,19 @@ def manifest(fn):
     return f
 
 
+def allah_list(fn):
+    """A changed quiz.ALLAH_KIND_ONLY (restored after the check)."""
+    def f():
+        saved = dict(Q.ALLAH_KIND_ONLY)
+        try:
+            fn(Q.ALLAH_KIND_ONLY)
+            return Q.allah_kind_only_problems(LESSONS)
+        finally:
+            Q.ALLAH_KIND_ONLY.clear()
+            Q.ALLAH_KIND_ONLY.update(saved)
+    return f
+
+
 def quizfile(fn):
     def f():
         q = copy.deepcopy(QUIZZES)
@@ -314,9 +327,9 @@ MUTATIONS = [
      quizfile(lambda q: warm(q, 1)["questions"][4].__setitem__("why", "Kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.")),
      "al-fatihah 1 word-kind q5 (word 4): its explanation restates the general definition of the kind ('yaitu nama benda, orang, atau sifat')"),
     ("the warm-up: … and beside the class (the new sentence with the old definition put back)",
-     quizfile(lambda q: warm(q, 2)["questions"][3].__setitem__("why", warm(q, 2)["questions"][3]["why"].replace(
+     quizfile(lambda q: warm(q, 2)["questions"][4].__setitem__("why", warm(q, 2)["questions"][4]["why"].replace(
          ", karena ia nama benda.", ", yaitu nama benda, orang, atau sifat, karena ia nama benda."))),
-     "al-fatihah 2 word-kind q4 (word 3): its explanation restates the general definition of the kind"),
+     "al-fatihah 2 word-kind q5 (word 4): its explanation restates the general definition of the kind"),
     ("the warm-up: a word by its place and meaning, the word itself left out",
      quizfile(lambda q: warm(q, 1)["questions"][4].__setitem__("why", "Kata keempat, yang artinya “Maha Penyayang”, adalah isim (اِسْم), karena ia nama sifat.")),
      "al-fatihah 1 word-kind q5 (word 4): its explanation is not the sentence built from the data"),
@@ -337,8 +350,23 @@ MUTATIONS = [
     ("the warm-up: a class of a tag the record teaches none for (allażīna, REL)",
      quizfile(lambda q: warm(q, 7)["questions"][1].__setitem__("class", "kata ganti")),
      "al-fatihah 7 word-kind q2 (word 2): names the class 'kata ganti', and the part's QAC tag gives None"),
-    ("the warm-up: the class withheld from a noun", quizfile(lambda q: warm(q, 2)["questions"][3].pop("class")),
-     "al-fatihah 2 word-kind q4 (word 3): names the class None, and the part's QAC tag gives 'nama benda'"),
+    ("the warm-up: the class withheld from a noun", quizfile(lambda q: warm(q, 2)["questions"][4].pop("class")),
+     "al-fatihah 2 word-kind q5 (word 4): names the class None, and the part's QAC tag gives 'nama benda'"),
+    # An isim that names, titles or describes Allah says the kind alone (operator 2026-10-17: "when ism
+    # is related to Allah, dont say it's nama benda"; "just say, it's ism.")
+    ("the warm-up: “nama benda” said of rabbi (“Tuhan”, a title of Allah), as until 2026-10-17",
+     quizfile(lambda q: warm(q, 2)["questions"][3].__setitem__("class", "nama benda")),
+     "al-fatihah 2 word-kind q4 (word 3): names the class 'nama benda', and the part's QAC tag gives None"),
+    ("… its sentence as it was", quizfile(lambda q: warm(q, 2)["questions"][3].__setitem__(
+        "why", warm(q, 2)["questions"][3]["why"].replace("adalah isim (اِسْم).", "adalah isim (اِسْم), karena ia nama benda."))),
+     "al-fatihah 2 word-kind q4 (word 3): its explanation is not the sentence built from the data"),
+    ("quiz.ALLAH_KIND_ONLY: an entry whose lemma the word does not have (a typo)",
+     allah_list(lambda d: d.__setitem__("1:2:3", ("rabb", "typo"))),
+     "quiz.ALLAH_KIND_ONLY 1:2:3 (rabbi): no isim part with the QAC lemma 'rabb'"),
+    ("quiz.ALLAH_KIND_ONLY: an entry at no lesson word", allah_list(lambda d: d.__setitem__("1:9:9", ("rab~", "nowhere"))),
+     "quiz.ALLAH_KIND_ONLY 1:9:9: no lesson word at that place"),
+    ("quiz.ALLAH_KIND_ONLY: an entry that is no isim (a fi'il)", allah_list(lambda d: d.__setitem__("1:5:2", ("Eabada", "a verb"))),
+     "quiz.ALLAH_KIND_ONLY 1:5:2 (na‘budu): no isim part with the QAC lemma 'Eabada'"),
     ("the warm-up: a Kalimah example that calls a noun a fi'il",
      library(lambda lib: next(e for e in next(c for c in lib["concepts"] if c["id"] == Q.KALIMAH_RECORD)["examples"]
                               if e["loc"] == "1:7:1").__setitem__("note", "ṣirāṭa: fi'il, nama benda.")),
@@ -696,7 +724,8 @@ class Warmup(unittest.TestCase):
         form_ = lambda loc, k: f"{comp['words'][loc]['forms'][k]['ar']} ({comp['words'][loc]['forms'][k]['translit']})"  # noqa: E731
         # The operator's own question (Al-Fatihah 1, the fourth word): the word, its meaning, its kind, its class.
         self.assertEqual(why[(1, 5)], f"Kata keempat, yaitu {word_('1:1:4')}, yang artinya “Maha Penyayang”, adalah isim (اِسْم), karena ia nama sifat.")
-        self.assertEqual(why[(2, 4)], f"Kata ketiga, yaitu {word_('1:2:3')}, yang artinya “Tuhan”, adalah isim (اِسْم), karena ia nama benda.")
+        # A title of Allah: the kind alone, no class (operator 2026-10-17: "just say, it's ism"; ALLAH_KIND_ONLY).
+        self.assertEqual(why[(2, 4)], f"Kata ketiga, yaitu {word_('1:2:3')}, yang artinya “Tuhan”, adalah isim (اِسْم).")
         self.assertEqual(why[(5, 1)], f"Kata pertama, yaitu {word_('1:5:1')}, yang artinya “hanya kepada Engkau”, adalah isim (اِسْم), karena ia kata ganti.")
         self.assertEqual(why[(5, 2)], f"Kata kedua, yaitu {word_('1:5:2')}, yang artinya “kami menyembah”, adalah fi'il (فِعْل), karena ia kata kerja.")
         self.assertEqual(why[(4, 3)], f"Kata ketiga, yaitu {word_('1:4:3')}, yang artinya “pembalasan”, adalah isim (اِسْم), karena ia nama benda. "
@@ -707,9 +736,11 @@ class Warmup(unittest.TestCase):
         self.assertNotEqual(comp["words"]["1:1:1"]["forms"]["ismi"]["ar"], warm(self.q, 1)["questions"][1]["ar"])  # by the join, not the bytes
         self.assertEqual(why[(7, 10)], f"Bagian kedua kata ketujuh, yaitu {form_('1:7:7', 'him')}, yang artinya “mereka”, adalah isim (اِسْم), karena ia kata ganti. "
                                        "Tandanya: didahului huruf jar (حَرْف جَرّ).")
-        # … and a part no form names (‘alaihim, 1:7:4: the composition has ‘alā and hum, not its bytes): its class, no meaning.
+        # … and a part no form names (the front عَلَيْ of ‘alaihim, 1:7:4: the composition has ‘alā, not its bytes): its
+        # class, no meaning; its back هِمْ is the composition's form `him` since 2026-10-17 ("Sibling lines").
         self.assertEqual(why[(7, 5)], "Bagian pertama kata keempat adalah huruf (حَرْف), karena ia kata tugas.")
-        self.assertEqual(why[(7, 6)], "Bagian kedua kata keempat adalah isim (اِسْم), karena ia kata ganti. Tandanya: didahului huruf jar (حَرْف جَرّ).")
+        self.assertEqual(why[(7, 6)], f"Bagian kedua kata keempat, yaitu {form_('1:7:4', 'him')}, yang artinya “mereka”, adalah isim (اِسْم), karena ia kata ganti. "
+                                      "Tandanya: didahului huruf jar (حَرْف جَرّ).")
         # A heavy-letter word is named on screen too (the narration leaves it unsaid: rule 5).
         self.assertEqual(why[(7, 13)], f"Kata kesembilan, yaitu {word_('1:7:9')}, yang artinya “orang-orang yang sesat”, adalah isim (اِسْم). "
                                        "Tandanya: memakai alif lam.")
@@ -723,7 +754,8 @@ class Warmup(unittest.TestCase):
         self.assertEqual(bare, {(1, 3): ["PN"], (2, 3): ["P", "PN"],                     # the Name
                                 (4, 1): ["N"], (7, 8): ["DET", "N"], (7, 13): ["DET", "N"],  # participles
                                 (7, 2): ["REL"],                                          # allażīna
-                                (7, 7): ["N"]})                                           # gair (CLASS_WITHHELD)
+                                (7, 7): ["N"],                                            # gair (CLASS_WITHHELD)
+                                (2, 4): ["N"]})                                           # rabbi (ALLAH_KIND_ONLY)
         # gair (“bukan”): a plain QAC N, listed by its QAC lemma with its reason — and that lemma is the
         # Kosakata entry whose sources give the reason (always annexed; negation or exception).
         self.assertEqual(list(Q.CLASS_WITHHELD), ["gayor"])
@@ -739,6 +771,16 @@ class Warmup(unittest.TestCase):
         self.assertEqual([Q.part_class(part("PN", lafaz=True), classes), Q.part_class(part("N", participle=True), classes),
                           Q.part_class(part("ADJ", participle=True), classes), Q.part_class(part("N", lemma="gayor"), classes),
                           Q.part_class(part("N", lemma="rab~"), classes)], [None, None, "nama sifat", None, "nama benda"])
+        # … by PLACE: rabb at 1:2:3 is a title of Allah; aḥad at 112:1:4 is said of Allah, at 112:4:5 not;
+        # ar-raḥmāni / ar-raḥīmi keep "nama sifat" (attributes, QAC ADJ; the operator's own example).
+        isim = lambda tag, lemma, loc: part(tag, lemma=lemma, loc=loc, kind="isim")  # noqa: E731
+        self.assertEqual([Q.part_class(isim("N", "rab~", "1:2:3"), classes), Q.part_class(isim("N", ">aHad", "112:1:4"), classes),
+                          Q.part_class(isim("N", ">aHad", "112:4:5"), classes), Q.part_class(isim("ADJ", "r~aHiym", "1:1:4"), classes),
+                          Q.part_class(isim("N", "<ila`h", "114:3:1"), classes)], [None, None, "nama benda", "nama sifat", None])
+        self.assertEqual(Q.allah_kind_only_problems(LESSONS), [])
+        self.assertNotIn("1:1:3", Q.ALLAH_KIND_ONLY)
+        self.assertNotIn("112:4:5", Q.ALLAH_KIND_ONLY)
+        self.assertEqual(why[(1, 5)], f"Kata keempat, yaitu {word_('1:1:4')}, yang artinya “Maha Penyayang”, adalah isim (اِسْم), karena ia nama sifat.")
         for n in range(1, 8):
             for q in warm(self.q, n)["questions"]:
                 # Never the general definition; the class where there is one, in one place.
@@ -785,7 +827,8 @@ class Warmup(unittest.TestCase):
         with_basic = Q.word_at(self.lesson, "1:2:2")
         q = by[(2, "label-role", 2)]
         self.assertEqual(q["word"], 2)
-        self.assertEqual(q["why"], TERMS.annotate(with_basic["why_basic"]))
+        self.assertEqual(q["why"], Q.named_words(TERMS.annotate(with_basic["why_basic"]), self.lesson))
+        self.assertIn("لِ (li)", q["why"])  # its part named (2026-10-17, "Sibling lines")
         # And every word that has one is shown with it wherever it is asked.
         for (n, key, _k), q in by.items():
             if key in ("why-harakat", "sort-case", "label-role"):
