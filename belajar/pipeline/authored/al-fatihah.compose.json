@@ -674,7 +674,7 @@
         {"stage": "change", "tiles": ["sirata"], "from": "siratu", "to": "sirata", "note": "badal: pengganti kata “jalan” di ayat 6",
          "say": [
            "Di sini akhirnya menjadi fathah, bunyi a.",
-           "Sebabnya, kata ini pengganti bagi kata {{1:6:2}} yang artinya “jalan”, dan pengganti mengikuti akhiran kata yang digantikannya.",
+           "Sebabnya, kata ini pengganti bagi kata {{!1:6:2}} yang artinya “jalan”, dan pengganti mengikuti akhiran kata yang digantikannya.",
            "Dengan pengganti ini, jalan yang lurus itu dijelaskan: jalan orang-orang yang telah Engkau beri nikmat."
          ]}
       ],
@@ -941,7 +941,7 @@
         {"stage": "whole", "tiles": ["ad-dallina"], "note": "jamak: -ūna (bentuk dasar) → -īna (majrur)", "letters": [["ad-dallina", -3]],
          "say": [
            "Tanda dobel pada huruf lam di tengahnya muncul karena dua huruf lam dilebur menjadi satu.",
-           "Kata ini jamak laki-laki beraturan; bentuk dasarnya memakai huruf wawu, bunyi u panjang, sebelum huruf nun: {{1:7:9/ad-dalluna}}.",
+           "Kata ini jamak laki-laki beraturan; bentuk dasarnya memakai huruf wawu, bunyi u panjang, sebelum huruf nun: {{!1:7:9/ad-dalluna}}.",
            "Di sini wawu itu diganti huruf ya', bunyi i panjang: inilah tanda majrur."
          ]},
         {"stage": "whole", "tiles": ["ad-dallina"], "note": "disambung kepada kata ke-6",

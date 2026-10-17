@@ -61,7 +61,7 @@ python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Ku
 python3 build_map.py               # the lesson maps ../content/map/*.json, for the surahs switched on (see "Peta pelajaran"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi"); stops on a term said before its lesson that authored/curriculum.pending.json does not list (`--write-pending` writes that list: see "Kurikulum")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
-python3 test_validate_narration.py # plants 264 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum and the pending list, each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
+python3 test_validate_narration.py # plants 262 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum and the pending list, each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
 python3 validate_map.py            # the lesson maps: new / learnt so far / later / next-level against the curriculum, the names against the captions
 python3 test_validate_map.py       # plants 40 faults (a step in the wrong group, one taught later listed as learnt, a learnt step left out, `here` on a step that does not occur, a name that says a Qur'anic word, …)
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah), or listed in authored/curriculum.pending.json; exit 1 on any failure
@@ -1658,28 +1658,32 @@ The operator's review of lesson zero and of ayat 1–2, item by item (his rules 
    reading "huruf ini" for a bare letter is accepted for now; (5) ٱلْعَٰلَمُونَ and ٱلضَّآلُّونَ named in
    captions only, with no example voice, are accepted. The named words whose sound waits for his ear
    stayed HELD for the first render (the 118 texts below, rendered 2026-10-17).
-8. **The held named words, recorded and checked by ear afterwards** (same day: shipping them silent
-   would leave ayah 7's word explanations and 14 voiced lines caption-only; "the same way every
-   other new term is handled"): pronunciation.json `named` gives each of the 16 its spoken spelling,
-   `approved: "pending-ear-check 2026-10-17 …"` — rendered, and listed by every validate and render
-   run until the operator has heard it and dates it. The spelling is the default one (ṣ → sh, ‘ →
-   ', ż → dz, g → gh: al-'alamina, na'budu, nasta'inu, alladzina, alladzi, an'amta, 'alaihim,
-   al-mustaqima, al-maghdhubi, al-'alamuna) except where the heavy-letter guard (`HEAVY_LATIN`,
-   rule 9) refuses that, and there the pesantren respelling of rule 11 (heavy letter + fathah → o, ra
-   with fathah → ro), each for the operator's ear: **aṣ-ṣirāṭa → ash-shirotho, ṣirāṭa → shirotho,
-   gairi → ghoiri, aḍ-ḍāllīna → adh-dhollina, aḍ-ḍāllūna → adh-dholluna, khalaqa → kholaqo**. A
-   heavy named word with no entry (qul, aṣ-ṣamadu, a‘ūżu … of the other surahs) is still refused.
+8. **Heavy-letter words are shown and explained, never said** (same day, the operator: "better not
+   to use heavy-letter words with elevenlabs, we just explain but not read them; simple words so
+   far is ok"). A named Qur'anic word with ص ض ط ظ ق خ غ among its Arabic letters — or whose plain
+   spelling the heavy-letter guard would still refuse — is named in the caption ("Kata pertama,
+   yaitu صِرَٰطَ (ṣirāṭa), artinya: “jalan”") and left out of the spoken text with its connector
+   ("Kata pertama artinya: jalan"); a simple word is said as it is written (bismi, ismi, rabbi,
+   al-hamdu, na'budu, 'alaihim, alladzina, al-'alamina, a'udzu …). The one rule is
+   `validate_narration.named_is_said` (mirrored by the TS `namedIsSaid`); the markup says it
+   ({{s:a:w}} said, {{!s:a:w}} shown only, and must agree); the respellings tried for a few hours
+   the same day (ash-shirotho, ghoiri, adh-dhollina, kholaqo; pronunciation.json `named`) are
+   retired. By side, as built: Al-Fatihah shows only aṣ-ṣirāṭa, ṣirāṭa, al-mustaqīma, gairi,
+   al-magḍūbi, aḍ-ḍāllīna, aḍ-ḍāllūna, khalaqa; Al-Ikhlas aṣ-ṣamadu, qul; Al-Falaq qul, al-falaqi,
+   gāsiqin, waqaba, al-‘uqadi, khalaqa; An-Nas qul, al-khannāsi, ṣudūri. Every other named word is
+   said.
 
-The first render (2026-10-17, with `--skip-held`): 118 distinct texts, 13,331 characters, about USD
-1.07 — the earlier batch of the review, 61 texts (8,952 characters, USD 0.72), and the rulings'
-additions, 57 texts (4,379 characters, USD 0.35). What is left, the 30 lines that named a held
-word (item 8): **30 distinct texts, 3,360 characters, about USD 0.27**, each listed by the dry run as
-"pending ear check, rendered: <word> (named word, said <spelling>): n lines". No shared line
-changed; the other surahs have no audio yet.
+The renders of 2026-10-17: 118 distinct texts (13,331 characters, about USD 1.07; with
+`--skip-held`), then the 30 lines that named a held word, in the respellings of that afternoon (30
+texts, 3,360 characters, USD 0.27). Item 8 takes the heavy words out of the speech again: 16
+Al-Fatihah lines change their spoken text and lose that audio — **16 distinct texts, 1,586
+characters, USD 0.13** in the dry run, of which 11 are texts recorded before (their masters are on
+disk: the render reuses them, paying nothing), so about 5 texts, 562 characters, USD 0.05 are new.
+No shared line changed; the other surahs have no audio yet.
 
 ```bash
 OUT=/path/to/the/checkout/with/the/masters/belajar/pipeline/out
-# must say: 30 distinct texts, 3360 characters, no "refused by --render"
+# must say: 16 distinct texts, 1586 characters, no "refused by --render"
 python3 render_narration.py --surah al-fatihah
 # the render: the same command with
 #   --render --i-approve-spend --voice-id aK834gEOxQEtviMPgurT --voice-name "Kang Nandar" --env-file … --out "$OUT"
@@ -1726,7 +1730,12 @@ enforces it, its name; otherwise "not enforced: review by reading".
    pertama, yaitu بِسْمِ (bismi), artinya: …"), the quiz's "Itu kata pertama, yaitu …", a structure
    item, a composition, a Konsep example ("Kata ini, yaitu …") — shows and says the word between the
    two. `Sanitiser.name_places` adds it wherever it can resolve the place (a run of words names each
-   word; "kata ini" is the line's own word); what it cannot, the author marks ({{s:a:w}}). Enforced:
+   word; "kata ini" is the line's own word); what it cannot, the author marks ({{s:a:w}}). **Heavy-letter
+   words are shown and explained but never said by the narrator** (operator 2026-10-17: "we just
+   explain but not read them"): a word with ص ض ط ظ ق خ غ is named in the caption only ({{!s:a:w}};
+   "Kata pertama, yaitu صِرَٰطَ (ṣirāṭa), artinya: “jalan”" is said "Kata pertama artinya: jalan"),
+   a simple word is shown and said; `PLACE_MEANING` reads the caption, so a caption-only name
+   satisfies it. Enforced:
    `check_display` `MEANING_ONLY` ("kata / huruf yang artinya …" fails), `PLACE_MEANING` ("kata
    ketiga, yang artinya …", "Kata pertama artinya: …", "kata ketiga dan keempat, yang artinya …",
    "Kata ini, yang artinya …", "yang pertama artinya …" fail; faults "a word line by its place and
@@ -1933,23 +1942,28 @@ ayat pertama"; a phrase is still named by its meaning). What relaxed and what st
 in narration"; the caption's "<Arabic> (<translit>)" must be one of the content's own pairs
 (`Named`, `check_display`); Qur'anic Arabic script in the spoken text stays forbidden; a tile
 syllable may be said only where it is so named (`check_animation_line`). The transliteration is
-said plain (`named_speech`; the Name at a word's start "Alloh": Allāhi → Allohi); a word whose
-Latin carries ص ض ط ظ ع ق غ ذ ث خ (ṣ ḍ ṭ ẓ ‘ q g ż ṡ ḫ) is HELD (`named_held`) — `render_narration.py`
-refuses the line and `validate_narration.py` lists it — until pronunciation.json `named` gives it
-its spoken spelling (`Lexicon.named`, keyed by the caption's transliteration: `speak`, `rule`,
-`approved` a date or "pending-ear-check <date> …", which renders and is listed until the operator
-has heard it, like a term's). `speak` is the default spelling (ṣ → sh, ḍ → dh, ż → dz, ‘ → ', g →
-gh) unless that keeps a heavy letter + a, which the shape check refuses (rule 9): then rule 11's
-respelling (aṣ-ṣirāṭa → ash-shirotho). Planted faults: "a named word's entry taken out: its
-rendered line is refused", "a named word's spelling with a heavy letter + a", "… not in plain
-letters", "… without its date or pending flag", "a named-word entry for no word of the lessons",
-"… for a word with nothing held", "a named word listed twice", "a named word's spelling changed,
-narration stale"; the TS checks read the same list (`parsePronunciation` `named`, `namedSaid`). A caption that
+said plain (`named_speech`; the Name at a word's start "Alloh": Allāhi → Allohi). **A word with a
+heavy letter is never said** (operator 2026-10-17: "better not to use heavy-letter words with
+elevenlabs, we just explain but not read them; simple words so far is ok"): `named_is_said(ar,
+translit)` is false when one of ص ض ط ظ ق خ غ is among the word's Arabic letters (or its plain
+spelling keeps a heavy letter + a, `HEAVY_LATIN`), and then the caption names the word while the
+spoken text leaves it out with its connector (`UNSAID`, `unsay`: "Kata kedua, yaitu X, artinya" →
+"Kata kedua artinya", "…, yaitu X, yang artinya" → "…, yang artinya", "kata X yang artinya" →
+"kata yang artinya", "bunyi u: X." → "bunyi u."). Its markup is {{!s:a:w}} / {{!s:a:w/form}}, and a
+mismatch stops the build either way (`Speech._named_mark`); generated lines write it with
+`named_markup`. The karaoke tokens: each left-out piece (", yaitu ٱلصِّرَٰطَ (aṣ-ṣirāṭa),") joins the
+token it falls in or follows and shows with that token's timing — no timing is made up
+(`Lexicon.text_cuts`, `_pieces`, used by `tokens`, `render_display`, `check_tokens` and
+`build_narration.retext_tokens`, the path a kept render's tokens take). A line that says such a
+word anyway (`said_heavy`) fails validation and is refused by `render_narration.py`; the TS checks
+and the screen-reader text use the same rule (`namedIsSaid`, `unsayCaption`). Planted faults: "a
+heavy-letter word said in its plain spelling", "… in a pesantren respelling", "… the caption as it
+was", "a rendered line saying a heavy-letter word", "a heavy-letter word named with the markup of
+a said one", "a simple word named as shown only", "a shown-only word without its token". A caption that
 names a word only by its meaning, "kata yang artinya …" / "huruf yang artinya …", fails
 (`MEANING_ONLY`). Planted faults: "a named word whose Arabic is not the content's", "… with another
 transliteration", "a lesson word said in Latin where the caption does not name it", "a named word
-said from Arabic script", "a word named only by its meaning", "a rendered line naming a heavy word
-with no spelling in pronunciation.json `named`". The lesson prose names words in SKB transliteration, so `build_narration.Sanitiser`
+said from Arabic script", "a word named only by its meaning". The lesson prose names words in SKB transliteration, so `build_narration.Sanitiser`
 replaces each mention with the word's place, which the stage numbers under each mushaf word
 (1, 2, 3… right to left, word 1 rightmost):
 

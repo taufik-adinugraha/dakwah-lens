@@ -19,7 +19,7 @@
       "focus": null
     },
     "al-ikhlas:1:w1": {
-      "text": "Kata pertama, yaitu qul, artinya: katakanlah. فِعْل أَمْر, yaitu kata perintah, ini مَبْنِيّ di atas سُكُون, sehingga akhirnya tetap mati; pelakunya tersirat, yaitu engkau, Nabi Muhammad shallallahu 'alaihi wa sallam.",
+      "text": "Kata pertama artinya: katakanlah. فِعْل أَمْر, yaitu kata perintah, ini مَبْنِيّ di atas سُكُون, sehingga akhirnya tetap mati; pelakunya tersirat, yaitu engkau, Nabi Muhammad shallallahu 'alaihi wa sallam.",
       "display": "Kata pertama, yaitu قُلْ (qul), artinya: “katakanlah”. Fi’il amr (فِعْل أَمْر), yaitu kata perintah, ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad shallallahu 'alaihi wa sallam).",
       "highlight": [
         1
@@ -51,7 +51,7 @@
       "focus": "112:1:4"
     },
     "al-ikhlas:1:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Ayat dibuka dengan kata perintah, yaitu kata pertama, qul, yang artinya katakanlah, yang pelakunya tersirat, engkau, Nabi Muhammad shallallahu 'alaihi wa sallam; kalimat sesudahnya, kata kedua sampai keempat, adalah isi yang diperintahkan untuk diucapkan, maqul al-qaul, dan berkedudukan نَصْب.",
+      "text": "Sekarang susunan kalimatnya. Ayat dibuka dengan kata perintah, yaitu kata pertama, yang artinya katakanlah, yang pelakunya tersirat, engkau, Nabi Muhammad shallallahu 'alaihi wa sallam; kalimat sesudahnya, kata kedua sampai keempat, adalah isi yang diperintahkan untuk diucapkan, maqul al-qaul, dan berkedudukan نَصْب.",
       "display": "Sekarang susunan kalimatnya. Ayat dibuka dengan kata perintah, yaitu kata pertama, قُلْ (qul), yang artinya “katakanlah”, yang pelakunya tersirat, “engkau” (Nabi Muhammad shallallahu 'alaihi wa sallam); kalimat sesudahnya, kata kedua sampai keempat, adalah isi yang diperintahkan untuk diucapkan (maqul al-qaul) dan berkedudukan nashab (نَصْب).",
       "highlight": [
         0
@@ -83,7 +83,7 @@
       "focus": null
     },
     "al-ikhlas:1:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yaitu qul, yang artinya katakanlah.",
+      "text": "Itu kata pertama, yang artinya katakanlah.",
       "display": "Itu kata pertama, yaitu قُلْ (qul), yang artinya “katakanlah”.",
       "highlight": [],
       "focus": null
@@ -235,7 +235,7 @@
       "focus": "112:2:1"
     },
     "al-ikhlas:2:w2": {
-      "text": "Kata kedua, yaitu ash-shamadu, artinya: tempat meminta segala sesuatu. Akhirnya dibaca dhommah, karena menjadi khobar, yaitu keterangan, bagi kata pertama.",
+      "text": "Kata kedua artinya: tempat meminta segala sesuatu. Akhirnya dibaca dhommah, karena menjadi khobar, yaitu keterangan, bagi kata pertama.",
       "display": "Kata kedua, yaitu ٱلصَّمَدُ (aṣ-ṣamadu), artinya: “tempat meminta segala sesuatu”. Akhirnya dibaca dhammah (ضَمَّة), karena menjadi khabar (خَبَر), yaitu keterangan, bagi kata pertama.",
       "highlight": [
         2
@@ -273,7 +273,7 @@
       "focus": null
     },
     "al-ikhlas:2:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yaitu ash-shamadu, yang artinya tempat meminta segala sesuatu.",
+      "text": "Itu kata kedua, yang artinya tempat meminta segala sesuatu.",
       "display": "Itu kata kedua, yaitu ٱلصَّمَدُ (aṣ-ṣamadu), yang artinya “tempat meminta segala sesuatu”.",
       "highlight": [],
       "focus": null
@@ -422,7 +422,7 @@
       "focus": null
     },
     "al-ikhlas:3:structure:c": {
-      "text": "menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan وَاو karena ia menguatkan makna kata ash-shamadu yang artinya tempat meminta segala sesuatu: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
+      "text": "menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan وَاو karena ia menguatkan makna kata yang artinya tempat meminta segala sesuatu: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
       "display": "menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan و karena ia menguatkan makna kata ٱلصَّمَدُ (aṣ-ṣamadu) yang artinya “tempat meminta segala sesuatu”: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
       "highlight": [
         0

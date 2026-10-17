@@ -2606,12 +2606,12 @@
    "examples": [
     {
      "loc": "1:7:1",
-     "say": "Kata ini, yaitu {{1:7:1}}, yang artinya “jalan”, adalah isim, yaitu nama benda.",
+     "say": "Kata ini, yaitu {{!1:7:1}}, yang artinya “jalan”, adalah isim, yaitu nama benda.",
      "about": "isim, nama benda."
     },
     {
      "loc": "1:6:3",
-     "say": "Kata ini, yaitu {{1:6:3}}, yang artinya “yang lurus”, juga isim, tetapi nama sifat: ia menyebut sifat sesuatu, bukan bendanya.",
+     "say": "Kata ini, yaitu {{!1:6:3}}, yang artinya “yang lurus”, juga isim, tetapi nama sifat: ia menyebut sifat sesuatu, bukan bendanya.",
      "about": "isim, nama sifat."
     },
     {

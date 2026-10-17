@@ -3859,7 +3859,7 @@
         },
         {
           "frame": 2,
-          "say": "Sebabnya, kata ini pengganti bagi kata {{1:6:2}} yang artinya “jalan”, dan pengganti mengikuti akhiran kata yang digantikannya."
+          "say": "Sebabnya, kata ini pengganti bagi kata {{!1:6:2}} yang artinya “jalan”, dan pengganti mengikuti akhiran kata yang digantikannya."
         },
         {
           "frame": 2,
@@ -5230,7 +5230,7 @@
         },
         {
           "frame": 2,
-          "say": "Kata ini jamak laki-laki beraturan; bentuk dasarnya memakai huruf wawu, bunyi u panjang, sebelum huruf nun: {{1:7:9/ad-dalluna}}."
+          "say": "Kata ini jamak laki-laki beraturan; bentuk dasarnya memakai huruf wawu, bunyi u panjang, sebelum huruf nun: {{!1:7:9/ad-dalluna}}."
         },
         {
           "frame": 2,
@@ -5505,7 +5505,7 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:c7b8ac3df75d4a8222043db67aeeea5412646ed0baf47ce1fce129190ff55bef",
+    "authored_compose": "authored/al-fatihah.compose.json sha256:3ec3d485c21df2c6c82ad2ca1864c229cc662f8589bf64c4163f1c9cb8217a1f",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }

@@ -226,9 +226,7 @@ export type NarrationManifest = {
  *  narrator is sent (`speak`: Arabic script, or a fixed Latin respelling
  *  for a heavy letter, "idhofah"), and its caption form (`display`). */
 export type PronunciationTerm = { term: string; speak: string; display: string };
-/** A named Qur'anic word's spoken spelling (pronunciation.json `named`, 2026-10-17): the caption's
- *  transliteration → what the narrator says ("aṣ-ṣirāṭa" → "ash-shirotho"). */
-export type Pronunciation = { terms: PronunciationTerm[]; named?: Record<string, string> };
+export type Pronunciation = { terms: PronunciationTerm[] };
 
 // ───────────────────────────── Sequence ─────────────────────────────
 

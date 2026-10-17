@@ -711,9 +711,9 @@ class Warmup(unittest.TestCase):
 
     def test_a_named_word_is_shown_not_its_markup(self):
         # Operator 2026-10-17 ("show the Arabic word"): a `why_basic` that names another word of the
-        # lesson ({{1:6:2}}) shows it as the narration's caption does — Arabic, then transliteration.
+        # lesson ({{!1:6:2}}) shows it as the narration's caption does — Arabic, then transliteration.
         w = Q.word_at(self.lesson, "1:7:1")
-        self.assertIn("{{1:6:2}}", w["why_basic"])
+        self.assertIn("{{!1:6:2}}", w["why_basic"])  # shown only: a heavy-letter word (operator 2026-10-17)
         q = next(q for a in self.q["ayat"] if a["ayah"] == 7 for ex in a["exercises"] if ex["key"] == "sort-case"
                  for q in ex["questions"] if q["word"] == 1)
         named = Q.word_at(self.lesson, "1:6:2")

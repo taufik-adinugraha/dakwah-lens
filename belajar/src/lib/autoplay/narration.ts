@@ -275,20 +275,7 @@ export function parsePronunciation(raw: unknown): { dict: Pronunciation | null; 
     }
     out.push({ term, speak, display });
   });
-  // The named words' spellings (validate_narration Lexicon._named): translit → speak.
-  const named: Record<string, string> = {};
-  const rawNamed = (raw as Record<string, unknown>).named ?? [];
-  if (!Array.isArray(rawNamed)) problems.push("named must be a list");
-  else
-    rawNamed.forEach((x, i) => {
-      const { translit, speak } = (x ?? {}) as Record<string, unknown>;
-      if (typeof translit !== "string" || typeof speak !== "string" || !translit || !speak) {
-        problems.push(`named[${i}]: translit and speak must be non-empty strings`);
-        return;
-      }
-      named[translit] = speak;
-    });
-  return { dict: { terms: out, named }, problems };
+  return { dict: { terms: out }, problems };
 }
 
 /** The dictionary's Arabic-script `speak` forms, longest first (so "حَرْف
@@ -369,12 +356,13 @@ export function captionArabicProblems(text: string, dict: Pronunciation | null, 
  * A caption without its Arabic, for a screen reader's Indonesian voice (and
  * never a Qur'anic word in Arabic): "kasrah (كَسْرَة), karena" → "kasrah,
  * karena"; "huruf jar (حَرْف جَرّ) ba’ (بِ)" → "huruf jar ba’". A named word
- * (rule 26, "kata pertama, yaitu قُلْ (qul), …") is announced as the narrator
- * says it: "kata pertama, yaitu qul, …" (namedSpeech).
+ * is announced as the narrator says it ("yaitu ٱسْمِ (ismi)" → "yaitu ismi"), and
+ * one he does not say (a heavy letter, namedIsSaid) is left out as he leaves it
+ * ("Kata pertama, yaitu قُلْ (qul), artinya" → "Kata pertama artinya").
  */
 export function withoutArabic(text: string): string {
   if (!ARABIC_SCRIPT.test(text)) return text;
-  return text
+  return unsayCaption(text)
     .replace(NAMED_SHOWN, (_m, _ar: string, lat: string) => namedSpeech(lat))
     .replace(/\s*\(\s*[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s،,–-]*\)/g, "")
     .replace(ARABIC_WORD, "")
@@ -612,10 +600,45 @@ export function namedSpeech(translit: string): string {
   return folded.replace(/(?<![\p{L}\p{N}_'])([Aa])llah/gu, "$1lloh");
 }
 
-/** The named words of a caption, in order, as the narrator says them: the dictionary's `named`
- *  spelling when it has one (validate_narration.named_speech), else namedSpeech. */
-export function namedSaid(display: string, dict: Pronunciation | null = null): string[] {
-  return [...display.matchAll(NAMED_SHOWN)].map((m) => dict?.named?.[m[2]] ?? namedSpeech(m[2]));
+/** The heavy (tafkhim) letters of rule 9 (validate_narration.TAFKHIM). */
+const TAFKHIM = /[صضطظقخغ]/u;
+/** A spoken heavy letter + a (validate_narration.HEAVY_LATIN), and the words that only look so. */
+const HEAVY_LATIN = /(?:dh|zh|kh|gh|sh|th|q)a/;
+const NOT_HEAVY = new Set(["fathatain", "menghafal"]);
+
+/** THE rule for a named Qur'anic word, as validate_narration.named_is_said (operator 2026-10-17:
+ *  "better not to use heavy-letter words with elevenlabs, we just explain but not read them; simple
+ *  words so far is ok"): said only when none of its Arabic letters is heavy and its plain spelling
+ *  (namedSpeech) has no heavy letter + a; else the caption shows it and the narrator does not say it. */
+export function namedIsSaid(ar: string, translit: string): boolean {
+  if (TAFKHIM.test(ar)) return false;
+  const said = namedSpeech(translit).toLowerCase();
+  return !(HEAVY_LATIN.test(said) && !NOT_HEAVY.has(said));
+}
+
+/** The named words of a caption that the narrator says, in order, as he says them. */
+export function namedSaid(display: string): string[] {
+  return [...display.matchAll(NAMED_SHOWN)].filter((m) => namedIsSaid(m[1], m[2])).map((m) => namedSpeech(m[2]));
+}
+
+/** What a line leaves unsaid with a word shown only (validate_narration.UNSAID, in order; {x}: the
+ *  word): "Kata kedua, yaitu X, artinya" → "Kata kedua artinya", "…, yaitu X, yang artinya" →
+ *  "…, yang artinya", "kata X yang artinya" → "kata yang artinya", "bunyi u: X." → "bunyi u.". */
+const UNSAID = [
+  ", (?:yaitu )?{x},(?= artinya\\b)",
+  ", (?:yaitu )?{x}(?=,)",
+  " {x}(?= yang artinya\\b)",
+  ": {x}(?=[.;,!?”]|$)",
+  ",? (?:yaitu )?{x}",
+  "^{x} ?",
+];
+
+/** A caption without its shown-only words and their connectors (validate_narration.unsay). */
+export function unsayCaption(display: string): string {
+  const hole = "\u{F5000}";
+  const holed = display.replace(NAMED_SHOWN, (m, ar: string, lat: string) => (namedIsSaid(ar, lat) ? m : hole));
+  if (!holed.includes(hole)) return display;
+  return holed.replace(new RegExp(UNSAID.map((r) => `(?:${r.replace("{x}", hole)})`).join("|"), "gu"), "");
 }
 
 /** The spoken text with the words its caption names masked, in order, once each: the one place a
@@ -638,7 +661,7 @@ export function maskNamedSaid(text: string, said: readonly string[]): string {
  *  reference → the word's or form's transliteration), for a caption without Arabic; an unknown
  *  reference is left as its reference, never dropped. */
 export function unmarkNamed(text: string, resolve?: (ref: string) => string | undefined): string {
-  return text.replace(/\{\{(\d{1,3}:\d{1,3}:\d{1,3}(?:\/[^{}\s/]+)?)\}\}/g, (m, ref: string) => resolve?.(ref) ?? ref);
+  return text.replace(/\{\{!?(\d{1,3}:\d{1,3}:\d{1,3}(?:\/[^{}\s/]+)?)\}\}/g, (m, ref: string) => resolve?.(ref) ?? ref);
 }
 
 /** Does a caption carry Arabic script? (Captions may carry transliteration.) */

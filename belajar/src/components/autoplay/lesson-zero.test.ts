@@ -171,7 +171,8 @@ describe("its sequence, as its page builds it", () => {
     // A named word ({{1:7:1}}, {{1:7:8/wa}}; rule 26, 2026-10-17) is shown from the content: its
     // bytes, then its transliteration.
     const named = (ref: string) => {
-      const [loc, form] = ref.split("/");
+      // ({{!…}}: a heavy-letter word, shown the same way and not said)
+      const [loc, form] = ref.replace(/^!/, "").split("/");
       const w = form
         ? composeFor("al-fatihah")!.words[loc].forms[form]
         : SURAHS.flatMap((x) => x.ayat.flatMap((a) => a.words)).find((x) => x.loc === loc)!;

@@ -2322,7 +2322,7 @@
             }
           ],
           "status": "draft",
-          "why_basic": "Akhirnya fathah karena menjadi pengganti bagi kata {{1:6:2}} yang artinya “jalan”, yang manshub; pengganti mengikuti akhiran kata yang digantikannya.",
+          "why_basic": "Akhirnya fathah karena menjadi pengganti bagi kata {{!1:6:2}} yang artinya “jalan”, yang manshub; pengganti mengikuti akhiran kata yang digantikannya.",
           "marked": {
             "why": "Akhirnya [[fathah|fathah]] karena menjadi [[badal|badal]] (pengganti) dari [[aṣ-ṣirāṭa|q:1:6:2]] di ayat 6 yang [[manshub|manshub]].",
             "role": "[[badal|badal]]",
@@ -3029,7 +3029,7 @@
               3,
               4
             ],
-            "say": "Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata {{1:6:2}} yang artinya “jalan”."
+            "say": "Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata {{!1:6:2}} yang artinya “jalan”."
           },
           {
             "words": [
@@ -5336,8 +5336,8 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
-    "authored_words": "authored/al-fatihah.words.json sha256:51398433b3cd321439fc32d787a60ac841091a490738cc8112c27d44a280377e",
-    "authored_structure": "authored/al-fatihah.structure.json sha256:702cca687d14ab85c59d1712542ef27fb67354dc6d05a4840b3f2b49ec739c25",
+    "authored_words": "authored/al-fatihah.words.json sha256:abda5b9a8fc0a27ef4ef6e0f4354b403dacc066d221e38c30b3bdd86f933fc59",
+    "authored_structure": "authored/al-fatihah.structure.json sha256:e2249b1e2a154af5315075692e5bac7ea2ee4211043432664f0757e93952c3d0",
     "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:e2513b4878e1704c60d8682e05701a3efb44e32ec5404f2d79a133394e7cf99b",
     "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:1181789ee65c1b2e800270475f1c6264576a0062f8d75290ee2f99af9d2adc5f",
     "pipeline": "belajar/pipeline/build_fatihah.py + facts.py (stdlib only, no LLM)"

@@ -108,7 +108,8 @@ def fake_tokens(text, focus=None, display=None):
     its named words)."""
     starts = [i * 0.05 for i in range(len(text))]
     ends = [i * 0.05 + 0.04 for i in range(len(text))]
-    return LEX.tokens(text, starts, ends, FORMS.word_ar.get(focus) if focus else None, V.named_in_display(display, LEX))
+    return LEX.tokens(text, starts, ends, FORMS.word_ar.get(focus) if focus else None, V.named_in_display(display),
+                      LEX.text_cuts(display))
 
 
 def good_audio(m, lid, text=None, *, fmt=V.DELIVERY_FORMAT):
@@ -163,23 +164,10 @@ def lex_term(term, **changes):
     return f
 
 
-def lex_named(translit, **changes):
-    """A pronunciation.json `named` entry changed."""
-    def f(_m, _l, lx, *_):
-        next(x for x in lx["named"] if x["translit"] == translit).update(changes)
-    return f
-
-
-def lex_named_drop(translit):
-    def f(_m, _l, lx, *_):
-        lx["named"] = [x for x in lx["named"] if x["translit"] != translit]
-    return f
-
-
-def lex_named_add(**entry):
-    def f(_m, _l, lx, *_):
-        lx["named"].append(entry)
-    return f
+def drop_shown_piece(ln):
+    """The karaoke token that carries a shown-only word without it (as if it were never shown)."""
+    for tk in ln["tokens"]:
+        tk["t"] = V.NAMED_SHOWN.sub("", tk["t"]).replace(", yaitu ,", ",").strip() or tk["t"]
 
 
 def lex_add(**entry):
@@ -302,15 +290,10 @@ def heavy_line():
 HEAVY = heavy_line()
 
 
-def held_named_line():
-    """A line without audio whose caption names a word whose sound waits for the operator (NAMED_HELD)."""
-    return next(lid for man in MANIFESTS.values() for lid, ln in man["lines"].items()
-                if "audio" not in ln and V.named_held(ln["display"]) and name_of(lid) != "al-fatihah")
-
-
-HELD_NAMED = held_named_line()
-# An Al-Fatihah line naming aṣ-ṣirāṭa, which pronunciation.json `named` spells (2026-10-17).
-NAMED_LISTED = "al-fatihah:7:structure:1"
+# A line whose caption names a word it does not say (a heavy letter: ṣirāṭa), and ayah 1's first
+# structure item as authored (it names بِ and ٱسْمِ, said).
+SHOWN_ONLY = "al-fatihah:7:w1"
+ITEM11_SAY = LESSONS["al-fatihah"]["ayat"][0]["structure"]["items"][0]["say"]
 
 
 def latin_line():
@@ -394,7 +377,7 @@ def unname(lid):
     ٱلْحَمْدُ (al-ḥamdu), artinya: …" → "Kata pertama artinya: …", in its caption and its speech."""
     def f(m, *_):
         ln = line(m, lid)
-        said = V.named_in_display(ln["display"], LEX)[0][0]
+        said = V.named_in_display(ln["display"])[0][0]
         d0, t0 = ln["display"], ln["text"]
         ln["display"] = re.sub(r",(?: yaitu)? " + V.NAMED_SHOWN.pattern + ",", "", d0, count=1)
         ln["text"] = re.sub(r",(?: yaitu)? " + re.escape(said) + ",", "", t0, count=1)
@@ -618,20 +601,6 @@ MUTATIONS = [
      f"{W}: names a word only by its meaning ('kata yang artinya')"),
     ("a part named only by its meaning", more(W, "Bagian kedua adalah huruf yang artinya “bukan”."),
      f"{W}: names a word only by its meaning ('huruf yang artinya')"),
-    # pronunciation.json `named` (2026-10-17: the held named words recorded, checked by ear afterwards)
-    ("a named word's entry taken out: its rendered line is refused", then(with_audio(NAMED_LISTED, voice=True), lex_named_drop("aṣ-ṣirāṭa")),
-     f"{NAMED_LISTED}: rendered with the named word 'aṣ-ṣirāṭa'"),
-    ("a named word's spelling with a heavy letter + a", lex_named("aṣ-ṣirāṭa", speak="ash-shiratha"),
-     "named aṣ-ṣirāṭa: speak 'ash-shiratha' keeps a heavy letter + a"),
-    ("a named word's spelling not in plain letters", lex_named("aṣ-ṣirāṭa", speak="aṣ-ṣirōṭo"), "must be plain Latin letters"),
-    ("a named word's entry without its date or pending flag", lex_named("aṣ-ṣirāṭa", approved=""), "named aṣ-ṣirāṭa: needs `approved`"),
-    ("a named-word entry for no word of the lessons", lex_named_add(translit="aṣ-ṣirāṭūna", speak="ash-shirothuna", approved="2026-10-17"),
-     "named aṣ-ṣirāṭūna: no lesson word or composition form has this transliteration"),
-    ("a named-word entry for a word with nothing held", lex_named_add(translit="bismi", speak="bismi", approved="2026-10-17"),
-     "named bismi: needs no entry"),
-    ("a named word listed twice", lex_named_add(translit="gairi", speak="ghoiri", approved="2026-10-17"), "named gairi: listed twice"),
-    ("a named word's spelling changed, narration stale", lex_named("aṣ-ṣirāṭa", speak="ash-shirootho"),
-     "display does not say what is spoken"),
     # a word named by its place and its meaning only (operator 2026-10-17, rule 26 "every one … even
     # when the stage highlights that word"), and a pointer at an earlier ayah (rule 29)
     ("a word line by its place and meaning only, as until 2026-10-17", unname(W),
@@ -652,8 +621,24 @@ MUTATIONS = [
      "al-ikhlas:2:structure:b: points back at an earlier ayah ('ayat sebelumnya')"),
     ("a comparison with an earlier ayah in a composition", compose_say("1:3:1", 4, "Sebabnya, kata ini sekali lagi menjadi sifat bagi nama Allah di ayat kedua."),
      "points back at an earlier ayah ('ayat kedua')"),
-    ("a rendered line naming a heavy word with no spelling in pronunciation.json `named`", with_audio(HELD_NAMED, voice=True),
-     f"{HELD_NAMED}: rendered with the named word"),
+    # a heavy-letter word is shown and explained, never said (operator 2026-10-17: "better not to use
+    # heavy-letter words with elevenlabs, we just explain but not read them; simple words so far is ok")
+    ("a heavy-letter word said in its plain spelling", replace_in(SHOWN_ONLY, "text", "Kata pertama artinya", "Kata pertama, yaitu shiratha, artinya"),
+     f"{SHOWN_ONLY}: says the heavy-letter word 'ṣirāṭa'"),
+    ("… in a pesantren respelling", replace_in(SHOWN_ONLY, "text", "Kata pertama artinya", "Kata pertama, yaitu shirotho, artinya"),
+     f"{SHOWN_ONLY}: Qur'anic word 'shirotho'"),
+    ("a heavy-letter word said, the caption as it was", replace_in(SHOWN_ONLY, "text", "Kata pertama artinya", "Kata pertama, yaitu shiratha, artinya"),
+     f"{SHOWN_ONLY}: display does not say what is spoken"),
+    ("a rendered line saying a heavy-letter word", then(replace_in(SHOWN_ONLY, "text", "Kata pertama artinya", "Kata pertama, yaitu shiratha, artinya"),
+                                                        with_audio(SHOWN_ONLY, voice=True)),
+     f"{SHOWN_ONLY}: says the heavy-letter word 'ṣirāṭa'"),
+    ("a heavy-letter word named with the markup of a said one",
+     compose_say("1:7:1", 3, "Sebabnya, kata ini pengganti bagi kata {{1:6:2}} yang artinya “jalan”, dan pengganti mengikuti akhiran kata yang digantikannya."),
+     "has a heavy letter (ص ض ط ظ ق خ غ): it is shown and explained, never said — write {{!1:6:2}}"),
+    ("a simple word named as shown only", item_say(1, 1, ITEM11_SAY.replace("{{1:1:1/bi}}", "{{!1:1:1/bi}}")),
+     "bi is a simple word, said as it is written: write {{1:1:1/bi}}"),
+    ("a shown-only word without its token (the karaoke drops it)", with_audio(SHOWN_ONLY, voice=True, tweak=drop_shown_piece),
+     f"{SHOWN_ONLY}: tokens do not join"),
     # a take ElevenLabs cut short (operator 2026-10-17: "the voice is cut slightly before the sentence
     # finished"; al-fatihah:0:primer:1 ended 111 ms before its own last word)
     ("a take cut short (111 ms, as al-fatihah:0:primer:1 was)", with_audio(AUD, tweak=cut_by(111)),
@@ -768,7 +753,7 @@ MUTATIONS = [
     ("a why_basic taken away: the card's why is said again, with its term", why_basic("1:7:1", None),
      "al-fatihah:7:ex:sort-case:1:why: uses the term 'badal' before the lesson that teaches it (taught in 114:2)"),
     ("a why_basic that names a term taught later",
-     why_basic("1:7:1", "Akhirnya fathah karena menjadi badal bagi kata {{1:6:2}} yang artinya “jalan”."),
+     why_basic("1:7:1", "Akhirnya fathah karena menjadi badal bagi kata {{!1:6:2}} yang artinya “jalan”."),
      "al-fatihah:7:ex:sort-case:1:why: uses the term 'badal' before the lesson that teaches it (taught in 114:2)"),
     ("a why_basic that names a next-level term",
      why_basic("1:5:2", "Akhirnya dhammah karena fi'il mudhari' ini tidak didahului penashab; pelakunya tersirat."),
@@ -1057,7 +1042,7 @@ class NarrationValidation(unittest.TestCase):
             if ":compose:" in lid or ":primer:" in lid:
                 said = re.sub(r"terdengar (?:ba|bi|bu)\.$", "", ln["text"]) if ":primer:" in lid else ln["text"]
                 # … and, since 2026-10-17, a word the caption names with its Arabic ("yaitu بِ (bi)")
-                said = V.mask_named_said(said, [w for w, _ in V.named_in_display(ln["display"], LEX)])
+                said = V.mask_named_said(said, [w for w, _ in V.named_in_display(ln["display"])])
                 self.assertNotRegex(said, r"\b(?:bi|bu|ismu|ismi|bismi|ar-rahmanu|ar-rahmani)\b", lid)
         self.assertIn("bunyinya a", lines["al-fatihah:0:primer:3"]["text"])
         # the letter alone first, then the same letter with its mark and the sound it gives
@@ -2452,19 +2437,19 @@ class SpeechAndRender(unittest.TestCase):
         # mention the arabic word not only artinya"), shown and said by Speech — and an EARLIER
         # ayah is not pointed at (rule 29, "no back-references to earlier ayat"); a later one is
         self.assertEqual(san.prose("Badal dari aṣ-ṣirāṭa di ayat 6.", 1, 7, 1),
-                         "Badal dari kata {{1:6:2}} yang artinya “jalan”.")
-        self.assertEqual(san.prose("Seperti aṣ-ṣirāṭa di ayat 6.", 1, 2), "Seperti kata {{1:6:2}} yang artinya “jalan” di ayat enam.")
+                         "Badal dari kata {{!1:6:2}} yang artinya “jalan”.")
+        self.assertEqual(san.prose("Seperti aṣ-ṣirāṭa di ayat 6.", 1, 2), "Seperti kata {{!1:6:2}} yang artinya “jalan” di ayat enam.")
         self.assertEqual(san.prose("Sifat bagi lafaz Allah di ayat 2.", 1, 3), "Sifat bagi lafaz “Allah”.")
         self.assertEqual(san.prose("Bergantung pada a‘ūżu (“aku berlindung”).", 113, 3),
                          "Bergantung pada kata {{113:1:2}} yang artinya “aku berlindung”.")
-        self.assertEqual(san.prose("Seperti khalaqa.", 1, 7), "Seperti kata {{113:2:4}} yang artinya “Dia ciptakan”.")
+        self.assertEqual(san.prose("Seperti khalaqa.", 1, 7), "Seperti kata {{!113:2:4}} yang artinya “Dia ciptakan”.")
         # … and what a listener hears and reads: the word's sound and its bytes where the markup was
         sp = B.Speech(LEX, V.Named(LESSONS, COMPOSE))
-        marked = sp.mark("Seperti kata {{1:6:2}} yang artinya “jalan”.")
+        marked = sp.mark("Seperti kata {{!1:6:2}} yang artinya “jalan”.")
         w = next(x for a in LESSONS["al-fatihah"]["ayat"] for x in a["words"] if x["loc"] == "1:6:2")
         self.assertEqual(sp.shown(marked, None), f"Seperti kata {w['ar']} ({w['translit']}) yang artinya “jalan”.")
-        # (said in pronunciation.json `named`'s spelling since 2026-10-17: "ash-shirotho", rule 11)
-        self.assertIn("kata ash-shirotho yang artinya", sp.spoken(marked))
+        # aṣ-ṣirāṭa has heavy letters: shown, never said (operator 2026-10-17)
+        self.assertEqual(sp.spoken(marked), "Seperti kata yang artinya jalan.")
         # the front of ‘alaihim (never spoken, not even in Arabic), and a title that is only the particle
         self.assertEqual(san.prose("‘Alā adalah huruf jar.", 1, 7, 4),
                          "Bagian depan kata ini adalah huruf jar yang artinya “atas”.")
@@ -2505,7 +2490,7 @@ class SpeechAndRender(unittest.TestCase):
                          "Kata ketiga, yaitu {{1:2:3}}, yang artinya “Tuhan”, disandarkan kepada kata keempat.")
         self.assertEqual(san.prose("Kata ketiga dan keempat, yang artinya “Tuhan seluruh alam”, adalah satu frasa.", 1, 2),
                          "Kata ketiga dan keempat, yaitu {{1:2:3}} {{1:2:4}}, yang artinya “Tuhan seluruh alam”, adalah satu frasa.")
-        self.assertIn("Kata kedua sampai keempat, yaitu {{113:1:2}} {{113:1:3}} {{113:1:4}}, yang artinya",
+        self.assertIn("Kata kedua sampai keempat, yaitu {{113:1:2}} {{113:1:3}} {{!113:1:4}}, yang artinya",
                       san.prose("Kata kedua sampai keempat, yang artinya “aku berlindung kepada Tuhan”, adalah isinya.", 113, 1))
         self.assertEqual(san.prose("Kata ini, yang artinya “dari”, adalah huruf jar.", 114, 4, 1),
                          "Kata ini, yaitu {{114:4:1}}, yang artinya “dari”, adalah huruf jar.")
@@ -2515,7 +2500,7 @@ class SpeechAndRender(unittest.TestCase):
         self.assertEqual(san.prose("Kata kelima, yang artinya “x”, tidak ada.", 1, 1), "Kata kelima, yang artinya “x”, tidak ada.")
         # "kata perintah, yaitu kata pertama" already has its "yaitu": the word is an apposition
         self.assertEqual(san.prose("Ayat dibuka dengan kata perintah qul (“katakanlah”).", 112, 1),
-                         "Ayat dibuka dengan kata perintah, yaitu kata pertama, {{112:1:1}}, yang artinya “katakanlah”.")
+                         "Ayat dibuka dengan kata perintah, yaitu kata pertama, {{!112:1:1}}, yang artinya “katakanlah”.")
         # what the validator reads in a caption (PLACE_MEANING): a place and a meaning with nothing between
         for bad in ("Kata ketiga, yang artinya “Tuhan”", "Kata pertama artinya: “segala puji”", "kata ketiga dan keempat, yang artinya",
                     "kata kedua sampai keempat, yang artinya", "Kata ini, yang artinya “jalan”", "kata itu, yang artinya",
@@ -2551,45 +2536,64 @@ class SpeechAndRender(unittest.TestCase):
             for lid, ln in man["lines"].items():
                 self.assertEqual(br(lid, ln["display"]), [], lid)
 
-    def test_named_spellings(self):
-        # pronunciation.json `named` (2026-10-17: "RECORDED and checked by ear afterwards, the same
-        # way every other new term is handled"): each held named word of Al-Fatihah has its spoken
-        # spelling, the default one or — where the heavy-letter guard refuses that — rule 11's.
-        self.assertEqual(LEX.named["aṣ-ṣirāṭa"].speak, "ash-shirotho")
-        self.assertEqual(V.default_named_speech("aṣ-ṣirāṭa"), "ash-shiratha")
-        self.assertEqual(LEX.named["al-‘ālamīna"].speak, V.default_named_speech("al-‘ālamīna"))
-        for tr, e in LEX.named.items():
-            self.assertTrue(V.NAMED_HELD.search(tr), tr)
-            self.assertIsNone(V.HEAVY_LATIN.search(e.speak), tr)
-            if not V.HEAVY_LATIN.search(V.default_named_speech(tr)):
-                self.assertEqual(e.speak, V.default_named_speech(tr), f"{tr}: respelled though the guard does not ask it")
-            self.assertTrue(e.pending, tr)
-        # every Al-Fatihah line renders now; another surah's unlisted ones (qul, aṣ-ṣamadu) do not
-        fatihah = MANIFESTS["al-fatihah"]["lines"]
-        self.assertEqual([lid for lid, ln in fatihah.items() if V.held_line(ln, LEX)], [])
-        self.assertIn("ash-shirotho", fatihah[NAMED_LISTED]["text"])
-        rows = [(n, lid, ln["text"]) for n, man in MANIFESTS.items() for lid, ln in man["lines"].items()]
-        held = {lid for lid, _ws in R.blocked(rows, LEX, MANIFESTS)}
-        self.assertFalse(any(lid.startswith("al-fatihah:") for lid in held))
-        self.assertIn(HELD_NAMED, held)
-        # a listed word may be rendered: a line naming it with audio (of the manifest's own voice)
-        # passes every check
-        m = copy.deepcopy(MANIFESTS)
-        ln = m["al-fatihah"]["lines"][NAMED_LISTED]
-        ln["audio"] = {"url": V.delivery_url(m["al-fatihah"]["voice"], "al-fatihah", ln["text"], SHA), "ms": len(ln["text"]) * 50 + 500,
-                       "sha256": SHA}
-        ln["tokens"] = fake_tokens(ln["text"], ln["focus"], ln["display"])
-        self.assertEqual(V.check(m, LESSONS, LIBRARY, build=False, lex=LEX), [])
-        # … and is reported until the operator has heard it: by validate and by the render's dry run
-        self.assertIn(NAMED_LISTED, V.pending_named(MANIFESTS, LEX)["aṣ-ṣirāṭa"])
-        fat = [r for r in rows if r[0] == "al-fatihah"]
-        self.assertIn(f"aṣ-ṣirāṭa (named word, said ash-shirotho): {len(V.pending_named(MANIFESTS, LEX)['aṣ-ṣirāṭa'])} lines",
-                      R.unheard(fat, MANIFESTS, LEX))
-        out = io.StringIO()
-        with contextlib.redirect_stdout(out):
-            R.dry_run(fat, MANIFESTS)
-        self.assertIn("pending ear check, rendered: aṣ-ṣirāṭa (named word, said ash-shirotho)", out.getvalue())
-        self.assertNotIn("refused by --render", out.getvalue())
+    def test_heavy_letter_words_are_shown_not_said(self):
+        # Operator 2026-10-17: "better not to use heavy-letter words with elevenlabs, we just explain
+        # but not read them; simple words so far is ok". THE rule, from the word's Arabic letters.
+        said = {"بِسْمِ": "bismi", "ٱسْمِ": "ismi", "رَبِّ": "rabbi", "ٱلْحَمْدُ": "al-ḥamdu", "نَعْبُدُ": "na‘budu",
+                "ٱلَّذِينَ": "allażīna", "أَعُوذُ": "a‘ūżu", "ٱلْعَٰلَمِينَ": "al-‘ālamīna"}
+        shown = {"ٱلصِّرَٰطَ": "aṣ-ṣirāṭa", "قُلْ": "qul", "غَيْرِ": "gairi", "خَلَقَ": "khalaqa", "ٱلْفَلَقِ": "al-falaqi",
+                 "ٱلصَّمَدُ": "aṣ-ṣamadu", "ٱلْمُسْتَقِيمَ": "al-mustaqīma", "ٱلضَّآلِّينَ": "aḍ-ḍāllīna"}
+        for ar, tr in said.items():
+            self.assertTrue(V.named_is_said(ar, tr), tr)
+        for ar, tr in shown.items():
+            self.assertFalse(V.named_is_said(ar, tr), tr)
+        # every manifest as built: a named word is in the spoken text exactly when it is said
+        n_said = n_shown = 0
+        for man in MANIFESTS.values():
+            for lid, ln in man["lines"].items():
+                for m in V.NAMED_SHOWN.finditer(ln["display"]):
+                    says = re.search(rf"(?<![\w'‘’-]){re.escape(V.named_speech(m.group('lat')))}(?![\w'‘’-])", ln["text"])
+                    self.assertEqual(bool(says), V.named_is_said(m.group("ar"), m.group("lat")), f"{lid}: {m.group()}")
+                    n_said, n_shown = n_said + bool(says), n_shown + (not says)
+                self.assertEqual(V.said_heavy(ln), [], lid)
+        self.assertGreater(n_said, 50)
+        self.assertGreater(n_shown, 30)
+        # a shown-only word: on screen, left out of the speech with its connector, its piece carried
+        # by the token before it (with that token's timing: nothing faked)
+        ln = MANIFESTS["al-fatihah"]["lines"][SHOWN_ONLY]
+        w = LESSONS["al-fatihah"]["ayat"][6]["words"][0]
+        self.assertEqual(ln["display"], f"Kata pertama, yaitu {w['ar']} ({w['translit']}), artinya: “jalan”.")
+        self.assertEqual(ln["text"], "Kata pertama artinya: jalan.")
+        self.assertEqual(LEX.speech_of_display(ln["display"]), ln["text"])
+        cuts = LEX.text_cuts(ln["display"])
+        self.assertEqual(cuts, [(len("Kata pertama"), f", yaitu {w['ar']} ({w['translit']}),")])
+        toks = fake_tokens(ln["text"], ln["focus"], ln["display"])
+        plain = LEX.tokens(ln["text"], [i * 0.05 for i in range(len(ln["text"]))], [i * 0.05 + 0.04 for i in range(len(ln["text"]))])
+        self.assertEqual([t["t"] for t in toks], ["Kata", f"pertama, yaitu {w['ar']} ({w['translit']}),", "artinya:", "jalan."])
+        self.assertEqual([(t["s"], t["e"]) for t in toks], [(t["s"], t["e"]) for t in plain])
+        self.assertEqual(V.check_tokens("t", toks, None, ln["text"], LEX, None, (), cuts), [])
+        # the cases of UNSAID, each a deletion
+        x = "X"
+        for before, after in (("Kata kedua, yaitu X, artinya: jalan.", "Kata kedua artinya: jalan."),
+                              ("Itu kata pertama, yaitu X, yang artinya jalan.", "Itu kata pertama, yang artinya jalan."),
+                              ("yaitu kata pertama, X, yang artinya katakanlah", "yaitu kata pertama, yang artinya katakanlah"),
+                              ("pengganti bagi kata X yang artinya jalan, dan", "pengganti bagi kata yang artinya jalan, dan"),
+                              ("sebelum huruf nun: X.", "sebelum huruf nun."),
+                              ("kata kedua sampai keempat, yaitu a'udzu birabbi X, yang artinya", "kata kedua sampai keempat, yaitu a'udzu birabbi, yang artinya")):
+            got, pieces = V.unsay(before, x)
+            self.assertEqual(got, after)
+            # … put back where they were, the text is what it was
+            for pos, piece in sorted(pieces, reverse=True):
+                got = got[:pos] + piece + got[pos:]
+            self.assertEqual(got, before)
+        # the render refuses a line that says one (said_heavy), and lets a line that only shows it go
+        bad = {**ln, "text": "Kata pertama, yaitu shiratha, artinya: jalan."}
+        self.assertIn("ṣirāṭa", V.held_line(bad, LEX))
+        self.assertEqual(V.held_line(ln, LEX), [])
+        manifests = {"x": {"lines": {"x:1:w1": bad}}}
+        self.assertEqual([lid for lid, _ in R.blocked([("x", "x:1:w1", bad["text"])], LEX, manifests)], ["x:1:w1"])
+        # and the dictionary's retired `named` list is refused
+        self.assertTrue(any("`named` is retired" in e for e in V.Lexicon({**LEXDATA, "named": []}).shape))
 
     def test_bare_letters_in_captions(self):
         # "we dont need to write “ba’” here, only the arabic one is enough, also apply this rule to
@@ -2703,11 +2707,8 @@ class SpeechAndRender(unittest.TestCase):
         self.assertEqual(V.named_speech("bi"), "bi")
         self.assertEqual(V.named_speech("Allāhi"), "Allohi")       # the Name at a word's start: Alloh
         self.assertEqual(V.named_speech("lillāhi"), "lillahi")     # … not after li-: light
-        self.assertEqual(V.named_speech("aṣ-ṣirāṭa"), "ash-shiratha")  # what a plain fold would lose: held
-        self.assertEqual(V.named_speech("al-‘ālamīna"), "al-'alamina")
-        self.assertEqual(V.named_speech("gairi"), "ghairi")
-        self.assertEqual([bool(V.NAMED_HELD.search(t)) for t in ("bi", "ismi", "Allāhi", "raḥmān", "aṣ-ṣirāṭa", "al-mustaqīma", "‘ālamīna")],
-                         [False, False, False, False, True, True, True])
+        self.assertEqual(V.named_speech("al-‘ālamīna"), "al-'alamina")  # a simple word: ‘ → '
+        self.assertEqual(V.named_speech("allażīna"), "alladzina")
         named = V.Named(LESSONS, COMPOSE)
         self.assertEqual(named.resolve("1:1:1", "bi"), ("بِ", "bi"))
         self.assertEqual(named.resolve("1:1:2"), (FORMS.word_ar["1:1:2"], "Allāhi"))
@@ -2725,27 +2726,10 @@ class SpeechAndRender(unittest.TestCase):
         toks = LEX.tokens(text, [i * 0.05 for i in range(len(text))], [i * 0.05 + 0.04 for i in range(len(text))], None,
                           V.named_in_display(shown))
         self.assertIn("بِ (bi)", [t["t"] for t in toks])
-        self.assertEqual(" ".join(t["t"] for t in toks), shown.replace("“", "").replace("”", "") if False else " ".join(t["t"] for t in toks))
         self.assertEqual(V.check_tokens("t", toks, None, text, LEX, None, V.named_in_display(shown)), [])
         # without a caption that names it, the same word said is a Qur'anic word in narration
         self.assertTrue(any("Qur'anic word 'bi'" in e or "Qur'anic word" in e for e in V.check_spoken("t", "Yaitu ismi.", FORMS, LEX)))
         self.assertEqual(V.check_spoken("t", "Yaitu ismi.", FORMS, LEX, ["ismi"]), [])
-        # a held word with no spelling in pronunciation.json `named` holds its line, from its caption
-        # (render_narration refuses it) ...
-        line = {"text": "Kata ash-shamadu yang artinya tempat meminta.", "display": "Kata ٱلصَّمَدُ (aṣ-ṣamadu) yang artinya “tempat meminta”."}
-        self.assertNotIn("aṣ-ṣamadu", LEX.named)
-        self.assertEqual(V.named_held(line["display"], LEX), ["aṣ-ṣamadu"])
-        self.assertIn("aṣ-ṣamadu", V.held_line(line, LEX))
-        manifests = {"x": {"lines": {"x:1:w1": line}}}
-        self.assertEqual([lid for lid, _ in R.blocked([("x", "x:1:w1", line["text"])], LEX, manifests)], ["x:1:w1"])
-        # ... and one with a spelling there is said in it and rendered (2026-10-17, pending the ear check)
-        line = {"text": "Kata ash-shirotho yang artinya jalan.", "display": "Kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan”."}
-        self.assertEqual(V.named_held(line["display"]), ["aṣ-ṣirāṭa"])  # without the dictionary: held
-        self.assertEqual(V.named_held(line["display"], LEX), [])
-        self.assertEqual(V.named_in_display(line["display"], LEX)[0][0], "ash-shirotho")
-        self.assertEqual(V.held_line(line, LEX), [])
-        manifests = {"x": {"lines": {"x:1:w1": line}}}
-        self.assertEqual(R.blocked([("x", "x:1:w1", line["text"])], LEX, manifests), [])
         # The lines as built: ayah 1's first structure item names بِ and ٱسْمِ (the operator's example)
         s11 = MANIFESTS["al-fatihah"]["lines"][S11]
         self.assertIn("yaitu بِ (bi) yang artinya “dengan”, sehingga isim (اِسْم) sesudahnya, yaitu ٱسْمِ (ismi) yang artinya “nama”",

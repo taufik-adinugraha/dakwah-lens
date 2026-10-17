@@ -196,7 +196,8 @@ def blocked(rows: list[tuple[str, str, str]], lex: V.Lexicon, manifests: dict[st
     """Lines that may not be rendered yet: they speak a heavy letter + a (validate_narration
     heavy_latin) that pronunciation.json has no operator-approved respelling for, an Arabic term or
     letter name in Latin (validate_narration.latin_terms), or — read from the line's caption when
-    `manifests` is given — a named Qur'anic word whose sound waits for the operator (named_held)."""
+    `manifests` is given — a named Qur'anic word with a heavy letter that the line says (said_heavy:
+    shown and explained, never said; operator 2026-10-17)."""
     def words(name: str, lid: str, text: str) -> list[str]:
         line = (manifests or {}).get(name, {}).get("lines", {}).get(lid)
         return V.held_line(line, lex) if isinstance(line, dict) else V.held(text, lex)
@@ -210,9 +211,7 @@ def unheard(rows: list[tuple[str, str, str]], manifests: dict[str, dict], lex: V
     todo = {name: {lid: manifests[name]["lines"][lid] for n, lid, _t in rows if n == name and lid not in held_ids
                    and "audio" not in manifests[name]["lines"][lid]} for name in {r[0] for r in rows}}
     use = V.pending_terms({n: {"lines": ls} for n, ls in todo.items()}, lex)
-    named = V.pending_named({n: {"lines": ls} for n, ls in todo.items()}, lex)
-    return ([f"{t.term} ({t.speak} → {t.display}): {len(use[t.term])} lines" for t in lex.terms if t.term in use]
-            + [f"{tr} (named word, said {lex.named[tr].speak}): {len(ids)} lines" for tr, ids in named.items()])
+    return [f"{t.term} ({t.speak} → {t.display}): {len(use[t.term])} lines" for t in lex.terms if t.term in use]
 
 
 def dry_run(rows: list[tuple[str, str, str]], manifests: dict[str, dict]) -> None:
@@ -250,7 +249,7 @@ def dry_run(rows: list[tuple[str, str, str]], manifests: dict[str, dict]) -> Non
     if held:
         words = sorted({V.key(w) for _lid, ws in held for w in ws})
         print(f"refused by --render: {len(held)} selected lines speak a heavy letter + a with no approved respelling, "
-              f"an Arabic term in Latin, or a named word with no spelling in its `named` list, not from pronunciation.json "
+              f"an Arabic term in Latin, not from pronunciation.json, or a heavy-letter word said "
               f"({', '.join(words)}); narrow --only to the others")
     for row in unheard(rows, manifests, lex):
         print(f"pending ear check, rendered: {row}")
@@ -344,7 +343,7 @@ def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
             al, fresh = new_al, True
             print(f"render {lid} ({len(text)} chars, character-cost {cost})")
         tokens = lex.tokens(text, al["character_start_times_seconds"], al["character_end_times_seconds"], focus_ar,
-                            V.named_in_display(line.get("display"), lex))
+                            V.named_in_display(line.get("display")), lex.text_cuts(line.get("display")))
         # The manifest describes what is served: the master encoded for delivery (64 kbps mono), not
         # the master. Refused (SystemExit) if the encode drifts or a token no longer fits; the paid
         # master stays on disk, so a re-run re-uses it.
@@ -433,8 +432,8 @@ def main() -> int:
     # line speaking one is rendered only once the dictionary has an approved respelling for it.
     held = blocked(rows, V.load_lexicon(), manifests)
     if held:
-        raise SystemExit("refused, nothing was sent: these lines speak a heavy letter + a, an Arabic term in Latin, or a "
-                         "named word that pronunciation.json does not speak (add it, as pending-ear-check or approved, reword "
+        raise SystemExit("refused, nothing was sent: these lines speak a heavy letter + a or an Arabic term in Latin that "
+                         "pronunciation.json does not speak, or a heavy-letter word (never said) (add the term, reword "
                          "the line, or narrow --only):\n  " + "\n  ".join(f"{lid}: {', '.join(ws)}" for lid, ws in held[:40]))
     for row in unheard(rows, manifests, V.load_lexicon()):
         print(f"pending ear check, rendering anyway (the operator waived the pre-render review): {row}")

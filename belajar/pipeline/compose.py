@@ -930,7 +930,7 @@ def authored_slugs() -> list[str]:
 # hears each one's sound at its first use in a word's explanation ("kasrah, bunyi i").
 _SAY_MARK = re.compile(r"\b(fathah|kasrah|dhammah)\b", re.I)
 # A named word's markup in a `say` (validate_narration.NAMED_REF, which imports this module).
-_NAMED_REF = re.compile(r"\{\{(\d{1,3}:\d{1,3}:\d{1,3})(?:/([^{}\s/]+))?\}\}")
+_NAMED_REF = re.compile(r"\{\{!?(\d{1,3}:\d{1,3}:\d{1,3})(?:/([^{}\s/]+))?\}\}")
 _SOUND_AFTER = re.compile(r",? (?:tanda )?bunyi ([aiu])\b")
 _SOUNDS = re.compile(r"\bbunyi ([aiu])\b")
 # A frame that shows a base form (or a change from it), or says what it is in its note.

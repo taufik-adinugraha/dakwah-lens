@@ -19,7 +19,7 @@
       "focus": null
     },
     "al-falaq:1:w1": {
-      "text": "Kata pertama, yaitu qul, artinya: katakanlah. Kata perintah, atau فِعْل أَمْر, ini مَبْنِيّ di atas سُكُون, jadi akhirnya tetap; pelakunya tersirat, yaitu engkau.",
+      "text": "Kata pertama artinya: katakanlah. Kata perintah, atau فِعْل أَمْر, ini مَبْنِيّ di atas سُكُون, jadi akhirnya tetap; pelakunya tersirat, yaitu engkau.",
       "display": "Kata pertama, yaitu قُلْ (qul), artinya: “katakanlah”. Kata perintah, atau fi’il amr (فِعْل أَمْر), ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”.",
       "highlight": [
         1
@@ -43,7 +43,7 @@
       "focus": "113:1:3"
     },
     "al-falaq:1:w4": {
-      "text": "Kata keempat, yaitu al-falaqi, artinya: subuh. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata ketiga, yaitu birabbi, yang artinya Tuhan yang menguasai subuh.",
+      "text": "Kata keempat artinya: subuh. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata ketiga, yaitu birabbi, yang artinya Tuhan yang menguasai subuh.",
       "display": "Kata keempat, yaitu ٱلْفَلَقِ (al-falaqi), artinya: “subuh”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ketiga, yaitu بِرَبِّ (birabbi), yang artinya “Tuhan yang menguasai subuh”.",
       "highlight": [
         4
@@ -51,7 +51,7 @@
       "focus": "113:1:4"
     },
     "al-falaq:1:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kata pertama, yaitu qul, yang artinya katakanlah, adalah kata perintah dengan pelaku tersirat, engkau.",
+      "text": "Sekarang susunan kalimatnya. Kata pertama, yang artinya katakanlah, adalah kata perintah dengan pelaku tersirat, engkau.",
       "display": "Sekarang susunan kalimatnya. Kata pertama, yaitu قُلْ (qul), yang artinya “katakanlah”, adalah kata perintah dengan pelaku tersirat, “engkau”.",
       "highlight": [
         0
@@ -59,7 +59,7 @@
       "focus": null
     },
     "al-falaq:1:structure:b": {
-      "text": "Yang diperintahkan untuk diucapkan, kata kedua sampai keempat, yaitu a'udzu birabbi al-falaqi, yang artinya aku berlindung kepada Tuhan yang menguasai subuh, adalah kalimat kata kerja dengan pelaku tersirat aku; seluruhnya menjadi isi ucapan, maqul al-qaul, dan berkedudukan نَصْب. Kata ketiga bergantung pada kata kedua, dan kata ketiga disandarkan, atau idhofah, kepada kata keempat.",
+      "text": "Yang diperintahkan untuk diucapkan, kata kedua sampai keempat, yaitu a'udzu birabbi, yang artinya aku berlindung kepada Tuhan yang menguasai subuh, adalah kalimat kata kerja dengan pelaku tersirat aku; seluruhnya menjadi isi ucapan, maqul al-qaul, dan berkedudukan نَصْب. Kata ketiga bergantung pada kata kedua, dan kata ketiga disandarkan, atau idhofah, kepada kata keempat.",
       "display": "Yang diperintahkan untuk diucapkan, kata kedua sampai keempat, yaitu أَعُوذُ (a‘ūżu) بِرَبِّ (birabbi) ٱلْفَلَقِ (al-falaqi), yang artinya “aku berlindung kepada Tuhan yang menguasai subuh”, adalah kalimat kata kerja dengan pelaku tersirat “aku”; seluruhnya menjadi isi ucapan (maqul al-qaul) dan berkedudukan nashab (نَصْب). Kata ketiga bergantung pada kata kedua, dan kata ketiga disandarkan, atau idhafah (إِضَافَة), kepada kata keempat.",
       "highlight": [
         0
@@ -75,7 +75,7 @@
       "focus": null
     },
     "al-falaq:1:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yaitu qul, yang artinya katakanlah.",
+      "text": "Itu kata pertama, yang artinya katakanlah.",
       "display": "Itu kata pertama, yaitu قُلْ (qul), yang artinya “katakanlah”.",
       "highlight": [],
       "focus": null
@@ -93,7 +93,7 @@
       "focus": null
     },
     "al-falaq:1:ex:tap-word:4:why": {
-      "text": "Itu kata keempat, yaitu al-falaqi, yang artinya subuh.",
+      "text": "Itu kata keempat, yang artinya subuh.",
       "display": "Itu kata keempat, yaitu ٱلْفَلَقِ (al-falaqi), yang artinya “subuh”.",
       "highlight": [],
       "focus": null
@@ -243,7 +243,7 @@
       "focus": "113:2:3"
     },
     "al-falaq:2:w4": {
-      "text": "Kata keempat, yaitu kholaqo, artinya: Dia ciptakan. فِعْل مَاضٍ ini مَبْنِيّ di atas فَتْحَة; pelakunya tersirat, yaitu Dia, Alloh subhanahu wa ta'ala, dan kalimat kata ini menjadi صِلَة bagi kata ketiga.",
+      "text": "Kata keempat artinya: Dia ciptakan. فِعْل مَاضٍ ini مَبْنِيّ di atas فَتْحَة; pelakunya tersirat, yaitu Dia, Alloh subhanahu wa ta'ala, dan kalimat kata ini menjadi صِلَة bagi kata ketiga.",
       "display": "Kata keempat, yaitu خَلَقَ (khalaqa), artinya: “Dia ciptakan”. Fi’il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat, yaitu “Dia” (Allah subhanahu wa ta'ala), dan kalimat kata ini menjadi shilah (صِلَة) bagi kata ketiga.",
       "highlight": [
         4
@@ -259,7 +259,7 @@
       "focus": null
     },
     "al-falaq:2:structure:b": {
-      "text": "Kata kedua disandarkan kepada kata ketiga, yaitu ma, yang artinya yang, اِسْم مَوْصُول yang dijelaskan oleh صِلَة kata keempat, yaitu kholaqo, yang artinya Dia ciptakan; kata ganti yang kembali kepada kata ketiga dibuang. Sebagian ulama membaca kata ketiga sebagai huruf mashdariyyah, sehingga maknanya ciptaan-Nya.",
+      "text": "Kata kedua disandarkan kepada kata ketiga, yaitu ma, yang artinya yang, اِسْم مَوْصُول yang dijelaskan oleh صِلَة kata keempat, yang artinya Dia ciptakan; kata ganti yang kembali kepada kata ketiga dibuang. Sebagian ulama membaca kata ketiga sebagai huruf mashdariyyah, sehingga maknanya ciptaan-Nya.",
       "display": "Kata kedua disandarkan kepada kata ketiga, yaitu مَا (mā), yang artinya “yang”, isim maushul (اِسْم مَوْصُول) yang dijelaskan oleh shilah (صِلَة) kata keempat, yaitu خَلَقَ (khalaqa), yang artinya “Dia ciptakan”; kata ganti yang kembali kepada kata ketiga dibuang. Sebagian ulama membaca kata ketiga sebagai huruf mashdariyyah, sehingga maknanya “ciptaan-Nya”.",
       "highlight": [
         0
@@ -293,7 +293,7 @@
       "focus": null
     },
     "al-falaq:2:ex:tap-word:4:why": {
-      "text": "Itu kata keempat, yaitu kholaqo, yang artinya Dia ciptakan.",
+      "text": "Itu kata keempat, yang artinya Dia ciptakan.",
       "display": "Itu kata keempat, yaitu خَلَقَ (khalaqa), yang artinya “Dia ciptakan”.",
       "highlight": [],
       "focus": null
@@ -423,7 +423,7 @@
       "focus": "113:3:2"
     },
     "al-falaq:3:w3": {
-      "text": "Kata ketiga, yaitu ghasiqin, artinya: malam. Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini nakirah, tak tentu, tanpa alif lam.",
+      "text": "Kata ketiga artinya: malam. Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini nakirah, tak tentu, tanpa alif lam.",
       "display": "Kata ketiga, yaitu غَاسِقٍ (gāsiqin), artinya: “malam”. Akhirnya dibaca kasrah (كَسْرَة) bertanwin, karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini nakirah (tak tentu), tanpa alif lam (ال).",
       "highlight": [
         3
@@ -439,7 +439,7 @@
       "focus": "113:3:4"
     },
     "al-falaq:3:w5": {
-      "text": "Kata kelima, yaitu waqaba, artinya: telah gelap gulita. فِعْل مَاضٍ ini مَبْنِيّ di atas فَتْحَة; pelakunya tersirat, ia, yaitu malam itu, dan kalimat kata ini berkedudukan جَرّ sebagai mudhof ilaih dari kata keempat.",
+      "text": "Kata kelima artinya: telah gelap gulita. فِعْل مَاضٍ ini مَبْنِيّ di atas فَتْحَة; pelakunya tersirat, ia, yaitu malam itu, dan kalimat kata ini berkedudukan جَرّ sebagai mudhof ilaih dari kata keempat.",
       "display": "Kata kelima, yaitu وَقَبَ (waqaba), artinya: “telah gelap gulita”. Fi’il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“ia”, yaitu malam itu), dan kalimat kata ini berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari kata keempat.",
       "highlight": [
         5
@@ -447,7 +447,7 @@
       "focus": "113:3:5"
     },
     "al-falaq:3:structure:a": {
-      "text": "Sekarang susunan kalimatnya. وَاو yang artinya dan, menyambungkan, atau عَطْف, frasa ini dengan frasa yang artinya dari kejahatan, jadi ia bergantung pada kata a'udzu yang artinya aku berlindung. Kata kedua disandarkan kepada kata ketiga, yaitu ghasiqin, yang artinya malam.",
+      "text": "Sekarang susunan kalimatnya. وَاو yang artinya dan, menyambungkan, atau عَطْف, frasa ini dengan frasa yang artinya dari kejahatan, jadi ia bergantung pada kata a'udzu yang artinya aku berlindung. Kata kedua disandarkan kepada kata ketiga, yang artinya malam.",
       "display": "Sekarang susunan kalimatnya. و yang artinya “dan”, menyambungkan, atau ‘athaf (عَطْف), frasa ini dengan frasa yang artinya “dari kejahatan”, jadi ia bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”. Kata kedua disandarkan kepada kata ketiga, yaitu غَاسِقٍ (gāsiqin), yang artinya “malam”.",
       "highlight": [
         0
@@ -455,7 +455,7 @@
       "focus": null
     },
     "al-falaq:3:structure:b": {
-      "text": "Kata keempat, yaitu idza, yang artinya apabila, di sini keterangan waktu, zharaf, murni tanpa makna syarat, dan kalimat kata kelima, yaitu waqaba, yang artinya telah gelap gulita, menjadi mudhof ilaih baginya; kata keempat dikaitkan dengan kata a'udzu yang artinya aku berlindung menurut al-Mujtaba dan as-Samin, atau dengan kata kedua menurut al-Jadwal.",
+      "text": "Kata keempat, yaitu idza, yang artinya apabila, di sini keterangan waktu, zharaf, murni tanpa makna syarat, dan kalimat kata kelima, yang artinya telah gelap gulita, menjadi mudhof ilaih baginya; kata keempat dikaitkan dengan kata a'udzu yang artinya aku berlindung menurut al-Mujtaba dan as-Samin, atau dengan kata kedua menurut al-Jadwal.",
       "display": "Kata keempat, yaitu إِذَا (iżā), yang artinya “apabila”, di sini keterangan waktu (zharaf) murni tanpa makna syarat, dan kalimat kata kelima, yaitu وَقَبَ (waqaba), yang artinya “telah gelap gulita”, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya; kata keempat dikaitkan dengan kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” menurut al-Mujtaba dan as-Samin, atau dengan kata kedua menurut al-Jadwal.",
       "highlight": [
         0
@@ -483,7 +483,7 @@
       "focus": null
     },
     "al-falaq:3:ex:tap-word:3:why": {
-      "text": "Itu kata ketiga, yaitu ghasiqin, yang artinya malam.",
+      "text": "Itu kata ketiga, yang artinya malam.",
       "display": "Itu kata ketiga, yaitu غَاسِقٍ (gāsiqin), yang artinya “malam”.",
       "highlight": [],
       "focus": null
@@ -495,7 +495,7 @@
       "focus": null
     },
     "al-falaq:3:ex:tap-word:5:why": {
-      "text": "Itu kata kelima, yaitu waqaba, yang artinya telah gelap gulita.",
+      "text": "Itu kata kelima, yang artinya telah gelap gulita.",
       "display": "Itu kata kelima, yaitu وَقَبَ (waqaba), yang artinya “telah gelap gulita”.",
       "highlight": [],
       "focus": null
@@ -659,7 +659,7 @@
       "focus": "113:4:4"
     },
     "al-falaq:4:w5": {
-      "text": "Kata kelima, yaitu al-'uqadi, artinya: buhul-buhul. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata keempat; kata ini jamak dari 'uqdah, buhul, simpul.",
+      "text": "Kata kelima artinya: buhul-buhul. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata keempat; kata ini jamak dari 'uqdah, buhul, simpul.",
       "display": "Kata kelima, yaitu ٱلْعُقَدِ (al-‘uqadi), artinya: “buhul-buhul”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata keempat; kata ini jamak dari 'uqdah (buhul, simpul).",
       "highlight": [
         5
@@ -675,7 +675,7 @@
       "focus": null
     },
     "al-falaq:4:structure:b": {
-      "text": "Frasa kata keempat dan kelima, yaitu fi al-'uqadi, yang artinya pada buhul-buhul, bergantung pada kata ketiga, Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as.",
+      "text": "Frasa kata keempat dan kelima, yaitu fi, yang artinya pada buhul-buhul, bergantung pada kata ketiga, Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as.",
       "display": "Frasa kata keempat dan kelima, yaitu فِى (fī) ٱلْعُقَدِ (al-‘uqadi), yang artinya “pada buhul-buhul”, bergantung pada kata ketiga (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
       "highlight": [
         0
@@ -715,7 +715,7 @@
       "focus": null
     },
     "al-falaq:4:ex:tap-word:5:why": {
-      "text": "Itu kata kelima, yaitu al-'uqadi, yang artinya buhul-buhul.",
+      "text": "Itu kata kelima, yang artinya buhul-buhul.",
       "display": "Itu kata kelima, yaitu ٱلْعُقَدِ (al-‘uqadi), yang artinya “buhul-buhul”.",
       "highlight": [],
       "focus": null

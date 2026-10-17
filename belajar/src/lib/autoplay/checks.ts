@@ -1100,7 +1100,7 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
       const { why, words } = owns(id);
       if (why) errors.push(`${file}: ${id}: ${why}`);
       // A word the caption names with its Arabic is said there in Latin on purpose (named words).
-      const said = namedSaid(l.display ?? "", dict);
+      const said = namedSaid(l.display ?? "");
       for (const p of spokenTextProblems(maskNamedSaid(l.text, said), quranTokens, dict)) errors.push(`${file}: ${id}: ${p}`);
       if (l.display !== undefined) {
         for (const p of captionArabicProblems(l.display, dict, allowedArabic)) errors.push(`${file}: ${id}: display: ${p}`);
