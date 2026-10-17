@@ -575,10 +575,14 @@ def mechanical_plan(lesson: dict, library: dict) -> dict:
 #   the answer      the part's QAC tag, as one of the three kinds (QAC_KIND). It must agree with
 #                   what the lesson already says about the word, its `pos` ("huruf jar + isim":
 #                   POS_KIND), part by part: a disagreement stops the build;
-#   the explanation the kind and its plain meaning as the Kalimah record's own summary gives it
-#                   (kind_meanings; the kind alone for an isim that is no noun, proper noun or
-#                   adjective, and for the Name of Allah: `glossed`), then a VISIBLE SIGN only
-#                   where the data shows one and the
+#   the explanation the part by its place, the part ITSELF with its meaning where the data names
+#                   it (part_named), the kind, and WHICH class of that kind this part is — never
+#                   the kind's general definition (operator 2026-10-17, on ٱلرَّحِيمِ: "you should
+#                   say this word is isim karena kata sifat, yang artinya Maha Penyayang. no need
+#                   to say 'yaitu nama benda, orang, atau sifat', directly show which one. Fix this
+#                   in similar cases"): the class the Kalimah record teaches for the part's QAC
+#                   tag (kind_classes, part_class; the kind alone where it teaches none, and for
+#                   the Name of Allah), then a VISIBLE SIGN only where the data shows one and the
 #                   step that teaches it belongs to an EARLIER lesson (SIGNS). The two signs are
 #                   the matn's own signs of an isim (Ajurrumiyyah, Shamela 11371/1: «فالاسم
 #                   يُعرَفُ: بالخَفضِ، والتنوينِ، ودخولِ الألف واللام، وحروفِ الخَفضِ»); no other
@@ -606,22 +610,46 @@ QAC_KIND = {"N": "isim", "PN": "isim", "ADJ": "isim", "PRON": "isim", "DEM": "is
             "V": "fiil", "P": "huruf", "CONJ": "huruf", "NEG": "huruf"}
 # The article: no part of its own (build_surah.pos_label leaves it out of `pos` as well).
 QAC_ARTICLE = "DET"
-# WHERE THE KIND'S PLAIN MEANING IS SAID (one rule, `glossed`). The Kalimah record glosses an isim
-# as "nama benda, orang, atau sifat": that covers a noun, a proper noun and an adjective (QAC N,
-# PN, ADJ) and nothing else. A pronoun, a relative or demonstrative, an adverb of time or place
-# (PRON, REL, DEM, T, LOC) is an isim too, but "Kata pertama adalah isim, yaitu nama benda, orang,
-# atau sifat" said of a pronoun would teach something the source does not say (main session
-# 2026-10-13): there the sentence says the kind and stops. So it does for the Name of Allah, as
-# QAC lemmatises it (build_surah.pos_label: "isim 'alam (lafaz Allah)"): the general gloss is
-# not said in a sentence whose subject is the Name. A fi'il and a huruf keep theirs ("kata
-# kerja", "kata tugas").
-ISIM_GLOSSED = ("N", "PN", "ADJ")
+# WHICH CLASS A SENTENCE NAMES (one rule, `part_class`; operator 2026-10-17: "directly show which
+# one"). Until then every isim was explained with the Kalimah record's general gloss, "yaitu nama
+# benda, orang, atau sifat" — the definition of the kind, not this word. Now the sentence says the
+# class of THIS part, and only a class the Kalimah record teaches, for the QAC tag it teaches it
+# for (kind_classes; nothing typed here):
+#   - an isim: the record's own examples, each a note "<word>: isim, <class>." on a word whose
+#     QAC tag the record's QAC source gives — ṣirāṭa (1:7:1, N) "nama benda", al-mustaqīma (1:6:3,
+#     ADJ) "nama sifat", iyyāka (1:5:1, PRON) "kata ganti". Lesson zero says each of them over its
+#     example ("… adalah isim, yaitu nama benda", "… tetapi nama sifat", "… yaitu kata ganti"), so
+#     a warm-up may name them; the taught check below holds that (class_problems). The operator's
+#     words were "kata sifat"; the lessons teach "nama sifat", and a warm-up says what was taught.
+#   - a fi'il and a huruf: the record's summary, "fi'il (kata kerja)", "huruf (kata tugas)", for
+#     every tag of the kind (kind_meanings; the fi'il example agrees).
+# And the kind alone, where the record teaches no class for the tag — a proper noun, a relative or
+# demonstrative, an adverb of time or place (PN, REL, DEM, T, LOC) — and in two cases it does not
+# fit: the Name of Allah, as QAC lemmatises it (build_surah.pos_label: "isim 'alam (lafaz
+# Allah)"), keeps the rule of 2026-10-13: the sentence whose subject is the Name says its kind
+# and stops (no class, no name, no meaning); and a NOUN THAT QAC MARKS AS A PARTICIPLE (N with
+# ACT/PASS PCPL; the lesson's pos "isim fa'il", "isim maf'ul": māliki "Pemilik", al-magḍūbi "yang
+# dimurkai", aḍ-ḍāllīna "orang-orang yang sesat") — the record's example of "nama benda" is a
+# plain noun, and whether a learner should call a participle a nama benda or a nama sifat no
+# source here says (an adjective participle, al-mustaqīma, is the record's own ADJ example).
+# And one listed word (CLASS_WITHHELD, by its QAC lemma; operator 2026-10-17, on the coordinator's
+# recommendation): gair (غَيْرِ, “bukan”, 1:7:5), a plain QAC N whose meaning names no thing — the
+# lexicon's sources (Library Kosakata `ghayr`: ar-Raghib "untuk penafian semata, atau bermakna
+# 'illa'"; al-Jadwal, Darwisy, as-Samin "selalu idhafah") make it a word of negation or exception
+# that is an isim by its place (always annexed), not a nama benda. Its sentence says the kind,
+# the word and its meaning. A lemma joins the list only with such a reason.
 QAC_LAFAZ = "LEM:{ll~ah"
-
-
-def glossed(kind: str, tag: str, lafaz: bool) -> bool:
-    """Does the explanation of a part say its kind's plain meaning (the rule above)?"""
-    return kind != "isim" or (tag in ISIM_GLOSSED and not lafaz)
+CLASS_WITHHELD = {
+    "gayor": "a word meaning “bukan” / “selain” is an isim by its place (always annexed: al-Jadwal, Darwisy, as-Samin; "
+             "ar-Raghib: negation or exception), not a nama benda",
+}
+QAC_PARTICIPLE = "PCPL"
+# The kinds as the record's notes and summary write them.
+KIND_LATIN = {"isim": "isim", "fiil": "fi'il", "huruf": "huruf"}
+# "ṣirāṭa: isim, nama benda." — a record example's note that gives a word's kind and class.
+_CLASS_NOTE = re.compile(r"^[^:]+: (isim|fi'il|huruf), ([a-z][a-z ]*[a-z])\.$")
+# "(1:7:1) N; (1:6:3) DET + ADJ; (1:5:2) V IMPF" — the record's QAC source, word by word.
+_QAC_ITEM = re.compile(r"\((\d{1,3}:\d{1,3}:\d{1,3})\) ([A-Z]+(?: [A-Z]+)*(?: \+ [A-Z]+(?: [A-Z]+)*)*)")
 # The first word of a `pos` part (build_surah.pos_label: "huruf jar", "isim 'alam (lafaz Allah)",
 # "dhamir muttashil", "fi'il mudhari'", "zharaf zaman", "lam taukid", "fa' jawab") → kind.
 POS_KIND = {"isim": "isim", "dhamir": "isim", "mashdar": "isim", "zharaf": "isim", "fi'il": "fiil",
@@ -645,8 +673,54 @@ def kind_meanings(library: dict) -> dict[str, str]:
     return dict(zip(KINDS, (g.strip() for g in m.groups())))
 
 
+def kind_classes(library: dict) -> dict[str, str]:
+    """QAC tag → the class the Kalimah record teaches for it (the rule above "which class a
+    sentence names"): an isim's from the record's examples — the note "<word>: isim, <class>." of
+    an example whose one QAC tag (the article aside) the record's own QAC source gives —, a fi'il's
+    and a huruf's from its summary, for every tag of that kind. Raises QuizError where the record
+    contradicts itself (an example's kind is not its tag's, one tag two classes, the fi'il
+    example's class is not the summary's)."""
+    record = next((c for c in library.get("concepts") or [] if c.get("id") == KALIMAH_RECORD), None) or {}
+    meanings = kind_meanings(library)
+    tags: dict[str, list[str]] = {}
+    for src in record.get("sources") or []:
+        if str(src.get("kitab", "")).startswith(CUR.QAC_KITAB):
+            for loc, segs in _QAC_ITEM.findall(str(src.get("ref", ""))):
+                tags[loc] = [s.split(" ")[0] for s in segs.split(" + ") if s.split(" ")[0] != QAC_ARTICLE]
+    by_latin = {v: k for k, v in KIND_LATIN.items()}
+    out: dict[str, str] = {}
+    for ex in record.get("examples") or []:
+        m = _CLASS_NOTE.match(_norm(str(ex.get("note", ""))))
+        if not m:
+            continue
+        kind, cls, tag = by_latin[m.group(1)], m.group(2), tags.get(str(ex.get("loc")))
+        if not tag or len(tag) != 1:
+            raise QuizError(f"the Konsep record {KALIMAH_RECORD!r}: example {ex.get('loc')} gives the class {cls!r}, and its QAC "
+                            f"source gives that word {tag!r}, not one tag")
+        if QAC_KIND.get(tag[0]) != kind:
+            raise QuizError(f"the Konsep record {KALIMAH_RECORD!r}: example {ex.get('loc')} calls a {tag[0]} ({QAC_KIND.get(tag[0])}) "
+                            f"a {m.group(1)}")
+        if out.get(tag[0], cls) != cls or (kind != "isim" and cls != meanings[kind]):
+            raise QuizError(f"the Konsep record {KALIMAH_RECORD!r}: {tag[0]} is given two classes ({out.get(tag[0]) or meanings[kind]!r}, {cls!r})")
+        out[tag[0]] = cls
+    for tag, kind in QAC_KIND.items():
+        if kind != "isim":
+            out[tag] = meanings[kind]
+    return out
+
+
+def part_class(p: dict, classes: dict[str, str]) -> str | None:
+    """THE rule of which class a part's sentence names (above): its QAC tag's class, if the
+    Kalimah record teaches one — never for the Name of Allah, a noun QAC marks as a participle,
+    or a lemma of CLASS_WITHHELD (gair). None: the sentence says the kind alone."""
+    if p["lafaz"] or (p["tag"] == "N" and p["participle"]) or p.get("lemma") in CLASS_WITHHELD:
+        return None
+    return classes.get(p["tag"])
+
+
 def word_parts(lesson: dict, w: dict) -> list[dict]:
-    """The parts of a lesson word the warm-up asks, in order: [{part, of, ar, tag, kind, article}].
+    """The parts of a lesson word the warm-up asks, in order: [{part, of, ar, tag, kind, article,
+    lafaz (the Name of Allah), participle (QAC PCPL), lemma (QAC LEM)}].
     Raises QuizError where the QAC line and the lesson's `pos` disagree, a tag has no kind, or
     the lesson does not carry a compound word's parts."""
     loc = w["loc"]
@@ -661,7 +735,9 @@ def word_parts(lesson: dict, w: dict) -> list[dict]:
             continue
         if seg[0] not in QAC_KIND:
             raise QuizError(f"{loc}: QAC tag {seg[0]!r} has no kind in quiz.QAC_KIND (add it with its class; never guess)")
-        groups.append({"tag": seg[0], "article": bool(article), "segs": article + [i], "lafaz": QAC_LAFAZ in seg})
+        groups.append({"tag": seg[0], "article": bool(article), "segs": article + [i], "lafaz": QAC_LAFAZ in seg,
+                       "participle": QAC_PARTICIPLE in seg,
+                       "lemma": next((f[4:] for f in seg if f.startswith("LEM:")), None)})
         article = []
     if article or not groups:
         raise QuizError(f"{loc}: QAC segments {[s[0] for s in segs]} end on the article, or are nothing but one")
@@ -680,7 +756,7 @@ def word_parts(lesson: dict, w: dict) -> list[dict]:
                             "segments (`segments`: build_surah.py writes them for a word whose part the marked prose names)")
         bytes_ = ["".join(pieces[i] for i in g["segs"]) for g in groups]
     return [{"part": k, "of": len(groups), "ar": ar, "tag": g["tag"], "kind": QAC_KIND[g["tag"]], "article": g["article"],
-             "glossed": glossed(QAC_KIND[g["tag"]], g["tag"], g["lafaz"])} for k, (g, ar) in enumerate(zip(groups, bytes_), 1)]
+             "lafaz": g["lafaz"], "participle": g["participle"], "lemma": g["lemma"]} for k, (g, ar) in enumerate(zip(groups, bytes_), 1)]
 
 
 def sign_steps(cur: dict) -> dict[str, str | None]:
@@ -692,10 +768,11 @@ def sign_steps(cur: dict) -> dict[str, str | None]:
     return {"jar": jar["lesson"] if jar else None, "al": al["lesson"] if al else None}
 
 
-def warmup_questions(lesson: dict, ayah: dict, cur: dict) -> list[dict]:
+def warmup_questions(lesson: dict, ayah: dict, cur: dict, classes: dict[str, str]) -> list[dict]:
     """The warm-up's questions for one ayah, without their texts: every part of every word, in
-    order, with its kind and the signs its explanation may give (those whose step an EARLIER
-    lesson of the curriculum taught)."""
+    order, with its kind, the class its sentence names (`class`, part_class: absent where the
+    sentence says the kind alone) and the signs it may give (those whose step an EARLIER lesson of
+    the curriculum taught)."""
     rank = CUR.ranks(cur)
     here = rank.get(CUR.ayah_lesson(lesson["surah"], ayah["ayah"]))
     taught = {sid for sid, at in sign_steps(cur).items() if at is not None and here is not None and rank.get(at, here) < here}
@@ -706,39 +783,89 @@ def warmup_questions(lesson: dict, ayah: dict, cur: dict) -> list[dict]:
             shows = {"jar": p["kind"] == "isim" and prev_tag == "P", "al": p["kind"] == "isim" and p["article"]}
             q = {"n": len(out) + 1, "ask": "kind", "word": i, "part": p["part"], "of": p["of"], "ar": p["ar"],
                  "kind": p["kind"], "signs": [sid for sid, _text in SIGNS if shows[sid] and sid in taught]}
-            if not p["glossed"]:
-                q["gloss"] = False
+            cls = part_class(p, classes)
+            if cls:
+                q["class"] = cls
             out.append(q)
             prev_tag = p["tag"]
     return out
 
 
-def warmup_marked(q: dict, terms: "Terms", meanings: dict[str, str]) -> str:
-    """The ONE sentence that explains a warm-up answer, as marked text ([[surface|term id]]): the
-    part by its place ("Kata kedua", "Bagian pertama kata pertama" — never a Qur'anic word), its
-    kind, the kind's plain meaning, and its signs."""
+def part_named(w: dict, p: dict, comp: dict | None) -> tuple[str, str, str, str | None] | None:
+    """The part ITSELF as its sentence names it (operator 2026-10-17, rule 26: "show the words, not
+    only artinya"): (the ref of the named-word markup, its Arabic, its transliteration, its
+    meaning) from the content, never typed —
+      a word of one part: the lesson word ("1:1:4"), with its gloss;
+      a part of a word: the composition form (content/compose) with the part's own bytes ("1:1:1/bi");
+        else the form at the part's place in the join the composition builds the word from (bi +
+        ismi → bismi: the part سْمِ is ٱسْمِ (ismi), whose hamzat washal the join drops); with the
+        form's gloss.
+    None for the Name of Allah (its sentence says the kind and stops) and for a part no form names
+    (ʿalaihim, 1:7:4: the composition has ʿalā and hum, not the bytes عَلَيْ and هِمْ)."""
+    if p["lafaz"]:
+        return None
+    if p["of"] == 1:
+        return w["loc"], w["ar"], w["translit"], w.get("gloss")
+    forms = (((comp or {}).get("words") or {}).get(w["loc"]) or {}).get("forms") or {}
+    usable = {k: f for k, f in forms.items() if isinstance(f, dict) and f.get("ar") and f.get("translit")}
+    name = next((k for k, f in usable.items() if f["ar"] == p["ar"]), None)
+    if name is None:
+        cur, seen = next((k for k, f in usable.items() if f["ar"] == w["ar"]), None), set()
+        while cur in usable and cur not in seen:
+            seen.add(cur)
+            src = usable[cur].get("src") or {}
+            if isinstance(src.get("join"), list):
+                if len(src["join"]) == p["of"] and src["join"][p["part"] - 1] in usable:
+                    name = src["join"][p["part"] - 1]
+                break
+            cur = src.get("from") if isinstance(src.get("from"), str) else None
+    if name is None:
+        return None
+    f = usable[name]
+    return f"{w['loc']}/{name}", f["ar"], f["translit"], f.get("gloss")
+
+
+def warmup_marked(q: dict, terms: "Terms", named: tuple[str, str, str, str | None] | None = None) -> str:
+    """The ONE sentence that explains a warm-up answer, as marked text ([[surface|term id]], a named
+    word {{ref}}): the part by its place ("Kata keempat", "Bagian pertama kata pertama"), the part
+    itself with its meaning where the data names it (part_named: "yaitu {{1:1:4}}, yang artinya
+    “Maha Penyayang”"), its kind, WHICH class of the kind it is ("karena ia nama sifat"; the kind
+    alone without one) — never the kind's general definition —, and its signs."""
+    import validate_narration as V  # noqa: PLC0415 — validate_narration imports this module
     name = f"Kata {ordinal(q['word'])}" if q["of"] == 1 else f"Bagian {ordinal(q['part'])} kata {ordinal(q['word'])}"
+    if named:
+        ref, ar, translit, gloss = named
+        name += f", yaitu {V.named_markup(ref, ar, translit)}" + (f", yang artinya “{V.fold(gloss)}”" if gloss else "") + ","
     kind = terms.by_id[q["kind"]]
-    out = f"{name} adalah [[{kind['latin']}|{q['kind']}]]" + ("." if q.get("gloss") is False else f", yaitu {meanings[q['kind']]}.")
+    out = f"{name} adalah [[{kind['latin']}|{q['kind']}]]" + (f", karena ia {q['class']}." if q.get("class") else ".")
     said = [text for sid, text in SIGNS if sid in (q.get("signs") or [])]
     if said:
         out += f" Tandanya: {' dan '.join(said)}."
     return out
 
 
-def warmup_prose(q: dict, terms: "Terms", meanings: dict[str, str]) -> str:
-    """warmup_marked without its markup: what the narration build sanitises and says."""
-    return _MARKUP.sub(lambda m: m.group(1), warmup_marked(q, terms, meanings))
+def warmup_named(lesson: dict, ayah: dict, q: dict, comp: dict | None) -> tuple[str, str, str, str | None] | None:
+    """part_named of a question's part."""
+    w = ayah["words"][q["word"] - 1]
+    return part_named(w, word_parts(lesson, w)[q["part"] - 1], comp)
 
 
-def warmup(lesson: dict, ayah: dict, library: dict, terms: "Terms", cur: dict) -> dict:
+def warmup_prose(q: dict, terms: "Terms", lesson: dict, ayah: dict, comp: dict | None) -> str:
+    """warmup_marked without its term markup (the named word's stays: the narration's Speech shows
+    and says it): what the narration build sanitises and says."""
+    return _MARKUP.sub(lambda m: m.group(1), warmup_marked(q, terms, warmup_named(lesson, ayah, q, comp)))
+
+
+def warmup(lesson: dict, ayah: dict, library: dict, terms: "Terms", cur: dict, comp: dict | None = None) -> dict:
     """The warm-up exercise of one ayah as content/quiz carries it: each question with the
     sentence shown after its answer (`why`: warmup_marked as the screen shows it, each term with
-    its Arabic from the table)."""
-    meanings = kind_meanings(library)
-    qs = warmup_questions(lesson, ayah, cur)
+    its Arabic from the table, the part named with the content's Arabic and transliteration).
+    `comp`: content/compose/<slug>.json (default: from disk), where a part's form is found."""
+    import compose as COMPOSE  # noqa: PLC0415 — compose imports nothing of the quiz; kept local like named_words
+    comp = COMPOSE.load_content(lesson["slug"]) if comp is None else comp
+    qs = warmup_questions(lesson, ayah, cur, kind_classes(library))
     for q in qs:
-        q["why"] = terms.annotate_marked(warmup_marked(q, terms, meanings), {})
+        q["why"] = named_words(terms.annotate_marked(warmup_marked(q, terms, warmup_named(lesson, ayah, q, comp)), {}), lesson)
     return {"key": WARMUP, "questions": qs}
 
 
@@ -1003,6 +1130,51 @@ def taught(manifest: dict, lesson: dict, terms: Terms) -> dict[int, dict[str, st
     return out
 
 
+# Where a CLASS of a kind is taught — the warm-up's "karena ia nama sifat" (part_class). A class is
+# plain Indonesian, no term of the table, so TAUGHT cannot hold it: it is taught where a line the
+# lesson plays before (a teaching line, or a Konsep card's lead or example line: lesson zero says
+# each class over its example, "… juga isim, tetapi nama sifat: …") names it together with its
+# kind. A warm-up opens its lesson, so only EARLIER ayat count (lesson zero is "ayah 0").
+CLASS_PART = re.compile(rf"(?:{TEACHING_PART.pattern})|concept:[a-z0-9-]+:(?:lead|ex:\d+)")
+
+
+def _words_rx(phrase: str) -> re.Pattern:
+    return re.compile(rf"(?<![\w']){re.escape(_norm(phrase))}(?![\w'])", re.I)
+
+
+def class_taught_first(manifest: dict, slug: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[int, str]]:
+    """(kind, class) → (the first ayah whose lines teach it, the line), for each of `wanted`."""
+    rx = re.compile(rf"^{re.escape(slug)}:(\d+):({CLASS_PART.pattern})(?::[a-z])?$")
+    first: dict[tuple[str, str], tuple[int, str]] = {}
+    for lid, line in (manifest.get("lines") or {}).items():
+        m = rx.match(lid)
+        if not m or not isinstance(line, dict):
+            continue
+        text, a = _norm(str(line.get("display") or "")), int(m.group(1))
+        for kind, cls in wanted:
+            if _words_rx(KIND_LATIN[kind]).search(text) and _words_rx(cls).search(text):
+                if (kind, cls) not in first or first[(kind, cls)][0] > a:
+                    first[(kind, cls)] = (a, lid)
+    return first
+
+
+def class_problems(quiz: dict, lesson: dict, manifest: dict) -> list[str]:
+    """Every class a warm-up sentence names was taught BEFORE the lesson it opens (above)."""
+    slug = lesson["slug"]
+    asked = [(a["ayah"], q) for a in lesson["ayat"] for ex in ayah_plan(quiz, a["ayah"]) if ex["key"] == WARMUP
+             for q in ex.get("questions") or [] if q.get("class")]
+    first = class_taught_first(manifest, slug, {(q["kind"], q["class"]) for _n, q in asked})
+    errs = []
+    for n, q in asked:
+        at = first.get((q["kind"], q["class"]))
+        if at is None or at[0] >= n:
+            errs.append(f"{slug} {n} {WARMUP} q{q['n']}: names the class {q['class']!r} of {KIND_LATIN[q['kind']]}, not taught "
+                        f"before ayah {n} (the warm-up opens the lesson)"
+                        + (f" (first taught in ayah {at[0]}: {at[1]})" if at else
+                           " (never taught: no line before it names that class with its kind)"))
+    return errs
+
+
 def required(ex: dict, q: dict, lesson: dict, ayah: dict, terms: Terms, quiz: dict) -> dict[str, str]:
     """{term id: what in the question needs it}: the answer's case state and sign (why-harakat),
     every bin (sort-case), every term an option's text names, every form label (wazn-factory) —
@@ -1092,6 +1264,8 @@ def warmup_problems(ex: dict | None, lesson: dict, ayah: dict, library: dict, te
         return [f"{where}: content/curriculum.json is missing (the warm-up's signs are the curriculum's)"]
     try:
         want = warmup(lesson, ayah, library, terms, cur)["questions"]
+        # An isim's general definition, the record's "nama benda, orang, atau sifat": never said of one part.
+        general_meanings = {"isim": kind_meanings(library)["isim"]}
     except QuizError as e:
         return [f"{where}: {e}"]
     got = ex.get("questions") or []
@@ -1106,10 +1280,17 @@ def warmup_problems(ex: dict | None, lesson: dict, ayah: dict, library: dict, te
             errs.append(f"{at}: `ask` must be \"kind\" (the one kind of question the warm-up has today)")
         if q.get("kind") != w["kind"]:
             errs.append(f"{at}: the answer is {q.get('kind')!r}, and the word's QAC tag and its `pos` give {w['kind']!r}")
-        if q.get("gloss") != w.get("gloss"):
-            errs.append(f"{at}: `gloss` is {q.get('gloss')!r}, and the part's QAC tag gives {w.get('gloss')!r} — the kind's plain "
-                        "meaning is said of a noun, a proper noun or an adjective (N, PN, ADJ), a fi'il and a huruf; not of a "
-                        "pronoun, a relative, a demonstrative or an adverb, and not of the Name of Allah")
+        if q.get("class") != w.get("class"):
+            errs.append(f"{at}: names the class {q.get('class')!r}, and the part's QAC tag gives {w.get('class')!r} — the class "
+                        "the Kalimah record teaches for that tag (its examples: nama benda N, nama sifat ADJ, kata ganti PRON; its "
+                        "summary: kata kerja, kata tugas); none for another tag, the Name of Allah, a participle noun or a "
+                        "word of quiz.CLASS_WITHHELD (gair)")
+        # The defect the operator named (2026-10-17): the kind's general definition instead of this
+        # part's class ("adalah isim, yaitu nama benda, orang, atau sifat").
+        general = f", yaitu {general_meanings.get(q.get('kind'), '')}"
+        if q.get("kind") in general_meanings and general in _norm(str(q.get("why", ""))):
+            errs.append(f"{at}: its explanation restates the general definition of the kind ({general[2:]!r}) — say which class "
+                        "this part is, and what it means (operator 2026-10-17: “directly show which one”)")
         if q.get("ar") != w["ar"] or q.get("of") != w["of"]:
             errs.append(f"{at}: shows {q.get('ar')!r} as part {q.get('part')} of {q.get('of')}; the lesson's bytes are {w['ar']!r}, of {w['of']}")
         if q.get("signs") != w["signs"]:
@@ -1223,6 +1404,8 @@ def plan_problems(quiz: dict, lesson: dict, library: dict, terms: Terms, manifes
                         errs.append(f"{where} q{q['n']}: options {opts} must be two or more distinct forms of {q['lexeme']}")
                     elif len({forms[o] for o in opts}) != len(opts):
                         errs.append(f"{where} q{q['n']}: two options are the same Arabic form (two correct options)")
+    if mapped and manifest is not None:
+        errs += class_problems(quiz, lesson, manifest)
     if not authored or manifest is None:
         return errs
     # TAUGHT ⊇ REQUIRED, and the list of questions that may still fail it, held both ways.

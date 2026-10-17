@@ -833,13 +833,16 @@ def said_why(w: dict, san: Sanitiser, S: int, A: int, i: int, where: str) -> str
     return san.prose(w["why"], S, A, i)
 
 
-def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.Terms, S: int) -> str:
+def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.Terms, S: int,
+           lesson: dict | None = None, compose: dict | None = None) -> str:
     """The ONE short line that explains a question's correct answer, said after "Benar." and after
     "Ini jawabannya." (operator 2026-10-10: "give narration/voice only for the correct answer, to
     give auditory explanation"; decision 2 of 2026-10-11: new short lines from the word's existing
     sourced fields only, never a new claim):
-      word-kind     the warm-up's sentence, built from data in quiz.py: the part's place, its
-                    kind, the kind's plain meaning, a visible sign an earlier lesson taught;
+      word-kind     the warm-up's sentence, built from data in quiz.py: the part's place, the
+                    part itself and its meaning (a named word: `lesson` and its `compose`
+                    content), its kind, WHICH class of the kind it is (never the kind's general
+                    definition: operator 2026-10-17), a visible sign an earlier lesson taught;
       tap-word      the word's place and gloss;
       why / sort    the word's `why` — its `why_basic` when it has one (said_why) —, then its case
                     state when the why does not name it ("Jadi, kata ini marfu'.": the state the
@@ -852,8 +855,11 @@ def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.T
     key = ex["key"]
     if key == Q.WARMUP:
         # The sentence the screen shows after the answer (quiz.warmup_marked: built once from the
-        # data), said as it stands: strict — it names a part by its place, never a Qur'anic word.
-        return san.prose(Q.warmup_prose(q, terms, Q.kind_meanings(library)), S, A, q["word"],
+        # data), said as it stands: strict — it names a part by its place and by the named-word
+        # markup ({{s:a:w}}, {{s:a:w/form}}), never by a Qur'anic word in its prose.
+        if lesson is None:
+            raise SystemExit(f"{a['loc']} ex:{key}:{q['n']}:why: the warm-up's sentence needs its lesson (it names the part)")
+        return san.prose(Q.warmup_prose(q, terms, lesson, a, compose), S, A, q["word"],
                          strict=f"{a['loc']} ex:{key}:{q['n']}:why")
     if key == "wazn-factory":
         concept = next((c for tid in sorted(terms.ids(q["label"]))
@@ -1085,7 +1091,7 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
                     continue
                 add(f"ex:{ex['key']}:intro", ex_intro(ex, terms))
                 for q in ex["questions"]:
-                    add(f"ex:{ex['key']}:{q['n']}:why", ex_why(ex, q, a, library, san, terms, S))
+                    add(f"ex:{ex['key']}:{q['n']}:why", ex_why(ex, q, a, library, san, terms, S, lesson, compose))
 
         exercise_lines(True)
         for i, w in enumerate(a["words"], 1):

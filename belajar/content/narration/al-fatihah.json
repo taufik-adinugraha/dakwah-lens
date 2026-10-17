@@ -3365,14 +3365,14 @@
       ]
     },
     "al-fatihah:1:ex:word-kind:1:why": {
-      "text": "Bagian pertama kata pertama adalah حَرْف, yaitu kata tugas.",
-      "display": "Bagian pertama kata pertama adalah huruf (حَرْف), yaitu kata tugas.",
+      "text": "Bagian pertama kata pertama, yaitu bi, yang artinya dengan, adalah حَرْف, karena ia kata tugas.",
+      "display": "Bagian pertama kata pertama, yaitu بِ (bi), yang artinya “dengan”, adalah huruf (حَرْف), karena ia kata tugas.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/c1995d8f60655f3a.mp3",
-        "ms": 4911,
-        "sha256": "9bd0bddae6ce5eb53766fe8cf1280cc59390c6b85f420b211d59121b9c1e2436"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/07495f93a2a09166.mp3",
+        "ms": 8438,
+        "sha256": "58cb42fe0afd1d917c8c9432558c79870b355a3f09fe045631aeb14edc230011"
       },
       "tokens": [
         {
@@ -3387,50 +3387,80 @@
         },
         {
           "t": "kata",
-          "s": 0.96,
-          "e": 1.28
+          "s": 0.976,
+          "e": 1.36
         },
         {
-          "t": "pertama",
-          "s": 1.344,
-          "e": 1.84
-        },
-        {
-          "t": "adalah",
-          "s": 1.897,
-          "e": 2.24
-        },
-        {
-          "t": "huruf (حَرْف),",
-          "s": 2.36,
-          "e": 3.28
+          "t": "pertama,",
+          "s": 1.424,
+          "e": 2.0
         },
         {
           "t": "yaitu",
-          "s": 3.32,
-          "e": 3.68
+          "s": 2.2,
+          "e": 2.72
+        },
+        {
+          "t": "بِ (bi),",
+          "s": 2.853,
+          "e": 3.32
+        },
+        {
+          "t": "yang",
+          "s": 3.36,
+          "e": 3.52
+        },
+        {
+          "t": "artinya",
+          "s": 3.56,
+          "e": 4.0
+        },
+        {
+          "t": "dengan,",
+          "s": 4.08,
+          "e": 4.64
+        },
+        {
+          "t": "adalah",
+          "s": 4.754,
+          "e": 5.44
+        },
+        {
+          "t": "huruf (حَرْف),",
+          "s": 5.6,
+          "e": 6.56
+        },
+        {
+          "t": "karena",
+          "s": 6.606,
+          "e": 6.88
+        },
+        {
+          "t": "ia",
+          "s": 6.987,
+          "e": 7.2
         },
         {
           "t": "kata",
-          "s": 3.76,
-          "e": 4.08
+          "s": 7.296,
+          "e": 7.68
         },
         {
           "t": "tugas.",
-          "s": 4.16,
-          "e": 4.88
+          "s": 7.76,
+          "e": 8.4
         }
       ]
     },
     "al-fatihah:1:ex:word-kind:2:why": {
-      "text": "Bagian kedua kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Bagian kedua kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Bagian kedua kata pertama, yaitu ismi, yang artinya nama, adalah اِسْم, karena ia nama benda.",
+      "display": "Bagian kedua kata pertama, yaitu ٱسْمِ (ismi), yang artinya “nama”, adalah isim (اِسْم), karena ia nama benda.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/57e13b3239626515.mp3",
-        "ms": 6687,
-        "sha256": "d8e2ea0f67e89fea56a3bb1bf24e67055dd89223535915e1dde9d31209c06b5c"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/dda8ff29d7425683.mp3",
+        "ms": 7889,
+        "sha256": "87b0ff29a6850268b17c8c2e99c53d806fe8cc5752cbbfa74e223bbc0f98abff"
       },
       "tokens": [
         {
@@ -3440,58 +3470,73 @@
         },
         {
           "t": "kedua",
-          "s": 0.4,
-          "e": 0.8
+          "s": 0.38,
+          "e": 0.72
         },
         {
           "t": "kata",
-          "s": 0.864,
-          "e": 1.12
+          "s": 0.784,
+          "e": 1.04
         },
         {
-          "t": "pertama",
-          "s": 1.168,
-          "e": 1.68
-        },
-        {
-          "t": "adalah",
-          "s": 1.737,
-          "e": 2.08
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 2.2,
-          "e": 2.64
+          "t": "pertama,",
+          "s": 1.088,
+          "e": 2.0
         },
         {
           "t": "yaitu",
-          "s": 3.04,
-          "e": 3.76
+          "s": 2.04,
+          "e": 2.4
+        },
+        {
+          "t": "ٱسْمِ (ismi),",
+          "s": 2.507,
+          "e": 3.04
+        },
+        {
+          "t": "yang",
+          "s": 3.136,
+          "e": 3.52
+        },
+        {
+          "t": "artinya",
+          "s": 3.56,
+          "e": 3.92
+        },
+        {
+          "t": "nama,",
+          "s": 4.016,
+          "e": 4.8
+        },
+        {
+          "t": "adalah",
+          "s": 4.857,
+          "e": 5.2
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 5.32,
+          "e": 5.84
+        },
+        {
+          "t": "karena",
+          "s": 5.954,
+          "e": 6.64
+        },
+        {
+          "t": "ia",
+          "s": 6.747,
+          "e": 6.96
         },
         {
           "t": "nama",
-          "s": 3.824,
-          "e": 4.08
+          "s": 7.024,
+          "e": 7.28
         },
         {
-          "t": "benda,",
-          "s": 4.12,
-          "e": 5.12
-        },
-        {
-          "t": "orang,",
-          "s": 5.2,
-          "e": 5.88
-        },
-        {
-          "t": "atau",
-          "s": 5.936,
-          "e": 6.16
-        },
-        {
-          "t": "sifat.",
-          "s": 6.2,
-          "e": 6.64
+          "t": "benda.",
+          "s": 7.36,
+          "e": 7.84
         }
       ]
     },
@@ -3529,77 +3574,14 @@
       ]
     },
     "al-fatihah:1:ex:word-kind:4:why": {
-      "text": "Kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Kata ketiga, yaitu ar-rahmani, yang artinya Yang Maha Pengasih, adalah اِسْم, karena ia nama sifat.",
+      "display": "Kata ketiga, yaitu ٱلرَّحْمَٰنِ (ar-raḥmāni), yang artinya “Yang Maha Pengasih”, adalah isim (اِسْم), karena ia nama sifat.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/98de97e54ab79df2.mp3",
-        "ms": 5642,
-        "sha256": "c837217d75f5160546b15c76a364b0190cbdab9ccf82f5e73d565da997a31813"
-      },
-      "tokens": [
-        {
-          "t": "Kata",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "ketiga",
-          "s": 0.3,
-          "e": 0.72
-        },
-        {
-          "t": "adalah",
-          "s": 0.789,
-          "e": 1.2
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.32,
-          "e": 1.84
-        },
-        {
-          "t": "yaitu",
-          "s": 2.12,
-          "e": 2.72
-        },
-        {
-          "t": "nama",
-          "s": 2.784,
-          "e": 3.04
-        },
-        {
-          "t": "benda,",
-          "s": 3.08,
-          "e": 4.0
-        },
-        {
-          "t": "orang,",
-          "s": 4.08,
-          "e": 4.56
-        },
-        {
-          "t": "atau",
-          "s": 4.656,
-          "e": 5.04
-        },
-        {
-          "t": "sifat.",
-          "s": 5.12,
-          "e": 5.6
-        }
-      ]
-    },
-    "al-fatihah:1:ex:word-kind:5:why": {
-      "text": "Kata keempat adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/72f9aedda93b3820.mp3",
-        "ms": 4989,
-        "sha256": "d057381c4a56b0e4ac8fc5818d6b06608905a1fee851e1bb5538ae3630e1e9b1"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/6c0fa4af8f84b869.mp3",
+        "ms": 9404,
+        "sha256": "37ae3f167c7269819acecaa493f7ab8cd791e097591d572f66a1adaa194dc86a"
       },
       "tokens": [
         {
@@ -3608,49 +3590,157 @@
           "e": 0.16
         },
         {
-          "t": "keempat",
-          "s": 0.24,
-          "e": 0.72
-        },
-        {
-          "t": "adalah",
-          "s": 0.777,
-          "e": 1.12
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.24,
-          "e": 1.76
+          "t": "ketiga,",
+          "s": 0.22,
+          "e": 0.8
         },
         {
           "t": "yaitu",
-          "s": 2.04,
-          "e": 2.56
+          "s": 0.92,
+          "e": 1.44
+        },
+        {
+          "t": "ٱلرَّحْمَٰنِ (ar-raḥmāni),",
+          "s": 1.627,
+          "e": 2.96
+        },
+        {
+          "t": "yang",
+          "s": 3.056,
+          "e": 3.44
+        },
+        {
+          "t": "artinya",
+          "s": 3.5,
+          "e": 4.0
+        },
+        {
+          "t": "Yang",
+          "s": 4.128,
+          "e": 4.64
+        },
+        {
+          "t": "Maha",
+          "s": 4.68,
+          "e": 4.88
+        },
+        {
+          "t": "Pengasih,",
+          "s": 4.928,
+          "e": 6.08
+        },
+        {
+          "t": "adalah",
+          "s": 6.137,
+          "e": 6.48
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 6.56,
+          "e": 7.04
+        },
+        {
+          "t": "karena",
+          "s": 7.131,
+          "e": 7.68
+        },
+        {
+          "t": "ia",
+          "s": 7.813,
+          "e": 8.08
         },
         {
           "t": "nama",
-          "s": 2.624,
-          "e": 2.88
-        },
-        {
-          "t": "benda,",
-          "s": 2.92,
-          "e": 3.68
-        },
-        {
-          "t": "orang,",
-          "s": 3.747,
-          "e": 4.16
-        },
-        {
-          "t": "atau",
-          "s": 4.208,
-          "e": 4.4
+          "s": 8.208,
+          "e": 8.72
         },
         {
           "t": "sifat.",
-          "s": 4.48,
-          "e": 4.96
+          "s": 8.8,
+          "e": 9.36
+        }
+      ]
+    },
+    "al-fatihah:1:ex:word-kind:5:why": {
+      "text": "Kata keempat, yaitu ar-rahimi, yang artinya Maha Penyayang, adalah اِسْم, karena ia nama sifat.",
+      "display": "Kata keempat, yaitu ٱلرَّحِيمِ (ar-raḥīmi), yang artinya “Maha Penyayang”, adalah isim (اِسْم), karena ia nama sifat.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/6f4be88024744060.mp3",
+        "ms": 7706,
+        "sha256": "0092cffabde6bd98f781767afab6d2c1cc31ac7009f3fe0d8aa7ee574f37fc5b"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "keempat,",
+          "s": 0.293,
+          "e": 0.8
+        },
+        {
+          "t": "yaitu",
+          "s": 0.84,
+          "e": 1.2
+        },
+        {
+          "t": "ٱلرَّحِيمِ (ar-raḥīmi),",
+          "s": 1.307,
+          "e": 2.32
+        },
+        {
+          "t": "yang",
+          "s": 2.4,
+          "e": 2.72
+        },
+        {
+          "t": "artinya",
+          "s": 2.78,
+          "e": 3.28
+        },
+        {
+          "t": "Maha",
+          "s": 3.4,
+          "e": 3.68
+        },
+        {
+          "t": "Penyayang,",
+          "s": 3.74,
+          "e": 4.4
+        },
+        {
+          "t": "adalah",
+          "s": 4.491,
+          "e": 5.04
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 5.16,
+          "e": 6.0
+        },
+        {
+          "t": "karena",
+          "s": 6.069,
+          "e": 6.48
+        },
+        {
+          "t": "ia",
+          "s": 6.613,
+          "e": 6.88
+        },
+        {
+          "t": "nama",
+          "s": 6.944,
+          "e": 7.2
+        },
+        {
+          "t": "sifat.",
+          "s": 7.24,
+          "e": 7.68
         }
       ]
     },
@@ -8593,14 +8683,14 @@
       ]
     },
     "al-fatihah:2:ex:word-kind:1:why": {
-      "text": "Kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Kata pertama, yaitu al-hamdu, yang artinya segala puji, adalah اِسْم, karena ia nama benda.",
+      "display": "Kata pertama, yaitu ٱلْحَمْدُ (al-ḥamdu), yang artinya “segala puji”, adalah isim (اِسْم), karena ia nama benda.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/72580d880d8fbef5.mp3",
-        "ms": 4833,
-        "sha256": "fb079030e9e122acf05f969e4c778d4a44573a623b2dc94b8a6a6b1216297f5d"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/579790e100e1793c.mp3",
+        "ms": 8359,
+        "sha256": "150e18bb41327eaeee480033d8096373552563da754f6aac63fe12f053ab4c10"
       },
       "tokens": [
         {
@@ -8609,61 +8699,81 @@
           "e": 0.24
         },
         {
-          "t": "pertama",
-          "s": 0.288,
-          "e": 0.72
-        },
-        {
-          "t": "adalah",
-          "s": 0.777,
-          "e": 1.12
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.2,
-          "e": 1.92
+          "t": "pertama,",
+          "s": 0.304,
+          "e": 0.88
         },
         {
           "t": "yaitu",
-          "s": 2.08,
-          "e": 2.48
+          "s": 1.04,
+          "e": 1.6
         },
         {
-          "t": "nama",
-          "s": 2.544,
+          "t": "ٱلْحَمْدُ (al-ḥamdu),",
+          "s": 1.787,
           "e": 2.8
         },
         {
-          "t": "benda,",
-          "s": 2.84,
-          "e": 3.52
+          "t": "yang",
+          "s": 2.928,
+          "e": 3.44
         },
         {
-          "t": "orang,",
-          "s": 3.587,
-          "e": 4.12
+          "t": "artinya",
+          "s": 3.5,
+          "e": 3.92
         },
         {
-          "t": "atau",
-          "s": 4.16,
+          "t": "segala",
+          "s": 3.98,
           "e": 4.32
         },
         {
-          "t": "sifat.",
-          "s": 4.36,
-          "e": 4.8
+          "t": "puji,",
+          "s": 4.427,
+          "e": 5.32
+        },
+        {
+          "t": "adalah",
+          "s": 5.383,
+          "e": 5.76
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 5.88,
+          "e": 6.8
+        },
+        {
+          "t": "karena",
+          "s": 6.857,
+          "e": 7.2
+        },
+        {
+          "t": "ia",
+          "s": 7.28,
+          "e": 7.44
+        },
+        {
+          "t": "nama",
+          "s": 7.504,
+          "e": 7.76
+        },
+        {
+          "t": "benda.",
+          "s": 7.8,
+          "e": 8.32
         }
       ]
     },
     "al-fatihah:2:ex:word-kind:2:why": {
-      "text": "Bagian pertama kata kedua adalah حَرْف, yaitu kata tugas.",
-      "display": "Bagian pertama kata kedua adalah huruf (حَرْف), yaitu kata tugas.",
+      "text": "Bagian pertama kata kedua, yaitu li, yang artinya bagi, adalah حَرْف, karena ia kata tugas.",
+      "display": "Bagian pertama kata kedua, yaitu لِ (li), yang artinya “bagi”, adalah huruf (حَرْف), karena ia kata tugas.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/cbf1be556ddbc4b6.mp3",
-        "ms": 3788,
-        "sha256": "e9ab9ac550caea91c5e4ebcfb0acb2694db6c5d05cc37b4bbda6f973b18cbf02"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/5c2f114a3b0b09d0.mp3",
+        "ms": 7549,
+        "sha256": "5653f8d935eb0162471188fc2d4f1331e5bd9a52f0b8dd952c781484ce179b16"
       },
       "tokens": [
         {
@@ -8678,38 +8788,68 @@
         },
         {
           "t": "kata",
-          "s": 0.768,
-          "e": 0.96
+          "s": 0.784,
+          "e": 1.04
         },
         {
-          "t": "kedua",
-          "s": 1.0,
-          "e": 1.36
-        },
-        {
-          "t": "adalah",
-          "s": 1.417,
-          "e": 1.76
-        },
-        {
-          "t": "huruf (حَرْف),",
-          "s": 1.84,
-          "e": 2.56
+          "t": "kedua,",
+          "s": 1.1,
+          "e": 1.6
         },
         {
           "t": "yaitu",
-          "s": 2.6,
-          "e": 2.88
+          "s": 1.68,
+          "e": 2.2
+        },
+        {
+          "t": "لِ (li),",
+          "s": 2.267,
+          "e": 2.56
+        },
+        {
+          "t": "yang",
+          "s": 2.64,
+          "e": 2.96
+        },
+        {
+          "t": "artinya",
+          "s": 3.02,
+          "e": 3.44
+        },
+        {
+          "t": "bagi,",
+          "s": 3.552,
+          "e": 4.4
+        },
+        {
+          "t": "adalah",
+          "s": 4.457,
+          "e": 4.8
+        },
+        {
+          "t": "huruf (حَرْف),",
+          "s": 4.92,
+          "e": 5.84
+        },
+        {
+          "t": "karena",
+          "s": 5.897,
+          "e": 6.24
+        },
+        {
+          "t": "ia",
+          "s": 6.347,
+          "e": 6.56
         },
         {
           "t": "kata",
-          "s": 2.928,
-          "e": 3.12
+          "s": 6.608,
+          "e": 6.8
         },
         {
           "t": "tugas.",
-          "s": 3.2,
-          "e": 3.76
+          "s": 6.88,
+          "e": 7.52
         }
       ]
     },
@@ -8772,14 +8912,14 @@
       ]
     },
     "al-fatihah:2:ex:word-kind:4:why": {
-      "text": "Kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Kata ketiga, yaitu rabbi, yang artinya Tuhan, adalah اِسْم, karena ia nama benda.",
+      "display": "Kata ketiga, yaitu رَبِّ (rabbi), yang artinya “Tuhan”, adalah isim (اِسْم), karena ia nama benda.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/98de97e54ab79df2.mp3",
-        "ms": 5642,
-        "sha256": "c837217d75f5160546b15c76a364b0190cbdab9ccf82f5e73d565da997a31813"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/8db413f36b2e9455.mp3",
+        "ms": 8594,
+        "sha256": "e8f229f6c8a78f6315aca1b269df406a0f874476335c53cb3dadcc33116d57ce"
       },
       "tokens": [
         {
@@ -8788,112 +8928,147 @@
           "e": 0.24
         },
         {
-          "t": "ketiga",
+          "t": "ketiga,",
           "s": 0.3,
-          "e": 0.72
-        },
-        {
-          "t": "adalah",
-          "s": 0.789,
-          "e": 1.2
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.32,
-          "e": 1.84
+          "e": 0.88
         },
         {
           "t": "yaitu",
-          "s": 2.12,
-          "e": 2.72
+          "s": 1.12,
+          "e": 1.84
+        },
+        {
+          "t": "رَبِّ (rabbi),",
+          "s": 2.02,
+          "e": 2.8
+        },
+        {
+          "t": "yang",
+          "s": 2.912,
+          "e": 3.36
+        },
+        {
+          "t": "artinya",
+          "s": 3.42,
+          "e": 3.92
+        },
+        {
+          "t": "Tuhan,",
+          "s": 4.107,
+          "e": 4.72
+        },
+        {
+          "t": "adalah",
+          "s": 4.857,
+          "e": 5.68
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 5.84,
+          "e": 6.72
+        },
+        {
+          "t": "karena",
+          "s": 6.777,
+          "e": 7.12
+        },
+        {
+          "t": "ia",
+          "s": 7.227,
+          "e": 7.44
         },
         {
           "t": "nama",
-          "s": 2.784,
-          "e": 3.04
+          "s": 7.552,
+          "e": 8.0
         },
         {
-          "t": "benda,",
-          "s": 3.08,
-          "e": 4.0
-        },
-        {
-          "t": "orang,",
-          "s": 4.08,
-          "e": 4.56
-        },
-        {
-          "t": "atau",
-          "s": 4.656,
-          "e": 5.04
-        },
-        {
-          "t": "sifat.",
-          "s": 5.12,
-          "e": 5.6
+          "t": "benda.",
+          "s": 8.04,
+          "e": 8.56
         }
       ]
     },
     "al-fatihah:2:ex:word-kind:5:why": {
-      "text": "Kata keempat adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Kata keempat, yaitu al-'alamina, yang artinya seluruh alam, adalah اِسْم, karena ia nama benda.",
+      "display": "Kata keempat, yaitu ٱلْعَٰلَمِينَ (al-‘ālamīna), yang artinya “seluruh alam”, adalah isim (اِسْم), karena ia nama benda.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/72f9aedda93b3820.mp3",
-        "ms": 4989,
-        "sha256": "d057381c4a56b0e4ac8fc5818d6b06608905a1fee851e1bb5538ae3630e1e9b1"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4ec37dfaab36355c.mp3",
+        "ms": 8359,
+        "sha256": "b5ae53100c702fe2b962b5763cf6188878548063bafcefcc882fc42de9f11f94"
       },
       "tokens": [
         {
           "t": "Kata",
           "s": 0.0,
-          "e": 0.16
+          "e": 0.24
         },
         {
-          "t": "keempat",
-          "s": 0.24,
-          "e": 0.72
-        },
-        {
-          "t": "adalah",
-          "s": 0.777,
-          "e": 1.12
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.24,
-          "e": 1.76
+          "t": "keempat,",
+          "s": 0.293,
+          "e": 0.88
         },
         {
           "t": "yaitu",
-          "s": 2.04,
-          "e": 2.56
+          "s": 0.92,
+          "e": 1.28
+        },
+        {
+          "t": "ٱلْعَٰلَمِينَ (al-‘ālamīna),",
+          "s": 1.44,
+          "e": 2.64
+        },
+        {
+          "t": "yang",
+          "s": 2.72,
+          "e": 3.04
+        },
+        {
+          "t": "artinya",
+          "s": 3.1,
+          "e": 3.6
+        },
+        {
+          "t": "seluruh",
+          "s": 3.68,
+          "e": 4.08
+        },
+        {
+          "t": "alam,",
+          "s": 4.16,
+          "e": 4.64
+        },
+        {
+          "t": "adalah",
+          "s": 4.777,
+          "e": 5.6
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 5.76,
+          "e": 6.72
+        },
+        {
+          "t": "karena",
+          "s": 6.789,
+          "e": 7.2
+        },
+        {
+          "t": "ia",
+          "s": 7.333,
+          "e": 7.6
         },
         {
           "t": "nama",
-          "s": 2.624,
-          "e": 2.88
+          "s": 7.648,
+          "e": 7.84
         },
         {
-          "t": "benda,",
-          "s": 2.92,
-          "e": 3.68
-        },
-        {
-          "t": "orang,",
-          "s": 3.747,
-          "e": 4.16
-        },
-        {
-          "t": "atau",
-          "s": 4.208,
-          "e": 4.4
-        },
-        {
-          "t": "sifat.",
-          "s": 4.48,
-          "e": 4.96
+          "t": "benda.",
+          "s": 7.88,
+          "e": 8.32
         }
       ]
     },
@@ -14422,128 +14597,173 @@
       ]
     },
     "al-fatihah:3:ex:word-kind:1:why": {
-      "text": "Kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Kata pertama, yaitu ar-rahmani, yang artinya Yang Maha Pengasih, adalah اِسْم, karena ia nama sifat.",
+      "display": "Kata pertama, yaitu ٱلرَّحْمَٰنِ (ar-raḥmāni), yang artinya “Yang Maha Pengasih”, adalah isim (اِسْم), karena ia nama sifat.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/72580d880d8fbef5.mp3",
-        "ms": 4833,
-        "sha256": "fb079030e9e122acf05f969e4c778d4a44573a623b2dc94b8a6a6b1216297f5d"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/8bd9d6ec4da03e76.mp3",
+        "ms": 9169,
+        "sha256": "aca46e570e55cff70b65c36c46827a69ddb782b05bf54cba3b111bc0d8dbe3be"
       },
       "tokens": [
         {
           "t": "Kata",
           "s": 0.0,
-          "e": 0.24
+          "e": 0.16
         },
         {
-          "t": "pertama",
-          "s": 0.288,
-          "e": 0.72
-        },
-        {
-          "t": "adalah",
-          "s": 0.777,
-          "e": 1.12
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.2,
-          "e": 1.92
+          "t": "pertama,",
+          "s": 0.208,
+          "e": 0.92
         },
         {
           "t": "yaitu",
-          "s": 2.08,
-          "e": 2.48
+          "s": 1.02,
+          "e": 1.44
         },
         {
-          "t": "nama",
-          "s": 2.544,
+          "t": "ٱلرَّحْمَٰنِ (ar-raḥmāni),",
+          "s": 1.627,
           "e": 2.8
         },
         {
-          "t": "benda,",
-          "s": 2.84,
-          "e": 3.52
+          "t": "yang",
+          "s": 2.912,
+          "e": 3.36
         },
         {
-          "t": "orang,",
-          "s": 3.587,
-          "e": 4.12
+          "t": "artinya",
+          "s": 3.42,
+          "e": 3.92
         },
         {
-          "t": "atau",
-          "s": 4.16,
-          "e": 4.32
+          "t": "Yang",
+          "s": 4.032,
+          "e": 4.48
+        },
+        {
+          "t": "Maha",
+          "s": 4.52,
+          "e": 4.8
+        },
+        {
+          "t": "Pengasih,",
+          "s": 4.848,
+          "e": 5.44
+        },
+        {
+          "t": "adalah",
+          "s": 5.566,
+          "e": 6.32
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 6.48,
+          "e": 7.04
+        },
+        {
+          "t": "karena",
+          "s": 7.154,
+          "e": 7.84
+        },
+        {
+          "t": "ia",
+          "s": 7.973,
+          "e": 8.24
+        },
+        {
+          "t": "nama",
+          "s": 8.32,
+          "e": 8.64
         },
         {
           "t": "sifat.",
-          "s": 4.36,
-          "e": 4.8
+          "s": 8.68,
+          "e": 9.12
         }
       ]
     },
     "al-fatihah:3:ex:word-kind:2:why": {
-      "text": "Kata kedua adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Kata kedua, yaitu ar-rahimi, yang artinya Maha Penyayang, adalah اِسْم, karena ia nama sifat.",
+      "display": "Kata kedua, yaitu ٱلرَّحِيمِ (ar-raḥīmi), yang artinya “Maha Penyayang”, adalah isim (اِسْم), karena ia nama sifat.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/3e142b676de94139.mp3",
-        "ms": 4989,
-        "sha256": "a3f501fd2f4ca02d45d3e572326ca57faefbf9ca7abbfde9d91271d4e823a12c"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/599b0a8d46960a82.mp3",
+        "ms": 9482,
+        "sha256": "aad687bf35779fc41519966d5339dfc4e9749a2cb041c8abc8a4a29692c87bbe"
       },
       "tokens": [
         {
           "t": "Kata",
           "s": 0.0,
-          "e": 0.24
+          "e": 0.16
         },
         {
-          "t": "kedua",
-          "s": 0.3,
-          "e": 0.64
-        },
-        {
-          "t": "adalah",
-          "s": 0.697,
-          "e": 1.04
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.16,
-          "e": 2.0
+          "t": "kedua,",
+          "s": 0.22,
+          "e": 0.96
         },
         {
           "t": "yaitu",
-          "s": 2.16,
-          "e": 2.64
+          "s": 1.08,
+          "e": 1.6
+        },
+        {
+          "t": "ٱلرَّحِيمِ (ar-raḥīmi),",
+          "s": 1.733,
+          "e": 2.8
+        },
+        {
+          "t": "yang",
+          "s": 2.896,
+          "e": 3.28
+        },
+        {
+          "t": "artinya",
+          "s": 3.36,
+          "e": 3.84
+        },
+        {
+          "t": "Maha",
+          "s": 4.0,
+          "e": 4.32
+        },
+        {
+          "t": "Penyayang,",
+          "s": 4.38,
+          "e": 5.52
+        },
+        {
+          "t": "adalah",
+          "s": 5.577,
+          "e": 5.92
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 6.0,
+          "e": 6.4
+        },
+        {
+          "t": "karena",
+          "s": 6.514,
+          "e": 7.2
+        },
+        {
+          "t": "ia",
+          "s": 7.333,
+          "e": 7.6
         },
         {
           "t": "nama",
-          "s": 2.704,
-          "e": 2.96
-        },
-        {
-          "t": "benda,",
-          "s": 3.0,
-          "e": 3.68
-        },
-        {
-          "t": "orang,",
-          "s": 3.747,
-          "e": 4.28
-        },
-        {
-          "t": "atau",
-          "s": 4.32,
-          "e": 4.48
+          "s": 7.664,
+          "e": 7.92
         },
         {
           "t": "sifat.",
-          "s": 4.56,
-          "e": 4.96
+          "s": 7.96,
+          "e": 8.48
         }
       ]
     },
@@ -17591,77 +17811,14 @@
       ]
     },
     "al-fatihah:4:ex:word-kind:1:why": {
-      "text": "Kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Kata pertama, yaitu maliki, yang artinya Pemilik, adalah اِسْم.",
+      "display": "Kata pertama, yaitu مَٰلِكِ (māliki), yang artinya “Pemilik”, adalah isim (اِسْم).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/72580d880d8fbef5.mp3",
-        "ms": 4833,
-        "sha256": "fb079030e9e122acf05f969e4c778d4a44573a623b2dc94b8a6a6b1216297f5d"
-      },
-      "tokens": [
-        {
-          "t": "Kata",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "pertama",
-          "s": 0.288,
-          "e": 0.72
-        },
-        {
-          "t": "adalah",
-          "s": 0.777,
-          "e": 1.12
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.2,
-          "e": 1.92
-        },
-        {
-          "t": "yaitu",
-          "s": 2.08,
-          "e": 2.48
-        },
-        {
-          "t": "nama",
-          "s": 2.544,
-          "e": 2.8
-        },
-        {
-          "t": "benda,",
-          "s": 2.84,
-          "e": 3.52
-        },
-        {
-          "t": "orang,",
-          "s": 3.587,
-          "e": 4.12
-        },
-        {
-          "t": "atau",
-          "s": 4.16,
-          "e": 4.32
-        },
-        {
-          "t": "sifat.",
-          "s": 4.36,
-          "e": 4.8
-        }
-      ]
-    },
-    "al-fatihah:4:ex:word-kind:2:why": {
-      "text": "Kata kedua adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/3e142b676de94139.mp3",
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a9cb35817239499a.mp3",
         "ms": 4989,
-        "sha256": "a3f501fd2f4ca02d45d3e572326ca57faefbf9ca7abbfde9d91271d4e823a12c"
+        "sha256": "d6e26fa22cd9eefb7ce62b31eafddf91483d01a0b165f3f1f7da8924fa3c01fe"
       },
       "tokens": [
         {
@@ -17670,61 +17827,56 @@
           "e": 0.24
         },
         {
-          "t": "kedua",
-          "s": 0.3,
-          "e": 0.64
-        },
-        {
-          "t": "adalah",
-          "s": 0.697,
-          "e": 1.04
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.16,
-          "e": 2.0
+          "t": "pertama,",
+          "s": 0.272,
+          "e": 0.8
         },
         {
           "t": "yaitu",
-          "s": 2.16,
+          "s": 0.92,
+          "e": 1.36
+        },
+        {
+          "t": "مَٰلِكِ (māliki),",
+          "s": 1.46,
+          "e": 2.24
+        },
+        {
+          "t": "yang",
+          "s": 2.32,
           "e": 2.64
         },
         {
-          "t": "nama",
-          "s": 2.704,
-          "e": 2.96
+          "t": "artinya",
+          "s": 2.7,
+          "e": 3.04
         },
         {
-          "t": "benda,",
-          "s": 3.0,
-          "e": 3.68
+          "t": "Pemilik,",
+          "s": 3.12,
+          "e": 4.04
         },
         {
-          "t": "orang,",
-          "s": 3.747,
-          "e": 4.28
+          "t": "adalah",
+          "s": 4.091,
+          "e": 4.4
         },
         {
-          "t": "atau",
-          "s": 4.32,
-          "e": 4.48
-        },
-        {
-          "t": "sifat.",
-          "s": 4.56,
+          "t": "isim (اِسْم).",
+          "s": 4.48,
           "e": 4.96
         }
       ]
     },
-    "al-fatihah:4:ex:word-kind:3:why": {
-      "text": "Kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.",
-      "display": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam (ال).",
+    "al-fatihah:4:ex:word-kind:2:why": {
+      "text": "Kata kedua, yaitu yaumi, yang artinya hari, adalah اِسْم, karena ia nama benda.",
+      "display": "Kata kedua, yaitu يَوْمِ (yaumi), yang artinya “hari”, adalah isim (اِسْم), karena ia nama benda.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/1b354ea5bab05f83.mp3",
-        "ms": 7889,
-        "sha256": "9087ca7b1c5145128957bced5bfc5ee36a656fb33868f22f087756bce095699e"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/cf03780e683a6e9c.mp3",
+        "ms": 6191,
+        "sha256": "657100de234a5cf78e4c7bb29dea45deaf1b828432928e48516096a435cec06c"
       },
       "tokens": [
         {
@@ -17733,64 +17885,157 @@
           "e": 0.16
         },
         {
-          "t": "ketiga",
-          "s": 0.24,
-          "e": 0.64
-        },
-        {
-          "t": "adalah",
-          "s": 0.697,
-          "e": 1.04
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.16,
-          "e": 1.6
+          "t": "kedua,",
+          "s": 0.22,
+          "e": 0.72
         },
         {
           "t": "yaitu",
-          "s": 1.8,
-          "e": 2.4
+          "s": 0.8,
+          "e": 1.2
         },
         {
-          "t": "nama",
-          "s": 2.464,
-          "e": 2.72
+          "t": "يَوْمِ (yaumi),",
+          "s": 1.307,
+          "e": 1.84
         },
         {
-          "t": "benda,",
-          "s": 2.76,
-          "e": 3.52
+          "t": "yang",
+          "s": 1.904,
+          "e": 2.16
         },
         {
-          "t": "orang,",
-          "s": 3.587,
-          "e": 4.0
+          "t": "artinya",
+          "s": 2.22,
+          "e": 2.64
         },
         {
-          "t": "atau",
-          "s": 4.048,
-          "e": 4.24
+          "t": "hari,",
+          "s": 2.72,
+          "e": 3.12
         },
         {
-          "t": "sifat.",
-          "s": 4.32,
+          "t": "adalah",
+          "s": 3.211,
+          "e": 3.76
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 3.84,
           "e": 4.8
         },
         {
+          "t": "karena",
+          "s": 4.846,
+          "e": 5.12
+        },
+        {
+          "t": "ia",
+          "s": 5.227,
+          "e": 5.44
+        },
+        {
+          "t": "nama",
+          "s": 5.488,
+          "e": 5.68
+        },
+        {
+          "t": "benda.",
+          "s": 5.72,
+          "e": 6.16
+        }
+      ]
+    },
+    "al-fatihah:4:ex:word-kind:3:why": {
+      "text": "Kata ketiga, yaitu ad-dini, yang artinya pembalasan, adalah اِسْم, karena ia nama benda. Tandanya: memakai alif lam.",
+      "display": "Kata ketiga, yaitu ٱلدِّينِ (ad-dīni), yang artinya “pembalasan”, adalah isim (اِسْم), karena ia nama benda. Tandanya: memakai alif lam (ال).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/e1c0cdd9dc5f045d.mp3",
+        "ms": 10109,
+        "sha256": "7c35477b4934f343921a4a8a707990d902f1ac247ce43dd00a43039209495585"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "ketiga,",
+          "s": 0.3,
+          "e": 0.8
+        },
+        {
+          "t": "yaitu",
+          "s": 0.92,
+          "e": 1.36
+        },
+        {
+          "t": "ٱلدِّينِ (ad-dīni),",
+          "s": 1.493,
+          "e": 2.4
+        },
+        {
+          "t": "yang",
+          "s": 2.496,
+          "e": 2.88
+        },
+        {
+          "t": "artinya",
+          "s": 2.94,
+          "e": 3.36
+        },
+        {
+          "t": "pembalasan,",
+          "s": 3.424,
+          "e": 4.24
+        },
+        {
+          "t": "adalah",
+          "s": 4.354,
+          "e": 5.04
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 5.16,
+          "e": 5.76
+        },
+        {
+          "t": "karena",
+          "s": 5.851,
+          "e": 6.4
+        },
+        {
+          "t": "ia",
+          "s": 6.48,
+          "e": 6.64
+        },
+        {
+          "t": "nama",
+          "s": 6.688,
+          "e": 6.88
+        },
+        {
+          "t": "benda.",
+          "s": 6.92,
+          "e": 7.36
+        },
+        {
           "t": "Tandanya:",
-          "s": 5.2,
-          "e": 6.48
+          "s": 7.68,
+          "e": 8.8
         },
         {
           "t": "memakai",
-          "s": 6.56,
-          "e": 7.2
+          "s": 8.86,
+          "e": 9.36
         },
         {
           "t": "alif lam (ال).",
-          "s": 7.253,
-          "e": 7.84
+          "s": 9.413,
+          "e": 10.08
         }
       ]
     },
@@ -21350,14 +21595,14 @@
       ]
     },
     "al-fatihah:5:ex:word-kind:1:why": {
-      "text": "Kata pertama adalah اِسْم.",
-      "display": "Kata pertama adalah isim (اِسْم).",
+      "text": "Kata pertama, yaitu iyyaka, yang artinya hanya kepada Engkau, adalah اِسْم, karena ia kata ganti.",
+      "display": "Kata pertama, yaitu إِيَّاكَ (iyyāka), yang artinya “hanya kepada Engkau”, adalah isim (اِسْم), karena ia kata ganti.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/28a0f8552d993d5d.mp3",
-        "ms": 2351,
-        "sha256": "40b82f12ef9a26928b95fae42b11503d7490836c23a133af90abfb67f39455ed"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/69b93abdf45a27e7.mp3",
+        "ms": 8594,
+        "sha256": "7f45aa3c222e6f18700a6f78dc206f3d9c46352992b04f3189610e30d9d9d454"
       },
       "tokens": [
         {
@@ -21366,137 +21611,169 @@
           "e": 0.24
         },
         {
-          "t": "pertama",
+          "t": "pertama,",
           "s": 0.304,
-          "e": 0.8
+          "e": 0.88
+        },
+        {
+          "t": "yaitu",
+          "s": 1.0,
+          "e": 1.52
+        },
+        {
+          "t": "إِيَّاكَ (iyyāka),",
+          "s": 1.76,
+          "e": 2.48
+        },
+        {
+          "t": "yang",
+          "s": 2.624,
+          "e": 3.2
+        },
+        {
+          "t": "artinya",
+          "s": 3.28,
+          "e": 3.76
+        },
+        {
+          "t": "hanya",
+          "s": 3.84,
+          "e": 4.24
+        },
+        {
+          "t": "kepada",
+          "s": 4.297,
+          "e": 4.64
+        },
+        {
+          "t": "Engkau,",
+          "s": 4.68,
+          "e": 5.12
         },
         {
           "t": "adalah",
-          "s": 0.891,
-          "e": 1.44
+          "s": 5.234,
+          "e": 5.92
         },
         {
-          "t": "isim (اِسْم).",
-          "s": 1.68,
-          "e": 2.32
+          "t": "isim (اِسْم),",
+          "s": 6.04,
+          "e": 6.96
+        },
+        {
+          "t": "karena",
+          "s": 7.006,
+          "e": 7.28
+        },
+        {
+          "t": "ia",
+          "s": 7.413,
+          "e": 7.68
+        },
+        {
+          "t": "kata",
+          "s": 7.76,
+          "e": 8.08
+        },
+        {
+          "t": "ganti.",
+          "s": 8.16,
+          "e": 8.56
         }
       ]
     },
     "al-fatihah:5:ex:word-kind:2:why": {
-      "text": "Kata kedua adalah فِعْل, yaitu kata kerja.",
-      "display": "Kata kedua adalah fi’il (فِعْل), yaitu kata kerja.",
+      "text": "Kata kedua, yaitu na'budu, yang artinya kami menyembah, adalah فِعْل, karena ia kata kerja.",
+      "display": "Kata kedua, yaitu نَعْبُدُ (na‘budu), yang artinya “kami menyembah”, adalah fi’il (فِعْل), karena ia kata kerja.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/ec49edd9c7e43826.mp3",
-        "ms": 3318,
-        "sha256": "2222bd69311093eb540476994a647925054b868b662d7d68791ed32785cc9b77"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/e284f72e96a03432.mp3",
+        "ms": 8516,
+        "sha256": "de8dd7972b4b4e0e4daebf07b7c64868395ca5b8c01d9190aa10b05bf03df781"
       },
       "tokens": [
         {
           "t": "Kata",
           "s": 0.0,
-          "e": 0.24
+          "e": 0.16
         },
         {
-          "t": "kedua",
-          "s": 0.3,
-          "e": 0.64
-        },
-        {
-          "t": "adalah",
-          "s": 0.697,
-          "e": 1.04
-        },
-        {
-          "t": "fi’il (فِعْل),",
-          "s": 1.12,
-          "e": 1.6
+          "t": "kedua,",
+          "s": 0.22,
+          "e": 0.8
         },
         {
           "t": "yaitu",
-          "s": 1.8,
-          "e": 2.4
-        },
-        {
-          "t": "kata",
-          "s": 2.464,
-          "e": 2.72
-        },
-        {
-          "t": "kerja.",
-          "s": 2.78,
-          "e": 3.28
-        }
-      ]
-    },
-    "al-fatihah:5:ex:word-kind:3:why": {
-      "text": "Bagian pertama kata ketiga adalah حَرْف, yaitu kata tugas.",
-      "display": "Bagian pertama kata ketiga adalah huruf (حَرْف), yaitu kata tugas.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/2520586fee86fb4b.mp3",
-        "ms": 5146,
-        "sha256": "7dfb0e11b1837bbbd4be4490de50cf77d14bad2f848aff4e87ee97e1850251db"
-      },
-      "tokens": [
-        {
-          "t": "Bagian",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "pertama",
-          "s": 0.384,
-          "e": 0.88
-        },
-        {
-          "t": "kata",
           "s": 0.96,
-          "e": 1.28
+          "e": 1.52
         },
         {
-          "t": "ketiga",
-          "s": 1.34,
-          "e": 1.84
+          "t": "نَعْبُدُ (na‘budu),",
+          "s": 1.653,
+          "e": 2.48
         },
         {
-          "t": "adalah",
-          "s": 1.909,
-          "e": 2.32
+          "t": "yang",
+          "s": 2.64,
+          "e": 3.28
         },
         {
-          "t": "huruf (حَرْف),",
-          "s": 2.44,
-          "e": 3.36
-        },
-        {
-          "t": "yaitu",
-          "s": 3.4,
+          "t": "artinya",
+          "s": 3.34,
           "e": 3.84
         },
         {
-          "t": "kata",
+          "t": "kami",
           "s": 3.936,
           "e": 4.32
         },
         {
-          "t": "tugas.",
-          "s": 4.4,
-          "e": 5.12
+          "t": "menyembah,",
+          "s": 4.368,
+          "e": 5.36
+        },
+        {
+          "t": "adalah",
+          "s": 5.429,
+          "e": 5.84
+        },
+        {
+          "t": "fi’il (فِعْل),",
+          "s": 5.92,
+          "e": 6.4
+        },
+        {
+          "t": "karena",
+          "s": 6.514,
+          "e": 7.2
+        },
+        {
+          "t": "ia",
+          "s": 7.333,
+          "e": 7.6
+        },
+        {
+          "t": "kata",
+          "s": 7.68,
+          "e": 8.0
+        },
+        {
+          "t": "kerja.",
+          "s": 8.06,
+          "e": 8.48
         }
       ]
     },
-    "al-fatihah:5:ex:word-kind:4:why": {
-      "text": "Bagian kedua kata ketiga adalah اِسْم.",
-      "display": "Bagian kedua kata ketiga adalah isim (اِسْم).",
+    "al-fatihah:5:ex:word-kind:3:why": {
+      "text": "Bagian pertama kata ketiga, yaitu wa, yang artinya dan, adalah حَرْف, karena ia kata tugas.",
+      "display": "Bagian pertama kata ketiga, yaitu وَ (wa), yang artinya “dan”, adalah huruf (حَرْف), karena ia kata tugas.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/456b45f52ad936d3.mp3",
-        "ms": 3004,
-        "sha256": "816087ab3e244c0c85029cee01ed07e8258fd5fa5e93a4cb5c2ef4383596ee5d"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/7a6c9c1578b70ede.mp3",
+        "ms": 9326,
+        "sha256": "a8dd13de3ec710ea0ac44822f5c080df9023dcd71b255e96ae0e18ba71098e5c"
       },
       "tokens": [
         {
@@ -21505,41 +21782,184 @@
           "e": 0.4
         },
         {
-          "t": "kedua",
-          "s": 0.46,
-          "e": 0.8
+          "t": "pertama",
+          "s": 0.464,
+          "e": 0.88
         },
         {
           "t": "kata",
-          "s": 0.864,
-          "e": 1.12
+          "s": 0.944,
+          "e": 1.2
         },
         {
-          "t": "ketiga",
-          "s": 1.16,
-          "e": 1.6
+          "t": "ketiga,",
+          "s": 1.26,
+          "e": 2.0
+        },
+        {
+          "t": "yaitu",
+          "s": 2.08,
+          "e": 2.56
+        },
+        {
+          "t": "وَ (wa),",
+          "s": 2.773,
+          "e": 3.28
+        },
+        {
+          "t": "yang",
+          "s": 3.392,
+          "e": 3.84
+        },
+        {
+          "t": "artinya",
+          "s": 3.9,
+          "e": 4.4
+        },
+        {
+          "t": "dan,",
+          "s": 4.58,
+          "e": 5.2
         },
         {
           "t": "adalah",
-          "s": 1.68,
-          "e": 2.16
+          "s": 5.349,
+          "e": 6.24
         },
         {
-          "t": "isim (اِسْم).",
-          "s": 2.32,
-          "e": 2.96
+          "t": "huruf (حَرْف),",
+          "s": 6.44,
+          "e": 7.04
+        },
+        {
+          "t": "karena",
+          "s": 7.166,
+          "e": 7.92
+        },
+        {
+          "t": "ia",
+          "s": 8.027,
+          "e": 8.24
+        },
+        {
+          "t": "kata",
+          "s": 8.304,
+          "e": 8.56
+        },
+        {
+          "t": "tugas.",
+          "s": 8.6,
+          "e": 9.28
+        }
+      ]
+    },
+    "al-fatihah:5:ex:word-kind:4:why": {
+      "text": "Bagian kedua kata ketiga, yaitu iyyaka, yang artinya hanya kepada Engkau, adalah اِسْم, karena ia kata ganti.",
+      "display": "Bagian kedua kata ketiga, yaitu إِيَّاكَ (iyyāka), yang artinya “hanya kepada Engkau”, adalah isim (اِسْم), karena ia kata ganti.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/22f546a2c4d72f27.mp3",
+        "ms": 10188,
+        "sha256": "57562d1441441fde1878e69bce4567c03dee09b3bd42f7d61be778fdccddfe35"
+      },
+      "tokens": [
+        {
+          "t": "Bagian",
+          "s": 0.0,
+          "e": 0.32
+        },
+        {
+          "t": "kedua",
+          "s": 0.38,
+          "e": 0.72
+        },
+        {
+          "t": "kata",
+          "s": 0.784,
+          "e": 1.04
+        },
+        {
+          "t": "ketiga,",
+          "s": 1.1,
+          "e": 1.6
+        },
+        {
+          "t": "yaitu",
+          "s": 1.84,
+          "e": 2.64
+        },
+        {
+          "t": "إِيَّاكَ (iyyāka),",
+          "s": 2.88,
+          "e": 3.76
+        },
+        {
+          "t": "yang",
+          "s": 3.904,
+          "e": 4.48
+        },
+        {
+          "t": "artinya",
+          "s": 4.52,
+          "e": 5.04
+        },
+        {
+          "t": "hanya",
+          "s": 5.12,
+          "e": 5.52
+        },
+        {
+          "t": "kepada",
+          "s": 5.566,
+          "e": 5.84
+        },
+        {
+          "t": "Engkau,",
+          "s": 5.9,
+          "e": 6.8
+        },
+        {
+          "t": "adalah",
+          "s": 6.88,
+          "e": 7.36
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 7.48,
+          "e": 8.48
+        },
+        {
+          "t": "karena",
+          "s": 8.549,
+          "e": 8.96
+        },
+        {
+          "t": "ia",
+          "s": 9.067,
+          "e": 9.28
+        },
+        {
+          "t": "kata",
+          "s": 9.344,
+          "e": 9.6
+        },
+        {
+          "t": "ganti.",
+          "s": 9.68,
+          "e": 10.16
         }
       ]
     },
     "al-fatihah:5:ex:word-kind:5:why": {
-      "text": "Kata keempat adalah فِعْل, yaitu kata kerja.",
-      "display": "Kata keempat adalah fi’il (فِعْل), yaitu kata kerja.",
+      "text": "Kata keempat, yaitu nasta'inu, yang artinya kami mohon pertolongan, adalah فِعْل, karena ia kata kerja.",
+      "display": "Kata keempat, yaitu نَسْتَعِينُ (nasta‘īnu), yang artinya “kami mohon pertolongan”, adalah fi’il (فِعْل), karena ia kata kerja.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/8f26456a450898ed.mp3",
-        "ms": 3318,
-        "sha256": "090f48b1645d98f7b244691cd3d52b2b59e865a3b17d2d90df4815ecec88efc4"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/5712c769802ca8be.mp3",
+        "ms": 8359,
+        "sha256": "ce6047e45b0d228e05360b68a24a34561cb5bfa40c1f7a02c072654317964c36"
       },
       "tokens": [
         {
@@ -21548,34 +21968,74 @@
           "e": 0.24
         },
         {
-          "t": "keempat",
+          "t": "keempat,",
           "s": 0.293,
-          "e": 0.64
-        },
-        {
-          "t": "adalah",
-          "s": 0.709,
-          "e": 1.12
-        },
-        {
-          "t": "fi’il (فِعْل),",
-          "s": 1.2,
-          "e": 1.88
+          "e": 0.88
         },
         {
           "t": "yaitu",
-          "s": 2.02,
-          "e": 2.4
+          "s": 0.96,
+          "e": 1.36
+        },
+        {
+          "t": "نَسْتَعِينُ (nasta‘īnu),",
+          "s": 1.52,
+          "e": 2.48
+        },
+        {
+          "t": "yang",
+          "s": 2.576,
+          "e": 2.96
+        },
+        {
+          "t": "artinya",
+          "s": 3.02,
+          "e": 3.52
+        },
+        {
+          "t": "kami",
+          "s": 3.616,
+          "e": 4.0
+        },
+        {
+          "t": "mohon",
+          "s": 4.04,
+          "e": 4.32
+        },
+        {
+          "t": "pertolongan,",
+          "s": 4.368,
+          "e": 5.04
+        },
+        {
+          "t": "adalah",
+          "s": 5.166,
+          "e": 5.92
+        },
+        {
+          "t": "fi’il (فِعْل),",
+          "s": 6.0,
+          "e": 6.68
+        },
+        {
+          "t": "karena",
+          "s": 6.731,
+          "e": 7.04
+        },
+        {
+          "t": "ia",
+          "s": 7.147,
+          "e": 7.36
         },
         {
           "t": "kata",
-          "s": 2.464,
-          "e": 2.72
+          "s": 7.44,
+          "e": 7.76
         },
         {
           "t": "kerja.",
-          "s": 2.78,
-          "e": 3.28
+          "s": 7.84,
+          "e": 8.32
         }
       ]
     },
@@ -26586,14 +27046,14 @@
       ]
     },
     "al-fatihah:6:ex:word-kind:1:why": {
-      "text": "Bagian pertama kata pertama adalah فِعْل, yaitu kata kerja.",
-      "display": "Bagian pertama kata pertama adalah fi’il (فِعْل), yaitu kata kerja.",
+      "text": "Bagian pertama kata pertama, yaitu ihdi, yang artinya tunjukilah, adalah فِعْل, karena ia kata kerja.",
+      "display": "Bagian pertama kata pertama, yaitu ٱهْدِ (ihdi), yang artinya “tunjukilah”, adalah fi’il (فِعْل), karena ia kata kerja.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0e50c24c69c4bea8.mp3",
-        "ms": 4833,
-        "sha256": "db92f978b2d405da8c7c6dce1e8df70f2197588283985d7fc53a45c3fbed0394"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/1c9a61c3020572b9.mp3",
+        "ms": 8438,
+        "sha256": "6771840bae1100bdfdec6850455ff4ef5a4be53c0cc2b781586ceb507281cda6"
       },
       "tokens": [
         {
@@ -26608,171 +27068,168 @@
         },
         {
           "t": "kata",
-          "s": 1.072,
-          "e": 1.52
+          "s": 1.04,
+          "e": 1.36
         },
         {
-          "t": "pertama",
-          "s": 1.568,
-          "e": 2.08
-        },
-        {
-          "t": "adalah",
-          "s": 2.149,
-          "e": 2.56
-        },
-        {
-          "t": "fi’il (فِعْل),",
-          "s": 2.64,
-          "e": 3.44
+          "t": "pertama,",
+          "s": 1.408,
+          "e": 2.0
         },
         {
           "t": "yaitu",
-          "s": 3.48,
-          "e": 3.92
+          "s": 2.08,
+          "e": 2.48
+        },
+        {
+          "t": "ٱهْدِ (ihdi),",
+          "s": 2.587,
+          "e": 3.12
+        },
+        {
+          "t": "yang",
+          "s": 3.232,
+          "e": 3.68
+        },
+        {
+          "t": "artinya",
+          "s": 3.74,
+          "e": 4.16
+        },
+        {
+          "t": "tunjukilah,",
+          "s": 4.24,
+          "e": 5.48
+        },
+        {
+          "t": "adalah",
+          "s": 5.554,
+          "e": 6.0
+        },
+        {
+          "t": "fi’il (فِعْل),",
+          "s": 6.08,
+          "e": 6.88
+        },
+        {
+          "t": "karena",
+          "s": 6.926,
+          "e": 7.2
+        },
+        {
+          "t": "ia",
+          "s": 7.307,
+          "e": 7.52
         },
         {
           "t": "kata",
-          "s": 3.984,
-          "e": 4.24
+          "s": 7.584,
+          "e": 7.84
         },
         {
           "t": "kerja.",
-          "s": 4.3,
-          "e": 4.8
+          "s": 7.9,
+          "e": 8.4
         }
       ]
     },
     "al-fatihah:6:ex:word-kind:2:why": {
-      "text": "Bagian kedua kata pertama adalah اِسْم.",
-      "display": "Bagian kedua kata pertama adalah isim (اِسْم).",
+      "text": "Bagian kedua kata pertama, yaitu na, yang artinya kami, adalah اِسْم, karena ia kata ganti.",
+      "display": "Bagian kedua kata pertama, yaitu نَا (nā), yang artinya “kami”, adalah isim (اِسْم), karena ia kata ganti.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/ef2dbd1ab49b1085.mp3",
-        "ms": 3161,
-        "sha256": "ee70119c2e0e0c7a0377ed761853eb5cc71577d70b50170bd3721eb640c7fe10"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/926ea7402247258f.mp3",
+        "ms": 7811,
+        "sha256": "b6a861010151393f38e1ab0fe61ecd9e94d773392f9a3246572cba8bb52123f2"
       },
       "tokens": [
         {
           "t": "Bagian",
           "s": 0.0,
-          "e": 0.32
+          "e": 0.4
         },
         {
           "t": "kedua",
-          "s": 0.38,
+          "s": 0.46,
           "e": 0.8
         },
         {
           "t": "kata",
-          "s": 0.896,
-          "e": 1.28
+          "s": 0.864,
+          "e": 1.12
         },
         {
-          "t": "pertama",
-          "s": 1.328,
-          "e": 1.76
+          "t": "pertama,",
+          "s": 1.168,
+          "e": 1.92
         },
         {
-          "t": "adalah",
-          "s": 1.84,
+          "t": "yaitu",
+          "s": 1.96,
           "e": 2.32
         },
         {
-          "t": "isim (اِسْم).",
-          "s": 2.48,
-          "e": 3.12
+          "t": "نَا (nā),",
+          "s": 2.427,
+          "e": 2.8
+        },
+        {
+          "t": "yang",
+          "s": 2.912,
+          "e": 3.36
+        },
+        {
+          "t": "artinya",
+          "s": 3.42,
+          "e": 3.84
+        },
+        {
+          "t": "kami,",
+          "s": 3.936,
+          "e": 4.4
+        },
+        {
+          "t": "adalah",
+          "s": 4.514,
+          "e": 5.2
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 5.28,
+          "e": 6.32
+        },
+        {
+          "t": "karena",
+          "s": 6.366,
+          "e": 6.64
+        },
+        {
+          "t": "ia",
+          "s": 6.72,
+          "e": 6.88
+        },
+        {
+          "t": "kata",
+          "s": 6.944,
+          "e": 7.2
+        },
+        {
+          "t": "ganti.",
+          "s": 7.24,
+          "e": 7.76
         }
       ]
     },
     "al-fatihah:6:ex:word-kind:3:why": {
-      "text": "Kata kedua adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.",
-      "display": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam (ال).",
+      "text": "Kata kedua, yang artinya jalan, adalah اِسْم, karena ia nama benda. Tandanya: memakai alif lam.",
+      "display": "Kata kedua, yaitu ٱلصِّرَٰطَ (aṣ-ṣirāṭa), yang artinya “jalan”, adalah isim (اِسْم), karena ia nama benda. Tandanya: memakai alif lam (ال).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/ef277204b4e6e131.mp3",
-        "ms": 7393,
-        "sha256": "906d930a4c50eb377cd3aa79843a18c12ef7a8ea3056b984153991724d7d850e"
-      },
-      "tokens": [
-        {
-          "t": "Kata",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "kedua",
-          "s": 0.28,
-          "e": 0.56
-        },
-        {
-          "t": "adalah",
-          "s": 0.617,
-          "e": 0.96
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.08,
-          "e": 1.6
-        },
-        {
-          "t": "yaitu",
-          "s": 1.88,
-          "e": 2.48
-        },
-        {
-          "t": "nama",
-          "s": 2.528,
-          "e": 2.72
-        },
-        {
-          "t": "benda,",
-          "s": 2.76,
-          "e": 3.52
-        },
-        {
-          "t": "orang,",
-          "s": 3.587,
-          "e": 4.0
-        },
-        {
-          "t": "atau",
-          "s": 4.048,
-          "e": 4.24
-        },
-        {
-          "t": "sifat.",
-          "s": 4.28,
-          "e": 4.72
-        },
-        {
-          "t": "Tandanya:",
-          "s": 5.0,
-          "e": 6.16
-        },
-        {
-          "t": "memakai",
-          "s": 6.24,
-          "e": 6.8
-        },
-        {
-          "t": "alif lam (ال).",
-          "s": 6.853,
-          "e": 7.36
-        }
-      ]
-    },
-    "al-fatihah:6:ex:word-kind:4:why": {
-      "text": "Kata ketiga adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.",
-      "display": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam (ال).",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/1b354ea5bab05f83.mp3",
-        "ms": 7889,
-        "sha256": "9087ca7b1c5145128957bced5bfc5ee36a656fb33868f22f087756bce095699e"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/3514eaef9d14b3bf.mp3",
+        "ms": 8124,
+        "sha256": "17e5b99ce591d6b3f86fb455130c3e909442249856c23a4cfc20d5705a2bc68a"
       },
       "tokens": [
         {
@@ -26781,64 +27238,157 @@
           "e": 0.16
         },
         {
-          "t": "ketiga",
-          "s": 0.24,
-          "e": 0.64
+          "t": "kedua, yaitu ٱلصِّرَٰطَ (aṣ-ṣirāṭa),",
+          "s": 0.22,
+          "e": 0.8
+        },
+        {
+          "t": "yang",
+          "s": 0.864,
+          "e": 1.12
+        },
+        {
+          "t": "artinya",
+          "s": 1.18,
+          "e": 1.52
+        },
+        {
+          "t": "jalan,",
+          "s": 1.6,
+          "e": 2.16
         },
         {
           "t": "adalah",
-          "s": 0.697,
-          "e": 1.04
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.16,
-          "e": 1.6
-        },
-        {
-          "t": "yaitu",
-          "s": 1.8,
-          "e": 2.4
-        },
-        {
-          "t": "nama",
-          "s": 2.464,
+          "s": 2.24,
           "e": 2.72
         },
         {
-          "t": "benda,",
-          "s": 2.76,
-          "e": 3.52
+          "t": "isim (اِسْم),",
+          "s": 2.8,
+          "e": 3.36
         },
         {
-          "t": "orang,",
-          "s": 3.587,
-          "e": 4.0
+          "t": "karena",
+          "s": 3.497,
+          "e": 4.32
         },
         {
-          "t": "atau",
-          "s": 4.048,
-          "e": 4.24
+          "t": "ia",
+          "s": 4.4,
+          "e": 4.56
         },
         {
-          "t": "sifat.",
-          "s": 4.32,
+          "t": "nama",
+          "s": 4.608,
           "e": 4.8
         },
         {
+          "t": "benda.",
+          "s": 4.84,
+          "e": 5.28
+        },
+        {
           "t": "Tandanya:",
-          "s": 5.2,
-          "e": 6.48
+          "s": 5.52,
+          "e": 6.4
         },
         {
           "t": "memakai",
-          "s": 6.56,
-          "e": 7.2
+          "s": 6.5,
+          "e": 7.12
         },
         {
           "t": "alif lam (ال).",
-          "s": 7.253,
-          "e": 7.84
+          "s": 7.227,
+          "e": 8.08
+        }
+      ]
+    },
+    "al-fatihah:6:ex:word-kind:4:why": {
+      "text": "Kata ketiga, yang artinya yang lurus, adalah اِسْم, karena ia nama sifat. Tandanya: memakai alif lam.",
+      "display": "Kata ketiga, yaitu ٱلْمُسْتَقِيمَ (al-mustaqīma), yang artinya “yang lurus”, adalah isim (اِسْم), karena ia nama sifat. Tandanya: memakai alif lam (ال).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/7ef10c21ef31bffb.mp3",
+        "ms": 8516,
+        "sha256": "651bf86b6acc42b59578c3bb702da8be4efc4767f9f8f8bb86d12ef83abc4106"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "ketiga, yaitu ٱلْمُسْتَقِيمَ (al-mustaqīma),",
+          "s": 0.28,
+          "e": 0.8
+        },
+        {
+          "t": "yang",
+          "s": 0.864,
+          "e": 1.12
+        },
+        {
+          "t": "artinya",
+          "s": 1.18,
+          "e": 1.6
+        },
+        {
+          "t": "yang",
+          "s": 1.632,
+          "e": 1.76
+        },
+        {
+          "t": "lurus,",
+          "s": 1.82,
+          "e": 2.32
+        },
+        {
+          "t": "adalah",
+          "s": 2.4,
+          "e": 2.88
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 3.04,
+          "e": 3.6
+        },
+        {
+          "t": "karena",
+          "s": 3.737,
+          "e": 4.56
+        },
+        {
+          "t": "ia",
+          "s": 4.667,
+          "e": 4.88
+        },
+        {
+          "t": "nama",
+          "s": 4.928,
+          "e": 5.12
+        },
+        {
+          "t": "sifat.",
+          "s": 5.2,
+          "e": 5.76
+        },
+        {
+          "t": "Tandanya:",
+          "s": 6.04,
+          "e": 7.0
+        },
+        {
+          "t": "memakai",
+          "s": 7.05,
+          "e": 7.6
+        },
+        {
+          "t": "alif lam (ال).",
+          "s": 7.653,
+          "e": 8.48
         }
       ]
     },
@@ -31961,14 +32511,14 @@
       ]
     },
     "al-fatihah:7:ex:word-kind:1:why": {
-      "text": "Kata pertama adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
+      "text": "Kata pertama, yang artinya jalan, adalah اِسْم, karena ia nama benda.",
+      "display": "Kata pertama, yaitu صِرَٰطَ (ṣirāṭa), yang artinya “jalan”, adalah isim (اِسْم), karena ia nama benda.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/72580d880d8fbef5.mp3",
-        "ms": 4833,
-        "sha256": "fb079030e9e122acf05f969e4c778d4a44573a623b2dc94b8a6a6b1216297f5d"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4fc05541c142d86e.mp3",
+        "ms": 5564,
+        "sha256": "d6382c85aade8c096889e061849c0c65261f6120ebfb1006a5582e54a81f787c"
       },
       "tokens": [
         {
@@ -31977,152 +32527,227 @@
           "e": 0.24
         },
         {
-          "t": "pertama",
+          "t": "pertama, yaitu صِرَٰطَ (ṣirāṭa),",
           "s": 0.288,
-          "e": 0.72
+          "e": 1.04
+        },
+        {
+          "t": "yang",
+          "s": 1.088,
+          "e": 1.28
+        },
+        {
+          "t": "artinya",
+          "s": 1.34,
+          "e": 1.76
+        },
+        {
+          "t": "jalan,",
+          "s": 1.88,
+          "e": 2.4
         },
         {
           "t": "adalah",
-          "s": 0.777,
-          "e": 1.12
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.2,
-          "e": 1.92
-        },
-        {
-          "t": "yaitu",
-          "s": 2.08,
-          "e": 2.48
-        },
-        {
-          "t": "nama",
-          "s": 2.544,
+          "s": 2.457,
           "e": 2.8
         },
         {
-          "t": "benda,",
-          "s": 2.84,
-          "e": 3.52
+          "t": "isim (اِسْم),",
+          "s": 2.92,
+          "e": 4.0
         },
         {
-          "t": "orang,",
-          "s": 3.587,
-          "e": 4.12
+          "t": "karena",
+          "s": 4.057,
+          "e": 4.4
         },
         {
-          "t": "atau",
-          "s": 4.16,
-          "e": 4.32
+          "t": "ia",
+          "s": 4.507,
+          "e": 4.72
         },
         {
-          "t": "sifat.",
-          "s": 4.36,
-          "e": 4.8
+          "t": "nama",
+          "s": 4.784,
+          "e": 5.04
+        },
+        {
+          "t": "benda.",
+          "s": 5.08,
+          "e": 5.52
         }
       ]
     },
     "al-fatihah:7:ex:word-kind:2:why": {
-      "text": "Kata kedua adalah اِسْم.",
-      "display": "Kata kedua adalah isim (اِسْم).",
+      "text": "Kata kedua, yaitu alladzina, yang artinya orang-orang yang, adalah اِسْم.",
+      "display": "Kata kedua, yaitu ٱلَّذِينَ (allażīna), yang artinya “orang-orang yang”, adalah isim (اِسْم).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/d18aaa619f0fd34b.mp3",
-        "ms": 1881,
-        "sha256": "cf26527704785167dbafe03d30d3edcea99fc05d8a87f5a7fc8c04e490824e90"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/8e5d9c64eb7d9bbc.mp3",
+        "ms": 6922,
+        "sha256": "dca07ffca55f644eba6b22715cf447d5ed4995d4ec6cef5e9b9245ecb19256cb"
       },
       "tokens": [
         {
           "t": "Kata",
           "s": 0.0,
-          "e": 0.16
+          "e": 0.24
         },
         {
-          "t": "kedua",
-          "s": 0.24,
-          "e": 0.64
+          "t": "kedua,",
+          "s": 0.3,
+          "e": 0.88
+        },
+        {
+          "t": "yaitu",
+          "s": 1.08,
+          "e": 1.68
+        },
+        {
+          "t": "ٱلَّذِينَ (allażīna),",
+          "s": 1.8,
+          "e": 2.8
+        },
+        {
+          "t": "yang",
+          "s": 2.912,
+          "e": 3.36
+        },
+        {
+          "t": "artinya",
+          "s": 3.42,
+          "e": 3.92
+        },
+        {
+          "t": "orang-orang",
+          "s": 4.0,
+          "e": 4.64
+        },
+        {
+          "t": "yang,",
+          "s": 4.704,
+          "e": 5.48
         },
         {
           "t": "adalah",
-          "s": 0.697,
-          "e": 1.04
+          "s": 5.554,
+          "e": 6.0
         },
         {
           "t": "isim (اِسْم).",
-          "s": 1.24,
-          "e": 1.84
+          "s": 6.16,
+          "e": 6.88
         }
       ]
     },
     "al-fatihah:7:ex:word-kind:3:why": {
-      "text": "Bagian pertama kata ketiga adalah فِعْل, yaitu kata kerja.",
-      "display": "Bagian pertama kata ketiga adalah fi’il (فِعْل), yaitu kata kerja.",
+      "text": "Bagian pertama kata ketiga, yaitu an'am, yang artinya telah memberi nikmat, adalah فِعْل, karena ia kata kerja.",
+      "display": "Bagian pertama kata ketiga, yaitu أَنْعَمْ (an‘am), yang artinya “telah memberi nikmat”, adalah fi’il (فِعْل), karena ia kata kerja.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/21e2c9457cdae528.mp3",
-        "ms": 3788,
-        "sha256": "d0ac0b5f0c467f075a5fd244d83b5cd137cf97aab291cbd8500d9d392f2c6bd9"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/5b5413f54b148d1a.mp3",
+        "ms": 9326,
+        "sha256": "62aaa1760361004b85fa5206396d8ef2f5f48632d90c620c9bcf40c8a445c0af"
       },
       "tokens": [
         {
           "t": "Bagian",
           "s": 0.0,
-          "e": 0.24
+          "e": 0.32
         },
         {
           "t": "pertama",
-          "s": 0.288,
-          "e": 0.64
+          "s": 0.384,
+          "e": 0.8
         },
         {
           "t": "kata",
-          "s": 0.688,
-          "e": 0.88
+          "s": 0.864,
+          "e": 1.12
         },
         {
-          "t": "ketiga",
-          "s": 0.94,
-          "e": 1.28
-        },
-        {
-          "t": "adalah",
-          "s": 1.337,
-          "e": 1.68
-        },
-        {
-          "t": "fi’il (فِعْل),",
-          "s": 1.8,
-          "e": 2.24
+          "t": "ketiga,",
+          "s": 1.16,
+          "e": 2.08
         },
         {
           "t": "yaitu",
-          "s": 2.4,
-          "e": 2.88
+          "s": 2.12,
+          "e": 2.56
+        },
+        {
+          "t": "أَنْعَمْ (an‘am),",
+          "s": 2.72,
+          "e": 3.84
+        },
+        {
+          "t": "yang",
+          "s": 3.92,
+          "e": 4.24
+        },
+        {
+          "t": "artinya",
+          "s": 4.3,
+          "e": 4.8
+        },
+        {
+          "t": "telah",
+          "s": 4.867,
+          "e": 5.2
+        },
+        {
+          "t": "memberi",
+          "s": 5.246,
+          "e": 5.6
+        },
+        {
+          "t": "nikmat,",
+          "s": 5.64,
+          "e": 6.08
+        },
+        {
+          "t": "adalah",
+          "s": 6.183,
+          "e": 6.8
+        },
+        {
+          "t": "fi’il (فِعْل),",
+          "s": 6.92,
+          "e": 7.36
+        },
+        {
+          "t": "karena",
+          "s": 7.463,
+          "e": 8.08
+        },
+        {
+          "t": "ia",
+          "s": 8.187,
+          "e": 8.4
         },
         {
           "t": "kata",
-          "s": 2.944,
-          "e": 3.2
+          "s": 8.464,
+          "e": 8.72
         },
         {
           "t": "kerja.",
-          "s": 3.26,
-          "e": 3.76
+          "s": 8.78,
+          "e": 9.28
         }
       ]
     },
     "al-fatihah:7:ex:word-kind:4:why": {
-      "text": "Bagian kedua kata ketiga adalah اِسْم.",
-      "display": "Bagian kedua kata ketiga adalah isim (اِسْم).",
+      "text": "Bagian kedua kata ketiga, yaitu ta, yang artinya Engkau, adalah اِسْم, karena ia kata ganti.",
+      "display": "Bagian kedua kata ketiga, yaitu تَ (ta), yang artinya “Engkau”, adalah isim (اِسْم), karena ia kata ganti.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/456b45f52ad936d3.mp3",
-        "ms": 3004,
-        "sha256": "816087ab3e244c0c85029cee01ed07e8258fd5fa5e93a4cb5c2ef4383596ee5d"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/b7ad6cbc35364b36.mp3",
+        "ms": 8908,
+        "sha256": "ea1d9876169e43439886f01b92c67479c1cb66396bdf28f8553404a26a17925d"
       },
       "tokens": [
         {
@@ -32133,6 +32758,94 @@
         {
           "t": "kedua",
           "s": 0.46,
+          "e": 0.88
+        },
+        {
+          "t": "kata",
+          "s": 0.944,
+          "e": 1.2
+        },
+        {
+          "t": "ketiga,",
+          "s": 1.26,
+          "e": 1.76
+        },
+        {
+          "t": "yaitu",
+          "s": 1.96,
+          "e": 2.64
+        },
+        {
+          "t": "تَ (ta),",
+          "s": 2.8,
+          "e": 3.2
+        },
+        {
+          "t": "yang",
+          "s": 3.344,
+          "e": 3.92
+        },
+        {
+          "t": "artinya",
+          "s": 3.98,
+          "e": 4.56
+        },
+        {
+          "t": "Engkau,",
+          "s": 4.66,
+          "e": 5.68
+        },
+        {
+          "t": "adalah",
+          "s": 5.749,
+          "e": 6.16
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 6.32,
+          "e": 6.88
+        },
+        {
+          "t": "karena",
+          "s": 7.006,
+          "e": 7.76
+        },
+        {
+          "t": "ia",
+          "s": 7.84,
+          "e": 8.0
+        },
+        {
+          "t": "kata",
+          "s": 8.064,
+          "e": 8.32
+        },
+        {
+          "t": "ganti.",
+          "s": 8.36,
+          "e": 8.88
+        }
+      ]
+    },
+    "al-fatihah:7:ex:word-kind:5:why": {
+      "text": "Bagian pertama kata keempat adalah حَرْف, karena ia kata tugas.",
+      "display": "Bagian pertama kata keempat adalah huruf (حَرْف), karena ia kata tugas.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/7a1dd094ea4944b7.mp3",
+        "ms": 4911,
+        "sha256": "c52c7ad42242c308cf2d42a132256fc4c2794a613f9ee5829fa27c217b655eb1"
+      },
+      "tokens": [
+        {
+          "t": "Bagian",
+          "s": 0.0,
+          "e": 0.32
+        },
+        {
+          "t": "pertama",
+          "s": 0.368,
           "e": 0.8
         },
         {
@@ -32141,346 +32854,51 @@
           "e": 1.12
         },
         {
-          "t": "ketiga",
-          "s": 1.16,
-          "e": 1.6
-        },
-        {
-          "t": "adalah",
-          "s": 1.68,
-          "e": 2.16
-        },
-        {
-          "t": "isim (اِسْم).",
-          "s": 2.32,
-          "e": 2.96
-        }
-      ]
-    },
-    "al-fatihah:7:ex:word-kind:5:why": {
-      "text": "Bagian pertama kata keempat adalah حَرْف, yaitu kata tugas.",
-      "display": "Bagian pertama kata keempat adalah huruf (حَرْف), yaitu kata tugas.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/34b1941b9b24500a.mp3",
-        "ms": 4598,
-        "sha256": "d022b8b8961fbdaf8af793292ed34167921da65d6bf5ae9c708e43562871afe3"
-      },
-      "tokens": [
-        {
-          "t": "Bagian",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "pertama",
-          "s": 0.368,
-          "e": 0.72
-        },
-        {
-          "t": "kata",
-          "s": 0.768,
-          "e": 0.96
-        },
-        {
           "t": "keempat",
-          "s": 1.013,
-          "e": 1.44
+          "s": 1.173,
+          "e": 1.68
         },
         {
           "t": "adalah",
-          "s": 1.497,
-          "e": 1.84
+          "s": 1.737,
+          "e": 2.08
         },
         {
           "t": "huruf (حَرْف),",
-          "s": 1.92,
-          "e": 2.88
+          "s": 2.16,
+          "e": 3.2
         },
         {
-          "t": "yaitu",
-          "s": 2.92,
-          "e": 3.28
+          "t": "karena",
+          "s": 3.257,
+          "e": 3.6
+        },
+        {
+          "t": "ia",
+          "s": 3.68,
+          "e": 3.84
         },
         {
           "t": "kata",
-          "s": 3.376,
-          "e": 3.76
+          "s": 3.904,
+          "e": 4.16
         },
         {
           "t": "tugas.",
-          "s": 3.88,
-          "e": 4.56
+          "s": 4.2,
+          "e": 4.88
         }
       ]
     },
     "al-fatihah:7:ex:word-kind:6:why": {
-      "text": "Bagian kedua kata keempat adalah اِسْم. Tandanya: didahului حَرْف جَرّ.",
-      "display": "Bagian kedua kata keempat adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ).",
+      "text": "Bagian kedua kata keempat adalah اِسْم, karena ia kata ganti. Tandanya: didahului حَرْف جَرّ.",
+      "display": "Bagian kedua kata keempat adalah isim (اِسْم), karena ia kata ganti. Tandanya: didahului huruf jar (حَرْف جَرّ).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/be34a81d5b31b19e.mp3",
-        "ms": 6426,
-        "sha256": "e3a60318c62bd144640dc7e35f2bf3e3e1fbd099d254cd5129c3c3842da7e73b"
-      },
-      "tokens": [
-        {
-          "t": "Bagian",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "kedua",
-          "s": 0.36,
-          "e": 0.72
-        },
-        {
-          "t": "kata",
-          "s": 0.768,
-          "e": 0.96
-        },
-        {
-          "t": "keempat",
-          "s": 1.013,
-          "e": 1.44
-        },
-        {
-          "t": "adalah",
-          "s": 1.52,
-          "e": 2.0
-        },
-        {
-          "t": "isim (اِسْم).",
-          "s": 2.16,
-          "e": 2.8
-        },
-        {
-          "t": "Tandanya:",
-          "s": 3.16,
-          "e": 4.36
-        },
-        {
-          "t": "didahului",
-          "s": 4.43,
-          "e": 5.12
-        },
-        {
-          "t": "huruf jar (حَرْف جَرّ).",
-          "s": 5.28,
-          "e": 6.4
-        }
-      ]
-    },
-    "al-fatihah:7:ex:word-kind:7:why": {
-      "text": "Kata kelima adalah اِسْم, yaitu nama benda, orang, atau sifat.",
-      "display": "Kata kelima adalah isim (اِسْم), yaitu nama benda, orang, atau sifat.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/3c2a872844348cd5.mp3",
-        "ms": 5329,
-        "sha256": "2ab61b77d43568304dfd2fee62bceee5f0b8e4aa0082466ebf91c7e156872c15"
-      },
-      "tokens": [
-        {
-          "t": "Kata",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "kelima",
-          "s": 0.28,
-          "e": 0.72
-        },
-        {
-          "t": "adalah",
-          "s": 0.766,
-          "e": 1.04
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.16,
-          "e": 1.68
-        },
-        {
-          "t": "yaitu",
-          "s": 1.88,
-          "e": 2.32
-        },
-        {
-          "t": "nama",
-          "s": 2.384,
-          "e": 2.64
-        },
-        {
-          "t": "benda,",
-          "s": 2.68,
-          "e": 3.6
-        },
-        {
-          "t": "orang,",
-          "s": 3.68,
-          "e": 4.4
-        },
-        {
-          "t": "atau",
-          "s": 4.464,
-          "e": 4.72
-        },
-        {
-          "t": "sifat.",
-          "s": 4.76,
-          "e": 5.28
-        }
-      ]
-    },
-    "al-fatihah:7:ex:word-kind:8:why": {
-      "text": "Kata keenam adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.",
-      "display": "Kata keenam adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam (ال).",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/301603cc95cc6eac.mp3",
-        "ms": 8594,
-        "sha256": "8d35a9d79adfe380d1de87db204a9868908c06e7e9d1cbce7a89de66f4633b3d"
-      },
-      "tokens": [
-        {
-          "t": "Kata",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "keenam",
-          "s": 0.304,
-          "e": 0.64
-        },
-        {
-          "t": "adalah",
-          "s": 0.72,
-          "e": 1.2
-        },
-        {
-          "t": "isim (اِسْم),",
-          "s": 1.36,
-          "e": 2.12
-        },
-        {
-          "t": "yaitu",
-          "s": 2.26,
-          "e": 2.8
-        },
-        {
-          "t": "nama",
-          "s": 2.864,
-          "e": 3.12
-        },
-        {
-          "t": "benda,",
-          "s": 3.16,
-          "e": 4.0
-        },
-        {
-          "t": "orang,",
-          "s": 4.08,
-          "e": 4.56
-        },
-        {
-          "t": "atau",
-          "s": 4.656,
-          "e": 5.04
-        },
-        {
-          "t": "sifat.",
-          "s": 5.08,
-          "e": 5.6
-        },
-        {
-          "t": "Tandanya:",
-          "s": 6.0,
-          "e": 7.24
-        },
-        {
-          "t": "memakai",
-          "s": 7.31,
-          "e": 7.84
-        },
-        {
-          "t": "alif lam (ال).",
-          "s": 7.92,
-          "e": 8.56
-        }
-      ]
-    },
-    "al-fatihah:7:ex:word-kind:9:why": {
-      "text": "Bagian pertama kata ketujuh adalah حَرْف, yaitu kata tugas.",
-      "display": "Bagian pertama kata ketujuh adalah huruf (حَرْف), yaitu kata tugas.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/b9990f5d2e02e600.mp3",
-        "ms": 4598,
-        "sha256": "7a77f419d8b3f70eb6845ea7a0423b6adf8edf0528d598c480f8f344ae4e568b"
-      },
-      "tokens": [
-        {
-          "t": "Bagian",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "pertama",
-          "s": 0.368,
-          "e": 0.88
-        },
-        {
-          "t": "kata",
-          "s": 0.928,
-          "e": 1.12
-        },
-        {
-          "t": "ketujuh",
-          "s": 1.18,
-          "e": 1.68
-        },
-        {
-          "t": "adalah",
-          "s": 1.749,
-          "e": 2.16
-        },
-        {
-          "t": "huruf (حَرْف),",
-          "s": 2.24,
-          "e": 2.72
-        },
-        {
-          "t": "yaitu",
-          "s": 2.92,
-          "e": 3.52
-        },
-        {
-          "t": "kata",
-          "s": 3.584,
-          "e": 3.84
-        },
-        {
-          "t": "tugas.",
-          "s": 3.88,
-          "e": 4.56
-        }
-      ]
-    },
-    "al-fatihah:7:ex:word-kind:10:why": {
-      "text": "Bagian kedua kata ketujuh adalah اِسْم. Tandanya: didahului حَرْف جَرّ.",
-      "display": "Bagian kedua kata ketujuh adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ).",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/80a18348716684ca.mp3",
-        "ms": 6269,
-        "sha256": "dd5688aa7911afb7298482410538c9a2e56d60a47f637a5c1f38c7e095143e49"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/fd10abea09c32058.mp3",
+        "ms": 8359,
+        "sha256": "1a7a90042cc560b1bb8fde6f995574a571ef18140b574f4b249bcbc0e03f2f4f"
       },
       "tokens": [
         {
@@ -32495,12 +32913,12 @@
         },
         {
           "t": "kata",
-          "s": 0.768,
-          "e": 0.96
+          "s": 0.784,
+          "e": 1.04
         },
         {
-          "t": "ketujuh",
-          "s": 1.02,
+          "t": "keempat",
+          "s": 1.093,
           "e": 1.52
         },
         {
@@ -32509,36 +32927,172 @@
           "e": 1.92
         },
         {
-          "t": "isim (اِسْم).",
-          "s": 2.04,
+          "t": "isim (اِسْم),",
+          "s": 2.08,
           "e": 2.64
         },
         {
+          "t": "karena",
+          "s": 2.766,
+          "e": 3.52
+        },
+        {
+          "t": "ia",
+          "s": 3.6,
+          "e": 3.76
+        },
+        {
+          "t": "kata",
+          "s": 3.824,
+          "e": 4.08
+        },
+        {
+          "t": "ganti.",
+          "s": 4.16,
+          "e": 4.92
+        },
+        {
           "t": "Tandanya:",
-          "s": 2.96,
-          "e": 4.24
+          "s": 5.1,
+          "e": 6.0
         },
         {
           "t": "didahului",
-          "s": 4.34,
-          "e": 5.2
+          "s": 6.14,
+          "e": 7.04
         },
         {
           "t": "huruf jar (حَرْف جَرّ).",
-          "s": 5.32,
-          "e": 6.24
+          "s": 7.2,
+          "e": 8.32
         }
       ]
     },
-    "al-fatihah:7:ex:word-kind:11:why": {
-      "text": "Bagian pertama kata kedelapan adalah حَرْف, yaitu kata tugas.",
-      "display": "Bagian pertama kata kedelapan adalah huruf (حَرْف), yaitu kata tugas.",
+    "al-fatihah:7:ex:word-kind:7:why": {
+      "text": "Kata kelima, yang artinya bukan, adalah اِسْم.",
+      "display": "Kata kelima, yaitu غَيْرِ (gairi), yang artinya “bukan”, adalah isim (اِسْم).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/7458be38709f8ca9.mp3",
-        "ms": 5799,
-        "sha256": "38b2afe2f0f1a37e9dd03fa612b96cc7d2ab4d64871ccf856bf082a261361eeb"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/7b03eb9bb3fd95ce.mp3",
+        "ms": 3971,
+        "sha256": "1a294c6a79bbb7036acaed3738c34760f70d018d7bc1d4bcab0a9bda01127928"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "kelima, yaitu غَيْرِ (gairi),",
+          "s": 0.3,
+          "e": 1.0
+        },
+        {
+          "t": "yang",
+          "s": 1.04,
+          "e": 1.2
+        },
+        {
+          "t": "artinya",
+          "s": 1.26,
+          "e": 1.6
+        },
+        {
+          "t": "bukan,",
+          "s": 1.653,
+          "e": 2.24
+        },
+        {
+          "t": "adalah",
+          "s": 2.343,
+          "e": 2.96
+        },
+        {
+          "t": "isim (اِسْم).",
+          "s": 3.24,
+          "e": 3.92
+        }
+      ]
+    },
+    "al-fatihah:7:ex:word-kind:8:why": {
+      "text": "Kata keenam, yang artinya yang dimurkai, adalah اِسْم. Tandanya: memakai alif lam.",
+      "display": "Kata keenam, yaitu ٱلْمَغْضُوبِ (al-magḍūbi), yang artinya “yang dimurkai”, adalah isim (اِسْم). Tandanya: memakai alif lam (ال).",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/7320a75af573b5a0.mp3",
+        "ms": 9404,
+        "sha256": "5c9ab9f1bdf05457e6a62d9968346c9f0c07f68babd1b3d5ab3ecaaaf0b33929"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "keenam, yaitu ٱلْمَغْضُوبِ (al-magḍūbi),",
+          "s": 0.304,
+          "e": 0.8
+        },
+        {
+          "t": "yang",
+          "s": 0.88,
+          "e": 1.2
+        },
+        {
+          "t": "artinya",
+          "s": 1.28,
+          "e": 1.76
+        },
+        {
+          "t": "yang",
+          "s": 1.824,
+          "e": 2.08
+        },
+        {
+          "t": "dimurkai,",
+          "s": 2.16,
+          "e": 2.96
+        },
+        {
+          "t": "adalah",
+          "s": 3.063,
+          "e": 3.68
+        },
+        {
+          "t": "isim (اِسْم).",
+          "s": 3.84,
+          "e": 4.56
+        },
+        {
+          "t": "Tandanya:",
+          "s": 4.88,
+          "e": 5.84
+        },
+        {
+          "t": "memakai",
+          "s": 5.98,
+          "e": 6.8
+        },
+        {
+          "t": "alif lam (ال).",
+          "s": 6.907,
+          "e": 9.36
+        }
+      ]
+    },
+    "al-fatihah:7:ex:word-kind:9:why": {
+      "text": "Bagian pertama kata ketujuh adalah حَرْف, karena ia kata tugas.",
+      "display": "Bagian pertama kata ketujuh adalah huruf (حَرْف), karena ia kata tugas.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/8271f56eefba2686.mp3",
+        "ms": 4519,
+        "sha256": "755cbf3bc96cec2b8da385623607b356e4ceebd61309c6b62850c71db4699493"
       },
       "tokens": [
         {
@@ -32549,54 +33103,59 @@
         {
           "t": "pertama",
           "s": 0.384,
-          "e": 0.88
+          "e": 0.8
         },
         {
           "t": "kata",
-          "s": 0.944,
-          "e": 1.2
+          "s": 0.848,
+          "e": 1.04
         },
         {
-          "t": "kedelapan",
-          "s": 1.24,
-          "e": 1.76
+          "t": "ketujuh",
+          "s": 1.1,
+          "e": 1.52
         },
         {
           "t": "adalah",
-          "s": 1.829,
-          "e": 2.24
+          "s": 1.566,
+          "e": 1.84
         },
         {
           "t": "huruf (حَرْف),",
-          "s": 2.4,
-          "e": 3.04
+          "s": 1.96,
+          "e": 2.88
         },
         {
-          "t": "yaitu",
-          "s": 3.32,
-          "e": 4.0
+          "t": "karena",
+          "s": 2.926,
+          "e": 3.2
+        },
+        {
+          "t": "ia",
+          "s": 3.28,
+          "e": 3.44
         },
         {
           "t": "kata",
-          "s": 4.144,
-          "e": 4.72
+          "s": 3.504,
+          "e": 3.76
         },
         {
           "t": "tugas.",
-          "s": 4.88,
-          "e": 5.76
+          "s": 3.8,
+          "e": 4.48
         }
       ]
     },
-    "al-fatihah:7:ex:word-kind:12:why": {
-      "text": "Bagian kedua kata kedelapan adalah حَرْف, yaitu kata tugas.",
-      "display": "Bagian kedua kata kedelapan adalah huruf (حَرْف), yaitu kata tugas.",
+    "al-fatihah:7:ex:word-kind:10:why": {
+      "text": "Bagian kedua kata ketujuh, yaitu him, yang artinya mereka, adalah اِسْم, karena ia kata ganti. Tandanya: didahului حَرْف جَرّ.",
+      "display": "Bagian kedua kata ketujuh, yaitu هِمْ (him), yang artinya “mereka”, adalah isim (اِسْم), karena ia kata ganti. Tandanya: didahului huruf jar (حَرْف جَرّ).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/087fe829080741b0.mp3",
-        "ms": 4676,
-        "sha256": "023555fd032874c007667a32a5f9dfc4e09181f233c63ff32f78b226e10592bc"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/d35c893664b8ebaf.mp3",
+        "ms": 12513,
+        "sha256": "2e751ddc59fc1b6769ef24b8ae84b0499d194908d8d679aefb7a71475d1b4e9a"
       },
       "tokens": [
         {
@@ -32606,55 +33165,276 @@
         },
         {
           "t": "kedua",
-          "s": 0.46,
-          "e": 0.88
+          "s": 0.48,
+          "e": 0.96
         },
         {
           "t": "kata",
-          "s": 0.96,
-          "e": 1.28
+          "s": 1.04,
+          "e": 1.36
         },
         {
-          "t": "kedelapan",
-          "s": 1.34,
+          "t": "ketujuh,",
+          "s": 1.4,
           "e": 2.0
         },
         {
-          "t": "adalah",
-          "s": 2.069,
-          "e": 2.48
-        },
-        {
-          "t": "huruf (حَرْف),",
-          "s": 2.56,
-          "e": 3.2
-        },
-        {
           "t": "yaitu",
+          "s": 2.2,
+          "e": 3.04
+        },
+        {
+          "t": "هِمْ (him),",
           "s": 3.24,
-          "e": 3.6
+          "e": 3.84
+        },
+        {
+          "t": "yang",
+          "s": 3.952,
+          "e": 4.4
+        },
+        {
+          "t": "artinya",
+          "s": 4.48,
+          "e": 4.96
+        },
+        {
+          "t": "mereka,",
+          "s": 5.029,
+          "e": 5.52
+        },
+        {
+          "t": "adalah",
+          "s": 5.623,
+          "e": 6.24
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 6.4,
+          "e": 7.32
+        },
+        {
+          "t": "karena",
+          "s": 7.383,
+          "e": 7.76
+        },
+        {
+          "t": "ia",
+          "s": 7.867,
+          "e": 8.08
         },
         {
           "t": "kata",
-          "s": 3.68,
-          "e": 4.0
+          "s": 8.128,
+          "e": 8.32
+        },
+        {
+          "t": "ganti.",
+          "s": 8.36,
+          "e": 8.88
+        },
+        {
+          "t": "Tandanya:",
+          "s": 9.2,
+          "e": 10.4
+        },
+        {
+          "t": "didahului",
+          "s": 10.5,
+          "e": 11.36
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ).",
+          "s": 11.52,
+          "e": 12.48
+        }
+      ]
+    },
+    "al-fatihah:7:ex:word-kind:11:why": {
+      "text": "Bagian pertama kata kedelapan, yaitu wa, yang artinya dan, adalah حَرْف, karena ia kata tugas.",
+      "display": "Bagian pertama kata kedelapan, yaitu وَ (wa), yang artinya “dan”, adalah huruf (حَرْف), karena ia kata tugas.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0b89e36dd8086ee5.mp3",
+        "ms": 9091,
+        "sha256": "fdca6f38eff0d9cba8fb95f77d4f31bf532357c1ebf848927dbb534329915ebb"
+      },
+      "tokens": [
+        {
+          "t": "Bagian",
+          "s": 0.0,
+          "e": 0.32
+        },
+        {
+          "t": "pertama",
+          "s": 0.368,
+          "e": 0.72
+        },
+        {
+          "t": "kata",
+          "s": 0.784,
+          "e": 1.04
+        },
+        {
+          "t": "kedelapan,",
+          "s": 1.1,
+          "e": 1.76
+        },
+        {
+          "t": "yaitu",
+          "s": 1.8,
+          "e": 2.32
+        },
+        {
+          "t": "وَ (wa),",
+          "s": 2.507,
+          "e": 2.96
+        },
+        {
+          "t": "yang",
+          "s": 3.088,
+          "e": 3.6
+        },
+        {
+          "t": "artinya",
+          "s": 3.66,
+          "e": 4.16
+        },
+        {
+          "t": "dan,",
+          "s": 4.3,
+          "e": 4.8
+        },
+        {
+          "t": "adalah",
+          "s": 4.971,
+          "e": 6.0
+        },
+        {
+          "t": "huruf (حَرْف),",
+          "s": 6.24,
+          "e": 7.36
+        },
+        {
+          "t": "karena",
+          "s": 7.406,
+          "e": 7.68
+        },
+        {
+          "t": "ia",
+          "s": 7.813,
+          "e": 8.08
+        },
+        {
+          "t": "kata",
+          "s": 8.144,
+          "e": 8.4
         },
         {
           "t": "tugas.",
-          "s": 4.04,
+          "s": 8.44,
+          "e": 9.04
+        }
+      ]
+    },
+    "al-fatihah:7:ex:word-kind:12:why": {
+      "text": "Bagian kedua kata kedelapan, yaitu la, yang artinya bukan, adalah حَرْف, karena ia kata tugas.",
+      "display": "Bagian kedua kata kedelapan, yaitu لَا (lā), yang artinya “bukan”, adalah huruf (حَرْف), karena ia kata tugas.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/af0f216db7d225a7.mp3",
+        "ms": 9718,
+        "sha256": "4df89b89d3b18077aca37d6fe851c653608ee65e8a2ff1a88cf3328b02b5c071"
+      },
+      "tokens": [
+        {
+          "t": "Bagian",
+          "s": 0.0,
+          "e": 0.32
+        },
+        {
+          "t": "kedua",
+          "s": 0.38,
+          "e": 0.8
+        },
+        {
+          "t": "kata",
+          "s": 0.864,
+          "e": 1.12
+        },
+        {
+          "t": "kedelapan,",
+          "s": 1.18,
+          "e": 2.08
+        },
+        {
+          "t": "yaitu",
+          "s": 2.2,
+          "e": 2.96
+        },
+        {
+          "t": "لَا (lā),",
+          "s": 3.147,
+          "e": 3.8
+        },
+        {
+          "t": "yang",
+          "s": 3.856,
+          "e": 4.08
+        },
+        {
+          "t": "artinya",
+          "s": 4.14,
           "e": 4.64
+        },
+        {
+          "t": "bukan,",
+          "s": 4.773,
+          "e": 5.44
+        },
+        {
+          "t": "adalah",
+          "s": 5.611,
+          "e": 6.64
+        },
+        {
+          "t": "huruf (حَرْف),",
+          "s": 6.88,
+          "e": 7.6
+        },
+        {
+          "t": "karena",
+          "s": 7.714,
+          "e": 8.4
+        },
+        {
+          "t": "ia",
+          "s": 8.48,
+          "e": 8.64
+        },
+        {
+          "t": "kata",
+          "s": 8.688,
+          "e": 8.88
+        },
+        {
+          "t": "tugas.",
+          "s": 8.92,
+          "e": 9.68
         }
       ]
     },
     "al-fatihah:7:ex:word-kind:13:why": {
-      "text": "Kata kesembilan adalah اِسْم, yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam.",
-      "display": "Kata kesembilan adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam (ال).",
+      "text": "Kata kesembilan, yang artinya orang-orang yang sesat, adalah اِسْم. Tandanya: memakai alif lam.",
+      "display": "Kata kesembilan, yaitu ٱلضَّآلِّينَ (aḍ-ḍāllīna), yang artinya “orang-orang yang sesat”, adalah isim (اِسْم). Tandanya: memakai alif lam (ال).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/30085a1f51b663e2.mp3",
-        "ms": 8202,
-        "sha256": "68be772e6c7de1cc53d7c8da62cd96f8943d9c42ea49d7b32221ae629d3a824c"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/5b8048b4c20b9698.mp3",
+        "ms": 7314,
+        "sha256": "0070ec884dd1f6441e35aa873bc25b80a48a7db072416c073979ad2b67e74bb1"
       },
       "tokens": [
         {
@@ -32663,64 +33443,59 @@
           "e": 0.24
         },
         {
-          "t": "kesembilan",
+          "t": "kesembilan, yaitu ٱلضَّآلِّينَ (aḍ-ḍāllīna),",
           "s": 0.3,
-          "e": 0.8
+          "e": 0.96
+        },
+        {
+          "t": "yang",
+          "s": 1.024,
+          "e": 1.28
+        },
+        {
+          "t": "artinya",
+          "s": 1.36,
+          "e": 1.92
+        },
+        {
+          "t": "orang-orang",
+          "s": 1.987,
+          "e": 2.56
+        },
+        {
+          "t": "yang",
+          "s": 2.592,
+          "e": 2.72
+        },
+        {
+          "t": "sesat,",
+          "s": 2.8,
+          "e": 3.28
         },
         {
           "t": "adalah",
-          "s": 0.857,
-          "e": 1.2
+          "s": 3.36,
+          "e": 3.84
         },
         {
-          "t": "isim (اِسْم),",
-          "s": 1.32,
-          "e": 1.84
-        },
-        {
-          "t": "yaitu",
-          "s": 2.12,
-          "e": 2.8
-        },
-        {
-          "t": "nama",
-          "s": 2.864,
-          "e": 3.12
-        },
-        {
-          "t": "benda,",
-          "s": 3.16,
-          "e": 4.0
-        },
-        {
-          "t": "orang,",
-          "s": 4.067,
-          "e": 4.64
-        },
-        {
-          "t": "atau",
-          "s": 4.688,
-          "e": 4.88
-        },
-        {
-          "t": "sifat.",
-          "s": 4.92,
-          "e": 5.76
+          "t": "isim (اِسْم).",
+          "s": 3.96,
+          "e": 4.48
         },
         {
           "t": "Tandanya:",
-          "s": 5.96,
-          "e": 6.72
+          "s": 4.8,
+          "e": 5.92
         },
         {
           "t": "memakai",
-          "s": 6.82,
-          "e": 7.44
+          "s": 5.98,
+          "e": 6.56
         },
         {
           "t": "alif lam (ال).",
-          "s": 7.52,
-          "e": 8.16
+          "s": 6.64,
+          "e": 7.28
         }
       ]
     },

@@ -23,8 +23,11 @@ Checks (quiz.py has the rules and their reasons):
      every ayat we identify first each words fall into which category: ismu, fi'il or harf"):
      every part of every word asked once, in order; the answer the one the part's QAC tag gives,
      agreeing with the lesson's `pos`; the bytes the lesson's; a sign only where the data shows
-     it and an earlier lesson taught it; the sentence shown the one built from the data; and the
-     three answers and every term of that sentence TAUGHT by the lessons BEFORE this one (lesson
+     it and an earlier lesson taught it; the class the sentence names the one the Kalimah record
+     teaches for the part's QAC tag (none for the Name of Allah, a participle noun or a tag it
+     teaches none for), and never the kind's general definition (operator 2026-10-17: "directly
+     show which one"); the sentence shown the one built from the data; and the three answers,
+     every term of that sentence and its class TAUGHT by the lessons BEFORE this one (lesson
      zero's lines count: they are "ayah 0"). And for every exercise: the terms of the explanation
      shown after an answer (`why`) are held to TAUGHT too;
   4. the narration has the intro of every exercise and one explanation line per question

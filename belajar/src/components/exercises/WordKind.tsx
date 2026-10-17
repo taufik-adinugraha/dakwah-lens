@@ -56,7 +56,9 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
  * never colour alone. Under the pieces, the word's place, its transliteration and its meaning,
  * as the other exercises show a word. Then three buttons, each with its Arabic term as the
  * lessons show it. After the answer: ONE sentence, the one the narrator says (content/quiz
- * `why`: the kind, its plain meaning, and a visible sign only where an earlier lesson taught it).
+ * `why`: the part itself with its meaning where the content names it, its kind, which class of
+ * the kind it is — never the kind's general definition — and a visible sign only where an earlier
+ * lesson taught it).
  *
  * Every text and every answer comes from content/quiz (pipeline/quiz.py "the warm-up"): the kind
  * is derived from the part's QAC tag and must agree with the lesson's own `pos`.

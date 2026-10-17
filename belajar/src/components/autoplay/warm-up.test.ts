@@ -287,8 +287,15 @@ describe("its lines: the introduction, and one sentence per question — the one
         const where = `${a.loc} q${q.n}`;
         // The same words (each shows a term's Arabic by its own table: the caption the dictionary's).
         expect(fold(line.display ?? ""), where).toBe(fold(q.why));
-        // A part is named by its place, never by a Qur'anic word; one sentence, or two with a sign.
-        expect(q.why, where).toMatch(q.of > 1 ? /^Bagian (pertama|kedua|ketiga) kata \S+ adalah / : /^Kata \S+ adalah /);
+        // A part is named by its place, then (where the content names it) by itself with its
+        // meaning, "Kata keempat, yaitu <Arabic> (ar-raḥīmi), yang artinya “…”," — never by a
+        // Qur'anic word in the prose; then its kind and WHICH class of the kind it is (operator
+        // 2026-10-17: "directly show which one"), never the kind's general definition; one
+        // sentence, or two with a sign.
+        expect(q.why, where).toMatch(q.of > 1 ? /^Bagian (pertama|kedua|ketiga) kata \S+?(?:,| adalah )/ : /^Kata \S+?(?:,| adalah )/);
+        expect(q.why, where).toMatch(/ adalah (?:isim|fi'il|huruf) \((?:\p{Script=Arabic}|\p{M})+\)(?:, karena ia [a-z ]+)?\./u);
+        expect(q.why.includes(`, karena ia ${q.class}.`), where).toBe(!!q.class);
+        expect(q.why, where).not.toContain("nama benda, orang, atau sifat");
         expect(line.text, where).not.toMatch(/[a-z]+[āīūḥṣḍṭẓżġ‘]/i);
         expect((q.why.match(/\. /g) ?? []).length, where).toBe(q.signs.length ? 1 : 0);
         expect(/Tandanya: /.test(q.why), where).toBe(q.signs.length > 0);
@@ -300,7 +307,8 @@ describe("its lines: the introduction, and one sentence per question — the one
     const intro = LINES["al-fatihah:1:ex:word-kind:intro"];
     expect(intro.display).toContain("isim (اِسْم), fi’il (فِعْل), atau huruf (حَرْف)");
     expect(intro.text).toContain("اِسْم, فِعْل, atau حَرْف");
-    expect(LINES["al-fatihah:1:ex:word-kind:1:why"].display).toBe("Bagian pertama kata pertama adalah huruf (حَرْف), yaitu kata tugas.");
+    expect(LINES["al-fatihah:1:ex:word-kind:1:why"].display).toMatch(/^Bagian pertama kata pertama, yaitu \S+ \(bi\), yang artinya “dengan”, adalah huruf \(حَرْف\), karena ia kata tugas\.$/);
+    expect(LINES["al-fatihah:1:ex:word-kind:1:why"].text).toBe("Bagian pertama kata pertama, yaitu bi, yang artinya dengan, adalah حَرْف, karena ia kata tugas.");
     // … and nowhere else did "huruf" become the term: a letter is still a letter.
     // (the kasrah's definition over the bare letter since 2026-10-15: "Contohnya huruf ba'" over ب;
     // the letter shown alone, without its Latin name, since 2026-10-17)

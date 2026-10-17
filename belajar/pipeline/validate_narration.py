@@ -1095,8 +1095,9 @@ LATIN_CONTEXT: dict[str, str] = {
     # "huruf" is also plain Indonesian ("huruf ba'", "empat huruf", "huruf 'athaf"): the word
     # class is said from the dictionary only where the Kalimah concept lists the three classes.
     # … and where the warm-up names the three (quiz.warmup_marked, build_narration.ex_intro:
-    # "isim, fi'il, atau huruf"; "… adalah huruf, yaitu kata tugas").
-    "حَرْف": r"(?:(?<=fi'il, dan ){h}|(?<=atau ){h}(?= \(kata tugas\))|(?<=fi'il, atau ){h}|(?<=adalah ){h}(?=, yaitu ))",
+    # "isim, fi'il, atau huruf"; "… adalah huruf, karena ia kata tugas", and lesson zero's "…
+    # adalah huruf, yaitu kata tugas").
+    "حَرْف": r"(?:(?<=fi'il, dan ){h}|(?<=atau ){h}(?= \(kata tugas\))|(?<=fi'il, atau ){h}|(?<=adalah ){h}(?=, (?:yaitu|karena ia) ))",
     # The letter of a prefixed preposition (bi-, li-), never "alif lam" or a root letter (fa', 'ain, lam).
     "بَاء": r"(?:(?<=[Hh]uruf )|(?<=jar )){h}",
     # … and the last of a wazan's three root letters as build_narration names them ("tiga huruf fa',
@@ -1568,8 +1569,12 @@ def said_heavy(line: dict) -> list[str]:
 
 def held_line(line: dict, lex: "Lexicon") -> list[str]:
     """What keeps a manifest line from being rendered: held(text), and a named word with a heavy
-    letter that the spoken text says (said_heavy: never said, operator 2026-10-17)."""
-    out = held(line.get("text") or "", lex) if isinstance(line.get("text"), str) else []
+    letter that the spoken text says (said_heavy: never said, operator 2026-10-17). A named word
+    the caption shows and the text says is said in Latin on purpose — its sound, not a letter's
+    name (the part تَ (ta) of an‘amta is "ta", not the letter ta’) — and is masked first, as
+    check_renderable masks it (the two read a line alike since 2026-10-17)."""
+    text = line.get("text")
+    out = held(mask_named_said(text, [s for s, _ in named_in_display(line.get("display"))]), lex) if isinstance(text, str) else []
     return out + [w for w in said_heavy(line) if w not in out]
 
 
