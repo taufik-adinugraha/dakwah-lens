@@ -377,9 +377,10 @@ def compute_facts(C: Corpus) -> tuple[list[dict], list[dict]]:
     above = ranking[:rank_rabb - 1]
     rabb_refs = uniq_refs((g.s, g.a) for g in h_rabb)
     F.append(fact(
-        "rabb", "Rabb: kata benda tersering setelah lafaz Allah",
-        f"Kata rabb (Tuhan, Pemelihara) muncul {kali(len(h_rabb), rabb_refs, True)}. Di antara lemma "
-        f"kata benda, {'hanya lafaz Allah' if above == [lem_allah] else 'beberapa lemma'} "
+        "rabb", "Rabb: kata bermakna “Tuhan” yang tersering setelah lafaz Allah",
+        f"Kata rabb (Tuhan, Pemelihara) muncul {kali(len(h_rabb), rabb_refs, True)}. Di antara nomina "
+        f"(nama dan kata benda; kata kerja, kata ganti, dan kata tugas tidak dihitung), "
+        f"{'hanya lafaz Allah' if above == [lem_allah] else 'beberapa lemma'} "
         f"({fmt(nominal[lem_allah])} kali) yang lebih sering.",
         rabb_refs,
         f"{QAC_BASIS}: lemma segmen STEM ber-POS N atau PN diurutkan menurut jumlah segmen; LEM:{lem_rabb} "

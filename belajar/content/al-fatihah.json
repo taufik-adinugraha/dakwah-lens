@@ -3946,8 +3946,8 @@
     },
     {
       "id": "rabb",
-      "title": "Rabb: kata benda tersering setelah lafaz Allah",
-      "body": "Kata rabb (Tuhan, Pemelihara) muncul 975 kali dalam 866 ayat Al-Qur'an. Di antara lemma kata benda, hanya lafaz Allah (2.699 kali) yang lebih sering.",
+      "title": "Rabb: kata bermakna “Tuhan” yang tersering setelah lafaz Allah",
+      "body": "Kata rabb (Tuhan, Pemelihara) muncul 975 kali dalam 866 ayat Al-Qur'an. Di antara nomina (nama dan kata benda; kata kerja, kata ganti, dan kata tugas tidak dihitung), hanya lafaz Allah (2.699 kali) yang lebih sering.",
       "locations": [
         "1:2",
         "2:5",
@@ -4826,8 +4826,8 @@
       ],
       "status": "draft",
       "marked": {
-        "title": "[[Rabb|q:1:2:3]]: kata benda tersering setelah lafaz Allah",
-        "body": "Kata [[rabb|q:1:2:3]] (Tuhan, Pemelihara) muncul 975 kali dalam 866 ayat Al-Qur'an. Di antara lemma kata benda, hanya lafaz Allah (2.699 kali) yang lebih sering.",
+        "title": "[[Rabb|q:1:2:3]]: kata bermakna “Tuhan” yang tersering setelah lafaz Allah",
+        "body": "Kata [[rabb|q:1:2:3]] (Tuhan, Pemelihara) muncul 975 kali dalam 866 ayat Al-Qur'an. Di antara nomina (nama dan kata benda; kata kerja, kata ganti, dan kata tugas tidak dihitung), hanya lafaz Allah (2.699 kali) yang lebih sering.",
         "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): lemma segmen STEM ber-POS N atau PN diurutkan menurut jumlah segmen; LEM:rab~ (lemma 1:2:3) berada di peringkat 2, di bawah LEM:{ll~ah. Ayat dihitung sekali walau memuat kata ini lebih dari sekali."
       }
     },
@@ -5339,7 +5339,7 @@
     "authored_words": "authored/al-fatihah.words.json sha256:ed247cb6ffa8dcae73dfe4b92be8f09dcae954ae22f5a86a40cca3dd2bb07e00",
     "authored_structure": "authored/al-fatihah.structure.json sha256:b88af717a96cfe2bc34ffcc5dcccbda33e1b6503f14acb2c26a9e2acfea56d49",
     "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:e2513b4878e1704c60d8682e05701a3efb44e32ec5404f2d79a133394e7cf99b",
-    "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:1181789ee65c1b2e800270475f1c6264576a0062f8d75290ee2f99af9d2adc5f",
+    "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:3eb46b48667a7c42d7be5431972db188e01ac2e3994c04e7619c1ab080c02420",
     "pipeline": "belajar/pipeline/build_fatihah.py + facts.py (stdlib only, no LLM)"
   }
 }
