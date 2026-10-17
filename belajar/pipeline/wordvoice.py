@@ -254,8 +254,13 @@ def inventory(content: Path = CONTENT) -> tuple[dict[str, set[str]], list[str]]:
         comp = _load(f)
         texts.append(json.dumps(comp, ensure_ascii=False))
         for unit in (comp.get("words") or {}).values():
-            for form in (unit.get("forms") or {}).values():
-                if form.get("ar"):
+            # A form no frame shows — one a line only NAMES in its caption ("… di tempat huruf ي itu:
+            # ٱلْعَٰلَمُونَ (al-‘ālamūna)", 2026-10-17; validate_narration "named words") — is heard in
+            # that line, said by the narrator, and is never played as a word of its own.
+            shown = {n for fr in unit.get("frames") or [] for k in ("tiles", "from", "to", "focus", "cause")
+                     for n in (fr.get(k) if isinstance(fr.get(k), list) else [fr.get(k)])}
+            for name, form in (unit.get("forms") or {}).items():
+                if form.get("ar") and name in shown:
                     add(form["ar"], "compose-form")
 
     unresolved: list[str] = []
@@ -305,7 +310,12 @@ def places(content: Path = CONTENT) -> dict[str, list[tuple[tuple, str, str]]]:
         comp = _load(f)
         for wl, unit in (comp.get("words") or {}).items():
             forms = unit.get("forms") or {}
+            # (a form only named in a caption is not a word voice: inventory, above)
+            shown = {n for fr in unit.get("frames") or [] for k in ("tiles", "from", "to", "focus", "cause")
+                     for n in (fr.get(k) if isinstance(fr.get(k), list) else [fr.get(k)])}
             for name, form in forms.items():
+                if name not in shown:
+                    continue
                 sp = form.get("src")
                 if isinstance(sp, dict) and len(sp) == 1 and set(sp) <= {"word", "tanzil"}:
                     add(form.get("ar", ""), sp.get("word") or sp.get("tanzil"), f"compose-form {wl} {name}", (1, *lesson_of(wl)))

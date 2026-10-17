@@ -302,8 +302,9 @@ describe("its lines: the introduction, and one sentence per question — the one
     expect(intro.text).toContain("اِسْم, فِعْل, atau حَرْف");
     expect(LINES["al-fatihah:1:ex:word-kind:1:why"].display).toBe("Bagian pertama kata pertama adalah huruf (حَرْف), yaitu kata tugas.");
     // … and nowhere else did "huruf" become the term: a letter is still a letter.
-    // (the kasrah's definition over the bare letter since 2026-10-15: "Contohnya huruf ba'" over ب)
-    expect(LINES["al-fatihah:0:primer:5"].display).toContain("Contohnya huruf ba’ (ب) ini");
+    // (the kasrah's definition over the bare letter since 2026-10-15: "Contohnya huruf ba'" over ب;
+    // the letter shown alone, without its Latin name, since 2026-10-17)
+    expect(LINES["al-fatihah:0:primer:5"].display).toContain("Contohnya huruf ب ini");
     expect(SHARED_NARRATION?.lines["shared:ex:word-kind:options"].display).toBe("Pilih jenisnya: isim (اِسْم), fi’il (فِعْل), atau huruf (حَرْف).");
   });
 });

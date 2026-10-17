@@ -43,6 +43,7 @@ import {
   type LessonExample,
 } from "@/lib/autoplay";
 import { exampleProblems, loadCheckInput, runAutoplayChecks, transitionProblem, type ExampleContext } from "@/lib/autoplay/checks";
+import type { NarrationManifest } from "@/lib/autoplay";
 import { composeFor } from "@/lib/compose-content";
 import { STOP_NOTE } from "@/lib/composition";
 import { SURAHS } from "@/lib/content";
@@ -97,6 +98,17 @@ const lessonOf = (s: SurahContent, a: Ayah, locale: "id" | "en" = "id"): Lesson 
   };
 };
 const fatihah = FATIHAH.ayat.map((a) => lessonOf(FATIHAH, a));
+/** The shipped manifest with a recording on every line (a test stand-in, `ms` by the text's length):
+ *  the narrated lesson as it plays once every line is rendered — 2026-10-17's reworded lines wait for
+ *  theirs, and a line without one is caption-only by design. */
+const voiced = (m: NarrationManifest | null): NarrationManifest | null =>
+  m && {
+    ...m,
+    lines: Object.fromEntries(
+      Object.entries(m.lines).map(([id, l]) => [id, l.audio ? l : { ...l, audio: { url: `/belajar/media/narration/test/${id.replace(/[^A-Za-z0-9_-]/g, "-")}.mp3`, ms: 60 * l.text.length, sha256: "0".repeat(64) } }]),
+    ),
+  };
+const fatihahVoiced = FATIHAH.ayat.map((a) => ({ ...lessonOf(FATIHAH, a), seq: stageSequence(FATIHAH, a, "id", voiced(narrationFor("al-fatihah"))) }));
 const every = SURAHS.flatMap((s) => s.ayat.map((a) => lessonOf(s, a)));
 const beatsOf = (seq: AutoplaySequence) => seq.steps.flatMap((st) => (st.examples ?? []).map((b) => ({ step: st, beat: b })));
 const exampleOf = (a: Activity | null): string | null => (a?.kind === "recite" && a.target !== "ayah" ? (a.example ?? null) : null);
@@ -804,7 +816,7 @@ describe("the lesson's own word is recited once, and its step does not wait for 
   });
 
   it("narrated (Al-Fatihah, Indonesian): no word waits for its caption, at any pace; the whole ayah's recitations are as they were", () => {
-    for (const l of fatihah) {
+    for (const l of fatihahVoiced) {
       for (const pace of PACES) {
         for (const r of recited(l.seq, pace)) expect([r.what, r.minMs], `${l.seq.lessonKey} ${pace}`).toEqual([r.what, 0]);
       }
@@ -1054,7 +1066,7 @@ describe("what the stage shows during a beat (caption.ts)", () => {
   });
 
   it("a bentuk dasar: the composition stays on its base frame while the narrator's recording of the base form plays, and in the pause after", () => {
-    const l = fatihah[0];
+    const l = fatihahVoiced[0];
     const s = atBeat(l.seq, "w1:base:2");
     expect(stageFrame(l.seq, s)).toEqual({ step: "compose", word: 1, frame: 2, recited: false });
     expect(stageExample(l.seq, s)).toMatchObject({ reciting: true, beat: { id: "w1:base:2", key: "1:1:1#ismu" } });

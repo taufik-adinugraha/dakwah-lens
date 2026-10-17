@@ -15,15 +15,16 @@ import type { AutoplayTexts } from "./types";
 
 /** The sentence about the steps here and taught later, as the narration words it
  *  (build_narration.py map_later): every one named; one ayah of this surah for all ("…, tetapi
- *  baru kita bahas di ayat 3."), several ("…: alif lam di ayat 3, na’t di ayat 3, dan idhafah di
- *  ayat 4."), or one taught elsewhere ("…, tetapi baru kita bahas nanti."). */
+ *  baru akan diajarkan lebih lengkap di ayat 3."), several ("…: alif lam di ayat 3, na’t di ayat 3,
+ *  dan idhafah di ayat 4."), or one taught elsewhere ("…, tetapi baru akan diajarkan lebih lengkap
+ *  nanti."; operator 2026-10-17, until then "baru kita bahas …"). */
 function laterId(later: readonly MapLaterName[]): string {
   const lead = `Ada ${later.length} hal lagi di ayat ini`;
   const names = mapListId(later.map((x) => x.name));
   const where = mapLaterWhere(later);
-  if (where === null) return `${lead}, yaitu ${names}, tetapi baru kita bahas nanti.`;
-  if (where !== "each") return `${lead}, yaitu ${names}, tetapi baru kita bahas di ayat ${where}.`;
-  return `${lead}, tetapi baru kita bahas nanti: ${mapListId(later.map((x) => `${x.name} di ayat ${x.ayah}`))}.`;
+  if (where === null) return `${lead}, yaitu ${names}, tetapi baru akan diajarkan lebih lengkap nanti.`;
+  if (where !== "each") return `${lead}, yaitu ${names}, tetapi baru akan diajarkan lebih lengkap di ayat ${where}.`;
+  return `${lead}, tetapi baru akan diajarkan lebih lengkap nanti: ${mapListId(later.map((x) => `${x.name} di ayat ${x.ayah}`))}.`;
 }
 
 export const ID_TEXTS: AutoplayTexts = {

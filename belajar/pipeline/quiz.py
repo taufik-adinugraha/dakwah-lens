@@ -754,6 +754,27 @@ def load_authored(slug: str) -> dict | None:
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
 
 
+def named_words(text: str, lesson: dict) -> str:
+    """A `why_basic` that names another word ({{s:a:w}}, {{s:a:w/form}}: the named-word markup of
+    build_narration.Speech, operator 2026-10-17 "show the Arabic word") as the narration's caption
+    shows it — the content's Arabic, then its transliteration — never the markup. The words come
+    from this lesson and its composition content (content/compose/<slug>.json); an unknown name
+    stops the build."""
+    if "{{" not in text:
+        return text
+    import compose as COMPOSE  # noqa: PLC0415 — compose imports nothing of the quiz; kept local like the next
+    import validate_narration as V  # noqa: PLC0415 — validate_narration imports this module
+    comp = COMPOSE.load_content(lesson["slug"])
+    named = V.Named({lesson["slug"]: lesson}, {lesson["slug"]: comp} if comp else None)
+
+    def one(m: re.Match) -> str:
+        ref = f"{m.group(1)}/{m.group(2)}" if m.group(2) else m.group(1)
+        if ref not in named.refs:
+            raise QuizError(f"{lesson['slug']}: {m.group()} names no word of the lesson or form of its composition")
+        return V.named_shown(*named.refs[ref])
+    return V.NAMED_REF.sub(one, text)
+
+
 def build(lesson: dict, library: dict, terms: Terms, authored: dict | None, *,
           curriculum: dict | None = None, mapped: bool | None = None) -> dict:
     """content/quiz/<slug>.json from the plan (authored, or mechanical without one) — and, for a
@@ -788,7 +809,7 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None, *,
         basic one, with terms of later lessons on screen (mudhaf ilaih in ayah 2, badal in ayah
         7). A `why_basic` is plain prose with no marked twin: its terms get their Arabic from the
         table (annotate). An OPTION stays the word's `why`: the options are compared by cause."""
-        return terms.annotate(w["why_basic"]) if w.get("why_basic") else shown(w, "why")
+        return named_words(terms.annotate(w["why_basic"]), lesson) if w.get("why_basic") else shown(w, "why")
     for k in (plan.get("ayat") or {}):
         if k not in known:
             raise QuizError(f"{slug}: the plan names ayah {k}, which the lesson does not have")

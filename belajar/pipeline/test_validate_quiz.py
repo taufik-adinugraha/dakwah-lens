@@ -239,7 +239,7 @@ MUTATIONS = [
     # Each state is taught twice now: by its word's line ("… disebut marfu'") and by its own step of
     # the curriculum ("Konsep baru: Marfu', dan tandanya: dhammah").
     ("the marfu' teaching lines removed (al-ḥamdu and the step marfu', ayah 2)",
-     manifest(drop_line("al-fatihah:2:w1:compose:8", "al-fatihah:2:concept:marfu")),
+     manifest(drop_line("al-fatihah:2:w1:compose:7", "al-fatihah:2:concept:marfu")),
      "needs \"marfu'\" (the bin marfu), not taught by the end of ayah 2"),
     ("the manshub teaching lines removed (aṣ-ṣirāṭa and the step manshub, ayah 6)",
      manifest(drop_line("al-fatihah:6:w2:compose:6", "al-fatihah:6:concept:manshub")),
@@ -706,7 +706,24 @@ class Warmup(unittest.TestCase):
             if key in ("why-harakat", "sort-case", "label-role"):
                 w = self.lesson["ayat"][n - 1]["words"][q["word"] - 1]
                 if w.get("why_basic"):
-                    self.assertEqual(q["why"], TERMS.annotate(w["why_basic"]), w["loc"])
+                    self.assertEqual(q["why"], Q.named_words(TERMS.annotate(w["why_basic"]), self.lesson), w["loc"])
+                    self.assertNotIn("{{", q["why"], w["loc"])
+
+    def test_a_named_word_is_shown_not_its_markup(self):
+        # Operator 2026-10-17 ("show the Arabic word"): a `why_basic` that names another word of the
+        # lesson ({{1:6:2}}) shows it as the narration's caption does — Arabic, then transliteration.
+        w = Q.word_at(self.lesson, "1:7:1")
+        self.assertIn("{{1:6:2}}", w["why_basic"])
+        q = next(q for a in self.q["ayat"] if a["ayah"] == 7 for ex in a["exercises"] if ex["key"] == "sort-case"
+                 for q in ex["questions"] if q["word"] == 1)
+        named = Q.word_at(self.lesson, "1:6:2")
+        self.assertIn(f"kata {named['ar']} ({named['translit']}) yang artinya", q["why"])
+        self.assertNotIn("{{", q["why"])
+        # An unknown name stops the build.
+        with self.assertRaises(Q.QuizError):
+            Q.named_words("bagi kata {{1:6:9}} yang artinya", self.lesson)
+        with self.assertRaises(Q.QuizError):
+            Q.named_words("bagi kata {{1:6:2/nope}} yang artinya", self.lesson)
 
 
 def main() -> int:

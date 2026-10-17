@@ -101,7 +101,8 @@ describe("the structure of an ayah, told item by item", () => {
     const en1 = stageSequence(FATIHAH, a, "en").steps.filter((s) => s.kind === "structure");
     const items = a.structure!.items!;
     expect(en1[0].cues[0].caption.startsWith("Now how its sentence is built. ")).toBe(true);
-    expect(en1[1].cues[0].caption).toBe(items[1].say.replace(/\s+/g, " ").trim());
+    // (its named words as their transliteration: "Kata {{1:1:1/ismi}} …" reads "Kata ismi …", 2026-10-17)
+    expect(en1[1].cues[0].caption).toBe(items[1].say.replace("{{1:1:1/ismi}}", "ismi").replace("{{1:1:2}}", "Allāhi").replace(/\s+/g, " ").trim());
     // … and never a word in Arabic script (the engine's own captions carry none).
     for (const st of en1) expect(st.cues[0].caption).not.toMatch(/[؀-ۿ]/);
     // One short part at a time: an item is a sentence or two, not a paragraph.
@@ -244,5 +245,26 @@ describe("an item on the stage", () => {
 
   it("at most four words on a card (the room a phone leaves): no item of Al-Fatihah is about more", () => {
     for (const a of FATIHAH.ayat) for (const it of a.structure!.items!) expect(it.words.length, `ayah ${a.ayah}`).toBeLessThanOrEqual(4);
+  });
+});
+
+describe("a named word (pipeline validate_narration “named words”, operator 2026-10-17)", () => {
+  it("its markup never reaches a caption: a caption-only line (an English page) shows its transliteration", () => {
+    let named = 0;
+    for (const s of SURAHS)
+      for (const a of s.ayat)
+        for (const locale of ["id", "en"]) {
+          const seq = stageSequence(s, a, locale);
+          for (const c of seq.steps.flatMap((st) => st.cues)) {
+            expect(c.caption, `${s.slug}:${a.ayah} ${locale} ${c.line}`).not.toMatch(/\{\{|\}\}/);
+            for (const p of c.parts) expect(p, c.line).not.toMatch(/\{\{|\}\}/);
+          }
+          if (s.slug === "al-fatihah" && a.ayah === 1 && locale === "en") {
+            const item = seq.steps.find((st) => st.id === "structure:1")!.cues[0].caption;
+            expect(item).toContain("yaitu bi yang artinya “dengan”, sehingga isim sesudahnya, yaitu ismi yang artinya “nama”");
+            named++;
+          }
+        }
+    expect(named).toBe(1);
   });
 });

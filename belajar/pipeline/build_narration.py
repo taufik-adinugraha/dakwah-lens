@@ -30,17 +30,20 @@ Each line is written three ways, from one prose sentence:
    dropped, brackets become commas).
 3. `display`, the caption: the same sentence with each dictionary term in its display form
    ("na’t (نَعْت)", "idhafah (إِضَافَة)", "Allah") and a letter shown as in the ayah (بِ; the focus
-   word's own first letter, لَ of lahu), never by its spelled-out name. Saying the display
+   word's own first letter, لَ of lahu), never by its spelled-out name, and alone: "huruf بِ", not
+   "huruf ba’ (بِ)" (operator 2026-10-17; the article stays "alif lam (ال)"). Saying the display
    (validate_narration Lexicon.speech_of_display) gives `text` exactly.
 
 The narrator never voices a Qur'anic word, in Arabic or in transliteration (plan §6.1 A1). Prose
 from the lessons names words in SKB transliteration; `Sanitiser` replaces every such mention with
 the word's place, which the screen highlights: "kata ini" (the word the line is about), "kata
-kedua", "kata pertama dan kedua", "kata kedua sampai keempat", or, for a word of another ayah, its
-meaning: "kata yang artinya “jalan” di ayat enam" (in another surah just "kata yang artinya “Dia
-ciptakan”"). The prefixed particles are named by their letters (bi- → huruf ba', li- → huruf lam,
-wa → wawu, the lā of wa lā → huruf nafi) and pronoun suffixes (-nā, -ta, -him, -hū) become
-"akhiran". What stays is grammar vocabulary (mubtada', majrur, isim fa'il), scholars' names and
+kedua", "kata pertama dan kedua", "kata kedua sampai keempat", or, for one word of another ayah,
+the word itself with its meaning, a named word (2026-10-17: "kata {{1:6:2}} yang artinya “jalan”
+di ayat keenam" before the sixth ayah — an EARLIER ayah is not pointed at, rule 29 —, shown
+"ٱلصِّرَٰطَ (aṣ-ṣirāṭa)" and said "ash-shiratha"; a phrase by its meaning alone); a word of the ayah
+named by its place and its meaning gets the word too (`name_places`, rule 26). The prefixed particles are named by their letters (bi- → huruf ba', li- → huruf lam,
+wa → wawu, the lā of wa lā → huruf nafi) where an authored line does not name the particle itself
+({{1:1:1/bi}}, said "bi"), and pronoun suffixes (-nā, -ta, -him, -hū) become "akhiran". What stays is grammar vocabulary (mubtada', majrur, isim fa'il), scholars' names and
 non-Qur'anic Arabic examples (abtadi'u, naffas), folded to plain letters; the ones the dictionary
 has are then spoken from it.
 
@@ -139,6 +142,10 @@ PRE_REWRITES: list[tuple[str, str]] = [
     # the term by itself ("huruf jar … seperti …, dan huruf jar yang artinya atas"): the line keeps
     # the two examples this ayah shows, bi- and li- (fixer review, 2026-10-10).
     (r", li- “bagi”, dan ‘alā “atas”", " dan li- “bagi”"),
+    # … and those two are shown and said as they are written, the letter with its harakat (operator
+    # 2026-10-17: "it's better to say bi instead of ba, and only show the arabic one"):
+    # validate_narration "named words".
+    (r"\bbi- “dengan” dan li- “bagi”", "{{1:1:1/bi}} yang artinya “dengan”, dan {{1:2:2/li}} yang artinya “bagi”"),
     # An open gloss ("yang banyak …") would be spoken as a fragment: 113:4's word card gives the
     # whole meaning of the same form, "yang banyak meniup".
     (r"bentuk mubalaghah \(“yang banyak …”\)", "bentuk mubalaghah (“yang banyak meniup”)"),
@@ -301,9 +308,11 @@ class Sanitiser:
 
     def _phrase(self, place, S, A, W, prep, meaning=None):
         """A word of this ayah by its place, which the stage numbers ("kata kedua", "kata ketiga
-        dan keempat"); a word of another ayah by its meaning ("kata yang artinya “bagi Allah” di
-        ayat dua", "frasa yang artinya “dari kejahatan”"), which a listener can follow without
-        seeing it. `meaning`: the gloss the prose already gives right after the mention."""
+        dan keempat"); one word of another ayah as a named word with its meaning ("kata
+        {{1:6:2}} yang artinya “jalan”", 2026-10-17, and " di ayat keenam" from an ayah before it:
+        `_where`), a phrase by its meaning alone
+        ("frasa yang artinya “dari kejahatan”"), which a listener can follow without seeing it.
+        `meaning`: the gloss the prose already gives right after the mention."""
         s, a, ws = place
         if len(ws) == 1 and (s, a) == (S, A) and ws[0] == W:
             return "kata ini"
@@ -314,12 +323,22 @@ class Sanitiser:
                 return f"kata {ordinal(ws[0])} dan {ordinal(ws[1])}"
             return f"kata {ordinal(ws[0])} sampai {ordinal(ws[-1])}"
         g = meaning or " ".join(self.gloss[(s, a, w)] for w in ws)
-        core = f"{'kata' if len(ws) == 1 else 'frasa'} yang artinya “{g}”"
-        return f"{core} {prep or 'di'} ayat {num_id(a)}" if s == S else core
+        # One word is named with the word itself, its bytes and transliteration (operator
+        # 2026-10-17: "should also mention the arabic word not only artinya. apply this in similar
+        # sentences"; validate_narration "named words"); a phrase by its meaning, as before.
+        core = (f"kata {self._hold(f'{{{{{s}:{a}:{ws[0]}}}}}')} yang artinya “{g}”" if len(ws) == 1
+                else f"frasa yang artinya “{g}”")
+        return core + self._where(place, S, prep, A)
 
-    def _where(self, place, S, prep) -> str:
+    @staticmethod
+    def _where(place, S, prep, A=None) -> str:
+        """ " di ayat N" after a word of another ayah of the surah — except an EARLIER one (operator
+        2026-10-17, rule 29 "A lesson stands on its own screen: no back-references to earlier
+        ayat"): the word itself is named and shown, its ayah is not pointed at."""
         s, a, _ = place
-        return f" {prep or 'di'} ayat {num_id(a)}" if s == S else ""
+        if s != S or (A is not None and a < A):
+            return ""
+        return f" {prep or 'di'} ayat {num_id(a)}"
 
     def replace_mentions(self, t: str, S: int, A: int, W: int | None) -> str:
         found, toks = self.forms.mentions(t)
@@ -386,7 +405,7 @@ class Sanitiser:
                 end += len(gm.group(0))
             if elsewhere and absorbed and absorbed.lower() == "lafaz" and g[0][2] == ("allah",):
                 # "lafaz Allah di ayat 2": the Name, said in Indonesian (quoted: not a recitation).
-                phrase = "lafaz “Allah”" + self._where(places[0], S, prep)
+                phrase = "lafaz “Allah”" + self._where(places[0], S, prep, A)
             else:
                 phrase = " ".join(self._phrase(p, S, A, W, prep, meaning) for p in places)
             if t[end:].startswith(" mashdariyyah"):
@@ -494,13 +513,50 @@ class Sanitiser:
                 continue  # the letter's name: "huruf lam", "alif lam"
             bad.append(orig)
         if bad:
-            raise SystemExit(f"{what}: names the Qur'anic word(s) {bad} — say its place (kata pertama) or its "
-                             "meaning (kata yang artinya …); the screen shows the Arabic and the transliteration")
+            raise SystemExit(f"{what}: names the Qur'anic word(s) {bad} — say its place (kata pertama) or name it "
+                             "with the markup {{s:a:w}} (the caption shows its Arabic and transliteration)")
+
+    _HOLD0 = 0xF0000  # a held markup's placeholder: one private-use character per markup of the line
+
+    def _hold(self, markup: str) -> str:
+        """A placeholder for a named word's markup ({{1:1:1/bi}}) while the steps of `prose` run (none
+        of them may read its digits or letters); `prose` puts the markup back at its end."""
+        self._held.append(markup)
+        return chr(self._HOLD0 + len(self._held) - 1)
+
+    def name_places(self, t: str, S: int, A: int, W: int | None) -> str:
+        """A word of the ayah named by its place AND its meaning — "kata ketiga, yang artinya
+        “Tuhan”", "kata ini, yang artinya “dari”", "Kata pertama artinya: …" — also shows and says
+        the word itself (operator 2026-10-17, rule 26, "even when the stage highlights that word"):
+        "kata ketiga, yaitu {{1:2:3}}, yang artinya “Tuhan”"; a run names each of its words. "kata
+        ini" is the line's own word (W); without one, or past the ayah's last word, the text is left
+        as it is and validate_narration's PLACE_MEANING refuses the line (author the markup)."""
+        def one(m: re.Match) -> str:
+            first, conj, second, yang, verb = m.group(2), m.group(3), m.group(4), m.group(6), m.group(7)
+            i = W if first == "ini" else V.ORDINAL_NUM[first]
+            if i is None:
+                return m.group()
+            ws = [i]
+            if second:
+                j = V.ORDINAL_NUM[second]
+                ws = list(range(i, j + 1)) if conj == "sampai" else [i, j]
+            if any((S, A, w) not in self.gloss for w in ws):
+                return m.group()
+            refs = " ".join(f"{{{{{S}:{A}:{w}}}}}" for w in ws)
+            # "kata perintah, yaitu kata pertama" (NAMED_BY) already has its "yaitu": the word
+            # follows as an apposition, "…, yaitu kata pertama, قُلْ (qul), yang artinya …".
+            lead = "" if t[:m.start()].endswith("yaitu ") else "yaitu "
+            return f"{t[m.start():m.start(5)]}, {lead}{refs}, {yang or ''}{verb}"
+        return V.PLACE_MEANING_SAN.sub(one, t)
 
     def prose(self, text: str, S: int, A: int, W: int | None = None, *, strict: str | None = None) -> str:
+        self._held: list[str] = []
         t = re.sub(r"\s+", " ", text).strip()
         for pat, repl in PRE_REWRITES:
             t = re.sub(pat, repl, t)
+        # A word the author names on purpose (validate_narration "named words": {{s:a:w}} or
+        # {{s:a:w/form}}), never mapped to a place nor read as prose.
+        t = V.NAMED_REF.sub(lambda m: self._hold(m.group()), t)
         t = quotes_to_typographic(t)
         t = self.qs(t)
         if strict:
@@ -515,7 +571,10 @@ class Sanitiser:
         t = self.surah_names(t)
         t = self.honorifics(t)
         t = V.fold(t)
-        return phrasing(self.tidy(t))
+        t = phrasing(self.tidy(t))
+        t = self.name_places(t, S, A, W)
+        return re.sub(f"[{chr(self._HOLD0)}-{chr(self._HOLD0 + max(len(self._held), 1) - 1)}]",
+                      lambda m: self._held[ord(m.group()) - self._HOLD0], t) if self._held else t
 
     def plain_check(self, what: str, text: str) -> None:
         """A translation or gloss may carry 'Allah' and nothing else Qur'anic."""
@@ -532,9 +591,17 @@ class Sanitiser:
 _MARK0 = 0xE000
 
 
+_NAMED0 = 0xF4000  # a named word in a marked line: one private-use character per distinct word
+
+
 class Speech:
-    def __init__(self, lex: V.Lexicon):
+    def __init__(self, lex: V.Lexicon, named: V.Named | None = None):
         self.lex = lex
+        # The words a line names with the word itself (validate_narration "named words"): markup
+        # {{s:a:w}} / {{s:a:w/form}} → (bytes, transliteration), each given one mark.
+        self.named = named
+        self._words: list[tuple[str, str]] = []
+        self._word_ix: dict[tuple[str, str], int] = {}
         self.index = {t.term: i for i, t in enumerate(lex.terms)}
         every = "".join(chr(_MARK0 + 2 * i + c) for i in range(len(lex.terms)) for c in (0, 1))
         boxed = "".join(chr(_MARK0 + 2 * i + c) for i, t in enumerate(lex.terms) if t.shown for c in (0, 1))
@@ -553,7 +620,23 @@ class Speech:
             (re.compile(rf"(?<=\S) \(([^()]*{b}[^()]*)\)"), r", yaitu \1,"),
         ]
 
+    def _named_mark(self, m: re.Match) -> str:
+        if self.named is None:
+            raise SystemExit(f"{m.group()}: a named word, and this Speech was given no words to name")
+        word = self.named.resolve(m.group(1), m.group(2))
+        if word not in self._word_ix:
+            self._word_ix[word] = len(self._words)
+            self._words.append(word)
+        return chr(_NAMED0 + self._word_ix[word])
+
+    def _words_out(self, marked: str, render) -> str:
+        if not self._words:
+            return marked
+        return re.sub(f"[{chr(_NAMED0)}-{chr(_NAMED0 + len(self._words) - 1)}]",
+                      lambda m: render(*self._words[ord(m.group()) - _NAMED0]), marked)
+
     def mark(self, prose: str) -> str:
+        prose = V.NAMED_REF.sub(self._named_mark, prose)
         out, cur = "", 0
         for a, b, t, cap in self.lex.latin_matches(prose):
             out += prose[cur:a] + chr(_MARK0 + 2 * self.index[t.term] + int(cap))
@@ -563,7 +646,9 @@ class Speech:
             out = rx.sub(repl, out)
         out = re.sub(r",(?:\s*,)+", ",", out)
         out = re.sub(r",\s*([.;:!?])", r"\1", out)
-        return out
+        # … and none at the very end (a step's name: "Tiga jenis kata (isim, fi'il, dan huruf)"
+        # becomes "tiga jenis kata, yaitu isim (اِسْم), …, dan huruf (حَرْف)", a name, not a clause)
+        return re.sub(r",\s*$", "", out)
 
     def _terms(self, marked: str, render) -> str:
         def rep(m: re.Match) -> str:
@@ -572,10 +657,10 @@ class Speech:
         return re.sub(self.any, rep, marked)
 
     def spoken(self, marked: str) -> str:
-        return tts_text(self._terms(marked, self.lex.speak_of))
+        return tts_text(self._words_out(self._terms(marked, self.lex.speak_of), lambda _ar, tr: V.named_speech(tr, self.lex)))
 
     def shown(self, marked: str, focus_ar: str | None) -> str:
-        return self._terms(marked, lambda t, cap: self.lex.display_of(t, cap, focus_ar))
+        return self._words_out(self._terms(marked, lambda t, cap: self.lex.display_of(t, cap, focus_ar)), V.named_shown)
 
 
 # ------------------------------------------------------------------ splitting long lines
@@ -763,7 +848,8 @@ def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.T
     i = q["word"]
     w = a["words"][i - 1]
     if key == "tap-word":
-        return f"Itu kata {ordinal(i)}, yang artinya “{V.fold(w['gloss'])}”."
+        # The word itself too (rule 26, operator 2026-10-17): "Itu kata pertama, yaitu بِسْمِ (bismi), …".
+        return f"Itu kata {ordinal(i)}, yaitu {{{{{w['loc']}}}}}, yang artinya “{V.fold(w['gloss'])}”."
     why = said_why(w, san, S, A, i, f"{a['loc']} ex:{key}:{q['n']}:why")
     if key == "label-role":
         # The role's head (before its brackets or its ";"): the why says the rest ("khabar
@@ -850,11 +936,11 @@ def map_later(entry: dict, steps: dict, surah: int) -> str | None:
         # Where each will be taught: an ayah of this surah, which the line names; None: elsewhere.
         here = [LM.taught_ayah(steps[c], surah) for c in later]
         if None in here:
-            out.append(f"{lead}, yaitu {_said(steps, later)}, tetapi baru kita bahas nanti.")
+            out.append(f"{lead}, yaitu {_said(steps, later)}, tetapi baru akan diajarkan lebih lengkap nanti.")
         elif len(set(here)) == 1:
-            out.append(f"{lead}, yaitu {_said(steps, later)}, tetapi baru kita bahas di ayat {ordinal(here[0])}.")
+            out.append(f"{lead}, yaitu {_said(steps, later)}, tetapi baru akan diajarkan lebih lengkap di ayat {ordinal(here[0])}.")
         else:
-            out.append(f"{lead}, tetapi baru kita bahas nanti: "
+            out.append(f"{lead}, tetapi baru akan diajarkan lebih lengkap nanti: "
                        f"{_names([f'{low(c)} di ayat {ordinal(a)}' for c, a in zip(later, here)])}.")
     if lanjut:
         out.append(f"{'Ada juga' if later else 'Di ayat ini ada'} {num_id(len(lanjut))} hal tingkat lanjut, yang tidak kita bahas "
@@ -988,7 +1074,9 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
         for i, w in enumerate(a["words"], 1):
             san.plain_check(f"{w['loc']} gloss", w["gloss"])
             comp = V.composition_of(compose, w["loc"])
-            gloss = f"Kata {ordinal(i)} artinya: “{V.fold(w['gloss'])}”."
+            # The word's own line names it by its place, then itself (rule 26: "Kata pertama, yaitu
+            # بِسْمِ (bismi), artinya: …"; until 2026-10-17 its place and meaning only).
+            gloss = f"Kata {ordinal(i)}, yaitu {{{{{w['loc']}}}}}, artinya: “{V.fold(w['gloss'])}”."
             if comp is None:
                 add(f"w{i}", f"{gloss} {said_why(w, san, S, A, i, f'{base}:w{i}')}")
                 continue
@@ -1057,7 +1145,8 @@ def build_all(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = N
     terms = Q.Terms(table)
     ids = V.term_ids(lex, table)
     san = Sanitiser(lessons)
-    sp = Speech(lex)
+    named = V.Named(lessons, compose)
+    sp = Speech(lex, named)
     forms = san.forms
     errs: list[str] = list(lex.problems(forms))
     if errs:
@@ -1097,8 +1186,8 @@ def build_all(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = N
             ids_ = [lid] if len(parts) == 1 else [f"{lid}:{chr(ord('a') + i)}" for i in range(len(parts))]
             for pid, piece in zip(ids_, parts):
                 text, display = sp.spoken(piece), sp.shown(piece, focus_ar)
-                errs += V.check_spoken(pid, text, forms, lex)
-                errs += V.check_display(pid, display, text, forms, lex, focus_ar)
+                errs += V.check_spoken(pid, text, forms, lex, [said for said, _shown in V.named_in_display(display, lex)])
+                errs += V.check_display(pid, display, text, forms, lex, focus_ar, named)
                 line = {"text": text, "display": display, "highlight": list(highlight), "focus": focus}
                 if frame is not None:
                     line["frame"] = frame
@@ -1134,10 +1223,11 @@ def build_lines(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None =
 def retext_tokens(tokens: list, line: dict, lex: V.Lexicon, focus_ar: str | None) -> list:
     """The karaoke tokens of a kept render with their texts re-derived from the spoken text (a
     changed display form needs no new render); unchanged when the words no longer line up."""
-    runs = lex.runs(line["text"])
+    named = V.named_in_display(line.get("display"), lex)
+    runs = lex.runs(line["text"], named)
     if len(runs) != len(tokens) or not all(isinstance(t, dict) for t in tokens):
         return tokens
-    spans = lex.spoken_spans(line["text"])
+    spans = lex._spans(line["text"], named)
     return [{**tk, "t": lex._render(line["text"], a, b, spans, focus_ar)} for tk, (a, b) in zip(tokens, runs)]
 
 
@@ -1156,20 +1246,25 @@ def manifest(lines: dict[str, dict], old: dict | None, lex: V.Lexicon, forms: V.
     rendered once and copied (render_narration.py), sharing one set of timings. Nothing is
     invented — the file is named by the text, the voice and its bytes
     (validate_narration.delivery_name), never by the line's place, and the tokens are that file's.
-    `letters(lid, line)`: where the line's caption takes a letter's shape (V.line_letters)."""
+    `letters(lid, line)`: where the line's caption takes a letter's shape (V.line_letters).
+    A take ElevenLabs CUT SHORT is not carried over (operator 2026-10-17: "the voice is cut slightly
+    before the sentence finished"; V.is_cut: its audio ends before its own last word does): the line
+    plays caption-only, as a changed line does, until render_narration.py gives it a new take."""
     old_lines = (old or {}).get("lines") or {}
+    whole = lambda prev: (isinstance(prev, dict) and "audio" in prev  # noqa: E731
+                          and not V.is_cut(prev.get("tokens"), (prev.get("audio") or {}).get("ms")))
     # Every rendered line of the old manifest, by its text (the first one of a text).
     said: dict[str, dict] = {}
     for prev in old_lines.values():
-        if isinstance(prev, dict) and "audio" in prev and isinstance(prev.get("text"), str):
+        if whole(prev) and isinstance(prev.get("text"), str):
             said.setdefault(prev["text"], prev)
     out = {}
     for lid, line in lines.items():
         new = dict(line)
         prev = old_lines.get(lid)
-        if not (isinstance(prev, dict) and prev.get("text") == line["text"] and "audio" in prev):
+        if not (whole(prev) and prev.get("text") == line["text"]):
             prev = said.get(line["text"])
-        if isinstance(prev, dict) and prev.get("text") == line["text"] and "audio" in prev:
+        if whole(prev) and prev.get("text") == line["text"]:
             new["audio"] = prev["audio"]
             if "tokens" in prev:
                 new["tokens"] = retext_tokens(prev["tokens"], line, lex, letters(lid, line))

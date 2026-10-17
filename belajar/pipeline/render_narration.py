@@ -62,6 +62,20 @@ bytes the manifest publishes (the same sha256, so the same name). When this ffmp
 bytes, the run stops and says to fetch the published file back from the server: another ffmpeg
 build must not rename a published file in passing.
 
+A TAKE CUT SHORT IS REFUSED (operator 2026-10-17: "the voice is cut slightly before the sentence
+finished"). ElevenLabs sometimes returns audio that ends before its own alignment does — the
+master of al-fatihah:0:primer:1 is 4.049 s, its last letter aligned to end at 4.16 s — so the last
+word is cut in the recording itself (validate_narration.CUT_TOLERANCE_MS, cut_ms). A fresh take is
+written beside the master as <file>.new.mp3 and measured (ffprobe) BEFORE it takes the master's
+place: cut, it is kept as <file>.cut-<k>.mp3 (+ .json; paid for, there to listen to), the line gets
+nothing — no master, no delivery, no manifest entry — and the run ends with exit 1, listing it.
+Running the same command again renders one more take of it (and pays again); nothing is retried
+by itself. A take already on disk (reuse, or a twin copied from another manifest) is measured the
+same way: a cut one is never used again — it is moved aside as <file>.cut-<k>.mp3 and the line is
+rendered anew. build_narration.py does not carry a cut take over in a manifest either, so a line
+whose take was cut has no audio and is what a render of it sends (the RETAKE of a cut line: select
+it with --only and render; the dry run counts it).
+
 After each line the manifest gets audio {url, ms, sha256} of the DELIVERED file (ms measured with
 ffprobe), tokens, and voice {id, name, model}. A render therefore needs ffmpeg and ffprobe, and
 says so before anything is sent; the dry run needs neither. The upload is printed, never run: the
@@ -73,6 +87,7 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import os
 import shutil
 import sys
 import urllib.error
@@ -148,21 +163,56 @@ def synthesize(api_key: str, voice_id: str, text: str) -> tuple[bytes, dict, int
 write_json = E.write_json
 
 
-def blocked(rows: list[tuple[str, str, str]], lex: V.Lexicon) -> list[tuple[str, list[str]]]:
+def cut_short(mp3: Path, al: dict) -> int | None:
+    """How many ms a take on disk ends before its own alignment's last character does, when that is
+    more than validate_narration.CUT_TOLERANCE_MS — ElevenLabs cut the take short (operator
+    2026-10-17: "the voice is cut slightly before the sentence finished"; al-fatihah:0:primer:1,
+    4.049 s of audio, its last letter aligned to end at 4.16 s) — else None (a whole take). The
+    length is the master's, by ffprobe, as encode_narration.deliver measures it."""
+    ends = al.get("character_end_times_seconds") or []
+    if not ends:
+        return None
+    ms = E.probe(mp3)["ms"]
+    tail = [{"e": max(ends)}]
+    return V.cut_ms(tail, ms) if V.is_cut(tail, ms) else None
+
+
+def set_aside(mp3: Path, why: str) -> Path:
+    """Moves a take (<file>.mp3 and its .json alignment) out of the master's place, to
+    <file-stem>.<why>-<k>.mp3 (+ .json) beside it, k the first number free: a paid take is never
+    overwritten or deleted, and never found again as the master of its text. Returns the new path."""
+    stem = mp3.name.split(".", 1)[0]
+    k = 1
+    while (mp3.parent / f"{stem}.{why}-{k}.mp3").exists() or (mp3.parent / f"{stem}.{why}-{k}.json").exists():
+        k += 1
+    dest = mp3.parent / f"{stem}.{why}-{k}.mp3"
+    os.replace(mp3, dest)
+    if mp3.with_suffix(".json").exists():
+        os.replace(mp3.with_suffix(".json"), dest.with_suffix(".json"))
+    return dest
+
+
+def blocked(rows: list[tuple[str, str, str]], lex: V.Lexicon, manifests: dict[str, dict] | None = None) -> list[tuple[str, list[str]]]:
     """Lines that may not be rendered yet: they speak a heavy letter + a (validate_narration
-    heavy_latin) that pronunciation.json has no operator-approved respelling for, or an Arabic term
-    or letter name in Latin (validate_narration.latin_terms)."""
-    return [(lid, words) for _name, lid, text in rows if (words := V.held(text, lex))]
+    heavy_latin) that pronunciation.json has no operator-approved respelling for, an Arabic term or
+    letter name in Latin (validate_narration.latin_terms), or — read from the line's caption when
+    `manifests` is given — a named Qur'anic word whose sound waits for the operator (named_held)."""
+    def words(name: str, lid: str, text: str) -> list[str]:
+        line = (manifests or {}).get(name, {}).get("lines", {}).get(lid)
+        return V.held_line(line, lex) if isinstance(line, dict) else V.held(text, lex)
+    return [(lid, ws) for name, lid, text in rows if (ws := words(name, lid, text))]
 
 
 def unheard(rows: list[tuple[str, str, str]], manifests: dict[str, dict], lex: V.Lexicon) -> list[str]:
     """The pending-ear-check terms that the selected lines a render would send (no audio yet, not
     held back) say: "term (speak → caption): n lines"."""
-    held_ids = {lid for lid, _ws in blocked(rows, lex)}
+    held_ids = {lid for lid, _ws in blocked(rows, lex, manifests)}
     todo = {name: {lid: manifests[name]["lines"][lid] for n, lid, _t in rows if n == name and lid not in held_ids
                    and "audio" not in manifests[name]["lines"][lid]} for name in {r[0] for r in rows}}
     use = V.pending_terms({n: {"lines": ls} for n, ls in todo.items()}, lex)
-    return [f"{t.term} ({t.speak} → {t.display}): {len(use[t.term])} lines" for t in lex.terms if t.term in use]
+    named = V.pending_named({n: {"lines": ls} for n, ls in todo.items()}, lex)
+    return ([f"{t.term} ({t.speak} → {t.display}): {len(use[t.term])} lines" for t in lex.terms if t.term in use]
+            + [f"{tr} (named word, said {lex.named[tr].speak}): {len(ids)} lines" for tr, ids in named.items()])
 
 
 def dry_run(rows: list[tuple[str, str, str]], manifests: dict[str, dict]) -> None:
@@ -190,14 +240,18 @@ def dry_run(rows: list[tuple[str, str, str]], manifests: dict[str, dict]) -> Non
     if longest:
         print(f"longest request: {len(longest[2])} characters ({longest[1]}); eleven_v3 limit {V.TTS_MAX}")
     print(f"estimate at USD {PRICE_PER_1K}/1K characters ({MODEL}), first take only, no retakes.")
+    print(f"a take ElevenLabs cuts short (it ends more than {V.CUT_TOLERANCE_MS} ms before its own last word) is refused "
+          "and kept aside, never put in a manifest: its line stays without audio, and running the same command again "
+          "renders (and pays for) one more take of it.")
     print(f"each render ({V.OUTPUT_FORMAT} master) is then encoded once to {V.DELIVERY_FORMAT} for delivery "
           "(encode_narration.py: ffmpeg on this machine, no cost).")
     lex = V.load_lexicon()
-    held = blocked(rows, lex)
+    held = blocked(rows, lex, manifests)
     if held:
         words = sorted({V.key(w) for _lid, ws in held for w in ws})
         print(f"refused by --render: {len(held)} selected lines speak a heavy letter + a with no approved respelling, "
-              f"or an Arabic term in Latin, not from pronunciation.json ({', '.join(words)}); narrow --only to the others")
+              f"an Arabic term in Latin, or a named word with no spelling in its `named` list, not from pronunciation.json "
+              f"({', '.join(words)}); narrow --only to the others")
     for row in unheard(rows, manifests, lex):
         print(f"pending ear check, rendered: {row}")
     print("dry run: nothing was sent. A render needs --render --i-approve-spend --voice-id --voice-name.")
@@ -227,6 +281,7 @@ def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
     charged = 0
     unknown_cost = 0
     done: list[tuple[str, str, Path]] = []
+    refused: list[tuple[str, int, Path]] = []  # (line, ms short, where the cut take was kept)
     for name, lid, text in rows:
         if len(text) > V.TTS_MAX:
             raise SystemExit(f"{lid}: {len(text)} characters is over the {V.TTS_MAX} limit")
@@ -241,28 +296,55 @@ def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
             continue
         twins = sorted(root.glob(f"*/{file}.mp3"))
         fresh = False  # a master rendered in this run: delivered anew, whatever the manifest named before
-        if mp3.exists() and aligned.exists():
-            al = json.loads(aligned.read_text(encoding="utf-8"))
-            print(f"reuse  {lid} (unchanged, {mp3.name})")
-        elif twins and twins[0].with_suffix(".json").exists():
-            mp3.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(twins[0], mp3)
-            shutil.copyfile(twins[0].with_suffix(".json"), aligned)
-            al = json.loads(aligned.read_text(encoding="utf-8"))
-            print(f"copy   {lid} (same text as {twins[0].parent.name}/{twins[0].name})")
-        else:
-            body, al, cost = synthesize(api_key, args.voice_id, text)
-            fresh = True
-            mp3.parent.mkdir(parents=True, exist_ok=True)
-            mp3.write_bytes(body)
-            write_json(aligned, al)
+        al = None
+        # A take on disk (this manifest's master, or a twin of the same text in another manifest)
+        # is used only when it is whole: a take ElevenLabs cut short (cut_short) is never used
+        # again — the line is rendered anew below, and the cut master is kept aside, not deleted.
+        on_disk = mp3 if mp3.exists() and aligned.exists() else \
+            twins[0] if twins and twins[0].with_suffix(".json").exists() else None
+        if on_disk is not None:
+            take_al = json.loads(on_disk.with_suffix(".json").read_text(encoding="utf-8"))
+            short = cut_short(on_disk, take_al)
+            if short is None and on_disk == mp3:
+                al = take_al
+                print(f"reuse  {lid} (unchanged, {mp3.name})")
+            elif short is None:
+                mp3.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(on_disk, mp3)
+                shutil.copyfile(on_disk.with_suffix(".json"), aligned)
+                al = take_al
+                print(f"copy   {lid} (same text as {on_disk.parent.name}/{on_disk.name})")
+            else:
+                aside = set_aside(mp3, "cut") if on_disk == mp3 else on_disk
+                print(f"cut    {lid} ({on_disk.name} ends {short} ms before its last word does: not used again"
+                      + (f"; kept as {aside.name}" if on_disk == mp3 else "") + "); a new take is rendered")
+        if al is None:
+            body, new_al, cost = synthesize(api_key, args.voice_id, text)
             sent += len(text)
             if cost is None:
                 unknown_cost += 1
             else:
                 charged += cost
+            # The new take is checked BEFORE it takes the master's place: a take ElevenLabs cut short
+            # never becomes the master, never gets delivered, never enters the manifest. It is kept
+            # beside the master as <file>.cut-<k>.mp3 (+ .json), paid for and there to listen to.
+            mp3.parent.mkdir(parents=True, exist_ok=True)
+            new = mp3.with_name(f"{file}.new.mp3")
+            new.write_bytes(body)
+            write_json(new.with_suffix(".json"), new_al)
+            short = cut_short(new, new_al)
+            if short is not None:
+                kept = set_aside(new, "cut")
+                refused.append((lid, short, kept))
+                print(f"REFUSED {lid} ({len(text)} chars, character-cost {cost}): ElevenLabs cut this take, it ends {short} ms "
+                      f"before its last word does; kept as {kept.name}, the manifest is not changed")
+                continue
+            os.replace(new, mp3)
+            os.replace(new.with_suffix(".json"), aligned)
+            al, fresh = new_al, True
             print(f"render {lid} ({len(text)} chars, character-cost {cost})")
-        tokens = lex.tokens(text, al["character_start_times_seconds"], al["character_end_times_seconds"], focus_ar)
+        tokens = lex.tokens(text, al["character_start_times_seconds"], al["character_end_times_seconds"], focus_ar,
+                            V.named_in_display(line.get("display"), lex))
         # The manifest describes what is served: the master encoded for delivery (64 kbps mono), not
         # the master. Refused (SystemExit) if the encode drifts or a token no longer fits; the paid
         # master stays on disk, so a re-run re-uses it.
@@ -291,12 +373,20 @@ def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
           f"character-cost header total {charged}" + (f" ({unknown_cost} responses without the header)" if unknown_cost else ""))
     for lid, url, mp3 in done:
         print(f"  {lid}  {url}")
+    if refused:
+        # Paid for and refused: the line keeps no audio (caption-only). Another run of the same
+        # command renders it again — one more take, one more charge, per line and per run.
+        print(f"\nREFUSED: {len(refused)} take(s) ElevenLabs cut short (each ends more than {V.CUT_TOLERANCE_MS} ms before its "
+              "own last word does); nothing of them is in a manifest. Listen to them if you like, then run the same "
+              "command again for another take (it costs as much again):")
+        for lid, short, kept in refused:
+            print(f"  {lid}: {short} ms short, kept as {kept}")
     # The upload sends the files the manifests reference and no others: the list is written by
     # encode_narration.py --check --list, which exits 1 if a referenced file is not here as described.
     print("Next: python3 build_narration.py --check && python3 validate_narration.py, listen; then, before the deploy "
           "(README, \"Before a deploy\"; not run by this script):")
     print("\n".join(E.upload_steps(out)))
-    return 0
+    return 1 if refused else 0
 
 
 def main() -> int:
@@ -322,7 +412,7 @@ def main() -> int:
         raise SystemExit(f"no manifest {args.surah!r}; have {sorted(manifests)}")
     rows = select(manifests, args.surah, args.only)
     if args.skip_held:
-        out = {lid for lid, _ws in blocked(rows, V.load_lexicon())}
+        out = {lid for lid, _ws in blocked(rows, V.load_lexicon(), manifests)}
         if out:
             print(f"--skip-held: {len(out)} selected lines are held back and left out (caption-only until "
                   f"pronunciation.json speaks their terms or they are reworded): {', '.join(sorted(out))}")
@@ -341,10 +431,10 @@ def main() -> int:
         raise SystemExit("validate_narration.py fails; fix that first:\n  " + "\n  ".join(errs[:20]))
     # Pronunciation rule 2 (operator 2026-10-10): eleven_v3 reads a heavy letter + a light, so a
     # line speaking one is rendered only once the dictionary has an approved respelling for it.
-    held = blocked(rows, V.load_lexicon())
+    held = blocked(rows, V.load_lexicon(), manifests)
     if held:
-        raise SystemExit("refused, nothing was sent: these lines speak a heavy letter + a, or an Arabic term in Latin, "
-                         "that pronunciation.json does not speak (add it after the operator approves its sound, reword "
+        raise SystemExit("refused, nothing was sent: these lines speak a heavy letter + a, an Arabic term in Latin, or a "
+                         "named word that pronunciation.json does not speak (add it, as pending-ear-check or approved, reword "
                          "the line, or narrow --only):\n  " + "\n  ".join(f"{lid}: {', '.join(ws)}" for lid, ws in held[:40]))
     for row in unheard(rows, manifests, V.load_lexicon()):
         print(f"pending ear check, rendering anyway (the operator waived the pre-render review): {row}")

@@ -47,7 +47,7 @@ const SLOT: unknown = new Proxy(
 );
 /** The lesson map's templates take LISTS of step names (2026-10-15: every counted step named), a
  *  postponed one with its ayah: each argument is one named slot that is a list of itself, its
- *  item a slot with a name and no ayah ("{later}" … "tetapi baru kita bahas nanti"). */
+ *  item a slot with a name and no ayah ("{later}" … "tetapi baru akan diajarkan lebih lengkap nanti"). */
 const LIST_SLOT: unknown = new Proxy(
   {},
   {
@@ -648,7 +648,7 @@ describe("meanings (plan L22): always in “…”, always emphasised", () => {
 describe("captionSpans: a stage caption emphasises every meaning", () => {
   it("two meanings in one caption: both (L22; the first alone until 2026-10-13)", () => {
     const concept = CAPTIONS.find(([where]) => where === "al-fatihah al-fatihah:1:concept:huruf-jar")![1];
-    expect(concept).toContain("huruf ba’ (بِ) yang artinya “dengan”, dan huruf lam (لِ) yang artinya “bagi”");
+    expect(concept).toContain("بِ (bi) yang artinya “dengan”, dan لِ (li) yang artinya “bagi”");
     expect(captionSpans(concept).filter((e) => e.kind === "meaning").map((e) => concept.slice(e.from, e.to))).toEqual(["“dengan”", "“bagi”"]);
     const s = "Kata ketiga artinya: “bagi-Nya”. Huruf lam (لَّ) yang artinya “bagi”, adalah huruf jar (حَرْف جَرّ) dan akhiran, yang artinya “Dia”; sehingga bermakna “setara bagi-Nya”.";
     expect(captionSpans(s).map((e) => s.slice(e.from, e.to))).toEqual(["“bagi-Nya”", "“bagi”", "“Dia”", "“setara bagi-Nya”"]);
@@ -919,8 +919,10 @@ describe("alignEmphasis: the karaoke words take the display's emphasis", () => {
         });
       }
     // Not vacuous; the numbers follow what is rendered (344 lines when every Al-Fatihah line had
-    // its voice, 294 on 2026-10-13 with the reworded lessons waiting for their render).
-    expect(lines).toBeGreaterThan(250);
-    expect(spans).toBeGreaterThan(150);
+    // its voice, 294 on 2026-10-13 with the reworded lessons waiting for their render; on
+    // 2026-10-17, with the review's rewordings and every word line naming its word waiting, 135
+    // spans).
+    expect(lines).toBeGreaterThan(200);
+    expect(spans).toBeGreaterThan(120);
   });
 });

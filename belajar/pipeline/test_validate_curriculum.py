@@ -253,8 +253,12 @@ MUTATIONS = [
      "lesson 1:5: learnt must be every step of every earlier lesson, in teaching order (10 steps)"),
     ("learnt in another order", built(lambda c: a_map(c, "1:5")["learnt"].reverse()),
      "lesson 1:5: learnt must be every step of every earlier lesson"),
-    ("a learnt step marked here that does not occur", built(lambda c: a_map(c, "1:1")["learnt"][0].__setitem__("here", True)),
-     "lesson 1:1: learnt says harakat occurs in this ayah; it does not"),
+    ("a learnt step marked here that does not occur", built(lambda c: a_map(c, "1:5")["learnt"][2].__setitem__("here", True)),
+     "lesson 1:5: learnt says majrur occurs in this ayah; it does not"),
+    # The harakat sit on every letter of every ayah (operator 2026-10-17: "in alfatihah ayat-1 it says
+    # no harakat?"): never "not in this ayah".
+    ("the harakat said not to occur in an ayah", built(lambda c: a_map(c, "1:1")["learnt"][0].__setitem__("here", False)),
+     "lesson 1:1: learnt says harakat does not occur in this ayah; it does"),
     ("a learnt step that occurs, not marked", built(lambda c: a_map(c, "1:3")["learnt"][2].__setitem__("here", False)),
      "lesson 1:3: learnt says majrur does not occur in this ayah; it does"),
     ("later: a step that does not occur here", built(lambda c: a_map(c, "1:3")["later"].append("idhafah")),
@@ -291,17 +295,17 @@ MUTATIONS = [
 # running count; "here", later and lanjut are what the words' records and tags give): ayah →
 # (new, the learnt steps that occur here, later, lanjut).
 FATIHAH = {
-    1: (["majrur", "huruf-jar"], ["kalimah"], ["alif-lam", "naat", "idhafah"], ["syibhul-jumlah"]),
-    2: (["jumlah-ismiyyah", "marfu", "jamak-mudzakkar-salim"], ["kalimah", "majrur", "huruf-jar"],
+    1: (["majrur", "huruf-jar"], ["harakat", "kalimah"], ["alif-lam", "naat", "idhafah"], ["syibhul-jumlah"]),
+    2: (["jumlah-ismiyyah", "marfu", "jamak-mudzakkar-salim"], ["harakat", "kalimah", "majrur", "huruf-jar"],
         ["alif-lam", "naat", "idhafah", "badal"], ["syibhul-jumlah", "wazan-dan-tashrif"]),
-    3: (["alif-lam", "naat"], ["kalimah", "majrur"], [], ["wazan-dan-tashrif"]),
-    4: (["idhafah"], ["kalimah", "majrur", "alif-lam", "naat"], [], ["wazan-dan-tashrif", "isim-fail"]),
-    5: (["dhamir", "fiil-mudhari", "murab-mabni"], ["kalimah", "marfu"], ["jumlah-filiyyah", "maful-bih", "athaf"],
+    3: (["alif-lam", "naat"], ["harakat", "kalimah", "majrur"], [], ["wazan-dan-tashrif"]),
+    4: (["idhafah"], ["harakat", "kalimah", "majrur", "alif-lam", "naat"], [], ["wazan-dan-tashrif", "isim-fail"]),
+    5: (["dhamir", "fiil-mudhari", "murab-mabni"], ["harakat", "kalimah", "marfu"], ["jumlah-filiyyah", "maful-bih", "athaf"],
         ["taqdim-maful", "bab-istifal", "ilal"]),
-    6: (["jumlah-filiyyah", "maful-bih", "manshub"], ["kalimah", "alif-lam", "naat", "dhamir"], ["fiil-amr"],
+    6: (["jumlah-filiyyah", "maful-bih", "manshub"], ["harakat", "kalimah", "alif-lam", "naat", "dhamir"], ["fiil-amr"],
         ["isim-fail", "bab-istifal", "ilal"]),
     7: (["isim-maushul", "fiil-madhi", "athaf"],
-        ["kalimah", "majrur", "huruf-jar", "jamak-mudzakkar-salim", "alif-lam", "idhafah", "dhamir", "murab-mabni", "jumlah-filiyyah",
+        ["harakat", "kalimah", "majrur", "huruf-jar", "jamak-mudzakkar-salim", "alif-lam", "idhafah", "dhamir", "murab-mabni", "jumlah-filiyyah",
          "manshub"], ["badal"], ["isim-fail", "bab-ifal", "isim-maful", "naib-fail"]),
 }
 LEARNT_BEFORE = {1: 2, 2: 4, 3: 7, 4: 9, 5: 10, 6: 13, 7: 16}
@@ -418,7 +422,7 @@ class Curriculum(unittest.TestCase):
         self.assertEqual(CUR.occurs(by["alif-lam"], a1), [3, 4])        # a QAC segment tagged DET
         self.assertEqual(CUR.occurs(by["alif-lam"], a2), [1, 4])        # not lillāhi: QAC has no DET there
         self.assertEqual(CUR.occurs(by["kalimah"], a3), [1, 2])         # always: every word is one of the three kinds
-        self.assertEqual(CUR.occurs(by["harakat"], a1), [])             # a basics step is never marked here
+        self.assertEqual(CUR.occurs(by["harakat"], a1), [1, 2, 3, 4])   # a basics step: on every letter (2026-10-17)
         self.assertEqual(CUR.occurs(by["idhafah"], a1), [1, 2])         # tagged, and the words of its structure group
         self.assertEqual(CUR.occurs(by["jamak-taksir"], a1), [])        # no record, no rule: nowhere yet
         self.assertEqual(CUR.qac_tags(a3["words"][0]), ["DET", "ADJ"])
@@ -500,7 +504,10 @@ class Curriculum(unittest.TestCase):
             self.assertEqual(namer.shown(s["latin"]), s["name"], s["id"])
         self.assertEqual(step(CONTENT, "majrur")["name"], "Majrur (مَجْرُور)")
         self.assertEqual(step(CONTENT, "murab-mabni")["name"], "Mu’rab (مُعْرَب) dan mabni (مَبْنِيّ)")
-        self.assertEqual(step(CONTENT, "kalimah")["name"], "Tiga jenis kata")
+        # the three kinds named with their members (operator 2026-10-17: "add in parenthesis what are
+        # tiga jenis kata"), the Arabic of each by the bracket rule ("yaitu …": no term inside brackets)
+        self.assertEqual(step(CONTENT, "kalimah")["name"], "Tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف)")
+        self.assertEqual(step(CONTENT, "kalimah")["latin"], "Tiga jenis kata (isim, fi'il, dan huruf)")
         # No name holds a Qur'anic word (2026-10-13: "Lam nafi" and "Lā nafi" were renamed "Huruf
         # nafi yang menjazmkan" and "Huruf nafi") …
         errs, notes = VC.speech_problems(AUTHORED, LESSONS, LIBRARY, namer, SWITCHED)

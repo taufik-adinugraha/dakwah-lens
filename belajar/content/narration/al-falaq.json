@@ -19,48 +19,48 @@
       "focus": null
     },
     "al-falaq:1:w1": {
-      "text": "Kata pertama artinya: katakanlah. Kata perintah, atau فِعْل أَمْر, ini مَبْنِيّ di atas سُكُون, jadi akhirnya tetap; pelakunya tersirat, yaitu engkau.",
-      "display": "Kata pertama artinya: “katakanlah”. Kata perintah, atau fi’il amr (فِعْل أَمْر), ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”.",
+      "text": "Kata pertama, yaitu qul, artinya: katakanlah. Kata perintah, atau فِعْل أَمْر, ini مَبْنِيّ di atas سُكُون, jadi akhirnya tetap; pelakunya tersirat, yaitu engkau.",
+      "display": "Kata pertama, yaitu قُلْ (qul), artinya: “katakanlah”. Kata perintah, atau fi’il amr (فِعْل أَمْر), ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”.",
       "highlight": [
         1
       ],
       "focus": "113:1:1"
     },
     "al-falaq:1:w2": {
-      "text": "Kata kedua artinya: aku berlindung. Akhirnya dibaca dhommah, karena fi'il mudhori' ini tidak didahului huruf نَاصِب atau جَازِم; pelakunya tersirat, yaitu aku.",
-      "display": "Kata kedua artinya: “aku berlindung”. Akhirnya dibaca dhammah (ضَمَّة), karena fi’il mudhari’ (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”.",
+      "text": "Kata kedua, yaitu a'udzu, artinya: aku berlindung. Akhirnya dibaca dhommah, karena fi'il mudhori' ini tidak didahului huruf نَاصِب atau جَازِم; pelakunya tersirat, yaitu aku.",
+      "display": "Kata kedua, yaitu أَعُوذُ (a‘ūżu), artinya: “aku berlindung”. Akhirnya dibaca dhammah (ضَمَّة), karena fi’il mudhari’ (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”.",
       "highlight": [
         2
       ],
       "focus": "113:1:2"
     },
     "al-falaq:1:w3": {
-      "text": "Kata ketiga artinya: kepada Tuhan. Akhirnya dibaca كَسْرَة, karena kata ini didahului حَرْف جَرّ, yaitu huruf بَاء; frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat.",
-      "display": "Kata ketiga artinya: “kepada Tuhan”. Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf ba’ (بِ); frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat.",
+      "text": "Kata ketiga, yaitu birabbi, artinya: kepada Tuhan. Akhirnya dibaca كَسْرَة, karena kata ini didahului حَرْف جَرّ, yaitu huruf بَاء; frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat.",
+      "display": "Kata ketiga, yaitu بِرَبِّ (birabbi), artinya: “kepada Tuhan”. Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf بِ; frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat.",
       "highlight": [
         3
       ],
       "focus": "113:1:3"
     },
     "al-falaq:1:w4": {
-      "text": "Kata keempat artinya: subuh. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata ketiga, yang artinya Tuhan yang menguasai subuh.",
-      "display": "Kata keempat artinya: “subuh”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ketiga, yang artinya “Tuhan yang menguasai subuh”.",
+      "text": "Kata keempat, yaitu al-falaqi, artinya: subuh. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata ketiga, yaitu birabbi, yang artinya Tuhan yang menguasai subuh.",
+      "display": "Kata keempat, yaitu ٱلْفَلَقِ (al-falaqi), artinya: “subuh”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ketiga, yaitu بِرَبِّ (birabbi), yang artinya “Tuhan yang menguasai subuh”.",
       "highlight": [
         4
       ],
       "focus": "113:1:4"
     },
     "al-falaq:1:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kata pertama, yang artinya katakanlah, adalah kata perintah dengan pelaku tersirat, engkau.",
-      "display": "Sekarang susunan kalimatnya. Kata pertama, yang artinya “katakanlah”, adalah kata perintah dengan pelaku tersirat, “engkau”.",
+      "text": "Sekarang susunan kalimatnya. Kata pertama, yaitu qul, yang artinya katakanlah, adalah kata perintah dengan pelaku tersirat, engkau.",
+      "display": "Sekarang susunan kalimatnya. Kata pertama, yaitu قُلْ (qul), yang artinya “katakanlah”, adalah kata perintah dengan pelaku tersirat, “engkau”.",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-falaq:1:structure:b": {
-      "text": "Yang diperintahkan untuk diucapkan, kata kedua sampai keempat, yang artinya aku berlindung kepada Tuhan yang menguasai subuh, adalah kalimat kata kerja dengan pelaku tersirat aku; seluruhnya menjadi isi ucapan, maqul al-qaul, dan berkedudukan نَصْب. Kata ketiga bergantung pada kata kedua, dan kata ketiga disandarkan, atau idhofah, kepada kata keempat.",
-      "display": "Yang diperintahkan untuk diucapkan, kata kedua sampai keempat, yang artinya “aku berlindung kepada Tuhan yang menguasai subuh”, adalah kalimat kata kerja dengan pelaku tersirat “aku”; seluruhnya menjadi isi ucapan (maqul al-qaul) dan berkedudukan nashab (نَصْب). Kata ketiga bergantung pada kata kedua, dan kata ketiga disandarkan, atau idhafah (إِضَافَة), kepada kata keempat.",
+      "text": "Yang diperintahkan untuk diucapkan, kata kedua sampai keempat, yaitu a'udzu birabbi al-falaqi, yang artinya aku berlindung kepada Tuhan yang menguasai subuh, adalah kalimat kata kerja dengan pelaku tersirat aku; seluruhnya menjadi isi ucapan, maqul al-qaul, dan berkedudukan نَصْب. Kata ketiga bergantung pada kata kedua, dan kata ketiga disandarkan, atau idhofah, kepada kata keempat.",
+      "display": "Yang diperintahkan untuk diucapkan, kata kedua sampai keempat, yaitu أَعُوذُ (a‘ūżu) بِرَبِّ (birabbi) ٱلْفَلَقِ (al-falaqi), yang artinya “aku berlindung kepada Tuhan yang menguasai subuh”, adalah kalimat kata kerja dengan pelaku tersirat “aku”; seluruhnya menjadi isi ucapan (maqul al-qaul) dan berkedudukan nashab (نَصْب). Kata ketiga bergantung pada kata kedua, dan kata ketiga disandarkan, atau idhafah (إِضَافَة), kepada kata keempat.",
       "highlight": [
         0
       ],
@@ -75,26 +75,26 @@
       "focus": null
     },
     "al-falaq:1:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yang artinya katakanlah.",
-      "display": "Itu kata pertama, yang artinya “katakanlah”.",
+      "text": "Itu kata pertama, yaitu qul, yang artinya katakanlah.",
+      "display": "Itu kata pertama, yaitu قُلْ (qul), yang artinya “katakanlah”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:1:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yang artinya aku berlindung.",
-      "display": "Itu kata kedua, yang artinya “aku berlindung”.",
+      "text": "Itu kata kedua, yaitu a'udzu, yang artinya aku berlindung.",
+      "display": "Itu kata kedua, yaitu أَعُوذُ (a‘ūżu), yang artinya “aku berlindung”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:1:ex:tap-word:3:why": {
-      "text": "Itu kata ketiga, yang artinya kepada Tuhan.",
-      "display": "Itu kata ketiga, yang artinya “kepada Tuhan”.",
+      "text": "Itu kata ketiga, yaitu birabbi, yang artinya kepada Tuhan.",
+      "display": "Itu kata ketiga, yaitu بِرَبِّ (birabbi), yang artinya “kepada Tuhan”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:1:ex:tap-word:4:why": {
-      "text": "Itu kata keempat, yang artinya subuh.",
-      "display": "Itu kata keempat, yang artinya “subuh”.",
+      "text": "Itu kata keempat, yaitu al-falaqi, yang artinya subuh.",
+      "display": "Itu kata keempat, yaitu ٱلْفَلَقِ (al-falaqi), yang artinya “subuh”.",
       "highlight": [],
       "focus": null
     },
@@ -118,13 +118,13 @@
     },
     "al-falaq:1:ex:why-harakat:3:why": {
       "text": "Akhirnya dibaca كَسْرَة, karena kata ini didahului حَرْف جَرّ, yaitu huruf بَاء; frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat. Jadi, kata ini مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf ba’ (بِ); frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat. Jadi, kata ini majrur (مَجْرُور).",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf بِ; frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat. Jadi, kata ini majrur (مَجْرُور).",
       "highlight": [],
       "focus": null
     },
     "al-falaq:1:ex:why-harakat:4:why": {
-      "text": "Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata ketiga, yang artinya Tuhan yang menguasai subuh. Jadi, kata ini مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ketiga, yang artinya “Tuhan yang menguasai subuh”. Jadi, kata ini majrur (مَجْرُور).",
+      "text": "Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata ketiga, yaitu birabbi, yang artinya Tuhan yang menguasai subuh. Jadi, kata ini مَجْرُور.",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ketiga, yaitu بِرَبِّ (birabbi), yang artinya “Tuhan yang menguasai subuh”. Jadi, kata ini majrur (مَجْرُور).",
       "highlight": [],
       "focus": null
     },
@@ -148,13 +148,13 @@
     },
     "al-falaq:1:ex:sort-case:3:why": {
       "text": "Akhirnya dibaca كَسْرَة, karena kata ini didahului حَرْف جَرّ, yaitu huruf بَاء; frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat. Jadi, kata ini مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf ba’ (بِ); frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat. Jadi, kata ini majrur (مَجْرُور).",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf بِ; frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat. Jadi, kata ini majrur (مَجْرُور).",
       "highlight": [],
       "focus": null
     },
     "al-falaq:1:ex:sort-case:4:why": {
-      "text": "Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata ketiga, yang artinya Tuhan yang menguasai subuh. Jadi, kata ini مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ketiga, yang artinya “Tuhan yang menguasai subuh”. Jadi, kata ini majrur (مَجْرُور).",
+      "text": "Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata ketiga, yaitu birabbi, yang artinya Tuhan yang menguasai subuh. Jadi, kata ini مَجْرُور.",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ketiga, yaitu بِرَبِّ (birabbi), yang artinya “Tuhan yang menguasai subuh”. Jadi, kata ini majrur (مَجْرُور).",
       "highlight": [],
       "focus": null
     },
@@ -178,13 +178,13 @@
     },
     "al-falaq:1:ex:label-role:3:why": {
       "text": "Perannya: حَرْف جَرّ dan مَجْرُور. Akhirnya dibaca كَسْرَة, karena kata ini didahului حَرْف جَرّ, yaitu huruf بَاء; frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat.",
-      "display": "Perannya: huruf jar (حَرْف جَرّ) + majrur (مَجْرُور). Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf ba’ (بِ); frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat.",
+      "display": "Perannya: huruf jar (حَرْف جَرّ) + majrur (مَجْرُور). Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf بِ; frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:1:ex:label-role:4:why": {
-      "text": "Perannya: mudhof ilaih. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata ketiga, yang artinya Tuhan yang menguasai subuh.",
-      "display": "Perannya: mudhaf ilaih (مُضَاف إِلَيْه). Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ketiga, yang artinya “Tuhan yang menguasai subuh”.",
+      "text": "Perannya: mudhof ilaih. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata ketiga, yaitu birabbi, yang artinya Tuhan yang menguasai subuh.",
+      "display": "Perannya: mudhaf ilaih (مُضَاف إِلَيْه). Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ketiga, yaitu بِرَبِّ (birabbi), yang artinya “Tuhan yang menguasai subuh”.",
       "highlight": [],
       "focus": null
     },
@@ -219,48 +219,48 @@
       "focus": null
     },
     "al-falaq:2:w1": {
-      "text": "Kata pertama artinya: dari. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata yang artinya aku berlindung di ayat satu.",
-      "display": "Kata pertama artinya: “dari”. Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata yang artinya “aku berlindung” di ayat satu.",
+      "text": "Kata pertama, yaitu min, artinya: dari. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung.",
+      "display": "Kata pertama, yaitu مِن (min), artinya: “dari”. Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
       "highlight": [
         1
       ],
       "focus": "113:2:1"
     },
     "al-falaq:2:w2": {
-      "text": "Kata kedua artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata sesudahnya, kata ketiga.",
-      "display": "Kata kedua artinya: “kejahatan”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata sesudahnya, kata ketiga.",
+      "text": "Kata kedua, yaitu syarri, artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata sesudahnya, kata ketiga.",
+      "display": "Kata kedua, yaitu شَرِّ (syarri), artinya: “kejahatan”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata sesudahnya, kata ketiga.",
       "highlight": [
         2
       ],
       "focus": "113:2:2"
     },
     "al-falaq:2:w3": {
-      "text": "Kata ketiga artinya: makhluk, yang. اِسْم مَوْصُول, yaitu kata penghubung yang artinya yang, ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai mudhof ilaih dari kata kedua; shilah-nya adalah kata keempat, dan kata ganti yang kembali kepada kata ini dibuang, maksudnya yang Dia ciptakan.",
-      "display": "Kata ketiga artinya: “(makhluk) yang”. Isim maushul (اِسْم مَوْصُول), yaitu kata penghubung yang artinya “yang”, ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; shilah-nya adalah kata keempat, dan kata ganti yang kembali kepada kata ini dibuang, maksudnya “yang Dia ciptakan”.",
+      "text": "Kata ketiga, yaitu ma, artinya: makhluk, yang. اِسْم مَوْصُول, yaitu kata penghubung yang artinya yang, ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai mudhof ilaih dari kata kedua; shilah-nya adalah kata keempat, dan kata ganti yang kembali kepada kata ini dibuang, maksudnya yang Dia ciptakan.",
+      "display": "Kata ketiga, yaitu مَا (mā), artinya: “(makhluk) yang”. Isim maushul (اِسْم مَوْصُول), yaitu kata penghubung yang artinya “yang”, ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; shilah-nya adalah kata keempat, dan kata ganti yang kembali kepada kata ini dibuang, maksudnya “yang Dia ciptakan”.",
       "highlight": [
         3
       ],
       "focus": "113:2:3"
     },
     "al-falaq:2:w4": {
-      "text": "Kata keempat artinya: Dia ciptakan. فِعْل مَاضٍ ini مَبْنِيّ di atas فَتْحَة; pelakunya tersirat, yaitu Dia, Alloh subhanahu wa ta'ala, dan kalimat kata ini menjadi صِلَة bagi kata ketiga.",
-      "display": "Kata keempat artinya: “Dia ciptakan”. Fi’il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat, yaitu “Dia” (Allah subhanahu wa ta'ala), dan kalimat kata ini menjadi shilah (صِلَة) bagi kata ketiga.",
+      "text": "Kata keempat, yaitu kholaqo, artinya: Dia ciptakan. فِعْل مَاضٍ ini مَبْنِيّ di atas فَتْحَة; pelakunya tersirat, yaitu Dia, Alloh subhanahu wa ta'ala, dan kalimat kata ini menjadi صِلَة bagi kata ketiga.",
+      "display": "Kata keempat, yaitu خَلَقَ (khalaqa), artinya: “Dia ciptakan”. Fi’il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat, yaitu “Dia” (Allah subhanahu wa ta'ala), dan kalimat kata ini menjadi shilah (صِلَة) bagi kata ketiga.",
       "highlight": [
         4
       ],
       "focus": "113:2:4"
     },
     "al-falaq:2:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat satu: kata pertama dan kedua, yang artinya dari kejahatan, bergantung pada kata yang artinya aku berlindung di ayat satu, begitu pula frasa yang artinya dan dari kejahatan di ayat tiga, empat dan lima.",
-      "display": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat satu: kata pertama dan kedua, yang artinya “dari kejahatan”, bergantung pada kata yang artinya “aku berlindung” di ayat satu, begitu pula frasa yang artinya “dan dari kejahatan” di ayat tiga, empat dan lima.",
+      "text": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yaitu min syarri, yang artinya dari kejahatan, bergantung pada kata a'udzu yang artinya aku berlindung, begitu pula frasa yang artinya dan dari kejahatan di ayat tiga, empat dan lima.",
+      "display": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yaitu مِن (min) شَرِّ (syarri), yang artinya “dari kejahatan”, bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”, begitu pula frasa yang artinya “dan dari kejahatan” di ayat tiga, empat dan lima.",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-falaq:2:structure:b": {
-      "text": "Kata kedua disandarkan kepada kata ketiga, yang artinya yang, اِسْم مَوْصُول yang dijelaskan oleh صِلَة kata keempat, yang artinya Dia ciptakan; kata ganti yang kembali kepada kata ketiga dibuang. Sebagian ulama membaca kata ketiga sebagai huruf mashdariyyah, sehingga maknanya ciptaan-Nya.",
-      "display": "Kata kedua disandarkan kepada kata ketiga, yang artinya “yang”, isim maushul (اِسْم مَوْصُول) yang dijelaskan oleh shilah (صِلَة) kata keempat, yang artinya “Dia ciptakan”; kata ganti yang kembali kepada kata ketiga dibuang. Sebagian ulama membaca kata ketiga sebagai huruf mashdariyyah, sehingga maknanya “ciptaan-Nya”.",
+      "text": "Kata kedua disandarkan kepada kata ketiga, yaitu ma, yang artinya yang, اِسْم مَوْصُول yang dijelaskan oleh صِلَة kata keempat, yaitu kholaqo, yang artinya Dia ciptakan; kata ganti yang kembali kepada kata ketiga dibuang. Sebagian ulama membaca kata ketiga sebagai huruf mashdariyyah, sehingga maknanya ciptaan-Nya.",
+      "display": "Kata kedua disandarkan kepada kata ketiga, yaitu مَا (mā), yang artinya “yang”, isim maushul (اِسْم مَوْصُول) yang dijelaskan oleh shilah (صِلَة) kata keempat, yaitu خَلَقَ (khalaqa), yang artinya “Dia ciptakan”; kata ganti yang kembali kepada kata ketiga dibuang. Sebagian ulama membaca kata ketiga sebagai huruf mashdariyyah, sehingga maknanya “ciptaan-Nya”.",
       "highlight": [
         0
       ],
@@ -275,26 +275,26 @@
       "focus": null
     },
     "al-falaq:2:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yang artinya dari.",
-      "display": "Itu kata pertama, yang artinya “dari”.",
+      "text": "Itu kata pertama, yaitu min, yang artinya dari.",
+      "display": "Itu kata pertama, yaitu مِن (min), yang artinya “dari”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:2:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yang artinya kejahatan.",
-      "display": "Itu kata kedua, yang artinya “kejahatan”.",
+      "text": "Itu kata kedua, yaitu syarri, yang artinya kejahatan.",
+      "display": "Itu kata kedua, yaitu شَرِّ (syarri), yang artinya “kejahatan”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:2:ex:tap-word:3:why": {
-      "text": "Itu kata ketiga, yang artinya, makhluk, yang.",
-      "display": "Itu kata ketiga, yang artinya “(makhluk) yang”.",
+      "text": "Itu kata ketiga, yaitu ma, yang artinya, makhluk, yang.",
+      "display": "Itu kata ketiga, yaitu مَا (mā), yang artinya “(makhluk) yang”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:2:ex:tap-word:4:why": {
-      "text": "Itu kata keempat, yang artinya Dia ciptakan.",
-      "display": "Itu kata keempat, yang artinya “Dia ciptakan”.",
+      "text": "Itu kata keempat, yaitu kholaqo, yang artinya Dia ciptakan.",
+      "display": "Itu kata keempat, yaitu خَلَقَ (khalaqa), yang artinya “Dia ciptakan”.",
       "highlight": [],
       "focus": null
     },
@@ -353,8 +353,8 @@
       "focus": null
     },
     "al-falaq:2:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف جَرّ. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata yang artinya aku berlindung di ayat satu.",
-      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata yang artinya “aku berlindung” di ayat satu.",
+      "text": "Perannya: حَرْف جَرّ. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung.",
+      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
       "highlight": [],
       "focus": null
     },
@@ -407,56 +407,56 @@
       "focus": null
     },
     "al-falaq:3:w1": {
-      "text": "Kata pertama artinya: dan dari. وَاو adalah حَرْف عَطْف, yaitu penyambung, dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan pada frasa yang artinya dari kejahatan di ayat dua, sehingga juga bergantung pada kata yang artinya aku berlindung di ayat satu.",
-      "display": "Kata pertama artinya: “dan dari”. Wawu (وَ) adalah huruf ‘athaf (حَرْف عَطْف), yaitu penyambung, dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan pada frasa yang artinya “dari kejahatan” di ayat dua, sehingga juga bergantung pada kata yang artinya “aku berlindung” di ayat satu.",
+      "text": "Kata pertama, yaitu wa min, artinya: dan dari. وَاو adalah حَرْف عَطْف, yaitu penyambung, dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan pada frasa yang artinya dari kejahatan, sehingga bergantung pada kata a'udzu yang artinya aku berlindung.",
+      "display": "Kata pertama, yaitu وَمِن (wa min), artinya: “dan dari”. وَ adalah huruf ‘athaf (حَرْف عَطْف), yaitu penyambung, dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan pada frasa yang artinya “dari kejahatan”, sehingga bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
       "highlight": [
         1
       ],
       "focus": "113:3:1"
     },
     "al-falaq:3:w2": {
-      "text": "Kata kedua artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata ketiga.",
-      "display": "Kata kedua artinya: “kejahatan”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata ketiga.",
+      "text": "Kata kedua, yaitu syarri, artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata ketiga.",
+      "display": "Kata kedua, yaitu شَرِّ (syarri), artinya: “kejahatan”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata ketiga.",
       "highlight": [
         2
       ],
       "focus": "113:3:2"
     },
     "al-falaq:3:w3": {
-      "text": "Kata ketiga artinya: malam. Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini nakirah, tak tentu, tanpa alif lam.",
-      "display": "Kata ketiga artinya: “malam”. Akhirnya dibaca kasrah (كَسْرَة) bertanwin, karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini nakirah (tak tentu), tanpa alif lam (ال).",
+      "text": "Kata ketiga, yaitu ghasiqin, artinya: malam. Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini nakirah, tak tentu, tanpa alif lam.",
+      "display": "Kata ketiga, yaitu غَاسِقٍ (gāsiqin), artinya: “malam”. Akhirnya dibaca kasrah (كَسْرَة) bertanwin, karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini nakirah (tak tentu), tanpa alif lam (ال).",
       "highlight": [
         3
       ],
       "focus": "113:3:3"
     },
     "al-falaq:3:w4": {
-      "text": "Kata keempat artinya: apabila. Kata ini مَبْنِيّ di atas سُكُون dan berkedudukan نَصْب sebagai keterangan waktu, zharaf, murni, tanpa makna syarat; kalimat sesudahnya, kata kelima, menjadi mudhof ilaih baginya.",
-      "display": "Kata keempat artinya: “apabila”. Kata ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf) murni, tanpa makna syarat; kalimat sesudahnya, kata kelima, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
+      "text": "Kata keempat, yaitu idza, artinya: apabila. Kata ini مَبْنِيّ di atas سُكُون dan berkedudukan نَصْب sebagai keterangan waktu, zharaf, murni, tanpa makna syarat; kalimat sesudahnya, kata kelima, menjadi mudhof ilaih baginya.",
+      "display": "Kata keempat, yaitu إِذَا (iżā), artinya: “apabila”. Kata ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf) murni, tanpa makna syarat; kalimat sesudahnya, kata kelima, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
       "highlight": [
         4
       ],
       "focus": "113:3:4"
     },
     "al-falaq:3:w5": {
-      "text": "Kata kelima artinya: telah gelap gulita. فِعْل مَاضٍ ini مَبْنِيّ di atas فَتْحَة; pelakunya tersirat, ia, yaitu malam itu, dan kalimat kata ini berkedudukan جَرّ sebagai mudhof ilaih dari kata keempat.",
-      "display": "Kata kelima artinya: “telah gelap gulita”. Fi’il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“ia”, yaitu malam itu), dan kalimat kata ini berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari kata keempat.",
+      "text": "Kata kelima, yaitu waqaba, artinya: telah gelap gulita. فِعْل مَاضٍ ini مَبْنِيّ di atas فَتْحَة; pelakunya tersirat, ia, yaitu malam itu, dan kalimat kata ini berkedudukan جَرّ sebagai mudhof ilaih dari kata keempat.",
+      "display": "Kata kelima, yaitu وَقَبَ (waqaba), artinya: “telah gelap gulita”. Fi’il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“ia”, yaitu malam itu), dan kalimat kata ini berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari kata keempat.",
       "highlight": [
         5
       ],
       "focus": "113:3:5"
     },
     "al-falaq:3:structure:a": {
-      "text": "Sekarang susunan kalimatnya. وَاو yang artinya dan, menyambungkan, atau عَطْف, frasa ini dengan frasa yang artinya dari kejahatan di ayat dua, jadi ia juga bergantung pada kata yang artinya aku berlindung di ayat satu. Kata kedua disandarkan kepada kata ketiga, yang artinya malam.",
-      "display": "Sekarang susunan kalimatnya. Wawu (و) yang artinya “dan”, menyambungkan, atau ‘athaf (عَطْف), frasa ini dengan frasa yang artinya “dari kejahatan” di ayat dua, jadi ia juga bergantung pada kata yang artinya “aku berlindung” di ayat satu. Kata kedua disandarkan kepada kata ketiga, yang artinya “malam”.",
+      "text": "Sekarang susunan kalimatnya. وَاو yang artinya dan, menyambungkan, atau عَطْف, frasa ini dengan frasa yang artinya dari kejahatan, jadi ia bergantung pada kata a'udzu yang artinya aku berlindung. Kata kedua disandarkan kepada kata ketiga, yaitu ghasiqin, yang artinya malam.",
+      "display": "Sekarang susunan kalimatnya. و yang artinya “dan”, menyambungkan, atau ‘athaf (عَطْف), frasa ini dengan frasa yang artinya “dari kejahatan”, jadi ia bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”. Kata kedua disandarkan kepada kata ketiga, yaitu غَاسِقٍ (gāsiqin), yang artinya “malam”.",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-falaq:3:structure:b": {
-      "text": "Kata keempat, yang artinya apabila, di sini keterangan waktu, zharaf, murni tanpa makna syarat, dan kalimat kata kelima, yang artinya telah gelap gulita, menjadi mudhof ilaih baginya; kata keempat dikaitkan dengan kata yang artinya aku berlindung di ayat satu menurut al-Mujtaba dan as-Samin, atau dengan kata kedua menurut al-Jadwal.",
-      "display": "Kata keempat, yang artinya “apabila”, di sini keterangan waktu (zharaf) murni tanpa makna syarat, dan kalimat kata kelima, yang artinya “telah gelap gulita”, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya; kata keempat dikaitkan dengan kata yang artinya “aku berlindung” di ayat satu menurut al-Mujtaba dan as-Samin, atau dengan kata kedua menurut al-Jadwal.",
+      "text": "Kata keempat, yaitu idza, yang artinya apabila, di sini keterangan waktu, zharaf, murni tanpa makna syarat, dan kalimat kata kelima, yaitu waqaba, yang artinya telah gelap gulita, menjadi mudhof ilaih baginya; kata keempat dikaitkan dengan kata a'udzu yang artinya aku berlindung menurut al-Mujtaba dan as-Samin, atau dengan kata kedua menurut al-Jadwal.",
+      "display": "Kata keempat, yaitu إِذَا (iżā), yang artinya “apabila”, di sini keterangan waktu (zharaf) murni tanpa makna syarat, dan kalimat kata kelima, yaitu وَقَبَ (waqaba), yang artinya “telah gelap gulita”, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya; kata keempat dikaitkan dengan kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” menurut al-Mujtaba dan as-Samin, atau dengan kata kedua menurut al-Jadwal.",
       "highlight": [
         0
       ],
@@ -471,32 +471,32 @@
       "focus": null
     },
     "al-falaq:3:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yang artinya dan dari.",
-      "display": "Itu kata pertama, yang artinya “dan dari”.",
+      "text": "Itu kata pertama, yaitu wa min, yang artinya dan dari.",
+      "display": "Itu kata pertama, yaitu وَمِن (wa min), yang artinya “dan dari”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:3:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yang artinya kejahatan.",
-      "display": "Itu kata kedua, yang artinya “kejahatan”.",
+      "text": "Itu kata kedua, yaitu syarri, yang artinya kejahatan.",
+      "display": "Itu kata kedua, yaitu شَرِّ (syarri), yang artinya “kejahatan”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:3:ex:tap-word:3:why": {
-      "text": "Itu kata ketiga, yang artinya malam.",
-      "display": "Itu kata ketiga, yang artinya “malam”.",
+      "text": "Itu kata ketiga, yaitu ghasiqin, yang artinya malam.",
+      "display": "Itu kata ketiga, yaitu غَاسِقٍ (gāsiqin), yang artinya “malam”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:3:ex:tap-word:4:why": {
-      "text": "Itu kata keempat, yang artinya apabila.",
-      "display": "Itu kata keempat, yang artinya “apabila”.",
+      "text": "Itu kata keempat, yaitu idza, yang artinya apabila.",
+      "display": "Itu kata keempat, yaitu إِذَا (iżā), yang artinya “apabila”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:3:ex:tap-word:5:why": {
-      "text": "Itu kata kelima, yang artinya telah gelap gulita.",
-      "display": "Itu kata kelima, yang artinya “telah gelap gulita”.",
+      "text": "Itu kata kelima, yaitu waqaba, yang artinya telah gelap gulita.",
+      "display": "Itu kata kelima, yaitu وَقَبَ (waqaba), yang artinya “telah gelap gulita”.",
       "highlight": [],
       "focus": null
     },
@@ -567,8 +567,8 @@
       "focus": null
     },
     "al-falaq:3:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف, yaitu penyambung, dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan pada frasa yang artinya dari kejahatan di ayat dua, sehingga juga bergantung pada kata yang artinya aku berlindung di ayat satu.",
-      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). Wawu (و) adalah huruf ‘athaf (حَرْف عَطْف), yaitu penyambung, dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan pada frasa yang artinya “dari kejahatan” di ayat dua, sehingga juga bergantung pada kata yang artinya “aku berlindung” di ayat satu.",
+      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف, yaitu penyambung, dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan pada frasa yang artinya dari kejahatan, sehingga bergantung pada kata a'udzu yang artinya aku berlindung.",
+      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). و adalah huruf ‘athaf (حَرْف عَطْف), yaitu penyambung, dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan pada frasa yang artinya “dari kejahatan”, sehingga bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
       "highlight": [],
       "focus": null
     },
@@ -627,56 +627,56 @@
       "focus": null
     },
     "al-falaq:4:w1": {
-      "text": "Kata pertama artinya: dan dari. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa ini juga disambungkan pada kata pertama dan kedua sebelumnya, jadi tetap bergantung pada kata yang artinya aku berlindung di ayat satu.",
-      "display": "Kata pertama artinya: “dan dari”. Wawu (وَ) adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini juga disambungkan pada kata pertama dan kedua sebelumnya, jadi tetap bergantung pada kata yang artinya “aku berlindung” di ayat satu.",
+      "text": "Kata pertama, yaitu wa min, artinya: dan dari. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan dengan وَاو, jadi bergantung pada kata a'udzu yang artinya aku berlindung.",
+      "display": "Kata pertama, yaitu وَمِن (wa min), artinya: “dan dari”. وَ adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan dengan وَ, jadi bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
       "highlight": [
         1
       ],
       "focus": "113:4:1"
     },
     "al-falaq:4:w2": {
-      "text": "Kata kedua artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata ketiga.",
-      "display": "Kata kedua artinya: “kejahatan”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata ketiga.",
+      "text": "Kata kedua, yaitu syarri, artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata ketiga.",
+      "display": "Kata kedua, yaitu شَرِّ (syarri), artinya: “kejahatan”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata ketiga.",
       "highlight": [
         2
       ],
       "focus": "113:4:2"
     },
     "al-falaq:4:w3": {
-      "text": "Kata ketiga artinya: penyihir, perempuan, yang meniup. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata kedua; kata ini jamak dari naffasah, bentuk mubalaghah, yang artinya yang banyak meniup, dari اِسْم فَاعِل.",
-      "display": "Kata ketiga artinya: “penyihir (perempuan) yang meniup”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini jamak dari naffasah, bentuk mubalaghah, yang artinya “yang banyak meniup”, dari isim fa’il (اِسْم فَاعِل).",
+      "text": "Kata ketiga, yaitu an-naffatsati, artinya: penyihir, perempuan, yang meniup. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata kedua; kata ini jamak dari naffasah, bentuk mubalaghah, yang artinya yang banyak meniup, dari اِسْم فَاعِل.",
+      "display": "Kata ketiga, yaitu ٱلنَّفَّٰثَٰتِ (an-naffāṡāti), artinya: “penyihir (perempuan) yang meniup”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini jamak dari naffasah, bentuk mubalaghah, yang artinya “yang banyak meniup”, dari isim fa’il (اِسْم فَاعِل).",
       "highlight": [
         3
       ],
       "focus": "113:4:3"
     },
     "al-falaq:4:w4": {
-      "text": "Kata keempat artinya: pada. Kata ini adalah حَرْف جَرّ yang artinya pada; kata kelima sesudahnya menjadi مَجْرُور karenanya, dan frasa kata keempat dan kelima bergantung pada kata ketiga.",
-      "display": "Kata keempat artinya: “pada”. Kata ini adalah huruf jar (حَرْف جَرّ) yang artinya “pada”; kata kelima sesudahnya menjadi majrur (مَجْرُور) karenanya, dan frasa kata keempat dan kelima bergantung pada kata ketiga.",
+      "text": "Kata keempat, yaitu fi, artinya: pada. Kata ini adalah حَرْف جَرّ yang artinya pada; kata kelima sesudahnya menjadi مَجْرُور karenanya, dan frasa kata keempat dan kelima bergantung pada kata ketiga.",
+      "display": "Kata keempat, yaitu فِى (fī), artinya: “pada”. Kata ini adalah huruf jar (حَرْف جَرّ) yang artinya “pada”; kata kelima sesudahnya menjadi majrur (مَجْرُور) karenanya, dan frasa kata keempat dan kelima bergantung pada kata ketiga.",
       "highlight": [
         4
       ],
       "focus": "113:4:4"
     },
     "al-falaq:4:w5": {
-      "text": "Kata kelima artinya: buhul-buhul. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata keempat; kata ini jamak dari 'uqdah, buhul, simpul.",
-      "display": "Kata kelima artinya: “buhul-buhul”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata keempat; kata ini jamak dari 'uqdah (buhul, simpul).",
+      "text": "Kata kelima, yaitu al-'uqadi, artinya: buhul-buhul. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata keempat; kata ini jamak dari 'uqdah, buhul, simpul.",
+      "display": "Kata kelima, yaitu ٱلْعُقَدِ (al-‘uqadi), artinya: “buhul-buhul”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata keempat; kata ini jamak dari 'uqdah (buhul, simpul).",
       "highlight": [
         5
       ],
       "focus": "113:4:5"
     },
     "al-falaq:4:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Frasa ini juga disambungkan dengan عَطْف pada kata pertama dan kedua sebelumnya, jadi tetap bergantung pada kata yang artinya aku berlindung di ayat satu.",
-      "display": "Sekarang susunan kalimatnya. Frasa ini juga disambungkan dengan ‘athaf (عَطْف) pada kata pertama dan kedua sebelumnya, jadi tetap bergantung pada kata yang artinya “aku berlindung” di ayat satu.",
+      "text": "Sekarang susunan kalimatnya. Frasa ini disambungkan dengan عَطْف dengan وَاو, jadi bergantung pada kata a'udzu yang artinya aku berlindung. Kata kedua disandarkan kepada kata ketiga, yaitu an-naffatsati, yang artinya para peniup, bentuk jamak dari naffasah, yaitu bentuk mubalaghah, yang artinya yang banyak meniup, dari اِسْم فَاعِل.",
+      "display": "Sekarang susunan kalimatnya. Frasa ini disambungkan dengan ‘athaf (عَطْف) dengan و, jadi bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”. Kata kedua disandarkan kepada kata ketiga, yaitu ٱلنَّفَّٰثَٰتِ (an-naffāṡāti), yang artinya “para peniup”, bentuk jamak dari naffasah, yaitu bentuk mubalaghah, yang artinya “yang banyak meniup”, dari isim fa’il (اِسْم فَاعِل).",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-falaq:4:structure:b": {
-      "text": "Kata kedua disandarkan kepada kata ketiga, yang artinya para peniup, bentuk jamak dari naffasah, yaitu bentuk mubalaghah, yang artinya yang banyak meniup, dari اِسْم فَاعِل. Frasa kata keempat dan kelima, yang artinya pada buhul-buhul, bergantung pada kata ketiga, Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as.",
-      "display": "Kata kedua disandarkan kepada kata ketiga, yang artinya “para peniup”, bentuk jamak dari naffasah, yaitu bentuk mubalaghah, yang artinya “yang banyak meniup”, dari isim fa’il (اِسْم فَاعِل). Frasa kata keempat dan kelima, yang artinya “pada buhul-buhul”, bergantung pada kata ketiga (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
+      "text": "Frasa kata keempat dan kelima, yaitu fi al-'uqadi, yang artinya pada buhul-buhul, bergantung pada kata ketiga, Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as.",
+      "display": "Frasa kata keempat dan kelima, yaitu فِى (fī) ٱلْعُقَدِ (al-‘uqadi), yang artinya “pada buhul-buhul”, bergantung pada kata ketiga (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
       "highlight": [
         0
       ],
@@ -691,32 +691,32 @@
       "focus": null
     },
     "al-falaq:4:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yang artinya dan dari.",
-      "display": "Itu kata pertama, yang artinya “dan dari”.",
+      "text": "Itu kata pertama, yaitu wa min, yang artinya dan dari.",
+      "display": "Itu kata pertama, yaitu وَمِن (wa min), yang artinya “dan dari”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:4:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yang artinya kejahatan.",
-      "display": "Itu kata kedua, yang artinya “kejahatan”.",
+      "text": "Itu kata kedua, yaitu syarri, yang artinya kejahatan.",
+      "display": "Itu kata kedua, yaitu شَرِّ (syarri), yang artinya “kejahatan”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:4:ex:tap-word:3:why": {
-      "text": "Itu kata ketiga, yang artinya penyihir, perempuan, yang meniup.",
-      "display": "Itu kata ketiga, yang artinya “penyihir (perempuan) yang meniup”.",
+      "text": "Itu kata ketiga, yaitu an-naffatsati, yang artinya penyihir, perempuan, yang meniup.",
+      "display": "Itu kata ketiga, yaitu ٱلنَّفَّٰثَٰتِ (an-naffāṡāti), yang artinya “penyihir (perempuan) yang meniup”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:4:ex:tap-word:4:why": {
-      "text": "Itu kata keempat, yang artinya pada.",
-      "display": "Itu kata keempat, yang artinya “pada”.",
+      "text": "Itu kata keempat, yaitu fi, yang artinya pada.",
+      "display": "Itu kata keempat, yaitu فِى (fī), yang artinya “pada”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:4:ex:tap-word:5:why": {
-      "text": "Itu kata kelima, yang artinya buhul-buhul.",
-      "display": "Itu kata kelima, yang artinya “buhul-buhul”.",
+      "text": "Itu kata kelima, yaitu al-'uqadi, yang artinya buhul-buhul.",
+      "display": "Itu kata kelima, yaitu ٱلْعُقَدِ (al-‘uqadi), yang artinya “buhul-buhul”.",
       "highlight": [],
       "focus": null
     },
@@ -775,8 +775,8 @@
       "focus": null
     },
     "al-falaq:4:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa ini juga disambungkan pada kata pertama dan kedua sebelumnya, jadi tetap bergantung pada kata yang artinya aku berlindung di ayat satu.",
-      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). Wawu (و) adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini juga disambungkan pada kata pertama dan kedua sebelumnya, jadi tetap bergantung pada kata yang artinya “aku berlindung” di ayat satu.",
+      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan dengan وَاو, jadi bergantung pada kata a'udzu yang artinya aku berlindung.",
+      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). و adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan dengan و, jadi bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
       "highlight": [],
       "focus": null
     },
@@ -835,56 +835,56 @@
       "focus": null
     },
     "al-falaq:5:w1": {
-      "text": "Kata pertama artinya: dan dari. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa terakhir ini pun disambungkan pada kata pertama dan kedua sebelumnya dan bergantung pada kata yang artinya aku berlindung di ayat satu.",
-      "display": "Kata pertama artinya: “dan dari”. Wawu (وَ) adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa terakhir ini pun disambungkan pada kata pertama dan kedua sebelumnya dan bergantung pada kata yang artinya “aku berlindung” di ayat satu.",
+      "text": "Kata pertama, yaitu wa min, artinya: dan dari. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa terakhir ini disambungkan dengan وَاو dan bergantung pada kata a'udzu yang artinya aku berlindung.",
+      "display": "Kata pertama, yaitu وَمِن (wa min), artinya: “dan dari”. وَ adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa terakhir ini disambungkan dengan وَ dan bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
       "highlight": [
         1
       ],
       "focus": "113:5:1"
     },
     "al-falaq:5:w2": {
-      "text": "Kata kedua artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata ketiga.",
-      "display": "Kata kedua artinya: “kejahatan”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata ketiga.",
+      "text": "Kata kedua, yaitu syarri, artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata ketiga.",
+      "display": "Kata kedua, yaitu شَرِّ (syarri), artinya: “kejahatan”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata ketiga.",
       "highlight": [
         2
       ],
       "focus": "113:5:2"
     },
     "al-falaq:5:w3": {
-      "text": "Kata ketiga artinya: orang yang dengki. Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini adalah اِسْم فَاعِل dari kata kelima, yang artinya yang dengki, dan di sini nakirah, tanpa alif lam.",
-      "display": "Kata ketiga artinya: “orang yang dengki”. Akhirnya dibaca kasrah (كَسْرَة) bertanwin, karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini adalah isim fa’il (اِسْم فَاعِل) dari kata kelima, yang artinya “yang dengki”, dan di sini nakirah, tanpa alif lam (ال).",
+      "text": "Kata ketiga, yaitu hasidin, artinya: orang yang dengki. Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini adalah اِسْم فَاعِل dari kata kelima, yaitu hasada, yang artinya yang dengki, dan di sini nakirah, tanpa alif lam.",
+      "display": "Kata ketiga, yaitu حَاسِدٍ (ḥāsidin), artinya: “orang yang dengki”. Akhirnya dibaca kasrah (كَسْرَة) bertanwin, karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini adalah isim fa’il (اِسْم فَاعِل) dari kata kelima, yaitu حَسَدَ (ḥasada), yang artinya “yang dengki”, dan di sini nakirah, tanpa alif lam (ال).",
       "highlight": [
         3
       ],
       "focus": "113:5:3"
     },
     "al-falaq:5:w4": {
-      "text": "Kata keempat artinya: apabila. Kata ini مَبْنِيّ di atas سُكُون dan berkedudukan نَصْب sebagai keterangan waktu, zharaf, murni; kalimat sesudahnya, kata kelima, menjadi mudhof ilaih baginya.",
-      "display": "Kata keempat artinya: “apabila”. Kata ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf) murni; kalimat sesudahnya, kata kelima, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
+      "text": "Kata keempat, yaitu idza, artinya: apabila. Kata ini مَبْنِيّ di atas سُكُون dan berkedudukan نَصْب sebagai keterangan waktu, zharaf, murni; kalimat sesudahnya, kata kelima, menjadi mudhof ilaih baginya.",
+      "display": "Kata keempat, yaitu إِذَا (iżā), artinya: “apabila”. Kata ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf) murni; kalimat sesudahnya, kata kelima, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
       "highlight": [
         4
       ],
       "focus": "113:5:4"
     },
     "al-falaq:5:w5": {
-      "text": "Kata kelima artinya: dia dengki. فِعْل مَاضٍ ini مَبْنِيّ di atas فَتْحَة; pelakunya tersirat, dia, yaitu orang yang dengki itu, dan kalimat kata ini berkedudukan جَرّ sebagai mudhof ilaih dari kata keempat.",
-      "display": "Kata kelima artinya: “dia dengki”. Fi’il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“dia”, yaitu orang yang dengki itu), dan kalimat kata ini berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari kata keempat.",
+      "text": "Kata kelima, yaitu hasada, artinya: dia dengki. فِعْل مَاضٍ ini مَبْنِيّ di atas فَتْحَة; pelakunya tersirat, dia, yaitu orang yang dengki itu, dan kalimat kata ini berkedudukan جَرّ sebagai mudhof ilaih dari kata keempat.",
+      "display": "Kata kelima, yaitu حَسَدَ (ḥasada), artinya: “dia dengki”. Fi’il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“dia”, yaitu orang yang dengki itu), dan kalimat kata ini berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari kata keempat.",
       "highlight": [
         5
       ],
       "focus": "113:5:5"
     },
     "al-falaq:5:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Polanya sama dengan ayat tiga, dan Darwisy menyebut i'rab-nya jelas: frasa ini disambungkan dengan عَطْف pada kata pertama dan kedua sebelumnya, kata kedua disandarkan kepada kata ketiga, yang artinya orang yang dengki, lalu kata keempat, yang artinya apabila, menjadi keterangan waktu dengan kalimat kata kelima, yang artinya dia dengki, sebagai mudhof ilaih baginya.",
-      "display": "Sekarang susunan kalimatnya. Polanya sama dengan ayat tiga, dan Darwisy menyebut i'rab-nya “jelas”: frasa ini disambungkan dengan ‘athaf (عَطْف) pada kata pertama dan kedua sebelumnya, kata kedua disandarkan kepada kata ketiga, yang artinya “orang yang dengki”, lalu kata keempat, yang artinya “apabila”, menjadi keterangan waktu dengan kalimat kata kelima, yang artinya “dia dengki”, sebagai mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
+      "text": "Sekarang susunan kalimatnya. Darwisy menyebut i'rab-nya jelas: frasa ini disambungkan dengan عَطْف dengan وَاو, kata kedua disandarkan kepada kata ketiga, yaitu hasidin, yang artinya orang yang dengki, lalu kata keempat, yaitu idza, yang artinya apabila, menjadi keterangan waktu dengan kalimat kata kelima, yaitu hasada, yang artinya dia dengki, sebagai mudhof ilaih baginya.",
+      "display": "Sekarang susunan kalimatnya. Darwisy menyebut i'rab-nya “jelas”: frasa ini disambungkan dengan ‘athaf (عَطْف) dengan و, kata kedua disandarkan kepada kata ketiga, yaitu حَاسِدٍ (ḥāsidin), yang artinya “orang yang dengki”, lalu kata keempat, yaitu إِذَا (iżā), yang artinya “apabila”, menjadi keterangan waktu dengan kalimat kata kelima, yaitu حَسَدَ (ḥasada), yang artinya “dia dengki”, sebagai mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-falaq:5:structure:b": {
-      "text": "Al-Mujtaba mengaitkan kata keempat dengan kata yang artinya aku berlindung di ayat satu, sedangkan al-Jadwal dengan kata kedua.",
-      "display": "Al-Mujtaba mengaitkan kata keempat dengan kata yang artinya “aku berlindung” di ayat satu, sedangkan al-Jadwal dengan kata kedua.",
+      "text": "Al-Mujtaba mengaitkan kata keempat dengan kata a'udzu yang artinya aku berlindung, sedangkan al-Jadwal dengan kata kedua.",
+      "display": "Al-Mujtaba mengaitkan kata keempat dengan kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”, sedangkan al-Jadwal dengan kata kedua.",
       "highlight": [
         0
       ],
@@ -899,32 +899,32 @@
       "focus": null
     },
     "al-falaq:5:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yang artinya dan dari.",
-      "display": "Itu kata pertama, yang artinya “dan dari”.",
+      "text": "Itu kata pertama, yaitu wa min, yang artinya dan dari.",
+      "display": "Itu kata pertama, yaitu وَمِن (wa min), yang artinya “dan dari”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:5:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yang artinya kejahatan.",
-      "display": "Itu kata kedua, yang artinya “kejahatan”.",
+      "text": "Itu kata kedua, yaitu syarri, yang artinya kejahatan.",
+      "display": "Itu kata kedua, yaitu شَرِّ (syarri), yang artinya “kejahatan”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:5:ex:tap-word:3:why": {
-      "text": "Itu kata ketiga, yang artinya orang yang dengki.",
-      "display": "Itu kata ketiga, yang artinya “orang yang dengki”.",
+      "text": "Itu kata ketiga, yaitu hasidin, yang artinya orang yang dengki.",
+      "display": "Itu kata ketiga, yaitu حَاسِدٍ (ḥāsidin), yang artinya “orang yang dengki”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:5:ex:tap-word:4:why": {
-      "text": "Itu kata keempat, yang artinya apabila.",
-      "display": "Itu kata keempat, yang artinya “apabila”.",
+      "text": "Itu kata keempat, yaitu idza, yang artinya apabila.",
+      "display": "Itu kata keempat, yaitu إِذَا (iżā), yang artinya “apabila”.",
       "highlight": [],
       "focus": null
     },
     "al-falaq:5:ex:tap-word:5:why": {
-      "text": "Itu kata kelima, yang artinya dia dengki.",
-      "display": "Itu kata kelima, yang artinya “dia dengki”.",
+      "text": "Itu kata kelima, yaitu hasada, yang artinya dia dengki.",
+      "display": "Itu kata kelima, yaitu حَسَدَ (ḥasada), yang artinya “dia dengki”.",
       "highlight": [],
       "focus": null
     },
@@ -941,8 +941,8 @@
       "focus": null
     },
     "al-falaq:5:ex:why-harakat:2:why": {
-      "text": "Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini adalah اِسْم فَاعِل dari kata kelima, yang artinya yang dengki, dan di sini nakirah, tanpa alif lam. Jadi, kata ini مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة) bertanwin, karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini adalah isim fa’il (اِسْم فَاعِل) dari kata kelima, yang artinya “yang dengki”, dan di sini nakirah, tanpa alif lam (ال). Jadi, kata ini majrur (مَجْرُور).",
+      "text": "Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini adalah اِسْم فَاعِل dari kata kelima, yaitu hasada, yang artinya yang dengki, dan di sini nakirah, tanpa alif lam. Jadi, kata ini مَجْرُور.",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة) bertanwin, karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini adalah isim fa’il (اِسْم فَاعِل) dari kata kelima, yaitu حَسَدَ (ḥasada), yang artinya “yang dengki”, dan di sini nakirah, tanpa alif lam (ال). Jadi, kata ini majrur (مَجْرُور).",
       "highlight": [],
       "focus": null
     },
@@ -971,8 +971,8 @@
       "focus": null
     },
     "al-falaq:5:ex:sort-case:2:why": {
-      "text": "Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini adalah اِسْم فَاعِل dari kata kelima, yang artinya yang dengki, dan di sini nakirah, tanpa alif lam. Jadi, kata ini مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة) bertanwin, karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini adalah isim fa’il (اِسْم فَاعِل) dari kata kelima, yang artinya “yang dengki”, dan di sini nakirah, tanpa alif lam (ال). Jadi, kata ini majrur (مَجْرُور).",
+      "text": "Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini adalah اِسْم فَاعِل dari kata kelima, yaitu hasada, yang artinya yang dengki, dan di sini nakirah, tanpa alif lam. Jadi, kata ini مَجْرُور.",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة) bertanwin, karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini adalah isim fa’il (اِسْم فَاعِل) dari kata kelima, yaitu حَسَدَ (ḥasada), yang artinya “yang dengki”, dan di sini nakirah, tanpa alif lam (ال). Jadi, kata ini majrur (مَجْرُور).",
       "highlight": [],
       "focus": null
     },
@@ -995,8 +995,8 @@
       "focus": null
     },
     "al-falaq:5:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa terakhir ini pun disambungkan pada kata pertama dan kedua sebelumnya dan bergantung pada kata yang artinya aku berlindung di ayat satu.",
-      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). Wawu (و) adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa terakhir ini pun disambungkan pada kata pertama dan kedua sebelumnya dan bergantung pada kata yang artinya “aku berlindung” di ayat satu.",
+      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa terakhir ini disambungkan dengan وَاو dan bergantung pada kata a'udzu yang artinya aku berlindung.",
+      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). و adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa terakhir ini disambungkan dengan و dan bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
       "highlight": [],
       "focus": null
     },
@@ -1007,8 +1007,8 @@
       "focus": null
     },
     "al-falaq:5:ex:label-role:3:why": {
-      "text": "Perannya: mudhof ilaih. Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini adalah اِسْم فَاعِل dari kata kelima, yang artinya yang dengki, dan di sini nakirah, tanpa alif lam.",
-      "display": "Perannya: mudhaf ilaih (مُضَاف إِلَيْه). Akhirnya dibaca kasrah (كَسْرَة) bertanwin, karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini adalah isim fa’il (اِسْم فَاعِل) dari kata kelima, yang artinya “yang dengki”, dan di sini nakirah, tanpa alif lam (ال).",
+      "text": "Perannya: mudhof ilaih. Akhirnya dibaca كَسْرَة bertanwin, karena menjadi mudhof ilaih dari kata kedua; kata ini adalah اِسْم فَاعِل dari kata kelima, yaitu hasada, yang artinya yang dengki, dan di sini nakirah, tanpa alif lam.",
+      "display": "Perannya: mudhaf ilaih (مُضَاف إِلَيْه). Akhirnya dibaca kasrah (كَسْرَة) bertanwin, karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kedua; kata ini adalah isim fa’il (اِسْم فَاعِل) dari kata kelima, yaitu حَسَدَ (ḥasada), yang artinya “yang dengki”, dan di sini nakirah, tanpa alif lam (ال).",
       "highlight": [],
       "focus": null
     },

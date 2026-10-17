@@ -84,15 +84,15 @@ const OPENING = MAP_GROUPS.map((g) => `map:${g}`);
 /** Al-Fatihah, measured on 2026-10-13 (the same table as pipeline/test_validate_map.py and
  *  curriculum.test.ts): ayah → [new, the learnt steps that occur here, later, lanjut]. */
 const TABLE: Record<number, [string[], string[], string[], string[]]> = {
-  1: [["majrur", "huruf-jar"], ["kalimah"], ["alif-lam", "naat", "idhafah"], ["syibhul-jumlah"]],
-  2: [["jumlah-ismiyyah", "marfu", "jamak-mudzakkar-salim"], ["kalimah", "majrur", "huruf-jar"], ["alif-lam", "naat", "idhafah", "badal"], ["syibhul-jumlah", "wazan-dan-tashrif"]],
-  3: [["alif-lam", "naat"], ["kalimah", "majrur"], [], ["wazan-dan-tashrif"]],
-  4: [["idhafah"], ["kalimah", "majrur", "alif-lam", "naat"], [], ["wazan-dan-tashrif", "isim-fail"]],
-  5: [["dhamir", "fiil-mudhari", "murab-mabni"], ["kalimah", "marfu"], ["jumlah-filiyyah", "maful-bih", "athaf"], ["taqdim-maful", "bab-istifal", "ilal"]],
-  6: [["jumlah-filiyyah", "maful-bih", "manshub"], ["kalimah", "alif-lam", "naat", "dhamir"], ["fiil-amr"], ["isim-fail", "bab-istifal", "ilal"]],
+  1: [["majrur", "huruf-jar"], ["harakat", "kalimah"], ["alif-lam", "naat", "idhafah"], ["syibhul-jumlah"]],
+  2: [["jumlah-ismiyyah", "marfu", "jamak-mudzakkar-salim"], ["harakat", "kalimah", "majrur", "huruf-jar"], ["alif-lam", "naat", "idhafah", "badal"], ["syibhul-jumlah", "wazan-dan-tashrif"]],
+  3: [["alif-lam", "naat"], ["harakat", "kalimah", "majrur"], [], ["wazan-dan-tashrif"]],
+  4: [["idhafah"], ["harakat", "kalimah", "majrur", "alif-lam", "naat"], [], ["wazan-dan-tashrif", "isim-fail"]],
+  5: [["dhamir", "fiil-mudhari", "murab-mabni"], ["harakat", "kalimah", "marfu"], ["jumlah-filiyyah", "maful-bih", "athaf"], ["taqdim-maful", "bab-istifal", "ilal"]],
+  6: [["jumlah-filiyyah", "maful-bih", "manshub"], ["harakat", "kalimah", "alif-lam", "naat", "dhamir"], ["fiil-amr"], ["isim-fail", "bab-istifal", "ilal"]],
   7: [
     ["isim-maushul", "fiil-madhi", "athaf"],
-    ["kalimah", "majrur", "huruf-jar", "jamak-mudzakkar-salim", "alif-lam", "idhafah", "dhamir", "murab-mabni", "jumlah-filiyyah", "manshub"],
+    ["harakat", "kalimah", "majrur", "huruf-jar", "jamak-mudzakkar-salim", "alif-lam", "idhafah", "dhamir", "murab-mabni", "jumlah-filiyyah", "manshub"],
     ["badal"],
     ["isim-fail", "bab-ifal", "isim-maful", "naib-fail"],
   ],
@@ -139,7 +139,7 @@ describe("the lesson map file (content/map) and the per-surah switch", () => {
     // and the sentence that points ahead there stays (the curriculum teaches marfu' in ayah 2).
     expect(FILE.ayat[0].later).not.toContain("marfu");
     for (const [lid, l] of Object.entries(lines)) if (lid.startsWith("al-fatihah:1:")) expect(l.display!.toLowerCase(), lid).not.toContain("marfu");
-    expect(lines["al-fatihah:1:w1:compose:3"].display).toMatch(/Mengapa dhammah \(ضَمَّة\), kita pelajari di ayat kedua\.$/);
+    expect(lines["al-fatihah:1:w1:compose:3"].display).toMatch(/Mengapa dhammah \(ضَمَّة\), baru akan diajarkan lebih lengkap di ayat kedua\.$/);
     // From ayah 3 on it is learnt, and marked wherever a word is marfu' (the two verbs of ayah 5).
     expect(lessonMapInput("al-fatihah", 3)!.learnt.find((x) => x.id === "marfu")).toMatchObject({ here: false });
     expect(lessonMapInput("al-fatihah", 5)!.learnt.find((x) => x.id === "marfu")).toMatchObject({ here: true });
@@ -208,7 +208,7 @@ describe("the lesson map file (content/map) and the per-surah switch", () => {
     expect(fault((f) => entry(f, 2).new.pop())).toContain("ayah 2: new");
     // learnt is the whole list so far, `here` exactly where the step occurs.
     expect(fault((f) => entry(f, 5).learnt.shift())).toContain("ayah 5: learnt");
-    expect(fault((f) => (entry(f, 1).learnt[0].here = true))).toContain("ayah 1: learnt");
+    expect(fault((f) => (entry(f, 1).learnt[0].here = false))).toContain("ayah 1: learnt"); // the harakat: every ayah (2026-10-17)
     // later really later, learnt really earlier; a step in two groups.
     expect(fault((f) => entry(f, 1).later.push("badal"))).toContain("ayah 1: later");
     expect(fault((f) => entry(f, 1).learnt.push({ id: entry(f, 1).later.shift()!, here: true }))).toContain("learnt lists alif-lam, which is not taught earlier");
@@ -410,9 +410,9 @@ describe("the lesson map in the autoplay sequence", () => {
     expect(t.lessonMap.learnt({ learnt: ["harakat", "tiga jenis kata"] })).toBe("Sebelum ayat ini, kita sudah mempelajari 2 hal, yaitu harakat dan tiga jenis kata.");
     expect(t.lessonMap.again({ again: ["tiga jenis kata"] })).toBe("Yang kita temui lagi di ayat ini adalah tiga jenis kata.");
     expect(t.lessonMap.later({ later: later([3, 3, 4]), lanjut: 1 })).toBe(
-      "Ada 3 hal lagi di ayat ini, tetapi baru kita bahas nanti: alif lam di ayat 3, na’t di ayat 3, dan idhafah di ayat 4. Ada juga 1 hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
+      "Ada 3 hal lagi di ayat ini, tetapi baru akan diajarkan lebih lengkap nanti: alif lam di ayat 3, na’t di ayat 3, dan idhafah di ayat 4. Ada juga 1 hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
     );
-    expect(t.lessonMap.later({ later: later([3, 3]), lanjut: 0 })).toBe("Ada 2 hal lagi di ayat ini, yaitu alif lam dan na’t, tetapi baru kita bahas di ayat 3.");
+    expect(t.lessonMap.later({ later: later([3, 3]), lanjut: 0 })).toBe("Ada 2 hal lagi di ayat ini, yaitu alif lam dan na’t, tetapi baru akan diajarkan lebih lengkap di ayat 3.");
     expect(t.lessonMap.focus({ later: 3, lanjut: 1, new: ["majrur", "huruf jar"], again: [] })).toBe(
       "Sekarang Anda tidak perlu menghafal ketiganya, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada pelajaran majrur dan huruf jar terlebih dahulu.",
     );
@@ -707,8 +707,9 @@ describe("the lesson map's card: one group at a time", () => {
       expect(flows.filter((f) => !f.here).map((f) => f.cls.includes("max-sm:hidden")), `ayah ${a.ayah}`).toEqual(rest.length ? [true] : []);
       expect(flows.filter((f) => f.here).map((f) => f.cls.includes("max-sm:hidden")), `ayah ${a.ayah}`).toEqual(full ? [] : [false]);
     }
-    // Ayat 4, 6 and 7 repeat more than three steps (ayah 7: ten): a flowing line of their names.
-    expect(FATIHAH.ayat.filter((a) => mapHere(lessonMapInput("al-fatihah", a.ayah)!).length > MAP_HERE_FULL).map((a) => a.ayah)).toEqual([4, 6, 7]);
+    // Ayat 2, 4, 6 and 7 repeat more than three steps (ayah 7: eleven; the harakat count in every
+    // ayah since 2026-10-17): a flowing line of their names.
+    expect(FATIHAH.ayat.filter((a) => mapHere(lessonMapInput("al-fatihah", a.ayah)!).length > MAP_HERE_FULL).map((a) => a.ayah)).toEqual([2, 4, 6, 7]);
     expect(MAP_HERE_FULL).toBe(3);
     // No learnt step comes up again: said plainly.
     const none: LessonMapInput = { surah: 1, new: [], learnt: [{ id: "naat", name: "Na’t (نَعْت)", here: false }], later: [], lanjut: [] };

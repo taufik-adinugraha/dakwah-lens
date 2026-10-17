@@ -633,7 +633,7 @@
       ],
       "structure": {
         "type": "jumlah ismiyyah",
-        "summary": "Kalimat nominal: Allāhu menjadi mubtada' dan aṣ-ṣamadu khabarnya (Darwisy, al-Mujtaba); al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khabar kedua bagi huwa di ayat 1, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu. Lafaz Allah diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan; menurut Darwisy, ayat ini tidak disambung dengan wa karena ia menegaskan dan memantapkan isi ayat sebelumnya.",
+        "summary": "Kalimat nominal: Allāhu menjadi mubtada' dan aṣ-ṣamadu khabarnya (Darwisy, al-Mujtaba); al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khabar kedua bagi huwa di ayat 1, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu. Lafaz Allah diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
         "groups": [
           {
             "words": [
@@ -1070,7 +1070,7 @@
             "state": "none",
             "sign": "—"
           },
-          "why": "Wawu adalah huruf 'athaf yang menyambungkan kalimat ini dengan lam yalid, dan lam sekali lagi menjazmkan kata kerja sesudahnya.",
+          "why": "Wawu adalah huruf 'athaf yang menyambungkan kalimat ini dengan lam yalid, dan lam menjazmkan kata kerja sesudahnya.",
           "lemma_id": "lam",
           "concepts": [
             "athaf",
@@ -2355,8 +2355,8 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:2fd5eac590213d9871c53009094487eefbdc8f42a507533d0003ef793a2459a7",
-    "authored_words": "authored/al-ikhlas.words.json sha256:abf019b92d6e901244fa3282a90a2540eff630da87cff1539d98b9662eb63f06",
-    "authored_structure": "authored/al-ikhlas.structure.json sha256:0cdd54684db7ccb6fdf36f3bd6a80cc3b2aba22097b4b0069bcce0ae5ee0b83f",
+    "authored_words": "authored/al-ikhlas.words.json sha256:ca50a92d1bb288f69709b5d788b0ca6db19b1969cc699dc70eaee6dec8f3fbc8",
+    "authored_structure": "authored/al-ikhlas.structure.json sha256:91fc36c6b21eb23a8d27de0a0299ab000b144212c94bff2b38a24fcc2b199739",
     "authored_concepts_map": "authored/al-ikhlas.concepts-map.json sha256:8a7af5814b68825851e4408b44fa4540f7c863f7c8c71bef337850e6e882c6db",
     "authored_facts": "authored/al-ikhlas.facts.generated.json sha256:5bd6e65b4b923e483fd069ed3e6d358d0ebf27e76c295552d3860654a442f260",
     "authored_hadith": "authored/al-ikhlas.hadith.json sha256:99395777b2bea9402220223ab49f99469a88973dd846ce9ecd4c16fdeef30317",

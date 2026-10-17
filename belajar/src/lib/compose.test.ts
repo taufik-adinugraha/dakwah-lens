@@ -34,7 +34,16 @@ import { SURAHS } from "./content";
 
 const CONTENT = fileURLToPath(new URL("../../content/", import.meta.url));
 const raw = JSON.parse(readFileSync(`${CONTENT}compose/al-fatihah.json`, "utf8")) as ComposeFile;
-const manifest = JSON.parse(readFileSync(`${CONTENT}narration/al-fatihah.json`, "utf8")) as NarrationManifest;
+const shipped = JSON.parse(readFileSync(`${CONTENT}narration/al-fatihah.json`, "utf8")) as NarrationManifest;
+/** The shipped manifest with a recording on every line (a stand-in, `ms` by the text's length): the
+ *  narrated composition steps as they play once rendered — 2026-10-17's reworded lines of word 1
+ *  wait for their render, and a line without one is caption-only by design. */
+const manifest: NarrationManifest = {
+  ...shipped,
+  lines: Object.fromEntries(
+    Object.entries(shipped.lines).map(([id, l]) => [id, l.audio ? l : { ...l, audio: { url: `/belajar/media/narration/test/${id.replace(/[^A-Za-z0-9_-]/g, "-")}.mp3`, ms: 60 * l.text.length, sha256: "0".repeat(64) } }]),
+  ),
+};
 const WORDS = new Map(SURAHS.flatMap((s) => s.ayat.flatMap((a) => a.words.map((w) => [w.loc, w.ar] as const))));
 const fatihah = SURAHS.find((s) => s.slug === "al-fatihah")!;
 const ayah1 = fatihah.ayat[0];
@@ -198,7 +207,11 @@ describe("the autoplay sequence with compositions", () => {
     expect(c.cues.map((q) => q.frame)).toEqual(raw.words["1:1:1"].lines.map((l) => l.frame));
     expect(c.cues.every((q) => q.highlight.join() === "1" && q.focus === 1)).toBe(true);
     // the word line: the gloss and the lead (the frames say the why)
-    expect(seq.steps.find((s) => s.id === "w1")!.cues[0].caption).toBe("Kata pertama artinya: “dengan nama”. Kata ini terdiri dari dua bagian.");
+    // (since 2026-10-17 with the word itself, rule 26: until then "Kata pertama artinya: …")
+    const word1 = ayah1.words[0];
+    expect(seq.steps.find((s) => s.id === "w1")!.cues[0].caption).toBe(
+      `Kata pertama, yaitu ${word1.ar} (${word1.translit}), artinya: “dengan nama”. Kata ini terdiri dari dua bagian.`,
+    );
     // no other cue names a frame
     expect(seq.steps.filter((s) => s.kind !== "compose" && s.kind !== "primer").every((s) => s.cues.every((q) => q.frame === null))).toBe(true);
     // ayah 2 has no composition yet: unchanged

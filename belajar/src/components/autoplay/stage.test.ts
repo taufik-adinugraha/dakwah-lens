@@ -25,7 +25,7 @@ import { quizAyah } from "@/lib/quiz-content";
 import { SURAH_SLUGS } from "@/lib/routes";
 import { wordVoice } from "@/lib/wordvoice";
 
-import { lessonExamplesFor, stageSequence } from "./build";
+import { lessonExamplesFor, namedTranslit, stageSequence } from "./build";
 import { NARRATED_SLUGS, narrationFor, SHARED_NARRATION } from "./manifests";
 import { AUTOPLAY_TEXT_SETS, autoplayTexts } from "./texts";
 
@@ -92,6 +92,8 @@ describe("autoplay stage: what the lesson page ships", () => {
             map: lessonMapInput(s.slug, a.ayah),
             // Every word heard on its own is the narrator's recording of it (operator 2026-10-14).
             voice: wordVoice,
+            // A named word in a caption-only line shows its transliteration (operator 2026-10-17).
+            named: namedTranslit,
           });
           expect(JSON.stringify(seq)).toBe(JSON.stringify(direct));
           // Every line the Indonesian stage can speak has its manifest text

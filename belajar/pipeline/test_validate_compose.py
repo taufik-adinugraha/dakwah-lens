@@ -112,6 +112,15 @@ MUTATIONS = [
         "src", {"word": "1:1:1", "pieces": [1, 2]})), "its source gives", False),
     ("an edit that does not fit its form", setf(lambda x: x["words"]["1:1:1"]["forms"]["ismi"].__setitem__(
         "src", {"from": "ismu", "ops": [{"remove": "shaddah", "piece": 0}]})), "carries no shaddah", False),
+    # the `letter` op (2026-10-17: the bentuk dasar of ٱلْعَٰلَمِينَ is ٱلْعَٰلَمُونَ, the ya' back to wawu)
+    ("a letter op on a letter that is not a wawu or ya'", setf(lambda x: x["words"]["1:2:4"]["forms"]["al-alamuna"].__setitem__(
+        "src", {"from": "al-alamina", "ops": [{"mark": -3, "to": "dhammah"}, {"letter": -1, "to": "wawu"}]})),
+     "is not one of the letters", False),
+    ("a letter op to a letter it may not write", setf(lambda x: x["words"]["1:2:4"]["forms"]["al-alamuna"].__setitem__(
+        "src", {"from": "al-alamina", "ops": [{"mark": -3, "to": "dhammah"}, {"letter": -2, "to": "alif"}]})),
+     "'to' must name a letter", False),
+    ("the jamak's bentuk dasar with its ya' kept", setf(lambda x: x["words"]["1:2:4"]["forms"]["al-alamuna"].__setitem__(
+        "src", {"from": "al-alamina", "ops": [{"mark": -3, "to": "dhammah"}]})), "its source gives", False),
     ("a Tanzil token from the wrong place", setf(lambda x: x["words"]["1:1:1"]["forms"]["ismu"].__setitem__(
         "src", {"tanzil": "55:78:3"})), "its source gives", True),
     ("an attestation the corpus does not have", setf(lambda x: x["words"]["1:1:1"]["forms"]["ismu"].__setitem__(
@@ -181,7 +190,7 @@ MUTATIONS = [
     ("a transliteration whose vowel is not the bytes'", setf(lambda x: x["words"]["1:1:1"]["forms"]["ismu"].__setitem__(
         "translit", "ismi")), "does not end in 'u'", False),
     ("the word's first harakah without its sound",
-     say_of("1:1:2", 1, lambda t: t.replace("dhammah, bunyi u,", "dhammah,")), "first dhammah without its sound", False),
+     say_of("1:1:2", 1, lambda t: t.replace("dhammah, bunyi u:", "dhammah:")), "first dhammah without its sound", False),
     ("the bentuk dasar said over a whole frame",
      say_of("1:5:1", 1, lambda t: t + " Bentuk dasarnya berakhir dengan dhammah, bunyi u."), "speaks of the bentuk dasar", False),
     ("written together, said over a word without parts",
@@ -189,7 +198,7 @@ MUTATIONS = [
     ("a part named over a one-tile frame",
      say_of("1:1:2", 2, lambda t: "Bagian kedua adalah nama Allah."), "names a part over a change frame", False),
     ("akar instead of bentuk dasar",
-     say_of("1:1:1", 3, lambda t: t.replace("Dalam bentuk dasarnya", "Dalam akarnya")), "never “akar”", False),
+     say_of("1:1:1", 3, lambda t: t.replace("Bentuk dasarnya", "Akarnya")), "never “akar”", False),
     ("a letter pin outside the composition", frame_set("1:7:9", 2, letters=[["nope", 0]]), "letters pins", False),
     # --- the imam's voice of each bentuk dasar (`examples`; operator 2026-10-12, plan L20)
     ("no examples at all", setf(lambda x: x.pop("examples")), "no `examples`", False),
@@ -347,6 +356,14 @@ class PiecesAndEdits(unittest.TestCase):
             C.apply_op(f["bi"], {"drop": 0})
         with self.assertRaises(C.ComposeError):
             C.apply_op(f["bi"], {"add": "kasrah", "piece": 0})
+        # the ya' of a jamak back to the wawu of its bentuk dasar, by name (2026-10-17), and only those letters
+        j = unit(CONTENTS, "1:2:4")["forms"]
+        self.assertEqual(C.apply_op(C.apply_op(j["al-alamina"]["ar"], {"mark": -3, "to": "dhammah"}), {"letter": -2, "to": "wawu"}),
+                         j["al-alamuna"]["ar"])
+        self.assertEqual(C.pieces(j["al-alamuna"]["ar"])[-2:], ["\u0648", "\u0646\u064e"])
+        for bad in ({"letter": -2, "to": "ya"}, {"letter": -1, "to": "wawu"}, {"letter": -2, "to": "alif"}, {"letter": 9, "to": "wawu"}):
+            with self.assertRaises(C.ComposeError, msg=str(bad)):
+                C.apply_op(j["al-alamina"]["ar"], bad)
         r = unit(CONTENTS, "1:1:3")["forms"]
         joined = r["al"]["ar"] + r["rahman"]["ar"]
         self.assertEqual(C.apply_op(C.apply_op(joined, {"remove": "sukun", "piece": 1}), {"add": "shaddah", "piece": 2}),

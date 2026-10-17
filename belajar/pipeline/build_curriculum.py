@@ -23,6 +23,7 @@ import sys
 
 import build_narration as B
 import curriculum as CUR
+import lessonmap as LM
 import terms as TERMS
 import validate_narration as V
 from common import CONTENT_DIR, SURAH_BY_NUM, SURAHS
@@ -66,7 +67,7 @@ class Namer:
             # The same prose without the stop: what the cards show meanwhile.
             errs.append(str(e))
             latin = B._cap(V.fold(text))
-        if len(latin.split()) > NAME_WORDS:
+        if LM.name_words(latin) > NAME_WORDS:  # the members a name lists in brackets aside
             errs.append(f"steps[{sid}] name: {latin!r} is longer than {NAME_WORDS} words (a description, not a name)")
         marked = self.sp.mark(latin)
         name, said = self.sp.shown(marked, None), self.sp.spoken(marked)
@@ -80,8 +81,10 @@ class Namer:
         """The Qur'anic words a prose text names in transliteration (validate_narration.Forms),
         but for what the narration says in Indonesian anyway: the Name ("Allah", and "lafaz Allah",
         which a line says as lafaz “Allah”), a surah's name after "Surah", and "lam" as the name
-        of the letter."""
-        t = " ".join(text.split())
+        of the letter. A named word's markup ({{1:7:8/wa}}, validate_narration "named words") is
+        the word shown and said on purpose, never a mention: it is left out (as the sanitiser
+        holds it)."""
+        t = " ".join(V.NAMED_REF.sub(" ", text).split())
         found, toks = self.san.forms.mentions(t)
         bad = []
         for start, end, k, _cands, i, _n in found:

@@ -11,6 +11,8 @@ import {
   captionArabicProblems,
   createAutoplayState,
   ID_TEXTS,
+  maskNamedSaid,
+  namedSaid,
   parsePronunciation,
   quranTokenSet,
   reduceAutoplay,
@@ -24,6 +26,7 @@ import { splitCaption } from "@/lib/lessonSteps";
 
 import { CaptionView } from "./CaptionView";
 import {
+  captionCue,
   captionText,
   karaokeAt,
   lineVoiced,
@@ -396,8 +399,10 @@ describe("screen-reader announcement", () => {
         sawRecite = true;
         expect(said).toBe("");
       }
-      // The caption of a word step shows "Kata ke-1: qul"; the announcement never carries a lesson word.
-      expect(spokenTextProblems(said || "x", guard, dict).join(" "), said).not.toMatch(/transliterated/);
+      // The caption of a word step shows "Kata ke-1: qul"; the announcement never carries a lesson word
+      // — but the one its caption names (rule 26: "Kata pertama, yaitu قُلْ (qul), …"), as the narrator says it.
+      const display = captionCue(seq, s)?.display ?? "";
+      expect(spokenTextProblems(maskNamedSaid(said || "x", namedSaid(display)), guard, dict).join(" "), said).not.toMatch(/transliterated/);
       if (seq.steps[s.idx].cues.some((c) => c.display !== null)) expect(said).not.toMatch(/[؀-ۿ]/);
       s = run(seq, s, endOf(s));
     }

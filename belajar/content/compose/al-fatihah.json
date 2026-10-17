@@ -588,7 +588,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Bagian pertama adalah huruf jar, yaitu huruf ba', yang artinya “dengan”."
+          "say": "Bagian pertama adalah huruf jar, yaitu {{1:1:1/bi}}, yang artinya “dengan”."
         },
         {
           "frame": 1,
@@ -596,7 +596,7 @@
         },
         {
           "frame": 2,
-          "say": "Dalam bentuk dasarnya, kata benda ini berakhir dengan dhammah, tanda bunyi u di atas huruf mim. Mengapa dhammah, kita pelajari di ayat kedua."
+          "say": "Bentuk dasarnya berakhir dengan dhammah, tanda bunyi u di atas huruf mim. Mengapa dhammah, baru akan diajarkan lebih lengkap di ayat kedua."
         },
         {
           "frame": 3,
@@ -612,7 +612,7 @@
         },
         {
           "frame": 4,
-          "say": "Alif di awal kata benda itu hanya dibaca bila bacaan dimulai darinya; setelah huruf ba', alif itu tidak dibaca."
+          "say": "Alif di awal kata benda itu hanya dibaca bila bacaan dimulai darinya; setelah {{1:1:1/bi}}, alif itu tidak dibaca."
         },
         {
           "frame": 5,
@@ -620,7 +620,7 @@
         },
         {
           "frame": 5,
-          "say": "Di ayat lain alif itu tetap ditulis, misalnya sebelum kata yang artinya “Tuhanmu”."
+          "say": "Di ayat lain alif itu tetap ditulis, misalnya {{1:1:1/bi+ismi}} di awal Surah Al-'Alaq, dalam ungkapan yang artinya “dengan nama Tuhanmu”."
         }
       ],
       "sources": [
@@ -730,15 +730,15 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Dalam bentuk dasarnya, kata ini berakhir dengan dhammah, bunyi u, seperti di awal ayat kedua Surah Al-Ikhlas."
+          "say": "Dalam bentuk dasarnya, kata ini berakhir dengan dhammah, bunyi u: {{1:1:2/allahu}}."
         },
         {
           "frame": 2,
-          "say": "Di ayat ini akhirnya menjadi kasrah, bunyi i, karena kata yang artinya “nama” disandarkan kepadanya."
+          "say": "Kata pertama, {{1:1:1/ismi}}, disandarkan kepada kata ini, dan kata yang disandari selalu majrur: akhirnya kasrah, bunyi i, {{1:1:2/allahi}}."
         },
         {
           "frame": 2,
-          "say": "Susunan sandaran seperti ini kita pelajari di ayat keempat."
+          "say": "Susunan sandaran seperti ini baru akan diajarkan lebih lengkap di ayat keempat."
         }
       ],
       "sources": [
@@ -944,7 +944,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Bagian pertama adalah alif lam. Gunanya kita pelajari di ayat ketiga."
+          "say": "Bagian pertama adalah alif lam. Gunanya baru akan diajarkan lebih lengkap di ayat ketiga."
         },
         {
           "frame": 1,
@@ -956,7 +956,7 @@
         },
         {
           "frame": 2,
-          "say": "Alif di awalnya juga tidak dibaca, karena bacaan bersambung dari kata sebelumnya, seperti alif pada kata pertama."
+          "say": "Alif di awalnya juga tidak dibaca, karena bacaan bersambung dari kata sebelumnya, seperti alif pada kata pertama, {{1:1:1/bi+ismi}}."
         },
         {
           "frame": 3,
@@ -968,7 +968,7 @@
         },
         {
           "frame": 4,
-          "say": "Aturan sifat ini kita pelajari di ayat ketiga."
+          "say": "Aturan sifat ini baru akan diajarkan lebih lengkap di ayat ketiga."
         }
       ],
       "sources": [
@@ -1234,7 +1234,7 @@
     "1:2:1": {
       "loc": "1:2:1",
       "ar": "ٱلْحَمْدُ",
-      "lead": "Kata ini juga terdiri dari dua bagian.",
+      "lead": "Kata ini terdiri dari dua bagian.",
       "forms": {
         "al": {
           "ar": "ٱلْ",
@@ -1311,7 +1311,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Bagian pertama adalah alif lam, seperti di ayat pertama."
+          "say": "Bagian pertama adalah alif lam."
         },
         {
           "frame": 1,
@@ -1319,15 +1319,11 @@
         },
         {
           "frame": 2,
-          "say": "Kali ini huruf lam dibaca, sebagai huruf mati: perhatikan tanda kecil di atasnya, seperti di atas huruf sin pada ayat pertama."
+          "say": "Kali ini huruf lam dibaca, sebagai huruf mati: perhatikan tanda kecil di atasnya."
         },
         {
           "frame": 2,
-          "say": "Huruf sesudahnya pun tidak dibaca dobel, berbeda dengan huruf ra' pada kata yang artinya “Yang Maha Pengasih” di ayat pertama."
-        },
-        {
-          "frame": 2,
-          "say": "Ayat ini dimulai dari kata ini, jadi alif di awalnya dibaca: seperti di ayat pertama, alif seperti ini hanya dibaca bila bacaan dimulai darinya."
+          "say": "Ayat ini dimulai dari kata ini, jadi alif di awalnya dibaca: alif seperti ini hanya dibaca bila bacaan dimulai darinya."
         },
         {
           "frame": 3,
@@ -1504,15 +1500,15 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Bagian pertama adalah huruf jar, yaitu huruf lam, yang artinya “bagi”."
+          "say": "Bagian pertama adalah huruf jar, yaitu {{1:2:2/li}}, yang artinya “bagi”."
         },
         {
           "frame": 1,
-          "say": "Bagian kedua adalah nama Allah; bentuk dasarnya berakhir dengan dhammah, bunyi u, seperti yang kita lihat di ayat pertama."
+          "say": "Bagian kedua adalah nama Allah; bentuk dasarnya berakhir dengan dhammah, bunyi u: {{1:2:2/allahu}}."
         },
         {
           "frame": 2,
-          "say": "Karena didahului huruf jar, akhirnya berubah menjadi kasrah, bunyi i, sama seperti kata yang artinya “dengan nama” di ayat pertama."
+          "say": "Karena didahului huruf jar {{1:2:2/li}}, akhirnya berubah menjadi kasrah, bunyi i: {{1:2:2/allahi}}."
         },
         {
           "frame": 3,
@@ -1621,7 +1617,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Dalam bentuk dasarnya, kata ini berakhir dengan dhammah, bunyi u; misalnya di ayat lain, dalam ungkapan yang artinya “Tuhan seluruh alam”."
+          "say": "Dalam bentuk dasarnya, kata ini berakhir dengan dhammah, bunyi u: {{1:2:3/rabbu}}."
         },
         {
           "frame": 2,
@@ -1629,7 +1625,7 @@
         },
         {
           "frame": 2,
-          "say": "Kata ini sifat bagi nama itu, seperti sifat-sifat di ayat pertama; sebagian ulama menyebutnya pengganti, dengan akhiran yang sama."
+          "say": "Kata ini sifat bagi nama itu; sebagian ulama menyebutnya pengganti, dengan akhiran yang sama."
         }
       ],
       "sources": [
@@ -1724,6 +1720,26 @@
             "2:131:9",
             "2:251:27"
           ]
+        },
+        "al-alamuna": {
+          "ar": "ٱلْعَٰلَمُونَ",
+          "translit": "al-‘ālamūna",
+          "src": {
+            "from": "al-alamina",
+            "ops": [
+              {
+                "mark": -3,
+                "to": "dhammah"
+              },
+              {
+                "letter": -2,
+                "to": "wawu"
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "seluruh alam",
+          "attested": []
         }
       },
       "frames": [
@@ -1793,7 +1809,7 @@
         },
         {
           "frame": 3,
-          "say": "Kata ketiga, yang artinya “Tuhan”, disandarkan kepada kata ini, seperti di ayat pertama."
+          "say": "Kata ketiga, {{1:2:3}}, yang artinya “Tuhan”, disandarkan kepada kata ini, {{1:2:4}}, yang artinya “seluruh alam”."
         },
         {
           "frame": 3,
@@ -1805,7 +1821,7 @@
         },
         {
           "frame": 3,
-          "say": "Dalam bentuk dasarnya, jamak seperti ini memakai huruf wawu, bunyi u panjang, di tempat huruf ya' itu."
+          "say": "Dalam bentuk dasarnya, jamak seperti ini memakai huruf wawu, bunyi u panjang, di tempat huruf ya' itu: {{1:2:4/al-alamuna}}."
         },
         {
           "frame": 4,
@@ -1864,7 +1880,6 @@
     "1:3:1": {
       "loc": "1:3:1",
       "ar": "ٱلرَّحْمَٰنِ",
-      "lead": "Kata yang sama sudah kita pelajari di ayat pertama.",
       "forms": {
         "al": {
           "ar": "ٱلْ",
@@ -2026,7 +2041,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Susunannya pun sama: alif lam bersambung dengan isim yang artinya “Maha Pengasih”."
+          "say": "Susunannya: alif lam bersambung dengan isim yang artinya “Maha Pengasih”."
         },
         {
           "frame": 1,
@@ -2038,11 +2053,11 @@
         },
         {
           "frame": 2,
-          "say": "Sebabnya, kata ini sekali lagi menjadi sifat, atau na't, bagi nama Allah di ayat kedua, yang berakhir kasrah."
+          "say": "Sebabnya, kata ini menjadi sifat, atau na't, bagi nama Allah, yang berakhir kasrah."
         },
         {
           "frame": 3,
-          "say": "Karena ayat ini dimulai dari kata ini, alif di awalnya dibaca, sama seperti di awal ayat kedua."
+          "say": "Karena ayat ini dimulai dari kata ini, alif di awalnya dibaca."
         }
       ],
       "sources": [
@@ -2092,7 +2107,6 @@
     "1:3:2": {
       "loc": "1:3:2",
       "ar": "ٱلرَّحِيمِ",
-      "lead": "Kata ini pun sudah kita pelajari di ayat pertama.",
       "forms": {
         "al": {
           "ar": "ٱلْ",
@@ -2278,7 +2292,7 @@
         },
         {
           "frame": 2,
-          "say": "Sebabnya, kata ini sifat berikutnya bagi nama Allah di ayat kedua."
+          "say": "Sebabnya, kata ini sifat berikutnya bagi nama Allah."
         },
         {
           "frame": 3,
@@ -2389,15 +2403,15 @@
         },
         {
           "frame": 2,
-          "say": "Di sini akhirnya menjadi kasrah, bunyi i, karena kata ini sifat, atau na't, bagi nama Allah di ayat kedua."
+          "say": "Di sini akhirnya menjadi kasrah, bunyi i, karena kata ini sifat, atau na't, bagi nama Allah."
         },
         {
           "frame": 2,
-          "say": "Nama itu juga berakhir kasrah, dan seperti di ayat pertama, sifat mengikuti akhiran kata yang disifatinya."
+          "say": "Nama itu juga berakhir kasrah, dan sifat mengikuti akhiran kata yang disifatinya."
         },
         {
           "frame": 2,
-          "say": "Darwisy menyebut kata ini sifat keempat, sesudah tiga sifat di ayat kedua dan ketiga."
+          "say": "Darwisy menyebut kata ini sifat keempat."
         }
       ],
       "sources": [
@@ -2497,10 +2511,6 @@
         {
           "frame": 2,
           "say": "Di sini akhirnya menjadi kasrah, bunyi i, karena kata pertama disandarkan kepadanya; kata ini menjadi mudhaf ilaih."
-        },
-        {
-          "frame": 2,
-          "say": "Aturannya sama seperti nama Allah di ayat pertama."
         }
       ],
       "sources": [
@@ -2535,7 +2545,7 @@
     "1:4:3": {
       "loc": "1:4:3",
       "ar": "ٱلدِّينِ",
-      "lead": "Kata ini juga terdiri dari dua bagian.",
+      "lead": "Kata ini terdiri dari dua bagian.",
       "forms": {
         "al": {
           "ar": "ٱلْ",
@@ -2713,7 +2723,7 @@
         },
         {
           "frame": 1,
-          "say": "Seperti di ayat pertama, alif dan huruf lam tidak dibaca; kali ini bunyi huruf lam melebur ke huruf dal, sehingga dal dibaca dobel."
+          "say": "Alif dan huruf lam tidak dibaca; bunyi huruf lam melebur ke huruf dal, sehingga dal dibaca dobel."
         },
         {
           "frame": 2,
@@ -2798,7 +2808,7 @@
         },
         {
           "frame": 1,
-          "say": "Akhirnya fathah, bunyi a. Berbeda dengan kata-kata sebelumnya, akhir kata ganti tidak berubah oleh kata lain dalam kalimat."
+          "say": "Akhirnya fathah, bunyi a. Akhir kata ganti tidak berubah oleh kata lain dalam kalimat."
         },
         {
           "frame": 1,
@@ -2948,7 +2958,7 @@
     "1:5:3": {
       "loc": "1:5:3",
       "ar": "وَإِيَّاكَ",
-      "lead": "Kata ini juga terdiri dari dua bagian.",
+      "lead": "Kata ini terdiri dari dua bagian.",
       "forms": {
         "wa": {
           "ar": "وَ",
@@ -3014,7 +3024,7 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Bagian pertama adalah huruf wawu, yang artinya “dan”."
+          "say": "Bagian pertama adalah {{1:5:3/wa}}, yang artinya “dan”."
         },
         {
           "frame": 1,
@@ -3026,7 +3036,7 @@
         },
         {
           "frame": 2,
-          "say": "Huruf wawu ini menyambungkan kalimat kedua, tentang memohon pertolongan, dengan kalimat pertama, tentang menyembah."
+          "say": "Huruf {{1:5:3/wa}} ini menyambungkan kalimat kedua, tentang memohon pertolongan, dengan kalimat pertama, tentang menyembah."
         },
         {
           "frame": 2,
@@ -3159,7 +3169,7 @@
     "1:6:1": {
       "loc": "1:6:1",
       "ar": "ٱهْدِنَا",
-      "lead": "Kata ini juga terdiri dari dua bagian.",
+      "lead": "Kata ini terdiri dari dua bagian.",
       "forms": {
         "ihdi": {
           "ar": "ٱهْدِ",
@@ -3489,7 +3499,7 @@
         },
         {
           "frame": 1,
-          "say": "Seperti di ayat pertama, alif dan huruf lam tidak dibaca; bunyi huruf lam melebur ke huruf sesudahnya, sehingga huruf itu dibaca dobel."
+          "say": "Alif dan huruf lam tidak dibaca; bunyi huruf lam melebur ke huruf sesudahnya, sehingga huruf itu dibaca dobel."
         },
         {
           "frame": 2,
@@ -3720,10 +3730,6 @@
           "say": "Alif di awalnya tidak dibaca, tetapi huruf lam dibaca sebagai huruf mati, dan huruf mim sesudahnya tidak dibaca dobel."
         },
         {
-          "frame": 1,
-          "say": "Hal ini sama seperti pada kata yang artinya “seluruh alam” di ayat kedua."
-        },
-        {
           "frame": 2,
           "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u."
         },
@@ -3733,7 +3739,7 @@
         },
         {
           "frame": 3,
-          "say": "Sifat mengikuti kata yang disifatinya, seperti di ayat pertama: kata kedua berakhir fathah dan memakai alif lam, maka kata ini juga."
+          "say": "Sifat mengikuti kata yang disifatinya: kata kedua berakhir fathah dan memakai alif lam, maka kata ini juga."
         },
         {
           "frame": 4,
@@ -3787,7 +3793,6 @@
     "1:7:1": {
       "loc": "1:7:1",
       "ar": "صِرَٰطَ",
-      "lead": "Kata ini sama dengan kata yang artinya “jalan” di ayat keenam, tetapi tanpa alif lam.",
       "forms": {
         "siratu": {
           "ar": "صِرَٰطُ",
@@ -3850,11 +3855,11 @@
         },
         {
           "frame": 2,
-          "say": "Di sini akhirnya menjadi fathah, bunyi a, sama seperti di ayat keenam."
+          "say": "Di sini akhirnya menjadi fathah, bunyi a."
         },
         {
           "frame": 2,
-          "say": "Sebabnya, kata ini pengganti bagi kata yang artinya “jalan” di ayat keenam, dan pengganti mengikuti akhiran kata yang digantikannya."
+          "say": "Sebabnya, kata ini pengganti bagi kata {{1:6:2}} yang artinya “jalan”, dan pengganti mengikuti akhiran kata yang digantikannya."
         },
         {
           "frame": 2,
@@ -3957,7 +3962,7 @@
         },
         {
           "frame": 2,
-          "say": "Kata pertama disandarkan kepadanya, jadi kata ini menjadi mudhaf ilaih, seperti kata yang artinya “Allah” di ayat pertama."
+          "say": "Kata pertama disandarkan kepadanya, jadi kata ini menjadi mudhaf ilaih."
         },
         {
           "frame": 2,
@@ -3965,7 +3970,7 @@
         },
         {
           "frame": 2,
-          "say": "Akhir kata ini mirip akhiran jamak pada kata yang artinya “seluruh alam” di ayat kedua, tetapi di sini ia bagian dari bentuk yang tetap."
+          "say": "Akhir kata ini mirip akhiran jamak, tetapi di sini ia bagian dari bentuk yang tetap."
         }
       ],
       "sources": [
@@ -4030,7 +4035,7 @@
     "1:7:3": {
       "loc": "1:7:3",
       "ar": "أَنْعَمْتَ",
-      "lead": "Kata ini juga terdiri dari dua bagian.",
+      "lead": "Kata ini terdiri dari dua bagian.",
       "forms": {
         "anam": {
           "ar": "أَنْعَمْ",
@@ -4141,11 +4146,11 @@
         },
         {
           "frame": 1,
-          "say": "Berbeda dengan ayat keenam, di sini dhamir yang menempel adalah pelaku, bukan objek."
+          "say": "Di sini dhamir yang menempel adalah pelaku, bukan objek."
         },
         {
           "frame": 2,
-          "say": "Kata kerja lampau akhirnya tetap; bentuk dasarnya berakhir dengan fathah, bunyi a, seperti tertulis di ayat lain."
+          "say": "Kata kerja lampau akhirnya tetap; bentuk dasarnya berakhir dengan fathah, bunyi a."
         },
         {
           "frame": 3,
@@ -4353,7 +4358,7 @@
         },
         {
           "frame": 3,
-          "say": "Jadi kasrah ini bukan karena huruf jar, seperti di ayat pertama, melainkan karena huruf ya' mati sebelumnya."
+          "say": "Jadi kasrah ini bukan karena huruf jar, melainkan karena huruf ya' mati sebelumnya."
         },
         {
           "frame": 4,
@@ -4703,7 +4708,7 @@
         },
         {
           "frame": 1,
-          "say": "Alif di awalnya tidak dibaca, tetapi huruf lam dibaca, sama seperti pada kata yang artinya “yang lurus” di ayat keenam."
+          "say": "Alif di awalnya tidak dibaca, tetapi huruf lam dibaca."
         },
         {
           "frame": 1,
@@ -4715,7 +4720,7 @@
         },
         {
           "frame": 3,
-          "say": "Di sini akhirnya menjadi kasrah, bunyi i, karena kata kelima disandarkan kepadanya: kata ini mudhaf ilaih, seperti di ayat pertama."
+          "say": "Di sini akhirnya menjadi kasrah, bunyi i, karena kata kelima disandarkan kepadanya: kata ini mudhaf ilaih."
         }
       ],
       "sources": [
@@ -5004,11 +5009,11 @@
       "lines": [
         {
           "frame": 1,
-          "say": "Bagian pertama adalah huruf wawu, yang artinya “dan”, sama seperti di ayat kelima."
+          "say": "Bagian pertama adalah {{1:7:8/wa}}, yang artinya “dan”."
         },
         {
           "frame": 1,
-          "say": "Bagian kedua adalah huruf yang artinya “bukan”."
+          "say": "Bagian kedua adalah huruf {{1:7:8/la}} yang artinya “bukan”."
         },
         {
           "frame": 2,
@@ -5020,7 +5025,7 @@
         },
         {
           "frame": 3,
-          "say": "Huruf yang artinya “bukan” ini berfungsi menegaskan: maknanya sudah ada pada kata kelima, dan di sini ia menguatkannya."
+          "say": "Huruf {{1:7:8/la}} ini, yang artinya “bukan”, berfungsi menegaskan: maknanya sudah ada pada kata kelima, dan di sini ia menguatkannya."
         },
         {
           "frame": 3,
@@ -5124,6 +5129,20 @@
             "26:20:6",
             "26:86:6"
           ]
+        },
+        "ad-dalluna": {
+          "ar": "ٱلضَّآلُّونَ",
+          "translit": "aḍ-ḍāllūna",
+          "src": {
+            "tanzil": "56:51:4"
+          },
+          "label": "isim",
+          "gloss": "orang-orang yang sesat",
+          "attested": [
+            "3:90:14",
+            "15:56:8",
+            "56:51:4"
+          ]
         }
       },
       "frames": [
@@ -5203,7 +5222,7 @@
         },
         {
           "frame": 1,
-          "say": "Sama seperti pada kata yang artinya “jalan” di ayat keenam, alif dan huruf lam tidak dibaca, dan huruf sesudahnya dibaca dobel."
+          "say": "Alif dan huruf lam tidak dibaca, dan huruf sesudahnya dibaca dobel."
         },
         {
           "frame": 2,
@@ -5211,11 +5230,11 @@
         },
         {
           "frame": 2,
-          "say": "Kata ini jamak laki-laki beraturan; bentuk dasarnya memakai huruf wawu, bunyi u panjang, sebelum huruf nun."
+          "say": "Kata ini jamak laki-laki beraturan; bentuk dasarnya memakai huruf wawu, bunyi u panjang, sebelum huruf nun: {{1:7:9/ad-dalluna}}."
         },
         {
           "frame": 2,
-          "say": "Di sini wawu itu diganti huruf ya', bunyi i panjang: inilah tanda majrur, sama seperti pada kata yang artinya “seluruh alam” di ayat kedua."
+          "say": "Di sini wawu itu diganti huruf ya', bunyi i panjang: inilah tanda majrur."
         },
         {
           "frame": 3,
@@ -5486,7 +5505,7 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:85309eabb6bccb2f6bc416d9f7761b7b67d3ad05de54c5772928747cb0f4f0e1",
+    "authored_compose": "authored/al-fatihah.compose.json sha256:c7b8ac3df75d4a8222043db67aeeea5412646ed0baf47ce1fce129190ff55bef",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }

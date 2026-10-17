@@ -27,6 +27,9 @@ import {
   parsePronunciation,
   quranTokenSet,
   spokenTextProblems,
+  maskNamedSaid,
+  namedSaid,
+  namedSpeech,
   withoutArabic,
   wordRefs,
 } from "./narration";
@@ -527,6 +530,13 @@ describe("a word's opening step: as long as the imam's word when the narrator ex
     expect(sequenceProblems(again, ctx)).toEqual([
       "w1: a explain step ends with the imam reciting word 1 (a word is recited once, when its step opens; only the ayah's last word again, after the line that says he stops on it)",
     ]);
+    // A named word's markup on screen (operator 2026-10-17: the word is shown, never its reference).
+    const marked = structuredClone(plain);
+    const cue = marked.steps.find((s) => s.id === "w1")?.cues[0];
+    if (!cue) throw new Error("no cue on w1");
+    cue.caption = `${cue.caption} Sama seperti kata {{1:1:2}}.`;
+    cue.parts[cue.parts.length - 1] = `${cue.parts[cue.parts.length - 1]} Sama seperti kata {{1:1:2}}.`;
+    expect(sequenceProblems(marked, ctx)).toEqual([`${cue.line}: the caption shows a named word's markup`]);
   });
 
   it("narrated, Biasa: the imam's word, the pause after him, the narrator — no reading time", () => {
@@ -1111,13 +1121,64 @@ describe("the pronunciation dictionary", () => {
 
   it("captions show a dictionary display form or the lesson's own Arabic, never a spoken-only form", () => {
     const allowed = [...dict.terms.map((t) => t.display), "بِسْمِ", "ٱللَّهِ"].join(" | ");
-    expect(captionArabicProblems("Akhirnya kasrah (كَسْرَة), huruf jar (حَرْف جَرّ) ba’ (بِ).", dict, allowed)).toEqual([]);
+    expect(captionArabicProblems("Akhirnya kasrah (كَسْرَة), huruf jar (حَرْف جَرّ), yaitu huruf بِ.", dict, allowed)).toEqual([]);
     expect(captionArabicProblems("Kata pertama: بِسْمِ.", dict, allowed)).toEqual([]);
     expect(captionArabicProblems("huruf بَاء", dict, allowed).join(" ")).toMatch(/spoken-only/);
     // a letter's name as a whole word only: لَام inside the term kalam (كَلَام) is not the letter lam
     expect(captionArabicProblems("disebut kalam (كَلَام).", dict, allowed).join(" ")).not.toMatch(/spoken-only/);
     expect(captionArabicProblems("kata الرحمن", dict, allowed).join(" ")).toMatch(/neither the dictionary nor the lesson/);
     expect(captionArabicProblems("tanpa huruf Arab", null, allowed)).toEqual([]);
+  });
+
+  it("a single letter is shown alone, never with its Latin name beside it (operator 2026-10-17)", () => {
+    const letters = {
+      terms: [
+        ...dict.terms,
+        term("سِين", "sin", "sin (س)"),
+        term("أَلِف", "alif", "alif (ا)"),
+        term("أَلِف لَام", "alif lam", "alif lam (ال)"),
+        term("لَام", "لَام", "lam (لِ)"),
+        term("كَلَام", "كَلَام", "kalam (كَلَام)"),
+      ],
+    };
+    const allowed = [...letters.terms.map((t) => t.display), "بِسْمِ", "ٱلْحَمْدُ"].join(" | ");
+    const named = (s: string) => captionArabicProblems(s, letters, allowed).filter((p) => p.startsWith("a letter shown with its Latin name"));
+    // The Pengantar as the operator wants it: the letter alone, in any of its shapes on screen.
+    expect(captionArabicProblems("Contohnya huruf ب ini, tanpa harakat.", letters, allowed)).toEqual([]);
+    expect(captionArabicProblems("maka huruf سْ dibaca mati, tanpa vokal.", letters, allowed)).toEqual([]);
+    expect(captionArabicProblems("Satu tanda lagi: ا kecil yang tegak.", letters, allowed)).toEqual([]);
+    // … the article keeps its name, and kalam is a term, not the letter lam.
+    expect(captionArabicProblems("Huruf ٱلْ di sini adalah alif lam (ٱلْ).", letters, allowed)).toEqual([]);
+    expect(named("dalam bahasa Arab disebut kalam (كَلَام).")).toEqual([]);
+    // Planted: the letter with its Latin name beside it, as lesson zero's captions had it until 2026-10-17.
+    expect(named("Contohnya huruf ba’ (ب) ini, tanpa harakat.")).toEqual([
+      "a letter shown with its Latin name: ba’ (ب) (a single letter is shown alone, as on screen)",
+    ]);
+    expect(named("Contohnya huruf sin (س) ini, tanpa tanda.").join(" ")).toMatch(/sin \(س\)/);
+    expect(named("Satu tanda lagi: alif (ا) kecil yang tegak.").join(" ")).toMatch(/alif \(ا\)/);
+    expect(named("Alif (ٱ) di awalnya dibaca.").join(" ")).toMatch(/Alif \(ٱ\)/);
+    expect(named("huruf ba' (بِ) dengan apostrof lurus").join(" ")).toMatch(/ba' \(بِ\)/);
+    expect(named("alif lam (ال) dan lam (لِ)").join(" ")).toMatch(/lam \(لِ\)/);
+    expect(named("alif lam (ال) dan lam (لِ)").join(" ")).not.toMatch(/alif lam/);
+  });
+
+  it("a named word: said in Latin exactly where the caption shows it (pipeline validate_narration named words)", () => {
+    expect(namedSpeech("bi")).toBe("bi");
+    expect(namedSpeech("Allāhi")).toBe("Allohi");
+    expect(namedSpeech("lillāhi")).toBe("lillahi");
+    expect(namedSpeech("aṣ-ṣirāṭa")).toBe("ash-shiratha");
+    expect(namedSpeech("al-‘ālamīna")).toBe("al-'alamina");
+    expect(namedSaid("yaitu بِ (bi) yang artinya “dengan”, sehingga isim (اِسْم) sesudahnya, yaitu ٱسْمِ (ismi)")).toEqual(["bi", "ismi"]);
+    // masked once each, in order: a second "ismi" the caption does not name is still a lesson word
+    expect(maskNamedSaid("yaitu bi, lalu ismi dan ismi.", ["bi", "ismi"])).toBe("yaitu istilah, lalu istilah dan ismi.");
+    expect(spokenTextProblems(maskNamedSaid("Yaitu bismi.", ["bismi"]), guard, dict)).toEqual([]);
+    expect(spokenTextProblems("Yaitu bismi.", guard, dict).join(" ")).toMatch(/transliterated Qur'anic word/);
+    // pronunciation.json `named` (2026-10-17): a held word's spelling, as validate_narration.named_speech says it
+    const listed = parsePronunciation({ terms: [], named: [{ translit: "aṣ-ṣirāṭa", speak: "ash-shirotho" }] });
+    expect(listed.problems).toEqual([]);
+    expect(namedSaid("kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan”", listed.dict)).toEqual(["ash-shirotho"]);
+    expect(namedSaid("kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan”")).toEqual(["ash-shiratha"]);
+    expect(parsePronunciation({ terms: [], named: [{ translit: "x" }] }).problems).toEqual(["named[0]: translit and speak must be non-empty strings"]);
   });
 
   it("drops the Arabic for a screen reader", () => {

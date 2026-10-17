@@ -53,15 +53,15 @@ const step = (sid: string) => CURRICULUM.steps.find((s) => s.id === sid)!;
 /** Al-Fatihah, measured on 2026-10-13 (the same table as pipeline/test_validate_curriculum.py):
  *  ayah → [new, the learnt steps that occur here, later, lanjut]. */
 const TABLE: Record<number, [string[], string[], string[], string[]]> = {
-  1: [["majrur", "huruf-jar"], ["kalimah"], ["alif-lam", "naat", "idhafah"], ["syibhul-jumlah"]],
-  2: [["jumlah-ismiyyah", "marfu", "jamak-mudzakkar-salim"], ["kalimah", "majrur", "huruf-jar"], ["alif-lam", "naat", "idhafah", "badal"], ["syibhul-jumlah", "wazan-dan-tashrif"]],
-  3: [["alif-lam", "naat"], ["kalimah", "majrur"], [], ["wazan-dan-tashrif"]],
-  4: [["idhafah"], ["kalimah", "majrur", "alif-lam", "naat"], [], ["wazan-dan-tashrif", "isim-fail"]],
-  5: [["dhamir", "fiil-mudhari", "murab-mabni"], ["kalimah", "marfu"], ["jumlah-filiyyah", "maful-bih", "athaf"], ["taqdim-maful", "bab-istifal", "ilal"]],
-  6: [["jumlah-filiyyah", "maful-bih", "manshub"], ["kalimah", "alif-lam", "naat", "dhamir"], ["fiil-amr"], ["isim-fail", "bab-istifal", "ilal"]],
+  1: [["majrur", "huruf-jar"], ["harakat", "kalimah"], ["alif-lam", "naat", "idhafah"], ["syibhul-jumlah"]],
+  2: [["jumlah-ismiyyah", "marfu", "jamak-mudzakkar-salim"], ["harakat", "kalimah", "majrur", "huruf-jar"], ["alif-lam", "naat", "idhafah", "badal"], ["syibhul-jumlah", "wazan-dan-tashrif"]],
+  3: [["alif-lam", "naat"], ["harakat", "kalimah", "majrur"], [], ["wazan-dan-tashrif"]],
+  4: [["idhafah"], ["harakat", "kalimah", "majrur", "alif-lam", "naat"], [], ["wazan-dan-tashrif", "isim-fail"]],
+  5: [["dhamir", "fiil-mudhari", "murab-mabni"], ["harakat", "kalimah", "marfu"], ["jumlah-filiyyah", "maful-bih", "athaf"], ["taqdim-maful", "bab-istifal", "ilal"]],
+  6: [["jumlah-filiyyah", "maful-bih", "manshub"], ["harakat", "kalimah", "alif-lam", "naat", "dhamir"], ["fiil-amr"], ["isim-fail", "bab-istifal", "ilal"]],
   7: [
     ["isim-maushul", "fiil-madhi", "athaf"],
-    ["kalimah", "majrur", "huruf-jar", "jamak-mudzakkar-salim", "alif-lam", "idhafah", "dhamir", "murab-mabni", "jumlah-filiyyah", "manshub"],
+    ["harakat", "kalimah", "majrur", "huruf-jar", "jamak-mudzakkar-salim", "alif-lam", "idhafah", "dhamir", "murab-mabni", "jumlah-filiyyah", "manshub"],
     ["badal"],
     ["isim-fail", "bab-ifal", "isim-maful", "naib-fail"],
   ],
@@ -165,7 +165,7 @@ describe("the curriculum file is what the lessons give (the app's twin of pipeli
     expect(stepOccurs(step("alif-lam"), a1)).toEqual([3, 4]);
     expect(stepOccurs(step("alif-lam"), a2)).toEqual([1, 4]); // not lillāhi: QAC has no DET there
     expect(stepOccurs(step("kalimah"), a3)).toEqual([1, 2]); // every word is one of the three kinds
-    expect(stepOccurs(step("harakat"), a1)).toEqual([]); // a basics step is never marked "here"
+    expect(stepOccurs(step("harakat"), a1)).toEqual([1, 2, 3, 4]); // a basics step: on every letter (2026-10-17)
     expect(stepOccurs(step("idhafah"), a1)).toEqual([1, 2]); // tagged, and the words of its structure group
     expect(stepOccurs(step("jamak-taksir"), a1)).toEqual([]); // no record, no rule: nowhere yet
     expect(qacTags(a3.words[0])).toEqual(["DET", "ADJ"]);
@@ -185,7 +185,7 @@ describe("the curriculum file is what the lessons give (the app's twin of pipeli
     const S = (f: CurriculumFile, sid: string) => f.steps.find((s) => s.id === sid)!;
     expect(fault((f) => L(f, "1:2").map!.new.reverse())).toContain("lesson 1:2: new");
     expect(fault((f) => L(f, "1:5").map!.learnt.splice(3, 1))).toContain("lesson 1:5: learnt");
-    expect(fault((f) => (L(f, "1:1").map!.learnt[0].here = true))).toContain("lesson 1:1: learnt");
+    expect(fault((f) => (L(f, "1:1").map!.learnt[0].here = false))).toContain("lesson 1:1: learnt"); // the harakat: every ayah
     expect(fault((f) => L(f, "1:3").map!.later.push("idhafah"))).toContain("lesson 1:3: later");
     expect(fault((f) => L(f, "1:1").map!.lanjut.push("hal"))).toContain("lesson 1:1: lanjut");
     expect(fault((f) => (L(f, "1:1").lines![0].words = [1]))).toContain("lesson 1:1: lines are not what the lessons give");

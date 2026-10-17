@@ -19,56 +19,56 @@
       "focus": null
     },
     "an-nas:1:w1": {
-      "text": "Kata pertama artinya: katakanlah. فِعْل أَمْر ini مَبْنِيّ di atas سُكُون, sesuai hukum asal فِعْل أَمْر; pelakunya kata ganti tersirat, yaitu engkau.",
-      "display": "Kata pertama artinya: “katakanlah”. Fi’il amr (فِعْل أَمْر) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sesuai hukum asal fi’il amr (فِعْل أَمْر); pelakunya kata ganti tersirat, yaitu “engkau”.",
+      "text": "Kata pertama, yaitu qul, artinya: katakanlah. فِعْل أَمْر ini مَبْنِيّ di atas سُكُون, sesuai hukum asal فِعْل أَمْر; pelakunya kata ganti tersirat, yaitu engkau.",
+      "display": "Kata pertama, yaitu قُلْ (qul), artinya: “katakanlah”. Fi’il amr (فِعْل أَمْر) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sesuai hukum asal fi’il amr (فِعْل أَمْر); pelakunya kata ganti tersirat, yaitu “engkau”.",
       "highlight": [
         1
       ],
       "focus": "114:1:1"
     },
     "an-nas:1:w2": {
-      "text": "Kata kedua artinya: aku berlindung. Akhirnya dibaca dhommah, karena fi'il mudhori' ini tidak didahului huruf نَاصِب atau جَازِم; pelakunya kata ganti tersirat, yaitu aku.",
-      "display": "Kata kedua artinya: “aku berlindung”. Akhirnya dibaca dhammah (ضَمَّة), karena fi’il mudhari’ (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya kata ganti tersirat, yaitu “aku”.",
+      "text": "Kata kedua, yaitu a'udzu, artinya: aku berlindung. Akhirnya dibaca dhommah, karena fi'il mudhori' ini tidak didahului huruf نَاصِب atau جَازِم; pelakunya kata ganti tersirat, yaitu aku.",
+      "display": "Kata kedua, yaitu أَعُوذُ (a‘ūżu), artinya: “aku berlindung”. Akhirnya dibaca dhammah (ضَمَّة), karena fi’il mudhari’ (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya kata ganti tersirat, yaitu “aku”.",
       "highlight": [
         2
       ],
       "focus": "114:1:2"
     },
     "an-nas:1:w3": {
-      "text": "Kata ketiga artinya: kepada Tuhan. Akhirnya dibaca كَسْرَة, karena kata ini didahului حَرْف جَرّ, yaitu huruf بَاء, yang artinya kepada; frasa kata ini bergantung pada kata kedua.",
-      "display": "Kata ketiga artinya: “kepada Tuhan”. Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf ba’ (بِ), yang artinya “kepada”; frasa kata ini bergantung pada kata kedua.",
+      "text": "Kata ketiga, yaitu birabbi, artinya: kepada Tuhan. Akhirnya dibaca كَسْرَة, karena kata ini didahului حَرْف جَرّ, yaitu huruf بَاء, yang artinya kepada; frasa kata ini bergantung pada kata kedua.",
+      "display": "Kata ketiga, yaitu بِرَبِّ (birabbi), artinya: “kepada Tuhan”. Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf بِ, yang artinya “kepada”; frasa kata ini bergantung pada kata kedua.",
       "highlight": [
         3
       ],
       "focus": "114:1:3"
     },
     "an-nas:1:w4": {
-      "text": "Kata keempat artinya: manusia. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih, yaitu kata yang disandari, bagi kata ketiga.",
-      "display": "Kata keempat artinya: “manusia”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه), yaitu kata yang disandari, bagi kata ketiga.",
+      "text": "Kata keempat, yaitu an-nasi, artinya: manusia. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih, yaitu kata yang disandari, bagi kata ketiga.",
+      "display": "Kata keempat, yaitu ٱلنَّاسِ (an-nāsi), artinya: “manusia”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه), yaitu kata yang disandari, bagi kata ketiga.",
       "highlight": [
         4
       ],
       "focus": "114:1:4"
     },
     "an-nas:1:concept:fiil-amr": {
-      "text": "Konsep baru: فِعْل أَمْر, yaitu bentuk perintah, juga untuk doa. فِعْل أَمْر adalah bentuk perintah, seperti kata pertama katakanlah; bila diucapkan hamba kepada Alloh subhanahu wa ta'ala maknanya permohonan, doa, seperti kata yang artinya tunjukilah kami.",
-      "display": "Konsep baru: Fi’il amr (فِعْل أَمْر), yaitu bentuk perintah, juga untuk doa. Fi’il amr (فِعْل أَمْر) adalah bentuk perintah, seperti kata pertama “katakanlah”; bila diucapkan hamba kepada Allah subhanahu wa ta'ala maknanya permohonan (doa), seperti kata yang artinya “tunjukilah kami”.",
+      "text": "Konsep baru: فِعْل أَمْر, yaitu bentuk perintah, juga untuk doa. فِعْل أَمْر adalah bentuk perintah, seperti kata pertama katakanlah; bila diucapkan hamba kepada Alloh subhanahu wa ta'ala maknanya permohonan, doa, seperti kata ihdina yang artinya tunjukilah kami.",
+      "display": "Konsep baru: Fi’il amr (فِعْل أَمْر), yaitu bentuk perintah, juga untuk doa. Fi’il amr (فِعْل أَمْر) adalah bentuk perintah, seperti kata pertama “katakanlah”; bila diucapkan hamba kepada Allah subhanahu wa ta'ala maknanya permohonan (doa), seperti kata ٱهْدِنَا (ihdinā) yang artinya “tunjukilah kami”.",
       "highlight": [
         1
       ],
       "focus": null
     },
     "an-nas:1:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kalimat perintah: kata pertama, yang artinya katakanlah, adalah فِعْل أَمْر dengan pelaku tersirat engkau, dan kalimat yang diawali kata kedua adalah isi perkataan itu, maqul al-qaul, yang berkedudukan نَصْب.",
-      "display": "Sekarang susunan kalimatnya. Kalimat perintah: kata pertama, yang artinya “katakanlah”, adalah fi’il amr (فِعْل أَمْر) dengan pelaku tersirat “engkau”, dan kalimat yang diawali kata kedua adalah isi perkataan itu (maqul al-qaul), yang berkedudukan nashab (نَصْب).",
+      "text": "Sekarang susunan kalimatnya. Kalimat perintah: kata pertama, yaitu qul, yang artinya katakanlah, adalah فِعْل أَمْر dengan pelaku tersirat engkau, dan kalimat yang diawali kata kedua adalah isi perkataan itu, maqul al-qaul, yang berkedudukan نَصْب.",
+      "display": "Sekarang susunan kalimatnya. Kalimat perintah: kata pertama, yaitu قُلْ (qul), yang artinya “katakanlah”, adalah fi’il amr (فِعْل أَمْر) dengan pelaku tersirat “engkau”, dan kalimat yang diawali kata kedua adalah isi perkataan itu (maqul al-qaul), yang berkedudukan nashab (نَصْب).",
       "highlight": [
         0
       ],
       "focus": null
     },
     "an-nas:1:structure:b": {
-      "text": "Isi itu sendiri kalimat kata kerja: kata kedua, yang artinya aku berlindung, dengan pelaku tersirat aku, lalu kata ketiga dan keempat, yang artinya kepada Tuhan manusia, menerangkan kepada siapa ia berlindung: جَارّ وَمَجْرُور yang bergantung pada kata kedua, dengan kata ketiga disandarkan kepada kata keempat.",
-      "display": "Isi itu sendiri kalimat kata kerja: kata kedua, yang artinya “aku berlindung”, dengan pelaku tersirat “aku”, lalu kata ketiga dan keempat, yang artinya “kepada Tuhan manusia”, menerangkan kepada siapa ia berlindung: jar-majrur (جَارّ وَمَجْرُور) yang bergantung pada kata kedua, dengan kata ketiga disandarkan kepada kata keempat.",
+      "text": "Isi itu sendiri kalimat kata kerja: kata kedua, yaitu a'udzu, yang artinya aku berlindung, dengan pelaku tersirat aku, lalu kata ketiga dan keempat, yaitu birabbi an-nasi, yang artinya kepada Tuhan manusia, menerangkan kepada siapa ia berlindung: جَارّ وَمَجْرُور yang bergantung pada kata kedua, dengan kata ketiga disandarkan kepada kata keempat.",
+      "display": "Isi itu sendiri kalimat kata kerja: kata kedua, yaitu أَعُوذُ (a‘ūżu), yang artinya “aku berlindung”, dengan pelaku tersirat “aku”, lalu kata ketiga dan keempat, yaitu بِرَبِّ (birabbi) ٱلنَّاسِ (an-nāsi), yang artinya “kepada Tuhan manusia”, menerangkan kepada siapa ia berlindung: jar-majrur (جَارّ وَمَجْرُور) yang bergantung pada kata kedua, dengan kata ketiga disandarkan kepada kata keempat.",
       "highlight": [
         0
       ],
@@ -91,26 +91,26 @@
       "focus": null
     },
     "an-nas:1:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yang artinya katakanlah.",
-      "display": "Itu kata pertama, yang artinya “katakanlah”.",
+      "text": "Itu kata pertama, yaitu qul, yang artinya katakanlah.",
+      "display": "Itu kata pertama, yaitu قُلْ (qul), yang artinya “katakanlah”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:1:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yang artinya aku berlindung.",
-      "display": "Itu kata kedua, yang artinya “aku berlindung”.",
+      "text": "Itu kata kedua, yaitu a'udzu, yang artinya aku berlindung.",
+      "display": "Itu kata kedua, yaitu أَعُوذُ (a‘ūżu), yang artinya “aku berlindung”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:1:ex:tap-word:3:why": {
-      "text": "Itu kata ketiga, yang artinya kepada Tuhan.",
-      "display": "Itu kata ketiga, yang artinya “kepada Tuhan”.",
+      "text": "Itu kata ketiga, yaitu birabbi, yang artinya kepada Tuhan.",
+      "display": "Itu kata ketiga, yaitu بِرَبِّ (birabbi), yang artinya “kepada Tuhan”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:1:ex:tap-word:4:why": {
-      "text": "Itu kata keempat, yang artinya manusia.",
-      "display": "Itu kata keempat, yang artinya “manusia”.",
+      "text": "Itu kata keempat, yaitu an-nasi, yang artinya manusia.",
+      "display": "Itu kata keempat, yaitu ٱلنَّاسِ (an-nāsi), yang artinya “manusia”.",
       "highlight": [],
       "focus": null
     },
@@ -134,7 +134,7 @@
     },
     "an-nas:1:ex:why-harakat:3:why": {
       "text": "Akhirnya dibaca كَسْرَة, karena kata ini didahului حَرْف جَرّ, yaitu huruf بَاء, yang artinya kepada; frasa kata ini bergantung pada kata kedua. Jadi, kata ini مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf ba’ (بِ), yang artinya “kepada”; frasa kata ini bergantung pada kata kedua. Jadi, kata ini majrur (مَجْرُور).",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf بِ, yang artinya “kepada”; frasa kata ini bergantung pada kata kedua. Jadi, kata ini majrur (مَجْرُور).",
       "highlight": [],
       "focus": null
     },
@@ -164,7 +164,7 @@
     },
     "an-nas:1:ex:sort-case:3:why": {
       "text": "Akhirnya dibaca كَسْرَة, karena kata ini didahului حَرْف جَرّ, yaitu huruf بَاء, yang artinya kepada; frasa kata ini bergantung pada kata kedua. Jadi, kata ini مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf ba’ (بِ), yang artinya “kepada”; frasa kata ini bergantung pada kata kedua. Jadi, kata ini majrur (مَجْرُور).",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf بِ, yang artinya “kepada”; frasa kata ini bergantung pada kata kedua. Jadi, kata ini majrur (مَجْرُور).",
       "highlight": [],
       "focus": null
     },
@@ -194,7 +194,7 @@
     },
     "an-nas:1:ex:label-role:3:why": {
       "text": "Perannya: حَرْف جَرّ dan مَجْرُور. Akhirnya dibaca كَسْرَة, karena kata ini didahului حَرْف جَرّ, yaitu huruf بَاء, yang artinya kepada; frasa kata ini bergantung pada kata kedua.",
-      "display": "Perannya: huruf jar (حَرْف جَرّ) + majrur (مَجْرُور). Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf ba’ (بِ), yang artinya “kepada”; frasa kata ini bergantung pada kata kedua.",
+      "display": "Perannya: huruf jar (حَرْف جَرّ) + majrur (مَجْرُور). Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf بِ, yang artinya “kepada”; frasa kata ini bergantung pada kata kedua.",
       "highlight": [],
       "focus": null
     },
@@ -235,16 +235,16 @@
       "focus": null
     },
     "an-nas:2:w1": {
-      "text": "Kata pertama artinya: Raja. Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata yang artinya kepada Tuhan di ayat satu yang مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
-      "display": "Kata pertama artinya: “Raja”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata yang artinya “kepada Tuhan” di ayat satu yang majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "text": "Kata pertama, yaitu maliki, artinya: Raja. Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata birabbi yang artinya kepada Tuhan yang مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "display": "Kata pertama, yaitu مَلِكِ (maliki), artinya: “Raja”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata بِرَبِّ (birabbi) yang artinya “kepada Tuhan” yang majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
       "highlight": [
         1
       ],
       "focus": "114:2:1"
     },
     "an-nas:2:w2": {
-      "text": "Kata kedua artinya: manusia. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih bagi kata pertama.",
-      "display": "Kata kedua artinya: “manusia”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi kata pertama.",
+      "text": "Kata kedua, yaitu an-nasi, artinya: manusia. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih bagi kata pertama.",
+      "display": "Kata kedua, yaitu ٱلنَّاسِ (an-nāsi), artinya: “manusia”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi kata pertama.",
       "highlight": [
         2
       ],
@@ -259,8 +259,8 @@
       "focus": null
     },
     "an-nas:2:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Ayat ini bukan kalimat baru: kata pertama, yang artinya Raja, mengikuti kata yang artinya kepada Tuhan di ayat satu sebagai بَدَل, yaitu pengganti yang menjelaskan, menurut al-Jadwal, al-Mujtaba dan ad-Da'as, maka ikut مَجْرُور; Darwisy, al-Jadwal dan as-Samin juga membolehkannya dibaca sebagai نَعْت, yaitu sifat, atau 'athf bayan.",
-      "display": "Sekarang susunan kalimatnya. Ayat ini bukan kalimat baru: kata pertama, yang artinya “Raja”, mengikuti kata yang artinya “kepada Tuhan” di ayat satu sebagai badal (بَدَل), yaitu pengganti yang menjelaskan, menurut al-Jadwal, al-Mujtaba dan ad-Da'as, maka ikut majrur (مَجْرُور); Darwisy, al-Jadwal dan as-Samin juga membolehkannya dibaca sebagai na’t (نَعْت), yaitu sifat, atau 'athf bayan.",
+      "text": "Sekarang susunan kalimatnya. Ayat ini bukan kalimat baru: kata pertama, yaitu maliki, yang artinya Raja, mengikuti kata birabbi yang artinya kepada Tuhan sebagai بَدَل, yaitu pengganti yang menjelaskan, menurut al-Jadwal, al-Mujtaba dan ad-Da'as, maka ikut مَجْرُور; Darwisy, al-Jadwal dan as-Samin juga membolehkannya dibaca sebagai نَعْت, yaitu sifat, atau 'athf bayan.",
+      "display": "Sekarang susunan kalimatnya. Ayat ini bukan kalimat baru: kata pertama, yaitu مَلِكِ (maliki), yang artinya “Raja”, mengikuti kata بِرَبِّ (birabbi) yang artinya “kepada Tuhan” sebagai badal (بَدَل), yaitu pengganti yang menjelaskan, menurut al-Jadwal, al-Mujtaba dan ad-Da'as, maka ikut majrur (مَجْرُور); Darwisy, al-Jadwal dan as-Samin juga membolehkannya dibaca sebagai na’t (نَعْت), yaitu sifat, atau 'athf bayan.",
       "highlight": [
         0
       ],
@@ -283,14 +283,14 @@
       "focus": null
     },
     "an-nas:2:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yang artinya Raja.",
-      "display": "Itu kata pertama, yang artinya “Raja”.",
+      "text": "Itu kata pertama, yaitu maliki, yang artinya Raja.",
+      "display": "Itu kata pertama, yaitu مَلِكِ (maliki), yang artinya “Raja”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:2:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yang artinya manusia.",
-      "display": "Itu kata kedua, yang artinya “manusia”.",
+      "text": "Itu kata kedua, yaitu an-nasi, yang artinya manusia.",
+      "display": "Itu kata kedua, yaitu ٱلنَّاسِ (an-nāsi), yang artinya “manusia”.",
       "highlight": [],
       "focus": null
     },
@@ -301,8 +301,8 @@
       "focus": null
     },
     "an-nas:2:ex:why-harakat:1:why": {
-      "text": "Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata yang artinya kepada Tuhan di ayat satu yang مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata yang artinya “kepada Tuhan” di ayat satu yang majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "text": "Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata birabbi yang artinya kepada Tuhan yang مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata بِرَبِّ (birabbi) yang artinya “kepada Tuhan” yang majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
       "highlight": [],
       "focus": null
     },
@@ -319,8 +319,8 @@
       "focus": null
     },
     "an-nas:2:ex:sort-case:1:why": {
-      "text": "Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata yang artinya kepada Tuhan di ayat satu yang مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata yang artinya “kepada Tuhan” di ayat satu yang majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "text": "Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata birabbi yang artinya kepada Tuhan yang مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata بِرَبِّ (birabbi) yang artinya “kepada Tuhan” yang majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
       "highlight": [],
       "focus": null
     },
@@ -337,8 +337,8 @@
       "focus": null
     },
     "an-nas:2:ex:label-role:1:why": {
-      "text": "Perannya: بَدَل. Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata yang artinya kepada Tuhan di ayat satu yang مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
-      "display": "Perannya: badal (بَدَل). Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata yang artinya “kepada Tuhan” di ayat satu yang majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "text": "Perannya: بَدَل. Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata birabbi yang artinya kepada Tuhan yang مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "display": "Perannya: badal (بَدَل). Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata بِرَبِّ (birabbi) yang artinya “kepada Tuhan” yang majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
       "highlight": [],
       "focus": null
     },
@@ -379,24 +379,24 @@
       "focus": null
     },
     "an-nas:3:w1": {
-      "text": "Kata pertama artinya: sembahan. Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata yang artinya Raja di ayat dua, sehingga ikut مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
-      "display": "Kata pertama artinya: “sembahan”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata yang artinya “Raja” di ayat dua, sehingga ikut majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "text": "Kata pertama, yaitu ilahi, artinya: sembahan. Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata maliki yang artinya Raja, sehingga ikut مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "display": "Kata pertama, yaitu إِلَٰهِ (ilāhi), artinya: “sembahan”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata مَلِكِ (maliki) yang artinya “Raja”, sehingga ikut majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
       "highlight": [
         1
       ],
       "focus": "114:3:1"
     },
     "an-nas:3:w2": {
-      "text": "Kata kedua artinya: manusia. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih bagi kata pertama.",
-      "display": "Kata kedua artinya: “manusia”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi kata pertama.",
+      "text": "Kata kedua, yaitu an-nasi, artinya: manusia. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih bagi kata pertama.",
+      "display": "Kata kedua, yaitu ٱلنَّاسِ (an-nāsi), artinya: “manusia”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi kata pertama.",
       "highlight": [
         2
       ],
       "focus": "114:3:2"
     },
     "an-nas:3:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kata pertama, yang artinya Sembahan, juga mengikuti kata sebelumnya dan ikut مَجْرُور: بَدَل dari kata yang artinya Raja di ayat dua menurut al-Jadwal dan al-Mujtaba, ad-Da'as: dari kata yang artinya kepada Tuhan di ayat satu, dan sebagian ulama menjadikannya sifat atau 'athf bayan; ia disandarkan kepada kata kedua.",
-      "display": "Sekarang susunan kalimatnya. Kata pertama, yang artinya “Sembahan”, juga mengikuti kata sebelumnya dan ikut majrur (مَجْرُور): badal (بَدَل) dari kata yang artinya “Raja” di ayat dua menurut al-Jadwal dan al-Mujtaba (ad-Da'as: dari kata yang artinya “kepada Tuhan” di ayat satu), dan sebagian ulama menjadikannya sifat atau 'athf bayan; ia disandarkan kepada kata kedua.",
+      "text": "Sekarang susunan kalimatnya. Kata pertama, yaitu ilahi, yang artinya Sembahan, ikut مَجْرُور: بَدَل dari kata maliki yang artinya Raja menurut al-Jadwal dan al-Mujtaba, ad-Da'as: dari kata birabbi yang artinya kepada Tuhan, dan sebagian ulama menjadikannya sifat atau 'athf bayan; ia disandarkan kepada kata kedua.",
+      "display": "Sekarang susunan kalimatnya. Kata pertama, yaitu إِلَٰهِ (ilāhi), yang artinya “Sembahan”, ikut majrur (مَجْرُور): badal (بَدَل) dari kata مَلِكِ (maliki) yang artinya “Raja” menurut al-Jadwal dan al-Mujtaba (ad-Da'as: dari kata بِرَبِّ (birabbi) yang artinya “kepada Tuhan”), dan sebagian ulama menjadikannya sifat atau 'athf bayan; ia disandarkan kepada kata kedua.",
       "highlight": [
         0
       ],
@@ -419,14 +419,14 @@
       "focus": null
     },
     "an-nas:3:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yang artinya sembahan.",
-      "display": "Itu kata pertama, yang artinya “sembahan”.",
+      "text": "Itu kata pertama, yaitu ilahi, yang artinya sembahan.",
+      "display": "Itu kata pertama, yaitu إِلَٰهِ (ilāhi), yang artinya “sembahan”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:3:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yang artinya manusia.",
-      "display": "Itu kata kedua, yang artinya “manusia”.",
+      "text": "Itu kata kedua, yaitu an-nasi, yang artinya manusia.",
+      "display": "Itu kata kedua, yaitu ٱلنَّاسِ (an-nāsi), yang artinya “manusia”.",
       "highlight": [],
       "focus": null
     },
@@ -437,8 +437,8 @@
       "focus": null
     },
     "an-nas:3:ex:why-harakat:1:why": {
-      "text": "Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata yang artinya Raja di ayat dua, sehingga ikut مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata yang artinya “Raja” di ayat dua, sehingga ikut majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "text": "Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata maliki yang artinya Raja, sehingga ikut مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata مَلِكِ (maliki) yang artinya “Raja”, sehingga ikut majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
       "highlight": [],
       "focus": null
     },
@@ -455,8 +455,8 @@
       "focus": null
     },
     "an-nas:3:ex:sort-case:1:why": {
-      "text": "Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata yang artinya Raja di ayat dua, sehingga ikut مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata yang artinya “Raja” di ayat dua, sehingga ikut majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "text": "Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata maliki yang artinya Raja, sehingga ikut مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata مَلِكِ (maliki) yang artinya “Raja”, sehingga ikut majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
       "highlight": [],
       "focus": null
     },
@@ -473,8 +473,8 @@
       "focus": null
     },
     "an-nas:3:ex:label-role:1:why": {
-      "text": "Perannya: بَدَل. Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata yang artinya Raja di ayat dua, sehingga ikut مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
-      "display": "Perannya: badal (بَدَل). Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata yang artinya “Raja” di ayat dua, sehingga ikut majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "text": "Perannya: بَدَل. Akhirnya dibaca كَسْرَة, karena menjadi بَدَل, yaitu pengganti yang menjelaskan, dari kata maliki yang artinya Raja, sehingga ikut مَجْرُور; sebagian ulama menjadikannya sifat atau 'athf bayan.",
+      "display": "Perannya: badal (بَدَل). Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal (بَدَل), yaitu pengganti yang menjelaskan, dari kata مَلِكِ (maliki) yang artinya “Raja”, sehingga ikut majrur (مَجْرُور); sebagian ulama menjadikannya sifat atau 'athf bayan.",
       "highlight": [],
       "focus": null
     },
@@ -515,48 +515,48 @@
       "focus": null
     },
     "an-nas:4:w1": {
-      "text": "Kata pertama artinya: dari. Kata ini, yang artinya dari, adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata pertama dan kedua bergantung pada kata yang artinya aku berlindung di ayat satu.",
-      "display": "Kata pertama artinya: “dari”. Kata ini, yang artinya “dari”, adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata pertama dan kedua bergantung pada kata yang artinya “aku berlindung” di ayat satu.",
+      "text": "Kata pertama, yaitu min, artinya: dari. Kata ini, yaitu min, yang artinya dari, adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung.",
+      "display": "Kata pertama, yaitu مِن (min), artinya: “dari”. Kata ini, yaitu مِن (min), yang artinya “dari”, adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
       "highlight": [
         1
       ],
       "focus": "114:4:1"
     },
     "an-nas:4:w2": {
-      "text": "Kata kedua artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini lalu disandarkan kepada kata ketiga.",
-      "display": "Kata kedua artinya: “kejahatan”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama; kata ini lalu disandarkan kepada kata ketiga.",
+      "text": "Kata kedua, yaitu syarri, artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini lalu disandarkan kepada kata ketiga.",
+      "display": "Kata kedua, yaitu شَرِّ (syarri), artinya: “kejahatan”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama; kata ini lalu disandarkan kepada kata ketiga.",
       "highlight": [
         2
       ],
       "focus": "114:4:2"
     },
     "an-nas:4:w3": {
-      "text": "Kata ketiga artinya: pembisik, setan. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih bagi kata kedua.",
-      "display": "Kata ketiga artinya: “pembisik (setan)”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi kata kedua.",
+      "text": "Kata ketiga, yaitu al-waswasi, artinya: pembisik, setan. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih bagi kata kedua.",
+      "display": "Kata ketiga, yaitu ٱلْوَسْوَاسِ (al-waswāsi), artinya: “pembisik (setan)”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi kata kedua.",
       "highlight": [
         3
       ],
       "focus": "114:4:3"
     },
     "an-nas:4:w4": {
-      "text": "Kata keempat artinya: yang bersembunyi. Akhirnya dibaca كَسْرَة, karena menjadi sifat, atau نَعْت, bagi kata ketiga yang مَجْرُور.",
-      "display": "Kata keempat artinya: “yang bersembunyi”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi sifat, atau na’t (نَعْت), bagi kata ketiga yang majrur (مَجْرُور).",
+      "text": "Kata keempat, yaitu al-khannasi, artinya: yang bersembunyi. Akhirnya dibaca كَسْرَة, karena menjadi sifat, atau نَعْت, bagi kata ketiga yang مَجْرُور.",
+      "display": "Kata keempat, yaitu ٱلْخَنَّاسِ (al-khannāsi), artinya: “yang bersembunyi”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi sifat, atau na’t (نَعْت), bagi kata ketiga yang majrur (مَجْرُور).",
       "highlight": [
         4
       ],
       "focus": "114:4:4"
     },
     "an-nas:4:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yang artinya dari kejahatan, adalah جَارّ وَمَجْرُور kedua yang bergantung pada kata yang artinya aku berlindung di ayat satu: berlindung kepada Tuhan manusia, dari kejahatan.",
-      "display": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yang artinya “dari kejahatan”, adalah jar-majrur (جَارّ وَمَجْرُور) kedua yang bergantung pada kata yang artinya “aku berlindung” di ayat satu: berlindung kepada Tuhan manusia, dari kejahatan.",
+      "text": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yaitu min syarri, yang artinya dari kejahatan, adalah جَارّ وَمَجْرُور yang bergantung pada kata a'udzu yang artinya aku berlindung: berlindung kepada Tuhan manusia, dari kejahatan.",
+      "display": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yaitu مِن (min) شَرِّ (syarri), yang artinya “dari kejahatan”, adalah jar-majrur (جَارّ وَمَجْرُور) yang bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”: berlindung kepada Tuhan manusia, dari kejahatan.",
       "highlight": [
         0
       ],
       "focus": null
     },
     "an-nas:4:structure:b": {
-      "text": "Kata kedua disandarkan kepada kata ketiga, yang artinya pembisik, dan kata keempat, yang artinya yang bersembunyi, adalah sifatnya, maka keduanya berakhir كَسْرَة. Menurut riwayat dari Ibnu 'Abbas, dinukil Ibnu Katsir dan an-Nahhas, setan membisik ketika manusia lalai, lalu mundur bersembunyi ketika manusia mengingat Alloh subhanahu wa ta'ala.",
-      "display": "Kata kedua disandarkan kepada kata ketiga, yang artinya “pembisik”, dan kata keempat, yang artinya “yang bersembunyi”, adalah sifatnya, maka keduanya berakhir kasrah (كَسْرَة). Menurut riwayat dari Ibnu 'Abbas (dinukil Ibnu Katsir dan an-Nahhas), setan membisik ketika manusia lalai, lalu mundur bersembunyi ketika manusia mengingat Allah subhanahu wa ta'ala.",
+      "text": "Kata kedua disandarkan kepada kata ketiga, yaitu al-waswasi, yang artinya pembisik, dan kata keempat, yaitu al-khannasi, yang artinya yang bersembunyi, adalah sifatnya, maka keduanya berakhir كَسْرَة. Menurut riwayat dari Ibnu 'Abbas, dinukil Ibnu Katsir dan an-Nahhas, setan membisik ketika manusia lalai, lalu mundur bersembunyi ketika manusia mengingat Alloh subhanahu wa ta'ala.",
+      "display": "Kata kedua disandarkan kepada kata ketiga, yaitu ٱلْوَسْوَاسِ (al-waswāsi), yang artinya “pembisik”, dan kata keempat, yaitu ٱلْخَنَّاسِ (al-khannāsi), yang artinya “yang bersembunyi”, adalah sifatnya, maka keduanya berakhir kasrah (كَسْرَة). Menurut riwayat dari Ibnu 'Abbas (dinukil Ibnu Katsir dan an-Nahhas), setan membisik ketika manusia lalai, lalu mundur bersembunyi ketika manusia mengingat Allah subhanahu wa ta'ala.",
       "highlight": [
         0
       ],
@@ -571,26 +571,26 @@
       "focus": null
     },
     "an-nas:4:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yang artinya dari.",
-      "display": "Itu kata pertama, yang artinya “dari”.",
+      "text": "Itu kata pertama, yaitu min, yang artinya dari.",
+      "display": "Itu kata pertama, yaitu مِن (min), yang artinya “dari”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:4:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yang artinya kejahatan.",
-      "display": "Itu kata kedua, yang artinya “kejahatan”.",
+      "text": "Itu kata kedua, yaitu syarri, yang artinya kejahatan.",
+      "display": "Itu kata kedua, yaitu شَرِّ (syarri), yang artinya “kejahatan”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:4:ex:tap-word:3:why": {
-      "text": "Itu kata ketiga, yang artinya pembisik, setan.",
-      "display": "Itu kata ketiga, yang artinya “pembisik (setan)”.",
+      "text": "Itu kata ketiga, yaitu al-waswasi, yang artinya pembisik, setan.",
+      "display": "Itu kata ketiga, yaitu ٱلْوَسْوَاسِ (al-waswāsi), yang artinya “pembisik (setan)”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:4:ex:tap-word:4:why": {
-      "text": "Itu kata keempat, yang artinya yang bersembunyi.",
-      "display": "Itu kata keempat, yang artinya “yang bersembunyi”.",
+      "text": "Itu kata keempat, yaitu al-khannasi, yang artinya yang bersembunyi.",
+      "display": "Itu kata keempat, yaitu ٱلْخَنَّاسِ (al-khannāsi), yang artinya “yang bersembunyi”.",
       "highlight": [],
       "focus": null
     },
@@ -649,8 +649,8 @@
       "focus": null
     },
     "an-nas:4:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف جَرّ. Kata ini, yang artinya dari, adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata pertama dan kedua bergantung pada kata yang artinya aku berlindung di ayat satu.",
-      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini, yang artinya “dari”, adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata pertama dan kedua bergantung pada kata yang artinya “aku berlindung” di ayat satu.",
+      "text": "Perannya: حَرْف جَرّ. Kata ini, yaitu min, yang artinya dari, adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung.",
+      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini, yaitu مِن (min), yang artinya “dari”, adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
       "highlight": [],
       "focus": null
     },
@@ -703,56 +703,56 @@
       "focus": null
     },
     "an-nas:5:w1": {
-      "text": "Kata pertama artinya: yang. اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata yang artinya pembisik, setan, di ayat empat; kalimat sesudahnya menjadi shilah-nya.",
-      "display": "Kata pertama artinya: “yang”. Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai sifat, atau na’t (نَعْت), bagi kata yang artinya “pembisik (setan)” di ayat empat; kalimat sesudahnya menjadi shilah-nya.",
+      "text": "Kata pertama, yaitu alladzi, artinya: yang. اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata al-waswasi yang artinya pembisik, setan; kalimat sesudahnya menjadi shilah-nya.",
+      "display": "Kata pertama, yaitu ٱلَّذِى (allażī), artinya: “yang”. Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai sifat, atau na’t (نَعْت), bagi kata ٱلْوَسْوَاسِ (al-waswāsi) yang artinya “pembisik (setan)”; kalimat sesudahnya menjadi shilah-nya.",
       "highlight": [
         1
       ],
       "focus": "114:5:1"
     },
     "an-nas:5:w2": {
-      "text": "Kata kedua artinya: membisikkan. Akhirnya dibaca dhommah, karena fi'il mudhori' ini tidak didahului huruf نَاصِب atau جَازِم; pelakunya kata ganti tersirat ia, yang kembali kepada kata pertama.",
-      "display": "Kata kedua artinya: “membisikkan”. Akhirnya dibaca dhammah (ضَمَّة), karena fi’il mudhari’ (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya kata ganti tersirat “ia”, yang kembali kepada kata pertama.",
+      "text": "Kata kedua, yaitu yuwaswisu, artinya: membisikkan. Akhirnya dibaca dhommah, karena fi'il mudhori' ini tidak didahului huruf نَاصِب atau جَازِم; pelakunya kata ganti tersirat ia, yang kembali kepada kata pertama.",
+      "display": "Kata kedua, yaitu يُوَسْوِسُ (yuwaswisu), artinya: “membisikkan”. Akhirnya dibaca dhammah (ضَمَّة), karena fi’il mudhari’ (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya kata ganti tersirat “ia”, yang kembali kepada kata pertama.",
       "highlight": [
         2
       ],
       "focus": "114:5:2"
     },
     "an-nas:5:w3": {
-      "text": "Kata ketiga artinya: ke dalam. Kata ini, yang artinya di dalam, adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata ketiga dan keempat bergantung pada kata kedua.",
-      "display": "Kata ketiga artinya: “ke dalam”. Kata ini, yang artinya “di dalam”, adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata ketiga dan keempat bergantung pada kata kedua.",
+      "text": "Kata ketiga, yaitu fi, artinya: ke dalam. Kata ini, yaitu fi, yang artinya di dalam, adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata ketiga dan keempat bergantung pada kata kedua.",
+      "display": "Kata ketiga, yaitu فِى (fī), artinya: “ke dalam”. Kata ini, yaitu فِى (fī), yang artinya “di dalam”, adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata ketiga dan keempat bergantung pada kata kedua.",
       "highlight": [
         3
       ],
       "focus": "114:5:3"
     },
     "an-nas:5:w4": {
-      "text": "Kata keempat artinya: dada. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata ketiga; kata ini lalu disandarkan kepada kata kelima.",
-      "display": "Kata keempat artinya: “dada”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata ketiga; kata ini lalu disandarkan kepada kata kelima.",
+      "text": "Kata keempat, yaitu shuduri, artinya: dada. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata ketiga; kata ini lalu disandarkan kepada kata kelima.",
+      "display": "Kata keempat, yaitu صُدُورِ (ṣudūri), artinya: “dada”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata ketiga; kata ini lalu disandarkan kepada kata kelima.",
       "highlight": [
         4
       ],
       "focus": "114:5:4"
     },
     "an-nas:5:w5": {
-      "text": "Kata kelima artinya: manusia. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih bagi kata keempat.",
-      "display": "Kata kelima artinya: “manusia”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi kata keempat.",
+      "text": "Kata kelima, yaitu an-nasi, artinya: manusia. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih bagi kata keempat.",
+      "display": "Kata kelima, yaitu ٱلنَّاسِ (an-nāsi), artinya: “manusia”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi kata keempat.",
       "highlight": [
         5
       ],
       "focus": "114:5:5"
     },
     "an-nas:5:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kata pertama, yang artinya yang, adalah sifat, atau نَعْت, bagi kata yang artinya pembisik, setan, di ayat empat: ia مَبْنِيّ, tetapi berkedudukan جَرّ.",
-      "display": "Sekarang susunan kalimatnya. Kata pertama, yang artinya “yang”, adalah sifat, atau na’t (نَعْت), bagi kata yang artinya “pembisik (setan)” di ayat empat: ia mabni (مَبْنِيّ), tetapi berkedudukan jar (جَرّ).",
+      "text": "Sekarang susunan kalimatnya. Kata pertama, yaitu alladzi, yang artinya yang, adalah sifat, atau نَعْت, bagi kata al-waswasi yang artinya pembisik, setan: ia مَبْنِيّ, tetapi berkedudukan جَرّ.",
+      "display": "Sekarang susunan kalimatnya. Kata pertama, yaitu ٱلَّذِى (allażī), yang artinya “yang”, adalah sifat, atau na’t (نَعْت), bagi kata ٱلْوَسْوَاسِ (al-waswāsi) yang artinya “pembisik (setan)”: ia mabni (مَبْنِيّ), tetapi berkedudukan jar (جَرّ).",
       "highlight": [
         0
       ],
       "focus": null
     },
     "an-nas:5:structure:b": {
-      "text": "Kalimat sesudahnya, kata kedua sampai kelima, yang artinya membisikkan ke dalam dada manusia, adalah shilah-nya: kata kedua fi'il mudhori' dengan pelaku tersirat ia yang kembali kepada kata pertama, kata ketiga dan keempat bergantung pada kata kedua, dan kata keempat disandarkan kepada kata kelima.",
-      "display": "Kalimat sesudahnya, kata kedua sampai kelima, yang artinya “membisikkan ke dalam dada manusia”, adalah shilah-nya: kata kedua fi’il mudhari’ (فِعْل مُضَارِع) dengan pelaku tersirat “ia” yang kembali kepada kata pertama, kata ketiga dan keempat bergantung pada kata kedua, dan kata keempat disandarkan kepada kata kelima.",
+      "text": "Kalimat sesudahnya, kata kedua sampai kelima, yaitu yuwaswisu fi shuduri an-nasi, yang artinya membisikkan ke dalam dada manusia, adalah shilah-nya: kata kedua fi'il mudhori' dengan pelaku tersirat ia yang kembali kepada kata pertama, kata ketiga dan keempat bergantung pada kata kedua, dan kata keempat disandarkan kepada kata kelima.",
+      "display": "Kalimat sesudahnya, kata kedua sampai kelima, yaitu يُوَسْوِسُ (yuwaswisu) فِى (fī) صُدُورِ (ṣudūri) ٱلنَّاسِ (an-nāsi), yang artinya “membisikkan ke dalam dada manusia”, adalah shilah-nya: kata kedua fi’il mudhari’ (فِعْل مُضَارِع) dengan pelaku tersirat “ia” yang kembali kepada kata pertama, kata ketiga dan keempat bergantung pada kata kedua, dan kata keempat disandarkan kepada kata kelima.",
       "highlight": [
         0
       ],
@@ -767,32 +767,32 @@
       "focus": null
     },
     "an-nas:5:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yang artinya yang.",
-      "display": "Itu kata pertama, yang artinya “yang”.",
+      "text": "Itu kata pertama, yaitu alladzi, yang artinya yang.",
+      "display": "Itu kata pertama, yaitu ٱلَّذِى (allażī), yang artinya “yang”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:5:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yang artinya membisikkan.",
-      "display": "Itu kata kedua, yang artinya “membisikkan”.",
+      "text": "Itu kata kedua, yaitu yuwaswisu, yang artinya membisikkan.",
+      "display": "Itu kata kedua, yaitu يُوَسْوِسُ (yuwaswisu), yang artinya “membisikkan”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:5:ex:tap-word:3:why": {
-      "text": "Itu kata ketiga, yang artinya ke dalam.",
-      "display": "Itu kata ketiga, yang artinya “ke dalam”.",
+      "text": "Itu kata ketiga, yaitu fi, yang artinya ke dalam.",
+      "display": "Itu kata ketiga, yaitu فِى (fī), yang artinya “ke dalam”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:5:ex:tap-word:4:why": {
-      "text": "Itu kata keempat, yang artinya dada.",
-      "display": "Itu kata keempat, yang artinya “dada”.",
+      "text": "Itu kata keempat, yaitu shuduri, yang artinya dada.",
+      "display": "Itu kata keempat, yaitu صُدُورِ (ṣudūri), yang artinya “dada”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:5:ex:tap-word:5:why": {
-      "text": "Itu kata kelima, yang artinya manusia.",
-      "display": "Itu kata kelima, yang artinya “manusia”.",
+      "text": "Itu kata kelima, yaitu an-nasi, yang artinya manusia.",
+      "display": "Itu kata kelima, yaitu ٱلنَّاسِ (an-nāsi), yang artinya “manusia”.",
       "highlight": [],
       "focus": null
     },
@@ -803,8 +803,8 @@
       "focus": null
     },
     "an-nas:5:ex:why-harakat:1:why": {
-      "text": "اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata yang artinya pembisik, setan, di ayat empat; kalimat sesudahnya menjadi shilah-nya.",
-      "display": "Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai sifat, atau na’t (نَعْت), bagi kata yang artinya “pembisik (setan)” di ayat empat; kalimat sesudahnya menjadi shilah-nya.",
+      "text": "اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata al-waswasi yang artinya pembisik, setan; kalimat sesudahnya menjadi shilah-nya.",
+      "display": "Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai sifat, atau na’t (نَعْت), bagi kata ٱلْوَسْوَاسِ (al-waswāsi) yang artinya “pembisik (setan)”; kalimat sesudahnya menjadi shilah-nya.",
       "highlight": [],
       "focus": null
     },
@@ -833,8 +833,8 @@
       "focus": null
     },
     "an-nas:5:ex:sort-case:1:why": {
-      "text": "اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata yang artinya pembisik, setan, di ayat empat; kalimat sesudahnya menjadi shilah-nya.",
-      "display": "Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai sifat, atau na’t (نَعْت), bagi kata yang artinya “pembisik (setan)” di ayat empat; kalimat sesudahnya menjadi shilah-nya.",
+      "text": "اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata al-waswasi yang artinya pembisik, setan; kalimat sesudahnya menjadi shilah-nya.",
+      "display": "Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai sifat, atau na’t (نَعْت), bagi kata ٱلْوَسْوَاسِ (al-waswāsi) yang artinya “pembisik (setan)”; kalimat sesudahnya menjadi shilah-nya.",
       "highlight": [],
       "focus": null
     },
@@ -863,8 +863,8 @@
       "focus": null
     },
     "an-nas:5:ex:label-role:1:why": {
-      "text": "Perannya: اِسْم مَوْصُول. اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata yang artinya pembisik, setan, di ayat empat; kalimat sesudahnya menjadi shilah-nya.",
-      "display": "Perannya: isim maushul (اِسْم مَوْصُول). Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai sifat, atau na’t (نَعْت), bagi kata yang artinya “pembisik (setan)” di ayat empat; kalimat sesudahnya menjadi shilah-nya.",
+      "text": "Perannya: اِسْم مَوْصُول. اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata al-waswasi yang artinya pembisik, setan; kalimat sesudahnya menjadi shilah-nya.",
+      "display": "Perannya: isim maushul (اِسْم مَوْصُول). Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai sifat, atau na’t (نَعْت), bagi kata ٱلْوَسْوَاسِ (al-waswāsi) yang artinya “pembisik (setan)”; kalimat sesudahnya menjadi shilah-nya.",
       "highlight": [],
       "focus": null
     },
@@ -875,8 +875,8 @@
       "focus": null
     },
     "an-nas:5:ex:label-role:3:why": {
-      "text": "Perannya: حَرْف جَرّ. Kata ini, yang artinya di dalam, adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata ketiga dan keempat bergantung pada kata kedua.",
-      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini, yang artinya “di dalam”, adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata ketiga dan keempat bergantung pada kata kedua.",
+      "text": "Perannya: حَرْف جَرّ. Kata ini, yaitu fi, yang artinya di dalam, adalah حَرْف جَرّ yang مَبْنِيّ di atas سُكُون, karena semua huruf مَبْنِيّ; frasa kata ketiga dan keempat bergantung pada kata kedua.",
+      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini, yaitu فِى (fī), yang artinya “di dalam”, adalah huruf jar (حَرْف جَرّ) yang mabni (مَبْنِيّ) di atas sukun (سُكُون), karena semua huruf mabni (مَبْنِيّ); frasa kata ketiga dan keempat bergantung pada kata kedua.",
       "highlight": [],
       "focus": null
     },
@@ -923,40 +923,40 @@
       "focus": null
     },
     "an-nas:6:w1": {
-      "text": "Kata pertama artinya: dari. Kata ini adalah حَرْف جَرّ yang artinya dari, yang مَبْنِيّ di atas سُكُون; nunnya berharakat فَتْحَة di sini hanya karena bertemu huruf mati pada alif lam sesudahnya, sebab kata مَبْنِيّ boleh bergerak untuk menghindari dua huruf mati bertemu.",
-      "display": "Kata pertama artinya: “dari”. Kata ini adalah huruf jar (حَرْف جَرّ) yang artinya “dari”, yang mabni (مَبْنِيّ) di atas sukun (سُكُون); nunnya berharakat fathah (فَتْحَة) di sini hanya karena bertemu huruf mati pada alif lam (ال) sesudahnya, sebab kata mabni (مَبْنِيّ) boleh bergerak untuk menghindari dua huruf mati bertemu.",
+      "text": "Kata pertama, yaitu mina, artinya: dari. Kata ini adalah حَرْف جَرّ yang artinya dari, yang مَبْنِيّ di atas سُكُون; nunnya berharakat فَتْحَة di sini hanya karena bertemu huruf mati pada alif lam sesudahnya, sebab kata مَبْنِيّ boleh bergerak untuk menghindari dua huruf mati bertemu.",
+      "display": "Kata pertama, yaitu مِنَ (mina), artinya: “dari”. Kata ini adalah huruf jar (حَرْف جَرّ) yang artinya “dari”, yang mabni (مَبْنِيّ) di atas sukun (سُكُون); nunnya berharakat fathah (فَتْحَة) di sini hanya karena bertemu huruf mati pada alif lam (ال) sesudahnya, sebab kata mabni (مَبْنِيّ) boleh bergerak untuk menghindari dua huruf mati bertemu.",
       "highlight": [
         1
       ],
       "focus": "114:6:1"
     },
     "an-nas:6:w2": {
-      "text": "Kata kedua artinya: golongan, jin. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama.",
-      "display": "Kata kedua artinya: “(golongan) jin”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama.",
+      "text": "Kata kedua, yaitu al-jinnati, artinya: golongan, jin. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama.",
+      "display": "Kata kedua, yaitu ٱلْجِنَّةِ (al-jinnati), artinya: “(golongan) jin”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu kata pertama.",
       "highlight": [
         2
       ],
       "focus": "114:6:2"
     },
     "an-nas:6:w3": {
-      "text": "Kata ketiga artinya: dan manusia. وَاو adalah حَرْف عَطْف, dan kata ini disambungkan dengan عَطْف kepada kata kedua yang مَجْرُور, maka ikut berakhir كَسْرَة.",
-      "display": "Kata ketiga artinya: “dan manusia”. Wawu (وَ) adalah huruf ‘athaf (حَرْف عَطْف), dan kata ini disambungkan dengan ‘athaf (عَطْف) kepada kata kedua yang majrur (مَجْرُور), maka ikut berakhir kasrah (كَسْرَة).",
+      "text": "Kata ketiga, yaitu wa an-nasi, artinya: dan manusia. وَاو adalah حَرْف عَطْف, dan kata ini disambungkan dengan عَطْف kepada kata kedua yang مَجْرُور, maka ikut berakhir كَسْرَة.",
+      "display": "Kata ketiga, yaitu وَٱلنَّاسِ (wa an-nāsi), artinya: “dan manusia”. وَ adalah huruf ‘athaf (حَرْف عَطْف), dan kata ini disambungkan dengan ‘athaf (عَطْف) kepada kata kedua yang majrur (مَجْرُور), maka ikut berakhir kasrah (كَسْرَة).",
       "highlight": [
         3
       ],
       "focus": "114:6:3"
     },
     "an-nas:6:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yang artinya dari golongan jin, adalah جَارّ وَمَجْرُور, dan kata ketiga, yang artinya dan manusia, disambungkan dengan عَطْف kepada kata kedua sehingga ikut مَجْرُور.",
-      "display": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yang artinya “dari golongan jin”, adalah jar-majrur (جَارّ وَمَجْرُور), dan kata ketiga, yang artinya “dan manusia”, disambungkan dengan ‘athaf (عَطْف) kepada kata kedua sehingga ikut majrur (مَجْرُور).",
+      "text": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yaitu mina al-jinnati, yang artinya dari golongan jin, adalah جَارّ وَمَجْرُور, dan kata ketiga, yaitu wa an-nasi, yang artinya dan manusia, disambungkan dengan عَطْف kepada kata kedua sehingga ikut مَجْرُور.",
+      "display": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yaitu مِنَ (mina) ٱلْجِنَّةِ (al-jinnati), yang artinya “dari golongan jin”, adalah jar-majrur (جَارّ وَمَجْرُور), dan kata ketiga, yaitu وَٱلنَّاسِ (wa an-nāsi), yang artinya “dan manusia”, disambungkan dengan ‘athaf (عَطْف) kepada kata kedua sehingga ikut majrur (مَجْرُور).",
       "highlight": [
         0
       ],
       "focus": null
     },
     "an-nas:6:structure:b": {
-      "text": "Al-Jadwal, al-Mujtaba dan ad-Da'as menjadikan frasa ini keterangan keadaan, hal, bagi pelaku kata yang artinya membisikkan di ayat lima, sedangkan Darwisy membacanya sebagai penjelas, bayan, bagi yang membisikkan; menurut keduanya, pembisik itu ada dari golongan jin dan dari golongan manusia.",
-      "display": "Al-Jadwal, al-Mujtaba dan ad-Da'as menjadikan frasa ini keterangan keadaan (hal) bagi pelaku kata yang artinya “membisikkan” di ayat lima, sedangkan Darwisy membacanya sebagai penjelas (bayan) bagi “yang membisikkan”; menurut keduanya, pembisik itu ada dari golongan jin dan dari golongan manusia.",
+      "text": "Al-Jadwal, al-Mujtaba dan ad-Da'as menjadikan frasa ini keterangan keadaan, hal, bagi pelaku kata yuwaswisu yang artinya membisikkan, sedangkan Darwisy membacanya sebagai penjelas, bayan, bagi yang membisikkan; menurut keduanya, pembisik itu ada dari golongan jin dan dari golongan manusia.",
+      "display": "Al-Jadwal, al-Mujtaba dan ad-Da'as menjadikan frasa ini keterangan keadaan (hal) bagi pelaku kata يُوَسْوِسُ (yuwaswisu) yang artinya “membisikkan”, sedangkan Darwisy membacanya sebagai penjelas (bayan) bagi “yang membisikkan”; menurut keduanya, pembisik itu ada dari golongan jin dan dari golongan manusia.",
       "highlight": [
         0
       ],
@@ -979,20 +979,20 @@
       "focus": null
     },
     "an-nas:6:ex:tap-word:1:why": {
-      "text": "Itu kata pertama, yang artinya dari.",
-      "display": "Itu kata pertama, yang artinya “dari”.",
+      "text": "Itu kata pertama, yaitu mina, yang artinya dari.",
+      "display": "Itu kata pertama, yaitu مِنَ (mina), yang artinya “dari”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:6:ex:tap-word:2:why": {
-      "text": "Itu kata kedua, yang artinya, golongan, jin.",
-      "display": "Itu kata kedua, yang artinya “(golongan) jin”.",
+      "text": "Itu kata kedua, yaitu al-jinnati, yang artinya, golongan, jin.",
+      "display": "Itu kata kedua, yaitu ٱلْجِنَّةِ (al-jinnati), yang artinya “(golongan) jin”.",
       "highlight": [],
       "focus": null
     },
     "an-nas:6:ex:tap-word:3:why": {
-      "text": "Itu kata ketiga, yang artinya dan manusia.",
-      "display": "Itu kata ketiga, yang artinya “dan manusia”.",
+      "text": "Itu kata ketiga, yaitu wa an-nasi, yang artinya dan manusia.",
+      "display": "Itu kata ketiga, yaitu وَٱلنَّاسِ (wa an-nāsi), yang artinya “dan manusia”.",
       "highlight": [],
       "focus": null
     },
@@ -1010,7 +1010,7 @@
     },
     "an-nas:6:ex:why-harakat:2:why": {
       "text": "وَاو adalah حَرْف عَطْف, dan kata ini disambungkan dengan عَطْف kepada kata kedua yang مَجْرُور, maka ikut berakhir كَسْرَة.",
-      "display": "Wawu (و) adalah huruf ‘athaf (حَرْف عَطْف), dan kata ini disambungkan dengan ‘athaf (عَطْف) kepada kata kedua yang majrur (مَجْرُور), maka ikut berakhir kasrah (كَسْرَة).",
+      "display": "و adalah huruf ‘athaf (حَرْف عَطْف), dan kata ini disambungkan dengan ‘athaf (عَطْف) kepada kata kedua yang majrur (مَجْرُور), maka ikut berakhir kasrah (كَسْرَة).",
       "highlight": [],
       "focus": null
     },
@@ -1028,7 +1028,7 @@
     },
     "an-nas:6:ex:sort-case:2:why": {
       "text": "وَاو adalah حَرْف عَطْف, dan kata ini disambungkan dengan عَطْف kepada kata kedua yang مَجْرُور, maka ikut berakhir كَسْرَة.",
-      "display": "Wawu (و) adalah huruf ‘athaf (حَرْف عَطْف), dan kata ini disambungkan dengan ‘athaf (عَطْف) kepada kata kedua yang majrur (مَجْرُور), maka ikut berakhir kasrah (كَسْرَة).",
+      "display": "و adalah huruf ‘athaf (حَرْف عَطْف), dan kata ini disambungkan dengan ‘athaf (عَطْف) kepada kata kedua yang majrur (مَجْرُور), maka ikut berakhir kasrah (كَسْرَة).",
       "highlight": [],
       "focus": null
     },
@@ -1052,7 +1052,7 @@
     },
     "an-nas:6:ex:label-role:3:why": {
       "text": "Perannya: حَرْف عَطْف dan ma'thuf. وَاو adalah حَرْف عَطْف, dan kata ini disambungkan dengan عَطْف kepada kata kedua yang مَجْرُور, maka ikut berakhir كَسْرَة.",
-      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + ma'thuf. Wawu (و) adalah huruf ‘athaf (حَرْف عَطْف), dan kata ini disambungkan dengan ‘athaf (عَطْف) kepada kata kedua yang majrur (مَجْرُور), maka ikut berakhir kasrah (كَسْرَة).",
+      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + ma'thuf. و adalah huruf ‘athaf (حَرْف عَطْف), dan kata ini disambungkan dengan ‘athaf (عَطْف) kepada kata kedua yang majrur (مَجْرُور), maka ikut berakhir kasrah (كَسْرَة).",
       "highlight": [],
       "focus": null
     },

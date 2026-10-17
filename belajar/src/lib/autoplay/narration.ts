@@ -275,7 +275,20 @@ export function parsePronunciation(raw: unknown): { dict: Pronunciation | null; 
     }
     out.push({ term, speak, display });
   });
-  return { dict: { terms: out }, problems };
+  // The named words' spellings (validate_narration Lexicon._named): translit → speak.
+  const named: Record<string, string> = {};
+  const rawNamed = (raw as Record<string, unknown>).named ?? [];
+  if (!Array.isArray(rawNamed)) problems.push("named must be a list");
+  else
+    rawNamed.forEach((x, i) => {
+      const { translit, speak } = (x ?? {}) as Record<string, unknown>;
+      if (typeof translit !== "string" || typeof speak !== "string" || !translit || !speak) {
+        problems.push(`named[${i}]: translit and speak must be non-empty strings`);
+        return;
+      }
+      named[translit] = speak;
+    });
+  return { dict: { terms: out, named }, problems };
 }
 
 /** The dictionary's Arabic-script `speak` forms, longest first (so "حَرْف
@@ -287,14 +300,45 @@ function arabicSpeakForms(dict: Pronunciation): string[] {
     .sort((a, b) => b.length - a.length);
 }
 
+/** An Arabic string's letters: harakat, Qur'anic marks and tatweel dropped, the alif forms as ا
+ *  (the skeleton validate_narration.ar_skeleton compares). */
+const arSkeleton = (s: string) =>
+  s
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640\s]/g, "")
+    .replace(/[ٱأإآ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه");
+const escapeRx = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * The dictionary's LETTER terms (a display "name (letter)" whose bracket is
+ * not the term itself: "ba’ (بِ)" of بَاء, "alif lam (ال)" of أَلِف لَام), each
+ * with its Latin name and whether it is ONE letter. A single letter is shown
+ * alone in a caption, as on screen — "Contohnya huruf ب ini", never "huruf
+ * ba’ (ب) ini" (operator 2026-10-17: "we dont need to write “ba’” here, only
+ * the arabic one is enough"); the article keeps its name, "alif lam (ال)".
+ * As validate_narration.py Term.letter / Term.bare.
+ */
+function letterTerms(dict: Pronunciation): { head: string; single: boolean }[] {
+  const out: { head: string; single: boolean }[] = [];
+  for (const t of dict.terms) {
+    const m = /^([^()]+?) \(([^()]+)\)$/u.exec(t.display);
+    if (!m || !ARABIC_SCRIPT.test(m[2]) || arSkeleton(m[2]) === arSkeleton(t.term)) continue;
+    out.push({ head: m[1], single: arSkeleton(m[2]).length === 1 });
+  }
+  return out;
+}
+
 /**
  * Arabic in a CAPTION (a line's display text or one karaoke word) that is
  * not allowed (empty when fine). A caption shows what is spoken, so its
- * Arabic is a dictionary term's display form ("na’t (نَعْت)", a letter as in
- * the ayah: "ba’ (بِ)") or the lesson's own Arabic (content bytes). Never a
- * letter's spelled-out name next to the verse (بَاء), i.e. a spoken-only
- * form. `allowed`: the dictionary displays and the lesson words' Arabic,
- * joined; every Arabic word of the caption must occur in it.
+ * Arabic is a dictionary term's display form ("na’t (نَعْت)"), a letter as in
+ * the ayah, alone ("huruf بِ"; the article "alif lam (ال)") or the lesson's
+ * own Arabic (content bytes). Never a letter's spelled-out name next to the
+ * verse (بَاء), i.e. a spoken-only form, nor a single letter with its Latin
+ * name beside it ("ba’ (بِ)", operator 2026-10-17). `allowed`: the dictionary
+ * displays and the lesson words' Arabic, joined; every Arabic word of the
+ * caption must occur in it.
  */
 export function captionArabicProblems(text: string, dict: Pronunciation | null, allowed: string): string[] {
   if (!ARABIC_SCRIPT.test(text)) return [];
@@ -302,9 +346,20 @@ export function captionArabicProblems(text: string, dict: Pronunciation | null, 
   if (!dict) return ["Arabic script in a caption, and no pronunciation dictionary to check it against"];
   const spokenOnly = dict.terms.filter((t) => ARABIC_SCRIPT.test(t.speak) && !t.display.includes(t.speak));
   // As a whole Arabic word: the letter name لَام inside كَلَام (kalam, 2026-10-15) is not the letter.
-  const whole = (sp: string) => new RegExp(`(?<![\u0600-\u06FF])${sp.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\u0600-\u06FF])`, "u").test(text);
+  const whole = (sp: string) => new RegExp(`(?<![\u0600-\u06FF])${escapeRx(sp)}(?![\u0600-\u06FF])`, "u").test(text);
   const shown = spokenOnly.filter((t) => whole(t.speak)).map((t) => `${t.speak} (shown as "${t.display}")`);
   if (shown.length) out.push(`a spoken-only form on screen: ${shown.join(", ")}`);
+  // A letter's Latin name with the letter in brackets: the longest name first, so the article
+  // "alif lam (ال)" is read whole and its "lam (ال)" is not a letter of its own.
+  const letters = letterTerms(dict).sort((a, b) => b.head.length - a.head.length);
+  if (letters.length) {
+    const name = (h: string) => `[${h[0].toUpperCase()}${h[0].toLowerCase()}]${escapeRx(h.slice(1)).replace(/[’'‘ʼ]/g, "[’'‘ʼ]")}`;
+    const rx = new RegExp(`(?<![\\p{L}\\p{M}’'‘ʼ])(${letters.map((l) => name(l.head)).join("|")}) \\([\u0600-\u06FF]+\\)`, "gu");
+    const named = [...text.matchAll(rx)]
+      .filter((m) => letters.find((l) => new RegExp(`^${name(l.head)}$`, "u").test(m[1]))?.single)
+      .map((m) => m[0]);
+    if (named.length) out.push(`a letter shown with its Latin name: ${named.join(", ")} (a single letter is shown alone, as on screen)`);
+  }
   const stray = [...new Set([...text.matchAll(ARABIC_WORD)].map((m) => m[0]))].filter((w) => !allowed.includes(w));
   if (stray.length) out.push(`Arabic from neither the dictionary nor the lesson: ${stray.join(" ")}`);
   return out;
@@ -313,11 +368,14 @@ export function captionArabicProblems(text: string, dict: Pronunciation | null, 
 /**
  * A caption without its Arabic, for a screen reader's Indonesian voice (and
  * never a Qur'anic word in Arabic): "kasrah (كَسْرَة), karena" → "kasrah,
- * karena"; "huruf jar (حَرْف جَرّ) ba’ (بِ)" → "huruf jar ba’".
+ * karena"; "huruf jar (حَرْف جَرّ) ba’ (بِ)" → "huruf jar ba’". A named word
+ * (rule 26, "kata pertama, yaitu قُلْ (qul), …") is announced as the narrator
+ * says it: "kata pertama, yaitu qul, …" (namedSpeech).
  */
 export function withoutArabic(text: string): string {
   if (!ARABIC_SCRIPT.test(text)) return text;
   return text
+    .replace(NAMED_SHOWN, (_m, _ar: string, lat: string) => namedSpeech(lat))
     .replace(/\s*\(\s*[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s،,–-]*\)/g, "")
     .replace(ARABIC_WORD, "")
     .replace(/\(\s*\)/g, "")
@@ -528,6 +586,59 @@ export function spokenTextProblems(text: string, guard: QuranGuard, dict: Pronun
   const informal = foldedTokens(text).filter((t) => t === "kamu" || t === "kalian");
   if (informal.length) out.push(`informal address: ${[...new Set(informal)].join(", ")} (use "Anda")`);
   return out;
+}
+
+// ───────────────────────────── Named words (2026-10-17) ─────────────────────────────
+
+/** A word a caption names with the word itself (pipeline/validate_narration.py "named words";
+ *  operator 2026-10-17: "make the sentence clear with examples", "say bi instead of ba"): the
+ *  content's Arabic, then its transliteration in brackets — "بِ (bi)", "ٱسْمِ (ismi)". */
+const NAMED_SHOWN = /(?<![\u0600-\u06FF])([\u0621-\u06D3\u06D5-\u06ED]+) \(([^()\u0600-\u06FF]+)\)/gu;
+/** The letters a plain fold would lose, in the pesantren spelling the narrator says them in
+ *  (validate_narration._NAMED_RESPELL). */
+const NAMED_RESPELL: Readonly<Record<string, string>> = {
+  "ṣ": "sh", "ḍ": "dh", "ṭ": "th", "ẓ": "zh", "ż": "dz", "ṡ": "ts", "‘": "'", "ʿ": "'", g: "gh", "ḫ": "kh",
+};
+
+/** What the narrator says for a named word (validate_narration.named_speech): the
+ *  transliteration in plain letters, the Name at a word's start as "Alloh" (Allāhi → Allohi). */
+export function namedSpeech(translit: string): string {
+  const t = [...translit].map((c) => NAMED_RESPELL[c] ?? c).join("");
+  const folded = t
+    .normalize("NFD")
+    .replace(/\p{Mn}/gu, "")
+    .replace(/['‘’ʼʿʾ`´]/g, "'")
+    .normalize("NFC");
+  return folded.replace(/(?<![\p{L}\p{N}_'])([Aa])llah/gu, "$1lloh");
+}
+
+/** The named words of a caption, in order, as the narrator says them: the dictionary's `named`
+ *  spelling when it has one (validate_narration.named_speech), else namedSpeech. */
+export function namedSaid(display: string, dict: Pronunciation | null = null): string[] {
+  return [...display.matchAll(NAMED_SHOWN)].map((m) => dict?.named?.[m[2]] ?? namedSpeech(m[2]));
+}
+
+/** The spoken text with the words its caption names masked, in order, once each: the one place a
+ *  lesson word may be said in Latin (validate_narration.mask_named_said). */
+export function maskNamedSaid(text: string, said: readonly string[]): string {
+  let out = text;
+  let pos = 0;
+  for (const w of said) {
+    const rx = new RegExp(`(?<![\\p{L}\\p{N}_'‘’-])${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}_'‘’-])`, "gu");
+    rx.lastIndex = pos;
+    const m = rx.exec(out);
+    if (!m) continue;
+    out = `${out.slice(0, m.index)}istilah${out.slice(m.index + m[0].length)}`;
+    pos = m.index + "istilah".length;
+  }
+  return out;
+}
+
+/** A text's named-word markup ({{1:1:1/bi}}, {{1:6:2}}) as its transliteration (`resolve`: the
+ *  reference → the word's or form's transliteration), for a caption without Arabic; an unknown
+ *  reference is left as its reference, never dropped. */
+export function unmarkNamed(text: string, resolve?: (ref: string) => string | undefined): string {
+  return text.replace(/\{\{(\d{1,3}:\d{1,3}:\d{1,3}(?:\/[^{}\s/]+)?)\}\}/g, (m, ref: string) => resolve?.(ref) ?? ref);
 }
 
 /** Does a caption carry Arabic script? (Captions may carry transliteration.) */

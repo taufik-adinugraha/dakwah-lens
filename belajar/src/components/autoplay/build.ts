@@ -21,7 +21,7 @@
  * their drawing (stageExamples: the content's bytes, by beat id).
  */
 import type { Ayah, SurahContent } from "@/content/schema";
-import { availableExercises, buildAutoplaySequence, lessonExamples, questionNumbers, zeroAyah, type AutoplaySequence, type ExampleGap, type LessonExample } from "@/lib/autoplay";
+import { availableExercises, buildAutoplaySequence, lessonExamples, questionNumbers, zeroAyah, type AutoplaySequence, type ExampleGap, type LessonExample, type NarrationManifest } from "@/lib/autoplay";
 import { composeFor, composeInput } from "@/lib/compose-content";
 import { SURAHS } from "@/lib/content";
 import { taughtAt, taughtInZero } from "@/lib/curriculum";
@@ -39,6 +39,17 @@ export const NARRATION_LOCALE = "id";
 /** Every lesson word, by loc: a concept's example may stand in another ayah, or another surah. */
 const WORDS = new Map(SURAHS.flatMap((x) => x.ayat.flatMap((y) => y.words.map((w) => [w.loc, w] as const))));
 
+/** Every word a narration line may name (pipeline validate_narration "named words": a lesson word,
+ *  "1:6:2", or a named form of its composition, "1:1:1/bi") by its reference, with its
+ *  transliteration: what a caption-only line shows for the word (no Arabic there). */
+const NAMED_TRANSLIT = new Map<string, string>([
+  ...SURAHS.flatMap((x) => x.ayat.flatMap((y) => y.words.map((w) => [w.loc, w.translit] as const))),
+  ...SURAHS.flatMap((x) =>
+    Object.entries(composeFor(x.slug)?.words ?? {}).flatMap(([loc, u]) => Object.entries(u.forms).map(([n, f]) => [`${loc}/${n}`, f.translit] as const)),
+  ),
+]);
+export const namedTranslit = (ref: string) => NAMED_TRANSLIT.get(ref);
+
 /** The example beats of one ayah's lesson (which, and why: src/lib/autoplay/examples.ts), and the
  *  rules it explains without one, each with its reason. */
 export function lessonExamplesFor(s: SurahContent, a: Ayah): { examples: LessonExample[]; gaps: ExampleGap[] } {
@@ -51,7 +62,10 @@ export function lessonExamplesFor(s: SurahContent, a: Ayah): { examples: LessonE
   });
 }
 
-export function stageSequence(s: SurahContent, a: Ayah, locale: string): AutoplaySequence {
+/** `narration`: the manifest to narrate with (default: the shipped one, on the narration locale);
+ *  tests pass a copy in which every line has a recording, to check the narrated lesson apart from
+ *  which lines still wait for a render. */
+export function stageSequence(s: SurahContent, a: Ayah, locale: string, narration?: NarrationManifest | null): AutoplaySequence {
   const quiz = quizAyah(s.slug, a.ayah);
   return buildAutoplaySequence({
     slug: s.slug,
@@ -64,8 +78,9 @@ export function stageSequence(s: SurahContent, a: Ayah, locale: string): Autopla
     exercises: availableExercises(quiz),
     questions: questionNumbers(quiz),
     texts: autoplayTexts(locale),
-    narration: locale === NARRATION_LOCALE ? narrationFor(s.slug) : null,
+    narration: narration !== undefined ? narration : locale === NARRATION_LOCALE ? narrationFor(s.slug) : null,
     shared: locale === NARRATION_LOCALE ? SHARED_NARRATION : null,
+    named: namedTranslit,
     // Word compositions and the harakat primer (rule 14): on every locale —
     // an English page shows their Indonesian lines as captions, as it shows
     // the words' Indonesian explanations.
@@ -115,6 +130,7 @@ export function zeroSequence(s: SurahContent, locale: string): AutoplaySequence 
     texts: autoplayTexts(locale),
     narration: locale === NARRATION_LOCALE ? narrationFor(s.slug) : null,
     shared: locale === NARRATION_LOCALE ? SHARED_NARRATION : null,
+    named: namedTranslit,
     compose: composeInput(s.slug, zero),
     examples: zeroExamplesFor(s).examples,
     map: null,

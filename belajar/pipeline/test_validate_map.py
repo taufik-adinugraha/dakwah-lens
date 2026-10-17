@@ -142,8 +142,10 @@ MUTATIONS = [
      "ayah 3: a step is listed twice"),
     ("learnt that is not the whole list so far", built(lambda c: entry(c, 5)["learnt"].pop(0)),
      "ayah 5: learnt is not what the curriculum gives for lesson 1:5"),
-    ("a learnt step marked here that does not occur", built(lambda c: entry(c, 1)["learnt"][0].__setitem__("here", True)),
-     "ayah 1: learnt is not what the curriculum gives"),
+    ("a learnt step marked here that does not occur", built(lambda c: entry(c, 5)["learnt"][2].__setitem__("here", True)),
+     "ayah 5: learnt is not what the curriculum gives"),
+    ("the harakat said not to occur in an ayah (they sit on every letter: operator 2026-10-17)",
+     built(lambda c: entry(c, 1)["learnt"][0].__setitem__("here", False)), "ayah 1: learnt is not what the curriculum gives"),
     ("a postponed step left out", built(lambda c: entry(c, 1)["later"].remove("naat")), "ayah 1: later is not what the curriculum gives"),
     ("later not in teaching order", built(lambda c: entry(c, 5)["later"].reverse()), "ayah 5: later is not what the curriculum gives"),
     ("lanjut: a record that is taught at this level", built(lambda c: entry(c, 1)["lanjut"].append("naat")),
@@ -207,17 +209,17 @@ MUTATIONS = [
 # Al-Fatihah, measured on 2026-10-13: ayah → (new, the learnt steps that occur here, later, lanjut).
 # kurikulum-dasar.md E gives the New column and how many steps were learnt before each ayah.
 FATIHAH = {
-    1: (["majrur", "huruf-jar"], ["kalimah"], ["alif-lam", "naat", "idhafah"], ["syibhul-jumlah"]),
-    2: (["jumlah-ismiyyah", "marfu", "jamak-mudzakkar-salim"], ["kalimah", "majrur", "huruf-jar"],
+    1: (["majrur", "huruf-jar"], ["harakat", "kalimah"], ["alif-lam", "naat", "idhafah"], ["syibhul-jumlah"]),
+    2: (["jumlah-ismiyyah", "marfu", "jamak-mudzakkar-salim"], ["harakat", "kalimah", "majrur", "huruf-jar"],
         ["alif-lam", "naat", "idhafah", "badal"], ["syibhul-jumlah", "wazan-dan-tashrif"]),
-    3: (["alif-lam", "naat"], ["kalimah", "majrur"], [], ["wazan-dan-tashrif"]),
-    4: (["idhafah"], ["kalimah", "majrur", "alif-lam", "naat"], [], ["wazan-dan-tashrif", "isim-fail"]),
-    5: (["dhamir", "fiil-mudhari", "murab-mabni"], ["kalimah", "marfu"], ["jumlah-filiyyah", "maful-bih", "athaf"],
+    3: (["alif-lam", "naat"], ["harakat", "kalimah", "majrur"], [], ["wazan-dan-tashrif"]),
+    4: (["idhafah"], ["harakat", "kalimah", "majrur", "alif-lam", "naat"], [], ["wazan-dan-tashrif", "isim-fail"]),
+    5: (["dhamir", "fiil-mudhari", "murab-mabni"], ["harakat", "kalimah", "marfu"], ["jumlah-filiyyah", "maful-bih", "athaf"],
         ["taqdim-maful", "bab-istifal", "ilal"]),
-    6: (["jumlah-filiyyah", "maful-bih", "manshub"], ["kalimah", "alif-lam", "naat", "dhamir"], ["fiil-amr"],
+    6: (["jumlah-filiyyah", "maful-bih", "manshub"], ["harakat", "kalimah", "alif-lam", "naat", "dhamir"], ["fiil-amr"],
         ["isim-fail", "bab-istifal", "ilal"]),
     7: (["isim-maushul", "fiil-madhi", "athaf"],
-        ["kalimah", "majrur", "huruf-jar", "jamak-mudzakkar-salim", "alif-lam", "idhafah", "dhamir", "murab-mabni", "jumlah-filiyyah",
+        ["harakat", "kalimah", "majrur", "huruf-jar", "jamak-mudzakkar-salim", "alif-lam", "idhafah", "dhamir", "murab-mabni", "jumlah-filiyyah",
          "manshub"], ["badal"], ["isim-fail", "bab-ifal", "isim-maful", "naib-fail"]),
 }
 LEARNT_BEFORE = {1: 2, 2: 4, 3: 7, 4: 9, 5: 10, 6: 13, 7: 16}
@@ -262,7 +264,8 @@ class LessonMap(unittest.TestCase):
         # Ayah 1 has no marfu' word, so its card no longer lists it; the sentence that points ahead
         # there stays, and no line of ayah 1 names the term (the curriculum's own rule holds that).
         self.assertNotIn("marfu", entry(CONTENTS[SLUG], 1)["later"])
-        self.assertTrue(lines["al-fatihah:1:w1:compose:3"]["display"].endswith("Mengapa dhammah (ضَمَّة), kita pelajari di ayat kedua."))
+        self.assertTrue(lines["al-fatihah:1:w1:compose:3"]["display"].endswith(
+            "Mengapa dhammah (ضَمَّة), baru akan diajarkan lebih lengkap di ayat kedua."))  # operator 2026-10-17
         for lid, ln in lines.items():
             if lid.startswith("al-fatihah:1:"):
                 self.assertNotIn("marfu", ln["display"].lower(), lid)

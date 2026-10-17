@@ -236,7 +236,15 @@ export function splitCaption(text: string, max = MAX_CAPTION): string[] {
         pieces.push({ text: c, cut: end });
         return;
       }
-      const words = c.split(" ");
+      // A bracket stays with the word before it, whole: "huruf jar (حَرْف جَرّ)", and a word named
+      // with its transliteration, "مَلِكِ (maliki)" (2026-10-17) — never cut in two.
+      const words: string[] = [];
+      let depth = 0;
+      for (const w of c.split(" ")) {
+        if (words.length && (depth > 0 || w.startsWith("("))) words[words.length - 1] += ` ${w}`;
+        else words.push(w);
+        for (const ch of w) depth = ch === "(" ? depth + 1 : ch === ")" ? Math.max(0, depth - 1) : depth;
+      }
       words.forEach((w, wi) => pieces.push({ text: w, cut: wi === words.length - 1 ? end : CUT_COST.word }));
     });
   }

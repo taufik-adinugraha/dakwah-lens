@@ -41,7 +41,7 @@ DELIVERY_FORMAT a new tag with it), and for nothing else.
 THIS STEP NEVER TOUCHES TOKENS. A master replaced by hand (a retake put in the master's place with
 its alignment .json) is therefore NOT a case for --reencode alone: that would deliver the new
 take's audio with the old take's word timings, and the validators notice that only when the
-timings run more than 0.5 s past the end of the new audio. Run
+timings run more than validate_narration.CUT_TOLERANCE_MS (20 ms) past the end of the new audio. Run
 render_narration.py --render on that line first (--only <line id>; nothing is sent or paid for
 while the master and its .json are on disk): it re-derives the tokens from the .json and delivers
 the master, so audio and tokens come from one take. Lines of one manifest that share a text share
@@ -70,8 +70,11 @@ What must hold of a file this step encodes, or the step fails and no manifest is
 - its length is within MAX_DRIFT_MS (80 ms) of its master's;
 - every karaoke token still fits: none ends later after the end of the delivered file than it did
   after the end of the master. (A token that already ran past the end of its MASTER is ElevenLabs'
-  own alignment, not the encode; it is listed, and validate_narration.check_tokens bounds it.)
-  This holds for every line that shares the file: their timings are the same, or the file is refused;
+  own alignment, not the encode: up to validate_narration.CUT_TOLERANCE_MS it is listed as a note;
+  more is a take ElevenLabs cut short — operator 2026-10-17, "the voice is cut slightly before the
+  sentence finished" — and it is refused, as validate_narration.check_tokens refuses it in a
+  manifest.) This holds for every line that shares the file: their timings are the same, or the
+  file is refused;
 - a file the manifest already names is made again as the published bytes, or not at all (above).
 
 render_narration.py runs `deliver` on every line it renders, so the next surah is delivered at
@@ -290,6 +293,11 @@ def deliver(master: Path, text: str, voice: dict, slug: str, tokens: list[dict],
         if bad:
             errs.append(f"does not decode cleanly: {bad[:200]}")
         errs += fit_problems(tokens, was["seconds"], info["seconds"])
+        if V.is_cut(tokens, was["ms"]):
+            # Not the encode's doing: ElevenLabs returned a take that ends before its own last word
+            # (validate_narration.CUT_TOLERANCE_MS; operator 2026-10-17). Never delivered.
+            errs.append(f"its master is cut short: the last token ends {V.cut_ms(tokens, was['ms'])} ms after the master "
+                        "does (render the line again: render_narration.py refuses a cut take and renders a new one)")
     if errs:
         raise SystemExit(f"delivery of {master} ({V.DELIVERY_FORMAT}) refused: " + "; ".join(errs))
     sha = sha256_bytes(body)

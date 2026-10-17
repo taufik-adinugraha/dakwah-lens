@@ -94,7 +94,11 @@ What it enforces (README "Narasi" has the reasons):
   (a letter's spelled name that is neither said nor shown in Arabic script — alif, said "alif" —
   is not compared); every term carries `approved`: the date of the operator's ear check, or
   "pending-ear-check <date> …" for one added when he waived the pre-render review (2026-10-10),
-  which renders and is listed by main() and render_narration.py until it is dated.
+  which renders and is listed by main() and render_narration.py until it is dated. Its `named`
+  list (2026-10-17) spells each named Qur'anic word whose sound waits for the operator (NAMED_HELD),
+  keyed by the caption's transliteration: plain letters, no heavy letter + a (rule 11's respelling
+  instead), `approved` a date or pending, every entry a transliteration the content shows; without
+  an entry such a word holds its line (named_held).
 - Spoken text: non-empty, trimmed, at most MAX_LINE characters; Arabic script only as a dictionary
   `speak` value (any other Arabic is an error, a Qur'anic word in Arabic says so); a dictionary
   term's Latin spelling never stays in the spoken text (it is said from the dictionary); "Allah" is
@@ -126,7 +130,9 @@ What it enforces (README "Narasi" has the reasons):
 - Caption (`display`): says what is spoken — replacing its dictionary display forms by their
   `speak` values and normalising for speech gives `text` exactly; Arabic only inside those display
   forms; a letter shown as in the ayah (بِ, or the focus word's own first letter, لَ of lahu), never
-  by its spelled-out name (بَاء); the same Qur'anic-word guard and word-place rules.
+  by its spelled-out name (بَاء), and a single letter ALONE, without its Latin name beside it
+  ("Contohnya huruf ب ini", never "huruf ba’ (ب)"; operator 2026-10-17 — the article keeps "alif
+  lam (ال)"); the same Qur'anic-word guard and word-place rules.
 - Word places: a line names a word of its own ayah by its place ("kata kedua"), never more places
   than the ayah has words, never a place in another ayah (it is named by its meaning there), never a
   place inside a place, and never "di kartu ini" (the stage shows no card); a concept's title is
@@ -148,7 +154,9 @@ What it enforces (README "Narasi" has the reasons):
   the file is named by, or a name made with another format tag: the three are bound together, with
   no audio file needed to check them (CI has none). ms > 0; 64-hex sha256; the manifest names its
   voice. `tokens` (with audio only): [{t, s, e}] in time order within the clip, whose texts joined
-  by spaces equal the display rendering of the spoken text (render_display).
+  by spaces equal the display rendering of the spoken text (render_display), and never past its
+  end: a take whose audio ends more than CUT_TOLERANCE_MS before its last token does was cut short
+  by ElevenLabs (operator 2026-10-17: "the voice is cut slightly before the sentence finished").
 - The manifests equal a fresh build_narration.py run (no hand edits, no stale lines).
 """
 from __future__ import annotations
@@ -166,7 +174,7 @@ import curriculum as CUR
 import lessonmap as LESSONMAP
 import quiz as QUIZ
 import terms as TERMS
-from common import AUTHORED_DIR, BELAJAR, CONTENT_DIR, SURAHS, normalise, num_id
+from common import AUTHORED_DIR, BELAJAR, CONTENT_DIR, SURAHS, normalise, num_id, ordinal
 
 NARRATION_DIR = CONTENT_DIR / "narration"
 PRONUNCIATION_JSON = AUTHORED_DIR / "pronunciation.json"
@@ -842,6 +850,146 @@ class Forms:
         return out, toks
 
 
+# ------------------------------------------------------------------ named words (operator 2026-10-17)
+# An explanation may NAME the word or the part of a word it explains, with the word itself: "Kata
+# pertama diawali huruf jar, yaitu بِ (bi) yang artinya “dengan”, sehingga isim sesudahnya, yaitu
+# ٱسْمِ (ismi) …" (operator, on Al-Fatihah 1: "make the sentence clear with examples"; "it's better to
+# say bi instead of ba, and only show the arabic one"; "should also mention the arabic word not only
+# artinya"). The ONE exception to "the narrator never voices a Qur'anic word" (plan §6.1 A1), and
+# a narrow one:
+#   - only where narration was written to name it: the markup {{s:a:w}} (a lesson word) or
+#     {{s:a:w/form}} (a named form of that word's composition, content/compose: بِ, ٱسْمِ, بِٱسْمِ …)
+#     in an authored `say` / `lead` / `why_basic` or a PRE_REWRITE, and the sanitiser's name for a
+#     word of another ayah ("kata ٱللَّهِ (Allāhi), yang artinya …"); never found in or typed into prose;
+#   - the caption shows the content's own bytes and the transliteration, "<Arabic> (<translit>)", and
+#     it must be one of those pairs (check_display with `named`); Arabic SCRIPT of a Qur'anic word in
+#     the spoken text stays forbidden;
+#   - the spoken text says the transliteration (named_speech) exactly where the caption names it
+#     (check_spoken `named_said`) — and nowhere else: every other mention is still a fault;
+#   - a word whose Latin carries a sound the voice must not get wrong (ص ض ط ظ ع ق غ ذ ث خ: ṣ ḍ ṭ ẓ ‘
+#     q g ż ṡ ḫ) is said in a pesantren spelling (ṣ → sh, ḍ → dh, ‘ → ', g → gh …) and HELD like a
+#     heavy letter: render_narration.py refuses the line and validate_narration.py lists it
+#     (named_held) until pronunciation.json `named` gives the word its spoken spelling; a line with
+#     audio may not carry one that has none.
+#   - pronunciation.json `named` (operator 2026-10-17, via the coordinator: "RECORDED and checked by
+#     ear afterwards, the same way every other new term is handled"): one entry per such word, keyed
+#     by the caption's transliteration — {translit, speak, rule, approved}. `speak` is the exact
+#     spelling the line says (named_speech), the default one unless the heavy-letter guard
+#     (HEAVY_LATIN) refuses it, then the pesantren respelling of rule 11 (heavy letter + fathah → o,
+#     ra with fathah → ro: aṣ-ṣirāṭa → ash-shirotho); `approved` a date, or "pending-ear-check <date>"
+#     — rendered, and listed by every validate / render run until the operator has heard it.
+NAMED_REF = re.compile(r"\{\{(\d{1,3}:\d{1,3}:\d{1,3})(?:/([^{}\s/]+))?\}\}")
+_NAMED_AR = "ء-ۓە-ۭ"
+NAMED_SHOWN = re.compile(rf"(?<![؀-ۿ])(?P<ar>[{_NAMED_AR}]+) \((?P<lat>[^()؀-ۿ]+)\)")
+NAMED_HELD = re.compile("[ṣḍṭẓżṡ‘ʿqgḫ]")
+_NAMED_RESPELL = {"ṣ": "sh", "ḍ": "dh", "ṭ": "th", "ẓ": "zh", "ż": "dz", "ṡ": "ts",
+                  "‘": "'", "ʿ": "'", "g": "gh", "ḫ": "kh"}
+
+
+# What a later ayah teaches, worded the old way ("Ini kita pelajari di ayat ketiga", "baru kita bahas
+# nanti"); "sudah kita pelajari di ayat pertama" (past) and "di ayat ini" are not that.
+LATER_WORDING = re.compile(r"(?<!sudah )\bkita (?:pelajari|bahas) (?:di ayat (?!ini\b)|nanti\b)")
+# A grammatical estimate said in jargon (operator 2026-10-15: "memperkirakan … your sentence is confusing").
+ESTIMATE_WORDING = re.compile(r"\b(?:memperkirakan\w*|diperkirakan|menafsirkan\w*|ditafsirkan)\b", re.I)
+# "kata yang artinya …", "huruf yang artinya …": a word or a part named only by what it means.
+MEANING_ONLY = re.compile(r"\b(?:[Kk]ata|[Hh]uruf) yang artinya\b")
+# A word named by its place and its meaning and nothing else (operator 2026-10-17, rule 26: "Kata
+# ketiga, yaitu رَبِّ (rabbi), yang artinya “Tuhan”" — every one, "even when the stage highlights that
+# word"): "kata ketiga, yang artinya …", "Kata pertama artinya: …", "kata ketiga dan keempat, yang
+# artinya …", "kata ini, yang artinya …", "yang pertama artinya …". A named word between the place
+# and "artinya" ("kata ketiga, yaitu رَبِّ (rabbi), yang artinya") is what the rule asks, and no match.
+ORDINAL_NUM = {ordinal(n): n for n in range(1, 31)}
+_ORDS = "|".join(sorted(ORDINAL_NUM, key=len, reverse=True))
+PLACE_MEANING_SAN = re.compile(rf"\b([Kk]ata) ({_ORDS}|ini)(?: (dan|sampai) (?:kata )?({_ORDS}))?(,?) (yang )?(artinya|berarti)\b")
+PLACE_MEANING = re.compile(rf"\b(?:[Kk]ata (?:{_ORDS}|ini|itu)(?: (?:dan|sampai) (?:kata )?(?:{_ORDS}))?|[Yy]ang (?:{_ORDS})),? "
+                           r"(?:yang )?(?:artinya|berarti)\b")
+# A back-reference to an earlier ayah (operator 2026-10-17, rule 29: "A lesson stands on its own
+# screen: no back-references to earlier ayat"; "remove the comparison, keep the sentence
+# complete"): "seperti di ayat pertama", "bagi kata … di ayat kedua", "ayat sebelumnya". A citation
+# of another surah ("Surah Al-'Alaq") and what a LATER ayah teaches are not back-references; the
+# lesson map's own lines ("Sebelum ayat ini, kita sudah mempelajari …") are its recap, not a pointer.
+AYAT_NUM = {**{num_id(n): n for n in range(1, 287)}, **{ordinal(n): n for n in range(1, 287)}}
+AYAT_NAMED = re.compile(r"\bayat (" + "|".join(sorted(AYAT_NUM, key=len, reverse=True)) + r")\b")
+AYAT_BEFORE = re.compile(r"\bayat sebelum(?:nya|\b)")
+BACKREF_FREE_PARTS = {"map", "learned", "intro", "next", "done", "recap", "recite"}
+
+
+def back_references(lid: str, display) -> list[str]:
+    """The pointers of a line of ayah A at an earlier ayah of its surah (rule 29), as written."""
+    parts = lid.split(":")
+    if not isinstance(display, str) or len(parts) < 3 or not parts[1].isdigit() or parts[2] in BACKREF_FREE_PARTS:
+        return []
+    A = int(parts[1])
+    out = []
+    for m in AYAT_NAMED.finditer(display):
+        if AYAT_NUM[m.group(1)] >= A or re.search(r"\bSurah [^\s,.;:]+(?: [^\s,.;:]+)? $", display[:m.start()]):
+            continue
+        out.append(m.group())
+    return out + [m.group() for m in AYAT_BEFORE.finditer(display)]
+
+
+def default_named_speech(translit: str) -> str:
+    """A named word's transliteration in plain letters — the letters a plain fold would lose in the
+    Indonesian pesantren spelling (NAMED_HELD: aṣ-ṣirāṭa → ash-shiratha, al-‘ālamīna → al-'alamina)
+    — and the Name at a word's start in its house spelling (Allāhi → Allohi; lillāhi stays light)."""
+    t = "".join(_NAMED_RESPELL.get(c, c) for c in translit)
+    return re.sub(r"(?<![\w'])([Aa])llah", r"\1lloh", fold(t))
+
+
+def named_speech(translit: str, lex: "Lexicon | None" = None) -> str:
+    """What the narrator says for a named word: its pronunciation.json `named` spelling when it has
+    one (`lex`), else default_named_speech."""
+    entry = lex.named.get(translit) if lex is not None else None
+    return entry.speak if entry is not None else default_named_speech(translit)
+
+
+def named_shown(ar: str, translit: str) -> str:
+    """How a caption shows a named word: the content's bytes, then the transliteration."""
+    return f"{ar} ({translit})"
+
+
+def named_in_display(display, lex: "Lexicon | None" = None) -> list[tuple[str, str]]:
+    """The named words of a caption, in order: (what is said, what is shown)."""
+    if not isinstance(display, str):
+        return []
+    return [(named_speech(m.group("lat"), lex), m.group()) for m in NAMED_SHOWN.finditer(display)]
+
+
+def named_held(display, lex: "Lexicon | None" = None) -> list[str]:
+    """The named words of a caption whose sound waits for the operator (NAMED_HELD) and that
+    pronunciation.json `named` has no spoken spelling for (`lex`), as shown."""
+    if not isinstance(display, str):
+        return []
+    known = lex.named if lex is not None else {}
+    return [m.group("lat") for m in NAMED_SHOWN.finditer(display)
+            if NAMED_HELD.search(m.group("lat")) and m.group("lat") not in known]
+
+
+class Named:
+    """The words a line may name (NAMED_REF): every lesson word ("1:1:1") and every named form of a
+    composition ("1:1:1/bi"), with their bytes and transliteration, from the content files only (CI
+    has no cache)."""
+
+    def __init__(self, lessons: dict[str, dict], compose: dict[str, dict] | None = None):
+        self.refs: dict[str, tuple[str, str]] = {}
+        for lesson in lessons.values():
+            for a in lesson.get("ayat") or []:
+                for w in a.get("words") or []:
+                    self.refs[w["loc"]] = (w["ar"], w["translit"])
+        for c in (compose or {}).values():
+            for loc, unit in ((c or {}).get("words") or {}).items():
+                for name, f in (unit.get("forms") or {}).items():
+                    if isinstance(f, dict) and f.get("ar") and f.get("translit"):
+                        self.refs[f"{loc}/{name}"] = (f["ar"], f["translit"])
+        self.pairs = {named_shown(ar, tr) for ar, tr in self.refs.values()}
+
+    def resolve(self, loc: str, form: str | None = None) -> tuple[str, str]:
+        ref = f"{loc}/{form}" if form else loc
+        if ref not in self.refs:
+            raise SystemExit(f"{{{{{ref}}}}}: no lesson word or composition form of that name (content/<slug>.json, content/compose)")
+        return self.refs[ref]
+
+
 def spoken_translation(text: str) -> str:
     """QuranEnc text as the narrator reads it: footnote markers and straight double quotes are not
     spoken (QuranEnc opens the Al-Mu'awwidzat quotation in ayah 1 and closes it in the last ayah),
@@ -878,8 +1026,8 @@ def tts_text(text: str) -> str:
 # authored/pronunciation.json (kamus pelafalan): each grammar term the narrator says, `speak` the
 # exact form sent to the voice (Arabic script, or a fixed Latin respelling where eleven_v3 reads a
 # heavy letter light), `display` its caption form, "na’t (نَعْت)". A letter term (بَاء) is spoken by
-# its name and shown as the letter in the ayah (بِ). Terms are added only after the operator has
-# approved their sound (README "Narasi").
+# its name and shown as the letter in the ayah, alone (بِ; Term.bare, operator 2026-10-17). Terms are
+# added only after the operator has approved their sound (README "Narasi").
 _DISPLAY = re.compile(r"^(?P<head>[^()؀-ۿ]+?)(?: \((?P<ar>[^()]+)\))?$")
 _CONT = f"\\w{AR_MARKS}'‘’ʼ`´\\-"  # characters that continue a word on either side of a term
 # A heavy letter (tafkhim) with fathah (or fathatan, either order with a shadda) or followed by alif.
@@ -887,6 +1035,14 @@ HEAVY_A = re.compile("[صضطظقخغ](?:\u0651?[\u064E\u064B]|[\u064E\u064B]\u0
 ARABIC_WORD = re.compile("[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]+")
 AR_LETTERS = "\u0621-\u065f\u0670-\u06ff"  # Arabic letters and their marks (a shown letter in brackets)
 MASK = "istilah"  # what a dictionary term becomes for the word guard (a plain Indonesian word)
+_LETTER_CHARS = [chr(x) for x in range(0x0621, 0x064B)] + ["\u0671"]  # the letters (and ٱ), no marks
+
+
+def letter_shapes(shown: str) -> str:
+    """The body of a regex character class of every letter whose skeleton is the one letter of
+    `shown` (ب → ب; ا → ا ٱ أ إ آ; ه → ه ة): the shapes a letter shown alone takes on screen."""
+    want = ar_skeleton(shown)
+    return "".join(re.escape(c) for c in _LETTER_CHARS if ar_skeleton(c) == want)
 
 # Where the lesson prose (Latin) carries a dictionary term, by the term's caption head ("kasrah",
 # "na't", "huruf jar"; build_narration.mark speaks it from the dictionary there). Most heads count
@@ -939,6 +1095,12 @@ def _capitalised(s: str) -> bool:
     return s[i:i + 1].isupper()
 
 
+def letter_name_rx(t: "Term") -> str:
+    """A letter's Latin name as a caption could write it — either case, any apostrophe ("ba’",
+    "Ba'", "‘ain") — as a regex."""
+    return _ci(fold(t.head)).replace("'", f"[{APOS}]")
+
+
 # `approved` of a dictionary term: the date the operator approved its sound by ear, or PENDING and the
 # date he waived the pre-render review (the term renders and is always reported).
 PENDING = "pending-ear-check"
@@ -984,6 +1146,30 @@ class Term:
         """A letter: its NAME is spoken (bā’), the letter as in the ayah is shown (بِ)."""
         return bool(self.shown) and ar_skeleton(self.shown) != ar_skeleton(self.term)
 
+    @property
+    def bare(self) -> bool:
+        """A single letter (بِ, س, و, ا …; not the article ال, named by its two letters): the caption
+        shows the letter ALONE, as on screen, without its Latin name — "Contohnya huruf ب ini", never
+        "huruf ba’ (ب) ini" (operator 2026-10-17, on the Pengantar: "we dont need to write “ba’”
+        here, only the arabic one is enough, also apply this rule to similar sentences"). The
+        `display` of pronunciation.json keeps the name ("ba’ (بِ)"): its head is how the lesson prose
+        writes the letter, its bracket the letter's default shape. The spoken text still names it."""
+        return self.letter and len(ar_skeleton(self.shown or "")) == 1
+
+
+@dataclass(frozen=True)
+class NamedSound:
+    """A named word's spoken spelling (pronunciation.json `named`): `translit` as the caption shows
+    it, `speak` as the narrator says it, `approved` the date of the operator's ear check or
+    "pending-ear-check <date> …" (rendered, and listed until he has heard it)."""
+    translit: str
+    speak: str
+    approved: str
+
+    @property
+    def pending(self) -> bool:
+        return self.approved.startswith(PENDING)
+
 
 class Lexicon:
     def __init__(self, data, source: str = "pronunciation.json"):
@@ -1010,6 +1196,7 @@ class Lexicon:
             self.terms.append(Term(raw["term"], raw["speak"], raw["display"], m.group("head"), m.group("ar"),
                                    str(raw.get("approved") or "")))
         self.by_term = {t.term: t for t in self.terms}
+        self.named: dict[str, NamedSound] = self._named(data.get("named", []) if isinstance(data, dict) else [], source)
         self._groups: dict[str, Term] = {}
         speak_alts, display_alts = [], []
         for i, t in enumerate(sorted(self.terms, key=lambda t: -len(t.speak))):
@@ -1017,9 +1204,12 @@ class Lexicon:
             speak_alts.append(f"(?P<s{i}>{re.escape(t.speak) if t.arabic_speak else _ci(t.speak)})")
         for i, t in enumerate(sorted(self.terms, key=lambda t: -len(t.display))):
             self._groups[f"d{i}"] = t
-            if t.letter:
-                # The letter as the screen writes it (any of its shapes: ٱ, لِّ, the article ٱلْ);
-                # check_display compares it with shown_letter.
+            if t.bare:
+                # The letter alone, as the screen writes it (any of its shapes and marks: ب بِ, ٱ,
+                # لِّ, مَٰ); check_display compares it with shown_letter.
+                body = f"[{letter_shapes(t.shown or '')}][{AR_MARKS}]*"
+            elif t.letter:
+                # The article: its name and, in brackets, as the screen writes it (ال, ٱلْ).
                 body = f"{_ci(t.head)} \\([{AR_LETTERS}]+\\)"
             else:
                 body = _ci(t.display)
@@ -1075,17 +1265,31 @@ class Lexicon:
         return fl if fl and ar_skeleton(fl) == want else (t.shown or "")
 
     def display_of(self, t: Term, cap: bool, focus_ar: str | None = None) -> str:
+        if t.bare:
+            return self.shown_letter(t, focus_ar)  # the letter alone (Term.bare); no case to give it
         s = f"{t.head} ({self.shown_letter(t, focus_ar)})" if t.letter else t.display
         return _cap(s) if cap else s
 
     def speak_of(self, t: Term, cap: bool) -> str:
         return _cap(t.speak) if cap and not t.arabic_speak else t.speak
 
-    def runs(self, text: str) -> list[tuple[int, int]]:
+    def _spans(self, text: str, named=()) -> list[tuple[int, int, "Term | str"]]:
+        """The dictionary terms of a spoken text and, in order, its named words (`named`: [(said,
+        shown)], named_in_display of its caption), as (start, end, the Term | the words as shown)."""
+        spans: list = list(self.spoken_spans(text))
+        pos = 0
+        for said, shown in named:
+            m = re.compile(rf"(?<![\w'‘’-]){re.escape(said)}(?![\w'‘’-])").search(text, pos)
+            if m:
+                spans.append((m.start(), m.end(), shown))
+                pos = m.end()
+        return sorted(spans, key=lambda x: x[0])
+
+    def runs(self, text: str, named=()) -> list[tuple[int, int]]:
         """The spoken words of a line: runs of non-space characters, a multi-word term (حَرْف جَرّ,
-        mudhof ilaih) being one word. These are the karaoke tokens."""
+        mudhof ilaih) or named word (wa la) being one word. These are the karaoke tokens."""
         runs = [[m.start(), m.end()] for m in re.finditer(r"\S+", text)]
-        for a, b, _t in self.spoken_spans(text):
+        for a, b, _t in self._spans(text, named):
             inside = [r for r in runs if r[1] > a and r[0] < b]
             if len(inside) > 1:
                 first = inside[0]
@@ -1098,40 +1302,87 @@ class Lexicon:
         for s, e, t in spans:
             if s < a or e > b:
                 continue
-            cap = _capitalised(text[s:e]) if not t.arabic_speak else _sentence_start(text, s)
-            out += text[cur:s] + self.display_of(t, cap, focus_ar)
+            if isinstance(t, str):  # a named word, as its caption shows it
+                out += text[cur:s] + t
+            else:
+                cap = _capitalised(text[s:e]) if not t.arabic_speak else _sentence_start(text, s)
+                out += text[cur:s] + self.display_of(t, cap, focus_ar)
             cur = e
         return out + text[cur:b]
 
-    def render_display(self, text: str, focus_ar: str | None = None) -> str:
+    def render_display(self, text: str, focus_ar: str | None = None, named=()) -> str:
         """The caption of a spoken line, word by word: each dictionary `speak` value in its display
-        form (a capital at a sentence start), "Alloh" as "Allah"; what the karaoke tokens join to."""
-        spans = self.spoken_spans(text)
-        return " ".join(self._render(text, a, b, spans, focus_ar) for a, b in self.runs(text))
+        form (a capital at a sentence start), "Alloh" as "Allah", each named word as its caption shows
+        it (`named`: named_in_display of the caption); what the karaoke tokens join to."""
+        spans = self._spans(text, named)
+        return " ".join(self._render(text, a, b, spans, focus_ar) for a, b in self.runs(text, named))
 
-    def tokens(self, text: str, starts: list[float], ends: list[float], focus_ar: str | None = None) -> list[dict]:
+    def tokens(self, text: str, starts: list[float], ends: list[float], focus_ar: str | None = None,
+               named=()) -> list[dict]:
         """Karaoke tokens from a character alignment of `text` (ElevenLabs /with-timestamps:
-        one start and end per input character): {t: display text, s: start, e: end} seconds."""
+        one start and end per input character): {t: display text, s: start, e: end} seconds.
+        `named`: the named words of the line's caption (named_in_display)."""
         if len(starts) != len(text) or len(ends) != len(text):
             raise ValueError("alignment does not match the text character for character")
-        spans = self.spoken_spans(text)
+        spans = self._spans(text, named)
         return [{"t": self._render(text, a, b, spans, focus_ar), "s": round(starts[a], 3), "e": round(ends[b - 1], 3)}
-                for a, b in self.runs(text)]
+                for a, b in self.runs(text, named)]
 
     def speech_of_display(self, display: str) -> str:
-        """What a caption says: each display form back to its `speak` value, then tts_text."""
+        """What a caption says: each named word as it is said (named_speech), each display form back
+        to its `speak` value, then tts_text. A letter shown alone (Term.bare) carries no case: a name
+        spoken in Latin (alif, sin) takes its capital from where it stands, as the prose wrote it —
+        at a sentence start."""
+        said = NAMED_SHOWN.sub(lambda m: named_speech(m.group("lat"), self), display)
+
         def rep(m: re.Match) -> str:
             t = self._groups[m.lastgroup]
-            return self.speak_of(t, _capitalised(m.group()))
-        return tts_text(self.display_rx.sub(rep, display))
+            return self.speak_of(t, _sentence_start(said, m.start()) if t.bare else _capitalised(m.group()))
+        return tts_text(self.display_rx.sub(rep, said))
+
+    def _named(self, raw_named, source: str) -> dict[str, NamedSound]:
+        """pronunciation.json `named`: a named word whose sound the voice could get wrong (NAMED_HELD)
+        is rendered only with an entry here — its spelling fixed, the operator's ear check dated or
+        pending. `speak` is what the voice gets: plain letters, no heavy letter + a (rule 9: the
+        pesantren respelling of rule 11 instead, "ash-shirotho", never "ash-shiratha")."""
+        out: dict[str, NamedSound] = {}
+        if not isinstance(raw_named, list):
+            self.shape.append(f"{source}: `named` must be a list")
+            return out
+        for i, raw in enumerate(raw_named):
+            if not isinstance(raw, dict) or not all(
+                isinstance(raw.get(k), str) and raw[k] and raw[k] == raw[k].strip() for k in ("translit", "speak")
+            ):
+                self.shape.append(f"{source}: named {i} needs non-empty, trimmed translit and speak")
+                continue
+            tr, sp = raw["translit"], raw["speak"]
+            if tr in out:
+                self.shape.append(f"{source}: named {tr}: listed twice")
+            if not NAMED_HELD.search(tr):
+                self.shape.append(f"{source}: named {tr}: needs no entry, no letter of it waits for the operator (NAMED_HELD)")
+            if not re.fullmatch(r"[A-Za-z'][A-Za-z'-]*", sp):
+                self.shape.append(f"{source}: named {tr}: speak {sp!r} must be plain Latin letters, ' and - (what the voice gets)")
+            elif HEAVY_LATIN.search(sp.lower()) and sp.lower() not in NOT_HEAVY:
+                self.shape.append(f"{source}: named {tr}: speak {sp!r} keeps a heavy letter + a: respell it (rule 9 and 11: "
+                                  "heavy letter + fathah → o, ra with fathah → ro)")
+            if not isinstance(raw.get("approved"), str) or not APPROVED.match(raw["approved"]):
+                self.shape.append(f"{source}: named {tr}: needs `approved`, the date the operator approved its sound by ear "
+                                  f"or \"{PENDING} <date> …\"")
+            out[tr] = NamedSound(tr, sp, str(raw.get("approved") or ""))
+        return out
 
     def mask_spoken(self, text: str) -> str:
         return self.speak_rx.sub(MASK, text)
 
+    @staticmethod
+    def unnamed(display: str) -> str:
+        """A caption with its named words masked (their Arabic is a lesson word's, never a term)."""
+        return NAMED_SHOWN.sub(MASK, display)
+
     def mask_display(self, display: str) -> str:
-        """Display forms with Arabic masked; a plain Latin one ("Allah") stays, for the guard's own
-        rule on the Name (inside “…” or with its honorific)."""
-        return self.display_rx.sub(lambda m: MASK if self._groups[m.lastgroup].shown else m.group(), display)
+        """Display forms with Arabic masked, and the named words; a plain Latin one ("Allah") stays,
+        for the guard's own rule on the Name (inside “…” or with its honorific)."""
+        return self.display_rx.sub(lambda m: MASK if self._groups[m.lastgroup].shown else m.group(), self.unnamed(display))
 
     # -- the dictionary's own rules
     def problems(self, forms: Forms) -> list[str]:
@@ -1260,6 +1511,13 @@ def latin_terms(text: str, lex: Lexicon) -> list[str]:
     return out
 
 
+def held_line(line: dict, lex: "Lexicon") -> list[str]:
+    """What keeps a manifest line from being rendered: held(text) and the named words of its
+    caption whose sound waits for the operator (named_held)."""
+    out = held(line.get("text") or "", lex) if isinstance(line.get("text"), str) else []
+    return out + [w for w in named_held(line.get("display"), lex) if w not in out]
+
+
 def held(text: str, lex: Lexicon) -> list[str]:
     """What keeps a spoken line from being rendered: heavy letters without a respelling and Latin
     Arabic terms or letter names the dictionary does not speak (render_narration refuses it)."""
@@ -1375,7 +1633,10 @@ def _caps(lid: str, text: str) -> list[str]:
 
 def check_text(lid: str, text, forms: Forms, *, max_len: int | None = MAX_LINE) -> list[str]:
     """Latin narration prose with its quotes (the build's input to `speech`, or a caption with its
-    dictionary terms masked): no Arabic, digits, diacritics or Qur'anic words; word places."""
+    dictionary terms masked): no Arabic, digits, diacritics or Qur'anic words; word places. A named
+    word's markup ({{1:1:1/bi}}) stands for the word, which the Speech renders: it is masked here."""
+    if isinstance(text, str):
+        text = NAMED_REF.sub(MASK, text)
     errs = _basic(lid, text, max_len)
     if errs and errs[0].endswith("empty text"):
         return errs
@@ -1395,12 +1656,25 @@ def check_text(lid: str, text, forms: Forms, *, max_len: int | None = MAX_LINE) 
     return errs
 
 
-def check_spoken(lid: str, text, forms: Forms, lex: Lexicon) -> list[str]:
-    """The spoken text, exactly as sent to the voice."""
+def mask_named_said(text: str, named_said) -> str:
+    """The spoken text with its named words masked, in order, once each: the words the caption
+    names with their Arabic (named_in_display), and those only."""
+    pos = 0
+    for said in named_said:
+        m = re.compile(rf"(?<![\w'‘’-]){re.escape(said)}(?![\w'‘’-])").search(text, pos)
+        if m:
+            text = text[:m.start()] + MASK + text[m.end():]
+            pos = m.start() + len(MASK)
+    return text
+
+
+def check_spoken(lid: str, text, forms: Forms, lex: Lexicon, named_said=()) -> list[str]:
+    """The spoken text, exactly as sent to the voice. `named_said`: what the line's caption names
+    with its Arabic (named_in_display), the one place a lesson word may be said in Latin."""
     errs = _basic(lid, text, MAX_LINE)
     if errs and errs[0].endswith("empty text"):
         return errs
-    masked = lex.mask_spoken(text)
+    masked = lex.mask_spoken(mask_named_said(text, named_said))
     for w in ARABIC_WORD.findall(masked):
         if forms.quranic_arabic(w):
             errs.append(f"{lid}: Qur'anic word {w!r} (Arabic script) in spoken text")
@@ -1440,21 +1714,62 @@ def check_spoken(lid: str, text, forms: Forms, lex: Lexicon) -> list[str]:
     return errs
 
 
-def check_display(lid: str, display, text, forms: Forms, lex: Lexicon, focus_ar: str | None) -> list[str]:
-    """The caption: what is spoken, dictionary terms in display form, letters as in the ayah."""
+def check_display(lid: str, display, text, forms: Forms, lex: Lexicon, focus_ar: str | None,
+                  named: "Named | None" = None) -> list[str]:
+    """The caption: what is spoken, dictionary terms in display form, letters as in the ayah, a
+    named word as the content writes it (`named`: Named; without it, any named word fails)."""
     errs = _basic(lid, display, None, "display")
     if errs and errs[0].endswith("empty display"):
         return errs
+    for m in NAMED_SHOWN.finditer(display):
+        if named is None or m.group() not in named.pairs:
+            errs.append(f"{lid}: caption names {m.group()!r}, which is no lesson word or composition form with its "
+                        "transliteration (content bytes only, never typed: the markup {{s:a:w}} or {{s:a:w/form}})")
+    # A word named only by its meaning (operator 2026-10-17: "should also mention the arabic word not
+    # only artinya. apply this in similar sentences"): "kata yang artinya “jalan”" shows nothing of
+    # the word; name it ({{s:a:w}}: "kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan”"). A phrase may still
+    # be named by its meaning ("frasa yang artinya …").
+    if MEANING_ONLY.search(display):
+        errs.append(f"{lid}: names a word only by its meaning ({MEANING_ONLY.search(display).group()!r}): show the word "
+                    "itself, its Arabic from the content and its transliteration (the markup {{s:a:w}} or {{s:a:w/form}})")
+    m = PLACE_MEANING.search(display)
+    if m:
+        errs.append(f"{lid}: names a word by its place and meaning only ({m.group()!r}): show and say the word itself "
+                    "too, “kata ketiga, yaitu <the word>, yang artinya …” (rule 26; the markup {{s:a:w}})")
+    for ref in back_references(lid, display):
+        errs.append(f"{lid}: points back at an earlier ayah ({ref!r}): remove the comparison, keep the sentence "
+                    "complete (rule 29, operator 2026-10-17)")
+    # The operator's wording (README "Operator's lesson-wording rules"): what a later ayah teaches is
+    # "baru akan diajarkan lebih lengkap di ayat …" (2026-10-17), not "kita pelajari / bahas di
+    # ayat …"; a grammatical estimate is what "para ulama memahaminya (antara lain) sebagai …"
+    # (2026-10-15), not "memperkirakannya" — and never "menafsirkan" (tafsir is not taqdir).
+    m = LATER_WORDING.search(display)
+    if m:
+        errs.append(f"{lid}: says {m.group()!r} of what a later ayah teaches: say “baru akan diajarkan lebih lengkap di "
+                    "ayat …” (operator 2026-10-17)")
+    m = ESTIMATE_WORDING.search(display)
+    if m:
+        errs.append(f"{lid}: says {m.group()!r}: say “para ulama memahaminya (antara lain) sebagai …” (operator 2026-10-15)")
+    whole = display
+    display = lex.unnamed(display)  # the checks below are the terms' and the letters'; named words were checked above
+    # The display forms of the other terms (the article "alif lam (ال)" holds the name lam).
+    held_by = [(m.start(), m.end()) for m in lex.display_rx.finditer(display) if not lex._groups[m.lastgroup].bare]
     for t in lex.terms:
         # A letter's NAME as a whole Arabic word: لَام inside كَلَام (kalam, 2026-10-15) is not the letter lam.
         if t.letter and re.search(rf"(?<![؀-ۿ]){re.escape(t.term)}(?![؀-ۿ])", display):
             errs.append(f"{lid}: caption shows the letter {t.head} by its name ({t.term}); show it as in the ayah "
                         f"({lex.shown_letter(t, focus_ar)})")
+        # … nor its Latin name beside it: a single letter is shown alone (Term.bare; operator 2026-10-17).
+        beside = [x for x in re.finditer(rf"(?<![\w'‘’]){letter_name_rx(t)} \([{AR_LETTERS}]+\)", display)
+                  if not any(a <= x.start() < b for a, b in held_by)] if t.bare else []
+        if beside:
+            errs.append(f"{lid}: caption names the letter in Latin beside it ({beside[0].group()!r}); show the letter alone, "
+                        f"as on screen: {lex.shown_letter(t, focus_ar)} (operator 2026-10-17)")
     for m in lex.display_rx.finditer(display):
         t = lex._groups[m.lastgroup]
         if t.letter:
             want = lex.shown_letter(t, focus_ar)
-            got = m.group()[m.group().index("(") + 1:-1]
+            got = m.group() if t.bare else m.group()[m.group().index("(") + 1:-1]
             if got != want:
                 errs.append(f"{lid}: caption shows {m.group()!r}; the letter as in the ayah is {want}")
     masked = lex.mask_display(display)
@@ -1463,7 +1778,7 @@ def check_display(lid: str, display, text, forms: Forms, lex: Lexicon, focus_ar:
     errs += [e.replace(" in narration", " in caption") for e in check_text(lid, masked, forms, max_len=None)
              if not e.endswith("Arabic script in narration")]
     if isinstance(text, str):
-        said = lex.speech_of_display(display)
+        said = lex.speech_of_display(whole)
         if said != text:
             errs.append(f"{lid}: display does not say what is spoken (spoken form of the display: {said!r})")
     return errs
@@ -1524,7 +1839,38 @@ def is_delivery(audio, voice: dict, manifest_slug: str, text: str) -> bool:
             and audio.get("url") == delivery_url(voice, manifest_slug, text, audio["sha256"]))
 
 
-def check_tokens(lid: str, toks, audio, text, lex: Lexicon, focus_ar: str | None) -> list[str]:
+# A take ElevenLabs CUT SHORT (operator 2026-10-17, on al-fatihah:0:primer:1: "the voice is cut
+# slightly before the sentence finished"): the master itself ends before its own alignment does —
+# 4.049 s of audio, its last letter (the b of "Arab") aligned to end at 4.16 s — so the cut is in
+# what ElevenLabs returned, not in our encode (which keeps the length: 0 ms drift on every file).
+# Measured over the 460 rendered lines of 2026-10-17: every whole take ends 26–51 ms AFTER its last
+# token (the last MP3 frame; three lines end 0.5–0.9 s after it, on trailing silence), and exactly
+# two end before it, by 111 ms (al-fatihah:0:primer:1) and 131 ms (al-fatihah:4:w1:compose:2). So a
+# take may end at most CUT_TOLERANCE_MS before its last token does — less than one 26.1 ms MP3
+# frame and under two 11.6 ms alignment steps: rounding, not speech — and anything more is a cut
+# take. It is held to this everywhere: validate_narration (a manifest line, check_tokens),
+# build_narration.manifest (a cut take is not carried over: the line plays caption-only until it is
+# rendered again), encode_narration.deliver and render_narration.py (a fresh take that is cut is
+# refused and kept aside, never put in the master's place or in a manifest).
+CUT_TOLERANCE_MS = 20
+
+
+def cut_ms(tokens, ms) -> int:
+    """How many milliseconds of a take's alignment lie past the end of its audio of `ms`: its last
+    token's end minus the length (≤ 0: the audio holds every word; > CUT_TOLERANCE_MS: cut)."""
+    return round(max(tk["e"] for tk in tokens) * 1000 - ms)
+
+
+def is_cut(tokens, ms) -> bool:
+    """Whether a take whose audio is `ms` long was cut short of its own alignment (`tokens`, or any
+    list of {e: seconds}); False when there is nothing to tell (no tokens, no length)."""
+    try:
+        return bool(tokens) and cut_ms(tokens, ms) > CUT_TOLERANCE_MS
+    except (TypeError, KeyError, ValueError):
+        return False
+
+
+def check_tokens(lid: str, toks, audio, text, lex: Lexicon, focus_ar: str | None, named=()) -> list[str]:
     if not isinstance(toks, list) or not toks:
         return [f"{lid}: tokens must be a non-empty list of {{t, s, e}}"]
     errs = []
@@ -1539,10 +1885,14 @@ def check_tokens(lid: str, toks, audio, text, lex: Lexicon, focus_ar: str | None
         if tk["s"] < prev:
             errs.append(f"{lid}: token {i} ({tk['t']!r}) starts before the token before it")
         prev = tk["s"]
-    if isinstance(audio, dict) and isinstance(audio.get("ms"), int) and toks[-1]["e"] > audio["ms"] / 1000 + 0.5:
-        errs.append(f"{lid}: tokens run past the end of the audio")
+    if isinstance(audio, dict) and isinstance(audio.get("ms"), int) and not isinstance(audio["ms"], bool) \
+            and is_cut(toks, audio["ms"]):
+        errs.append(f"{lid}: tokens run past the end of the audio: the take is cut, its last word ends "
+                    f"{cut_ms(toks, audio['ms'])} ms after the file does (a whole take ends after its last word; at most "
+                    f"{CUT_TOLERANCE_MS} ms the other way is rounding). Render the line again (render_narration.py: a cut "
+                    "take is refused, a new one is checked before it is kept)")
     if isinstance(text, str):
-        joined, want = " ".join(tk["t"] for tk in toks), lex.render_display(text, focus_ar)
+        joined, want = " ".join(tk["t"] for tk in toks), lex.render_display(text, focus_ar, named)
         if joined != want:
             errs.append(f"{lid}: tokens do not join to the display rendering of the spoken text ({joined!r} ≠ {want!r})")
     return errs
@@ -1660,7 +2010,8 @@ def check_animation_line(lid: str, line: dict, ayah: dict | None, part: str, com
     banned = ayah_syllables(ayah, compose, anim)
     text = line.get("text")
     if isinstance(text, str):
-        masked = HONORIFIC_RE.sub(MASK, lex.mask_spoken(text))
+        # A word the caption names with its Arabic (named_in_display) is said on purpose there.
+        masked = HONORIFIC_RE.sub(MASK, lex.mask_spoken(mask_named_said(text, [s for s, _ in named_in_display(display, lex)])))
         heard = primer_sounds(anim, line.get("frame")) if PRIMER_PART.fullmatch(part) else set()
         said = [orig for k, a, _b, orig in tokens(masked)
                 if (k in banned or sound(k) in banned) and not (k in heard and _HEARD.search(masked[:a]))]
@@ -1726,6 +2077,9 @@ def check_renderable(lid: str, line: dict, ayah: dict | None, part: str, compose
     text = line.get("text")
     if not isinstance(text, str) or not ("audio" in line or authored(ayah, part, compose, quiz)):
         return []
+    # A named word is said in Latin on purpose; one whose sound waits for the operator holds the
+    # line (named_held: listed by main(), refused by render_narration.py), and is no error here.
+    text = mask_named_said(text, [s for s, _ in named_in_display(line.get("display"), lex)])
     errs = [f"{lid}: says {w!r} in Latin, an Arabic term or letter name the pronunciation dictionary does not "
             "speak (rule 1: add it to pronunciation.json, or say it in plain Indonesian)" for w in latin_terms(text, lex)]
     if "audio" not in line:
@@ -1758,7 +2112,7 @@ def check_view(lid: str, line: dict, ayah: dict | None, part: str, compose: dict
 
 def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: dict, lex: Lexicon,
                    compose: dict | None = None, quiz: dict | None = None, lessonmap: dict | None = None,
-                   curriculum: dict | None = None) -> list[str]:
+                   curriculum: dict | None = None, named: "Named | None" = None) -> list[str]:
     errs: list[str] = []
     curriculum = load_curriculum() if curriculum is None else curriculum
     if not isinstance(man, dict) or set(man) != {"version", "voice", "lines"}:
@@ -1792,8 +2146,9 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
             ayah = ayat.get(int(m.group("ayah")))
         focus = line["focus"] if isinstance(line.get("focus"), str) else None
         focus_ar = line_letters(ayah, part, focus, forms, compose, library)
-        errs += check_spoken(lid, line["text"], forms, lex)
-        errs += check_display(lid, line["display"], line["text"], forms, lex, focus_ar)
+        names = named_in_display(line["display"], lex)
+        errs += check_spoken(lid, line["text"], forms, lex, [said for said, _shown in names])
+        errs += check_display(lid, line["display"], line["text"], forms, lex, focus_ar, named)
         if m and (name == "shared" or ayah is not None):
             errs += check_view(lid, line, ayah, part, compose, curriculum)
             errs += check_animation_line(lid, line, ayah, part, compose, lex, bool(m.group("split")))
@@ -1806,16 +2161,19 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
             if voice is None:
                 errs.append(f"{lid}: audio present but the manifest names no voice")
             if isinstance(line["text"], str):
-                for w in heavy_latin(line["text"], lex):
+                for w in heavy_latin(mask_named_said(line["text"], [said for said, _shown in names]), lex):
                     errs.append(f"{lid}: rendered with {w!r}, a heavy letter + a with no approved respelling in "
                                 "pronunciation.json")
+            for w in named_held(line["display"], lex):
+                errs.append(f"{lid}: rendered with the named word {w!r}, whose sound waits for the operator's ear "
+                            "(validate_narration.NAMED_HELD) and has no spelling in pronunciation.json `named`")
             errs += check_audio(lid, line["audio"], slug, voice, line["text"])
             if "tokens" not in line:
                 errs.append(f"{lid}: audio without tokens (render with /with-timestamps)")
         if "tokens" in line:
             if "audio" not in line:
                 errs.append(f"{lid}: tokens without audio")
-            errs += check_tokens(lid, line["tokens"], line.get("audio"), line["text"], lex, focus_ar)
+            errs += check_tokens(lid, line["tokens"], line.get("audio"), line["text"], lex, focus_ar, names)
     # coverage
     if name == "shared":
         want = {f"shared:{k}" for k in expected_shared()}
@@ -1906,9 +2264,9 @@ _MAP_SOFAR = re.compile(r"^Sebelum ayat ini, kita sudah mempelajari (?P<n>[a-z ]
 _MAP_AGAIN = re.compile(r"^Yang kita temui lagi di ayat ini adalah (?P<list>.+)\.$")
 _MAP_AGAIN_OLD = re.compile(r"^Yang kita temui lagi di ayat ini ada [a-z ]+?(?:, di antaranya|:) .+\.$")
 _MAP_NOT_AGAIN = "Tidak ada yang kita temui lagi di ayat ini."
-_MAP_LATER = re.compile(rf"^Ada (?P<n>[a-z ]+?) hal lagi di ayat ini, (?P<some>di antaranya|yaitu) (?P<list>.+), tetapi baru kita "
-                        rf"bahas (?:di ayat (?P<ayah>{ORDINAL})|nanti)\.$")
-_MAP_LATER_EACH = re.compile(r"^Ada (?P<n>[a-z ]+?) hal lagi di ayat ini, tetapi baru kita bahas nanti: (?P<list>.+)\.$")
+_MAP_LATER = re.compile(rf"^Ada (?P<n>[a-z ]+?) hal lagi di ayat ini, (?P<some>di antaranya|yaitu) (?P<list>.+), tetapi baru akan "
+                        rf"diajarkan lebih lengkap (?:di ayat (?P<ayah>{ORDINAL})|nanti)\.$")
+_MAP_LATER_EACH = re.compile(r"^Ada (?P<n>[a-z ]+?) hal lagi di ayat ini, tetapi baru akan diajarkan lebih lengkap nanti: (?P<list>.+)\.$")
 _MAP_LANJUT = re.compile(r"^(?P<lead>Ada juga|Di ayat ini ada) (?P<n>[a-z ]+?) hal tingkat lanjut, yang tidak kita bahas di "
                          r"tingkat dasar\.$")
 # The same sentence with something between the count and its end: a next-level topic named.
@@ -2201,9 +2559,11 @@ def _map_focus(lid: str, shown: str, entry: dict, known: dict[str, str]) -> list
 def _map_later(lid: str, sentence: str, later: list[str], steps: dict, known: dict[str, str], surah: int) -> list[str]:
     """The sentence about the steps present here and taught later: their count, EVERY name (in
     teaching order), and where they are taught — one ayah of this surah for all: "…, yaitu Z dan
-    W, tetapi baru kita bahas di ayat ketiga."; several ayat of this surah: "…, tetapi baru kita
-    bahas nanti: Z di ayat ketiga, serta W di ayat ketujuh."; any of them in another surah (or in
-    no whole ayah): "…, yaitu Z dan W, tetapi baru kita bahas nanti.\""""
+    W, tetapi baru akan diajarkan lebih lengkap di ayat ketiga."; several ayat of this surah: "…,
+    tetapi baru akan diajarkan lebih lengkap nanti: Z di ayat ketiga, serta W di ayat ketujuh."; any
+    of them in another surah (or in no whole ayah): "…, yaitu Z dan W, tetapi baru akan diajarkan
+    lebih lengkap nanti." (operator 2026-10-17: "better to say konsep ini baru akan diajari lebih
+    lengkap di ayat keXX"; until then "baru kita bahas …")\""""
     what = "postponed step(s)"
     where = [LESSONMAP.taught_ayah(steps[c], surah) for c in later]
     each = _MAP_LATER_EACH.match(sentence)
@@ -2299,6 +2659,7 @@ def caption_terms(display: str, lex: "Lexicon", ids: dict[str, str]) -> list[str
     """The library terms a caption shows, in order: its dictionary display forms, and the term
     table's forms in the Latin text between them (what the dictionary did not turn into a
     display form stands in the caption as the prose wrote it)."""
+    display = lex.unnamed(display)
     return _with_latin(display, [(m.start(), m.end(), ids.get(lex._groups[m.lastgroup].term)) for m in lex.display_rx.finditer(display)], ids)
 
 
@@ -2466,6 +2827,8 @@ def check(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, *
     curriculum = load_curriculum() if curriculum is None else curriculum
     pending = CUR.load_pending() if pending is None else pending
     errs: list[str] = lex.problems(forms)
+    named = Named(lessons, compose)
+    errs += named_stale(lex, named)
     # The lesson maps are held to the curriculum before their lines are read back.
     for slug, mp in lessonmap.items():
         errs += LESSONMAP.problems(mp, lessons, library, curriculum) if slug in lessons else [f"map/{slug}: a lesson map for a surah without a lesson"]
@@ -2479,7 +2842,7 @@ def check(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, *
             errs.append(f"{name}: narration manifest for a surah without a lesson")
             continue
         errs += check_manifest(name, man, forms, lessons.get(name), library, lex, compose.get(name), quiz.get(name),
-                               lessonmap.get(name), curriculum)
+                               lessonmap.get(name), curriculum, named=named)
     # No term before its lesson (decision 7), on the manifests as they stand.
     errs += term_order_problems(manifests, lessons, lex, curriculum, lessonmap, pending)
     errs += check_guide_ts()
@@ -2506,7 +2869,7 @@ def pending_respellings(manifests: dict[str, dict], lex: Lexicon) -> dict[str, l
     for man in manifests.values():
         for lid, line in (man.get("lines") or {}).items() if isinstance(man, dict) else ():
             if isinstance(line, dict) and "audio" not in line and isinstance(line.get("text"), str):
-                for w in held(line["text"], lex):
+                for w in held_line(line, lex):
                     out.setdefault(key(w), []).append(lid)
     return out
 
@@ -2523,6 +2886,27 @@ def pending_terms(manifests: dict[str, dict], lex: Lexicon) -> dict[str, list[st
     return out
 
 
+def pending_named(manifests: dict[str, dict], lex: Lexicon) -> dict[str, list[str]]:
+    """Named words whose pronunciation.json `named` spelling the operator has not heard yet
+    (NamedSound.pending) → the lines whose captions name them."""
+    out: dict[str, list[str]] = {}
+    for man in manifests.values():
+        for lid, line in (man.get("lines") or {}).items() if isinstance(man, dict) else ():
+            for m in NAMED_SHOWN.finditer(line.get("display") or "") if isinstance(line, dict) else ():
+                entry = lex.named.get(m.group("lat"))
+                if entry is not None and entry.pending and lid not in out.setdefault(entry.translit, []):
+                    out[entry.translit].append(lid)
+    return out
+
+
+def named_stale(lex: Lexicon, named: "Named") -> list[str]:
+    """pronunciation.json `named` entries that name no lesson word or composition form (a typo, or a
+    word reworded away): each entry must be a transliteration the content shows."""
+    shown = {tr for _ar, tr in named.refs.values()}
+    return [f"{lex.source}: named {tr}: no lesson word or composition form has this transliteration (content/<slug>.json, "
+            "content/compose): remove the entry, or correct it" for tr in lex.named if tr not in shown]
+
+
 def main() -> int:
     manifests, lessons, library = load_all()
     errs = check(manifests, lessons, library)
@@ -2535,8 +2919,9 @@ def main() -> int:
     pending = pending_respellings(manifests, lex)
     if pending:
         n = len({lid for ids in pending.values() for lid in ids})
-        print(f"\nnot renderable yet: {n} lines speak a heavy letter + a with no approved respelling, or an Arabic term "
-              "or letter name in Latin (render_narration.py refuses them until pronunciation.json speaks it):")
+        print(f"\nnot renderable yet: {n} lines speak a heavy letter + a with no approved respelling, an Arabic term "
+              "or letter name in Latin, or a named Qur'anic word whose sound waits for the operator's ear (NAMED_HELD) "
+              "(render_narration.py refuses them until pronunciation.json speaks it, or the operator approves the sound):")
         print("  " + ", ".join(f"{w} ×{len(ids)}" for w, ids in sorted(pending.items(), key=lambda x: (-len(x[1]), x[0]))))
     # What the lessons written before the curriculum still say before its lesson (decision 7):
     # tolerated, listed, and meant to shrink to nothing.
@@ -2554,6 +2939,11 @@ def main() -> int:
         for t in lex.terms:
             if t.term in unheard:
                 print(f"  {t.term} → speak {t.speak!r}, caption {t.display!r}: {len(unheard[t.term])} lines")
+    unheard_named = pending_named(manifests, lex)
+    if unheard_named:
+        print(f"\npending ear check, named words ({PENDING}: rendered, not yet approved by the operator's ear):")
+        for tr, ids in unheard_named.items():
+            print(f"  {tr} → speak {lex.named[tr].speak!r}: {len(ids)} lines")
     if errs:
         print(f"\nFAIL: {len(errs)} problem(s)")
         for e in errs:
