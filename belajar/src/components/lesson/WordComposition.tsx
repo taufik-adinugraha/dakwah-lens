@@ -110,11 +110,15 @@ export function WordComposition({
       data-example={example?.id}
       data-example-state={example?.state}
       data-clip={example?.key}
-      className="mx-auto flex max-w-xl flex-col rounded-2xl border-[1.5px] border-forest bg-forest-tint px-3 py-2 sm:min-h-56 sm:px-5 sm:py-3"
+      // py-1.5 on a phone (was py-2): 4px of the room its Arabic took for its marks (ar-clear,
+      // 2026-10-17) given back where the figure already rides up over the end of the mushaf line.
+      className="mx-auto flex max-w-xl flex-col rounded-2xl border-[1.5px] border-forest bg-forest-tint px-3 py-1.5 sm:min-h-56 sm:px-5 sm:py-3"
     >
       <figcaption className="sr-only">{describe}</figcaption>
+      {/* pb-1: a frame may open with a mark's term ("dhammah (ضَمَّة)", the chips' line height 1.6),
+          whose marks stand up to 0.12em over its line; never into this label (2026-10-17). */}
       {word !== null ? (
-        <p aria-hidden className="hidden text-base leading-tight font-semibold text-forest sm:block">
+        <p aria-hidden className="hidden pb-1 text-base leading-tight font-semibold text-forest sm:block">
           {t("word_n", { n: word })}
         </p>
       ) : null}
@@ -140,10 +144,14 @@ type T = ReturnType<typeof useTranslations>;
 
 /** One whole Arabic string, isolated RTL in the Amiri face, never broken.
  *  Inside the figure its line height is the strip's (globals.css: 1.6 for
- *  pieces and terms, 1.8 for a `tile`'s whole form). */
+ *  pieces and terms, 1.8 for a `tile`'s whole form). Every one of them has a
+ *  label, a transliteration or its own border right above or below it, so
+ *  each is a box with room for its marks (ar-clear, operator 2026-10-17: the
+ *  marks of رَبُّ ran into its tile's "isim"); an inline-block, because an
+ *  inline element's padding would move nothing. */
 function Ar({ text, className, quran = false, tile = false }: { text: string; className?: string; quran?: boolean; tile?: boolean }) {
   return (
-    <bdi lang="ar" dir="rtl" className={clsx(quran ? "quran" : "arabic-inline", tile && "compose-ar", "whitespace-nowrap", className)}>
+    <bdi lang="ar" dir="rtl" className={clsx(quran ? "quran" : "arabic-inline", tile && "compose-ar", "ar-clear inline-block whitespace-nowrap", className)}>
       {text}
     </bdi>
   );
@@ -183,7 +191,10 @@ function Tile({
         recited ? "border-forest bg-forest text-paper" : clsx("bg-white", ring ? "border-forest ring-4 ring-forest/25" : "border-hairline"),
       )}
     >
-      <span className={clsx("text-sm leading-tight whitespace-nowrap", recited ? "text-paper" : "text-ink-muted")}>{tag ?? f.label ?? " "}</span>
+      {/* The label and the transliteration line are Latin inside the RTL row of tiles: each is an
+          LTR isolate of its own, or a quote or a ’ at its end is drawn at its start (operator
+          2026-10-17: the tile read ”rabbu · “Tuhan). */}
+      <span dir="ltr" className={clsx("text-sm leading-tight whitespace-nowrap", recited ? "text-paper" : "text-ink-muted")}>{tag ?? f.label ?? " "}</span>
       <span className="grid place-items-center">
         {before ? (
           <span data-compose-before className="col-start-1 row-start-1">
@@ -194,7 +205,7 @@ function Tile({
           <Ar text={f.ar} quran={quran} tile className={clsx("text-ar-md sm:text-ar-xl", recited ? "text-paper" : "text-ink")} />
         </span>
       </span>
-      <span className="grid text-base leading-tight whitespace-nowrap">
+      <span dir="ltr" className="grid text-base leading-tight whitespace-nowrap">
         {before ? (
           <span data-compose-before className={clsx("col-start-1 row-start-1 text-center", recited ? "text-paper" : "text-ink")}>
             {before.translit}

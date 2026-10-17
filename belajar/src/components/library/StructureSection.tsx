@@ -78,7 +78,8 @@ export function StructureSection({
       <ol dir="rtl" className="mt-5 flex flex-wrap justify-center gap-x-4 gap-y-5">
         {ayah.words.map((w, i) => (
           <li key={w.loc} className="flex flex-col items-center">
-            <span lang="ar" className="quran text-ar-md text-ink">
+            {/* Its role under it: room for the marks (ar-clear, globals.css). */}
+            <span lang="ar" className="quran ar-clear text-ar-md text-ink">
               {w.ar}
             </span>
             {w.role ? (
@@ -106,7 +107,7 @@ export function StructureSection({
                 {/* The words joined " · ", each kept with its dot so no line
                     starts with one; the dash inside the text, glued to the
                     label's first word (line breaks, operator 2026-10-10). */}
-                <span lang="ar" dir="rtl" className="quran text-ar-sm text-ink">
+                <span lang="ar" dir="rtl" className="quran ar-clear text-ar-sm text-ink">
                   {g.words
                     .map((k) => ayah.words[k - 1]?.ar)
                     .filter(Boolean)

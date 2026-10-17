@@ -101,12 +101,14 @@ export function Prose({
  * of an RTL box): each term is one nowrap item with its separator after it, so a line may end
  * with "·" but never starts with one, and a term never breaks. A harakah term carries its sign on
  * a small dotted circle, as the Harakat page draws it ("ضَمَّة" with ـُ, never "u": operator
- * 2026-10-12), since the title is where a beginner meets it first.
+ * 2026-10-12), since the title is where a beginner meets it first. Right under the title, so it
+ * has room for its marks (ar-clear, globals.css); `className` carries its size (text-ar-*), on this
+ * same element, which the room is measured in.
  */
 export function Headword({ head, className = "" }: { head: HeadTerm[]; className?: string }) {
   if (!head.length) return null;
   return (
-    <span lang="ar" dir="rtl" className={`arabic-inline flex flex-wrap items-baseline gap-x-3 text-forest ${className}`}>
+    <span lang="ar" dir="rtl" className={`arabic-inline ar-clear flex flex-wrap items-baseline gap-x-3 text-forest ${className}`}>
       {head.map((h, i) => (
         <span key={h.ar} className="inline-flex items-baseline whitespace-nowrap">
           <bdi>{h.ar}</bdi>

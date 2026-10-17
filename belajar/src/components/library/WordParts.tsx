@@ -143,7 +143,9 @@ function Tile({
         result ? "stage-card" : "border-[1.5px] border-teal-line"
       }`}
     >
-      <span lang="ar" dir="rtl" className="quran text-ar-xl whitespace-nowrap text-ink">
+      {/* The tile's border above the word, its transliteration under it: room for the marks
+          (ar-clear, globals.css; operator 2026-10-17). */}
+      <span lang="ar" dir="rtl" className="quran ar-clear text-ar-xl whitespace-nowrap text-ink">
         {dropped.length
           ? ls.map((l, j) =>
               dropped.includes(j + 1) ? (

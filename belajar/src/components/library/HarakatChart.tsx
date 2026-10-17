@@ -103,7 +103,7 @@ export function HarakatChart({
                   <span className="text-sm text-ink-muted">{labels.example}:</span>
                   {/* The letter before the sign, then with it: ب → dibaca kasrah: بِ = b + i. */}
                   <span className="inline-flex items-baseline gap-x-1.5 whitespace-nowrap">
-                    <span lang="ar" dir="rtl" data-sign-bare className="quran text-ar-lg text-ink">
+                    <span lang="ar" dir="rtl" data-sign-bare className="quran ar-clear text-ar-lg text-ink">
                       {s.bare}
                     </span>
                     <span className="text-sm text-ink-muted">{labels.bare}</span>
@@ -115,7 +115,7 @@ export function HarakatChart({
                     <span className="text-sm text-ink-muted">{labels.read(s.term?.latin ?? "")}</span>
                   </span>
                   <span className="inline-flex items-baseline gap-x-2 whitespace-nowrap">
-                    <span lang="ar" dir="rtl" className="quran text-ar-lg text-ink">
+                    <span lang="ar" dir="rtl" className="quran ar-clear text-ar-lg text-ink">
                       {s.letter}
                     </span>
                     <span className="text-base text-ink">= {s.reading}</span>

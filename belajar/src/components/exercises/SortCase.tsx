@@ -239,7 +239,7 @@ function SortCaseRound({
                       : "m-px border-2 border-border-ui bg-paper-deep hover:border-forest",
                   )}
                 >
-                  <span lang="ar" className="quran text-ar-md">
+                  <span lang="ar" className="quran ar-clear text-ar-md">
                     {w.ar}
                   </span>
                   {isSel && (
@@ -288,7 +288,7 @@ function SortCaseRound({
                 {inBin.length > 0 && (
                   <span dir="rtl" className="flex flex-wrap justify-center gap-x-3">
                     {inBin.map((w) => (
-                      <span key={w.loc} lang="ar" className="quran text-ar-sm">
+                      <span key={w.loc} lang="ar" className="quran ar-clear text-ar-sm">
                         {w.ar}
                       </span>
                     ))}

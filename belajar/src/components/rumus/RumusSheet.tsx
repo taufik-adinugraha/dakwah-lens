@@ -124,7 +124,8 @@ function Step({ step, unit }: { step: SheetStep; unit: string }) {
             <div data-rumus-example={step.example.loc} className="mt-4 rounded-xl bg-paper-deep px-4 py-3">
               <p className="text-sm font-semibold text-ink-muted">{t("example")}</p>
               <p className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                <bdi lang="ar" dir="rtl" className="quran text-ar-md text-ink">
+                {/* "Contoh" right above it (a flex item: ar-clear gives it room for its marks). */}
+                <bdi lang="ar" dir="rtl" className="quran ar-clear text-ar-md text-ink">
                   {word.ar}
                 </bdi>
                 <span className="text-base text-ink">

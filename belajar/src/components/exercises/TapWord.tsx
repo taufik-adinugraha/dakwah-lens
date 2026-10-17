@@ -197,7 +197,7 @@ function TapWordRound({
                     state === "idle" && "border-border-ui bg-paper-deep text-ink hover:border-forest",
                   )}
                 >
-                  <span lang="ar" className="quran text-ar-md">
+                  <span lang="ar" className="quran ar-clear text-ar-md">
                     {w.ar}
                   </span>
                   {state === "right" && <OptionMark state="right" label={t("tap_target")} inverse />}

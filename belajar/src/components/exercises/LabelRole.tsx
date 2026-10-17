@@ -105,7 +105,7 @@ function LabelRoleRound({
             <Counter n={q.i + 1} total={q.total} />
             <p className="mt-1 text-lg font-semibold text-ink">{t("role_question")}</p>
             <div className="mt-3 flex flex-col items-center gap-1 rounded-xl bg-paper-deep px-4 py-3 text-center">
-              <span lang="ar" dir="rtl" className="quran text-ar-md text-ink">
+              <span lang="ar" dir="rtl" className="quran ar-clear text-ar-md text-ink">
                 {w.ar}
               </span>
               {/* The word's meaning bold in forest (operator 2026-10-11): it names the word, it

@@ -31,7 +31,8 @@ export function TermContrastCard({ id, lead }: { id: string; lead: CurriculumLea
           <p className="text-sm font-semibold text-ink-muted">{c.lang === "ar" ? t("lead_lang_ar") : t("lead_lang_id")}</p>
           {c.lang === "ar" && c.term ? (
             <>
-              <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-lg whitespace-nowrap text-ink">
+              {/* Between the language's name and the term's Latin: room for its marks (ar-clear). */}
+              <bdi lang="ar" dir="rtl" className="arabic-inline ar-clear text-ar-lg whitespace-nowrap text-ink">
                 {c.term.ar}
               </bdi>
               <span className="text-base text-ink-muted">{c.term.latin}</span>

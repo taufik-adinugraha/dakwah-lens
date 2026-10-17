@@ -778,7 +778,9 @@ export function LessonStage({
                     <MixedText {...cardMeaning(focusWord.gloss)} />
                   </p>
                 </div>
-                <p lang="ar" dir="rtl" className="quran ml-auto text-ar-lg text-ink sm:order-2 sm:ml-0 sm:text-ar-xl">
+                {/* "Kata ke-N" above it and its transliteration under it (from sm; on a phone when it
+                    takes a row of its own): room for its marks (ar-clear, operator 2026-10-17). */}
+                <p lang="ar" dir="rtl" className="quran ar-clear ml-auto text-ar-lg text-ink sm:order-2 sm:ml-0 sm:text-ar-xl">
                   {focusWord.ar}
                 </p>
               </div>

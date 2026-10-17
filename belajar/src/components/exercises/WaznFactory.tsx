@@ -140,7 +140,7 @@ function WaznFactoryRound({
                     onClick={() => q.choose(opt)}
                     optionKey={item.q.options.find((l) => item.lex.tashrif?.forms.find((f) => f.label === l)?.ar === opt)}
                   >
-                    <span lang="ar" dir="rtl" className="arabic-inline text-ar-md">
+                    <span lang="ar" dir="rtl" className="arabic-inline ar-clear text-ar-md">
                       {opt}
                     </span>
                   </OptionButton>
