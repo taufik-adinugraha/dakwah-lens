@@ -132,7 +132,7 @@ const AYAH_PATH = /^\/belajar\/id\/quran\/[^/]+\/\d+$/;
 // ───────────────────────────── Node side ─────────────────────────────
 
 const all = [];
-const tally = { measures: 0, containers: 0, lines: 0, units: 0, glued: 0, flowed: 0, arabic: 0, karaoke: 0, markers: 0, exercises: 0, inkRuns: 0, inkTiles: 0, inkQuotes: 0 };
+const tally = { measures: 0, containers: 0, lines: 0, units: 0, glued: 0, flowed: 0, arabic: 0, karaoke: 0, markers: 0, exercises: 0, inkRuns: 0, inkInline: 0, inkTiles: 0, inkQuotes: 0 };
 const record = (o) => all.push(o);
 /** How the ink check measures a run's ink: "metrics" (measureText) or "pixels" — picked by the
  *  ink self-test, the one that matches Amiri's known ink on this browser. */
@@ -192,6 +192,7 @@ async function measureAllSizes(page, vp, label, scope = null, shot = null, inkUn
     if (counts.containers === 0) offenders.push({ kind: "nothing-measured", where: scope ?? "body", detail: "no text found", text: "" });
     const ink = await page.evaluate(inkMeasure, { scope, mode: INK_MODE });
     tally.inkRuns += ink.counts.runs;
+    tally.inkInline += ink.counts.inline;
     tally.inkTiles += ink.counts.tiles;
     tally.inkQuotes += ink.counts.quotes;
     offenders.push(...ink.offenders);
@@ -784,7 +785,10 @@ async function selfTest(page, fixture) {
  *  The operator's tile (label "isim" over رَبُّ at line height 1.8, as the composition drew it
  *  until 2026-10-17) and the same with ar-clear, outside and inside a composition figure (its own
  *  room, globals.css); a chip whose border the shaddah + dhammah cross, and with ar-clear; the
- *  tile's "rabbu · “Tuhan”" in a right-to-left row, without and with its LTR isolate. Its {{…}}
+ *  tile's "rabbu · “Tuhan”" in a right-to-left row, without and with its LTR isolate; ٱلنَّفَّٰثَٰتِ
+ *  inline under a line of Latin, without and with ar-tall (CI 2026-10-17); and two things a
+ *  clipping ancestor hides, which must not count: a long ayah scrolled under a footer (the ayah
+ *  dialog), a "+" narrowed to nothing over a tile (a join). Its {{…}}
  *  slots are content bytes (inkFixture), never Arabic typed into a test. */
 const INK_CASES = `
   <div data-ink-case="tile-overlap" data-expect="ink-overlap" style="display:flex;flex-direction:column;align-items:center;width:12rem;background:#fff">
@@ -811,7 +815,14 @@ const INK_CASES = `
     <bdi lang="ar" dir="rtl" class="arabic-inline ar-clear" style="display:inline-block;--ar-lh:1.6;line-height:1.6;font-size:24px;border:1px solid #0e5a3c;border-radius:6px;padding-inline:6px">{{BU}}</bdi>
   </div>
   <div data-ink-case="quote-rtl" data-expect="quote-order" dir="rtl" style="font-size:16px"><span style="display:block">rabbu · “Tuhan”</span></div>
-  <div data-ink-case="quote-ltr" dir="rtl" style="font-size:16px"><span dir="ltr" style="display:block">rabbu · “Tuhan”</span></div>`;
+  <div data-ink-case="quote-ltr" dir="rtl" style="font-size:16px"><span dir="ltr" style="display:block">rabbu · “Tuhan”</span></div>
+  <p data-ink-case="inline-tall" data-expect="ink-overlap" style="width:16rem;font-size:16px;line-height:1.5;background:#fff">bergantung pada<br><bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{NAFFATHAT}}</bdi> lagi</p>
+  <p data-ink-case="inline-tall-clear" style="width:16rem;font-size:16px;line-height:1.5;background:#fff">bergantung pada<br><bdi lang="ar" dir="rtl" class="arabic-inline ar-tall text-ar-sm">{{NAFFATHAT}}</bdi> lagi</p>
+  <div data-ink-case="clipped" style="display:flex;flex-direction:column;width:12rem;height:9rem;background:#fff">
+    <div style="flex:1 1 0;min-height:0;overflow-y:auto"><p lang="ar" dir="rtl" class="quran" style="font-size:36px">{{LONG}}</p></div>
+    <p style="border-top:1px solid #e7e4da;font-size:16px;line-height:1.5">Putar bacaan imam</p>
+  </div>
+  <div data-ink-case="collapsed-plus" style="padding:1rem;background:#fff"><bdi lang="ar" dir="rtl" class="arabic-inline ar-clear inline-block" style="font-size:32px">{{RABBU}}</bdi><span style="display:inline-block;width:0;overflow-x:clip;margin-left:-3rem;font-size:24px">+</span></div>`;
 
 /** Amiri's ink, known (HarfBuzz on the served font, 2026-10-17), in em: what the canvas must give
  *  for these slots — رَبُّ's shaddah + dhammah, ٱلرَّحِيمِ's kasrah under its mim, a bare ب. */
@@ -822,17 +833,22 @@ const AMIRI_INK = [
 ];
 
 /** The ink self-test's Arabic, from the content: the bentuk dasar rabbu of Al-Fatihah 2 word 3
- *  and the piece of its chip (content/compose), word 4 of ayah 1 and the primer's bare letter. */
+ *  and the piece of its chip (content/compose), word 4 of ayah 1 and the primer's bare letter,
+ *  word 3 of Al-Falaq 4 and the whole of Al-Fatihah 7. */
 async function inkFixture() {
   const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
   const compose = await read("content/compose/al-fatihah.json");
   const lesson = await read("content/al-fatihah.json");
+  const falaq = await read("content/al-falaq.json");
   const rabb = compose.words?.["1:2:3"];
   const values = {
     RABBU: rabb?.forms?.rabbu?.ar,
     BU: rabb?.frames?.find((f) => f.chips?.length)?.chips[0]?.from,
     RAHIM: lesson.ayat.find((a) => a.ayah === 1)?.words.find((w) => w.loc === "1:1:4")?.ar,
     BA: compose.primer?.forms?.ba?.ar,
+    // the tallest stack the module draws: QS 113:4 word 3
+    NAFFATHAT: falaq.ayat.find((a) => a.ayah === 4)?.words.find((w) => w.loc === "113:4:3")?.ar,
+    LONG: lesson.ayat.find((a) => a.ayah === 7)?.ar,
   };
   const missing = Object.entries(values).filter(([, v]) => !v).map(([k]) => k);
   if (missing.length) throw new Error(`ink self-test: the content no longer has ${missing.join(", ")} (content/compose/al-fatihah.json, content/al-fatihah.json)`);
@@ -918,7 +934,7 @@ async function inkSelfTest(page, values) {
     return true;
   });
   if (failures.length) throw new Error(`ink self-test failed:\n  ${failures.join("\n  ")}`);
-  console.log(`ink self-test ok: ${[...caught].join(", ")} caught; ar-clear (outside and inside a composition) and dir="ltr" pass; baseline within ${Math.abs(base.derived - base.onBaseline).toFixed(2)}px of its probe`);
+  console.log(`ink self-test ok: ${[...caught].join(", ")} caught; ar-clear (outside and inside a composition), ar-tall and dir="ltr" pass, clipped text is not counted; baseline within ${Math.abs(base.derived - base.onBaseline).toFixed(2)}px of its probe`);
   await page.goto("about:blank");
 }
 
@@ -961,7 +977,7 @@ console.log(
   `line breaks${SURAHS_ON ? " (every surah listed)" : ""}: ${tally.measures} measures (${SIZES.length} text sizes × ${VIEWPORTS.length} viewports), ${tally.containers} text blocks, ` +
     `${tally.lines} lines, ${tally.units} units, ${tally.glued} kept words, ${tally.flowed} laid out in the flow, ${tally.arabic} inline Arabic runs, ` +
     `${tally.karaoke} karaoke words, ${tally.markers} ayah markers, ${tally.exercises} exercises answered; ink of the marks (${INK_MODE}) on ${tally.inkRuns} boxes of Arabic ` +
-    `(${tally.inkTiles} in composition tiles), ${tally.inkQuotes} quoted glosses in reading order — ${Math.round((Date.now() - t0) / 1000)}s`,
+    `(${tally.inkTiles} in composition tiles, ${tally.inkInline} inline in a Latin line), ${tally.inkQuotes} quoted glosses in reading order — ${Math.round((Date.now() - t0) / 1000)}s`,
 );
 if (all.length) {
   for (const o of all.slice(0, MAX_PRINTED))

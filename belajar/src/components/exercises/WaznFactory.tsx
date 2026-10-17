@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import type { QuizExerciseOf } from "@/content/quiz-schema";
 import type { Lexeme } from "@/content/schema";
 import { seededShuffle } from "@/lib/shuffle";
+import { arTall } from "@/lib/arabicInk";
 
 import { KeepTogether, MixedText } from "../library/MixedText";
 import {
@@ -158,7 +159,7 @@ function WaznFactoryRound({
               // The label and its form on one line: never "label:" ⏎ form.
               <KeepTogether>
                 <MixedText text={`${shown}:`} />{" "}
-                <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm">
+                <bdi lang="ar" dir="rtl" className={`arabic-inline text-ar-sm ${arTall(item.answer)}`}>
                   {item.answer}
                 </bdi>
               </KeepTogether>

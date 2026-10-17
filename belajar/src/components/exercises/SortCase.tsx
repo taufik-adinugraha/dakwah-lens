@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import type { QuizExerciseOf } from "@/content/quiz-schema";
 import type { CaseState, Word } from "@/content/schema";
 import { useProgress } from "@/hooks/useProgress";
+import { arTall } from "@/lib/arabicInk";
 import { CASE_META } from "@/lib/cases";
 import { seededShuffle } from "@/lib/shuffle";
 
@@ -304,7 +305,7 @@ function SortCaseRound({
       <Feedback kind={say?.kind ?? null} title={title} nonce={say?.n}>
         {(say?.kind === "ok" || say?.kind === "reveal") && say.word && (
           <>
-            <bdi lang="ar" dir="rtl" className="quran text-ar-sm">
+            <bdi lang="ar" dir="rtl" className={clsx("quran text-ar-sm", arTall(say.word.ar))}>
               {say.word.ar}
             </bdi>{" "}
             <CaseBadge

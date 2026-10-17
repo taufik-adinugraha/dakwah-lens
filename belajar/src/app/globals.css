@@ -167,6 +167,8 @@ body {
   --ar-descent: 0.634;
   --ar-ink-above: 1.48;
   --ar-ink-below: 0.78;
+  /* The room an inline run with a tall stack gets (ar-tall): the module's tallest, everywhere. */
+  --ar-ink-tall: 1.48;
 }
 
 /* Qur'anic text: generous line height for harakat, never synthetic bold.
@@ -253,12 +255,14 @@ body {
 /* Room for the marks of a box of Arabic (see :root above): padding that takes the box from its line
    box to --ar-ink-above over the baseline and --ar-ink-below under it, at the box's own font size
    (em) and line height (--ar-lh). Never negative: a box whose line height already leaves the room
-   gets none. A utility (not unlayered) so that it never fights .quran / .arabic-inline, which set
-   the line height; don't combine it with a py-* utility on the same element (both are
-   padding-block). */
+   gets none. Plus one pixel each side: the browser draws and measures ink to whole pixels, rounded
+   outward (CI 2026-10-17: بُّ measured 1.317em at 30.4px for its 1.287em; ٱلنَّفَّٰثَٰتِ 1.500em
+   at 24px for its 1.460em). A utility (not unlayered) so that it never fights .quran /
+   .arabic-inline, which set the line height; don't combine it with a py-* utility on the same
+   element (both are padding-block). */
 @utility ar-clear {
-  padding-top: max(0px, calc((var(--ar-ink-above) - var(--ar-ascent) - (var(--ar-lh, 2) - var(--ar-ascent) - var(--ar-descent)) / 2) * 1em));
-  padding-bottom: max(0px, calc((var(--ar-ink-below) - var(--ar-descent) - (var(--ar-lh, 2) - var(--ar-ascent) - var(--ar-descent)) / 2) * 1em));
+  padding-top: max(0px, calc((var(--ar-ink-above) - var(--ar-ascent) - (var(--ar-lh, 2) - var(--ar-ascent) - var(--ar-descent)) / 2) * 1em + 1px));
+  padding-bottom: max(0px, calc((var(--ar-ink-below) - var(--ar-descent) - (var(--ar-lh, 2) - var(--ar-ascent) - var(--ar-descent)) / 2) * 1em + 1px));
 }
 
 /* ── Shared controls (senior-ux.md §3.3). Use these; don't hand-roll. ── */
@@ -722,14 +726,15 @@ label:has(> .sr-only:focus-visible) {
    than those rules, so they win wherever the composition draws.
    Its own room for the marks: the composition draws only the forms of
    content/compose (and the mark terms of its chips), whose ink reaches
-   1.287em above the baseline (رَبُّ) and 0.759em below (ٱلرَّحِيمِ), not the
+   1.287em above the baseline (رَبُّ; 1.33 for the room, CI measured 1.317 at
+   Sangat besar) and 0.759em below (ٱلرَّحِيمِ), not the
    1.48em the module's other Arabic needs (:root): on a phone the figure
    already rides up over the end of the mushaf line, and every em counts
    there. A composed form with a taller stack (a dotted letter with shaddah
    and a vowel, ٱلنَّفَّٰثَٰتِ) must raise these two first: the browser check
    (inkMeasure) measures every frame of the compositions its walk visits. */
 [data-autoplay="composition"] {
-  --ar-ink-above: 1.3;
+  --ar-ink-above: 1.33;
   --ar-ink-below: 0.77;
 }
 [data-autoplay="composition"] :is(.arabic-inline, .quran) {
@@ -739,6 +744,20 @@ label:has(> .sr-only:focus-visible) {
 [data-autoplay="composition"] .compose-ar {
   --ar-lh: 1.8;
   line-height: var(--ar-lh);
+}
+/* An INLINE run of Arabic whose marks stand too tall for a line of text (src/lib/arabicInk.ts
+   tallStack: a shaddah with a small alif, a tanwin above or a maddah; three marks over one letter;
+   أُ — e.g. ٱلنَّفَّٰثَٰتِ, 1.46em over the baseline; CI 2026-10-17: inline in the Konsep pages and
+   Al-Falaq's cards it ran up to 3.3px into the line above). At .arabic-inline's 2 an inline run owns
+   1.245em over its baseline; this one gets a line box that holds 1.48em over it (+1px a side for
+   the outward pixel; --ar-ink-tall, which the composition's own smaller room does not lower),
+   ≈2.47em: its own line only — 13px taller at 24px, half of it under the
+   baseline, since an inline box grows on both sides — never every line with Arabic in it (half an
+   em more on all of them). Inline elements only (MixedText's Arabic, a feedback word, an i'lal
+   form): a box of Arabic takes ar-clear. Unlayered, more specific than .arabic-inline / .quran and
+   the composition's rules, and after them, so it wins wherever it is put. */
+:is(.arabic-inline, .quran).ar-tall {
+  line-height: calc((var(--ar-ascent) + var(--ar-descent) + 2 * (var(--ar-ink-tall) - var(--ar-ascent))) * 1em + 2px);
 }
 @media (prefers-reduced-motion: no-preference) {
   [data-compose-layer] {

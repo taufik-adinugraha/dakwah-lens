@@ -548,10 +548,12 @@ export const INK_KINDS = ["ink-overlap", "ink-border", "quote-order", "check-err
  *
  *   ink-overlap   a BOX OF ARABIC (the nearest element laying out an Arabic text node — a block, a
  *                 flex or grid item, an inline-block — whose text has no Latin in it: a tile's word,
- *                 a chip, a word card's word; Arabic inside a Latin sentence is the sentence's line
- *                 spacing, not this rule) whose glyphs' INK enters the text box of anything outside
- *                 that box (a label above it, a transliteration under it, a number badge, another
- *                 word): ink = each of its lines' baseline ± the run's own ink ascent / descent in its
+ *                 a chip, a word card's word, MixedText's Arabic part; and Arabic inside a Latin
+ *                 line, its own outermost lang="ar" element: a feedback word, an i'lal form — CI
+ *                 2026-10-17 found ٱلنَّفَّٰثَٰتِ, inline, 3px into the line above) whose glyphs' INK
+ *                 enters the text box of anything outside that box (a label above it, a
+ *                 transliteration under it, a number badge, another word, the line above):
+ *                 ink = each of its lines' baseline ± the run's own ink ascent / descent in its
  *                 computed font (canvas: measureText's actualBoundingBox, or — `mode: "pixels"` — the
  *                 rows the run inks when drawn), baseline = the line's text box top + the font's
  *                 ascent (fontBoundingBoxAscent, the ascent the line is laid out with);
@@ -567,7 +569,10 @@ export const INK_KINDS = ["ink-overlap", "ink-border", "quote-order", "check-err
  * is fixed, sticky or absolute — the stage's sticky word-card slot rides over the mushaf line on
  * purpose — or transformed, which an animation is moving). Hidden text (display: none, sr-only)
  * is left out; text hidden with visibility only counts inside the composition figure, where it is
- * a frame or a state shown at another moment.
+ * a frame or a state shown at another moment. Every text box and every ink box is cut to what its
+ * clipping ancestors show (overflow other than visible, x and y apart): a long ayah scrolled under
+ * the dialog's footer is not drawn there (CI 2026-10-17, QS 2:282), nor a join's "+" narrowed to
+ * nothing over the tile beside it.
  *
  * `calibrate`: instead, the ink of the given strings ({ text, font, size }) both ways — the
  * self-test compares them with Amiri's known extents and picks the mode that matches.
@@ -584,9 +589,18 @@ export function inkMeasure({ scope = null, mode = "metrics", calibrate = null, j
   const pairable = (a, b) => a.world === b.world && a.layer === b.layer && !(a.state && b.state && a.state !== b.state);
   /** One box of Arabic: `lines` [{ left, right, baseline }], its ink `above` / `below` the baseline
    *  (px), the text boxes around it `neighbours` [{ text, rects }], the inner edges of the borders
-   *  around it `edges` [{ left, right, top } | { left, right, bottom }]. Its offences. */
+   *  around it `edges` [{ left, right, top } | { left, right, bottom }], and `clip`, what its clipping
+   *  ancestors show of it (optional; its neighbours' rects come cut to theirs). Its offences. */
+  /** `r` cut to `c` (what a clipping ancestor shows), or null when nothing of it is left. */
+  const clipTo = (r, c) => {
+    if (!c) return r;
+    const x = { left: Math.max(r.left, c.left), right: Math.min(r.right, c.right), top: Math.max(r.top, c.top), bottom: Math.min(r.bottom, c.bottom) };
+    return x.right > x.left && x.bottom > x.top ? x : null;
+  };
   const judgeRun = (run) => {
-    const ink = run.lines.map((l) => ({ left: l.left, right: l.right, top: l.baseline - run.above, bottom: l.baseline + run.below }));
+    const ink = run.lines
+      .map((l) => clipTo({ left: l.left, right: l.right, top: l.baseline - run.above, bottom: l.baseline + run.below }, run.clip))
+      .filter(Boolean);
     const out = [];
     for (const n of run.neighbours) {
       for (const r of n.rects) {
@@ -611,6 +625,7 @@ export function inkMeasure({ scope = null, mode = "metrics", calibrate = null, j
       runs: (judge.runs ?? []).map(judgeRun),
       quotes: (judge.quotes ?? []).map(quoteBad),
       pairs: (judge.pairs ?? []).map(([a, b]) => pairable(a, b)),
+      clips: (judge.clips ?? []).map(([r, c]) => clipTo(r, c)),
     };
 
   // ── The ink of a run, in its computed font ──
@@ -665,7 +680,7 @@ export function inkMeasure({ scope = null, mode = "metrics", calibrate = null, j
   const COMPOSE = '[data-autoplay="composition"]';
   const root = (scope && document.querySelector(scope)) || document.body;
   const offenders = [];
-  const counts = { runs: 0, tiles: 0, neighbours: 0, quotes: 0 };
+  const counts = { runs: 0, inline: 0, tiles: 0, neighbours: 0, quotes: 0 };
   const units = new Set();
   const short = (s, n = 60) => {
     const t = (s || "").replace(/\s+/g, " ").trim();
@@ -716,6 +731,26 @@ export function inkMeasure({ scope = null, mode = "metrics", calibrate = null, j
     for (let e = el; e; e = e.parentElement) if (/^(fixed|sticky|absolute)$/.test(style(e).position) || isMoved(style(e))) return e;
     return null;
   });
+  /** What its clipping ancestors show of an element's content (overflow other than visible, x and y
+   *  apart), from the element itself up. */
+  const clipOf = cached((el) => {
+    const c = { left: -Infinity, right: Infinity, top: -Infinity, bottom: Infinity };
+    for (let e = el; e && e !== document.documentElement; e = e.parentElement) {
+      const s = style(e);
+      const [cx, cy] = [s.overflowX !== "visible", s.overflowY !== "visible"];
+      if (!cx && !cy) continue;
+      const r = e.getBoundingClientRect();
+      if (cx) {
+        c.left = Math.max(c.left, r.left + parseFloat(s.borderLeftWidth));
+        c.right = Math.min(c.right, r.right - parseFloat(s.borderRightWidth));
+      }
+      if (cy) {
+        c.top = Math.max(c.top, r.top + parseFloat(s.borderTopWidth));
+        c.bottom = Math.min(c.bottom, r.bottom - parseFloat(s.borderBottomWidth));
+      }
+    }
+    return c;
+  });
   const range = document.createRange();
   const rectsOf = (n) => {
     range.selectNodeContents(n);
@@ -736,9 +771,12 @@ export function inkMeasure({ scope = null, mode = "metrics", calibrate = null, j
     guard("text boxes", n.parentElement, () => {
       const el = n.parentElement;
       const st = el.closest("[data-compose-before], [data-compose-after]");
+      const raw = rectsOf(n);
       meta.set(n, {
         el,
-        rects: rectsOf(n),
+        raw,
+        // what is drawn of it: cut to its clipping ancestors
+        rects: raw.map((r) => clipTo(r, clipOf(el))).filter(Boolean),
         world: el.closest("[data-compose-ghost], [data-compose-layer]"),
         state: st ? (st.hasAttribute("data-compose-before") ? "before" : "after") : null,
         layer: layerOf(el),
@@ -754,8 +792,19 @@ export function inkMeasure({ scope = null, mode = "metrics", calibrate = null, j
     const a = meta.get(n);
     if (!a) continue;
     guard("ink", a.el, () => {
-      const box = blockOf(a.el);
-      if (!arabicOnly(box) || !a.rects.length) return;
+      // Its box: the element laying it out when that holds no Latin; inside a Latin line, its own
+      // outermost lang="ar" element there.
+      let box = blockOf(a.el);
+      let inline = false;
+      if (!arabicOnly(box)) {
+        let e = a.el.closest('[lang|="ar"]');
+        if (!e || e === box || !box.contains(e)) return;
+        for (let up = e.parentElement; up && up !== box; up = up.parentElement) if (up.matches('[lang|="ar"]')) e = up;
+        if (!arabicOnly(e)) return;
+        box = e;
+        inline = true;
+      }
+      if (!a.raw.length) return;
       const s = style(a.el);
       const size = parseFloat(s.fontSize);
       const v = inkOf(n.data, `${s.fontStyle} ${s.fontWeight} ${s.fontSize} ${s.fontFamily}`, size, mode);
@@ -767,12 +816,12 @@ export function inkMeasure({ scope = null, mode = "metrics", calibrate = null, j
       }
       // A text box is the font's content area (ascent over the baseline, descent under it): the
       // baseline is its top + the ascent — and its bottom − the descent, or this is no text box.
-      const odd = a.rects.find((r) => Math.abs(r.top + v.ascent - (r.bottom - v.descent)) > 1.5);
+      const odd = a.raw.find((r) => Math.abs(r.top + v.ascent - (r.bottom - v.descent)) > 1.5);
       if (odd) {
         push("check-error", a.el, `its text box (${odd.top.toFixed(1)}–${odd.bottom.toFixed(1)}) is not the font's ascent ${v.ascent} + descent ${v.descent}: no baseline`, short(n.data));
         return;
       }
-      const lines = a.rects.map((r) => ({ left: r.left, right: r.right, baseline: r.top + v.ascent }));
+      const lines = a.raw.map((r) => ({ left: r.left, right: r.right, baseline: r.top + v.ascent }));
       const top = Math.min(...lines.map((l) => l.baseline)) - v.above - TOL - 2;
       const bottom = Math.max(...lines.map((l) => l.baseline)) + v.below + TOL + 2;
       const neighbours = [];
@@ -804,12 +853,13 @@ export function inkMeasure({ scope = null, mode = "metrics", calibrate = null, j
         if (e === a.layer || es.overflowX !== "visible" || es.overflowY !== "visible") break;
       }
       counts.runs++;
+      if (inline) counts.inline++;
       counts.neighbours += neighbours.length;
       if (a.el.closest("[data-compose-tile]")) counts.tiles++;
       const fig = a.el.closest(COMPOSE);
       if (fig) units.add(fig.getAttribute("data-compose-kind") === "primer" ? "primer" : `word ${fig.getAttribute("data-compose-word")}`);
       const em = (px) => `${(px / size).toFixed(3)}em`;
-      for (const o of judgeRun({ lines, above: v.above, below: v.below, neighbours, edges })) {
+      for (const o of judgeRun({ lines, above: v.above, below: v.below, neighbours, edges, clip: clipOf(a.el) })) {
         const ink = `ink ${em(v.above)} above / ${em(v.below)} below its baseline, ${s.fontSize}`;
         if (o.kind === "ink-overlap") push(o.kind, a.el, `${ink}: its marks run ${o.depth.toFixed(1)}px into “${short(o.with, 30)}”`, short(n.data));
         else push(o.kind, a.el, `${ink}: its marks cross the border ${o.side === "top" ? "above" : "below"} it by ${o.depth.toFixed(1)}px`, short(n.data));

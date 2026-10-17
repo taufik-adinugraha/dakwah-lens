@@ -1,5 +1,6 @@
 import { wordVoice } from "@/lib/wordvoice";
 import { hasWaqfNote } from "@/lib/heard";
+import { arTall } from "@/lib/arabicInk";
 import type { PreparedSign } from "@/lib/terms";
 
 import { ClipButton, ClipPlayerProvider } from "./ClipButton";
@@ -124,7 +125,7 @@ export function HarakatChart({
                     <span className="text-sm text-ink-muted">
                       {labels.from}{" "}
                       <span className="whitespace-nowrap">
-                        <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-ink">
+                        <bdi lang="ar" dir="rtl" className={`arabic-inline text-ar-sm text-ink ${arTall(w.ar)}`}>
                           {w.ar}
                         </bdi>{" "}
                         ({w.translit})

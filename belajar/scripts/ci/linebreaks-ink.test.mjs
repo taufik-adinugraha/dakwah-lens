@@ -80,6 +80,25 @@ describe("inkMeasure: marks never in a neighbour", () => {
   });
 });
 
+describe("inkMeasure: only what is drawn counts", () => {
+  it("ink and text boxes are cut to what a clipping ancestor shows", () => {
+    const clip = (r, c) => inkMeasure({ judge: { clips: [[r, c]] } }).clips[0];
+    // a line of a long ayah scrolled under the dialog's footer: nothing of it is drawn there
+    expect(clip({ left: 0, right: 300, top: 500, bottom: 560 }, { left: 0, right: 320, top: 100, bottom: 420 })).toBeNull();
+    // a join's "+" narrowed to nothing (overflow-x: clip, width 0)
+    expect(clip({ left: 120, right: 134, top: 40, bottom: 69 }, { left: 120, right: 120, top: -Infinity, bottom: Infinity })).toBeNull();
+    // what is left of a line half scrolled out
+    expect(clip({ left: 0, right: 300, top: 400, bottom: 460 }, { left: 0, right: 320, top: 100, bottom: 420 })).toEqual({ left: 0, right: 300, top: 400, bottom: 420 });
+  });
+  it("a run's ink under a footer is no overlap once cut to its scroller", () => {
+    const footer = { text: "Putar bacaan imam", rects: [{ left: 16, right: 200, top: 440, bottom: 460 }] };
+    const line = { left: 16, right: 300, baseline: 450 };
+    const run = { lines: [line], above: 45, below: 25, neighbours: [footer], edges: [] };
+    expect(judge([run])[0].map((o) => o.kind)).toEqual(["ink-overlap"]);
+    expect(judge([{ ...run, clip: { left: 0, right: 320, top: 100, bottom: 420 } }])).toEqual([[]]);
+  });
+});
+
 describe("inkMeasure: quotes in reading order", () => {
   const q = (open, close) => inkMeasure({ judge: { quotes: [{ open, close }] } }).quotes[0];
   it("”rabbu · “Tuhan: the closing quote drawn left of the opening one, on one line", () => {

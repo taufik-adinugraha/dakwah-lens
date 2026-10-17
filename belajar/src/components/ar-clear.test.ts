@@ -78,8 +78,9 @@ describe("ar-clear: room for the marks of every box of Arabic", () => {
     expect(css).toMatch(/--ar-ink-above: 1\.48;/);
     expect(css).toMatch(/--ar-ink-below: 0\.78;/);
     const util = /@utility ar-clear \{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
-    expect(util).toContain("padding-top: max(0px, calc((var(--ar-ink-above) - var(--ar-ascent) - (var(--ar-lh, 2) - var(--ar-ascent) - var(--ar-descent)) / 2) * 1em));");
-    expect(util).toContain("padding-bottom: max(0px, calc((var(--ar-ink-below) - var(--ar-descent) - (var(--ar-lh, 2) - var(--ar-ascent) - var(--ar-descent)) / 2) * 1em));");
+    // + 1px: ink is drawn and measured to whole pixels, rounded outward (CI 2026-10-17)
+    expect(util).toContain("padding-top: max(0px, calc((var(--ar-ink-above) - var(--ar-ascent) - (var(--ar-lh, 2) - var(--ar-ascent) - var(--ar-descent)) / 2) * 1em + 1px));");
+    expect(util).toContain("padding-bottom: max(0px, calc((var(--ar-ink-below) - var(--ar-descent) - (var(--ar-lh, 2) - var(--ar-ascent) - var(--ar-descent)) / 2) * 1em + 1px));");
     // never clipped instead
     expect(util).not.toMatch(/overflow/);
   });
@@ -90,8 +91,9 @@ describe("ar-clear: room for the marks of every box of Arabic", () => {
       expect(body, String(rule)).toMatch(/--ar-lh: [\d.]+;/);
       expect(body, String(rule)).toContain("line-height: var(--ar-lh);");
     }
-    // the composition draws only content/compose's forms: its own room (rabbu 1.287em, ar-rahimi 0.759em)
-    expect(css).toMatch(/\[data-autoplay="composition"\] \{\s*--ar-ink-above: 1\.3;\s*--ar-ink-below: 0\.77;\s*\}/);
+    // the composition draws only content/compose's forms: its own room (rabbu 1.287em, measured
+    // 1.317 at Sangat besar; ar-rahimi 0.759em). src/lib/arabicInk.test.ts: no composed form is taller.
+    expect(css).toMatch(/\[data-autoplay="composition"\] \{\s*--ar-ink-above: 1\.33;\s*--ar-ink-below: 0\.77;\s*\}/);
   });
 
   it("the composition's Arabic is a box (an inline element's padding moves nothing) with it", () => {
@@ -127,6 +129,33 @@ describe("ar-clear: room for the marks of every box of Arabic", () => {
     }
     expect(bare).toEqual([]);
     // the MushafLine's words take their size from the line: pinned by name above (AyahPlayer: 2)
+  });
+
+  it("an inline run with a tall stack gets a line of its own that holds it (ar-tall), after every Arabic line-height rule", () => {
+    const rule = /:is\(\.arabic-inline, \.quran\)\.ar-tall \{([^}]*)\}/.exec(css);
+    expect(rule?.[1]).toContain("line-height: calc((var(--ar-ascent) + var(--ar-descent) + 2 * (var(--ar-ink-tall) - var(--ar-ascent))) * 1em + 2px);");
+    expect(css).toMatch(/--ar-ink-tall: 1\.48;/);
+    // unlayered and after the composition's rules (same specificity): it wins wherever it is put
+    expect(css.indexOf(rule![0])).toBeGreaterThan(css.indexOf('[data-autoplay="composition"] .compose-ar {'));
+  });
+
+  it("every inline Arabic run that can carry a lesson word or a lexicon form asks arTall (src/lib/arabicInk.ts)", () => {
+    // MixedText's Arabic (prose, captions, notes, fact cards, Konsep, quiz options); the feedback
+    // words of the exercises; an i'lal's forms; the Harakat page's example word.
+    const bdi = /function Bdi\([\s\S]*?\n\}\n/.exec(read("src/components/library/MixedText.tsx"))?.[0] ?? "";
+    expect(bdi).toContain("const tall = arTall(text);");
+    expect(bdi).toMatch(/\$\{tall \? ` \$\{tall\}` : ""\}/);
+    const sites: Record<string, number> = {
+      "src/components/library/SharafPanel.tsx": 2,
+      "src/components/exercises/SortCase.tsx": 1,
+      "src/components/exercises/TapWord.tsx": 1,
+      "src/components/exercises/WaznFactory.tsx": 1,
+      "src/components/library/HarakatChart.tsx": 1,
+    };
+    for (const [file, n] of Object.entries(sites)) {
+      const tags = arabicTags(read(file)).filter((t) => /arTall\(/.test(t));
+      expect(tags.length, file).toBe(n);
+    }
   });
 
   it("the tile's label and its transliteration · gloss line are LTR isolates inside the RTL row", () => {

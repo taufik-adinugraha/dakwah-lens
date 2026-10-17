@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import type { Clip } from "@/content/schema";
 import { useClipPlayer } from "@/hooks/useClipPlayer";
 import { glossSlot } from "@/lib/emphasis";
+import { arTall } from "@/lib/arabicInk";
 import { seededShuffle } from "@/lib/shuffle";
 
 import { KeepTogether, MixedText } from "../library/MixedText";
@@ -218,7 +219,7 @@ function TapWordRound({
                     gloss wraps after them (line breaks, 2026-10-10), bold in forest
                     (a meaning, operator 2026-10-11). */}
                 <KeepTogether>
-                  <bdi lang="ar" dir="rtl" className="quran text-ar-sm">
+                  <bdi lang="ar" dir="rtl" className={clsx("quran text-ar-sm", arTall(targetWord.ar))}>
                     {targetWord.ar}
                   </bdi>{" "}
                   ({targetWord.translit} —
