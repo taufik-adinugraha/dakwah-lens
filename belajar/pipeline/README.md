@@ -61,7 +61,7 @@ python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Ku
 python3 build_map.py               # the lesson maps ../content/map/*.json, for the surahs switched on (see "Peta pelajaran"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi"); stops on a term said before its lesson that authored/curriculum.pending.json does not list (`--write-pending` writes that list: see "Kurikulum")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
-python3 test_validate_narration.py # plants 262 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum and the pending list, each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
+python3 test_validate_narration.py # plants 268 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum and the pending list, each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
 python3 validate_map.py            # the lesson maps: new / learnt so far / later / next-level against the curriculum, the names against the captions
 python3 test_validate_map.py       # plants 40 faults (a step in the wrong group, one taught later listed as learnt, a learnt step left out, `here` on a step that does not occur, a name that says a Qur'anic word, …)
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah), or listed in authored/curriculum.pending.json; exit 1 on any failure
@@ -668,9 +668,13 @@ heavy letter + a without its respelling (rule 9: "mushaf" too).
 
 **Narration rules for `say`** (checked by `build_narration.py` / `validate_narration.py`): no
 Qur'anic word in any spelling (strict: the build stops instead of replacing it; name a word by its
-place, "kata pertama", or its meaning, "kata yang artinya “nama”"); never a syllable the tiles show
+place, "kata pertama", and — since 2026-10-17 — by itself with the named-word markup, never by its
+meaning alone: "Bagian pertama adalah huruf jar, yaitu {{1:1:1/bi}}, yang artinya “dengan”", "Bagian
+kedua adalah isim, yaitu {{1:1:3/rahman}}, yang artinya …", the frame's own tile form, {{!…}} for a
+heavy-letter one; a part named by its kind and meaning only fails, `part_meaning_only`, wording rule
+5); never a syllable the tiles show
 in transliteration (bi, ismu, ismi, ar-raḥmānu …: the screen shows them, the imam recites the
-word), nor one of another word of the same ayah ("hum"), in any spelling — with ONE exception
+word) except where the caption names it with the markup, nor one of another word of the same ayah ("hum"), in any spelling — with ONE exception
 (operator 2026-10-15: "jika dibaca kasrah, maka terdengar bi"): a primer line over a `mark` frame
 may say that frame's own example after "terdengar" when it is one letter with one short vowel
 (بَ بِ بُ: ba, bi, bu; `validate_narration.primer_sounds`), and there the syllable is a sound,
@@ -1311,9 +1315,9 @@ file to draw a card. Read by the narration build and validator, by the page
 (`src/lib/map-content.ts`: zod, then `lessonMapProblems` against the curriculum in TypeScript — a
 file that disagrees with it fails `next build`) and by the engine checks.
 
-**The lines** (operator 2026-10-15; `build_narration.map_new` / `map_learnt` / `map_again` /
+**The lines** (operator 2026-10-15; `build_narration.map_new` / `map_again` /
 `map_later` / `map_focus` / `map_closing` / `map_total`; ids `${slug}:${ayah}:map:new`,
-`:map:learnt`, `:map:again`, `:map:later`, `:map:focus` right after `recite`, and
+`:map:again`, `:map:later`, `:map:focus` right after `recite`, and
 `${slug}:${ayah}:learned`, `:map:total` right before `recap`; highlight `[]`, no word card; never
 split). The operator's rule: a sentence that COUNTS steps also NAMES every one of them — "Sebelum
 ayat ini, kita sudah mempelajari dua hal, yaitu XXX dan YYY. Yang kita temui lagi di ayat ini adalah
@@ -1326,7 +1330,7 @@ steps in teaching order, then the ayah's new ones. A next-level topic is still c
 in all), each such sentence is ONE LINE of its own, so no line is split (MAX_LINE 400 spoken
 characters; the longest, `al-fatihah:7:map:total`, is 321). A step of the lesson keeps its card
 while its lines are said one after the other (src/lib/autoplay/lessonMap.ts `MAP_LINES`: the step
-`map:learnt` says `map:learnt` + `map:again`, `map:later` says `map:later` + `map:focus`, `learned`
+`map:learnt` says `map:again` alone since 2026-10-17, `map:later` says `map:later` + `map:focus`, `learned`
 says `learned` + `map:total`). And what an ayah puts aside is followed by a reassurance (operator,
 the same day: "Sekarang Anda tidak perlu menghafal ketiganya, mari kita fokus pada pelajaran XXX
 dan YYY terlebih dahulu" — and the same for the next-level topics, and with nothing new "we focus
@@ -1338,8 +1342,8 @@ counts in words; lists `_names`):
 | line | when | template |
 |---|---|---|
 | `map:new` | always | "Di ayat ini ada N hal baru: A, B, dan C." · none: "Di ayat ini tidak ada hal baru." |
-| `map:learnt` | something was learnt before | "Sebelum ayat ini, kita sudah mempelajari N hal, yaitu A, B, …, dan P." (every step learnt so far) |
-| `map:again` | with `map:learnt` | "Yang kita temui lagi di ayat ini adalah A dan B." (every one met again; one: "… adalah A.") · none: "Tidak ada yang kita temui lagi di ayat ini." |
+| `map:again` | something was learnt before (the step `map:learnt`) | "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah A dan B." (every one met again; one: "… adalah A."; it stands on its own: until 2026-10-17 it followed the line below and opened "Yang kita temui lagi …") · none: "Tidak ada yang kita temui lagi di ayat ini." |
+| ~~`map:learnt`~~ | removed 2026-10-17 | was "Sebelum ayat ini, kita sudah mempelajari N hal, yaitu A, B, …, dan P."; the count of everything learnt so far is said only by `map:total` |
 | `map:later` | a step is postponed or a next-level topic is here | postponed, every one named — all taught in ONE ayah of this surah: "Ada N hal lagi di ayat ini, yaitu Z dan W, tetapi baru akan diajarkan lebih lengkap di ayat ketiga."; in several ayat of it: "Ada N hal lagi di ayat ini, tetapi baru akan diajarkan lebih lengkap nanti: Z di ayat ketiga, serta W di ayat ketujuh."; any of them taught in another surah (or no whole ayah): "Ada N hal lagi di ayat ini, yaitu Z dan W, tetapi baru akan diajarkan lebih lengkap nanti." (until 2026-10-17 "baru kita bahas …"; operator: "better to say konsep ini baru akan diajari lebih lengkap di ayat keXX") — then the next-level count: "Ada juga N hal tingkat lanjut, yang tidak kita bahas di tingkat dasar." (alone: "Di ayat ini ada N hal tingkat lanjut, …") |
 | `map:focus` | with `map:later` | "Sekarang Anda tidak perlu menghafal ⟨P⟩[, dan tidak perlu memikirkan hal tingkat lanjut tadi]." — ⟨P⟩ by the count of the postponed steps: 1 "yang satu ini", 2 "keduanya", 3 "ketiganya", more "semuanya"; the bracket when next-level topics are there too; next-level topics alone: "Sekarang Anda tidak perlu memikirkan ⟨P⟩." (⟨P⟩ by their count) — then "Mari kita fokus pada pelajaran A dan B terlebih dahulu." (the ayah's new steps, every one; at most three, the curriculum's limit) · nothing new: "Mari kita fokus mengulang A dan B terlebih dahulu." (the steps met again) · nothing new and nothing met again: "Mari kita fokus pada ayat ini terlebih dahulu." |
 | `learned` | always | "Di ayat ini kita mempelajari N hal baru: A, B, dan C." · nothing new: "Di ayat ini tidak ada hal baru; kita mengulang N hal yang sudah kita pelajari, yaitu A dan B." · nothing met again either: "Di ayat ini tidak ada hal baru." |
@@ -1349,8 +1353,7 @@ Al-Fatihah, all seven ayat, as built (caption forms; the spoken text says each t
 script or its respelling, "Narasi"): ayah 1 —
 
 - `map:new` "Di ayat ini ada dua hal baru: majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ)." (kept)
-- `map:learnt` "Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu harakat, serta tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف)."
-- `map:again` "Yang kita temui lagi di ayat ini adalah harakat, serta tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف)."
+- `map:again` "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, serta tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف)."
 - `map:later` "Ada tiga hal lagi di ayat ini, tetapi baru akan diajarkan lebih lengkap nanti: alif lam (ال) di
   ayat ketiga, na’t (نَعْت) di ayat ketiga, dan idhafah (إِضَافَة) di ayat keempat. Ada juga satu hal tingkat
   lanjut, yang tidak kita bahas di tingkat dasar."
@@ -1694,6 +1697,66 @@ python3 render_narration.py --surah al-fatihah
 # words, the cut lines), and the upload steps of "Rendering the lines" above.
 ```
 
+### Sibling lines (2026-10-17): its 26 lines rendered; the follow-ups prepared, NOT rendered
+
+The operator's "finish this: Sibling lines" — the leftovers of "name the word, not only its
+meaning" (wording rule 5):
+
+- **A. The parts of a composition named by themselves.** 21 composition lines of ayat 1–7 named a
+  tile by its kind and meaning only ("Bagian kedua adalah isim yang artinya “Maha Pengasih”", "Alif lam
+  bersambung dengan isim yang artinya “jalan”", "Bagian pertama adalah huruf jar yang artinya “kepada”",
+  "Dhamir yang artinya “mereka” ini …"); each now names the frame's form, "isim, yaitu رَحْمَٰن (raḥmān),
+  yang artinya …" (the parts of a join frame by its `from` forms; ṣirāṭ, mustaqīm, magḍūb, ḍāllīna
+  caption-only). 1:7:4 got the form `him` (هِمْ, its own bytes, as 1:7:7 has), which the warm-up's
+  part 2 of ‘alaihim now names too (`7:ex:word-kind:6:why`). Two `why_basic` of the same shape were
+  named the same way: 1:2:2 (لِ) and 1:6:1 (نَا).
+- **B. A word named once.** An-Nas 4:w1 and 5:w3 said the word twice (the word line, then its why's
+  "Kata ini, yaitu …"): `build_narration.named_once`. Al-Fatihah 1's structure item 2 named ٱسْمِ again
+  right after item 1 ("Isim itu disandarkan …"); Al-Falaq 3's structure (split :a/:b) named أَعُوذُ
+  twice ("… dikaitkan dengan kata kerja tempat frasa ini bergantung, menurut al-Mujtaba …").
+- **C. A word's meaning is the word's.** Al-Falaq 1:4's `why` gave rabbi the phrase's meaning, so the
+  line said "kata ketiga, yaitu بِرَبِّ (birabbi), yang artinya “Tuhan yang menguasai subuh”": now
+  "dari birabbi (“kepada Tuhan”)", the word's gloss (113:1:3). The same defect in Al-Falaq 5:3:
+  ḥasada was glossed “yang dengki” (ḥāsid's meaning); now “dia dengki” (113:5:5's gloss, ayah 5's
+  structure summary). The lesson glosses themselves are word glosses (none is a phrase's).
+
+Its 26 lines (25 texts, 2,555 characters, USD 0.20) were rendered the same day. Then, prepared
+and NOT rendered:
+
+- **One Arabic unit per karaoke word** (found by the TS textUnits test once those lines had tokens):
+  a caption-only word that followed a word already showing Arabic was glued to it, "isim (اِسْم),
+  yaitu صِرَٰط (ṣirāṭ)," — one karaoke word with two Arabic units, where a line could break inside
+  it (wording rule 15 of the memory: clean line breaks). `Lexicon.token_entries` makes such a piece a
+  karaoke word of its own, cut at the piece's first space, with the SAME timing as the word it is
+  shown with (no time made up); beside a plain word it still joins it ("pertama, yaitu صِرَٰطَ
+  (ṣirāṭa),"). `build_narration.retext_tokens` re-derives a kept render's tokens either way, the
+  timings byte-identical; `check_tokens` holds the tokens to `token_entries` one by one and gives a
+  piece its word's timing (faults "a shown-only piece glued to a word that shows Arabic, as rendered
+  2026-10-17", "… its own token with a time made up"). Tokens changed in 5 rendered lines
+  (`6:w2:compose:1`, `6:w3:compose:1`, `7:w6:compose:1`, `7:w9:compose:1`, `7:w9:compose:4`); every
+  audio file, its url and sha256 unchanged.
+- **The Allah rule** (wording rule 13): `2:ex:word-kind:4:why` "… رَبِّ (rabbi), yang artinya “Tuhan”,
+  adalah isim (اِسْم)." (was "…, karena ia nama benda.").
+- **The learnt-so-far line removed** (wording rule 1, operator 2026-10-17: "better to remove this
+  line in every ayat beginning"): the seven `map:learnt` lines are gone (their files simply no
+  longer referenced) and the seven `map:again` lines open "Dari yang sudah kita pelajari, …".
+
+**8 lines, 8 distinct texts, 1,208 characters, USD 0.10** in the dry run, all new texts:
+
+```bash
+args=(--surah al-fatihah
+  --only al-fatihah:1:map:again --only al-fatihah:2:map:again --only al-fatihah:2:ex:word-kind:4:why
+  --only al-fatihah:3:map:again --only al-fatihah:4:map:again --only al-fatihah:5:map:again
+  --only al-fatihah:6:map:again --only al-fatihah:7:map:again)
+# must say: 8 distinct texts, 1208 characters, no "refused by --render"
+python3 render_narration.py "${args[@]}"
+# the render (an array: a "$n:ex:" inside one string breaks the command):
+#   python3 render_narration.py "${args[@]}" --render --i-approve-spend --voice-id aK834gEOxQEtviMPgurT \
+#     --voice-name "Kang Nandar" --env-file … --out "$OUT"
+# then build_narration.py --check, validate_narration.py, encode_narration.py --check --out "$OUT" --list …,
+# listen, and the upload steps of "Rendering the lines" above.
+```
+
 ## Operator's lesson-wording rules (2026-10)
 
 The rules the operator gave while reviewing the lessons, kept here so that work on any lesson
@@ -1702,9 +1765,16 @@ enforces it, its name; otherwise "not enforced: review by reading".
 
 1. **A count is always followed by its names** (2026-10-15: "Dengan itu, sudah empat hal yang kita
    pelajari, yaitu A, B, C, D … always re-mention what they are"): every map line that counts steps
-   names each, in teaching order; never "di antaranya", never "ada satu: X". Enforced:
-   `validate_narration.map_problems` (and `lessonMap.ts` for the caption-only fallback). See "Peta
-   pelajaran".
+   names each, in teaching order; never "di antaranya", never "ada satu: X". **The count of what was
+   learnt so far is said only in the closing recap, `map:total`** (operator 2026-10-17: "better to
+   remove this line in every ayat beginning: 'Sebelum ayat ini, kita sudah mempelajari XX hal, yaitu
+   …'"): the opening's `map:learnt` line is gone; its STEP `map:learnt` stays (the card "Sudah kita
+   pelajari" and the CI walks by that step id) and says one line, `map:again`, worded to stand on
+   its own: "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah …". Enforced:
+   `validate_narration.map_problems` (a "Sebelum ayat ini, kita sudah mempelajari …" line anywhere
+   fails; `map:again` in the old wording fails; faults "the learnt-so-far line back at an ayah's
+   opening, as until 2026-10-17" and its kin) and `lessonMap.ts` `MAP_LINES` (and the caption-only
+   fallback, `texts.ts`). See "Peta pelajaran".
 2. **Reassure after postponing** (2026-10-15: "Sekarang Anda tidak perlu menghafal ketiganya, mari
    kita fokus pada pelajaran XXX dan YYY terlebih dahulu"): `map:focus` after `map:later`, its pronoun
    by the count. Enforced: `map_problems` (`_map_focus`).
@@ -1740,7 +1810,28 @@ enforces it, its name; otherwise "not enforced: review by reading".
    ketiga, yang artinya …", "Kata pertama artinya: …", "kata ketiga dan keempat, yang artinya …",
    "Kata ini, yang artinya …", "yang pertama artinya …" fail; faults "a word line by its place and
    meaning only, as until 2026-10-17" and its six kin) and the named-word checks (`Named`,
-   `named_said`). See "Narasi", the named word.
+   `named_said`). See "Narasi", the named word. **A part is named too, and a word only once**
+   (operator 2026-10-17, "Sibling lines"): a composition line that names a part (a tile) by its kind
+   and its meaning — "Bagian kedua adalah isim yang artinya “Maha Pengasih”", "Alif lam bersambung
+   dengan isim yang artinya …", "dhamir yang artinya “kami”" — names the part itself between the two,
+   by the composition form the frame shows ("Bagian kedua adalah isim, yaitu رَحْمَٰن (raḥmān), yang
+   artinya …"; a heavy-letter part caption-only, {{!1:6:2/sirat}}); and a line names a word once: the
+   word line that has just said "Kata pertama, yaitu مِن (min), artinya: “dari”." goes on "Kata ini
+   adalah huruf jar …", not "Kata ini, yaitu مِن (min), yang artinya “dari”, adalah …"
+   (`build_narration.named_once`; the quiz explanation, which says the why alone, keeps the name),
+   and a word named in one part of a line split into :a/:b is not named again in the other. A word
+   named in two consecutive lines of one step (structure item 2 of 1:1 after item 1) is reworded
+   in its source. Enforced: `check_display` `part_meaning_only` (`:compose:` lines: a kind word —
+   isim, fi'il, dhamir, huruf (jar), akhiran, kata benda/kerja/ganti — before "(yang) artinya" with
+   no named word since the clause or the meaning before it; "Kata ini adalah kata penghubung yang
+   artinya …" and "ungkapan yang artinya …" hold no kind word) and `named_twice` (one line, and the
+   parts of a split line; faults "a composition part by its kind and meaning only, as until
+   2026-10-17", its three kin, "a word named twice in its own line, as until 2026-10-17 (An-Nas 4)",
+   "a word named in two parts of one split line …"); outside the compositions (a `why_basic`, a
+   Konsep text): review by reading. And a named word's meaning is the WORD's: a gloss in prose
+   after a word ("rabbi (“…”)") is that word's own meaning, never the phrase's (Al-Falaq 1:4 said
+   "kata ketiga, yaitu بِرَبِّ (birabbi), yang artinya “Tuhan yang menguasai subuh”"): review by
+   reading (see "Sibling lines" above).
 6. **Name the members of a group step** (2026-10-17: "add in parenthesis what are tiga jenis kata"):
    "Tiga jenis kata (isim, fi'il, dan huruf)". Enforced for this step by its test
    (`test_validate_curriculum` test_names); other group names: review by reading.
@@ -1798,7 +1889,26 @@ enforces it, its name; otherwise "not enforced: review by reading".
     a relative / gair) and `quiz.class_problems` (a class not taught before the warm-up asks it). The other
     exercises' explanations are a word's `why_basic` / `why`, the reason of THIS word, with at most
     a term's gloss after the term ("mubtada', yaitu pokok kalimat"): review by reading. See
-    "Pemanasan".
+    "Pemanasan". **An isim that names, titles or describes Allah says the kind ONLY** (operator
+    2026-10-17: "when ism is related to Allah, dont say it's nama benda"; "just say, it's ism."):
+    "Kata ketiga, yaitu رَبِّ (rabbi), yang artinya “Tuhan”, adalah isim (اِسْم)." — no "nama benda"
+    (a thing), and no other class in its place. Listed by PLACE in `quiz.ALLAH_KIND_ONLY`, each with
+    its QAC lemma and a one-line reason, because the context decides (aḥad at 112:1:4 "Yang Maha Esa"
+    is listed, 112:4:5 "sesuatu" is not): rabbi 1:2:3, māliki 1:4:1, aḥadun 112:1:4, aṣ-ṣamadu
+    112:2:2, the rabbi of birabbi 113:1:3 and 114:1:3, maliki 114:2:1, ilāhi 114:3:1; the Name Allāh
+    already said the kind alone. The distinction kept on purpose: ar-raḥmāni and ar-raḥīmi keep "nama
+    sifat" (the operator's own example, "isim karena kata sifat, yang artinya Maha Penyayang"; an
+    attribute of Allah is accurately a sifat, QAC ADJ). `quiz.part_class` is the one rule;
+    `quiz.allah_kind_only_problems` holds each entry to its lesson word (it exists, and has an isim
+    part with that lemma), run by `validate_quiz.py`; faults "the warm-up: “nama benda” said of rabbi
+    …, as until 2026-10-17", "… its sentence as it was", and three on the list (a lemma typo, a place
+    with no word, a fi'il). Left as it is, for the operator: the fact card "Rabb: kata benda tersering
+    setelah lafaz Allah" (`facts.py`, a frequency among QAC noun lemmas, N + PN; "isim" there would
+    count pronouns and relatives too and the statement would no longer hold). The part is named by
+    the composition's form of its bytes (`quiz.part_named`):
+    since 2026-10-17 the back هِمْ of ‘alaihim (1:7:4) is the form `him`, as at 1:7:7, so "Bagian
+    kedua kata keempat, yaitu هِمْ (him), yang artinya “mereka”, adalah isim …"; the front عَلَيْ
+    of both has no form of its own (the composition shows عَلَى) and says its kind and class only.
 
 ## Narasi (guided-lesson narration)
 
@@ -1840,7 +1950,7 @@ hosts it (intro, primer:k, concept:<id>, next; see "Pelajaran nol"):
 |---|---|---|---|
 | `intro` | every ayah | which ayah, its translation (QuranEnc, in quotes on the caption), how many words | `[0]` |
 | `recite` | every ayah | one line before the imam recites the ayah | `[0]` |
-| `map:new`, `map:learnt`, `map:again`, `map:later`, `map:focus` | every ayah of a surah with a lesson map (`content/map/<slug>.json`; "Peta pelajaran"), one step per group, ONE SENTENCE PER LINE (2026-10-15); `map:learnt` + `map:again` once anything was learnt, `map:later` + `map:focus` when the ayah has a postponed or a next-level topic | what is new in the ayah; how many steps were learnt before it, then which come up again here; what a later lesson teaches (with the ayah) and how many next-level topics there are (counted, never named); the reassurance: that need not be learnt now, focus on the new steps — every counted step named, in teaching order | `[]`, focus `null` (its card is on the stage) |
+| `map:new`, `map:again`, `map:later`, `map:focus` | every ayah of a surah with a lesson map (`content/map/<slug>.json`; "Peta pelajaran"), one step per group, ONE SENTENCE PER LINE (2026-10-15); `map:again` (the step `map:learnt`; its learnt-so-far line `map:learnt` was removed 2026-10-17) once anything was learnt, `map:later` + `map:focus` when the ayah has a postponed or a next-level topic | what is new in the ayah; how many steps were learnt before it, then which come up again here; what a later lesson teaches (with the ayah) and how many next-level topics there are (counted, never named); the reassurance: that need not be learnt now, focus on the new steps — every counted step named, in teaching order | `[]`, focus `null` (its card is on the stage) |
 | `primer:${k}` | the lesson the harakat primer plays in: lesson zero ("ayah 0" of Al-Fatihah) since 2026-10-13, where its lines light nothing | the k-th sentence of the primer's frames | `[]` in lesson zero (no ayah on the stage); in an ayah's lesson the words whose letters its frame shows as they are (بِ: `[1]`); focus `null` |
 | `w${n}` | every word | "Kata ke-n artinya: “gloss”." + the word's `why`, sanitised (its `why_basic` when it has one: see "why_basic") — or, when the word has a composition, + its `lead` ("Kata ini terdiri dari dua bagian."), since the frames say the why part by part | `[n]`, focus = that word |
 | `w${n}:compose:${k}` | a word with a composition | the k-th sentence of its frames (strict: no Qur'anic word, spoken as authored) | `[n]`, focus = that word (the animation takes the card's place) |
@@ -1943,9 +2053,11 @@ Such a line stays caption-only until the dictionary has an approved respelling f
 `render_narration.py --render` refuses it before anything is sent, a line with audio may not carry
 one, and `validate_narration.py` lists the words waiting for the operator (`NOT_HEAVY` holds the
 spellings that only look heavy: fathatain is ta + ha). عَلَى was removed (2026-10-10): it is the
-front of عَلَيْهِمْ (1:7), a Qur'anic word, so the narrator never says ‘ala in any script ("Bagian
+front of عَلَيْهِمْ (1:7), a Qur'anic word, so the narrator never says ‘ala as a TERM ("Bagian
 depan kata ini adalah huruf jar yang artinya “atas”"; the Huruf jar concept names only its bi- and
-li- examples, never "huruf jar yang artinya atas", which would define the term by itself).
+li- examples, never "huruf jar yang artinya atas", which would define the term by itself). Since
+2026-10-17 the compositions of 1:7:4 and 1:7:7 name it as a part, a named word ("huruf jar, yaitu
+عَلَى (‘alā), yang artinya “kepada”", said "'ala"; "Sibling lines").
 
 **The narrator never voices a Qur'anic word** (plan §6.1 A1; the imam's recording carries every
 Qur'anic word) — **with one exception since 2026-10-17, the named word**: where an explanation
@@ -1973,8 +2085,10 @@ spoken text leaves it out with its connector (`UNSAID`, `unsay`: "Kata kedua, ya
 "kata yang artinya", "bunyi u: X." → "bunyi u."). Its markup is {{!s:a:w}} / {{!s:a:w/form}}, and a
 mismatch stops the build either way (`Speech._named_mark`); generated lines write it with
 `named_markup`. The karaoke tokens: each left-out piece (", yaitu ٱلصِّرَٰطَ (aṣ-ṣirāṭa),") joins the
-token it falls in or follows and shows with that token's timing — no timing is made up
-(`Lexicon.text_cuts`, `_pieces`, used by `tokens`, `render_display`, `check_tokens` and
+token it falls in or follows and shows with that token's timing — or, where that token already
+shows Arabic ("isim (اِسْم),"), is a token of its own with the same timing, so a karaoke word holds
+at most one Arabic unit, at its end (2026-10-17) — no timing is made up (`Lexicon.text_cuts`,
+`token_entries`, used by `tokens`, `render_display`, `check_tokens` and
 `build_narration.retext_tokens`, the path a kept render's tokens take). A line that says such a
 word anyway (`said_heavy`) fails validation and is refused by `render_narration.py`; the TS checks
 and the screen-reader text use the same rule (`namedIsSaid`, `unsayCaption`). Planted faults: "a

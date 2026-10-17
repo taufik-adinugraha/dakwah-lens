@@ -263,7 +263,7 @@
         "state": "majrur",
         "sign": "kasrah"
       },
-      "why": "Akhirnya kasrah karena menjadi mudhaf ilaih dari rabbi (“Tuhan yang menguasai subuh”).",
+      "why": "Akhirnya kasrah karena menjadi mudhaf ilaih dari birabbi (“kepada Tuhan”).",
       "ikhtilaf": [
         {
           "point": "Apa makna al-falaq?",
@@ -298,7 +298,8 @@
       "review_notes": [
         "Pendapat ketiga (al-falaq nama sebuah tempat di Jahannam: riwayat dari Ka'b al-Ahbar dan lainnya; Ibnu Katsir jil. 8 hlm. 535 menilai riwayat marfu'-nya tidak sahih; disebut juga oleh an-Nahhas, as-Samin dan catatan kaki al-Jadwal) sengaja tidak dimuat. Darwisy (hlm. 622) juga menyebut ada pendapat lain lalu tidak membahasnya karena 'yang pertama lebih utama'; ini juga menjaga kartu dari nada menakut-nakuti.",
         "Kedudukan mudhaf ilaih dinyatakan ad-Da'as (jil. 3 hlm. 476); Darwisy dan al-Jadwal hanya menyebut birabbi al-falaqi terkait a‘ūżu.",
-        "Gloss mengikuti QuranEnc ('Tuhan yang menguasai subuh (fajar)')."
+        "Gloss mengikuti QuranEnc ('Tuhan yang menguasai subuh (fajar)').",
+        "2026-10-17: arti dalam `why` adalah arti kata birabbi sendiri (“kepada Tuhan”, gloss 113:1:3), bukan arti frasa birabbi al-falaqi (“Tuhan yang menguasai subuh”), yang dulu terbaca sebagai arti kata ketiga."
       ]
     },
     "113:2:1": {
@@ -894,7 +895,7 @@
         "state": "majrur",
         "sign": "kasratain"
       },
-      "why": "Akhirnya kasrah bertanwin karena menjadi mudhaf ilaih dari syarri; ḥāsid adalah isim fa'il dari ḥasada (“yang dengki”), dan di sini nakirah, tanpa al-.",
+      "why": "Akhirnya kasrah bertanwin karena menjadi mudhaf ilaih dari syarri; ḥāsid adalah isim fa'il dari ḥasada (“dia dengki”), dan di sini nakirah, tanpa al-.",
       "ikhtilaf": [
         {
           "point": "Mengapa gāsiqin dan ḥāsidin berbentuk nakirah (tanpa al-), sedangkan an-naffāṡāti memakai al-?",
@@ -929,7 +930,8 @@
         "Tidak ada kitab yang dikutip yang menulis 'mudhaf ilaih' untuk ḥāsidin secara harfiah (Darwisy: 'i'rab-nya jelas'; ad-Da'as: frasanya di-'athaf-kan; al-Jadwal: iżā terkait mashdar syarri ḥāsidin). Lihat catatan yang sama pada 113:4:3.",
         "an-Nahhas (jil. 5 hlm. 198) menukil pendapat yang menunjuk kelompok atau orang tertentu sebagai ḥāsid, lalu teksnya terputus oleh bagian kosong dalam naskah; tidak dimuat (kartu tidak menunjuk kelompok mana pun, sesuai nada rahmah).",
         "Bagian al-Fawa'id al-Jadwal adalah tambahan penerbit; kalimatnya yang menyebut kelompok tertentu tidak dikutip.",
-        "Sign 'kasratain' (kasrah bertanwin), seragam dengan dhammatain/fathatain di Al-Ikhlas; tanda jar-nya tetap kasrah (fixer 2026-10-09, temuan D12)."
+        "Sign 'kasratain' (kasrah bertanwin), seragam dengan dhammatain/fathatain di Al-Ikhlas; tanda jar-nya tetap kasrah (fixer 2026-10-09, temuan D12).",
+        "2026-10-17: arti dalam `why` sesudah ḥasada adalah arti kata ḥasada sendiri (“dia dengki”, gloss 113:5:5 dan ringkasan susunan ayat 5); “yang dengki”, arti ḥāsid, dulu terbaca sebagai arti kata kelima."
       ]
     },
     "113:5:4": {

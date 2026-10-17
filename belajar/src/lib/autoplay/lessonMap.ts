@@ -81,8 +81,10 @@ export const MAP_CLOSING = "learned";
  * pipeline/validate_narration.py map_opening_parts / map_closing_parts). Operator 2026-10-15: a
  * sentence that COUNTS steps also NAMES every one of them ("Dengan itu, sudah empat hal yang kita
  * pelajari, yaitu A, B, C, D" — "always re-mention what they are"), so a list of sixteen is a line
- * of its own and each such sentence is ONE line (never split): the learnt step says "map:learnt"
- * (everything learnt so far) then "map:again" (which of it comes up again here); the later step
+ * of its own and each such sentence is ONE line (never split): the learnt step says "map:again"
+ * (which of what was learnt comes up again here; since 2026-10-17 alone — operator: "better to
+ * remove this line in every ayat beginning: 'Sebelum ayat ini, kita sudah mempelajari XX hal'",
+ * so the learnt-so-far count is said only in the closing's "map:total"); the later step
  * "map:later" (what is taught later, and how many next-level topics) then "map:focus" (the
  * reassurance: none of that needs learning now, focus on the new steps); the closing "learned"
  * (what was new) then "map:total" (the running total, every step named). One card per step: the
@@ -90,7 +92,7 @@ export const MAP_CLOSING = "learned";
  */
 export const MAP_LINES = {
   new: ["map:new"],
-  learnt: ["map:learnt", "map:again"],
+  learnt: ["map:again"],
   later: ["map:later", "map:focus"],
   learned: ["learned", "map:total"],
 } as const satisfies Record<MapGroup | typeof MAP_CLOSING, readonly string[]>;

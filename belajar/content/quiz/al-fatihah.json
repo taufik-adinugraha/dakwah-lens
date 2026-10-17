@@ -157,8 +157,7 @@
        "ar": "رَبِّ",
        "kind": "isim",
        "signs": [],
-       "class": "nama benda",
-       "why": "Kata ketiga, yaitu رَبِّ (rabbi), yang artinya “Tuhan”, adalah isim (اِسْم), karena ia nama benda."
+       "why": "Kata ketiga, yaitu رَبِّ (rabbi), yang artinya “Tuhan”, adalah isim (اِسْم)."
       },
       {
        "n": 5,
@@ -212,7 +211,7 @@
        "n": 2,
        "word": 2,
        "sign": "kasrah (كَسْرَة)",
-       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) yang artinya “bagi”. Keterangan ini bergantung pada kata yang tidak diucapkan, yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”."
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ), yaitu لِ (li), yang artinya “bagi”. Keterangan ini bergantung pada kata yang tidak diucapkan, yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”."
       },
       {
        "n": 3,
@@ -247,7 +246,7 @@
       {
        "n": 2,
        "word": 2,
-       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) yang artinya “bagi”. Keterangan ini bergantung pada kata yang tidak diucapkan, yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”.",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ), yaitu لِ (li), yang artinya “bagi”. Keterangan ini bergantung pada kata yang tidak diucapkan, yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”.",
        "options": [
         {
          "from": "1:2:2",
@@ -699,7 +698,7 @@
        "n": 1,
        "word": 1,
        "sign": "dibuangnya huruf 'illah (حَرْف عِلَّة, ya')",
-       "why": "Kata kerja perintah yang bermakna doa ini mabni (مَبْنِيّ), ditandai dengan dibuangnya huruf ya' di akhirnya; fa'il (فَاعِل) kata ini tersirat, yaitu “Engkau”, dan dhamir (ضَمِير) yang artinya “kami” adalah maf'ul bih (مَفْعُول بِه) baginya."
+       "why": "Kata kerja perintah yang bermakna doa ini mabni (مَبْنِيّ), ditandai dengan dibuangnya huruf ya' di akhirnya; fa'il (فَاعِل) kata ini tersirat, yaitu “Engkau”, dan dhamir (ضَمِير), yaitu نَا (nā), yang artinya “kami”, adalah maf'ul bih (مَفْعُول بِه) baginya."
       },
       {
        "n": 2,
@@ -845,7 +844,7 @@
         "jar"
        ],
        "class": "kata ganti",
-       "why": "Bagian kedua kata keempat adalah isim (اِسْم), karena ia kata ganti. Tandanya: didahului huruf jar (حَرْف جَرّ)."
+       "why": "Bagian kedua kata keempat, yaitu هِمْ (him), yang artinya “mereka”, adalah isim (اِسْم), karena ia kata ganti. Tandanya: didahului huruf jar (حَرْف جَرّ)."
       },
       {
        "n": 7,

@@ -113,13 +113,12 @@ const EN: AutoplayTexts = {
   lessonMap: {
     new: ({ new: fresh }) =>
       fresh.length ? `This ayah has ${fresh.length} new ${things(fresh.length)} to learn: ${listEn(fresh)}.` : "This ayah has nothing new.",
-    learnt: ({ learnt }) => `Before this ayah, we have learnt ${learnt.length} ${things(learnt.length)}, namely ${listEn(learnt)}.`,
     again: ({ again }) =>
       again.length === 0
-        ? "None of them comes up again in this ayah."
+        ? "Nothing we have learnt comes up again in this ayah."
         : again.length === 1
-          ? `The one we meet again in this ayah is ${again[0]}.`
-          : `The ones we meet again in this ayah are ${listEn(again)}.`,
+          ? `Of what we have learnt, the one we meet again in this ayah is ${again[0]}.`
+          : `Of what we have learnt, the ones we meet again in this ayah are ${listEn(again)}.`,
     later: ({ later, lanjut }) =>
       [
         later.length ? laterEn(later) : "",

@@ -113,7 +113,7 @@
       "wazn": null,
       "case": { "state": "majrur", "sign": "[[kasrah]]" },
       "why": "Akhirnya [[kasrah]] karena didahului [[huruf jar]] [[li-|q:1:2:2/1]]; [[jar-majrur]] ini bergantung pada [[khabar]] yang tidak disebut (misalnya “tetap”).",
-      "why_basic": "Akhirnya kasrah karena didahului huruf jar yang artinya “bagi”. Keterangan ini bergantung pada kata yang tidak diucapkan, yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”.",
+      "why_basic": "Akhirnya kasrah karena didahului huruf jar, yaitu {{1:2:2/li}}, yang artinya “bagi”. Keterangan ini bergantung pada kata yang tidak diucapkan, yang artinya “tetap”, sehingga maknanya “segala puji tetap bagi Allah”.",
       "ikhtilaf": [
         {
           "point": "Makna huruf [[lam|q:1:2:2#1]] pada [[lillāhi|q:1:2:2]]",
@@ -296,7 +296,7 @@
       "wazn": "افْعِنا",
       "case": { "state": "mabni", "sign": "dibuangnya [[huruf 'illah]] (ya')" },
       "why": "[[Fi'il amr]] yang bermakna doa ini [[mabni]] dengan dibuangnya huruf ya' di akhir; pelakunya tersirat (“Engkau”), dan [[-nā|q:1:6:1/2]], yang artinya “kami”, adalah objeknya.",
-      "why_basic": "Kata kerja perintah yang bermakna doa ini mabni, ditandai dengan dibuangnya huruf ya' di akhirnya; fa'il kata ini tersirat, yaitu “Engkau”, dan dhamir yang artinya “kami” adalah maf'ul bih baginya.",
+      "why_basic": "Kata kerja perintah yang bermakna doa ini mabni, ditandai dengan dibuangnya huruf ya' di akhirnya; fa'il kata ini tersirat, yaitu “Engkau”, dan dhamir, yaitu {{1:6:1/na}}, yang artinya “kami”, adalah maf'ul bih baginya.",
       "ikhtilaf": [],
       "src": [["D"], ["J"]],
       "review_notes": ["al-Mujtaba QS 1:6 tidak membahas mengapa ihdinā mabni, jadi tidak dikutip untuk kata ini.", "Lampiran A mengosongkan wazan; al-Jadwal menulis 'wazan ihdina: if'ina' (افعنا), dipakai di sini persis seperti di laporan riset §2."]

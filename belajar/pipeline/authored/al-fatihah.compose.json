@@ -67,7 +67,7 @@
         {"stage": "parts", "tiles": ["bi", "ismu"],
          "say": [
            "Bagian pertama adalah huruf jar, yaitu {{1:1:1/bi}}, yang artinya “dengan”.",
-           "Bagian kedua adalah sebuah isim, atau kata benda, yang artinya “nama”."
+           "Bagian kedua adalah sebuah isim, atau kata benda, yaitu {{1:1:1/ismu}}, yang artinya “nama”."
          ]},
         {"stage": "base", "tiles": ["bi", "ismu"], "focus": "ismu",
          "say": ["Bentuk dasarnya berakhir dengan dhammah, tanda bunyi u di atas huruf mim. Mengapa dhammah, baru akan diajarkan lebih lengkap di ayat kedua."]},
@@ -127,7 +127,7 @@
         {"stage": "parts", "tiles": ["al", "rahman"],
          "say": [
            "Bagian pertama adalah alif lam. Gunanya baru akan diajarkan lebih lengkap di ayat ketiga.",
-           "Bagian kedua adalah isim yang artinya “Maha Pengasih”."
+           "Bagian kedua adalah isim, yaitu {{1:1:3/rahman}}, yang artinya “Maha Pengasih”."
          ]},
         {"stage": "join", "tiles": ["ar-rahman"], "from": ["al", "rahman"], "silent": [0], "note": "alif dan lam tidak dibaca, ra' dibaca dobel",
          "say": [
@@ -161,7 +161,7 @@
       "frames": [
         {"stage": "join", "tiles": ["ar-rahim"], "from": ["al", "rahim"], "silent": [0], "note": "alif dan lam tidak dibaca, ra' dibaca dobel",
          "say": [
-           "Alif lam bersambung dengan isim yang artinya “Maha Penyayang”.",
+           "Alif lam bersambung dengan isim, yaitu {{1:1:4/rahim}}, yang artinya “Maha Penyayang”.",
            "Alif dan huruf lam tidak dibaca, dan huruf ra' sesudahnya dibaca dobel."
          ]},
         {"stage": "change", "tiles": ["ar-rahimi"], "from": "ar-rahimu", "to": "ar-rahimi",
@@ -188,7 +188,7 @@
         {"stage": "parts", "tiles": ["al", "hamdu"],
          "say": [
            "Bagian pertama adalah alif lam.",
-           "Bagian kedua adalah isim yang artinya “pujian”."
+           "Bagian kedua adalah isim, yaitu {{1:2:1/hamdu}}, yang artinya “pujian”."
          ]},
         {"stage": "join", "tiles": ["al-hamdu"], "from": ["al", "hamdu"], "note": "lam dibaca mati; alif dibaca di awal ayat",
          "say": [
@@ -280,7 +280,7 @@
         {"stage": "parts", "tiles": ["al", "alamina"],
          "say": [
            "Bagian pertama adalah alif lam, seperti pada kata pertama.",
-           "Bagian kedua adalah isim yang artinya “seluruh alam”."
+           "Bagian kedua adalah isim, yaitu {{1:2:4/alamina}}, yang artinya “seluruh alam”."
          ]},
         {"stage": "join", "tiles": ["al-alamina"], "from": ["al", "alamina"], "silent": [0], "note": "alif tidak dibaca; lam dibaca mati",
          "say": [
@@ -320,7 +320,7 @@
       "frames": [
         {"stage": "join", "tiles": ["ar-rahman"], "from": ["al", "rahman"], "note": "lam tidak dibaca, ra' dibaca dobel",
          "say": [
-           "Susunannya: alif lam bersambung dengan isim yang artinya “Maha Pengasih”.",
+           "Susunannya: alif lam bersambung dengan isim, yaitu {{1:3:1/rahman}}, yang artinya “Maha Pengasih”.",
            "Huruf lam tidak dibaca, dan huruf ra' sesudahnya dibaca dobel."
          ]},
         {"stage": "change", "tiles": ["ar-rahmani"], "from": "ar-rahmanu", "to": "ar-rahmani",
@@ -353,7 +353,7 @@
       "frames": [
         {"stage": "join", "tiles": ["ar-rahim"], "from": ["al", "rahim"], "silent": [0], "note": "alif dan lam tidak dibaca, ra dibaca dobel",
          "say": [
-           "Alif lam bersambung dengan isim yang artinya “Maha Penyayang”.",
+           "Alif lam bersambung dengan isim, yaitu {{1:3:2/rahim}}, yang artinya “Maha Penyayang”.",
            "Alif dan huruf lam tidak dibaca, dan huruf ra' sesudahnya dibaca dobel."
          ]},
         {"stage": "change", "tiles": ["ar-rahimi"], "from": "ar-rahimu", "to": "ar-rahimi",
@@ -428,7 +428,7 @@
       "frames": [
         {"stage": "join", "tiles": ["ad-din"], "from": ["al", "din"], "silent": [0], "note": "alif dan lam tidak dibaca, dal dibaca dobel",
          "say": [
-           "Alif lam bersambung dengan isim yang artinya “pembalasan”.",
+           "Alif lam bersambung dengan isim, yaitu {{1:4:3/din}}, yang artinya “pembalasan”.",
            "Alif dan huruf lam tidak dibaca; bunyi huruf lam melebur ke huruf dal, sehingga dal dibaca dobel."
          ]},
         {"stage": "change", "tiles": ["ad-dini"], "from": "ad-dinu", "to": "ad-dini",
@@ -560,8 +560,8 @@
       "frames": [
         {"stage": "parts", "tiles": ["ihdi", "na"],
          "say": [
-           "Bagian pertama adalah fi'il, atau kata kerja, dalam bentuk perintah, yang artinya “tunjukilah”.",
-           "Bagian kedua adalah dhamir, yaitu kata ganti yang menempel, yang artinya “kami”."
+           "Bagian pertama adalah fi'il, atau kata kerja, dalam bentuk perintah, yaitu {{1:6:1/ihdi}}, yang artinya “tunjukilah”.",
+           "Bagian kedua adalah dhamir, atau kata ganti yang menempel, yaitu {{1:6:1/na}}, yang artinya “kami”."
          ]},
         {"stage": "join", "tiles": ["ihdina"], "from": ["ihdi", "na"], "note": "dhamir “kami” objeknya; pelakunya “Engkau”",
          "say": [
@@ -601,7 +601,7 @@
       "frames": [
         {"stage": "join", "tiles": ["as-sirat"], "from": ["al", "sirat"], "silent": [0], "note": "alif dan lam tidak dibaca, huruf sesudahnya dobel",
          "say": [
-           "Alif lam bersambung dengan isim yang artinya “jalan”.",
+           "Alif lam bersambung dengan isim, yaitu {{!1:6:2/sirat}}, yang artinya “jalan”.",
            "Alif dan huruf lam tidak dibaca; bunyi huruf lam melebur ke huruf sesudahnya, sehingga huruf itu dibaca dobel."
          ]},
         {"stage": "base", "tiles": ["as-siratu"], "focus": "as-siratu",
@@ -609,7 +609,7 @@
         {"stage": "change", "tiles": ["as-sirata"], "from": "as-siratu", "to": "as-sirata",
          "say": [
            "Di sini akhirnya menjadi fathah, tanda bunyi a di atas huruf.",
-           "Sebabnya, kata ini menjadi objek kedua dari kata pertama; objek pertamanya adalah dhamir yang artinya “kami”.",
+           "Sebabnya, kata ini menjadi objek kedua dari kata pertama; objek pertamanya adalah dhamir, yaitu {{1:6:1/na}}, yang artinya “kami”.",
            "Kata yang akhirnya menjadi fathah, bunyi a, karena kedudukannya seperti ini disebut manshub."
          ]}
       ],
@@ -639,7 +639,7 @@
       "frames": [
         {"stage": "join", "tiles": ["al-mustaqim"], "from": ["al", "mustaqim"], "silent": [0], "note": "alif tidak dibaca; lam dibaca mati",
          "say": [
-           "Alif lam bersambung dengan isim yang artinya “yang lurus”.",
+           "Alif lam bersambung dengan isim, yaitu {{!1:6:3/mustaqim}}, yang artinya “yang lurus”.",
            "Alif di awalnya tidak dibaca, tetapi huruf lam dibaca sebagai huruf mati, dan huruf mim sesudahnya tidak dibaca dobel."
          ]},
         {"stage": "base", "tiles": ["al-mustaqimu"], "focus": "al-mustaqimu",
@@ -732,8 +732,8 @@
       "frames": [
         {"stage": "parts", "tiles": ["anam", "ta"],
          "say": [
-           "Bagian pertama adalah fi'il, kata kerja bentuk lampau, yang artinya “telah memberi nikmat”.",
-           "Bagian kedua adalah dhamir yang artinya “Engkau”, yaitu pelakunya.",
+           "Bagian pertama adalah fi'il, kata kerja bentuk lampau, yaitu {{1:7:3/anam}}, yang artinya “telah memberi nikmat”.",
+           "Bagian kedua adalah dhamir, yaitu {{1:7:3/ta}}, yang artinya “Engkau”, sebagai pelakunya.",
            "Di sini dhamir yang menempel adalah pelaku, bukan objek."
          ]},
         {"stage": "base", "tiles": ["anama"], "focus": "anama", "base_mark": "fathah", "note": "seperti di QS 5:23",
@@ -760,13 +760,14 @@
         "ala": {"ar": {"tanzil": "2:31:7"}, "translit": "‘alā", "label": "huruf jar", "gloss": "kepada"},
         "hum": {"ar": {"from": {"word": "1:7:4", "pieces": [3, null]}, "ops": [{"mark": 0, "to": "dhammah"}]}, "translit": "hum", "label": "dhamir", "gloss": "mereka"},
         "alaihum": {"ar": {"from": {"word": "1:7:4"}, "ops": [{"mark": 3, "to": "dhammah"}]}, "translit": "‘alaihum", "gloss": "kepada mereka"},
+        "him": {"ar": {"word": "1:7:4", "pieces": [3, null]}, "translit": "him", "label": "dhamir", "gloss": "mereka"},
         "alaihim": {"ar": {"word": "1:7:4"}, "translit": "‘alaihim", "gloss": "kepada mereka"}
       },
       "frames": [
         {"stage": "parts", "tiles": ["ala", "hum"], "note": "asal bunyi huruf ha': u",
          "say": [
-           "Bagian pertama adalah huruf jar yang artinya “kepada”.",
-           "Bagian kedua adalah dhamir yang artinya “mereka”; asal bunyi huruf ha' di awalnya adalah u."
+           "Bagian pertama adalah huruf jar, yaitu {{1:7:4/ala}}, yang artinya “kepada”.",
+           "Bagian kedua adalah dhamir, yaitu {{1:7:4/hum}}, yang artinya “mereka”; asal bunyi huruf ha' di awalnya adalah u."
          ]},
         {"stage": "join", "tiles": ["alaihum"], "from": ["ala", "hum"], "note": "akhir huruf jar ditulis dengan ya' mati",
          "say": ["Ketika keduanya bersambung, akhir huruf jar itu ditulis dengan huruf ya' mati."]},
@@ -778,7 +779,7 @@
         {"stage": "whole", "tiles": ["alaihim"], "note": "kedudukannya majrur",
          "say": [
            "Dhamir ini dikenai huruf jar, tetapi tidak berubah karenanya; seperti kata kedua, hanya kedudukannya yang majrur.",
-           "Dhamir yang artinya “mereka” ini merujuk kepada kata kedua: merekalah yang diberi nikmat."
+           "Dhamir ini, yaitu {{1:7:4/him}}, yang artinya “mereka”, merujuk kepada kata kedua: merekalah yang diberi nikmat."
          ]}
       ],
       "sources": [
@@ -837,7 +838,7 @@
       "frames": [
         {"stage": "join", "tiles": ["al-magdub"], "from": ["al", "magdub"], "silent": [0], "note": "alif tidak dibaca; lam dibaca mati",
          "say": [
-           "Alif lam bersambung dengan isim yang artinya “yang dimurkai”.",
+           "Alif lam bersambung dengan isim, yaitu {{!1:7:6/magdub}}, yang artinya “yang dimurkai”.",
            "Alif di awalnya tidak dibaca, tetapi huruf lam dibaca.",
            "Isim ini menunjuk pihak yang dikenai perbuatan, yaitu pihak yang dikenai murka."
          ]},
@@ -867,7 +868,7 @@
       "frames": [
         {"stage": "join", "tiles": ["alaihim"], "from": ["ala", "him"], "note": "seperti kata ke-4",
          "say": [
-           "Huruf jar yang artinya “atas” bersambung dengan dhamir yang artinya “mereka”.",
+           "Huruf jar, yaitu {{1:7:7/ala}}, yang artinya “atas”, bersambung dengan dhamir, yaitu {{1:7:7/him}}, yang artinya “mereka”.",
            "Bunyi i pada dhamir ini juga datang dari huruf ya' mati sebelumnya, bukan dari huruf jar."
          ]},
         {"stage": "whole", "tiles": ["alaihim"], "note": "pengganti pelaku bagi kata ke-6",
@@ -935,7 +936,7 @@
       "frames": [
         {"stage": "join", "tiles": ["ad-dallina"], "from": ["al", "dallina"], "silent": [0], "note": "alif dan lam tidak dibaca, huruf sesudahnya dobel",
          "say": [
-           "Alif lam bersambung dengan isim yang artinya “orang-orang yang sesat”.",
+           "Alif lam bersambung dengan isim, yaitu {{!1:7:9/dallina}}, yang artinya “orang-orang yang sesat”.",
            "Alif dan huruf lam tidak dibaca, dan huruf sesudahnya dibaca dobel."
          ]},
         {"stage": "whole", "tiles": ["ad-dallina"], "note": "jamak: -ūna (bentuk dasar) → -īna (majrur)", "letters": [["ad-dallina", -3]],
