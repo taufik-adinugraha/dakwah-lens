@@ -1,14 +1,15 @@
 "use client";
 
 import clsx from "clsx";
-import { ArrowLeft, FileText, Library, Menu as MenuIcon, X } from "lucide-react";
+import { ArrowLeft, FileText, House, Library, Menu as MenuIcon, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { MixedText } from "@/components/library/MixedText";
 import { TextSizeOptions } from "@/components/TextSizeSwitch";
 import { Link, usePathname } from "@/i18n/navigation";
-import { conceptIndexHref, creditsHref } from "@/lib/routes";
+import { listenForDismiss } from "@/lib/dismiss";
+import { conceptIndexHref, creditsHref, hubHref } from "@/lib/routes";
 
 type Panel = "size" | "menu" | null;
 
@@ -26,8 +27,14 @@ const toggleClass = (on: boolean) =>
  * "Menu" button. Each opens an inline panel under the header (the header is
  * the positioned ancestor; no hover, no modal); opening one closes the
  * other, Escape or "Tutup" closes it and puts focus back on its button.
- * The Menu panel holds everything the header row used to carry: Konsep tata
- * bahasa, Kembali ke Dakwah-Lens (a plain <a>: cross-app), Sumber & lisensi.
+ * The Menu also closes on a press outside it and its button (operator,
+ * 2026-10-17; lib/dismiss.ts says how and why), and when one of its links
+ * is chosen. The "Aa" panel does not close on an outside press: the request
+ * was the Menu's.
+ * The Menu panel holds, first, Halaman Belajar, the hub (operator,
+ * 2026-10-17: the module's root, also behind the brand mark), then
+ * everything the header row used to carry: Konsep tata bahasa, Kembali ke
+ * Dakwah-Lens (a plain <a>: cross-app), Sumber & lisensi.
  * No sign-in (operator, 2026-10-12: "there should be no login feature here").
  *
  * Both panels are always rendered (hidden when closed), so aria-controls
@@ -50,6 +57,7 @@ export function HeaderControls({ locale }: { locale: string }) {
   const sizeButton = useRef<HTMLButtonElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
   const sizePanel = useRef<HTMLDivElement>(null);
+  const menuPanel = useRef<HTMLElement>(null);
   const sizeId = useId();
   const menuId = useId();
 
@@ -57,13 +65,16 @@ export function HeaderControls({ locale }: { locale: string }) {
     if (!open) return;
     // Text size: put keyboard and screen-reader users on the current choice.
     if (open === "size") sizePanel.current?.querySelector<HTMLInputElement>("input:checked")?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      setOpenOn(null);
-      (open === "size" ? sizeButton : menuButton).current?.focus();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    // Escape (both panels) and, for the Menu, a press outside it: listened only while the panel
+    // is open; the cleanup runs when it closes (any way) or the header unmounts.
+    const panel = open === "size" ? sizePanel : menuPanel;
+    const button = open === "size" ? sizeButton : menuButton;
+    return listenForDismiss(document, {
+      panel: () => panel.current,
+      button: () => button.current,
+      close: () => setOpenOn(null),
+      outside: open === "menu",
+    });
   }, [open]);
 
   const close = (which: "size" | "menu") => {
@@ -136,6 +147,7 @@ export function HeaderControls({ locale }: { locale: string }) {
 
       <nav
         id={menuId}
+        ref={menuPanel}
         aria-label={t("menu")}
         hidden={open !== "menu"}
         data-header-menu=""
@@ -146,6 +158,20 @@ export function HeaderControls({ locale }: { locale: string }) {
               learner's text size. */}
           <div className="@container">
             <ul className="grid gap-3 @xl:grid-cols-2">
+              <li>
+                {/* The module's root first: the hub, the page listing the
+                    tracks (operator, 2026-10-17). */}
+                <Link
+                  href={hubHref()}
+                  onClick={leave}
+                  aria-current={current(hubHref())}
+                  data-header-menu-home=""
+                  className="menu-row"
+                >
+                  <House aria-hidden className="h-5 w-5 shrink-0 text-forest" />
+                  {t("nav_home")}
+                </Link>
+              </li>
               <li>
                 <Link
                   href={conceptIndexHref()}
