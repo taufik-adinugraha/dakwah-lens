@@ -65,7 +65,7 @@ import type { ExampleInput } from "./examples";
 import { canonicalExercises, exerciseProgressId } from "./exercises";
 import { MAP_LINES, mapHere, mapLaterNames, mapOpening, mapSaidName, type LessonMapInput, type MapGroup } from "./lessonMap";
 import { explainLineId, lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
-import { lineDisplay, lineMarks, lineSegments, lineText, wordRefs } from "./narration";
+import { lineDisplay, lineMarks, lineSegments, lineText, unmarkNamed, wordRefs } from "./narration";
 import {
   OPENING_EXERCISES,
   PARTS_OF,
@@ -96,6 +96,11 @@ export type SequenceInput = {
    *  ayah and no recap: its opening line, the harakat primer, the "Konsep baru" line of each
    *  step it teaches with the examples the imam recites, and the hand-over to ayah 1. */
   zero?: boolean;
+  /** A named word's transliteration by its markup's reference ("1:1:1/bi", "1:6:2"; the authored
+   *  `say` names words as {{…}}: pipeline/validate_narration.py "named words"), for the caption a
+   *  line without a narration display shows — that caption has no Arabic, so the word is its
+   *  transliteration. Without it, a marked word shows as its reference. */
+  named?: (ref: string) => string | undefined;
   /** What this ayah's lesson teaches as "Konsep baru", in the order said (curriculum.ts taughtIn):
    *  a whole Konsep record (`id` its id) or a step's own text (`id` the step's); `words`: the
    *  words of the ayah its line lights (else: the words tagged with a record of that id). */
@@ -194,7 +199,7 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     // The manifest's display (what is spoken, dictionary terms as "na’t
     // (نَعْت)") is the caption; without one, the engine's own (no Arabic).
     const display = lineDisplay(m, line);
-    const text = display !== null ? clean(display) : clean(stripArabic(caption));
+    const text = display !== null ? clean(display) : clean(stripArabic(unmarkNamed(caption, input.named)));
     const spoken = lineText(m, line);
     const id = parseLineId(line);
     // Only this ayah's own lines name its word places, highlight its words

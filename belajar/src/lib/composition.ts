@@ -60,7 +60,13 @@ type Op =
   | { mark: number; to: MarkName }
   | { remove: MarkName | "vowel"; piece: number }
   | { add: MarkName; piece: number }
-  | { drop: number };
+  | { drop: number }
+  | { letter: number; to: LetterName };
+
+/** The letters the `letter` op may write, by name (pipeline/compose.py LONG_LETTERS): the wawu and
+ *  ya' of a jamak's ending (operator 2026-10-17: the bentuk dasar of ٱلْعَٰلَمِينَ is ٱلْعَٰلَمُونَ). */
+const LONG_LETTERS = { wawu: "\u0648", ya: "\u064A" } as const;
+type LetterName = keyof typeof LONG_LETTERS;
 
 function at(ps: string[], i: unknown): number {
   if (typeof i !== "number" || !Number.isInteger(i)) throw new Error(`piece index ${String(i)}`);
@@ -103,6 +109,14 @@ export function applyOp(ar: string, op: Op): string {
   } else if (keys === "drop") {
     ps.splice(at(ps, o.drop), 1);
     if (!ps.length) throw new Error("nothing left after the drop");
+  } else if (keys === "letter,to") {
+    const j = at(ps, o.letter);
+    const to = o.to as LetterName;
+    const letters: readonly string[] = Object.values(LONG_LETTERS);
+    if (!(to in LONG_LETTERS) || !letters.includes(ps[j][0]) || ps[j][0] === LONG_LETTERS[to]) {
+      throw new Error(`letter: piece ${ps[j]} → ${String(to)}`);
+    }
+    ps[j] = LONG_LETTERS[to] + ps[j].slice(1);
   } else {
     throw new Error(`unknown op ${JSON.stringify(op)}`);
   }

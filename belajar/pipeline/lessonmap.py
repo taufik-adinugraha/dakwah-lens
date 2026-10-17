@@ -323,13 +323,20 @@ def problems(content, lessons: dict[str, dict], library: dict, curriculum: dict 
     return errs
 
 
+def name_words(latin: str) -> int:
+    """The words of a name, not counting the members it lists in brackets at its end: "Tiga jenis
+    kata (isim, fi'il, dan huruf)" is a name of three words (operator 2026-10-17: "add in parenthesis
+    what are tiga jenis kata", so that the steps named after it are not heard as its members)."""
+    return len(re.sub(r"\s*\([^()]*\)$", "", latin.strip()).split())
+
+
 def _name_problems(w: str, key: str, rec: dict) -> list[str]:
     errs = []
     for k in ("name", "latin"):
         if not isinstance(rec[k], str) or not rec[k].strip() or rec[k] != rec[k].strip():
             errs.append(f"{w}: {key}: {k} must be a non-empty, trimmed string")
     if isinstance(rec["latin"], str):
-        if len(rec["latin"].split()) > NAME_WORDS:
+        if name_words(rec["latin"]) > NAME_WORDS:
             errs.append(f"{w}: {key}: the name {rec['latin']!r} is longer than {NAME_WORDS} words (a description, not a name)")
         if re.search("[؀-ۿ]", rec["latin"]):
             errs.append(f"{w}: {key}: latin carries Arabic script (the caption form goes in name)")

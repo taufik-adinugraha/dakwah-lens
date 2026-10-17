@@ -698,7 +698,7 @@
       ],
       "structure": {
         "type": "lanjutan jumlah ayat 1 (jar-majrur terkait a‘ūżu), memuat jumlah shilah",
-        "summary": "Ayat ini melanjutkan ayat 1: min syarri (“dari kejahatan”) bergantung pada a‘ūżu, begitu pula min syarri di ayat 3, 4 dan 5. Syarri disandarkan kepada mā (“yang”), isim maushul yang dijelaskan oleh shilah khalaqa (“Dia ciptakan”); kata ganti yang kembali kepada mā dibuang. Sebagian ulama membaca mā sebagai mā mashdariyyah, sehingga maknanya “ciptaan-Nya”.",
+        "summary": "Min syarri (“dari kejahatan”) bergantung pada a‘ūżu, begitu pula min syarri di ayat 3, 4 dan 5. Syarri disandarkan kepada mā (“yang”), isim maushul yang dijelaskan oleh shilah khalaqa (“Dia ciptakan”); kata ganti yang kembali kepada mā dibuang. Sebagian ulama membaca mā sebagai mā mashdariyyah, sehingga maknanya “ciptaan-Nya”.",
         "groups": [
           {
             "words": [
@@ -790,7 +790,7 @@
             "state": "none",
             "sign": "—"
           },
-          "why": "Wa adalah huruf 'athaf (penyambung) dan min huruf jar “dari”; frasa ini disambungkan pada min syarri di ayat 2, sehingga juga bergantung pada a‘ūżu.",
+          "why": "Wa adalah huruf 'athaf (penyambung) dan min huruf jar “dari”; frasa ini disambungkan pada min syarri di ayat 2, sehingga bergantung pada a‘ūżu.",
           "lemma_id": "min",
           "concepts": [
             "athaf"
@@ -1187,7 +1187,7 @@
       ],
       "structure": {
         "type": "lanjutan jumlah ayat 1 ('athaf), memuat zharaf iżā dan jumlah mudhaf ilaih",
-        "summary": "Wa (“dan”) menyambungkan ('athaf) frasa ini dengan min syarri di ayat 2, jadi ia juga bergantung pada a‘ūżu. Syarri disandarkan kepada gāsiqin (“malam”). Iżā (“apabila”) di sini keterangan waktu (zharaf) murni tanpa makna syarat, dan kalimat waqaba (“telah gelap gulita”) menjadi mudhaf ilaih baginya; iżā dikaitkan dengan a‘ūżu menurut al-Mujtaba dan as-Samin, atau dengan syarri menurut al-Jadwal.",
+        "summary": "Wa (“dan”) menyambungkan ('athaf) frasa ini dengan min syarri di ayat 2, jadi ia bergantung pada a‘ūżu. Syarri disandarkan kepada gāsiqin (“malam”). Iżā (“apabila”) di sini keterangan waktu (zharaf) murni tanpa makna syarat, dan kalimat waqaba (“telah gelap gulita”) menjadi mudhaf ilaih baginya; iżā dikaitkan dengan a‘ūżu menurut al-Mujtaba dan as-Samin, atau dengan syarri menurut al-Jadwal.",
         "groups": [
           {
             "words": [
@@ -1285,7 +1285,7 @@
             "state": "none",
             "sign": "—"
           },
-          "why": "Wa adalah huruf 'athaf dan min huruf jar “dari”; frasa ini juga disambungkan pada min syarri sebelumnya, jadi tetap bergantung pada a‘ūżu.",
+          "why": "Wa adalah huruf 'athaf dan min huruf jar “dari”; frasa ini disambungkan dengan wa, jadi bergantung pada a‘ūżu.",
           "lemma_id": "min",
           "concepts": [
             "athaf"
@@ -1647,7 +1647,7 @@
       ],
       "structure": {
         "type": "lanjutan jumlah ayat 1 ('athaf)",
-        "summary": "Frasa ini juga di-'athaf-kan pada min syarri sebelumnya, jadi tetap bergantung pada a‘ūżu. Syarri disandarkan kepada an-naffāṡāti (“para peniup”), bentuk jamak dari naffāṡah, yaitu bentuk mubalaghah (“yang banyak …”) dari isim fa'il. Frasa fī al-‘uqadi (“pada buhul-buhul”) bergantung pada an-naffāṡāti (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
+        "summary": "Frasa ini di-'athaf-kan dengan wa, jadi bergantung pada a‘ūżu. Syarri disandarkan kepada an-naffāṡāti (“para peniup”), bentuk jamak dari naffāṡah, yaitu bentuk mubalaghah (“yang banyak …”) dari isim fa'il. Frasa fī al-‘uqadi (“pada buhul-buhul”) bergantung pada an-naffāṡāti (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
         "groups": [
           {
             "words": [
@@ -1746,7 +1746,7 @@
             "state": "none",
             "sign": "—"
           },
-          "why": "Wa adalah huruf 'athaf dan min huruf jar “dari”; frasa terakhir ini pun disambungkan pada min syarri sebelumnya dan bergantung pada a‘ūżu.",
+          "why": "Wa adalah huruf 'athaf dan min huruf jar “dari”; frasa terakhir ini disambungkan dengan wa dan bergantung pada a‘ūżu.",
           "lemma_id": "min",
           "concepts": [
             "athaf"
@@ -2110,7 +2110,7 @@
       ],
       "structure": {
         "type": "lanjutan jumlah ayat 1 ('athaf), memuat zharaf iżā dan jumlah mudhaf ilaih",
-        "summary": "Polanya sama dengan ayat 3, dan Darwisy menyebut i'rab-nya “jelas”: frasa ini di-'athaf-kan pada min syarri sebelumnya, syarri disandarkan kepada ḥāsidin (“orang yang dengki”), lalu iżā (“apabila”) menjadi keterangan waktu dengan kalimat ḥasada (“dia dengki”) sebagai mudhaf ilaih-nya. Al-Mujtaba mengaitkan iżā dengan a‘ūżu, sedangkan al-Jadwal dengan syarri.",
+        "summary": "Darwisy menyebut i'rab-nya “jelas”: frasa ini di-'athaf-kan dengan wa, syarri disandarkan kepada ḥāsidin (“orang yang dengki”), lalu iżā (“apabila”) menjadi keterangan waktu dengan kalimat ḥasada (“dia dengki”) sebagai mudhaf ilaih-nya. Al-Mujtaba mengaitkan iżā dengan a‘ūżu, sedangkan al-Jadwal dengan syarri.",
         "groups": [
           {
             "words": [
@@ -2649,8 +2649,8 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:f8250fd994df183364e019892b0f8e5a9c4f16c527ec173a54326618b38e5d6a",
-    "authored_words": "authored/al-falaq.words.json sha256:c431b95177c1b29159ab3fe2a5333eeed1e5349b467b05ebec4ba94bd7d6229e",
-    "authored_structure": "authored/al-falaq.structure.json sha256:aee44f97abcf01539c7d43bf91a684eb045f450ce093017f4817c0e81afd2545",
+    "authored_words": "authored/al-falaq.words.json sha256:bed2ba90ef11da16f0dd519e666fdaca3180117b32f4365e20962921937b9500",
+    "authored_structure": "authored/al-falaq.structure.json sha256:79b3f5e7bdb1174bd1712aa7a8f38ee6bbbb8be7531dd65a41226860cfd1bfd6",
     "authored_concepts_map": "authored/al-falaq.concepts-map.json sha256:aed1fd50942fa30fa657a55a384d2fe284d957714238d05a9499b0065e82aaf4",
     "authored_facts": "authored/al-falaq.facts.generated.json sha256:75ebf95f8fe6d95dbad2bd5b19df7a8e6cb49e44b945adf96abde2b533e1ebd3",
     "authored_hadith": "authored/al-falaq.hadith.json sha256:b21ea1e52401b20e98c0b96dac242a626180ec8bc779405b3bb099f7b429ba62",

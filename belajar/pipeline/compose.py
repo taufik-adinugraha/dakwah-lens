@@ -120,6 +120,8 @@ MARKS: dict[str, str] = {
     "small_alif": "\u0670",
 }
 MARK_OF = {v: k for k, v in MARKS.items()}
+# The letters the `letter` op may write, by name (the wawu and ya' of a jamak's ending).
+LONG_LETTERS = {"wawu": "\u0648", "ya": "\u064a"}
 VOWELS = ("fathah", "dhammah", "kasrah", "fathatain", "dhammatain", "kasratain")
 # The sound each vowel mark gives (shown on screen, never spoken as a syllable).
 SOUND = {"fathah": "a", "kasrah": "i", "dhammah": "u", "fathatain": "an", "kasratain": "in", "dhammatain": "un",
@@ -237,8 +239,21 @@ def apply_op(ar: str, op: dict, what: str = "op") -> str:
         del ps[j]
         if not ps:
             raise ComposeError(f"{what}: nothing left after the drop")
+    elif keys == {"letter", "to"}:
+        # One long-vowel letter for another, by NAME (never typed), its marks kept: the ya' of a
+        # jamak mudzakkar salim that is majrur (ٱلْعَٰلَمِينَ) back to the wawu of its bentuk dasar
+        # (operator 2026-10-17: "show example here what it looks like when in basic form and using
+        # wawu"). Only the letters of that change, LONG_LETTERS.
+        j = _idx(ps, op["letter"], what)
+        if op["to"] not in LONG_LETTERS:
+            raise ComposeError(f"{what}: 'to' must name a letter {tuple(LONG_LETTERS)}, got {op['to']!r}")
+        if ps[j][0] not in LONG_LETTERS.values():
+            raise ComposeError(f"{what}: piece {op['letter']} {ps[j]!r} is not one of the letters {tuple(LONG_LETTERS)}")
+        if ps[j][0] == LONG_LETTERS[op["to"]]:
+            raise ComposeError(f"{what}: piece {op['letter']} is already {op['to']}")
+        ps[j] = LONG_LETTERS[op["to"]] + ps[j][1:]
     else:
-        raise ComposeError(f"{what}: unknown op {op!r} (mark+to, remove+piece, add+piece or drop)")
+        raise ComposeError(f"{what}: unknown op {op!r} (mark+to, remove+piece, add+piece, drop or letter+to)")
     return "".join(ps)
 
 
@@ -914,6 +929,8 @@ def authored_slugs() -> list[str]:
 # dictionary), with the sound each gives. Operator 2026-10-10: a learner who does not know the marks
 # hears each one's sound at its first use in a word's explanation ("kasrah, bunyi i").
 _SAY_MARK = re.compile(r"\b(fathah|kasrah|dhammah)\b", re.I)
+# A named word's markup in a `say` (validate_narration.NAMED_REF, which imports this module).
+_NAMED_REF = re.compile(r"\{\{!?(\d{1,3}:\d{1,3}:\d{1,3})(?:/([^{}\s/]+))?\}\}")
 _SOUND_AFTER = re.compile(r",? (?:tanda )?bunyi ([aiu])\b")
 _SOUNDS = re.compile(r"\bbunyi ([aiu])\b")
 # A frame that shows a base form (or a change from it), or says what it is in its note.
@@ -1267,6 +1284,13 @@ def stage_problems(unit: dict, w: str, *, kind: str, word_ar: str | None, corpus
     if kind == "word":
         errs += say_problems(unit, w)
     derived_from = {n for f2 in forms.values() for n in refs_of(f2.get("src"))}
+    # A form a line names with its bytes in the caption ({{loc/form}}, validate_narration "named
+    # words") is shown there.
+    loc = unit.get("loc")
+    said_texts = [str(unit.get("lead") or "")] + [str((ln or {}).get("say") or "") for ln in unit.get("lines") or []
+                                                 if isinstance(ln, dict)]
+    said_texts += [str(x) for fr in frames if isinstance(fr, dict) for x in fr.get("say") or []]
+    used |= {m.group(2) for t in said_texts for m in _NAMED_REF.finditer(t) if m.group(1) == loc and m.group(2)}
     for name in forms:
         if name not in used and name not in derived_from:
             errs.append(f"{w}: form {name!r} is never shown nor used")

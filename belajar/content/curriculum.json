@@ -101,7 +101,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -163,7 +163,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -227,7 +227,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -288,7 +288,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -377,7 +377,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -474,7 +474,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -582,7 +582,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -682,7 +682,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -789,7 +789,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -888,7 +888,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -991,7 +991,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -1100,7 +1100,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -1207,7 +1207,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -1314,7 +1314,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -1426,7 +1426,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -1539,7 +1539,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -1655,7 +1655,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -1770,7 +1770,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -1890,7 +1890,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -2012,7 +2012,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -2149,7 +2149,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -2285,7 +2285,7 @@
     "learnt": [
      {
       "id": "harakat",
-      "here": false
+      "here": true
      },
      {
       "id": "kalimah",
@@ -2560,8 +2560,8 @@
   {
    "id": "kalimah",
    "lesson": "0",
-   "name": "Tiga jenis kata",
-   "latin": "Tiga jenis kata",
+   "name": "Tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف)",
+   "latin": "Tiga jenis kata (isim, fi'il, dan huruf)",
    "concept": "kalimah-isim-fiil-huruf",
    "occurs": {
     "always": true
@@ -2606,27 +2606,27 @@
    "examples": [
     {
      "loc": "1:7:1",
-     "say": "Kata ini, yang artinya “jalan”, adalah isim, yaitu nama benda.",
+     "say": "Kata ini, yaitu {{!1:7:1}}, yang artinya “jalan”, adalah isim, yaitu nama benda.",
      "about": "isim, nama benda."
     },
     {
      "loc": "1:6:3",
-     "say": "Kata ini, yang artinya “yang lurus”, juga isim, tetapi nama sifat: ia menyebut sifat sesuatu, bukan bendanya.",
+     "say": "Kata ini, yaitu {{!1:6:3}}, yang artinya “yang lurus”, juga isim, tetapi nama sifat: ia menyebut sifat sesuatu, bukan bendanya.",
      "about": "isim, nama sifat."
     },
     {
      "loc": "1:5:1",
-     "say": "Kata ini, yang artinya “hanya kepada Engkau”, juga isim, yaitu kata ganti: kata yang dipakai sebagai pengganti nama.",
+     "say": "Kata ini, yaitu {{1:5:1}}, yang artinya “hanya kepada Engkau”, juga isim, yaitu kata ganti: kata yang dipakai sebagai pengganti nama.",
      "about": "isim, kata ganti."
     },
     {
      "loc": "1:5:2",
-     "say": "Kata ini, yang artinya “kami menyembah”, adalah fi'il, yaitu kata kerja: ia menyebut suatu perbuatan dan waktu terjadinya.",
+     "say": "Kata ini, yaitu {{1:5:2}}, yang artinya “kami menyembah”, adalah fi'il, yaitu kata kerja: ia menyebut suatu perbuatan dan waktu terjadinya.",
      "about": "fi'il, kata kerja."
     },
     {
      "loc": "1:7:8",
-     "say": "Tulisan ini memuat dua kata, dan keduanya adalah huruf, yaitu kata tugas: yang pertama artinya “dan”, yang kedua artinya “bukan”. Keduanya baru bermakna utuh bersama kata sesudahnya.",
+     "say": "Tulisan ini memuat dua kata, dan keduanya adalah huruf, yaitu kata tugas: yang pertama, {{1:7:8/wa}}, artinya “dan”, yang kedua, {{1:7:8/la}}, artinya “bukan”. Keduanya baru bermakna utuh bersama kata sesudahnya.",
      "about": "dua huruf, wa yang artinya “dan”, dan lā yang artinya “bukan”."
     }
    ],

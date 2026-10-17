@@ -62,8 +62,9 @@ WHERE A STEP OCCURS (`occurs`), in the words of one ayah:
   occurs {always}    every word (the three kinds of word: every word is one of them);
   a whole record     without `occurs`: the words tagged with its record, and the words of the ayah's
                      structure groups of that record (validate_narration.concept_words);
-  a basics step      nowhere: the harakat are on every letter, and marking them "here" in every
-                     ayah would say nothing;
+  a basics step      every word: the harakat are on every letter of every ayah, so the step is met
+                     again in each (operator 2026-10-17, on ayah 1's card "Tidak ada di ayat ini:
+                     Harakat": "in alfatihah ayat-1 it says no harakat?"; until then: nowhere);
   anything else      nowhere yet (a step with no record and no `occurs`).
 
 THE BUILT FILE, content/curriculum.json (build_curriculum.py; what the web app and the other
@@ -308,7 +309,9 @@ def occurs(step: dict, ayah: dict) -> list[int]:
     words = ayah.get("words") or []
     rule = step.get("occurs")
     if step.get("basics"):
-        return []
+        # The harakat sit on every letter of every ayah (operator 2026-10-17: "in alfatihah ayat-1 it
+        # says no harakat?"): met again in each ayah, never "not in this ayah".
+        return list(range(1, len(words) + 1))
     if isinstance(rule, dict):
         if rule.get("always") is True:
             return list(range(1, len(words) + 1))

@@ -14,6 +14,7 @@ import {
   type AutoplaySequence,
   type AutoplayState,
   type ExampleClip,
+  type NarrationManifest,
 } from "@/lib/autoplay";
 import { loadCheckInput, runAutoplayChecks, transitionProblem, wordVoiceProblems } from "@/lib/autoplay/checks";
 import { SURAHS } from "@/lib/content";
@@ -21,6 +22,7 @@ import { PACES, type Pace } from "@/lib/lessonSteps";
 import { plainLetters, voiceFrom, wordVoice, type WordVoiceManifest } from "@/lib/wordvoice";
 
 import { stageSequence } from "./build";
+import { narrationFor } from "./manifests";
 
 // Operator 2026-10-14: "for all quran word by word should be replaced by this, not using truncated
 // voice from imam … because in some parts the truncation are not clean". Every Qur'anic WORD the
@@ -134,7 +136,16 @@ describe("every word heard on its own is the narrator's recording of it, never t
   });
 
   it("a word step ends with its own recording: no reading time where the narrator explains the word next", () => {
-    const { seq } = lessons.find((l) => l.a.loc === "1:2")!;
+    // The word line with a recording (since 2026-10-17 every word line names its word, rule 26, and
+    // waits for its render: caption-only, it is read, and the step before it gives reading time).
+    const { s: fatihah, a } = lessons.find((l) => l.a.loc === "1:2")!;
+    const shipped = narrationFor("al-fatihah")!;
+    const w1 = shipped.lines["al-fatihah:2:w1"];
+    const narration: NarrationManifest = {
+      ...shipped,
+      lines: { ...shipped.lines, "al-fatihah:2:w1": { ...w1, audio: w1.audio ?? { url: "/belajar/media/narration/test/al-fatihah-2-w1.mp3", ms: 60 * w1.text.length, sha256: "0".repeat(64) } } },
+    };
+    const seq = stageSequence(fatihah, a, "id", narration);
     const idx = seq.steps.findIndex((x) => x.id === "w1:recite");
     const s = reduceAutoplay(seq, createAutoplayState(seq), { type: "start", from: idx, reason: "continue" });
     expect(s.activity).toMatchObject({ kind: "recite", target: "word", word: 1, clip: seq.wordVoices[0], minMs: 0 });

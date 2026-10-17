@@ -24,7 +24,8 @@
  * Where a step OCCURS in an ayah (pipeline/curriculum.py occurs): `occurs.case` — the words in that
  * i'rab state; `occurs.qac` — the words with a QAC segment of that tag, read from the QAC line of
  * the word's own sources; `occurs.always` — every word; a whole record without `occurs` — the words
- * tagged with it and the words of its structure groups; a basics step (harakat) — nowhere.
+ * tagged with it and the words of its structure groups; a basics step (harakat) — every word (the
+ * harakat sit on every letter: met again in every ayah, operator 2026-10-17 — until then nowhere).
  *
  * "Earlier" and "later" are places in the curriculum's lesson order, never mushaf order.
  *
@@ -158,7 +159,7 @@ type OccurStep = Pick<CurriculumStep, "concept" | "part" | "basics" | "occurs">;
 
 /** The words (1-based) of `ayah` a step occurs on (the rules at the head of this file). */
 export function stepOccurs(step: OccurStep, ayah: Pick<CurriculumAyah, "words" | "structure">): number[] {
-  if (step.basics) return [];
+  if (step.basics) return ayah.words.map((_, i) => i + 1);
   const rule = step.occurs;
   if (rule) {
     if (rule.always === true) return ayah.words.map((_, i) => i + 1);

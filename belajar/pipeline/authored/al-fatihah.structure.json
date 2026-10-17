@@ -11,9 +11,9 @@
           { "words": [2, 3, 4], "label": "[[Allāhi|q:1:1:2]] diikuti dua [[na't]]: [[ar-raḥmāni|q:1:1:3]], [[ar-raḥīmi|q:1:1:4]] (ikut berakhiran [[kasrah]])", "concept": "naat" }
         ],
         "items": [
-          { "words": [1], "say": "Kata pertama diawali huruf jar yang artinya “dengan”, sehingga isim sesudahnya, yang artinya “nama”, menjadi majrur. Gabungan seperti ini disebut jar-majrur." },
-          { "words": [1, 2], "say": "Kata yang artinya “nama” itu disandarkan kepada kata kedua, sehingga maknanya “nama Allah”. Susunan sandaran ini kita pelajari di ayat keempat." },
-          { "words": [2, 3, 4], "say": "Kata ketiga dan kata keempat adalah dua sifat bagi kata kedua, dan keduanya mengikuti akhirannya, yaitu kasrah. Ini kita pelajari di ayat ketiga." },
+          { "words": [1], "say": "Kata pertama diawali huruf jar, yaitu {{1:1:1/bi}} yang artinya “dengan”, sehingga isim sesudahnya, yaitu {{1:1:1/ismi}} yang artinya “nama”, menjadi majrur. Gabungan seperti ini disebut jar-majrur." },
+          { "words": [1, 2], "say": "Kata {{1:1:1/ismi}} yang artinya “nama” itu disandarkan kepada kata kedua, {{1:1:2}}, sehingga maknanya “nama Allah”. Susunan sandaran ini baru akan diajarkan lebih lengkap di ayat keempat." },
+          { "words": [2, 3, 4], "say": "Kata ketiga dan kata keempat adalah dua sifat bagi kata kedua, dan keduanya mengikuti akhirannya, yaitu kasrah. Konsep ini baru akan diajarkan lebih lengkap di ayat ketiga." },
           { "words": [1, 2, 3, 4], "say": "Seluruh ayat ini adalah satu keterangan, tetapi kata yang diterangkannya tidak diucapkan. Karena basmalah adalah kalimat pembuka, para ulama memahaminya antara lain sebagai “aku memulai”, dan ada pula yang menyesuaikannya dengan pekerjaan yang sedang dimulai. Jadi maknanya: “aku memulai dengan nama Allah”." }
         ],
         "sources": [
@@ -44,8 +44,8 @@
         "items": [
           { "words": [1, 2], "say": "Ini jumlah ismiyyah: kata pertama adalah mubtada', yaitu pokok kalimat, dan kata kedua adalah khabar, yaitu berita tentangnya." },
           { "words": [2], "say": "Khabar di sini berupa huruf jar beserta isim yang majrur. Keterangan seperti ini bergantung pada kata yang tidak diucapkan; para ulama memahaminya antara lain sebagai “tetap”. Jadi maknanya: “segala puji tetap bagi Allah”." },
-          { "words": [2, 3], "say": "Kata ketiga adalah sifat bagi nama Allah pada kata kedua, sehingga ikut majrur; sebagian ulama menyebutnya pengganti. Sifat seperti ini kita pelajari di ayat ketiga." },
-          { "words": [3, 4], "say": "Kata ketiga disandarkan kepada kata keempat, sehingga maknanya “Tuhan seluruh alam”, dan kata keempat menjadi majrur. Susunan sandaran ini kita pelajari di ayat keempat." }
+          { "words": [2, 3], "say": "Kata ketiga adalah sifat bagi nama Allah pada kata kedua, sehingga ikut majrur; sebagian ulama menyebutnya pengganti. Sifat seperti ini baru akan diajarkan lebih lengkap di ayat ketiga." },
+          { "words": [3, 4], "say": "Kata ketiga disandarkan kepada kata keempat, sehingga maknanya “Tuhan seluruh alam”, dan kata keempat menjadi majrur. Susunan sandaran ini baru akan diajarkan lebih lengkap di ayat keempat." }
         ],
         "sources": [
           { "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)", "ref": "jil. 1, hlm. 14 (al-ḥamdu mubtada'; lillāhi jar-majrur terkait khabar yang dibuang; rabbi sifat atau badal; al-‘ālamīna mudhaf ilaih)", "url": "https://tafsir.app/iraab-aldarweesh/1/2" },
@@ -71,7 +71,7 @@
           { "words": [1, 2], "label": "[[ar-raḥmāni|q:1:3:1]], [[ar-raḥīmi|q:1:3:2]]: dua [[na't]] bagi lafaz Allah di ayat 2", "concept": "naat" }
         ],
         "items": [
-          { "words": [1, 2], "say": "Ayat ini bukan kalimat baru: kedua katanya adalah na't, yaitu dua sifat lagi bagi nama Allah di ayat kedua, maka keduanya ikut majrur, berakhir kasrah." },
+          { "words": [1, 2], "say": "Ayat ini bukan kalimat baru: kedua katanya adalah na't, yaitu dua sifat bagi nama Allah, maka keduanya ikut majrur, berakhir kasrah." },
           { "words": [1, 2], "say": "Keduanya memakai alif lam, karena na't mengikuti kata yang disifatinya juga dalam tertentu atau tidaknya, dan nama Allah sudah ma'rifah." }
         ],
         "sources": [
@@ -91,7 +91,7 @@
           { "words": [1, 2, 3], "label": "rangkaian [[idhafah]]: [[māliki|q:1:4:1]] → [[yaumi|q:1:4:2]] → [[ad-dīni|q:1:4:3]] (“Pemilik hari pembalasan”)", "concept": "idhafah" }
         ],
         "items": [
-          { "words": [1], "say": "Ayat ini masih melanjutkan ayat kedua: kata pertama adalah na't berikutnya bagi nama Allah." },
+          { "words": [1], "say": "Kata pertama adalah na't bagi nama Allah." },
           { "words": [1, 2, 3], "say": "Lalu kata pertama disandarkan kepada kata kedua, dan kata kedua disandarkan kepada kata ketiga. Inilah rangkaian idhafah tiga kata, yang artinya “Pemilik hari pembalasan”." },
           { "words": [2, 3], "say": "Kata kedua dan kata ketiga sama-sama mudhaf ilaih, maka keduanya majrur. Dengan ini kita mengenal tiga sebab sebuah isim menjadi majrur: didahului huruf jar, menjadi mudhaf ilaih, dan mengikuti kata yang majrur, seperti na't." }
         ],
@@ -122,7 +122,7 @@
         "items": [
           { "words": [1, 2], "say": "Ayat ini terdiri dari dua kalimat. Pada kalimat pertama, objeknya, yaitu dhamir pada kata pertama, diletakkan sebelum kata kerjanya, sehingga maknanya menjadi “hanya kepada-Mu”." },
           { "words": [3, 4], "say": "Kalimat kedua memakai pola yang sama: dhamir pada kata ketiga didahulukan sebelum kata kerjanya, yaitu kata keempat." },
-          { "words": [1, 2, 3, 4], "say": "Kedua kalimat itu disambung dengan huruf wawu, yang artinya “dan”. Pelaku kedua kata kerja itu tidak tertulis, yaitu “kami”." }
+          { "words": [1, 2, 3, 4], "say": "Kedua kalimat itu disambung dengan huruf {{1:5:3/wa}}, yang artinya “dan”. Pelaku kedua kata kerja itu tidak tertulis, yaitu “kami”." }
         ],
         "sources": [
           { "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)", "ref": "jil. 1, hlm. 14 (iyyāka dhamir munfashil, mahall nashb, maf'ul bih yang didahulukan untuk pengkhususan; na‘budu fi'il mudhari', pelakunya tersimpan, “kami”; wa iyyāka nasta‘īnu di-'athaf-kan pada iyyāka na‘budu)", "url": "https://tafsir.app/iraab-aldarweesh/1/5" },
@@ -151,7 +151,7 @@
         ],
         "items": [
           { "words": [1], "say": "Ini jumlah fi'liyyah: intinya kata kerja perintah pada kata pertama, yang di sini bermakna doa. Fa'il kata kerja ini tidak tertulis, yaitu “Engkau”." },
-          { "words": [1, 2], "say": "Kata kerja ini mempunyai dua maf'ul bih: yang pertama dhamir yang artinya “kami” pada kata pertama, dan yang kedua adalah kata kedua, yang artinya “jalan”." },
+          { "words": [1, 2], "say": "Kata kerja ini mempunyai dua maf'ul bih: yang pertama dhamir {{1:6:1/na}} yang artinya “kami” pada kata pertama, dan yang kedua adalah kata kedua, yang artinya “jalan”." },
           { "words": [2, 3], "say": "Kata ketiga adalah na't bagi kata kedua, maka ikut manshub, berakhir fathah." }
         ],
         "sources": [
@@ -183,11 +183,11 @@
           { "words": [8, 9], "label": "[[wa lā aḍ-ḍāllīna|q:1:7:8-9]]: [['athaf]], dengan [[lā|q:1:7:8/2]] sebagai penegas makna “bukan”", "concept": "athaf" }
         ],
         "items": [
-          { "words": [1, 2, 3, 4], "say": "Ayat ini melanjutkan ayat keenam: empat kata pertamanya menjadi pengganti yang menjelaskan kata yang artinya “jalan” di ayat keenam." },
+          { "words": [1, 2, 3, 4], "say": "Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata {{!1:6:2}} yang artinya “jalan”." },
           { "words": [1, 2], "say": "Kata pertama disandarkan kepada kata kedua: ini idhafah, yang artinya “jalan orang-orang yang”." },
           { "words": [2, 3, 4], "say": "Kata kedua adalah isim maushul, dan dua kata sesudahnya adalah shilah baginya, yaitu kalimat yang menjelaskannya, yang artinya “yang telah Engkau beri nikmat”." },
           { "words": [5, 6, 7], "say": "Tiga kata berikutnya menjadi pengganti bagi kata kedua; sebagian ulama menjadikannya sifat. Di dalamnya, kata ketujuh menempati posisi pelaku bagi kata keenam, yang bermakna dikenai perbuatan." },
-          { "words": [8, 9], "say": "Kata terakhir disambungkan dengan huruf wawu: ini 'athaf. Huruf yang artinya “bukan” sesudah huruf wawu itu menegaskan makna “bukan” yang sudah ada pada kata kelima." }
+          { "words": [8, 9], "say": "Kata terakhir disambungkan dengan huruf {{1:7:8/wa}}: ini 'athaf. Huruf {{1:7:8/la}} sesudahnya, yang artinya “bukan”, menegaskan makna “bukan” yang sudah ada pada kata kelima." }
         ],
         "sources": [
           { "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)", "ref": "jil. 1, hlm. 15 (ṣirāṭa badal yang sepadan; allażīna mudhaf ilaih, mahall jar; jumlah an‘amta adalah shilah, tidak punya kedudukan i'rab; gairi badal dari dhamir pada ‘alaihim, atau dari allażīna, atau na't bagi allażīna; ‘alaihim kedua mahall raf' sebagai na'ib fa'il; lā tambahan untuk menegaskan nafi; aḍ-ḍāllīna di-'athaf-kan pada al-magḍūbi ‘alaihim)", "url": "https://tafsir.app/iraab-aldarweesh/1/7" },

@@ -82,6 +82,8 @@ import {
 import {
   captionArabicProblems,
   hasArabicScript,
+  maskNamedSaid,
+  namedSaid,
   parseNarrationManifest,
   parsePronunciation,
   quranTokenSet,
@@ -264,6 +266,13 @@ export function sequenceProblems(
   if (steps.length === 0) return ["the sequence is empty"];
   const ids = steps.map((s) => s.id);
   if (new Set(ids).size !== ids.length) out.push("step ids are not unique");
+  // A named word's markup ({{1:6:2}}, operator 2026-10-17) is resolved before the screen: the
+  // manifest's caption shows the word, a caption-only line its transliteration (unmarkNamed).
+  for (const s of steps) {
+    for (const c of s.cues) {
+      if (/\{\{|\}\}/.test(c.caption) || /\{\{|\}\}/.test(c.display ?? "")) out.push(`${c.line}: the caption shows a named word's markup`);
+    }
+  }
   if (steps[0].kind !== "intro") out.push("does not open with the intro");
   const zero = ctx.zero === true;
   /** How many steps open the lesson before its map / primer: the intro, and the imam's ayah. */
@@ -1062,9 +1071,16 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
   }
   // Arabic a caption may show: the dictionary's display forms and the lesson
   // words' own Arabic (content bytes).
+  // … and the named forms of the compositions a caption may name with the word itself
+  // (validate_narration "named words": ٱسْمِ, بِٱسْمِ — content bytes, never typed).
+  const composeForms = Object.values(input.compose ?? {}).flatMap((c) => {
+    const words = (c as { words?: Record<string, { forms?: Record<string, { ar?: unknown }> }> } | null)?.words ?? {};
+    return Object.values(words).flatMap((w) => Object.values(w?.forms ?? {}).map((f) => (typeof f?.ar === "string" ? f.ar : "")));
+  });
   const allowedArabic = [
     ...(dict?.terms.map((t) => t.display) ?? []),
     ...input.surahs.flatMap((s) => s.ayat.flatMap((a) => a.words.map((w) => w.ar))),
+    ...composeForms.filter(Boolean),
   ].join(" | ");
 
   // Manifests: parse + spoken-text guard + captions + marks.
@@ -1083,7 +1099,9 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
     for (const [id, l] of Object.entries(manifest.lines)) {
       const { why, words } = owns(id);
       if (why) errors.push(`${file}: ${id}: ${why}`);
-      for (const p of spokenTextProblems(l.text, quranTokens, dict)) errors.push(`${file}: ${id}: ${p}`);
+      // A word the caption names with its Arabic is said there in Latin on purpose (named words).
+      const said = namedSaid(l.display ?? "");
+      for (const p of spokenTextProblems(maskNamedSaid(l.text, said), quranTokens, dict)) errors.push(`${file}: ${id}: ${p}`);
       if (l.display !== undefined) {
         for (const p of captionArabicProblems(l.display, dict, allowedArabic)) errors.push(`${file}: ${id}: display: ${p}`);
       }

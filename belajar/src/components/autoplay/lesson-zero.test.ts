@@ -168,9 +168,21 @@ describe("its sequence, as its page builds it", () => {
     expect(LINES[`al-fatihah:0:concept:${KALIMAH}:lead`].display).toBe(
       "Sebelum mengenal tiga jenis kata, perhatikan satu istilah. Kalimah (كَلِمَة) dalam bahasa Arab tidak sama dengan kalimat dalam bahasa Indonesia. Dalam tata bahasa Arab, kalimah (كَلِمَة) berarti satu kata. Rangkaian kata yang bermakna utuh, yang dalam bahasa Indonesia disebut kalimat, dalam bahasa Arab disebut kalam (كَلَام).",
     );
+    // A named word ({{1:7:1}}, {{1:7:8/wa}}; rule 26, 2026-10-17) is shown from the content: its
+    // bytes, then its transliteration.
+    const named = (ref: string) => {
+      // ({{!…}}: a heavy-letter word, shown the same way and not said)
+      const [loc, form] = ref.replace(/^!/, "").split("/");
+      const w = form
+        ? composeFor("al-fatihah")!.words[loc].forms[form]
+        : SURAHS.flatMap((x) => x.ayat.flatMap((a) => a.words)).find((x) => x.loc === loc)!;
+      return `${w.ar} (${w.translit})`;
+    };
     kalimah.examples!.forEach((e, k) => {
       const line = LINES[`al-fatihah:0:concept:${KALIMAH}:ex:${k + 1}`];
-      expect((line.display ?? "").replace(/ \([^)]*[؀-ۿ][^)]*\)/gu, "")).toBe(e.say.replace(/fi'il/g, "fi’il"));
+      expect((line.display ?? "").replace(/ \([^)]*[؀-ۿ][^)]*\)/gu, "")).toBe(
+        e.say.replace(/fi'il/g, "fi’il").replace(/\{\{([^{}]+)\}\}/g, (_m, ref: string) => named(ref)),
+      );
       expect(line.text.length, e.loc).toBeLessThanOrEqual(400);
     });
     for (const k of mine) expect(LINE_ID_RE.test(k), k).toBe(true);
@@ -296,7 +308,8 @@ describe("what left Al-Fatihah 1", () => {
     const map = lessonMapInput("al-fatihah", 1)!;
     expect(map.learnt.map((x) => x.id)).toEqual(CURRICULUM.lessons.find((l) => l.id === LESSON_ZERO)!.steps);
     // … and named (operator 2026-10-15: "Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu XXX dan YYY").
-    expect(LINES["al-fatihah:1:map:learnt"].text).toBe("Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu harakat dan tiga jenis kata.");
+    // … the three kinds with their members (operator 2026-10-17: "add in parenthesis what are tiga jenis kata").
+    expect(LINES["al-fatihah:1:map:learnt"].text).toBe("Sebelum ayat ini, kita sudah mempelajari dua hal, yaitu harakat, serta tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف.");
   });
 });
 

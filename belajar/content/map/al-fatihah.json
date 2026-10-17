@@ -9,8 +9,8 @@
    "lesson": "0"
   },
   "kalimah": {
-   "name": "Tiga jenis kata",
-   "latin": "Tiga jenis kata",
+   "name": "Tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف)",
+   "latin": "Tiga jenis kata (isim, fi'il, dan huruf)",
    "lesson": "0"
   },
   "majrur": {
@@ -166,7 +166,7 @@
    "learnt": [
     {
      "id": "harakat",
-     "here": false
+     "here": true
     },
     {
      "id": "kalimah",
@@ -192,7 +192,7 @@
    "learnt": [
     {
      "id": "harakat",
-     "here": false
+     "here": true
     },
     {
      "id": "kalimah",
@@ -227,7 +227,7 @@
    "learnt": [
     {
      "id": "harakat",
-     "here": false
+     "here": true
     },
     {
      "id": "kalimah",
@@ -267,7 +267,7 @@
    "learnt": [
     {
      "id": "harakat",
-     "here": false
+     "here": true
     },
     {
      "id": "kalimah",
@@ -318,7 +318,7 @@
    "learnt": [
     {
      "id": "harakat",
-     "here": false
+     "here": true
     },
     {
      "id": "kalimah",
@@ -378,7 +378,7 @@
    "learnt": [
     {
      "id": "harakat",
-     "here": false
+     "here": true
     },
     {
      "id": "kalimah",
@@ -448,7 +448,7 @@
    "learnt": [
     {
      "id": "harakat",
-     "here": false
+     "here": true
     },
     {
      "id": "kalimah",

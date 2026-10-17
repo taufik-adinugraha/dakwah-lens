@@ -33,7 +33,7 @@
     "2": {
       "structure": {
         "type": "jumlah ismiyyah",
-        "summary": "Kalimat nominal: Allāhu menjadi mubtada' dan aṣ-ṣamadu khabarnya (Darwisy, al-Mujtaba); al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khabar kedua bagi huwa di ayat 1, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu. Lafaz Allah diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan; menurut Darwisy, ayat ini tidak disambung dengan wa karena ia menegaskan dan memantapkan isi ayat sebelumnya.",
+        "summary": "Kalimat nominal: Allāhu menjadi mubtada' dan aṣ-ṣamadu khabarnya (Darwisy, al-Mujtaba); al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khabar kedua bagi huwa di ayat 1, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu. Lafaz Allah diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
         "groups": [
           { "words": [1, 2], "label": "Allāhu (mubtada') + aṣ-ṣamadu (khabar)", "concept": "jumlah-ismiyyah" }
         ],
