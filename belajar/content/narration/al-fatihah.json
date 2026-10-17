@@ -1815,13 +1815,162 @@
       "text": "Kata ini, yang artinya jalan, adalah اِسْم, yaitu nama benda.",
       "display": "Kata ini, yaitu صِرَٰطَ (ṣirāṭa), yang artinya “jalan”, adalah isim (اِسْم), yaitu nama benda.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/32cd0b70841f91ab.mp3",
+        "ms": 5068,
+        "sha256": "944f3a9bf626633bd0c71233c86296e23930e746c679c9dbc4b5a373a9b0f9a5"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "ini, yaitu صِرَٰطَ (ṣirāṭa),",
+          "s": 0.34,
+          "e": 0.72
+        },
+        {
+          "t": "yang",
+          "s": 0.784,
+          "e": 1.04
+        },
+        {
+          "t": "artinya",
+          "s": 1.1,
+          "e": 1.44
+        },
+        {
+          "t": "jalan,",
+          "s": 1.6,
+          "e": 2.24
+        },
+        {
+          "t": "adalah",
+          "s": 2.331,
+          "e": 2.88
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 2.96,
+          "e": 3.92
+        },
+        {
+          "t": "yaitu",
+          "s": 3.96,
+          "e": 4.24
+        },
+        {
+          "t": "nama",
+          "s": 4.304,
+          "e": 4.56
+        },
+        {
+          "t": "benda.",
+          "s": 4.6,
+          "e": 5.04
+        }
+      ]
     },
     "al-fatihah:0:concept:kalimah-isim-fiil-huruf:ex:2": {
       "text": "Kata ini, yang artinya yang lurus, juga اِسْم, tetapi nama sifat: ia menyebut sifat sesuatu, bukan bendanya.",
       "display": "Kata ini, yaitu ٱلْمُسْتَقِيمَ (al-mustaqīma), yang artinya “yang lurus”, juga isim (اِسْم), tetapi nama sifat: ia menyebut sifat sesuatu, bukan bendanya.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a9213cd81facd2d9.mp3",
+        "ms": 9404,
+        "sha256": "623164221bc7a590d0673bc7717d24df46d95955eda04f5220ab12024df1d641"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "ini, yaitu ٱلْمُسْتَقِيمَ (al-mustaqīma),",
+          "s": 0.34,
+          "e": 0.72
+        },
+        {
+          "t": "yang",
+          "s": 0.8,
+          "e": 1.12
+        },
+        {
+          "t": "artinya",
+          "s": 1.18,
+          "e": 1.6
+        },
+        {
+          "t": "yang",
+          "s": 1.664,
+          "e": 1.92
+        },
+        {
+          "t": "lurus,",
+          "s": 1.98,
+          "e": 2.48
+        },
+        {
+          "t": "juga",
+          "s": 2.608,
+          "e": 3.12
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 3.28,
+          "e": 3.84
+        },
+        {
+          "t": "tetapi",
+          "s": 4.02,
+          "e": 4.96
+        },
+        {
+          "t": "nama",
+          "s": 5.04,
+          "e": 5.36
+        },
+        {
+          "t": "sifat:",
+          "s": 5.44,
+          "e": 6.24
+        },
+        {
+          "t": "ia",
+          "s": 6.373,
+          "e": 6.64
+        },
+        {
+          "t": "menyebut",
+          "s": 6.672,
+          "e": 7.04
+        },
+        {
+          "t": "sifat",
+          "s": 7.08,
+          "e": 7.44
+        },
+        {
+          "t": "sesuatu,",
+          "s": 7.48,
+          "e": 8.28
+        },
+        {
+          "t": "bukan",
+          "s": 8.347,
+          "e": 8.72
+        },
+        {
+          "t": "bendanya.",
+          "s": 8.768,
+          "e": 9.36
+        }
+      ]
     },
     "al-fatihah:0:concept:kalimah-isim-fiil-huruf:ex:3": {
       "text": "Kata ini, yaitu iyyaka, yang artinya hanya kepada Engkau, juga اِسْم, yaitu kata ganti: kata yang dipakai sebagai pengganti nama.",
@@ -27387,7 +27536,69 @@
       "highlight": [
         2
       ],
-      "focus": "1:6:2"
+      "focus": "1:6:2",
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/1b109e1052d0fb0f.mp3",
+        "ms": 5068,
+        "sha256": "dca203b178a7715f2f7ff41d228238f4aea21ad0bfe99ae5682b5e91a4465256"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.16
+        },
+        {
+          "t": "kedua, yaitu ٱلصِّرَٰطَ (aṣ-ṣirāṭa),",
+          "s": 0.22,
+          "e": 0.56
+        },
+        {
+          "t": "artinya:",
+          "s": 0.62,
+          "e": 1.12
+        },
+        {
+          "t": "jalan.",
+          "s": 1.32,
+          "e": 1.92
+        },
+        {
+          "t": "Kata",
+          "s": 2.128,
+          "e": 2.96
+        },
+        {
+          "t": "ini",
+          "s": 3.04,
+          "e": 3.28
+        },
+        {
+          "t": "juga",
+          "s": 3.328,
+          "e": 3.52
+        },
+        {
+          "t": "terdiri",
+          "s": 3.58,
+          "e": 4.0
+        },
+        {
+          "t": "dari",
+          "s": 4.048,
+          "e": 4.24
+        },
+        {
+          "t": "dua",
+          "s": 4.28,
+          "e": 4.4
+        },
+        {
+          "t": "bagian.",
+          "s": 4.46,
+          "e": 5.04
+        }
+      ]
     },
     "al-fatihah:6:w2:compose:1": {
       "text": "Alif lam bersambung dengan اِسْم yang artinya jalan.",
@@ -27851,7 +28062,74 @@
       "highlight": [
         3
       ],
-      "focus": "1:6:3"
+      "focus": "1:6:3",
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/1ac5fcb8e914b484.mp3",
+        "ms": 6034,
+        "sha256": "230731b1fd16800413ac6f97b1317bb6a286808d04ba829f161b18e053588840"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "ketiga, yaitu ٱلْمُسْتَقِيمَ (al-mustaqīma),",
+          "s": 0.3,
+          "e": 0.72
+        },
+        {
+          "t": "artinya:",
+          "s": 0.82,
+          "e": 1.76
+        },
+        {
+          "t": "yang",
+          "s": 1.824,
+          "e": 2.08
+        },
+        {
+          "t": "lurus.",
+          "s": 2.16,
+          "e": 2.8
+        },
+        {
+          "t": "Kata",
+          "s": 2.976,
+          "e": 3.68
+        },
+        {
+          "t": "ini",
+          "s": 3.76,
+          "e": 4.0
+        },
+        {
+          "t": "juga",
+          "s": 4.064,
+          "e": 4.32
+        },
+        {
+          "t": "terdiri",
+          "s": 4.38,
+          "e": 4.8
+        },
+        {
+          "t": "dari",
+          "s": 4.848,
+          "e": 5.04
+        },
+        {
+          "t": "dua",
+          "s": 5.1,
+          "e": 5.28
+        },
+        {
+          "t": "bagian.",
+          "s": 5.36,
+          "e": 6.0
+        }
+      ]
     },
     "al-fatihah:6:w3:compose:1": {
       "text": "Alif lam bersambung dengan اِسْم yang artinya yang lurus.",
@@ -28988,7 +29266,139 @@
         1,
         2
       ],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4360e7e55862abe6.mp3",
+        "ms": 11729,
+        "sha256": "885c8a55b0907cd4cce6fc888031e773c500fba4b29141a9b497e5d38cc3a423"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.16
+        },
+        {
+          "t": "kerja",
+          "s": 0.22,
+          "e": 0.48
+        },
+        {
+          "t": "ini",
+          "s": 0.56,
+          "e": 0.8
+        },
+        {
+          "t": "mempunyai",
+          "s": 0.86,
+          "e": 1.28
+        },
+        {
+          "t": "dua",
+          "s": 1.36,
+          "e": 1.6
+        },
+        {
+          "t": "maf’ul bih (مَفْعُول بِه):",
+          "s": 1.64,
+          "e": 2.88
+        },
+        {
+          "t": "yang",
+          "s": 2.912,
+          "e": 3.04
+        },
+        {
+          "t": "pertama",
+          "s": 3.104,
+          "e": 3.6
+        },
+        {
+          "t": "dhamir (ضَمِير)",
+          "s": 3.68,
+          "e": 4.08
+        },
+        {
+          "t": "نَا (nā)",
+          "s": 4.24,
+          "e": 4.56
+        },
+        {
+          "t": "yang",
+          "s": 4.656,
+          "e": 5.04
+        },
+        {
+          "t": "artinya",
+          "s": 5.1,
+          "e": 5.52
+        },
+        {
+          "t": "kami",
+          "s": 5.616,
+          "e": 6.0
+        },
+        {
+          "t": "pada",
+          "s": 6.064,
+          "e": 6.32
+        },
+        {
+          "t": "kata",
+          "s": 6.368,
+          "e": 6.56
+        },
+        {
+          "t": "pertama,",
+          "s": 6.624,
+          "e": 7.76
+        },
+        {
+          "t": "dan",
+          "s": 7.82,
+          "e": 8.0
+        },
+        {
+          "t": "yang",
+          "s": 8.032,
+          "e": 8.16
+        },
+        {
+          "t": "kedua",
+          "s": 8.2,
+          "e": 8.56
+        },
+        {
+          "t": "adalah",
+          "s": 8.629,
+          "e": 9.04
+        },
+        {
+          "t": "kata",
+          "s": 9.088,
+          "e": 9.28
+        },
+        {
+          "t": "kedua, yaitu ٱلصِّرَٰطَ (aṣ-ṣirāṭa),",
+          "s": 9.36,
+          "e": 10.16
+        },
+        {
+          "t": "yang",
+          "s": 10.192,
+          "e": 10.32
+        },
+        {
+          "t": "artinya",
+          "s": 10.38,
+          "e": 10.88
+        },
+        {
+          "t": "jalan.",
+          "s": 11.08,
+          "e": 11.68
+        }
+      ]
     },
     "al-fatihah:6:structure:3": {
       "text": "Kata ketiga adalah نَعْت bagi kata kedua, maka ikut مَنْصُوب, berakhir فَتْحَة.",
@@ -29263,13 +29673,92 @@
       "text": "Itu kata kedua, yang artinya jalan.",
       "display": "Itu kata kedua, yaitu ٱلصِّرَٰطَ (aṣ-ṣirāṭa), yang artinya “jalan”.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/69eedb508c858167.mp3",
+        "ms": 2926,
+        "sha256": "26373ef127d325c933be85039c271f42353231dd3b5a93cbff2d49a8b1475a3a"
+      },
+      "tokens": [
+        {
+          "t": "Itu",
+          "s": 0.0,
+          "e": 0.32
+        },
+        {
+          "t": "kata",
+          "s": 0.352,
+          "e": 0.48
+        },
+        {
+          "t": "kedua, yaitu ٱلصِّرَٰطَ (aṣ-ṣirāṭa),",
+          "s": 0.54,
+          "e": 0.96
+        },
+        {
+          "t": "yang",
+          "s": 1.056,
+          "e": 1.44
+        },
+        {
+          "t": "artinya",
+          "s": 1.5,
+          "e": 2.0
+        },
+        {
+          "t": "jalan.",
+          "s": 2.2,
+          "e": 2.88
+        }
+      ]
     },
     "al-fatihah:6:ex:tap-word:3:why": {
       "text": "Itu kata ketiga, yang artinya yang lurus.",
       "display": "Itu kata ketiga, yaitu ٱلْمُسْتَقِيمَ (al-mustaqīma), yang artinya “yang lurus”.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/d6676fe95ea7890c.mp3",
+        "ms": 3004,
+        "sha256": "84b5530bc3dea0952043247a52e21e8fda3aba36cd3ca67f1ed7b2b88e0ba6da"
+      },
+      "tokens": [
+        {
+          "t": "Itu",
+          "s": 0.0,
+          "e": 0.32
+        },
+        {
+          "t": "kata",
+          "s": 0.352,
+          "e": 0.48
+        },
+        {
+          "t": "ketiga, yaitu ٱلْمُسْتَقِيمَ (al-mustaqīma),",
+          "s": 0.54,
+          "e": 1.04
+        },
+        {
+          "t": "yang",
+          "s": 1.12,
+          "e": 1.44
+        },
+        {
+          "t": "artinya",
+          "s": 1.52,
+          "e": 2.0
+        },
+        {
+          "t": "yang",
+          "s": 2.064,
+          "e": 2.32
+        },
+        {
+          "t": "lurus.",
+          "s": 2.38,
+          "e": 2.96
+        }
+      ]
     },
     "al-fatihah:6:ex:sort-case:intro": {
       "text": "Latihan kelompokkan menurut akhiran, tiga kata, dalam empat kelompok: مَرْفُوع, مَنْصُوب, مَجْرُور, dan مَبْنِيّ. Klik satu kata, lalu klik kelompok akhirannya.",
@@ -32241,7 +32730,34 @@
       "highlight": [
         1
       ],
-      "focus": "1:7:1"
+      "focus": "1:7:1",
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/181c405902bb8789.mp3",
+        "ms": 2429,
+        "sha256": "dec7002354d509d1795ef3200f25d0158cab8b003a7460603b3a11281dfd4b92"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.16
+        },
+        {
+          "t": "pertama, yaitu صِرَٰطَ (ṣirāṭa),",
+          "s": 0.224,
+          "e": 0.64
+        },
+        {
+          "t": "artinya:",
+          "s": 0.7,
+          "e": 1.52
+        },
+        {
+          "t": "jalan.",
+          "s": 1.68,
+          "e": 2.4
+        }
+      ]
     },
     "al-fatihah:7:w1:compose:1": {
       "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u.",
@@ -32352,7 +32868,94 @@
         1
       ],
       "focus": "1:7:1",
-      "frame": 2
+      "frame": 2,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4ed812993e9b5c79.mp3",
+        "ms": 8046,
+        "sha256": "37ce3f9061a6b7429bc78149a23c268f50b291659eda154a7d3f19859c1b2c30"
+      },
+      "tokens": [
+        {
+          "t": "Sebabnya,",
+          "s": 0.0,
+          "e": 0.64
+        },
+        {
+          "t": "kata",
+          "s": 0.704,
+          "e": 0.96
+        },
+        {
+          "t": "ini",
+          "s": 1.02,
+          "e": 1.2
+        },
+        {
+          "t": "pengganti",
+          "s": 1.264,
+          "e": 1.92
+        },
+        {
+          "t": "bagi",
+          "s": 1.968,
+          "e": 2.16
+        },
+        {
+          "t": "kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa)",
+          "s": 2.224,
+          "e": 2.48
+        },
+        {
+          "t": "yang",
+          "s": 2.512,
+          "e": 2.64
+        },
+        {
+          "t": "artinya",
+          "s": 2.7,
+          "e": 3.12
+        },
+        {
+          "t": "jalan,",
+          "s": 3.2,
+          "e": 4.24
+        },
+        {
+          "t": "dan",
+          "s": 4.28,
+          "e": 4.4
+        },
+        {
+          "t": "pengganti",
+          "s": 4.448,
+          "e": 5.12
+        },
+        {
+          "t": "mengikuti",
+          "s": 5.184,
+          "e": 5.84
+        },
+        {
+          "t": "akhiran",
+          "s": 5.893,
+          "e": 6.24
+        },
+        {
+          "t": "kata",
+          "s": 6.336,
+          "e": 6.72
+        },
+        {
+          "t": "yang",
+          "s": 6.784,
+          "e": 7.04
+        },
+        {
+          "t": "digantikannya.",
+          "s": 7.1,
+          "e": 8.0
+        }
+      ]
     },
     "al-fatihah:7:w1:compose:4": {
       "text": "Dengan pengganti ini, jalan yang lurus itu dijelaskan: jalan orang-orang yang telah Engkau beri nikmat.",
@@ -34180,7 +34783,79 @@
       "highlight": [
         5
       ],
-      "focus": "1:7:5"
+      "focus": "1:7:5",
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/1ba189805e35bc9c.mp3",
+        "ms": 7549,
+        "sha256": "f58a8a55f30c037b66bffa6dbae04b39a1acb0ad98d9702b8a2543001e364126"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "kelima, yaitu غَيْرِ (gairi),",
+          "s": 0.3,
+          "e": 0.72
+        },
+        {
+          "t": "artinya:",
+          "s": 0.78,
+          "e": 1.36
+        },
+        {
+          "t": "bukan.",
+          "s": 1.493,
+          "e": 2.16
+        },
+        {
+          "t": "Meskipun",
+          "s": 2.42,
+          "e": 3.44
+        },
+        {
+          "t": "artinya",
+          "s": 3.5,
+          "e": 3.92
+        },
+        {
+          "t": "bukan,",
+          "s": 3.973,
+          "e": 4.88
+        },
+        {
+          "t": "kata",
+          "s": 4.928,
+          "e": 5.12
+        },
+        {
+          "t": "ini",
+          "s": 5.2,
+          "e": 5.44
+        },
+        {
+          "t": "sebuah",
+          "s": 5.497,
+          "e": 5.84
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 5.92,
+          "e": 6.4
+        },
+        {
+          "t": "bukan",
+          "s": 6.533,
+          "e": 6.96
+        },
+        {
+          "t": "huruf.",
+          "s": 7.02,
+          "e": 7.52
+        }
+      ]
     },
     "al-fatihah:7:w5:compose:1": {
       "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u.",
@@ -34624,7 +35299,74 @@
       "highlight": [
         6
       ],
-      "focus": "1:7:6"
+      "focus": "1:7:6",
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0370df2448d2d096.mp3",
+        "ms": 5956,
+        "sha256": "ae68ffc1fa4b49df9adafd3800147332f7acf789feb097bece1cacedee022755"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "keenam, yaitu ٱلْمَغْضُوبِ (al-magḍūbi),",
+          "s": 0.288,
+          "e": 0.64
+        },
+        {
+          "t": "artinya:",
+          "s": 0.7,
+          "e": 1.56
+        },
+        {
+          "t": "yang",
+          "s": 1.632,
+          "e": 1.92
+        },
+        {
+          "t": "dimurkai.",
+          "s": 2.0,
+          "e": 2.88
+        },
+        {
+          "t": "Kata",
+          "s": 3.072,
+          "e": 3.84
+        },
+        {
+          "t": "ini",
+          "s": 3.9,
+          "e": 4.08
+        },
+        {
+          "t": "juga",
+          "s": 4.128,
+          "e": 4.32
+        },
+        {
+          "t": "terdiri",
+          "s": 4.4,
+          "e": 4.88
+        },
+        {
+          "t": "dari",
+          "s": 4.928,
+          "e": 5.12
+        },
+        {
+          "t": "dua",
+          "s": 5.16,
+          "e": 5.28
+        },
+        {
+          "t": "bagian.",
+          "s": 5.36,
+          "e": 5.92
+        }
+      ]
     },
     "al-fatihah:7:w6:compose:1": {
       "text": "Alif lam bersambung dengan اِسْم yang artinya yang dimurkai.",
@@ -35998,7 +36740,79 @@
       "highlight": [
         9
       ],
-      "focus": "1:7:9"
+      "focus": "1:7:9",
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/75c837161d262910.mp3",
+        "ms": 6426,
+        "sha256": "9cc55a821f318276b20ccdca676fa0eaa23152a4769bd50b89b138cd3ecd4709"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.16
+        },
+        {
+          "t": "kesembilan, yaitu ٱلضَّآلِّينَ (aḍ-ḍāllīna),",
+          "s": 0.22,
+          "e": 0.8
+        },
+        {
+          "t": "artinya:",
+          "s": 0.9,
+          "e": 1.52
+        },
+        {
+          "t": "orang-orang",
+          "s": 1.653,
+          "e": 2.56
+        },
+        {
+          "t": "yang",
+          "s": 2.592,
+          "e": 2.72
+        },
+        {
+          "t": "sesat.",
+          "s": 2.78,
+          "e": 3.2
+        },
+        {
+          "t": "Kata",
+          "s": 3.408,
+          "e": 4.24
+        },
+        {
+          "t": "ini",
+          "s": 4.32,
+          "e": 4.56
+        },
+        {
+          "t": "juga",
+          "s": 4.624,
+          "e": 4.88
+        },
+        {
+          "t": "terdiri",
+          "s": 4.92,
+          "e": 5.36
+        },
+        {
+          "t": "dari",
+          "s": 5.408,
+          "e": 5.6
+        },
+        {
+          "t": "dua",
+          "s": 5.64,
+          "e": 5.76
+        },
+        {
+          "t": "bagian.",
+          "s": 5.82,
+          "e": 6.4
+        }
+      ]
     },
     "al-fatihah:7:w9:compose:1": {
       "text": "Alif lam bersambung dengan اِسْم yang artinya orang-orang yang sesat.",
@@ -36230,7 +37044,94 @@
         9
       ],
       "focus": "1:7:9",
-      "frame": 2
+      "frame": 2,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/a5be87357ebf133f.mp3",
+        "ms": 8359,
+        "sha256": "2d426926d86183f277e794f53b7712729104f38374ee8267ee8a05962280ab42"
+      },
+      "tokens": [
+        {
+          "t": "Kata",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "ini",
+          "s": 0.32,
+          "e": 0.56
+        },
+        {
+          "t": "jamak",
+          "s": 0.64,
+          "e": 1.04
+        },
+        {
+          "t": "laki-laki",
+          "s": 1.08,
+          "e": 1.68
+        },
+        {
+          "t": "beraturan;",
+          "s": 1.72,
+          "e": 2.4
+        },
+        {
+          "t": "bentuk",
+          "s": 2.576,
+          "e": 3.36
+        },
+        {
+          "t": "dasarnya",
+          "s": 3.42,
+          "e": 3.92
+        },
+        {
+          "t": "memakai",
+          "s": 3.98,
+          "e": 4.4
+        },
+        {
+          "t": "huruf",
+          "s": 4.44,
+          "e": 4.8
+        },
+        {
+          "t": "و,",
+          "s": 4.88,
+          "e": 5.36
+        },
+        {
+          "t": "bunyi",
+          "s": 5.5,
+          "e": 6.0
+        },
+        {
+          "t": "u",
+          "s": 6.12,
+          "e": 6.24
+        },
+        {
+          "t": "panjang,",
+          "s": 6.32,
+          "e": 7.08
+        },
+        {
+          "t": "sebelum",
+          "s": 7.173,
+          "e": 7.6
+        },
+        {
+          "t": "huruf",
+          "s": 7.64,
+          "e": 7.92
+        },
+        {
+          "t": "نَ: ٱلضَّآلُّونَ (aḍ-ḍāllūna).",
+          "s": 8.0,
+          "e": 8.32
+        }
+      ]
     },
     "al-fatihah:7:w9:compose:5": {
       "text": "Di sini وَاو itu diganti huruf يَاء, bunyi i panjang: inilah tanda مَجْرُور.",
@@ -36839,7 +37740,219 @@
       "highlight": [
         3
       ],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/1b330a740772633c.mp3",
+        "ms": 22204,
+        "sha256": "86d930ddadd789f48d10c4b86a5e422939792a4ead0e4767147916d2859c538a"
+      },
+      "tokens": [
+        {
+          "t": "Konsep",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "baru:",
+          "s": 0.48,
+          "e": 1.08
+        },
+        {
+          "t": "Fi’il madhi (فِعْل مَاضٍ),",
+          "s": 1.22,
+          "e": 2.36
+        },
+        {
+          "t": "yaitu",
+          "s": 2.46,
+          "e": 2.88
+        },
+        {
+          "t": "kata",
+          "s": 2.96,
+          "e": 3.28
+        },
+        {
+          "t": "kerja",
+          "s": 3.32,
+          "e": 3.6
+        },
+        {
+          "t": "lampau.",
+          "s": 3.68,
+          "e": 4.24
+        },
+        {
+          "t": "Fi’il madhi (فِعْل مَاضٍ)",
+          "s": 4.6,
+          "e": 5.68
+        },
+        {
+          "t": "menunjuk",
+          "s": 5.74,
+          "e": 6.16
+        },
+        {
+          "t": "perbuatan",
+          "s": 6.22,
+          "e": 6.8
+        },
+        {
+          "t": "yang",
+          "s": 6.832,
+          "e": 6.96
+        },
+        {
+          "t": "sudah",
+          "s": 7.0,
+          "e": 7.2
+        },
+        {
+          "t": "terjadi;",
+          "s": 7.26,
+          "e": 8.48
+        },
+        {
+          "t": "ia",
+          "s": 8.587,
+          "e": 8.8
+        },
+        {
+          "t": "mabni (مَبْنِيّ),",
+          "s": 8.88,
+          "e": 9.84
+        },
+        {
+          "t": "pada",
+          "s": 9.888,
+          "e": 10.08
+        },
+        {
+          "t": "asalnya",
+          "s": 10.16,
+          "e": 10.64
+        },
+        {
+          "t": "di",
+          "s": 10.747,
+          "e": 10.96
+        },
+        {
+          "t": "atas",
+          "s": 11.024,
+          "e": 11.28
+        },
+        {
+          "t": "fathah (فَتْحَة)",
+          "s": 11.32,
+          "e": 11.84
+        },
+        {
+          "t": "seperti",
+          "s": 11.94,
+          "e": 12.64
+        },
+        {
+          "t": "kata خَلَقَ (khalaqa)",
+          "s": 12.704,
+          "e": 12.96
+        },
+        {
+          "t": "yang",
+          "s": 12.992,
+          "e": 13.12
+        },
+        {
+          "t": "artinya",
+          "s": 13.18,
+          "e": 13.68
+        },
+        {
+          "t": "Dia",
+          "s": 13.76,
+          "e": 14.0
+        },
+        {
+          "t": "ciptakan,",
+          "s": 14.04,
+          "e": 15.28
+        },
+        {
+          "t": "dan",
+          "s": 15.32,
+          "e": 15.44
+        },
+        {
+          "t": "huruf",
+          "s": 15.48,
+          "e": 15.68
+        },
+        {
+          "t": "akhirnya",
+          "s": 15.733,
+          "e": 16.24
+        },
+        {
+          "t": "sukun (سُكُون)",
+          "s": 16.36,
+          "e": 16.96
+        },
+        {
+          "t": "bila",
+          "s": 17.24,
+          "e": 17.76
+        },
+        {
+          "t": "bersambung",
+          "s": 17.808,
+          "e": 18.32
+        },
+        {
+          "t": "dengan",
+          "s": 18.354,
+          "e": 18.56
+        },
+        {
+          "t": "kata",
+          "s": 18.624,
+          "e": 18.88
+        },
+        {
+          "t": "ganti",
+          "s": 18.96,
+          "e": 19.2
+        },
+        {
+          "t": "pelaku",
+          "s": 19.24,
+          "e": 19.68
+        },
+        {
+          "t": "seperti",
+          "s": 19.77,
+          "e": 20.4
+        },
+        {
+          "t": "akhiran",
+          "s": 20.453,
+          "e": 20.88
+        },
+        {
+          "t": "yang",
+          "s": 20.896,
+          "e": 20.96
+        },
+        {
+          "t": "artinya",
+          "s": 21.02,
+          "e": 21.44
+        },
+        {
+          "t": "Engkau.",
+          "s": 21.54,
+          "e": 22.16
+        }
+      ]
     },
     "al-fatihah:7:concept:athaf": {
       "text": "Konsep baru: عَطْف, yaitu kata sambung: وَاو yang artinya dan. عَطْف adalah menyambungkan kata atau kalimat dengan huruf seperti وَاو yang artinya dan; kata yang disambungkan mengikuti إِعْرَاب kata sebelumnya.",
@@ -37016,7 +38129,94 @@
         3,
         4
       ],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/23f9848f316958de.mp3",
+        "ms": 7967,
+        "sha256": "80c3c098b5a56c09632a3a71f94508bc9955f168148be9f19aed084c526d4d58"
+      },
+      "tokens": [
+        {
+          "t": "Sekarang",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "susunan",
+          "s": 0.46,
+          "e": 0.8
+        },
+        {
+          "t": "kalimatnya.",
+          "s": 0.86,
+          "e": 1.96
+        },
+        {
+          "t": "Empat",
+          "s": 2.07,
+          "e": 2.48
+        },
+        {
+          "t": "kata",
+          "s": 2.544,
+          "e": 2.8
+        },
+        {
+          "t": "pertama",
+          "s": 2.848,
+          "e": 3.28
+        },
+        {
+          "t": "ayat",
+          "s": 3.333,
+          "e": 3.52
+        },
+        {
+          "t": "ini",
+          "s": 3.62,
+          "e": 3.92
+        },
+        {
+          "t": "menjadi",
+          "s": 4.0,
+          "e": 4.56
+        },
+        {
+          "t": "pengganti",
+          "s": 4.608,
+          "e": 5.28
+        },
+        {
+          "t": "yang",
+          "s": 5.328,
+          "e": 5.52
+        },
+        {
+          "t": "menjelaskan",
+          "s": 5.552,
+          "e": 6.24
+        },
+        {
+          "t": "kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa)",
+          "s": 6.32,
+          "e": 6.64
+        },
+        {
+          "t": "yang",
+          "s": 6.688,
+          "e": 6.88
+        },
+        {
+          "t": "artinya",
+          "s": 6.94,
+          "e": 7.28
+        },
+        {
+          "t": "jalan.",
+          "s": 7.4,
+          "e": 7.92
+        }
+      ]
     },
     "al-fatihah:7:structure:2": {
       "text": "Kata pertama disandarkan kepada kata kedua: ini idhofah, yang artinya jalan orang-orang yang.",
@@ -37626,7 +38826,109 @@
       "text": "Akhirnya dibaca فَتْحَة, karena menjadi pengganti bagi kata yang artinya jalan, yang مَنْصُوب; pengganti mengikuti akhiran kata yang digantikannya.",
       "display": "Akhirnya dibaca fathah (فَتْحَة), karena menjadi pengganti bagi kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan”, yang manshub (مَنْصُوب); pengganti mengikuti akhiran kata yang digantikannya.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0833096c5772d6c7.mp3",
+        "ms": 11076,
+        "sha256": "1c9bbbb010d24b54e6744c617df0278351342b2f9448ce17998a778691cc03ad"
+      },
+      "tokens": [
+        {
+          "t": "Akhirnya",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "dibaca",
+          "s": 0.46,
+          "e": 0.96
+        },
+        {
+          "t": "fathah (فَتْحَة),",
+          "s": 1.08,
+          "e": 1.68
+        },
+        {
+          "t": "karena",
+          "s": 1.817,
+          "e": 2.64
+        },
+        {
+          "t": "menjadi",
+          "s": 2.7,
+          "e": 3.12
+        },
+        {
+          "t": "pengganti",
+          "s": 3.168,
+          "e": 3.76
+        },
+        {
+          "t": "bagi",
+          "s": 3.84,
+          "e": 4.16
+        },
+        {
+          "t": "kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa)",
+          "s": 4.24,
+          "e": 4.56
+        },
+        {
+          "t": "yang",
+          "s": 4.592,
+          "e": 4.72
+        },
+        {
+          "t": "artinya",
+          "s": 4.78,
+          "e": 5.2
+        },
+        {
+          "t": "jalan,",
+          "s": 5.32,
+          "e": 6.24
+        },
+        {
+          "t": "yang",
+          "s": 6.288,
+          "e": 6.48
+        },
+        {
+          "t": "manshub (مَنْصُوب);",
+          "s": 6.56,
+          "e": 7.84
+        },
+        {
+          "t": "pengganti",
+          "s": 7.888,
+          "e": 8.48
+        },
+        {
+          "t": "mengikuti",
+          "s": 8.512,
+          "e": 9.04
+        },
+        {
+          "t": "akhiran",
+          "s": 9.093,
+          "e": 9.52
+        },
+        {
+          "t": "kata",
+          "s": 9.6,
+          "e": 9.92
+        },
+        {
+          "t": "yang",
+          "s": 9.952,
+          "e": 10.08
+        },
+        {
+          "t": "digantikannya.",
+          "s": 10.14,
+          "e": 11.04
+        }
+      ]
     },
     "al-fatihah:7:ex:sort-case:2:why": {
       "text": "فِعْل مَاضٍ ini مَبْنِيّ di atas سُكُون karena bersambung dengan dhomir akhiran, Engkau, pelakunya, dan kalimatnya menjadi صِلَة bagi kata kedua.",
