@@ -332,21 +332,77 @@ async function autoplayShots(page, vp) {
 }
 
 /**
- * The header's one "Menu" button, open, on the hub (viewport): the panel holding Konsep tata
- * bahasa, Kembali ke Dakwah-Lens and Sumber & lisensi (no sign-in: operator, 2026-10-12). Escape closes it
- * again. Fails the job if the panel never opens or never closes.
+ * The header's one "Menu" button, open, on the hub (viewport): the panel holding Halaman Belajar
+ * (the hub, first: operator, 2026-10-17), Konsep tata bahasa, Kembali ke Dakwah-Lens and Sumber &
+ * lisensi (no sign-in: operator, 2026-10-12). Checked (src/lib/dismiss.ts; operator, 2026-10-17:
+ * the menu closes on a click outside it): the first Tab stop after the button is Halaman Belajar;
+ * Escape closes the panel and puts focus back on the button; a press inside the panel leaves it
+ * open; a press outside it, on a plain spot of the page, closes it without navigating; the button
+ * still toggles (a second click closes it, not closed by the press and reopened by the click); the
+ * home link leads to the hub in each locale. Mouse presses: this context has no touch screen.
+ * Fails the job if any of it does not hold.
  */
 async function menuShots(page, vp) {
+  const toggle = page.locator("[data-header-menu-toggle]");
+  const menu = page.locator("[data-header-menu]");
+  const home = page.locator("[data-header-menu-home]");
+  const fail = (what) => {
+    throw new Error(`${vp}: header Menu — ${what}`);
+  };
   await page.goto(BASE + "/belajar/id", { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
-  await page.locator("[data-header-menu-toggle]").click();
-  const menu = page.locator("[data-header-menu]");
+  await toggle.click();
   await menu.waitFor({ state: "visible", timeout: 10_000 });
   await page.waitForTimeout(200);
   await page.screenshot({ path: `shots/${vp}-menu-open.png` });
   console.log(`shot ${vp}-menu-open`);
+  if ((await home.getAttribute("aria-current")) !== "page") fail("Halaman Belajar is not marked as the current page on the hub");
+  await toggle.focus();
+  await page.keyboard.press("Tab");
+  if (!(await home.evaluate((a) => a === document.activeElement))) fail("the first Tab stop after the button is not Halaman Belajar");
   await page.keyboard.press("Escape");
   await menu.waitFor({ state: "hidden", timeout: 5_000 });
+  if (!(await toggle.evaluate((b) => b === document.activeElement))) fail("Escape did not put focus back on the button");
+
+  await toggle.click();
+  await menu.waitFor({ state: "visible", timeout: 5_000 });
+  const box = await menu.boundingBox();
+  // Inside: the panel's own padding, no link under it.
+  await page.mouse.click(box.x + 4, box.y + 4);
+  await page.waitForTimeout(200);
+  if (!(await menu.isVisible())) fail("a press inside the panel closed it");
+  // Outside: a spot under the panel in the page's side gutter that is no control.
+  const spot = await page.evaluate((top) => {
+    for (let y = Math.ceil(top) + 16; y < window.innerHeight - 4; y += 16) {
+      const el = document.elementFromPoint(8, y);
+      if (el && !el.closest("a, button, input, label, select, textarea, summary, [role=button], [role=link], header")) return { x: 8, y };
+    }
+    return null;
+  }, box.y + box.height);
+  if (!spot) fail("no plain spot under the panel to press");
+  const before = page.url();
+  await page.mouse.click(spot.x, spot.y);
+  await menu.waitFor({ state: "hidden", timeout: 5_000 }).catch(() => fail("a press outside the panel did not close it"));
+  if (page.url() !== before) fail(`the press outside navigated to ${page.url()}`);
+  await toggle.click();
+  await menu.waitFor({ state: "visible", timeout: 5_000 });
+  await toggle.click();
+  await menu.waitFor({ state: "hidden", timeout: 5_000 }).catch(() => fail("a second click on the button did not close the panel"));
+  console.log(`  menu ok ${vp}: Tab, Escape, press inside, press outside, toggle`);
+
+  // The home link: the hub in the page's locale; chosen, it navigates there and the panel closes.
+  for (const locale of ["id", "en"]) {
+    await page.goto(BASE + `/belajar/${locale}/kredit`, { waitUntil: "networkidle" });
+    const href = await home.getAttribute("href");
+    if (href !== `/belajar/${locale}`) fail(`Halaman Belajar links to ${href} on /belajar/${locale}/kredit`);
+  }
+  await page.goto(BASE + "/belajar/id/konsep", { waitUntil: "networkidle" });
+  await toggle.click();
+  await menu.waitFor({ state: "visible", timeout: 5_000 });
+  await home.click();
+  await page.waitForURL((u) => u.pathname === "/belajar/id", { timeout: 10_000 }).catch(() => fail(`Halaman Belajar led to ${page.url()}`));
+  await menu.waitFor({ state: "hidden", timeout: 5_000 }).catch(() => fail("the panel stayed open after Halaman Belajar"));
+  console.log(`  menu ok ${vp}: Halaman Belajar → /belajar/id`);
   await page.goto("about:blank");
 }
 
