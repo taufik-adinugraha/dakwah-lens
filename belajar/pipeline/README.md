@@ -65,7 +65,7 @@ python3 test_validate_narration.py # plants 262 faults in copies of the manifest
 python3 validate_map.py            # the lesson maps: new / learnt so far / later / next-level against the curriculum, the names against the captions
 python3 test_validate_map.py       # plants 40 faults (a step in the wrong group, one taught later listed as learnt, a learnt step left out, `here` on a step that does not occur, a name that says a Qur'anic word, …)
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah), or listed in authored/curriculum.pending.json; exit 1 on any failure
-python3 test_validate_quiz.py      # plants 53 faults (an untaught state, an untaught option, two correct options, an untaught question not listed, a listed one that is taught, the wazan exercise in a basic lesson; an explanation shown that names an untaught term; the warm-up: a pos that disagrees with the QAC tag, a part left out, a wrong answer, a sign before its lesson, an edited sentence), each must fail
+python3 test_validate_quiz.py      # plants 65 faults (an untaught state, an untaught option, two correct options, an untaught question not listed, a listed one that is taught, the wazan exercise in a basic lesson; an explanation shown that names an untaught term; the warm-up: a pos that disagrees with the QAC tag, a part left out, a wrong answer, a sign before its lesson, an edited sentence, the general definition "yaitu nama benda, orang, atau sifat" again, a wrong class for a tag, a class said of the Name / a participle / a relative / gair, a class not taught before it is asked), each must fail
 python3 render_narration.py        # DRY RUN: characters and cost; never calls the API without --render --i-approve-spend
 python3 build_wordvoice.py --check # the word voices (content/wordvoice.json): Quran.com's word file of every word at a place, the narrator's for the rest; locally also Tanzil and the downloaded copies (CI: --require-audio --no-network); --fetch-quran-com refreshes the fixture and the copies (read-only downloads)
 python3 test_validate_wordvoice.py # plants 28 manifest faults (a Quran.com entry for a part or a run, another place, another host, our copy under the narrator's prefix, a missing entry, …) + the place rule, the fixture, a stale pin, the hosted pins
@@ -1778,6 +1778,27 @@ enforces it, its name; otherwise "not enforced: review by reading".
     a place may be CITED on a card ("QS 41:9" in a frame note), not used as a pointer in speech.
     Enforced in part: `_places` (no "kata kedua di ayat …", no "di kartu ini"), `MEANING_ONLY`
     (a word of another ayah is shown, not only meant); the rest: review by reading.
+13. **Say WHICH one, not the category's definition** (2026-10-17, on the warm-up's ٱلرَّحِيمِ: "you
+    should say this word is isim karena kata sifat, yang artinya Maha Penyayang. no need to say
+    'yaitu nama benda, orang, atau sifat', directly show which one. Fix this in similar cases"): an
+    explanation of an answer says the concrete class or reason of THIS word, and the word itself
+    with its meaning — never the general definition of the category it belongs to. The warm-up:
+    "Kata keempat, yaitu ٱلرَّحِيمِ (ar-raḥīmi), yang artinya “Maha Penyayang”, adalah isim (اِسْم),
+    karena ia nama sifat." The class is the one the Kalimah record teaches for the part's QAC tag,
+    in the lessons' own words ("nama sifat", what lesson zero teaches, not the operator's "kata
+    sifat"); a tag it teaches no class for says the kind alone, and so does a word whose tag the
+    class does not fit: the Name of Allah, a participle noun, and gair (غَيْرِ, “bukan”, 1:7:5; operator
+    2026-10-17 on the coordinator's recommendation) — a plain QAC N, but a word meaning “bukan” /
+    “selain” is an isim by its place (always annexed: al-Jadwal, Darwisy, as-Samin; ar-Raghib: for
+    negation or exception, Kosakata `ghayr`), not a nama benda; it is listed by its QAC lemma in
+    `quiz.CLASS_WITHHELD` with that reason, the one list of its kind. A category's definition stays where
+    the category is TAUGHT (the Kalimah record's "isim (nama benda, orang, atau sifat)", lesson
+    zero's examples). Enforced: `quiz.warmup_problems` (faults "the general definition again, the
+    shape of until 2026-10-17", a wrong class for a tag, a class said of the Name / a participle /
+    a relative / gair) and `quiz.class_problems` (a class not taught before the warm-up asks it). The other
+    exercises' explanations are a word's `why_basic` / `why`, the reason of THIS word, with at most
+    a term's gloss after the term ("mubtada', yaitu pokok kalimat"): review by reading. See
+    "Pemanasan".
 
 ## Narasi (guided-lesson narration)
 
@@ -2406,29 +2427,66 @@ rules; it is **derived, never authored** (a plan that lists it stops the build).
   by part (`POS_KIND`): a disagreement stops the build. 26 isim, 4 fi'il, 7 huruf.
 - **The explanation** is ONE sentence, built once (`quiz.warmup_marked`) and used twice: the quiz
   file shows it after the answer (`why`), the narration says it (`ex:word-kind:<n>:why`,
-  `build_narration.ex_why`): the part by its place ("Kata kedua", "Bagian pertama kata pertama";
-  never a Qur'anic word), its kind, the kind's plain meaning as the Kalimah record's own summary
-  gives it (`kind_meanings`: nothing typed; where it is said: below), and a **visible sign** only where the data shows one
-  and the step that teaches it belongs to an EARLIER lesson: "didahului huruf jar" (the part
-  before it is a huruf jar; from Al-Fatihah 2 on) and "memakai alif lam" (it carries the
-  article; from Al-Fatihah 4 on). These are the matn's own signs of an isim (Ajurrumiyyah,
-  Shamela 11371/1: «فالاسم يُعرَفُ: بالخَفضِ، والتنوينِ، ودخولِ الألف واللام، وحروفِ الخَفضِ»);
-  no other sign is given, and none for a fi'il or a huruf.
-- **Where the kind's plain meaning is said** (one rule, `quiz.glossed`; main session
-  2026-10-13): the Kalimah record glosses an isim as "nama benda, orang, atau sifat", which
-  covers a noun, a proper noun and an adjective (QAC N, PN, ADJ) and nothing else. For an isim
-  of another tag — PRON, REL, DEM, T, LOC — the sentence says the kind and stops ("Kata pertama
-  adalah isim."): said of a pronoun, the gloss would teach something the source does not say.
-  So it does for the **Name of Allah** (QAC lemma `{ll~ah`; 1:1:2, 1:2:2): the general gloss is
-  not said in a sentence whose subject is the Name. A fi'il and a huruf keep theirs. The
-  question carries `gloss: false` then: 9 of Al-Fatihah's 37 (the Name twice; iyyāka twice,
-  -nā, -ta, -him twice; allażīna).
+  `build_narration.ex_why`, which is given the lesson and its composition to name the part): the
+  part by its place ("Kata keempat", "Bagian pertama kata pertama"), **the part itself with its
+  meaning** where the content names it (`quiz.part_named`; rule 5 of "Operator's lesson-wording
+  rules": "yaitu ٱلرَّحِيمِ (ar-raḥīmi), yang artinya “Maha Penyayang”"), its kind, **which class of
+  the kind it is** ("karena ia nama sifat"; rule 13, operator 2026-10-17 — never the kind's
+  general definition "yaitu nama benda, orang, atau sifat", as until then), and a **visible sign**
+  only where the data shows one and the step that teaches it belongs to an EARLIER lesson:
+  "didahului huruf jar" (the part before it is a huruf jar; from Al-Fatihah 2 on) and "memakai alif
+  lam" (it carries the article; from Al-Fatihah 4 on). These are the matn's own signs of an isim
+  (Ajurrumiyyah, Shamela 11371/1: «فالاسم يُعرَفُ: بالخَفضِ، والتنوينِ، ودخولِ الألف واللام، وحروفِ
+  الخَفضِ»); no other sign is given, and none for a fi'il or a huruf. The operator's question,
+  Al-Fatihah 1: "Kata keempat, yaitu ٱلرَّحِيمِ (ar-raḥīmi), yang artinya “Maha Penyayang”, adalah
+  isim (اِسْم), karena ia nama sifat." A heavy-letter word is named on screen and left unsaid
+  (rule 5): "Kata kedua, yaitu ٱلصِّرَٰطَ (aṣ-ṣirāṭa), yang artinya “jalan”, …" is said "Kata kedua,
+  yang artinya jalan, adalah isim, karena ia nama benda. …".
+- **The part named** (`quiz.part_named`, from the content only): a word of one part is the lesson
+  word, with its gloss; a part of a word is the composition form (`content/compose`) with the
+  part's own bytes (بِ, لِ, وَ, ٱهْدِ, نَا, أَنْعَمْ, تَ, هِمْ, لَا), else the form at the part's place
+  in the join the composition builds the word from (bi + ismi → bismi: the part سْمِ is named
+  ٱسْمِ (ismi), whose hamzat washal the join drops), with that form's gloss. Not named: the Name of
+  Allah (below) and a part no form names — both parts of ‘alaihim at 1:7:4 (the composition has
+  ‘alā and hum, not عَلَيْ and هِمْ) and the ‘alā of 1:7:7: those sentences give the place, the kind
+  and the class, and no meaning (a meaning without its word is what rule 5 refuses).
+- **Which class** (one rule, `quiz.part_class`; the classes from `quiz.kind_classes`, nothing
+  typed): the class the Kalimah record teaches for the part's QAC tag — an isim's from the
+  record's own examples, each a note "<word>: isim, <class>." on a word whose tag the record's QAC
+  source gives: N "nama benda" (ṣirāṭa, 1:7:1), ADJ "nama sifat" (al-mustaqīma, 1:6:3), PRON
+  "kata ganti" (iyyāka, 1:5:1); a fi'il's and a huruf's from its summary, "kata kerja" (V), "kata
+  tugas" (P, CONJ, NEG). The kind alone: a tag the record teaches no class for (PN other than the
+  Name, REL, DEM, T, LOC — Al-Fatihah: allażīna), the **Name of Allah** (QAC lemma `{ll~ah`;
+  1:1:2, 1:2:2 — the rule of 2026-10-13 kept: its sentence says the kind and stops, no class, no
+  name, no meaning; both lines are unchanged and keep their audio), and a **noun QAC marks as a
+  participle** (N with ACT/PASS PCPL, the lesson's "isim fa'il" / "isim maf'ul": māliki,
+  al-magḍūbi, aḍ-ḍāllīna) — the record's "nama benda" example is a plain noun, and whether a
+  participle is a nama benda or a nama sifat no source here says (an ADJ participle, al-mustaqīma,
+  is the record's own "nama sifat"), and a lemma of **`quiz.CLASS_WITHHELD`**, each with its
+  reason: gair (QAC lemma `gayor`, 1:7:5, “bukan”; operator 2026-10-17) — a plain QAC N, but a word
+  meaning “bukan” / “selain” is an isim by its place (always annexed: al-Jadwal, Darwisy, as-Samin;
+  ar-Raghib: for negation or exception; Kosakata `ghayr`), not a nama benda. The question carries
+  `class` where its sentence names one: 30 of Al-Fatihah's 37 (nama benda 8, nama sifat 5, kata
+  ganti 6, kata kerja 4, kata tugas 7); 7 say the kind alone (the Name twice, the three
+  participles, allażīna, gair) — each with the word and its meaning but the Name's. The
+  operator's word was "kata sifat"; the lessons teach "nama sifat" (lesson zero, al-mustaqīma), and
+  a warm-up says what was taught (operator: kept).
+- **A class is held to what was taught before it**, like a term: it is plain Indonesian, no term
+  of the table, so `quiz.class_problems` holds it on its own — a line of an EARLIER ayah (a
+  teaching line, or a Konsep card's lead or example line) must name the class together with its
+  kind. All five are lesson zero's ("ayah 0"): the Kalimah line ("isim (اِسْم), yaitu nama benda,
+  …", "fi’il (فِعْل), yaitu kata kerja", "huruf (حَرْف), yaitu kata tugas") and its examples ("…
+  juga isim (اِسْم), tetapi nama sifat", "… juga isim (اِسْم), yaitu kata ganti").
 - **The introduction** (`build_narration.ex_intro`): "Latihan pemanasan, lima soal. Setiap soal
   menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: isim, fi'il,
   atau huruf." ("satu kata" alone in an ayah with no word of two parts). The prompt of its three
   buttons is the shared line `shared:ex:word-kind:options` ("Pilih jenisnya: isim, fi'il, atau
   huruf."). In these sentences "huruf" is the word class and is said from the dictionary (حَرْف):
-  `validate_narration.LATIN_CONTEXT` names the two contexts; a letter is still "huruf".
+  `validate_narration.LATIN_CONTEXT` names the contexts (the list of the three, "… adalah huruf,
+  karena ia kata tugas", lesson zero's "… adalah huruf, yaitu kata tugas"); a letter is still
+  "huruf". A named part said as its sound is no letter's name: "yaitu تَ (ta)" says the syllable
+  ta, and the render guard (`validate_narration.held_line`) masks a named word the caption shows
+  before it looks for letter names, as `check_renderable` already did.
 - **Held to what earlier lessons taught**, twice: the three answers and every term of the
   sentence must be TAUGHT by the lessons BEFORE this one (`quiz.untaught_reasons`: an opening
   exercise counts lines of earlier ayat only; lesson zero's are "ayah 0"), and a warm-up line

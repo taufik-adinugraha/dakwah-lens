@@ -296,10 +296,17 @@ SHOWN_ONLY = "al-fatihah:7:w1"
 ITEM11_SAY = LESSONS["al-fatihah"]["ayat"][0]["structure"]["items"][0]["say"]
 
 
+def unnamed_text(ln):
+    """A line's spoken text with the named words its caption shows masked: a named word is said in
+    Latin on purpose (its sound: the warm-up's تَ (ta) is no letter name), as check_renderable and
+    held_line read a line."""
+    return V.mask_named_said(ln["text"], [s for s, _ in V.named_in_display(ln.get("display"))])
+
+
 def latin_line():
     """A line without audio that says an Arabic term in Latin (mubtada', fa'il…) and no heavy letter."""
     return next(lid for man in MANIFESTS.values() for lid, ln in man["lines"].items()
-                if "audio" not in ln and V.latin_terms(ln["text"], LEX) and not V.heavy_latin(ln["text"], LEX))
+                if "audio" not in ln and V.latin_terms(unnamed_text(ln), LEX) and not V.heavy_latin(ln["text"], LEX))
 
 
 LATIN = latin_line()
@@ -1587,6 +1594,7 @@ class Dictionary(unittest.TestCase):
 
         for prose in ("tebak dulu jenisnya: isim, fi'il, atau huruf.", "Pilih jenisnya: isim, fi'il, atau huruf.",
                       "Bagian pertama kata pertama adalah huruf, yaitu kata tugas.", "isim, fi'il, dan huruf",
+                      "Bagian pertama kata pertama, yaitu bi, yang artinya “dengan”, adalah huruf, karena ia kata tugas.",
                       "atau huruf (kata tugas)."):
             self.assertEqual(found(prose), ["huruf"], prose)
         for prose in ("Huruf pertama Surah Al-Fatihah, huruf ba', memakai kasrah.", "Bagian pertama adalah huruf jar, yaitu huruf ba'.",
@@ -1596,7 +1604,8 @@ class Dictionary(unittest.TestCase):
         # The lines as built: the three kinds said from the dictionary, a letter still a letter.
         lines = MANIFESTS["al-fatihah"]["lines"]
         self.assertIn("اِسْم, فِعْل, atau حَرْف.", lines["al-fatihah:1:ex:word-kind:intro"]["text"])
-        self.assertEqual(lines["al-fatihah:1:ex:word-kind:1:why"]["text"], "Bagian pertama kata pertama adalah حَرْف, yaitu kata tugas.")
+        self.assertEqual(lines["al-fatihah:1:ex:word-kind:1:why"]["text"],
+                         "Bagian pertama kata pertama, yaitu bi, yang artinya dengan, adalah حَرْف, karena ia kata tugas.")
         self.assertNotIn("حَرْف,", lines["al-fatihah:0:primer:5"]["text"])
         self.assertEqual(MANIFESTS["shared"]["lines"]["shared:ex:word-kind:options"]["text"], "Pilih jenisnya: اِسْم, فِعْل, atau حَرْف.")
 
@@ -2590,6 +2599,12 @@ class SpeechAndRender(unittest.TestCase):
         bad = {**ln, "text": "Kata pertama, yaitu shiratha, artinya: jalan."}
         self.assertIn("ṣirāṭa", V.held_line(bad, LEX))
         self.assertEqual(V.held_line(ln, LEX), [])
+        # a named part said as its sound is no letter's name (the warm-up's تَ (ta), 2026-10-17); the
+        # same syllable said outside a named word still is
+        ta = MANIFESTS["al-fatihah"]["lines"]["al-fatihah:7:ex:word-kind:4:why"]
+        self.assertIn(", yaitu ta, ", ta["text"])
+        self.assertEqual(V.held_line(ta, LEX), [])
+        self.assertEqual(V.held_line({**ta, "text": ta["text"] + " Huruf ta di akhirnya."}, LEX), ["ta"])
         manifests = {"x": {"lines": {"x:1:w1": bad}}}
         self.assertEqual([lid for lid, _ in R.blocked([("x", "x:1:w1", bad["text"])], LEX, manifests)], ["x:1:w1"])
         # and the dictionary's retired `named` list is refused

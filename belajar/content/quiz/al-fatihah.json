@@ -30,7 +30,8 @@
        "ar": "بِ",
        "kind": "huruf",
        "signs": [],
-       "why": "Bagian pertama kata pertama adalah huruf (حَرْف), yaitu kata tugas."
+       "class": "kata tugas",
+       "why": "Bagian pertama kata pertama, yaitu بِ (bi), yang artinya “dengan”, adalah huruf (حَرْف), karena ia kata tugas."
       },
       {
        "n": 2,
@@ -41,7 +42,8 @@
        "ar": "سْمِ",
        "kind": "isim",
        "signs": [],
-       "why": "Bagian kedua kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "class": "nama benda",
+       "why": "Bagian kedua kata pertama, yaitu ٱسْمِ (ismi), yang artinya “nama”, adalah isim (اِسْم), karena ia nama benda."
       },
       {
        "n": 3,
@@ -52,7 +54,6 @@
        "ar": "ٱللَّهِ",
        "kind": "isim",
        "signs": [],
-       "gloss": false,
        "why": "Kata kedua adalah isim (اِسْم)."
       },
       {
@@ -64,7 +65,8 @@
        "ar": "ٱلرَّحْمَٰنِ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "class": "nama sifat",
+       "why": "Kata ketiga, yaitu ٱلرَّحْمَٰنِ (ar-raḥmāni), yang artinya “Yang Maha Pengasih”, adalah isim (اِسْم), karena ia nama sifat."
       },
       {
        "n": 5,
@@ -75,7 +77,8 @@
        "ar": "ٱلرَّحِيمِ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "class": "nama sifat",
+       "why": "Kata keempat, yaitu ٱلرَّحِيمِ (ar-raḥīmi), yang artinya “Maha Penyayang”, adalah isim (اِسْم), karena ia nama sifat."
       }
      ]
     },
@@ -117,7 +120,8 @@
        "ar": "ٱلْحَمْدُ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "class": "nama benda",
+       "why": "Kata pertama, yaitu ٱلْحَمْدُ (al-ḥamdu), yang artinya “segala puji”, adalah isim (اِسْم), karena ia nama benda."
       },
       {
        "n": 2,
@@ -128,7 +132,8 @@
        "ar": "لِ",
        "kind": "huruf",
        "signs": [],
-       "why": "Bagian pertama kata kedua adalah huruf (حَرْف), yaitu kata tugas."
+       "class": "kata tugas",
+       "why": "Bagian pertama kata kedua, yaitu لِ (li), yang artinya “bagi”, adalah huruf (حَرْف), karena ia kata tugas."
       },
       {
        "n": 3,
@@ -141,7 +146,6 @@
        "signs": [
         "jar"
        ],
-       "gloss": false,
        "why": "Bagian kedua kata kedua adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ)."
       },
       {
@@ -153,7 +157,8 @@
        "ar": "رَبِّ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "class": "nama benda",
+       "why": "Kata ketiga, yaitu رَبِّ (rabbi), yang artinya “Tuhan”, adalah isim (اِسْم), karena ia nama benda."
       },
       {
        "n": 5,
@@ -164,7 +169,8 @@
        "ar": "ٱلْعَٰلَمِينَ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata keempat adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "class": "nama benda",
+       "why": "Kata keempat, yaitu ٱلْعَٰلَمِينَ (al-‘ālamīna), yang artinya “seluruh alam”, adalah isim (اِسْم), karena ia nama benda."
       }
      ]
     },
@@ -272,7 +278,8 @@
        "ar": "ٱلرَّحْمَٰنِ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "class": "nama sifat",
+       "why": "Kata pertama, yaitu ٱلرَّحْمَٰنِ (ar-raḥmāni), yang artinya “Yang Maha Pengasih”, adalah isim (اِسْم), karena ia nama sifat."
       },
       {
        "n": 2,
@@ -283,7 +290,8 @@
        "ar": "ٱلرَّحِيمِ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "class": "nama sifat",
+       "why": "Kata kedua, yaitu ٱلرَّحِيمِ (ar-raḥīmi), yang artinya “Maha Penyayang”, adalah isim (اِسْم), karena ia nama sifat."
       }
      ]
     },
@@ -362,7 +370,7 @@
        "ar": "مَٰلِكِ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "why": "Kata pertama, yaitu مَٰلِكِ (māliki), yang artinya “Pemilik”, adalah isim (اِسْم)."
       },
       {
        "n": 2,
@@ -373,7 +381,8 @@
        "ar": "يَوْمِ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "class": "nama benda",
+       "why": "Kata kedua, yaitu يَوْمِ (yaumi), yang artinya “hari”, adalah isim (اِسْم), karena ia nama benda."
       },
       {
        "n": 3,
@@ -386,7 +395,8 @@
        "signs": [
         "al"
        ],
-       "why": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam."
+       "class": "nama benda",
+       "why": "Kata ketiga, yaitu ٱلدِّينِ (ad-dīni), yang artinya “pembalasan”, adalah isim (اِسْم), karena ia nama benda. Tandanya: memakai alif lam."
       }
      ]
     },
@@ -489,8 +499,8 @@
        "ar": "إِيَّاكَ",
        "kind": "isim",
        "signs": [],
-       "gloss": false,
-       "why": "Kata pertama adalah isim (اِسْم)."
+       "class": "kata ganti",
+       "why": "Kata pertama, yaitu إِيَّاكَ (iyyāka), yang artinya “hanya kepada Engkau”, adalah isim (اِسْم), karena ia kata ganti."
       },
       {
        "n": 2,
@@ -501,7 +511,8 @@
        "ar": "نَعْبُدُ",
        "kind": "fiil",
        "signs": [],
-       "why": "Kata kedua adalah fi'il (فِعْل), yaitu kata kerja."
+       "class": "kata kerja",
+       "why": "Kata kedua, yaitu نَعْبُدُ (na‘budu), yang artinya “kami menyembah”, adalah fi'il (فِعْل), karena ia kata kerja."
       },
       {
        "n": 3,
@@ -512,7 +523,8 @@
        "ar": "وَ",
        "kind": "huruf",
        "signs": [],
-       "why": "Bagian pertama kata ketiga adalah huruf (حَرْف), yaitu kata tugas."
+       "class": "kata tugas",
+       "why": "Bagian pertama kata ketiga, yaitu وَ (wa), yang artinya “dan”, adalah huruf (حَرْف), karena ia kata tugas."
       },
       {
        "n": 4,
@@ -523,8 +535,8 @@
        "ar": "إِيَّاكَ",
        "kind": "isim",
        "signs": [],
-       "gloss": false,
-       "why": "Bagian kedua kata ketiga adalah isim (اِسْم)."
+       "class": "kata ganti",
+       "why": "Bagian kedua kata ketiga, yaitu إِيَّاكَ (iyyāka), yang artinya “hanya kepada Engkau”, adalah isim (اِسْم), karena ia kata ganti."
       },
       {
        "n": 5,
@@ -535,7 +547,8 @@
        "ar": "نَسْتَعِينُ",
        "kind": "fiil",
        "signs": [],
-       "why": "Kata keempat adalah fi'il (فِعْل), yaitu kata kerja."
+       "class": "kata kerja",
+       "why": "Kata keempat, yaitu نَسْتَعِينُ (nasta‘īnu), yang artinya “kami mohon pertolongan”, adalah fi'il (فِعْل), karena ia kata kerja."
       }
      ]
     },
@@ -611,7 +624,8 @@
        "ar": "ٱهْدِ",
        "kind": "fiil",
        "signs": [],
-       "why": "Bagian pertama kata pertama adalah fi'il (فِعْل), yaitu kata kerja."
+       "class": "kata kerja",
+       "why": "Bagian pertama kata pertama, yaitu ٱهْدِ (ihdi), yang artinya “tunjukilah”, adalah fi'il (فِعْل), karena ia kata kerja."
       },
       {
        "n": 2,
@@ -622,8 +636,8 @@
        "ar": "نَا",
        "kind": "isim",
        "signs": [],
-       "gloss": false,
-       "why": "Bagian kedua kata pertama adalah isim (اِسْم)."
+       "class": "kata ganti",
+       "why": "Bagian kedua kata pertama, yaitu نَا (nā), yang artinya “kami”, adalah isim (اِسْم), karena ia kata ganti."
       },
       {
        "n": 3,
@@ -636,7 +650,8 @@
        "signs": [
         "al"
        ],
-       "why": "Kata kedua adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam."
+       "class": "nama benda",
+       "why": "Kata kedua, yaitu ٱلصِّرَٰطَ (aṣ-ṣirāṭa), yang artinya “jalan”, adalah isim (اِسْم), karena ia nama benda. Tandanya: memakai alif lam."
       },
       {
        "n": 4,
@@ -649,7 +664,8 @@
        "signs": [
         "al"
        ],
-       "why": "Kata ketiga adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam."
+       "class": "nama sifat",
+       "why": "Kata ketiga, yaitu ٱلْمُسْتَقِيمَ (al-mustaqīma), yang artinya “yang lurus”, adalah isim (اِسْم), karena ia nama sifat. Tandanya: memakai alif lam."
       }
      ]
     },
@@ -767,7 +783,8 @@
        "ar": "صِرَٰطَ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata pertama adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "class": "nama benda",
+       "why": "Kata pertama, yaitu صِرَٰطَ (ṣirāṭa), yang artinya “jalan”, adalah isim (اِسْم), karena ia nama benda."
       },
       {
        "n": 2,
@@ -778,8 +795,7 @@
        "ar": "ٱلَّذِينَ",
        "kind": "isim",
        "signs": [],
-       "gloss": false,
-       "why": "Kata kedua adalah isim (اِسْم)."
+       "why": "Kata kedua, yaitu ٱلَّذِينَ (allażīna), yang artinya “orang-orang yang”, adalah isim (اِسْم)."
       },
       {
        "n": 3,
@@ -790,7 +806,8 @@
        "ar": "أَنْعَمْ",
        "kind": "fiil",
        "signs": [],
-       "why": "Bagian pertama kata ketiga adalah fi'il (فِعْل), yaitu kata kerja."
+       "class": "kata kerja",
+       "why": "Bagian pertama kata ketiga, yaitu أَنْعَمْ (an‘am), yang artinya “telah memberi nikmat”, adalah fi'il (فِعْل), karena ia kata kerja."
       },
       {
        "n": 4,
@@ -801,8 +818,8 @@
        "ar": "تَ",
        "kind": "isim",
        "signs": [],
-       "gloss": false,
-       "why": "Bagian kedua kata ketiga adalah isim (اِسْم)."
+       "class": "kata ganti",
+       "why": "Bagian kedua kata ketiga, yaitu تَ (ta), yang artinya “Engkau”, adalah isim (اِسْم), karena ia kata ganti."
       },
       {
        "n": 5,
@@ -813,7 +830,8 @@
        "ar": "عَلَيْ",
        "kind": "huruf",
        "signs": [],
-       "why": "Bagian pertama kata keempat adalah huruf (حَرْف), yaitu kata tugas."
+       "class": "kata tugas",
+       "why": "Bagian pertama kata keempat adalah huruf (حَرْف), karena ia kata tugas."
       },
       {
        "n": 6,
@@ -826,8 +844,8 @@
        "signs": [
         "jar"
        ],
-       "gloss": false,
-       "why": "Bagian kedua kata keempat adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ)."
+       "class": "kata ganti",
+       "why": "Bagian kedua kata keempat adalah isim (اِسْم), karena ia kata ganti. Tandanya: didahului huruf jar (حَرْف جَرّ)."
       },
       {
        "n": 7,
@@ -838,7 +856,7 @@
        "ar": "غَيْرِ",
        "kind": "isim",
        "signs": [],
-       "why": "Kata kelima adalah isim (اِسْم), yaitu nama benda, orang, atau sifat."
+       "why": "Kata kelima, yaitu غَيْرِ (gairi), yang artinya “bukan”, adalah isim (اِسْم)."
       },
       {
        "n": 8,
@@ -851,7 +869,7 @@
        "signs": [
         "al"
        ],
-       "why": "Kata keenam adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam."
+       "why": "Kata keenam, yaitu ٱلْمَغْضُوبِ (al-magḍūbi), yang artinya “yang dimurkai”, adalah isim (اِسْم). Tandanya: memakai alif lam."
       },
       {
        "n": 9,
@@ -862,7 +880,8 @@
        "ar": "عَلَيْ",
        "kind": "huruf",
        "signs": [],
-       "why": "Bagian pertama kata ketujuh adalah huruf (حَرْف), yaitu kata tugas."
+       "class": "kata tugas",
+       "why": "Bagian pertama kata ketujuh adalah huruf (حَرْف), karena ia kata tugas."
       },
       {
        "n": 10,
@@ -875,8 +894,8 @@
        "signs": [
         "jar"
        ],
-       "gloss": false,
-       "why": "Bagian kedua kata ketujuh adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ)."
+       "class": "kata ganti",
+       "why": "Bagian kedua kata ketujuh, yaitu هِمْ (him), yang artinya “mereka”, adalah isim (اِسْم), karena ia kata ganti. Tandanya: didahului huruf jar (حَرْف جَرّ)."
       },
       {
        "n": 11,
@@ -887,7 +906,8 @@
        "ar": "وَ",
        "kind": "huruf",
        "signs": [],
-       "why": "Bagian pertama kata kedelapan adalah huruf (حَرْف), yaitu kata tugas."
+       "class": "kata tugas",
+       "why": "Bagian pertama kata kedelapan, yaitu وَ (wa), yang artinya “dan”, adalah huruf (حَرْف), karena ia kata tugas."
       },
       {
        "n": 12,
@@ -898,7 +918,8 @@
        "ar": "لَا",
        "kind": "huruf",
        "signs": [],
-       "why": "Bagian kedua kata kedelapan adalah huruf (حَرْف), yaitu kata tugas."
+       "class": "kata tugas",
+       "why": "Bagian kedua kata kedelapan, yaitu لَا (lā), yang artinya “bukan”, adalah huruf (حَرْف), karena ia kata tugas."
       },
       {
        "n": 13,
@@ -911,7 +932,7 @@
        "signs": [
         "al"
        ],
-       "why": "Kata kesembilan adalah isim (اِسْم), yaitu nama benda, orang, atau sifat. Tandanya: memakai alif lam."
+       "why": "Kata kesembilan, yaitu ٱلضَّآلِّينَ (aḍ-ḍāllīna), yang artinya “orang-orang yang sesat”, adalah isim (اِسْم). Tandanya: memakai alif lam."
       }
      ]
     },

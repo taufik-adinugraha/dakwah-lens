@@ -80,11 +80,14 @@ const KindQ = z.object({
   /** The visible signs its explanation gives (an isim only, and only what an earlier lesson
    *  taught): "jar" — the part before it is a huruf jar; "al" — it carries alif lam. */
   signs: z.array(z.enum(["jar", "al"])),
-  /** false: the explanation says the kind and stops, without the kind's plain meaning — an isim
-   *  that is no noun, proper noun or adjective (a pronoun, a relative …: the Kalimah record's
-   *  gloss does not cover it), and the Name of Allah (pipeline/quiz.py `glossed`). */
-  gloss: z.literal(false).optional(),
-  /** The one sentence shown after the answer, which the narrator says too. */
+  /** WHICH class of its kind the part is, as its explanation names it ("nama sifat", "kata ganti",
+   *  "kata kerja", "kata tugas": the class the Kalimah record teaches for the part's QAC tag;
+   *  operator 2026-10-17, "directly show which one" — never the kind's general definition).
+   *  Absent: the explanation says the kind alone — a tag the record gives no class (a relative …),
+   *  the Name of Allah, a participle noun (pipeline/quiz.py `part_class`). */
+  class: z.string().min(1).optional(),
+  /** The one sentence shown after the answer, which the narrator says too: the part by its place,
+   *  the part itself with its meaning where the content names it, its kind and its class. */
   why: z.string().min(1),
 });
 export const WarmupQuestion = z.discriminatedUnion("ask", [KindQ]);
