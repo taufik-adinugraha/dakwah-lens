@@ -134,7 +134,7 @@ function WordKindRound({ id, words, questions, kinds, guided, compact, restarted
                         data-kind-piece={p.part}
                         data-asked={asked ? "true" : undefined}
                         className={clsx(
-                          "quran text-ar-lg flex min-h-14 min-w-14 items-center justify-center rounded-xl px-3 py-1 whitespace-nowrap",
+                          "quran ar-clear text-ar-lg flex min-h-14 min-w-14 items-center justify-center rounded-xl px-3 whitespace-nowrap",
                           asked ? "border-[3px] border-forest bg-white text-ink" : "border-[1.5px] border-dashed border-border-ui text-ink-muted",
                         )}
                       >

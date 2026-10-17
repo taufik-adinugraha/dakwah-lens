@@ -40,6 +40,27 @@
 //   page-overflow        the page scrolls sideways   ·   nothing-measured: a check that saw nothing
 //   page-error / check-error   a page that did not load; a bug in this check (never swallowed)
 //
+// The same walk also checks that MARKS NEVER RUN INTO THEIR NEIGHBOURS (operator 2026-10-17: "fix
+// some layout to avoid overlapping between words like this (isim overlap with harakat)"), with
+// inkMeasure (linebreaks-measure.mjs), at every measure — every text size, phone and desktop,
+// every page and lesson step above, and in a composition step every frame of the word at once (all
+// are laid out in its figure):
+//
+//   ink-overlap   a box of Arabic whose glyphs' ink (baseline ± the run's own ink ascent/descent,
+//                 measured on a canvas in its computed font) enters the text box of a label, a
+//                 transliteration, a badge or a word above or below it
+//   ink-border    … or crosses the border of its chip, tile or card
+//   quote-order   “…” around Latin drawn closing-quote first ("”rabbu · “Tuhan"): no LTR isolate
+//
+// and that it measured something: on each lesson, at each size, every composition the content
+// gives that lesson (content/compose: the primer in Pengantar, every composed word of Al-Fatihah
+// 1, 2 — رَبُّ is its word 3 — and 7) had its tiles ink-checked. A self-test first calibrates the
+// canvas on the page's own Amiri against its known ink (رَبُّ 1.287em above the baseline,
+// ٱلرَّحِيمِ 0.759em below, ب 0.386em: measured with HarfBuzz, 2026-10-17) — measureText's
+// actualBoundingBox, or else the rows the run inks when drawn — checks the baseline it derives
+// against a probe on the baseline, and lays out one bad case of each kind (they must be caught) and
+// the markup as it ships (ar-clear, dir="ltr": it must not be).
+//
 // The rules themselves live in linebreaks-measure.mjs (run in the page; unit-tested under vitest
 // against a scripted layout, linebreaks-measure.test.mjs). A break inside a kept box is allowed
 // only when the box is wider than its whole line (the fallback: then it breaks between its
@@ -70,7 +91,7 @@ import { chromium } from "playwright";
 // The in-page measurement (tested in linebreaks-measure.test.mjs), the self-test fixture and the
 // routed narration audio shared with screenshots.mjs; the workflow copies them next to this script.
 import { loadFixture } from "./linebreaks-fixture.mjs";
-import { KINDS, measure } from "./linebreaks-measure.mjs";
+import { INK_KINDS, inkMeasure, KINDS, measure } from "./linebreaks-measure.mjs";
 import { BELAJAR_DIR, isNarration, narrationIndex, narrationRoute } from "./narration-route.mjs";
 
 const BASE = process.env.BASE_URL ?? "http://127.0.0.1:3300";
@@ -111,8 +132,23 @@ const AYAH_PATH = /^\/belajar\/id\/quran\/[^/]+\/\d+$/;
 // ───────────────────────────── Node side ─────────────────────────────
 
 const all = [];
-const tally = { measures: 0, containers: 0, lines: 0, units: 0, glued: 0, flowed: 0, arabic: 0, karaoke: 0, markers: 0, exercises: 0 };
+const tally = { measures: 0, containers: 0, lines: 0, units: 0, glued: 0, flowed: 0, arabic: 0, karaoke: 0, markers: 0, exercises: 0, inkRuns: 0, inkInline: 0, inkTiles: 0, inkQuotes: 0 };
 const record = (o) => all.push(o);
+/** How the ink check measures a run's ink: "metrics" (measureText) or "pixels" — picked by the
+ *  ink self-test, the one that matches Amiri's known ink on this browser. */
+let INK_MODE = null;
+
+/** The compositions of each lesson (content/compose, the shapes inkMeasure reports: "primer",
+ *  "word N"), by its path — what the ink check must have measured there at every size. */
+async function composedByLesson() {
+  const c = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", "al-fatihah.json"), "utf8"));
+  const by = new Map();
+  const add = (p, u) => by.set(p, [...(by.get(p) ?? []), u]);
+  for (const loc of Object.keys(c.words ?? {})) add(`/belajar/id/quran/al-fatihah/${loc.split(":")[1]}`, `word ${loc.split(":")[2]}`);
+  // The primer plays in the lesson that hosts it: lesson zero's ("0"), or its ayah's.
+  if (c.primer) add(c.primer.lesson === "0" ? INTRO_PATH : `/belajar/id/quran/al-fatihah/${c.primer.ayah}`, "primer");
+  return by;
+}
 
 /** A few animation frames: the in-flow fallback (src/lib/lineFit.ts) runs a frame after the page
  *  changes size, and again if that pass changed it. */
@@ -145,14 +181,25 @@ async function setSize(page, size) {
 
 /** One measure per text size; the size is back to Normal afterwards. `shot`: also a screenshot
  *  at each size (shots/lb[-semua-surah]-<vp>-<shot>-<size>.png), for reviewing the breaks by eye — every other CI
- *  shot is at the Normal size only. */
-async function measureAllSizes(page, vp, label, scope = null, shot = null) {
+ *  shot is at the Normal size only. Each measure is the line breaks and the ink of the marks
+ *  (inkMeasure); `inkUnits` (size → Set): the compositions the ink check measured, added to. */
+async function measureAllSizes(page, vp, label, scope = null, shot = null, inkUnits = null) {
   for (const size of SIZES) {
     await setSize(page, size);
     const { counts, offenders } = await page.evaluate(measure, { scope });
     tally.measures++;
     for (const k of Object.keys(counts)) tally[k] += counts[k];
     if (counts.containers === 0) offenders.push({ kind: "nothing-measured", where: scope ?? "body", detail: "no text found", text: "" });
+    const ink = await page.evaluate(inkMeasure, { scope, mode: INK_MODE });
+    tally.inkRuns += ink.counts.runs;
+    tally.inkInline += ink.counts.inline;
+    tally.inkTiles += ink.counts.tiles;
+    tally.inkQuotes += ink.counts.quotes;
+    offenders.push(...ink.offenders);
+    if (inkUnits) {
+      if (!inkUnits.has(size)) inkUnits.set(size, new Set());
+      for (const u of ink.units) inkUnits.get(size).add(u);
+    }
     for (const o of offenders) record({ page: label, viewport: vp, size, ...o });
     if (shot) {
       const file = `shots/lb${TAG}-${vp}-${shot}-${size}.png`;
@@ -424,12 +471,14 @@ async function leaveStep(page, n) {
     }
   }
 }
-async function lessonPages(page, vp, index) {
+async function lessonPages(page, vp, index, composed) {
   const answered = new Set();
   for (const [urlPath, narrated] of LESSONS) {
     const served = [];
     const handler = narrationRoute(index, served);
     if (narrated) await page.route(isNarration, handler);
+    /** The compositions the ink check measured on this lesson, by text size. */
+    const inkUnits = new Map();
     let karaoke = 0;
     let cards = 0;
     let steps = 0;
@@ -437,7 +486,7 @@ async function lessonPages(page, vp, index) {
     let baseExample = 0;
     try {
       if (!(await open(page, vp, urlPath))) continue;
-      await measureAllSizes(page, vp, `${urlPath} before Mulai`, STAGE);
+      await measureAllSizes(page, vp, `${urlPath} before Mulai`, STAGE, null, inkUnits);
       await press(page.locator('[data-autoplay="start"]'));
       await page.locator('[data-autoplay="step"]').first().waitFor({ state: "visible", timeout: 10_000 });
       const start = page.url();
@@ -468,7 +517,7 @@ async function lessonPages(page, vp, index) {
         if (!shot && !cards && (await page.locator(`${STAGE} [data-autoplay="word-card"]`).count())) shot = "word-card";
         if (shot === "word-card") cards++;
         await settle(page);
-        await measureAllSizes(page, vp, `${urlPath} step ${at[0]}/${at[1]}`, STAGE, shot);
+        await measureAllSizes(page, vp, `${urlPath} step ${at[0]}/${at[1]}`, STAGE, shot, inkUnits);
         steps++;
         if (held) await resumeLesson(page);
         // The first bentuk dasar's example of the narrated lesson: inside word 1's composition,
@@ -477,7 +526,7 @@ async function lessonPages(page, vp, index) {
           const beat = page.locator(`${STAGE}[data-example^="w1:base:"]`);
           if (await beat.waitFor({ state: "attached", timeout: BASE_EXAMPLE_WAIT_MS }).then(() => true, () => false)) {
             await settle(page);
-            await measureAllSizes(page, vp, `${urlPath} step ${at[0]}/${at[1]} · bentuk dasar example`, STAGE, "example-base");
+            await measureAllSizes(page, vp, `${urlPath} step ${at[0]}/${at[1]} · bentuk dasar example`, STAGE, "example-base", inkUnits);
             baseExample++;
           }
         }
@@ -514,6 +563,15 @@ async function lessonPages(page, vp, index) {
     // Not vacuous: the narrated ayah must have shown its karaoke words.
     if (narrated && karaoke === 0)
       record({ page: urlPath, viewport: vp, size: "-", kind: "nothing-measured", where: "caption", detail: "the karaoke caption never showed", text: "" });
+    // Not vacuous: at every size, every composition of this lesson had its tiles ink-checked (all
+    // its frames are laid out in its figure, so this covers every tile of every frame).
+    if (steps > 0)
+      for (const size of SIZES) {
+        const missing = (composed.get(urlPath) ?? []).filter((u) => !inkUnits.get(size)?.has(u));
+        if (missing.length)
+          record({ page: urlPath, viewport: vp, size, kind: "nothing-measured", where: "composition", detail: `the ink check never measured ${missing.join(", ")} (content/compose)`, text: "" });
+      }
+    console.log(`  ${vp}: ${urlPath} — ink checked on ${[...new Set([...inkUnits.values()].flatMap((s) => [...s]))].join(", ") || "no composition"}`);
   }
   console.log(`  ${vp}: exercises answered: ${[...answered].join(", ") || "none"}`);
   if (!answered.size) record({ page: "lessons", viewport: vp, size: "-", kind: "nothing-measured", where: "exercise", detail: "no exercise step was reached", text: "" });
@@ -722,13 +780,171 @@ async function selfTest(page, fixture) {
   await page.goto("about:blank");
 }
 
-async function runViewport(browser, vp, viewport, index) {
+/** The ink self-test's cases, laid out in the real page (its Amiri, its CSS: .arabic-inline,
+ *  .compose-ar, ar-clear): a case with data-expect must report those kinds, one without nothing.
+ *  The operator's tile (label "isim" over رَبُّ at line height 1.8, as the composition drew it
+ *  until 2026-10-17) and the same with ar-clear, outside and inside a composition figure (its own
+ *  room, globals.css); a chip whose border the shaddah + dhammah cross, and with ar-clear; the
+ *  tile's "rabbu · “Tuhan”" in a right-to-left row, without and with its LTR isolate; ٱلنَّفَّٰثَٰتِ
+ *  inline under a line of Latin, without and with ar-tall (CI 2026-10-17); and two things a
+ *  clipping ancestor hides, which must not count: a long ayah scrolled under a footer (the ayah
+ *  dialog), a "+" narrowed to nothing over a tile (a join). Its {{…}}
+ *  slots are content bytes (inkFixture), never Arabic typed into a test. */
+const INK_CASES = `
+  <div data-ink-case="tile-overlap" data-expect="ink-overlap" style="display:flex;flex-direction:column;align-items:center;width:12rem;background:#fff">
+    <span style="font-size:14px;line-height:1.25">isim</span>
+    <span style="display:block"><bdi lang="ar" dir="rtl" class="arabic-inline" style="--ar-lh:1.8;line-height:1.8;font-size:32px">{{RABBU}}</bdi></span>
+    <span dir="ltr" style="font-size:16px;line-height:1.25">rabbu</span>
+  </div>
+  <div data-ink-case="tile-clear" style="display:flex;flex-direction:column;align-items:center;width:12rem;background:#fff">
+    <span style="font-size:14px;line-height:1.25">isim</span>
+    <bdi lang="ar" dir="rtl" class="arabic-inline ar-clear inline-block" style="--ar-lh:1.8;line-height:1.8;font-size:32px">{{RABBU}}</bdi>
+    <span dir="ltr" style="font-size:16px;line-height:1.25">rabbu</span>
+  </div>
+  <div data-ink-case="compose-clear">
+    <div data-autoplay="composition" style="display:flex;flex-direction:column;align-items:center;width:12rem;background:#fff">
+      <span style="font-size:14px;line-height:1.25">isim</span>
+      <bdi lang="ar" dir="rtl" class="arabic-inline compose-ar ar-clear inline-block" style="font-size:32px">{{RABBU}}</bdi>
+      <span dir="ltr" style="font-size:16px;line-height:1.25">rabbu</span>
+    </div>
+  </div>
+  <div data-ink-case="chip-border" data-expect="ink-border" style="padding:2rem 1rem;background:#fff">
+    <bdi lang="ar" dir="rtl" class="arabic-inline" style="display:inline-block;--ar-lh:1.6;line-height:1.6;font-size:24px;border:1px solid #0e5a3c;border-radius:6px;padding-inline:6px">{{BU}}</bdi>
+  </div>
+  <div data-ink-case="chip-clear" style="padding:2rem 1rem;background:#fff">
+    <bdi lang="ar" dir="rtl" class="arabic-inline ar-clear" style="display:inline-block;--ar-lh:1.6;line-height:1.6;font-size:24px;border:1px solid #0e5a3c;border-radius:6px;padding-inline:6px">{{BU}}</bdi>
+  </div>
+  <div data-ink-case="quote-rtl" data-expect="quote-order" dir="rtl" style="font-size:16px"><span style="display:block">rabbu · “Tuhan”</span></div>
+  <div data-ink-case="quote-ltr" dir="rtl" style="font-size:16px"><span dir="ltr" style="display:block">rabbu · “Tuhan”</span></div>
+  <p data-ink-case="inline-tall" data-expect="ink-overlap" style="width:16rem;font-size:16px;line-height:1.5;background:#fff">bergantung pada<br><bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{NAFFATHAT}}</bdi> lagi</p>
+  <p data-ink-case="inline-tall-clear" style="width:16rem;font-size:16px;line-height:1.5;background:#fff">bergantung pada<br><bdi lang="ar" dir="rtl" class="arabic-inline ar-tall text-ar-sm">{{NAFFATHAT}}</bdi> lagi</p>
+  <div data-ink-case="clipped" style="display:flex;flex-direction:column;width:12rem;height:9rem;background:#fff">
+    <div style="flex:1 1 0;min-height:0;overflow-y:auto"><p lang="ar" dir="rtl" class="quran" style="font-size:36px">{{LONG}}</p></div>
+    <p style="border-top:1px solid #e7e4da;font-size:16px;line-height:1.5">Putar bacaan imam</p>
+  </div>
+  <div data-ink-case="collapsed-plus" style="padding:1rem;background:#fff"><bdi lang="ar" dir="rtl" class="arabic-inline ar-clear inline-block" style="font-size:32px">{{RABBU}}</bdi><span style="display:inline-block;width:0;overflow-x:clip;margin-left:-3rem;font-size:24px">+</span></div>`;
+
+/** Amiri's ink, known (HarfBuzz on the served font, 2026-10-17), in em: what the canvas must give
+ *  for these slots — رَبُّ's shaddah + dhammah, ٱلرَّحِيمِ's kasrah under its mim, a bare ب. */
+const AMIRI_INK = [
+  { slot: "RABBU", above: 1.287 },
+  { slot: "RAHIM", below: 0.759 },
+  { slot: "BA", above: 0.386 },
+];
+
+/** The ink self-test's Arabic, from the content: the bentuk dasar rabbu of Al-Fatihah 2 word 3
+ *  and the piece of its chip (content/compose), word 4 of ayah 1 and the primer's bare letter,
+ *  word 3 of Al-Falaq 4 and the whole of Al-Fatihah 7. */
+async function inkFixture() {
+  const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
+  const compose = await read("content/compose/al-fatihah.json");
+  const lesson = await read("content/al-fatihah.json");
+  const falaq = await read("content/al-falaq.json");
+  const rabb = compose.words?.["1:2:3"];
+  const values = {
+    RABBU: rabb?.forms?.rabbu?.ar,
+    BU: rabb?.frames?.find((f) => f.chips?.length)?.chips[0]?.from,
+    RAHIM: lesson.ayat.find((a) => a.ayah === 1)?.words.find((w) => w.loc === "1:1:4")?.ar,
+    BA: compose.primer?.forms?.ba?.ar,
+    // the tallest stack the module draws: QS 113:4 word 3
+    NAFFATHAT: falaq.ayat.find((a) => a.ayah === 4)?.words.find((w) => w.loc === "113:4:3")?.ar,
+    LONG: lesson.ayat.find((a) => a.ayah === 7)?.ar,
+  };
+  const missing = Object.entries(values).filter(([, v]) => !v).map(([k]) => k);
+  if (missing.length) throw new Error(`ink self-test: the content no longer has ${missing.join(", ")} (content/compose/al-fatihah.json, content/al-fatihah.json)`);
+  return values;
+}
+
+/**
+ * The ink check measures what it claims (inkMeasure), in a real page with its real fonts and CSS:
+ *   1. the canvas gives Amiri's known ink, in the page's own Amiri family at 100px — measureText's
+ *      actualBoundingBox, or else the inked rows of the drawn run (INK_MODE: the first that does;
+ *      neither fails the run: no ink measured is no check);
+ *   2. the baseline it derives (a text box's top + the font's ascent) lies within a pixel of a
+ *      probe laid on the baseline (an empty inline-block);
+ *   3. every case of INK_CASES reports the kinds it expects and the markup as it ships nothing —
+ *      the bad tile (the operator's), the bad chip, the RTL gloss — and every kind is caught.
+ */
+async function inkSelfTest(page, values) {
+  if (!(await open(page, "phone", "/belajar/id/quran/al-fatihah/1"))) throw new Error("ink self-test: page did not load");
+  const family = await page.evaluate(() => {
+    const el = document.querySelector(".quran, .arabic-inline");
+    return el ? getComputedStyle(el).fontFamily : null;
+  });
+  if (!family) throw new Error("ink self-test: no Arabic on the page to take Amiri's family from");
+  const cal = await page.evaluate(inkMeasure, { calibrate: AMIRI_INK.map((k) => ({ text: values[k.slot], font: `normal 400 100px ${family}`, size: 100 })) });
+  const off = (how) =>
+    AMIRI_INK.flatMap((k, i) => [
+      k.above !== undefined && Math.abs(cal[i][how].above / 100 - k.above) > 0.05 ? `${k.slot} ${(cal[i][how].above / 100).toFixed(3)}em above (Amiri: ${k.above})` : null,
+      k.below !== undefined && Math.abs(cal[i][how].below / 100 - k.below) > 0.05 ? `${k.slot} ${(cal[i][how].below / 100).toFixed(3)}em below (Amiri: ${k.below})` : null,
+    ]).filter(Boolean);
+  const [byMetrics, byPixels] = [off("metrics"), off("pixels")];
+  INK_MODE = !byMetrics.length ? "metrics" : !byPixels.length ? "pixels" : null;
+  const shown = cal.map((c, i) => `${AMIRI_INK[i].slot} ${(c.metrics.above / 100).toFixed(3)}/${(c.metrics.below / 100).toFixed(3)} (pixels ${(c.pixels.above / 100).toFixed(3)}/${(c.pixels.below / 100).toFixed(3)})`).join(", ");
+  if (!INK_MODE) throw new Error(`ink self-test: the canvas gives neither measureText (${byMetrics.join("; ")}) nor the drawn pixels (${byPixels.join("; ")}) Amiri's ink — ${shown}`);
+  console.log(`ink self-test: canvas ink in ${family.split(",")[0]} (above/below, em): ${shown} — measuring by ${INK_MODE}${byMetrics.length ? ` (measureText is off: ${byMetrics.join("; ")})` : ""}`);
+
+  await page.evaluate((html) => {
+    const box = document.createElement("div");
+    box.id = "ink-selftest";
+    box.innerHTML = html;
+    (document.querySelector("main") ?? document.body).prepend(box);
+    return document.fonts.ready.then(() => true);
+  }, INK_CASES.replace(/\{\{(\w+)\}\}/g, (_, k) => values[k]));
+  await settle(page);
+  const failures = [];
+  // 2. The baseline: a text box's top + the font's ascent, against an empty inline-block on it.
+  const base = await page.evaluate(() => {
+    const bdi = document.querySelector('#ink-selftest [data-ink-case="tile-clear"] bdi');
+    const text = [...bdi.childNodes].find((n) => n.nodeType === 3);
+    const r = document.createRange();
+    r.selectNodeContents(text);
+    const top = [...r.getClientRects()].find((x) => x.height > 0)?.top;
+    const s = getComputedStyle(bdi);
+    const ctx = document.createElement("canvas").getContext("2d");
+    ctx.font = `${s.fontStyle} ${s.fontWeight} ${s.fontSize} ${s.fontFamily}`;
+    const ascent = ctx.measureText(text.data).fontBoundingBoxAscent;
+    const probe = document.createElement("span");
+    probe.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+    bdi.prepend(probe);
+    const onBaseline = probe.getBoundingClientRect().bottom;
+    probe.remove();
+    return { derived: top + ascent, onBaseline };
+  });
+  if (!(Math.abs(base.derived - base.onBaseline) <= 1))
+    failures.push(`baseline: a text box's top + the font's ascent is ${base.derived.toFixed(2)}, the probe on the baseline ${base.onBaseline.toFixed(2)}`);
+  // 3. The cases.
+  const cases = await page.locator("#ink-selftest > [data-ink-case]").evaluateAll((els) =>
+    els.map((el) => ({ name: el.getAttribute("data-ink-case"), expect: (el.getAttribute("data-expect") ?? "").split(/\s+/).filter(Boolean) })),
+  );
+  const caught = new Set();
+  for (const c of cases) {
+    const { offenders, counts } = await page.evaluate(inkMeasure, { scope: `#ink-selftest [data-ink-case="${c.name}"]`, mode: INK_MODE });
+    const got = new Set(offenders.map((o) => o.kind));
+    if (c.expect.length) {
+      const missing = c.expect.filter((k) => !got.has(k));
+      if (missing.length) failures.push(`${c.name}: not caught: ${missing.join(", ")} (got ${[...got].join(", ") || "nothing"}; ${counts.runs} runs, ${counts.quotes} quotes)`);
+      c.expect.forEach((k) => got.has(k) && caught.add(k));
+    } else if (offenders.length) failures.push(`${c.name}: the markup as it ships was reported: ${JSON.stringify(offenders)}`);
+  }
+  const uncovered = INK_KINDS.filter((k) => k !== "check-error" && !caught.has(k));
+  if (uncovered.length) failures.push(`no case caught: ${uncovered.join(", ")}`);
+  await page.evaluate(() => {
+    document.getElementById("ink-selftest")?.remove();
+    return true;
+  });
+  if (failures.length) throw new Error(`ink self-test failed:\n  ${failures.join("\n  ")}`);
+  console.log(`ink self-test ok: ${[...caught].join(", ")} caught; ar-clear (outside and inside a composition), ar-tall and dir="ltr" pass, clipped text is not counted; baseline within ${Math.abs(base.derived - base.onBaseline).toFixed(2)}px of its probe`);
+  await page.goto("about:blank");
+}
+
+async function runViewport(browser, vp, viewport, index, composed) {
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1, locale: "id-ID" });
   const page = await ctx.newPage();
   try {
     await staticPages(page, vp);
     await ayahDialogs(page, vp);
-    await lessonPages(page, vp, index);
+    await lessonPages(page, vp, index, composed);
   } finally {
     await ctx.close();
   }
@@ -737,6 +953,7 @@ async function runViewport(browser, vp, viewport, index) {
 const t0 = Date.now();
 await mkdir("shots", { recursive: true });
 const index = await narrationIndex();
+const composed = await composedByLesson();
 const fixture = await loadFixture(BELAJAR_DIR);
 const browser = await chromium.launch();
 try {
@@ -744,12 +961,13 @@ try {
     const ctx = await browser.newContext({ viewport: VIEWPORTS[0][1], deviceScaleFactor: 1, locale: "id-ID" });
     try {
       await selfTest(await ctx.newPage(), fixture);
+      await inkSelfTest(await ctx.newPage(), await inkFixture());
     } finally {
       await ctx.close();
     }
   }
   // Phone and desktop side by side: two pages of one browser.
-  await Promise.all(VIEWPORTS.map(([vp, viewport]) => runViewport(browser, vp, viewport, index)));
+  await Promise.all(VIEWPORTS.map(([vp, viewport]) => runViewport(browser, vp, viewport, index, composed)));
 } finally {
   await browser.close();
 }
@@ -758,7 +976,8 @@ await writeFile(REPORT, JSON.stringify({ tally, offenders: all }, null, 2));
 console.log(
   `line breaks${SURAHS_ON ? " (every surah listed)" : ""}: ${tally.measures} measures (${SIZES.length} text sizes × ${VIEWPORTS.length} viewports), ${tally.containers} text blocks, ` +
     `${tally.lines} lines, ${tally.units} units, ${tally.glued} kept words, ${tally.flowed} laid out in the flow, ${tally.arabic} inline Arabic runs, ` +
-    `${tally.karaoke} karaoke words, ${tally.markers} ayah markers, ${tally.exercises} exercises answered — ${Math.round((Date.now() - t0) / 1000)}s`,
+    `${tally.karaoke} karaoke words, ${tally.markers} ayah markers, ${tally.exercises} exercises answered; ink of the marks (${INK_MODE}) on ${tally.inkRuns} boxes of Arabic ` +
+    `(${tally.inkTiles} in composition tiles, ${tally.inkInline} inline in a Latin line), ${tally.inkQuotes} quoted glosses in reading order — ${Math.round((Date.now() - t0) / 1000)}s`,
 );
 if (all.length) {
   for (const o of all.slice(0, MAX_PRINTED))

@@ -101,7 +101,8 @@ export function ExampleCard({
           </p>
         ) : null}
       </div>
-      <p lang="ar" dir="rtl" className="quran ml-auto text-ar-lg text-ink sm:order-2 sm:ml-0 sm:text-ar-xl">
+      {/* As the stage's word card: a label above it, its transliteration under it (ar-clear). */}
+      <p lang="ar" dir="rtl" className="quran ar-clear ml-auto text-ar-lg text-ink sm:order-2 sm:ml-0 sm:text-ar-xl">
         {example.ar}
       </p>
     </div>

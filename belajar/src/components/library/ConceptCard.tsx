@@ -274,8 +274,9 @@ function ExampleRow({
   return (
     <li className="border-t border-hairline py-4 first:border-t-0">
       <p className="flex flex-wrap items-baseline gap-x-3">
+        {/* A flex item, the note right under its row: room for the marks (ar-clear). */}
         {row.ar ? (
-          <span lang="ar" dir="rtl" className="quran text-ar-lg text-ink">
+          <span lang="ar" dir="rtl" className="quran ar-clear text-ar-lg text-ink">
             {row.ar}
           </span>
         ) : null}

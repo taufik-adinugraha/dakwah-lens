@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 
 import type { Lexeme } from "@/content/schema";
+import { arTall } from "@/lib/arabicInk";
 import { type Lookup, markedTokens, type Scope, type Token } from "@/lib/terms";
 
 import { MixedText } from "./MixedText";
@@ -96,14 +97,14 @@ export function SharafPanel({
                   <p className="flex flex-wrap items-baseline gap-x-2 text-sm text-ink-muted">
                     <span className="inline-flex items-baseline gap-x-2">
                       <span>{labels.ilal_from}</span>
-                      <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-ink">
+                      <bdi lang="ar" dir="rtl" className={`arabic-inline text-ar-sm text-ink ${arTall(x.from)}`}>
                         {x.from}
                       </bdi>
                       <span aria-hidden="true">→</span>
                     </span>
                     <span className="inline-flex items-baseline gap-x-2">
                       <span>{labels.ilal_to}</span>
-                      <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-ink">
+                      <bdi lang="ar" dir="rtl" className={`arabic-inline text-ar-sm text-ink ${arTall(x.to)}`}>
                         {x.to}
                       </bdi>
                     </span>

@@ -41,7 +41,7 @@ export function StructureItemCard({ n, total, words }: { n: number; total: numbe
       <ul dir="rtl" className="mt-1 flex flex-wrap justify-center gap-x-5 gap-y-1">
         {words.map((w) => (
           <li key={w.index} data-item-word={w.index} className="flex min-w-0 flex-col items-center text-center">
-            <span lang="ar" dir="rtl" className="quran text-ar-lg whitespace-nowrap text-ink">
+            <span lang="ar" dir="rtl" className="quran ar-clear text-ar-lg whitespace-nowrap text-ink">
               {w.ar}
             </span>
             <span dir="ltr" className="text-base text-ink-muted">

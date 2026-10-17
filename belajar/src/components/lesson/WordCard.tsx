@@ -166,7 +166,8 @@ export function WordCard({
         {listen ?? null}
       </div>
 
-      <p lang="ar" dir="rtl" className="quran mt-1 text-ar-lg text-ink">
+      {/* "Kata ke-N" above, the transliteration under it: room for the marks (ar-clear). */}
+      <p lang="ar" dir="rtl" className="quran ar-clear mt-1 text-ar-lg text-ink">
         {word.ar}
       </p>
       <p className="text-sm text-ink-muted">{word.translit}</p>

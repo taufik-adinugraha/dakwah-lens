@@ -139,22 +139,56 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Room for the marks (operator 2026-10-17: "fix some layout to avoid overlapping between words
+   like this (isim overlap with harakat)": the shaddah + dhammah of رَبُّ rose into the tile's
+   "isim" label above it). Amiri lays a line out on its CONTENT AREA, ascent 1.124em + descent
+   0.634em (the served Amiri 1.000: hhea = OS/2 typo, USE_TYPO_METRICS), but its marks reach past
+   both: the INK of a letter with stacked marks stands up to 1.46em above the baseline (fa +
+   shaddah + small alif, ٱلنَّفَّٰثَٰتِ of QS 113:4; 1.474 in the bold face; رَبُّ 1.287) and up to
+   0.78em below it (dots + kasrah: 0.769 in the hadith texts, ٱلرَّحِيمِ 0.759) — measured with
+   HarfBuzz on every Arabic string a lesson, a Konsep or Kosakata page, the curriculum, the cheat
+   sheet or the messages show (2026-10-17). The 1,300 ayat the fact cards' dialog cites reach 0.95em
+   below; that dialog's ayah is a multi-line .quran paragraph with 1rem under it, not a .ar-clear
+   box. A line box is only (line-height − content area) / 2 taller than the content area on each
+   side, so at the composition's 1.6 / 1.8 (below) and even at .arabic-inline's 2 the marks stand
+   out of the Arabic's own box, into whatever sits right above or below it.
+   `ar-clear` gives such a box exactly the room its marks need: padding above and below, computed
+   from the line height in force (--ar-lh, set with every Arabic line height below) so that the
+   box reaches --ar-ink-above over the baseline and --ar-ink-below under it, and never less than
+   the line box itself. Put it on every box of Arabic that a label, a transliteration, a tag or a
+   border sits right above or below (a tile, a chip, a word card's word, an example row, an
+   exercise word), on the element that carries the Arabic font size, and only on a box: a block,
+   a flex or grid item, or an inline-block — an inline element's padding moves nothing. Never
+   clip Arabic instead (no overflow: hidden). Checked in a real browser at every text size, phone
+   and desktop, from the glyphs' own ink (scripts/ci/linebreaks-measure.mjs inkMeasure); its use
+   is pinned in src/components/ar-clear.test.ts. */
+:root {
+  --ar-ascent: 1.124;
+  --ar-descent: 0.634;
+  --ar-ink-above: 1.48;
+  --ar-ink-below: 0.78;
+  /* The room an inline run with a tall stack gets (ar-tall): the module's tallest, everywhere. */
+  --ar-ink-tall: 1.48;
+}
+
 /* Qur'anic text: generous line height for harakat, never synthetic bold.
    Unlayered on purpose: it beats any leading-* utility, so Arabic line
-   height is set here and never through utilities. */
+   height is set here and never through utilities (--ar-lh: ar-clear reads it). */
 .quran {
+  --ar-lh: 2.2;
   font-family: var(--font-arabic), "Amiri", serif;
   font-synthesis: none;
-  line-height: 2.2;
+  line-height: var(--ar-lh);
 }
 
 /* Any other vocalised Arabic (roots, wazn, examples, chips, feedback). Use
    this instead of a bare font-arabic, which would inherit a Latin line
    height and cramp stacked harakat. */
 .arabic-inline {
+  --ar-lh: 2;
   font-family: var(--font-arabic), "Amiri", serif;
   font-synthesis: none;
-  line-height: 2;
+  line-height: var(--ar-lh);
 }
 
 /* ── Line breaks (operator, 2026-10-10: "make sure the line break is clean
@@ -216,6 +250,19 @@ body {
       transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
+}
+
+/* Room for the marks of a box of Arabic (see :root above): padding that takes the box from its line
+   box to --ar-ink-above over the baseline and --ar-ink-below under it, at the box's own font size
+   (em) and line height (--ar-lh). Never negative: a box whose line height already leaves the room
+   gets none. Plus one pixel each side: the browser draws and measures ink to whole pixels, rounded
+   outward (CI 2026-10-17: بُّ measured 1.317em at 30.4px for its 1.287em; ٱلنَّفَّٰثَٰتِ 1.500em
+   at 24px for its 1.460em). A utility (not unlayered) so that it never fights .quran /
+   .arabic-inline, which set the line height; don't combine it with a py-* utility on the same
+   element (both are padding-block). */
+@utility ar-clear {
+  padding-top: max(0px, calc((var(--ar-ink-above) - var(--ar-ascent) - (var(--ar-lh, 2) - var(--ar-ascent) - var(--ar-descent)) / 2) * 1em + 1px));
+  padding-bottom: max(0px, calc((var(--ar-ink-below) - var(--ar-descent) - (var(--ar-lh, 2) - var(--ar-ascent) - var(--ar-descent)) / 2) * 1em + 1px));
 }
 
 /* ── Shared controls (senior-ux.md §3.3). Use these; don't hand-roll. ── */
@@ -671,14 +718,46 @@ label:has(> .sr-only:focus-visible) {
 /* The strip's Arabic at a tighter line height than .arabic-inline / .quran
    (2 / 2.2, which make a chip row 48px and a tile twice its letters' height
    on a phone): 1.6 for the pieces and the terms of the chips ("kasrah
-   (كَسْرَة)"), 1.8 for a tile's whole form, which still clears its stacked
-   marks (shaddah + fathah, the small alif). Unlayered and more specific
-   than those rules, so they win wherever the composition draws. */
+   (كَسْرَة)"), 1.8 for a tile's whole form. Neither clears stacked marks by
+   itself — the shaddah + dhammah of رَبُّ stood 4.5px (a phone) to 8px
+   (desktop, Sangat besar) into the tile's label above it, the dhammah of مُ
+   through its chip's border (operator 2026-10-17) — so every box of Arabic
+   here carries ar-clear (WordComposition's Ar). Unlayered and more specific
+   than those rules, so they win wherever the composition draws.
+   Its own room for the marks: the composition draws only the forms of
+   content/compose (and the mark terms of its chips), whose ink reaches
+   1.287em above the baseline (رَبُّ; 1.33 for the room, CI measured 1.317 at
+   Sangat besar) and 0.759em below (ٱلرَّحِيمِ), not the
+   1.48em the module's other Arabic needs (:root): on a phone the figure
+   already rides up over the end of the mushaf line, and every em counts
+   there. A composed form with a taller stack (a dotted letter with shaddah
+   and a vowel, ٱلنَّفَّٰثَٰتِ) must raise these two first: the browser check
+   (inkMeasure) measures every frame of the compositions its walk visits. */
+[data-autoplay="composition"] {
+  --ar-ink-above: 1.33;
+  --ar-ink-below: 0.77;
+}
 [data-autoplay="composition"] :is(.arabic-inline, .quran) {
-  line-height: 1.6;
+  --ar-lh: 1.6;
+  line-height: var(--ar-lh);
 }
 [data-autoplay="composition"] .compose-ar {
-  line-height: 1.8;
+  --ar-lh: 1.8;
+  line-height: var(--ar-lh);
+}
+/* An INLINE run of Arabic whose marks stand too tall for a line of text (src/lib/arabicInk.ts
+   tallStack: a shaddah with a small alif, a tanwin above or a maddah; three marks over one letter;
+   أُ — e.g. ٱلنَّفَّٰثَٰتِ, 1.46em over the baseline; CI 2026-10-17: inline in the Konsep pages and
+   Al-Falaq's cards it ran up to 3.3px into the line above). At .arabic-inline's 2 an inline run owns
+   1.245em over its baseline; this one gets a line box that holds 1.48em over it (+1px a side for
+   the outward pixel; --ar-ink-tall, which the composition's own smaller room does not lower),
+   ≈2.47em: its own line only — 13px taller at 24px, half of it under the
+   baseline, since an inline box grows on both sides — never every line with Arabic in it (half an
+   em more on all of them). Inline elements only (MixedText's Arabic, a feedback word, an i'lal
+   form): a box of Arabic takes ar-clear. Unlayered, more specific than .arabic-inline / .quran and
+   the composition's rules, and after them, so it wins wherever it is put. */
+:is(.arabic-inline, .quran).ar-tall {
+  line-height: calc((var(--ar-ascent) + var(--ar-descent) + 2 * (var(--ar-ink-tall) - var(--ar-ascent))) * 1em + 2px);
 }
 @media (prefers-reduced-motion: no-preference) {
   [data-compose-layer] {

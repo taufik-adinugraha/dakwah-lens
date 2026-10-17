@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import type { QuizExerciseOf } from "@/content/quiz-schema";
 import type { Lexeme } from "@/content/schema";
 import { seededShuffle } from "@/lib/shuffle";
+import { arTall } from "@/lib/arabicInk";
 
 import { KeepTogether, MixedText } from "../library/MixedText";
 import {
@@ -140,7 +141,7 @@ function WaznFactoryRound({
                     onClick={() => q.choose(opt)}
                     optionKey={item.q.options.find((l) => item.lex.tashrif?.forms.find((f) => f.label === l)?.ar === opt)}
                   >
-                    <span lang="ar" dir="rtl" className="arabic-inline text-ar-md">
+                    <span lang="ar" dir="rtl" className="arabic-inline ar-clear text-ar-md">
                       {opt}
                     </span>
                   </OptionButton>
@@ -158,7 +159,7 @@ function WaznFactoryRound({
               // The label and its form on one line: never "label:" ⏎ form.
               <KeepTogether>
                 <MixedText text={`${shown}:`} />{" "}
-                <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm">
+                <bdi lang="ar" dir="rtl" className={`arabic-inline text-ar-sm ${arTall(item.answer)}`}>
                   {item.answer}
                 </bdi>
               </KeepTogether>

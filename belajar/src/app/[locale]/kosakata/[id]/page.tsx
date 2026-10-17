@@ -72,7 +72,8 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
           </p>
         </div>
         <div className="text-end">
-          <p lang="ar" dir="rtl" className="arabic-inline text-ar-xl text-ink">
+          {/* Its caption right under it: room for the marks (ar-clear, globals.css). */}
+          <p lang="ar" dir="rtl" className="arabic-inline ar-clear text-ar-xl text-ink">
             {lex.lemma_ar}
           </p>
           {/* The headword is QAC's lemma form (e.g. the mudhari' for some
@@ -155,7 +156,7 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
                   <span className={open ? "text-sm font-semibold text-forest" : "text-sm font-semibold text-ink-muted"}>
                     <MixedText text={t("loc_label", { surah: s.name_id, ayah: a.ayah, word })} />
                   </span>
-                  <span lang="ar" dir="rtl" className="quran text-ar-md text-ink">
+                  <span lang="ar" dir="rtl" className="quran ar-clear text-ar-md text-ink">
                     {w.ar}
                   </span>
                   <span className="text-base text-ink-muted">

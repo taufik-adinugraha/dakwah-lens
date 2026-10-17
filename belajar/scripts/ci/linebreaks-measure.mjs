@@ -533,3 +533,368 @@ export function measure({ scope, seams }) {
     push("page-overflow", document.body, `scrollWidth ${document.documentElement.scrollWidth} > ${window.innerWidth}`, "");
   return { counts, offenders };
 }
+
+// ───────────────────────── Marks never in a neighbour (inkMeasure) ─────────────────────────
+
+/** Every kind of offender inkMeasure() reports (linebreaks.mjs prints them with measure()'s; its
+ *  ink self-test lays out a case of each but check-error). */
+export const INK_KINDS = ["ink-overlap", "ink-border", "quote-order", "check-error"];
+
+/**
+ * Runs IN THE PAGE, like measure() (page.evaluate with a FUNCTION: self-contained, no closures).
+ * Operator 2026-10-17: "fix some layout to avoid overlapping between words like this (isim overlap
+ * with harakat)" — the shaddah + dhammah of رَبُّ stood in its tile's label — and, in the same tile,
+ * "”rabbu · “Tuhan": the closing quote drawn first. Two rules, measured on what the browser drew:
+ *
+ *   ink-overlap   a BOX OF ARABIC (the nearest element laying out an Arabic text node — a block, a
+ *                 flex or grid item, an inline-block — whose text has no Latin in it: a tile's word,
+ *                 a chip, a word card's word, MixedText's Arabic part; and Arabic inside a Latin
+ *                 line, its own outermost lang="ar" element: a feedback word, an i'lal form — CI
+ *                 2026-10-17 found ٱلنَّفَّٰثَٰتِ, inline, 3px into the line above) whose glyphs' INK
+ *                 enters the text box of anything outside that box (a label above it, a
+ *                 transliteration under it, a number badge, another word, the line above):
+ *                 ink = each of its lines' baseline ± the run's own ink ascent / descent in its
+ *                 computed font (canvas: measureText's actualBoundingBox, or — `mode: "pixels"` — the
+ *                 rows the run inks when drawn), baseline = the line's text box top + the font's
+ *                 ascent (fontBoundingBoxAscent, the ascent the line is laid out with);
+ *   ink-border    … or crosses the border of the nearest bordered box around it, above or below (a
+ *                 chip's, a tile's), up to a box that clips or scrolls (whose border says nothing
+ *                 about content scrolled under it);
+ *   quote-order   “…” around Latin text drawn with its closing quote left of its opening one, on one
+ *                 line: Latin left in a right-to-left paragraph without an LTR isolate.
+ * Text is compared only with text drawn at the same time in the same place: inside the composition
+ * figure every frame is laid out under the one on screen (data-compose-ghost) and a changing form
+ * fades from the one before it in the same cell (data-compose-before / -after) — each frame, and
+ * each state, is a world of its own; and never across a layer drawn over another (an ancestor that
+ * is fixed, sticky or absolute — the stage's sticky word-card slot rides over the mushaf line on
+ * purpose — or transformed, which an animation is moving). Hidden text (display: none, sr-only)
+ * is left out; text hidden with visibility only counts inside the composition figure, where it is
+ * a frame or a state shown at another moment. Every text box and every ink box is cut to what its
+ * clipping ancestors show (overflow other than visible, x and y apart): a long ayah scrolled under
+ * the dialog's footer is not drawn there (CI 2026-10-17, QS 2:282), nor a join's "+" narrowed to
+ * nothing over the tile beside it.
+ *
+ * `calibrate`: instead, the ink of the given strings ({ text, font, size }) both ways — the
+ * self-test compares them with Amiri's known extents and picks the mode that matches.
+ * `judge`: no DOM — the rules on given geometry (linebreaks-measure.test.mjs).
+ * Returns { counts, offenders, units } (units: the compositions measured, "primer" / "word N").
+ */
+export function inkMeasure({ scope = null, mode = "metrics", calibrate = null, judge = null } = {}) {
+  /** Slack, px: Chromium lays a line out on its font's ascent and descent rounded to whole pixels. */
+  const TOL = 1;
+  const xOverlap = (a, b) => Math.min(a.right, b.right) - Math.max(a.left, b.left);
+  const yOverlap = (a, b) => Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+  /** Two text nodes are compared only in the same world, the same layer, and never a form with the
+   *  one it fades from or into. */
+  const pairable = (a, b) => a.world === b.world && a.layer === b.layer && !(a.state && b.state && a.state !== b.state);
+  /** One box of Arabic: `lines` [{ left, right, baseline }], its ink `above` / `below` the baseline
+   *  (px), the text boxes around it `neighbours` [{ text, rects }], the inner edges of the borders
+   *  around it `edges` [{ left, right, top } | { left, right, bottom }], and `clip`, what its clipping
+   *  ancestors show of it (optional; its neighbours' rects come cut to theirs). Its offences. */
+  /** `r` cut to `c` (what a clipping ancestor shows), or null when nothing of it is left. */
+  const clipTo = (r, c) => {
+    if (!c) return r;
+    const x = { left: Math.max(r.left, c.left), right: Math.min(r.right, c.right), top: Math.max(r.top, c.top), bottom: Math.min(r.bottom, c.bottom) };
+    return x.right > x.left && x.bottom > x.top ? x : null;
+  };
+  const judgeRun = (run) => {
+    const ink = run.lines
+      .map((l) => clipTo({ left: l.left, right: l.right, top: l.baseline - run.above, bottom: l.baseline + run.below }, run.clip))
+      .filter(Boolean);
+    const out = [];
+    for (const n of run.neighbours) {
+      for (const r of n.rects) {
+        const hit = ink.find((k) => xOverlap(k, r) > TOL && yOverlap(k, r) > TOL);
+        if (hit) {
+          out.push({ kind: "ink-overlap", depth: yOverlap(hit, r), with: n.text });
+          break;
+        }
+      }
+    }
+    for (const e of run.edges) {
+      const hit = ink.find((k) => xOverlap(k, e) > TOL && (e.top !== undefined ? k.top < e.top - TOL : k.bottom > e.bottom + TOL));
+      if (hit) out.push({ kind: "ink-border", side: e.top !== undefined ? "top" : "bottom", depth: e.top !== undefined ? e.top - hit.top : hit.bottom - e.bottom });
+    }
+    return out;
+  };
+  /** An opening and a closing quote ({ left, c: vertical centre, h }) around Latin text: drawn in
+   *  the wrong order on one line. */
+  const quoteBad = (q) => Math.abs(q.open.c - q.close.c) < Math.min(q.open.h, q.close.h) / 2 && q.close.left < q.open.left - TOL;
+  if (judge)
+    return {
+      runs: (judge.runs ?? []).map(judgeRun),
+      quotes: (judge.quotes ?? []).map(quoteBad),
+      pairs: (judge.pairs ?? []).map(([a, b]) => pairable(a, b)),
+      clips: (judge.clips ?? []).map(([r, c]) => clipTo(r, c)),
+    };
+
+  // ── The ink of a run, in its computed font ──
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const inks = new Map();
+  /** { above, below, ascent } px of `text` in `font` (a CSS font shorthand at `size` px). */
+  const inkOf = (text, font, size, how) => {
+    const key = `${how}|${font}|${text}`;
+    let v = inks.get(key);
+    if (v) return v;
+    const setUp = () => {
+      ctx.font = font;
+      ctx.direction = "rtl";
+      ctx.textAlign = "right";
+      ctx.textBaseline = "alphabetic";
+    };
+    setUp();
+    const m = ctx.measureText(text);
+    v = { above: m.actualBoundingBoxAscent, below: m.actualBoundingBoxDescent, ascent: m.fontBoundingBoxAscent, descent: m.fontBoundingBoxDescent };
+    if (how === "pixels") {
+      // Drawn with room on every side (marks reach ~1.5em up, ~1em down), its inked rows found.
+      const pad = Math.ceil(size);
+      const W = Math.ceil(m.width) + 4 * pad;
+      const H = 4 * pad;
+      const base = Math.ceil(2.4 * size);
+      canvas.width = W;
+      canvas.height = H;
+      setUp();
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#000";
+      ctx.fillText(text, W - 2 * pad, base);
+      const px = ctx.getImageData(0, 0, W, H).data;
+      let first = -1;
+      let last = -1;
+      for (let y = 0; y < H; y++)
+        for (let x = 0; x < W; x++)
+          if (px[(y * W + x) * 4 + 3] > 24) {
+            if (first < 0) first = y;
+            last = y;
+            break;
+          }
+      v = { ...v, above: first < 0 ? 0 : base - first, below: last < 0 ? 0 : last + 1 - base };
+    }
+    inks.set(key, v);
+    return v;
+  };
+  if (calibrate) return calibrate.map((c) => ({ text: c.text, metrics: inkOf(c.text, c.font, c.size, "metrics"), pixels: inkOf(c.text, c.font, c.size, "pixels") }));
+
+  const AR = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
+  const LATIN = /\p{Script=Latin}/u;
+  const COMPOSE = '[data-autoplay="composition"]';
+  const root = (scope && document.querySelector(scope)) || document.body;
+  const offenders = [];
+  const counts = { runs: 0, inline: 0, tiles: 0, neighbours: 0, quotes: 0 };
+  const units = new Set();
+  const short = (s, n = 60) => {
+    const t = (s || "").replace(/\s+/g, " ").trim();
+    return t.length > n ? `${t.slice(0, n)}…` : t;
+  };
+  const where = (el) => {
+    const parts = [];
+    for (let e = el; e && e !== document.body && parts.length < 4; e = e.parentElement) {
+      const tag = e.tagName.toLowerCase();
+      const mark = e.getAttribute("data-autoplay") ?? (e.hasAttribute("data-compose-tile") ? "tile" : null) ?? e.getAttribute("data-lb") ?? (e.id || null);
+      if (mark || parts.length === 0) parts.unshift(mark ? `${tag}[${mark}]` : tag);
+    }
+    return parts.join(" › ");
+  };
+  const push = (kind, el, detail, text) => offenders.push({ kind, where: where(el), detail, text });
+  const guard = (what, el, fn) => {
+    try {
+      fn();
+    } catch (e) {
+      push("check-error", el, `${what}: ${e?.stack ?? e}`, "");
+    }
+  };
+  const css = new Map();
+  const style = (el) => {
+    let s = css.get(el);
+    if (!s) css.set(el, (s = getComputedStyle(el)));
+    return s;
+  };
+  const shown = (el) =>
+    !!el &&
+    !el.closest(".sr-only, script, style, noscript, title, template, svg") &&
+    (el.closest(COMPOSE) ? el.checkVisibility() : el.checkVisibility({ checkVisibilityCSS: true, visibilityProperty: true }));
+  const cached = (fn) => {
+    const m = new Map();
+    return (el) => {
+      if (!m.has(el)) m.set(el, fn(el));
+      return m.get(el);
+    };
+  };
+  /** The element that lays out this element's lines: the nearest one that is not inline. */
+  const blockOf = cached((el) => {
+    for (let e = el; e && e !== document.documentElement; e = e.parentElement) if (!/^(inline|contents)$/.test(style(e).display)) return e;
+    return document.body;
+  });
+  const isMoved = (s) => (s.transform && s.transform !== "none") || (s.translate && s.translate !== "none") || (s.scale && s.scale !== "none") || (s.rotate && s.rotate !== "none");
+  /** The layer it is drawn in: the nearest fixed / sticky / absolute or transformed ancestor. */
+  const layerOf = cached((el) => {
+    for (let e = el; e; e = e.parentElement) if (/^(fixed|sticky|absolute)$/.test(style(e).position) || isMoved(style(e))) return e;
+    return null;
+  });
+  /** What its clipping ancestors show of an element's content (overflow other than visible, x and y
+   *  apart), from the element itself up. */
+  const clipOf = cached((el) => {
+    const c = { left: -Infinity, right: Infinity, top: -Infinity, bottom: Infinity };
+    for (let e = el; e && e !== document.documentElement; e = e.parentElement) {
+      const s = style(e);
+      const [cx, cy] = [s.overflowX !== "visible", s.overflowY !== "visible"];
+      if (!cx && !cy) continue;
+      const r = e.getBoundingClientRect();
+      if (cx) {
+        c.left = Math.max(c.left, r.left + parseFloat(s.borderLeftWidth));
+        c.right = Math.min(c.right, r.right - parseFloat(s.borderRightWidth));
+      }
+      if (cy) {
+        c.top = Math.max(c.top, r.top + parseFloat(s.borderTopWidth));
+        c.bottom = Math.min(c.bottom, r.bottom - parseFloat(s.borderBottomWidth));
+      }
+    }
+    return c;
+  });
+  const range = document.createRange();
+  const rectsOf = (n) => {
+    range.selectNodeContents(n);
+    return Array.from(range.getClientRects()).filter((r) => r.width > 0 && r.height > 0);
+  };
+  const charRect = (n, i) => {
+    range.setStart(n, i);
+    range.setEnd(n, i + 1);
+    const r = Array.from(range.getClientRects()).find((x) => x.height > 0);
+    return r ? { left: r.left, c: (r.top + r.bottom) / 2, h: r.height } : null;
+  };
+
+  const nodes = [];
+  const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let n = tw.nextNode(); n; n = tw.nextNode()) if (n.data.trim() && shown(n.parentElement)) nodes.push(n);
+  const meta = new Map();
+  for (const n of nodes)
+    guard("text boxes", n.parentElement, () => {
+      const el = n.parentElement;
+      const st = el.closest("[data-compose-before], [data-compose-after]");
+      const raw = rectsOf(n);
+      meta.set(n, {
+        el,
+        raw,
+        // what is drawn of it: cut to its clipping ancestors
+        rects: raw.map((r) => clipTo(r, clipOf(el))).filter(Boolean),
+        world: el.closest("[data-compose-ghost], [data-compose-layer]"),
+        state: st ? (st.hasAttribute("data-compose-before") ? "before" : "after") : null,
+        layer: layerOf(el),
+      });
+    });
+  /** A box of Arabic: no Latin text in it. */
+  const arabicOnly = cached((b) => !nodes.some((m) => LATIN.test(m.data) && b.contains(m)));
+  const visibleEdge = (s, side) => parseFloat(s[`border${side}Width`]) > 0 && !/^(none|hidden)$/.test(s[`border${side}Style`]) && !/rgba\([^)]*,\s*0\)$|transparent/.test(s[`border${side}Color`]);
+
+  // 1. Boxes of Arabic: their ink inside their box, out of every neighbour's text and inside their border.
+  for (const n of nodes) {
+    if (!AR.test(n.data)) continue;
+    const a = meta.get(n);
+    if (!a) continue;
+    guard("ink", a.el, () => {
+      // Its box: the element laying it out when that holds no Latin; inside a Latin line, its own
+      // outermost lang="ar" element there.
+      let box = blockOf(a.el);
+      let inline = false;
+      if (!arabicOnly(box)) {
+        let e = a.el.closest('[lang|="ar"]');
+        if (!e || e === box || !box.contains(e)) return;
+        for (let up = e.parentElement; up && up !== box; up = up.parentElement) if (up.matches('[lang|="ar"]')) e = up;
+        if (!arabicOnly(e)) return;
+        box = e;
+        inline = true;
+      }
+      if (!a.raw.length) return;
+      const s = style(a.el);
+      const size = parseFloat(s.fontSize);
+      const v = inkOf(n.data, `${s.fontStyle} ${s.fontWeight} ${s.fontSize} ${s.fontFamily}`, size, mode);
+      // The canvas drew it in the page's Amiri at its size: Amiri's ascent is 1.124em (globals.css
+      // --ar-ascent). Anything else is a font the canvas fell back to, whose ink says nothing.
+      if (!(Math.abs(v.ascent / size - 1.124) < 0.06)) {
+        push("check-error", a.el, `the canvas did not draw ${s.fontFamily} at ${s.fontSize} (font ascent ${v.ascent}px, Amiri's is 1.124em): no ink measured`, short(n.data));
+        return;
+      }
+      // A text box is the font's content area (ascent over the baseline, descent under it): the
+      // baseline is its top + the ascent — and its bottom − the descent, or this is no text box.
+      const odd = a.raw.find((r) => Math.abs(r.top + v.ascent - (r.bottom - v.descent)) > 1.5);
+      if (odd) {
+        push("check-error", a.el, `its text box (${odd.top.toFixed(1)}–${odd.bottom.toFixed(1)}) is not the font's ascent ${v.ascent} + descent ${v.descent}: no baseline`, short(n.data));
+        return;
+      }
+      const lines = a.raw.map((r) => ({ left: r.left, right: r.right, baseline: r.top + v.ascent }));
+      const top = Math.min(...lines.map((l) => l.baseline)) - v.above - TOL - 2;
+      const bottom = Math.max(...lines.map((l) => l.baseline)) + v.below + TOL + 2;
+      const neighbours = [];
+      for (const m of nodes) {
+        if (m === n) continue;
+        const b = meta.get(m);
+        if (!b || box.contains(b.el) || !pairable(a, b)) continue;
+        const rects = b.rects.filter((r) => r.bottom > top && r.top < bottom);
+        if (rects.length) neighbours.push({ text: m.data, rects });
+      }
+      // The border above and the border below it: of the nearest box that has one, up to its layer
+      // or a box that clips or scrolls.
+      const edges = [];
+      let needTop = true;
+      let needBottom = true;
+      for (let e = a.el; e && e !== document.documentElement && (needTop || needBottom); e = e.parentElement) {
+        const es = style(e);
+        const r = e.getBoundingClientRect();
+        const left = r.left + parseFloat(es.borderLeftWidth);
+        const right = r.right - parseFloat(es.borderRightWidth);
+        if (needTop && visibleEdge(es, "Top")) {
+          edges.push({ left, right, top: r.top + parseFloat(es.borderTopWidth) });
+          needTop = false;
+        }
+        if (needBottom && visibleEdge(es, "Bottom")) {
+          edges.push({ left, right, bottom: r.bottom - parseFloat(es.borderBottomWidth) });
+          needBottom = false;
+        }
+        if (e === a.layer || es.overflowX !== "visible" || es.overflowY !== "visible") break;
+      }
+      counts.runs++;
+      if (inline) counts.inline++;
+      counts.neighbours += neighbours.length;
+      if (a.el.closest("[data-compose-tile]")) counts.tiles++;
+      const fig = a.el.closest(COMPOSE);
+      if (fig) units.add(fig.getAttribute("data-compose-kind") === "primer" ? "primer" : `word ${fig.getAttribute("data-compose-word")}`);
+      const em = (px) => `${(px / size).toFixed(3)}em`;
+      for (const o of judgeRun({ lines, above: v.above, below: v.below, neighbours, edges, clip: clipOf(a.el) })) {
+        const ink = `ink ${em(v.above)} above / ${em(v.below)} below its baseline, ${s.fontSize}`;
+        if (o.kind === "ink-overlap") push(o.kind, a.el, `${ink}: its marks run ${o.depth.toFixed(1)}px into “${short(o.with, 30)}”`, short(n.data));
+        else push(o.kind, a.el, `${ink}: its marks cross the border ${o.side === "top" ? "above" : "below"} it by ${o.depth.toFixed(1)}px`, short(n.data));
+      }
+    });
+  }
+
+  // 2. Quotes around Latin text, in the order they are read.
+  const byBlock = new Map();
+  for (const n of nodes) {
+    if (!meta.has(n)) continue;
+    const b = blockOf(n.parentElement);
+    if (!byBlock.has(b)) byBlock.set(b, []);
+    byBlock.get(b).push(n);
+  }
+  for (const [b, ns] of byBlock)
+    guard("quotes", b, () => {
+      let text = "";
+      const open = [];
+      for (const n of ns) {
+        for (let i = 0; i < n.data.length; i++) {
+          if (n.data[i] === "“") open.push({ n, i, at: text.length + i });
+          else if (n.data[i] === "”" && open.length) {
+            const o = open.pop();
+            const inner = (text + n.data.slice(0, i)).slice(o.at + 1);
+            if (!LATIN.test(inner) || AR.test(inner)) continue;
+            const [ro, rc] = [charRect(o.n, o.i), charRect(n, i)];
+            if (!ro || !rc) continue;
+            counts.quotes++;
+            if (quoteBad({ open: ro, close: rc }))
+              push("quote-order", n.parentElement, `“${short(inner, 40)}” is drawn with its closing quote ${Math.round(ro.left - rc.left)}px left of its opening one: Latin in a right-to-left line without an LTR isolate (dir="ltr")`, short(b.textContent, 60));
+          }
+        }
+        text += n.data;
+      }
+    });
+  return { counts, offenders, units: [...units] };
+}

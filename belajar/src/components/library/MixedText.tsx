@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 
 import { emphasisSpans, meaningSpans, type Emphasis, type EmphasisKind } from "@/lib/emphasis";
+import { arTall } from "@/lib/arabicInk";
 import { joinUnits, rtlRuns, textUnits, type Seg, type UnitPart } from "@/lib/textUnits";
 
 /**
@@ -75,10 +76,13 @@ function starts(lengths: readonly number[], at: number): number[] {
   return out;
 }
 
-/** One Arabic run: isolated (`bdi`, RTL) at the 24px floor. */
+/** One Arabic run: isolated (`bdi`, RTL) at the 24px floor. A run with a stack of marks too tall
+ *  for a line of text (ٱلنَّفَّٰثَٰتِ: arabicInk.ts) gets a taller line of its own (ar-tall), so
+ *  its marks never run into the line above (CI 2026-10-17). */
 function Bdi({ text, tone }: { text: string; tone?: string }) {
+  const tall = arTall(text);
   return (
-    <bdi lang="ar" dir="rtl" className={`arabic-inline text-ar-sm${tone ? ` ${tone}` : ""}`}>
+    <bdi lang="ar" dir="rtl" className={`arabic-inline text-ar-sm${tone ? ` ${tone}` : ""}${tall ? ` ${tall}` : ""}`}>
       {text}
     </bdi>
   );

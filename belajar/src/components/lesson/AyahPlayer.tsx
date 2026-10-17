@@ -102,7 +102,9 @@ export function MushafLine({
               {/* The narration names words by place ("kata kedua"); the
                   badge is aria-hidden, so its place is said here. */}
               {numbered ? <span className="sr-only">{t("word_place", { n: w.index })}</span> : null}
-              <span lang="ar">{w.ar}</span>
+              <span lang="ar" className="ar-clear">
+                {w.ar}
+              </span>
               {place}
             </span>,
           );
@@ -127,7 +129,11 @@ export function MushafLine({
                 : "border-border-ui bg-paper-deep text-ink hover:border-forest"
             } ${isMarked ? "ring-4 ring-forest ring-offset-2 ring-offset-white" : ""}`}
           >
-            <span lang="ar">{w.ar}</span>
+            {/* The chip's border above the word, its number under it: room for the marks
+                (ar-clear, globals.css; operator 2026-10-17). */}
+            <span lang="ar" className="ar-clear">
+              {w.ar}
+            </span>
             {active && place ? (
               // On the forest fill the badge is paper with forest digits.
               <span

@@ -13,6 +13,7 @@ import { TermText } from "@/components/library/TermText";
 
 import { measure } from "../../scripts/ci/linebreaks-measure.mjs";
 
+import { tallStack } from "./arabicInk";
 import { mapLatinName } from "./autoplay/lessonMap";
 import { caseLabelMarked } from "./cases";
 import { SURAHS, WORD_INFO } from "./content";
@@ -681,9 +682,12 @@ describe("MixedText renders the pieces", () => {
     for (const [k, [where, s]] of sample.entries()) {
       const html = rendered[k];
       expect(textOf(html), where).toBe(s);
-      const bdis = [...html.matchAll(/<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">([^<]*)<\/bdi>/g)].map((m) =>
-        textOf(m[1]),
-      );
+      // ar-tall exactly on a run with a stack too tall for a line of text (arabicInk.ts, CI 2026-10-17)
+      const bdis = [...html.matchAll(/<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm( ar-tall)?">([^<]*)<\/bdi>/g)].map((m) => {
+        const text = textOf(m[2]);
+        expect(!!m[1], `${where}: ar-tall on ${text}`).toBe(tallStack(text));
+        return text;
+      });
       expect(bdis, where).toEqual([...s.matchAll(ARABIC_RUN)].map((m) => m[0]));
     }
     // a few thousand strings: room for a loaded runner
