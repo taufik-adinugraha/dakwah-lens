@@ -698,7 +698,7 @@
       ],
       "structure": {
         "type": "lanjutan jumlah ayat 1 (jar-majrur terkait a‘ūżu), memuat jumlah shilah",
-        "summary": "Min syarri (“dari kejahatan”) bergantung pada a‘ūżu, begitu pula min syarri di ayat 3, 4 dan 5. Syarri disandarkan kepada mā (“yang”), isim maushul yang dijelaskan oleh shilah khalaqa (“Dia ciptakan”); kata ganti yang kembali kepada mā dibuang. Sebagian ulama membaca mā sebagai mā mashdariyyah, sehingga maknanya “ciptaan-Nya”.",
+        "summary": "Ayat ini melanjutkan ayat 1. Min syarri (“dari kejahatan”) bergantung pada a‘ūżu, begitu pula min syarri di ayat 3, 4 dan 5. Syarri disandarkan kepada mā (“yang”), isim maushul yang dijelaskan oleh shilah khalaqa (“Dia ciptakan”); kata ganti yang kembali kepada mā dibuang. Sebagian ulama membaca mā sebagai mā mashdariyyah, sehingga maknanya “ciptaan-Nya”.",
         "groups": [
           {
             "words": [
@@ -1187,7 +1187,7 @@
       ],
       "structure": {
         "type": "lanjutan jumlah ayat 1 ('athaf), memuat zharaf iżā dan jumlah mudhaf ilaih",
-        "summary": "Wa (“dan”) menyambungkan ('athaf) frasa ini dengan min syarri di ayat 2, jadi ia bergantung pada a‘ūżu. Syarri disandarkan kepada gāsiqin (“malam”). Iżā (“apabila”) di sini keterangan waktu (zharaf) murni tanpa makna syarat, dan kalimat waqaba (“telah gelap gulita”) menjadi mudhaf ilaih baginya; iżā dikaitkan dengan kata kerja tempat frasa ini bergantung, menurut al-Mujtaba dan as-Samin, atau dengan syarri menurut al-Jadwal.",
+        "summary": "Ayat ini melanjutkan ayat 1. Wa (“dan”) menyambungkan ('athaf) frasa ini dengan min syarri di ayat 2, jadi ia bergantung pada a‘ūżu. Syarri disandarkan kepada gāsiqin (“malam”). Iżā (“apabila”) di sini keterangan waktu (zharaf) murni tanpa makna syarat, dan kalimat waqaba (“telah gelap gulita”) menjadi mudhaf ilaih baginya; iżā dikaitkan dengan kata kerja tempat frasa ini bergantung, menurut al-Mujtaba dan as-Samin, atau dengan syarri menurut al-Jadwal.",
         "groups": [
           {
             "words": [
@@ -1647,7 +1647,7 @@
       ],
       "structure": {
         "type": "lanjutan jumlah ayat 1 ('athaf)",
-        "summary": "Frasa ini di-'athaf-kan dengan wa, jadi bergantung pada a‘ūżu. Syarri disandarkan kepada an-naffāṡāti (“para peniup”), bentuk jamak dari naffāṡah, yaitu bentuk mubalaghah (“yang banyak …”) dari isim fa'il. Frasa fī al-‘uqadi (“pada buhul-buhul”) bergantung pada an-naffāṡāti (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
+        "summary": "Ayat ini melanjutkan ayat 1. Frasa ini di-'athaf-kan dengan wa, jadi bergantung pada a‘ūżu. Syarri disandarkan kepada an-naffāṡāti (“para peniup”), bentuk jamak dari naffāṡah, yaitu bentuk mubalaghah (“yang banyak …”) dari isim fa'il. Frasa fī al-‘uqadi (“pada buhul-buhul”) bergantung pada an-naffāṡāti (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
         "groups": [
           {
             "words": [
@@ -2110,7 +2110,7 @@
       ],
       "structure": {
         "type": "lanjutan jumlah ayat 1 ('athaf), memuat zharaf iżā dan jumlah mudhaf ilaih",
-        "summary": "Darwisy menyebut i'rab-nya “jelas”: frasa ini di-'athaf-kan dengan wa, syarri disandarkan kepada ḥāsidin (“orang yang dengki”), lalu iżā (“apabila”) menjadi keterangan waktu dengan kalimat ḥasada (“dia dengki”) sebagai mudhaf ilaih-nya. Al-Mujtaba mengaitkan iżā dengan a‘ūżu, sedangkan al-Jadwal dengan syarri.",
+        "summary": "Ayat ini melanjutkan ayat 1. Darwisy menyebut i'rab-nya “jelas”: frasa ini di-'athaf-kan dengan wa, syarri disandarkan kepada ḥāsidin (“orang yang dengki”), lalu iżā (“apabila”) menjadi keterangan waktu dengan kalimat ḥasada (“dia dengki”) sebagai mudhaf ilaih-nya. Al-Mujtaba mengaitkan iżā dengan a‘ūżu, sedangkan al-Jadwal dengan syarri.",
         "groups": [
           {
             "words": [
@@ -2650,7 +2650,7 @@
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:f8250fd994df183364e019892b0f8e5a9c4f16c527ec173a54326618b38e5d6a",
     "authored_words": "authored/al-falaq.words.json sha256:62de86e9afab02ab0a6e8f97f380691b8e2351d7490702973c12c2697d4698c2",
-    "authored_structure": "authored/al-falaq.structure.json sha256:8374caa53f132faa4b9a905b5ee42fc55410f5d0a207632a243b90a3f136893c",
+    "authored_structure": "authored/al-falaq.structure.json sha256:7b3075320b29039294b2150f7eb827abe9d0a99de7be99f285b449ceb7f969ad",
     "authored_concepts_map": "authored/al-falaq.concepts-map.json sha256:aed1fd50942fa30fa657a55a384d2fe284d957714238d05a9499b0065e82aaf4",
     "authored_facts": "authored/al-falaq.facts.generated.json sha256:75ebf95f8fe6d95dbad2bd5b19df7a8e6cb49e44b945adf96abde2b533e1ebd3",
     "authored_hadith": "authored/al-falaq.hadith.json sha256:b21ea1e52401b20e98c0b96dac242a626180ec8bc779405b3bb099f7b429ba62",

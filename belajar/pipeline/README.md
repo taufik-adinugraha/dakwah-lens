@@ -61,7 +61,7 @@ python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Ku
 python3 build_map.py               # the lesson maps ../content/map/*.json, for the surahs switched on (see "Peta pelajaran"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi"); stops on a term said before its lesson that authored/curriculum.pending.json does not list (`--write-pending` writes that list: see "Kurikulum")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
-python3 test_validate_narration.py # plants 268 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum and the pending list, each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
+python3 test_validate_narration.py # plants 283 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum, the pending list and the continuation data (`continues`), each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
 python3 validate_map.py            # the lesson maps: new / learnt so far / later / next-level against the curriculum, the names against the captions
 python3 test_validate_map.py       # plants 40 faults (a step in the wrong group, one taught later listed as learnt, a learnt step left out, `here` on a step that does not occur, a name that says a Qur'anic word, …)
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah), or listed in authored/curriculum.pending.json; exit 1 on any failure
@@ -1757,6 +1757,62 @@ python3 render_narration.py "${args[@]}"
 # listen, and the upload steps of "Rendering the lines" above.
 ```
 
+### Continuations (2026-10-18): an ayah that continues an earlier one says so; prepared, NOT rendered
+
+The operator, refining wording rule 8 (rule 29 of the session memory): "we need to remind some
+ayat is continuing previous ayat. So when we explain for example ayat 3 Al-Fatihah, why it kasrah
+because it's na't of Allah in previous ayat and mention which word. Apply this to similar cases."
+**Note for whoever works on a lesson next** (it overturns part of the 2026-10-17 sweep, which also
+took dependencies out): a COMPARISON with an earlier ayah stays out; a DEPENDENCY on one is said —
+"Ayat ini melanjutkan ayat kedua." at the opening of the structure part, and in the affected word's
+explanation the earlier word named and its ayah cited, "bagi ٱللَّهِ (Allāhi) di ayat kedua". Which
+ayat continue which is DATA (`continues` in `authored/<slug>.structure.json`, from the kitab the
+lesson cites), and the validator holds the lines to it both ways (wording rule 8 below).
+
+- **The sweep**: every cross-ayah dependency in the four surahs, from the authored `why`s, roles,
+  summaries, structure items and review notes (the pipeline reads no QAC syntax data; QAC 0.4 is
+  morphology only): 15 ayat, 21 links — Al-Fatihah 3, 4 (na't of Allāhi, ayah 2) and 7 (badal of
+  aṣ-ṣirāṭa, ayah 6); Al-Ikhlas 2, 3 (khabar of huwa, ayah 1, "menurut al-Mujtaba dan al-Jadwal",
+  and Darwisy's link of lam yalid to aṣ-ṣamad, ayah 2) and 4 ('athaf on lam yalid, ayah 3); Al-Falaq
+  2–5 (min syarri on a‘ūżu, ayah 1; 3 also 'athaf on min syarri, ayah 2; iżā on a‘ūżu per al-Mujtaba
+  / as-Samin); An-Nas 2, 3 (badal of birabbi / maliki), 4 (min syarri on a‘ūżu), 5 (allażī na't of
+  al-waswāsi, ayah 4), 6 (hal of the doer of yuwaswisu, ayah 5). Not data, on purpose: dependencies
+  inside one ayah; Al-Fatihah 5 and 6 (new sentences); the 'athaf target of Al-Falaq 4 and 5 (the
+  authored text never said which earlier min syarri, so none is named; their ta'alluq on a‘ūżu is).
+- **The text**: Al-Fatihah's lines are authored — structure items 3:1, 4:1, 7:1 open with the
+  sentence and cite the word; the compositions' reason lines 1:3:1 and 1:3:2 (frame `change`, line
+  4), 1:4:1 (line 2), 1:7:1 (line 3) cite it ("Sebabnya, kata ini na’t (نَعْت), yaitu sifat, bagi
+  ٱللَّهِ (Allāhi) di ayat kedua." — the operator's one-sentence example would be 182 characters,
+  over the 170 a caption beside the animation may have, so the base-form sentence before it stays
+  its own line, with its recording); new `why_basic` for 1:3:1, 1:3:2, 1:4:1 and "di ayat keenam"
+  in 1:7:1's (the quiz explanations, shown and said: "Akhirnya kasrah karena menjadi na't, yaitu
+  sifat, bagi {{1:2:2/allahi}} di ayat kedua, yang majrur."). The Mu'awwidzat are told from their summaries: each opens with
+  "Ayat ini melanjutkan ayat N." (Al-Ikhlas 2 and 3 hedged "Menurut al-Mujtaba dan al-Jadwal, …",
+  their sentences reordered so the continuation comes first), and the sanitiser cites each earlier
+  word and names an earlier phrase by its words. On-screen reference texts (summaries, why cards)
+  that already cited the ayah are unchanged; the `type`s too.
+- **The audio**: 11 Al-Fatihah lines change their spoken text and lose their audio:
+  `3:w1:compose:4`, `3:w2:compose:4`, `3:structure:1`, `3:ex:why-harakat:1:why`,
+  `3:ex:why-harakat:2:why`, `4:w1:compose:2`, `4:structure:1`, `4:ex:why-harakat:1:why`,
+  `7:w1:compose:3`, `7:structure:1`, `7:ex:sort-case:1:why`. Dry run: **11 distinct texts, 1,350
+  characters, USD 0.11**; two of them (`7:w1:compose:3`, `7:ex:sort-case:1:why`, the texts of before
+  2026-10-17) have their masters on disk and are reused, so 9 texts, 1,058 characters, about USD 0.08
+  are new. No shared line changed; the other surahs have no audio. No line id changed or was added
+  in Al-Fatihah (the Mu'awwidzat's summary lines split anew, :a … :c, caption-only).
+
+```bash
+OUT=/path/to/the/checkout/with/the/masters/belajar/pipeline/out
+args=(--surah al-fatihah)
+# must say: 11 distinct texts, 1350 characters, no "refused by --render"
+python3 render_narration.py "${args[@]}"
+# the render:
+#   python3 render_narration.py "${args[@]}" --render --i-approve-spend --voice-id aK834gEOxQEtviMPgurT \
+#     --voice-name "Kang Nandar" --env-file /path/to/dakwah-lens/.env --out "$OUT"
+# then build_narration.py --check, validate_narration.py, encode_narration.py --check --out "$OUT" --list …,
+# listen (Allohi in the cited lines; manshub, pending its ear check, in 7:ex:sort-case:1:why), and the
+# upload steps of "Rendering the lines" above.
+```
+
 ## Operator's lesson-wording rules (2026-10)
 
 The rules the operator gave while reviewing the lessons, kept here so that work on any lesson
@@ -1839,19 +1895,67 @@ enforces it, its name; otherwise "not enforced: review by reading".
    "better to say konsep ini baru akan diajari lebih lengkap di ayat keXX"). Enforced:
    `check_display` `LATER_WORDING` (faults "what a later ayah teaches said the old way", "… baru kita
    bahas nanti") and the `map:later` template in `map_problems`.
-8. **No back-references to earlier ayat inside a lesson** (2026-10-17, on ayah 2: "better to remove
-   this lines to make it less complicated"; the ruling on the rest, the same day: "YES — remove them
-   all … remove the comparison, keep the sentence complete"): a lesson stands on what its screen
-   shows. A comparison with an earlier ayah goes ("seperti di ayat pertama", "sekali lagi", "Polanya
-   sama dengan ayat tiga", "Kata yang sama sudah kita pelajari di ayat pertama", "juga terdiri dari
-   dua bagian" where no earlier word of the same ayah has two); a word an explanation depends on
-   (the word a badal replaces, the name a na't describes, the a‘ūżu a phrase hangs on) stays, shown
-   as a named word, without its ayah ("pengganti bagi kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya
-   “jalan”"; `Sanitiser._where` no longer adds "di ayat N" for an earlier ayah; a later one keeps
-   it). Enforced: `check_display` `back_references` ("ayat <earlier>", "ayat sebelumnya" in a line of
-   a later ayah; the lesson map's own recap, a citation after "Surah …" and lesson zero are not
-   back-references; faults "a comparison with an earlier ayah", "“ayat sebelumnya”", "… in a
-   composition"); comparisons worded without an ayah ("sekali lagi", "juga"): review by reading.
+8. **No comparisons with earlier ayat; dependencies on them are said** (2026-10-17, on ayah 2:
+   "better to remove this lines to make it less complicated"; the ruling on the rest, the same
+   day: "YES — remove them all … remove the comparison, keep the sentence complete"; REFINED
+   2026-10-18: "we need to remind some ayat is continuing previous ayat. So when we explain for
+   example ayat 3 Al-Fatihah, why it kasrah because it's na't of Allah in previous ayat and mention
+   which word. Apply this to similar cases."). Two kinds of pointer at an earlier ayah, told apart:
+   - (a) a **comparison** goes, removed, not rephrased: "seperti di ayat pertama", "sekali lagi",
+     "Polanya sama dengan ayat tiga", "berbeda dengan … di ayat …", "Kata yang sama sudah kita
+     pelajari di ayat pertama", "juga terdiri dari dua bagian" where no earlier word of the same ayah
+     has two; and "ayat sebelumnya" (say which ayah, and only for a dependency);
+   - (b) a **dependency** is said, required: where an ayah continues an earlier one — a word's
+     ending, case or role CAUSED by a word of an earlier ayah (na't of …, badal of …, 'athaf on …,
+     khabar / mudhaf ilaih relations across ayat, a phrase hanging on an earlier verb) — (1) the
+     ayah's structure part opens with "Ayat ini melanjutkan ayat kedua." (the ordinal of the ayah
+     the data says; hedged where the kitab differ, "Menurut al-Mujtaba dan al-Jadwal, ayat ini
+     melanjutkan ayat pertama: …"), and (2) the explanation of the affected word gives the reason
+     with the earlier word NAMED and its ayah cited after it: "Sebabnya, kata ini na’t (نَعْت),
+     yaitu sifat, bagi ٱللَّهِ (Allāhi) di ayat kedua." (a citation beside a SHOWN word, which rule
+     12 allows; a heavy-letter word is caption-only, rule 5: "pengganti bagi kata ٱلصِّرَٰطَ
+     (aṣ-ṣirāṭa) yang artinya “jalan” di ayat keenam" is said "… bagi kata yang artinya jalan di ayat
+     keenam"); the structure item that says the dependency names the word and the ayah the same way.
+     The word described is the SOURCE's (Darwisy, al-Jadwal, al-Mujtaba …): where the kitab differ the
+     lesson says what the main source says and keeps the hedge the authored text has ("menurut …",
+     "sebagian ulama …"); a dependency the authored data and its kitab do not state is never said.
+   **The data**: `continues` beside an ayah's `structure` in `authored/<slug>.structure.json`
+   (reviewer-only: `build_surah.py` reads only `structure`) — the ayah it continues, the hedge
+   (`per`), and each link: the word(s) of this ayah, the kind, the earlier word(s) by named-word ref
+   (`on`, one earlier ayah; a run for a phrase: lam yalid, min syarri), the kitab (`src`, the surah's
+   abbreviations) and where it is said (`said_in`: `word` — the word's own line or one of its
+   composition lines —, `structure`). Every continuation of the four surahs: "Continuations
+   (2026-10-18)" above (15 ayat, 21 links).
+   **The build**: an authored line (a composition's `say`, a structure item, a `why_basic`) writes
+   the citation itself ("bagi {{1:2:2/allahi}} di ayat kedua"); in a `why` or a summary the
+   sanitiser cites a word of an earlier ayah by its ordinal (`Sanitiser._where`; a comma closes the
+   citation before "yang …" goes on) and names a phrase of an earlier ayah by its words; "Ayat ini
+   melanjutkan ayat 1" in a summary is said with the ordinal (PRE_REWRITES).
+   Enforced: `check_display` `back_references` — a line of a later ayah may say "ayat <earlier>"
+   only as "Ayat ini melanjutkan ayat <N>" (CONTINUES) or as a CITATION, a named word (or a run of
+   them, with its gloss) right before "di ayat <N>", in a line that says a dependency (DEPENDENCY:
+   na’t / sifat bagi, badal / pengganti bagi, ‘athaf / disambungkan pada, bergantung pada,
+   disandarkan kepada, khabar bagi, dikaitkan dengan, menguatkan …); a comparison form (COMPARISON:
+   "seperti / sama dengan / berbeda dengan / sekali lagi / sudah kita pelajari … ayat") in the line
+   fails it all, and "ayat sebelumnya" always fails; and `continuation_problems`, on the data and the
+   lines: the data's shape (an earlier ayah, refs that resolve, one earlier ayah per link, kitab of
+   the surah's table); an ayah whose structure type says "lanjutan" has data, and "lanjutan jumlah
+   ayat N" agrees with it (so a new surah cannot forget it); the structure part of an ayah with data
+   opens with the sentence (hedged by `per`), said once, and no other ayah says it ("melanjutkan
+   ayat N" where the data has no continuation of ayah N fails); every citation is of a word of
+   that ayah and is a link of the data; every named word that stands only in an earlier ayah of
+   the surah is cited (a word's own lines cite only that word's links); every link is said where
+   `said_in` says. Faults: "a comparison with an earlier ayah", "“ayat sebelumnya”", "… in a
+   composition", "a dependency's citation taken out, as 2026-10-17 to 2026-10-18", "… in a quiz
+   explanation (An-Nas 2)", "… in a structure line (An-Nas 6, a phrase's hal)", "the continuation
+   sentence taken out", "… said of an ayah the data does not continue", "… the wrong ayah", "a hedged
+   continuation said without its hedge", "a continuation in a later structure line", "a citation of
+   a word that is not in that ayah", "a citation the data does not have (its link taken out)", "a
+   citation inside a comparison", "a lanjutan ayah without data", "data that continues the ayah
+   itself", "data that disagrees with the ayah's structure type", "data with a ref that does not
+   resolve", "data with a kitab the surah does not cite"; unit tests `test_back_references` and
+   `test_continuations` (the operator's example line, the counts per surah).
+   Comparisons worded without an ayah ("sekali lagi", "juga"): review by reading.
 9. **Foundation steps count as met again in every ayah** (2026-10-17: "in alfatihah ayat-1 it says
    no harakat?"): the harakat, like the three kinds of word, occur on every word. Enforced:
    `curriculum.occurs` / `stepOccurs`, held by `validate_curriculum.py` and `validate_map.py`
@@ -2106,10 +2210,13 @@ replaces each mention with the word's place, which the stage numbers under each 
   "kata pertama dan kedua", "kata kedua sampai keempat". A word of ANOTHER ayah is not on screen,
   so since 2026-10-17 it is a named word, shown and said with its meaning: "kata ٱلصِّرَٰطَ
   (aṣ-ṣirāṭa) yang artinya “jalan” di ayat keenam" in an ayah before the sixth (an existing "di ayat
-  6" is reused); a word of an EARLIER ayah is not pointed at (rule 8 of the operator's wording rules:
-  "pengganti bagi kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan”" in ayah 7), and in another surah no
-  "di ayat"; a phrase of several words is still named by its meaning alone, "frasa yang artinya “dan
-  dari kejahatan” di ayat tiga"; a word of the ayah named by its place and its meaning is shown too
+  6" is reused); a word of an EARLIER ayah is cited by its ayah's ordinal, because the line says
+  what this ayah depends on (rule 8 of the operator's wording rules, as refined 2026-10-18:
+  "pengganti bagi kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan” di ayat keenam" in ayah 7; from
+  2026-10-17 to 2026-10-18 the ayah was left out), and in another surah no "di ayat"; a phrase of
+  several words is still named by its meaning alone, "frasa yang artinya “dan dari kejahatan” di
+  ayat tiga", except a phrase of an EARLIER ayah, which is a dependency and named by its words too,
+  "frasa لَمْ (lam) يَلِدْ (yalid) yang artinya “tidak beranak” di ayat ketiga"; a word of the ayah named by its place and its meaning is shown too
   ("kata ketiga, yaitu رَبِّ (rabbi), yang artinya “Tuhan”", `name_places`, rule 5); a gloss the prose already gives right after the mention is
   that meaning; the quiz shows a `why_basic` that names a word the same way (`quiz.named_words`),
   and the stage's own check refuses a caption that still carries the markup (`checks.ts`

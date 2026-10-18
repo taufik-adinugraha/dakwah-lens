@@ -137,6 +137,13 @@ What it enforces (README "Narasi" has the reasons):
   than the ayah has words, never a place in another ayah (it is named by its meaning there), never a
   place inside a place, and never "di kartu ini" (the stage shows no card); a concept's title is
   never turned into a place.
+- An earlier ayah (README wording rule 8, refined by the operator 2026-10-18): never a comparison
+  ("seperti di ayat pertama", "ayat sebelumnya"); only a dependency, in its two forms — the
+  structure part's opening "Ayat ini melanjutkan ayat <N>." and a citation, a named word right
+  before "di ayat <N>" in a line that says the dependency — and both as the authored `continues`
+  data says (continuation_problems: the opening where the data has it and nowhere else, every link
+  said where its `said_in` says, every citation a link of the data, every named word of an earlier
+  ayah only cited, a "lanjutan" structure with data).
 - What the stage shows (operator review, 2026-10-10): intro, recite, structure and recap highlight
   the whole ayah ([0]); w${n} and w${n}:compose:${k} highlight word n and put it on the word card
   slot (focus; the composition animation takes the card's place); primer:${k} highlights the words
@@ -934,29 +941,270 @@ def named_twice(display) -> list[str]:
         return []
     names = [m.group() for m in NAMED_SHOWN.finditer(display)]
     return sorted({n for n in names if names.count(n) > 1})
-# A back-reference to an earlier ayah (operator 2026-10-17, rule 29: "A lesson stands on its own
-# screen: no back-references to earlier ayat"; "remove the comparison, keep the sentence
-# complete"): "seperti di ayat pertama", "bagi kata … di ayat kedua", "ayat sebelumnya". A citation
-# of another surah ("Surah Al-'Alaq") and what a LATER ayah teaches are not back-references; the
-# lesson map's own lines ("Sebelum ayat ini, kita sudah mempelajari …") are its recap, not a pointer.
+# An earlier ayah in a line of a later one (README wording rule 8). Operator 2026-10-17 (rule 29:
+# "A lesson stands on its own screen: no back-references to earlier ayat"; "remove the comparison,
+# keep the sentence complete"), REFINED 2026-10-18 ("we need to remind some ayat is continuing
+# previous ayat. So when we explain for example ayat 3 Al-Fatihah, why it kasrah because it's na't
+# of Allah in previous ayat and mention which word. Apply this to similar cases."):
+#   - a COMPARISON with an earlier ayah still goes: "seperti di ayat pertama", "sama dengan ayat
+#     tiga", "berbeda dengan … di ayat …", "sekali lagi" (COMPARISON), and "ayat sebelumnya" (say
+#     which ayah, and why);
+#   - a DEPENDENCY is said, in one of two forms only: the opening of the ayah's structure part,
+#     "Ayat ini melanjutkan ayat kedua." (CONTINUES), and a CITATION, a named word of that ayah
+#     right before "di ayat <N>" ("na’t (نَعْت), yaitu sifat, bagi ٱللَّهِ (Allāhi) di ayat kedua"),
+#     in a line that says the dependency (DEPENDENCY: na't / sifat bagi, badal / pengganti bagi,
+#     'athaf / disambungkan pada, bergantung pada, disandarkan kepada, khabar bagi, …).
+# Which ayat continue which, and on which words, is the authored data (structure.json `continues`,
+# continuation_problems below): a citation the data does not have fails, and so does a dependency
+# of the data that its word's explanation does not say. A citation of another surah ("Surah
+# Al-'Alaq") and what a LATER ayah teaches are not back-references; the lesson map's own lines are
+# its recap, not a pointer.
 AYAT_NUM = {**{num_id(n): n for n in range(1, 287)}, **{ordinal(n): n for n in range(1, 287)}}
-AYAT_NAMED = re.compile(r"\bayat (" + "|".join(sorted(AYAT_NUM, key=len, reverse=True)) + r")\b")
+_AYAT_WORDS = "|".join(sorted(AYAT_NUM, key=len, reverse=True))
+AYAT_NAMED = re.compile(rf"\bayat ({_AYAT_WORDS})\b")
 AYAT_BEFORE = re.compile(r"\bayat sebelum(?:nya|\b)")
 BACKREF_FREE_PARTS = {"map", "learned", "intro", "next", "done", "recap", "recite"}
+# "Ayat ini melanjutkan ayat kedua." — the hedged form, where the kitab differ, is "Menurut
+# al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama."
+CONTINUES = re.compile(rf"\b[Aa]yat ini (?:masih )?melanjutkan ayat ({_AYAT_WORDS})\b")
+# What a line says when it names a word of an earlier ayah because this ayah depends on it.
+DEPENDENCY = re.compile(r"\b(?:na[’']t|sifat|badal|pengganti|[’'‘]athaf|[’'‘]athf|disambungkan|menyambungkan|melanjutkan|"
+                        r"disandarkan|bergantung|dikaitkan|mengaitkan|mengikuti|menerangkan|menguatkan|khabar|mudhaf ilaih|"
+                        r"keterangan keadaan|penjelas)\b", re.I)
+COMPARISON = re.compile(r"\b(?:seperti|sama (?:seperti|dengan)|berbeda dengan|sekali lagi|polanya sama|"
+                        r"sudah (?:kita )?(?:pelajari|bahas|lihat|temui))\b[^.;]*\bayat\b"
+                        r"|\bayat\b[^.;]*\b(?:seperti|sama (?:seperti|dengan)|berbeda dengan)\b", re.I)
+# A named word as a caption shows it (NAMED_SHOWN without its groups), a run of them, and the
+# citation that follows one: "ٱللَّهِ (Allāhi) di ayat kedua", "kata بِرَبِّ (birabbi) yang artinya
+# “kepada Tuhan” di ayat pertama", "frasa لَمْ (lam) يَلِدْ (yalid) yang artinya “tidak beranak” di ayat ketiga".
+_NAMED_ONE = rf"(?<![؀-ۿ])[{_NAMED_AR}]+ \([^()؀-ۿ]+\)"
+CITATION = re.compile(rf"(?P<run>{_NAMED_ONE}(?: {_NAMED_ONE})*)(?:,? (?:yang )?artinya “[^”]*”)?,? (?:di|pada) "
+                      rf"ayat (?P<n>{_AYAT_WORDS})\b")
+
+
+def _line_ayah(lid: str) -> int | None:
+    """The ayah of a line whose earlier-ayah pointers are checked (None: a shared line, lesson zero,
+    or a part that is the lesson map's or the ayah's frame, BACKREF_FREE_PARTS)."""
+    parts = lid.split(":")
+    if len(parts) < 3 or not parts[1].isdigit() or parts[2] in BACKREF_FREE_PARTS:
+        return None
+    return int(parts[1]) or None
+
+
+def _surah_citation(display: str, start: int) -> bool:
+    return bool(re.search(r"\bSurah [^\s,.;:]+(?: [^\s,.;:]+)? $", display[:start]))
+
+
+def citations(lid: str, display) -> list[tuple[list[str], int]]:
+    """The citations of a line of ayah A at an earlier ayah of its surah: ([named words], N)."""
+    A = _line_ayah(lid)
+    if A is None or not isinstance(display, str):
+        return []
+    out = []
+    for m in CITATION.finditer(display):
+        n = AYAT_NUM[m.group("n")]
+        if n < A:
+            out.append(([x.group() for x in NAMED_SHOWN.finditer(m.group("run"))], n))
+    return out
 
 
 def back_references(lid: str, display) -> list[str]:
-    """The pointers of a line of ayah A at an earlier ayah of its surah (rule 29), as written."""
-    parts = lid.split(":")
-    if not isinstance(display, str) or len(parts) < 3 or not parts[1].isdigit() or parts[2] in BACKREF_FREE_PARTS:
+    """The pointers of a line of ayah A at an earlier ayah of its surah that are not a dependency in
+    one of its two forms (rule 8 as refined 2026-10-18), as written: a comparison, "ayat
+    sebelumnya", or an "ayat <earlier>" that is neither "Ayat ini melanjutkan ayat <N>" nor a
+    citation after a named word in a line that says the dependency."""
+    A = _line_ayah(lid)
+    if A is None or not isinstance(display, str):
         return []
-    A = int(parts[1])
+    compared = bool(COMPARISON.search(display))
+    cited = {m.end() for m in CITATION.finditer(display)}
+    depends = bool(DEPENDENCY.search(display))
     out = []
     for m in AYAT_NAMED.finditer(display):
-        if AYAT_NUM[m.group(1)] >= A or re.search(r"\bSurah [^\s,.;:]+(?: [^\s,.;:]+)? $", display[:m.start()]):
+        if AYAT_NUM[m.group(1)] >= A or _surah_citation(display, m.start()):
+            continue
+        cont = any(c.end() == m.end() for c in CONTINUES.finditer(display))
+        if not compared and (cont or (m.end() in cited and depends)):
             continue
         out.append(m.group())
     return out + [m.group() for m in AYAT_BEFORE.finditer(display)]
+
+
+# ------------------------------------------------------------------ continuations (rule 8, 2026-10-18)
+# authored/<slug>.structure.json, per ayah beside its `structure`: `continues`, the ayah this one
+# continues and what in it depends on which earlier word, from the kitab the lesson cites:
+#   {"ayah": 2, "per": null | "al-Mujtaba dan al-Jadwal",
+#    "links": [{"words": [1], "kind": "na't", "on": ["1:2:2/allahi"], "src": ["D", "J"],
+#               "said_in": ["word", "structure"]}, …]}
+# `ayah` is the ordinal the opening sentence says ("Ayat ini melanjutkan ayat kedua."); `per` the
+# hedge that sentence carries where the kitab differ ("Menurut al-Mujtaba dan al-Jadwal, ayat ini
+# melanjutkan ayat pertama."); each link: the word(s) of this ayah, the kind of dependency, the
+# named word(s) of ONE earlier ayah it is on (the named-word refs, a run for a phrase), the kitab
+# (the surah's `kitab` abbreviations) and where it is said — "word": the explanation of each of
+# `words` (its w<n> line or one of its composition lines) cites `on` "di ayat <N>"; "structure":
+# one of the ayah's structure lines does. Reviewer-only (build_surah.py reads only `structure`).
+CONTINUES_KEYS = {"ayah", "per", "links"}
+LINK_KEYS = {"words", "kind", "on", "src", "said_in"}
+SAID_IN = ("word", "structure")
+
+
+def load_continues() -> dict[str, dict]:
+    """{slug: {"ayat": {A: continues}, "kitab": {abbr}}} from the authored structure and words files."""
+    out: dict[str, dict] = {}
+    for sp in SURAHS:
+        p = AUTHORED_DIR / f"{sp.slug}.structure.json"
+        if not p.exists():
+            continue
+        st = json.loads(p.read_text(encoding="utf-8"))
+        wp = AUTHORED_DIR / f"{sp.slug}.words.json"
+        kitab = set((json.loads(wp.read_text(encoding="utf-8")).get("kitab") or {}) if wp.exists() else ())
+        out[sp.slug] = {"ayat": {int(a): v["continues"] for a, v in (st.get("ayat") or {}).items() if "continues" in v},
+                        "kitab": kitab}
+    return out
+
+
+def continuation_problems(manifests: dict[str, dict], lessons: dict[str, dict], named: "Named",
+                          continues: dict[str, dict]) -> list[str]:
+    """Rule 8 as refined 2026-10-18, on the data and on the lines: every ayah the data says continues
+    an earlier one opens its structure part with "Ayat ini melanjutkan ayat <N>." (hedged as the data
+    says), and no other ayah says it; every dependency of the data is said where the data says (its
+    word's explanation, its structure lines), the earlier word named and its ayah cited; every
+    citation of an earlier ayah's word is a dependency of the data; every named word of an earlier
+    ayah only is cited; and an ayah whose structure is a "lanjutan" has data at all."""
+    errs: list[str] = []
+    for sp in SURAHS:
+        slug, S = sp.slug, sp.surah
+        lesson, man = lessons.get(slug), manifests.get(slug)
+        if lesson is None or not isinstance(man, dict) or not isinstance(man.get("lines"), dict):
+            continue
+        lines = man["lines"]
+        data = (continues.get(slug) or {}).get("ayat") or {}
+        kitab = (continues.get(slug) or {}).get("kitab") or set()
+        n_words = {a["ayah"]: len(a["words"]) for a in lesson["ayat"]}
+        # The data itself.
+        links_of: dict[int, list[tuple[tuple[str, ...], int, dict]]] = {}
+        for A, c in sorted(data.items()):
+            where = f"{slug} structure.json ayah {A} continues"
+            if A not in n_words:
+                errs.append(f"{where}: the lesson has no ayah {A}")
+                continue
+            if not isinstance(c, dict) or set(c) != CONTINUES_KEYS:
+                errs.append(f"{where}: must be exactly {sorted(CONTINUES_KEYS)}")
+                continue
+            if not isinstance(c["ayah"], int) or isinstance(c["ayah"], bool) or not 1 <= c["ayah"] < A:
+                errs.append(f"{where}: ayah {c['ayah']!r} is not an earlier ayah")
+            if c["per"] is not None and (not isinstance(c["per"], str) or not c["per"].strip()):
+                errs.append(f"{where}: per must be null or the kitab the hedge names")
+            if not isinstance(c["links"], list) or not c["links"]:
+                errs.append(f"{where}: links must be a non-empty list (what in this ayah depends on which word)")
+                continue
+            for i, ln in enumerate(c["links"]):
+                lw = f"{where}.links[{i}]"
+                if not isinstance(ln, dict) or set(ln) != LINK_KEYS:
+                    errs.append(f"{lw}: must be exactly {sorted(LINK_KEYS)}")
+                    continue
+                ws = ln["words"]
+                if (not isinstance(ws, list) or not ws or ws != sorted(set(ws))
+                        or any(not isinstance(w, int) or isinstance(w, bool) or not 1 <= w <= n_words[A] for w in ws)):
+                    errs.append(f"{lw}: words {ws!r} must be ascending word numbers of ayah {A}")
+                    continue
+                if not isinstance(ln["kind"], str) or not ln["kind"].strip():
+                    errs.append(f"{lw}: kind must name the dependency (na't, badal, 'athaf, …)")
+                if not isinstance(ln["src"], list) or not ln["src"] or any(x not in kitab for x in ln["src"]):
+                    errs.append(f"{lw}: src {ln['src']!r} must be kitab of the surah's `kitab` table (the source of the dependency)")
+                if not isinstance(ln["said_in"], list) or not ln["said_in"] or any(x not in SAID_IN for x in ln["said_in"]):
+                    errs.append(f"{lw}: said_in must list where it is said, of {list(SAID_IN)}")
+                    continue
+                on = ln["on"]
+                if not isinstance(on, list) or not on or any(not isinstance(r, str) or r not in named.refs for r in on):
+                    errs.append(f"{lw}: on {on!r} must be named-word refs (\"1:2:2/allahi\") of the lesson")
+                    continue
+                ayat_on = {(int(r.split("/")[0].split(":")[0]), int(r.split("/")[0].split(":")[1])) for r in on}
+                if len(ayat_on) != 1 or next(iter(ayat_on))[0] != S or not next(iter(ayat_on))[1] < A:
+                    errs.append(f"{lw}: on {on!r} must be words of ONE earlier ayah of this surah")
+                    continue
+                pairs = tuple(named_shown(*named.refs[r]) for r in on)
+                links_of.setdefault(A, []).append((pairs, next(iter(ayat_on))[1], ln))
+        # An ayah whose structure the lesson calls a continuation ("lanjutan jumlah ayat 2") has data,
+        # and the ayah the type names is the data's.
+        for a in lesson["ayat"]:
+            t = ((a.get("structure") or {}).get("type") or "")
+            if re.match(r"\s*lanjutan\b", t) and a["ayah"] not in data:
+                errs.append(f"{slug}:{a['ayah']}: its structure is a continuation ({t!r}): give the ayah `continues` in "
+                            f"authored/{slug}.structure.json (which ayah it continues, and what depends on which word)")
+            m = re.match(r"\s*lanjutan jumlah ayat (\d+)\b", t)
+            c = data.get(a["ayah"])
+            if m and isinstance(c, dict) and c.get("ayah") != int(m.group(1)):
+                errs.append(f"{slug}:{a['ayah']}: its structure type continues ayat {m.group(1)}, `continues` says ayah {c.get('ayah')!r}")
+        # Where each named word stands: the ayat of this surah it is a word (or form) of.
+        places: dict[str, set[int]] = {}
+        for ref, word in named.refs.items():
+            s, a = (int(x) for x in ref.split("/")[0].split(":")[:2])
+            if s == S:
+                places.setdefault(named_shown(*word), set()).add(a)
+        for A in sorted(n_words):
+            base = f"{slug}:{A}"
+            c = data.get(A) if isinstance(data.get(A), dict) else None
+            own = {lid: ln for lid, ln in lines.items() if lid.startswith(base + ":") and isinstance(ln, dict)
+                   and isinstance(ln.get("display"), str)}
+            # The opening sentence: where the data has it — the structure part's first words after its
+            # lead, across its split parts — and nowhere else.
+            parts = [lid for lid in own if lid.startswith(f"{base}:structure")]
+            opening = re.sub(rf"^{re.escape(STRUCTURE_LEAD)}\s*", "", " ".join(own[lid]["display"] for lid in parts))
+            said_at = [(lid, m) for lid, ln in own.items() for m in CONTINUES.finditer(ln["display"])]
+            for lid, m in said_at:
+                n = AYAT_NUM[m.group(1)]
+                if c is None or n != c.get("ayah"):
+                    errs.append(f"{lid}: says {m.group()!r}, but the data has no continuation of ayah {n} "
+                                f"(authored/{slug}.structure.json `continues` of ayah {A})")
+            if c is not None and isinstance(c.get("ayah"), int) and 1 <= c["ayah"] < A:
+                want = f"ayat ini melanjutkan ayat {ordinal(c['ayah'])}"
+                lead = f"menurut {c['per'].lower()}, " if isinstance(c.get("per"), str) and c["per"].strip() else ""
+                head = opening.lower()
+                if not (head.startswith(lead + want) or head.startswith(lead + want.replace("ini ", "ini masih "))):
+                    say = (f"Menurut {c['per']}, a" if lead else "A") + want[1:]
+                    errs.append(f"{parts[0] if parts else base + ':structure'}: ayah {A} continues ayah {c['ayah']} (the data): its "
+                                f"structure part opens with “{say}.” (rule 8, operator 2026-10-18)")
+                elif len(said_at) > 1:
+                    errs.append(f"{said_at[1][0]}: {said_at[1][1].group()!r} again: the continuation is said once, at the "
+                                f"opening of the structure part ({parts[0]})")
+            known = links_of.get(A, [])
+            # Every citation is a dependency of the data, of words of the ayah it names — in a word's own
+            # lines, a dependency of THAT word.
+            for lid, ln in own.items():
+                wm = re.match(rf"{re.escape(base)}:w(\d+)(?::|$)", lid)
+                mine = [x for x in known if wm is None or int(wm.group(1)) in x[2]["words"]]
+                for run, n in citations(lid, ln["display"]):
+                    if any(n not in places.get(w, set()) for w in run):
+                        errs.append(f"{lid}: cites {' '.join(run)!r} “di ayat {ordinal(n)}”, which is not a word of ayah {n}")
+                    elif not any(tuple(run) == pairs and n == on_a for pairs, on_a, _ in mine):
+                        errs.append(f"{lid}: cites {' '.join(run)!r} of ayah {n} as a dependency the data does not have "
+                                    f"(authored/{slug}.structure.json `continues` of ayah {A}): never one the kitab do not state")
+                # … and a named word that stands only in an earlier ayah says which.
+                cited_spans = [m.span("run") for m in CITATION.finditer(ln["display"])]
+                if _line_ayah(lid) is None:
+                    continue
+                for m in NAMED_SHOWN.finditer(ln["display"]):
+                    at = places.get(m.group(), set())
+                    if at and max(at) < A and not any(s <= m.start() and m.end() <= e for s, e in cited_spans):
+                        errs.append(f"{lid}: names {m.group()!r}, a word of ayah {max(at)}, without saying which ayah "
+                                    f"(“… di ayat {ordinal(max(at))}”: rule 8, operator 2026-10-18)")
+            # Every dependency of the data is said where the data says.
+            for pairs, on_a, ln in known:
+                def cite(lid: str, pairs: tuple[str, ...] = pairs, on_a: int = on_a) -> bool:
+                    return any(tuple(run) == pairs and n == on_a for run, n in citations(lid, own[lid]["display"]))
+                if "word" in ln["said_in"]:
+                    for w in ln["words"]:
+                        mine = [lid for lid in own if re.fullmatch(rf"{re.escape(base)}:w{w}(?::compose:\d+)?(?::[a-z])?", lid)]
+                        if not any(cite(lid) for lid in mine):
+                            errs.append(f"{base}:w{w}: depends on {' '.join(pairs)!r} of ayah {on_a} ({ln['kind']}, the data): its "
+                                        f"explanation says so, “… {pairs[-1]} di ayat {ordinal(on_a)}” (rule 8, operator 2026-10-18)")
+                if "structure" in ln["said_in"]:
+                    mine = [lid for lid in own if lid.startswith(f"{base}:structure")]
+                    if not any(cite(lid) for lid in mine):
+                        errs.append(f"{base}:structure: words {ln['words']} depend on {' '.join(pairs)!r} of ayah {on_a} "
+                                    f"({ln['kind']}, the data): a structure line says so, “… di ayat {ordinal(on_a)}”")
+    return errs
 
 
 def default_named_speech(translit: str) -> str:
@@ -1876,7 +2124,9 @@ def check_display(lid: str, display, text, forms: Forms, lex: Lexicon, focus_ar:
                     "“Kata pertama, yaitu …”; operator 2026-10-17)")
     for ref in back_references(lid, display):
         errs.append(f"{lid}: points back at an earlier ayah ({ref!r}): remove the comparison, keep the sentence "
-                    "complete (rule 29, operator 2026-10-17)")
+                    "complete (rule 29, operator 2026-10-17); an earlier ayah is named only for a dependency, "
+                    "“Ayat ini melanjutkan ayat …” or “<the named word> di ayat …” in a line that says it "
+                    "(na’t / badal / ‘athaf / bergantung …: rule 8, 2026-10-18)")
     # The operator's wording (README "Operator's lesson-wording rules"): what a later ayah teaches is
     # "baru akan diajarkan lebih lengkap di ayat …" (2026-10-17), not "kita pelajari / bahas di
     # ayat …"; a grammatical estimate is what "para ulama memahaminya (antara lain) sebagai …"
@@ -2978,9 +3228,11 @@ def letters_for(name: str, lessons: dict[str, dict], forms: Forms, compose: dict
 def check(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, *, build: bool = True,
           lex: Lexicon | None = None, compose: dict[str, dict] | None = None,
           quiz: dict[str, dict] | None = None, lessonmap: dict[str, dict] | None = None,
-          curriculum: dict | None = None, pending: dict | None = None) -> list[str]:
+          curriculum: dict | None = None, pending: dict | None = None,
+          continues: dict[str, dict] | None = None) -> list[str]:
     """Every check of the module docstring. `curriculum`: content/curriculum.json, `pending`:
-    authored/curriculum.pending.json (both default: from disk)."""
+    authored/curriculum.pending.json, `continues`: the continuation data of the authored structure
+    files (load_continues; all default: from disk)."""
     forms = Forms(lessons)
     lex = lex or load_lexicon()
     compose = load_compose() if compose is None else compose
@@ -3006,6 +3258,8 @@ def check(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, *
                                lessonmap.get(name), curriculum, named=named)
     # No term before its lesson (decision 7), on the manifests as they stand.
     errs += term_order_problems(manifests, lessons, lex, curriculum, lessonmap, pending)
+    # Which ayat continue which, said where the data says (rule 8 as refined 2026-10-18).
+    errs += continuation_problems(manifests, lessons, named, load_continues() if continues is None else continues)
     errs += check_guide_ts()
     if build:
         errs += check_build(manifests, lessons, library, lex, compose, quiz, lessonmap, curriculum, pending)

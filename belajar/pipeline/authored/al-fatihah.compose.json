@@ -326,7 +326,7 @@
         {"stage": "change", "tiles": ["ar-rahmani"], "from": "ar-rahmanu", "to": "ar-rahmani",
          "say": [
            "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini akhirnya kasrah, bunyi i.",
-           "Sebabnya, kata ini menjadi sifat, atau na't, bagi nama Allah, yang berakhir kasrah."
+           "Sebabnya, kata ini na't, yaitu sifat, bagi {{1:2:2/allahi}} di ayat kedua."
          ]},
         {"stage": "whole", "tiles": ["ar-rahmani"], "note": "awal ayat: alif dibaca",
          "say": ["Karena ayat ini dimulai dari kata ini, alif di awalnya dibaca."]}
@@ -359,7 +359,7 @@
         {"stage": "change", "tiles": ["ar-rahimi"], "from": "ar-rahimu", "to": "ar-rahimi",
          "say": [
            "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini akhirnya kasrah, bunyi i.",
-           "Sebabnya, kata ini sifat berikutnya bagi nama Allah."
+           "Sebabnya, kata ini juga na't, yaitu sifat berikutnya, bagi {{1:2:2/allahi}} di ayat kedua."
          ]},
         {"stage": "whole", "tiles": ["ar-rahimi"], "note": "bacaan berhenti di sini",
          "say": ["Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."]}
@@ -383,7 +383,7 @@
          "say": ["Dalam bentuk dasarnya, kata ini berakhir dengan dhammah, bunyi u, di atas huruf kaf."]},
         {"stage": "change", "tiles": ["maliki"], "from": "maliku", "to": "maliki", "note": "sifat bagi nama Allah di ayat 2",
          "say": [
-           "Di sini akhirnya menjadi kasrah, bunyi i, karena kata ini sifat, atau na't, bagi nama Allah.",
+           "Di sini akhirnya menjadi kasrah, bunyi i, karena kata ini na't, yaitu sifat, bagi {{1:2:2/allahi}} di ayat kedua.",
            "Nama itu juga berakhir kasrah, dan sifat mengikuti akhiran kata yang disifatinya.",
            "Darwisy menyebut kata ini sifat keempat."
          ]}
@@ -674,7 +674,7 @@
         {"stage": "change", "tiles": ["sirata"], "from": "siratu", "to": "sirata", "note": "badal: pengganti kata “jalan” di ayat 6",
          "say": [
            "Di sini akhirnya menjadi fathah, bunyi a.",
-           "Sebabnya, kata ini pengganti bagi kata {{!1:6:2}} yang artinya “jalan”, dan pengganti mengikuti akhiran kata yang digantikannya.",
+           "Sebabnya, kata ini pengganti bagi kata {{!1:6:2}} yang artinya “jalan” di ayat keenam, dan pengganti mengikuti akhiran kata yang digantikannya.",
            "Dengan pengganti ini, jalan yang lurus itu dijelaskan: jalan orang-orang yang telah Engkau beri nikmat."
          ]}
       ],

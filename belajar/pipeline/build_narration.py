@@ -39,10 +39,13 @@ from the lessons names words in SKB transliteration; `Sanitiser` replaces every 
 the word's place, which the screen highlights: "kata ini" (the word the line is about), "kata
 kedua", "kata pertama dan kedua", "kata kedua sampai keempat", or, for one word of another ayah,
 the word itself with its meaning, a named word (2026-10-17: "kata {{!1:6:2}} yang artinya “jalan”
-di ayat keenam" before the sixth ayah — an EARLIER ayah is not pointed at, rule 29 —, shown
-"ٱلصِّرَٰطَ (aṣ-ṣirāṭa)" and, its letters being heavy, not said: "kata yang artinya jalan"; a simple
-word, "kata {{1:1:2}} yang artinya “Allah”", is said "kata Allohi yang artinya Allah"; a phrase by
-its meaning alone); a word of the ayah
+di ayat keenam", shown "ٱلصِّرَٰطَ (aṣ-ṣirāṭa)" and, its letters being heavy, not said: "kata yang
+artinya jalan"; a simple word, "kata {{1:1:2}} yang artinya “Allah”", is said "kata Allohi yang
+artinya Allah"; a phrase by its meaning alone — a phrase of an EARLIER ayah by its words too). A
+word of an EARLIER ayah is cited by the ordinal of its ayah, "… di ayat pertama", because this ayah
+depends on it (operator 2026-10-18, refining rule 29 of 2026-10-17: comparisons with earlier ayat
+stay out, dependencies are said; validate_narration.continuation_problems holds every such
+citation to the authored `continues` data); a word of the ayah
 named by its place and its meaning gets the word too (`name_places`, rule 26). The prefixed particles are named by their letters (bi- → huruf ba', li- → huruf lam,
 wa → wawu, the lā of wa lā → huruf nafi) where an authored line does not name the particle itself
 ({{1:1:1/bi}}, said "bi"), and pronoun suffixes (-nā, -ta, -him, -hū) become "akhiran". What stays is grammar vocabulary (mubtada', majrur, isim fa'il), scholars' names and
@@ -182,6 +185,9 @@ PRE_REWRITES: list[tuple[str, str]] = [
     # An aside in brackets is its own clause, not a gloss of the word before it ("berkedudukan jar
     # (sebagian ulama …)" would be said "jar, yaitu sebagian ulama …").
     (r" \((sebagian ulama [^()]+)\)", r"; \1"),
+    # The ayah a structure continues, by its ordinal (operator 2026-10-18: "Ayat ini melanjutkan
+    # ayat kedua."), as the citations of its words say it.
+    (r"\b([Aa]yat ini (?:masih )?melanjutkan ayat) (\d+)\b", r"\1 ke-\2"),
 ]
 
 
@@ -329,21 +335,32 @@ class Sanitiser:
                 return f"kata {ordinal(ws[0])} dan {ordinal(ws[1])}"
             return f"kata {ordinal(ws[0])} sampai {ordinal(ws[-1])}"
         g = meaning or " ".join(self.gloss[(s, a, w)] for w in ws)
+        named = lambda w: V.named_markup(f"{s}:{a}:{w}", *self.word[(s, a, w)])  # noqa: E731
         # One word is named with the word itself, its bytes and transliteration (operator
         # 2026-10-17: "should also mention the arabic word not only artinya. apply this in similar
-        # sentences"; validate_narration "named words"); a phrase by its meaning, as before.
-        core = (f"kata {self._hold(V.named_markup(f'{s}:{a}:{ws[0]}', *self.word[(s, a, ws[0])]))} yang artinya “{g}”" if len(ws) == 1
-                else f"frasa yang artinya “{g}”")
+        # sentences"; validate_narration "named words"); a phrase by its meaning — and, when it is
+        # a phrase of an EARLIER ayah that this one depends on (lam yalid, min syarri: operator
+        # 2026-10-18, "mention which word"), by its words too.
+        if len(ws) == 1:
+            core = f"kata {self._hold(named(ws[0]))} yang artinya “{g}”"
+        elif s == S and a < A:
+            core = f"frasa {self._hold(' '.join(named(w) for w in ws))} yang artinya “{g}”"
+        else:
+            core = f"frasa yang artinya “{g}”"
         return core + self._where(place, S, prep, A)
 
     @staticmethod
     def _where(place, S, prep, A=None) -> str:
-        """ " di ayat N" after a word of another ayah of the surah — except an EARLIER one (operator
-        2026-10-17, rule 29 "A lesson stands on its own screen: no back-references to earlier
-        ayat"): the word itself is named and shown, its ayah is not pointed at."""
+        """ " di ayat N" after a word of another ayah of the surah. An EARLIER ayah is named only
+        because this one depends on it (operator 2026-10-18, refining rule 29 of 2026-10-17: "we need
+        to remind some ayat is continuing previous ayat … mention which word"; a comparison is never
+        worded here), by its ordinal: "bagi kata بِرَبِّ (birabbi) yang artinya “kepada Tuhan” di ayat
+        pertama" — validate_narration holds each such citation to the authored continuation data."""
         s, a, _ = place
-        if s != S or (A is not None and a < A):
+        if s != S:
             return ""
+        if A is not None and a < A:
+            return f" {prep or 'di'} ayat {ordinal(a)}"
         return f" {prep or 'di'} ayat {num_id(a)}"
 
     def replace_mentions(self, t: str, S: int, A: int, W: int | None) -> str:
@@ -414,6 +431,9 @@ class Sanitiser:
                 phrase = "lafaz “Allah”" + self._where(places[0], S, prep, A)
             else:
                 phrase = " ".join(self._phrase(p, S, A, W, prep, meaning) for p in places)
+            if (len(places) == 1 and places[0][0] == S and places[0][1] < A and re.search(r" ayat [a-z]+$", phrase)
+                    and t[end:].startswith(" yang ")):
+                phrase += ","  # "… di ayat pertama, yang majrur": the citation closes before the clause goes on
             if t[end:].startswith(" mashdariyyah"):
                 phrase = "huruf"  # "mā mashdariyyah" names a kind of particle
             if phrase.endswith("kata ini") and t[end:].startswith(" ini"):

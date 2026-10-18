@@ -2,7 +2,8 @@
 """Mutation tests for validate_narration.py: each case plants one fault in a copy of the narration
 manifests (content/narration/*.json), of the lessons they are built from, of the pronunciation
 dictionary (authored/pronunciation.json), of the lesson maps, of the curriculum
-(content/curriculum.json) or of the list it tolerates for now (authored/curriculum.pending.json),
+(content/curriculum.json), of the list it tolerates for now (authored/curriculum.pending.json) or
+of the continuation data (authored/<slug>.structure.json `continues`, validate_narration.load_continues),
 and asserts that the validator fails with the expected message. The unmutated copies must pass. Also unit-tests the speech text, the dictionary rendering
 (spoken text, caption, karaoke tokens), the Indonesian numbers, the render request body (no
 network) and the delivery encode (its name, its fixed flags, drift and token fit, one take per
@@ -42,6 +43,10 @@ COMPOSE = V.load_compose()
 LESSONMAP = V.load_map()
 CURRICULUM = V.load_curriculum()
 PENDING = CUR.load_pending()
+CONTINUES = V.load_continues()
+# Named words as the captions show them (the content's bytes: never typed here).
+_NAMED = V.Named(LESSONS, COMPOSE)
+ALLAHI, SIRATA, BIRABBI, YUWASWISU = (V.named_shown(*_NAMED.refs[r]) for r in ("1:2:2/allahi", "1:6:2", "114:1:3", "114:5:2"))
 LEXDATA = json.loads(V.PRONUNCIATION_JSON.read_text(encoding="utf-8"))
 LEX = V.Lexicon(LEXDATA)
 FORMS = V.Forms(LESSONS)
@@ -49,10 +54,10 @@ SHA = "a" * 64
 VOICE = {"id": "v123", "name": "Suara Uji", "model": "eleven_v3"}
 
 
-def run_check(m, ls, lx, cp=None, mp=None, cur=None, pend=None):
+def run_check(m, ls, lx, cp=None, mp=None, cur=None, pend=None, cont=None):
     return V.check(m, ls, LIBRARY, lex=V.Lexicon(lx), compose=COMPOSE if cp is None else cp,
                    lessonmap=LESSONMAP if mp is None else mp, curriculum=CURRICULUM if cur is None else cur,
-                   pending=PENDING if pend is None else pend)
+                   pending=PENDING if pend is None else pend, continues=CONTINUES if cont is None else cont)
 
 
 def name_of(lid):
@@ -437,9 +442,20 @@ def in_cur(fn):
 
 def in_pending(fn):
     """A fault in the list of what is tolerated for now (authored/curriculum.pending.json)."""
-    def f(_m, _l, _x, _c, _mp, _cur, pend):
+    def f(_m, _l, _x, _c, _mp, _cur, pend, *_):
         fn(pend["lines"])
     return f
+
+
+def in_continues(fn):
+    """A fault in the continuation data (authored/<slug>.structure.json `continues`, load_continues)."""
+    def f(_m, _l, _x, _c, _mp, _cur, _pend, cont):
+        fn(cont)
+    return f
+
+
+def link_of(cont, slug, ayah, k):
+    return cont[slug]["ayat"][ayah]["links"][k]
 
 
 def listed(lid, terms):
@@ -668,6 +684,46 @@ MUTATIONS = [
      "al-ikhlas:2:structure:b: points back at an earlier ayah ('ayat sebelumnya')"),
     ("a comparison with an earlier ayah in a composition", compose_say("1:3:1", 4, "Sebabnya, kata ini sekali lagi menjadi sifat bagi nama Allah di ayat kedua."),
      "points back at an earlier ayah ('ayat kedua')"),
+    # … but a DEPENDENCY on an earlier ayah is said (operator 2026-10-18: "we need to remind some ayat
+    # is continuing previous ayat … mention which word"): the opening "Ayat ini melanjutkan ayat …"
+    # and the earlier word named and cited, where the authored `continues` data says
+    ("a dependency's citation taken out, as 2026-10-17 to 2026-10-18",
+     both("al-fatihah:3:w1:compose:4", " di ayat kedua", "", " di ayat kedua", ""),
+     f"al-fatihah:3:w1: depends on '{ALLAHI}' of ayah 2 (na't (sifat), the data): its explanation says so"),
+    ("… in a quiz explanation (An-Nas 2)", both("an-nas:2:ex:why-harakat:1:why", " di ayat pertama,", "", " di ayat pertama,", ""),
+     f"an-nas:2:ex:why-harakat:1:why: names '{BIRABBI}', a word of ayah 1, without saying which ayah"),
+    ("… in a structure line (An-Nas 6, a phrase's hal)", both("an-nas:6:structure:b", " di ayat kelima", "", " di ayat kelima", ""),
+     f"an-nas:6:structure: words [1, 2, 3] depend on '{YUWASWISU}' of ayah 5"),
+    ("the continuation sentence taken out", both("al-fatihah:3:structure:1", " Ayat ini melanjutkan ayat kedua.", ""),
+     "al-fatihah:3:structure:1: ayah 3 continues ayah 2 (the data): its structure part opens with “Ayat ini melanjutkan ayat kedua.”"),
+    ("… said of an ayah the data does not continue",
+     both("al-fatihah:6:structure:1", "Sekarang susunan kalimatnya.", "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat kelima."),
+     "al-fatihah:6:structure:1: says 'Ayat ini melanjutkan ayat kelima', but the data has no continuation of ayah 5"),
+    ("… the wrong ayah", both("al-fatihah:4:structure:1", "melanjutkan ayat kedua", "melanjutkan ayat ketiga"),
+     "al-fatihah:4:structure:1: says 'Ayat ini melanjutkan ayat ketiga', but the data has no continuation of ayah 3"),
+    ("a hedged continuation said without its hedge",
+     both("al-ikhlas:2:structure:a", "Menurut al-Mujtaba dan al-Jadwal, ayat ini", "Ayat ini"),
+     "al-ikhlas:2:structure:a: ayah 2 continues ayah 1 (the data): its structure part opens with “Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama.”"),
+    ("a continuation in a later structure line",
+     both("al-fatihah:7:structure:2", "Kata pertama disandarkan", "Ayat ini melanjutkan ayat keenam. Kata pertama disandarkan"),
+     "al-fatihah:7:structure:2: 'Ayat ini melanjutkan ayat keenam' again: the continuation is said once"),
+    ("a citation of a word that is not in that ayah",
+     both("al-fatihah:7:w1:compose:3", "di ayat keenam", "di ayat kelima"),
+     f"al-fatihah:7:w1:compose:3: cites '{SIRATA}' “di ayat kelima”, which is not a word of ayah 5"),
+    ("a citation the data does not have (its link taken out)", in_continues(lambda c: c["al-fatihah"]["ayat"][3]["links"].pop(1)),
+     f"al-fatihah:3:w2:compose:4: cites '{ALLAHI}' of ayah 2 as a dependency the data does not have"),
+    ("a citation inside a comparison", both("an-nas:5:w1", "di ayat keempat;", "di ayat keempat, seperti di ayat kedua;"),
+     "an-nas:5:w1: points back at an earlier ayah ('ayat keempat')"),
+    ("a lanjutan ayah without data", in_continues(lambda c: c["al-falaq"]["ayat"].pop(4)),
+     "al-falaq:4: its structure is a continuation ("),
+    ("data that continues the ayah itself", in_continues(lambda c: c["al-fatihah"]["ayat"][7].__setitem__("ayah", 7)),
+     "al-fatihah structure.json ayah 7 continues: ayah 7 is not an earlier ayah"),
+    ("data that disagrees with the ayah's structure type", in_continues(lambda c: c["an-nas"]["ayat"][3].__setitem__("ayah", 2)),
+     "an-nas:3: its structure type continues ayat 1, `continues` says ayah 2"),
+    ("data with a ref that does not resolve", in_continues(lambda c: link_of(c, "an-nas", 2, 0).__setitem__("on", ["114:1:9"])),
+     "an-nas structure.json ayah 2 continues.links[0]: on ['114:1:9'] must be named-word refs"),
+    ("data with a kitab the surah does not cite", in_continues(lambda c: link_of(c, "al-fatihah", 4, 0).__setitem__("src", ["DA"])),
+     "al-fatihah structure.json ayah 4 continues.links[0]: src ['DA'] must be kitab of the surah's `kitab` table"),
     # a heavy-letter word is shown and explained, never said (operator 2026-10-17: "better not to use
     # heavy-letter words with elevenlabs, we just explain but not read them; simple words so far is ok")
     ("a heavy-letter word said in its plain spelling", replace_in(SHOWN_ONLY, "text", "Kata pertama artinya", "Kata pertama, yaitu shiratha, artinya"),
@@ -680,7 +736,7 @@ MUTATIONS = [
                                                         with_audio(SHOWN_ONLY, voice=True)),
      f"{SHOWN_ONLY}: says the heavy-letter word 'ṣirāṭa'"),
     ("a heavy-letter word named with the markup of a said one",
-     compose_say("1:7:1", 3, "Sebabnya, kata ini pengganti bagi kata {{1:6:2}} yang artinya “jalan”, dan pengganti mengikuti akhiran kata yang digantikannya."),
+     compose_say("1:7:1", 3, "Sebabnya, kata ini pengganti bagi kata {{1:6:2}} yang artinya “jalan” di ayat keenam, dan pengganti mengikuti akhiran kata yang digantikannya."),
      "has a heavy letter (ص ض ط ظ ق خ غ): it is shown and explained, never said — write {{!1:6:2}}"),
     ("a simple word named as shown only", item_say(1, 1, ITEM11_SAY.replace("{{1:1:1/bi}}", "{{!1:1:1/bi}}")),
      "bi is a simple word, said as it is written: write {{1:1:1/bi}}"),
@@ -1105,8 +1161,9 @@ class NarrationValidation(unittest.TestCase):
             with self.subTest(name):
                 m, ls, lx, cp = copy.deepcopy(MANIFESTS), copy.deepcopy(LESSONS), copy.deepcopy(LEXDATA), copy.deepcopy(COMPOSE)
                 mp, cur, pend = copy.deepcopy(LESSONMAP), copy.deepcopy(CURRICULUM), copy.deepcopy(PENDING)
-                mutate(m, ls, lx, cp, mp, cur, pend)
-                errs = run_check(m, ls, lx, cp, mp, cur, pend)
+                cont = copy.deepcopy(CONTINUES)
+                mutate(m, ls, lx, cp, mp, cur, pend, cont)
+                errs = run_check(m, ls, lx, cp, mp, cur, pend, cont)
                 self.assertTrue(any(expect in e for e in errs), f"{name}: expected {expect!r} in {errs[:5]}")
 
     def test_good_audio_passes(self):
@@ -2553,14 +2610,22 @@ class SpeechAndRender(unittest.TestCase):
         self.assertEqual(san.prose("Min adalah huruf jar.", 113, 2, 1), "Kata ini adalah huruf jar.")
         # a word of ANOTHER ayah (only this ayah's words are numbered on screen): until 2026-10-17
         # by its meaning alone; since, a named word with its meaning (operator: "should also
-        # mention the arabic word not only artinya"), shown and said by Speech — and an EARLIER
-        # ayah is not pointed at (rule 29, "no back-references to earlier ayat"); a later one is
+        # mention the arabic word not only artinya"), shown and said by Speech — and an EARLIER ayah
+        # by its ordinal, the word this ayah depends on (operator 2026-10-18, refining rule 29 of
+        # 2026-10-17, when it was left out: "… mention which word"; validate_narration holds the
+        # citation to the `continues` data); a later one as before
         self.assertEqual(san.prose("Badal dari aṣ-ṣirāṭa di ayat 6.", 1, 7, 1),
-                         "Badal dari kata {{!1:6:2}} yang artinya “jalan”.")
+                         "Badal dari kata {{!1:6:2}} yang artinya “jalan” di ayat keenam.")
         self.assertEqual(san.prose("Seperti aṣ-ṣirāṭa di ayat 6.", 1, 2), "Seperti kata {{!1:6:2}} yang artinya “jalan” di ayat enam.")
-        self.assertEqual(san.prose("Sifat bagi lafaz Allah di ayat 2.", 1, 3), "Sifat bagi lafaz “Allah”.")
+        self.assertEqual(san.prose("Sifat bagi lafaz Allah di ayat 2.", 1, 3), "Sifat bagi lafaz “Allah” di ayat kedua.")
         self.assertEqual(san.prose("Bergantung pada a‘ūżu (“aku berlindung”).", 113, 3),
-                         "Bergantung pada kata {{113:1:2}} yang artinya “aku berlindung”.")
+                         "Bergantung pada kata {{113:1:2}} yang artinya “aku berlindung” di ayat pertama.")
+        # … a comma closes the citation before the clause goes on, and a phrase of an earlier ayah is
+        # named by its words
+        self.assertEqual(san.prose("Badal dari rabbi di ayat 1 yang majrur.", 114, 2, 1),
+                         "Badal dari kata {{114:1:3}} yang artinya “kepada Tuhan” di ayat pertama, yang majrur.")
+        self.assertEqual(san.prose("Wa menyambungkan kalimat ini dengan lam yalid.", 112, 4, 1),
+                         "Wawu menyambungkan kalimat ini dengan frasa {{112:3:1}} {{112:3:2}} yang artinya “tidak beranak” di ayat ketiga.")
         self.assertEqual(san.prose("Seperti khalaqa.", 1, 7), "Seperti kata {{!113:2:4}} yang artinya “Dia ciptakan”.")
         # … and what a listener hears and reads: the word's sound and its bytes where the markup was
         sp = B.Speech(LEX, V.Named(LESSONS, COMPOSE))
@@ -2639,9 +2704,12 @@ class SpeechAndRender(unittest.TestCase):
                 self.assertIsNone(V.PLACE_MEANING.search(ln["display"]), lid)
 
     def test_back_references(self):
-        # Rule 29 (operator 2026-10-17: "BACK-REFERENCES: YES — remove them all"): a line of ayah A
-        # does not point at an earlier ayah of its surah; a later ayah, the same one, another
-        # surah's citation, lesson zero and the lesson map's own recap are no back-references.
+        # Rule 8 (operator 2026-10-17, "BACK-REFERENCES: YES — remove them all"; refined 2026-10-18: "we
+        # need to remind some ayat is continuing previous ayat … mention which word"): a line of ayah A
+        # does not COMPARE with an earlier ayah of its surah; it names one only for a dependency, as
+        # "Ayat ini melanjutkan ayat <N>" or as a citation after a named word in a line that says the
+        # dependency. A later ayah, the same one, another surah's citation, lesson zero and the lesson
+        # map's own recap are no back-references.
         br = V.back_references
         self.assertEqual(br("al-fatihah:3:w1:compose:4", "Sifat, seperti di ayat pertama."), ["ayat pertama"])
         self.assertEqual(br("al-ikhlas:2:structure:b", "Ia menegaskan isi ayat sebelumnya."), ["ayat sebelumnya"])
@@ -2651,9 +2719,52 @@ class SpeechAndRender(unittest.TestCase):
         self.assertEqual(br("al-ikhlas:3:structure:a", "seperti dalam Surah Al-Fatihah ayat dua"), [])
         self.assertEqual(br("al-fatihah:3:map:total", "Sampai ayat ini, sudah … di ayat pertama"), [])
         self.assertEqual(br("al-fatihah:0:primer:1", "ayat pertama"), [])
+        # the two forms of a dependency
+        allahi = ALLAHI
+        self.assertEqual(br("al-fatihah:3:w1:compose:4", f"Sebabnya, kata ini na’t (نَعْت), yaitu sifat, bagi {allahi} di ayat kedua."), [])
+        self.assertEqual(br("al-fatihah:3:structure:1", "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat kedua."), [])
+        self.assertEqual(br("al-ikhlas:4:w1", "menyambungkan kalimat ini dengan frasa لَمْ (lam) يَلِدْ (yalid) yang artinya “tidak "
+                                              "beranak” di ayat ketiga"), [])
+        self.assertEqual(br("an-nas:2:w1", "badal dari kata بِرَبِّ (birabbi) yang artinya “kepada Tuhan” di ayat pertama, yang majrur"), [])
+        # … a citation in a line that says no dependency, a citation in a comparison, an ayah after an
+        # ordinary word, "melanjutkan" not at "ayat ini"
+        self.assertEqual(br("al-fatihah:3:w1", f"Lihat {allahi} di ayat kedua."), ["ayat kedua"])
+        self.assertEqual(br("al-fatihah:3:w1", f"Sifat bagi {allahi} di ayat kedua, seperti di ayat pertama."), ["ayat kedua", "ayat pertama"])
+        self.assertEqual(br("al-fatihah:3:w1", "Kata ini sifat bagi nama Allah di ayat kedua."), ["ayat kedua"])
+        self.assertEqual(br("al-fatihah:4:w1", "Pelajaran ini melanjutkan ayat kedua."), ["ayat kedua"])
+        self.assertEqual(V.citations("al-fatihah:4:w1:compose:2", f"na’t (نَعْت), yaitu sifat, bagi {allahi} di ayat kedua."), [([allahi], 2)])
+        self.assertEqual(V.citations("al-fatihah:2:w1", f"bagi {allahi} di ayat pertama"), [([allahi], 1)])
+        self.assertEqual(V.citations("al-fatihah:1:w1", f"bagi {allahi} di ayat kedua"), [])  # a later ayah: no citation
         for man in MANIFESTS.values():
             for lid, ln in man["lines"].items():
                 self.assertEqual(br(lid, ln["display"]), [], lid)
+
+    def test_continuations(self):
+        # Every continuation of the four surahs (the authored data, 2026-10-18), said as the data says.
+        per = {slug: sorted(d["ayat"]) for slug, d in CONTINUES.items()}
+        self.assertEqual(per, {"al-fatihah": [3, 4, 7], "al-ikhlas": [2, 3, 4], "al-falaq": [2, 3, 4, 5], "an-nas": [2, 3, 4, 5, 6]})
+        self.assertEqual(V.continuation_problems(MANIFESTS, LESSONS, V.Named(LESSONS, COMPOSE), CONTINUES), [])
+        lines = MANIFESTS["al-fatihah"]["lines"]
+        # The operator's example: Al-Fatihah 3, word 1, and the structure item that said "bukan kalimat baru".
+        self.assertEqual(lines["al-fatihah:3:w1:compose:4"]["display"],
+                         f"Sebabnya, kata ini na’t (نَعْت), yaitu sifat, bagi {ALLAHI} di ayat kedua.")
+        self.assertTrue(lines["al-fatihah:3:structure:1"]["display"].startswith(
+            "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat kedua. Kedua katanya adalah na’t (نَعْت), yaitu dua sifat "
+            f"bagi {ALLAHI} di ayat kedua"))
+        self.assertIn("bagi Allohi di ayat kedua", lines["al-fatihah:3:w1:compose:4"]["text"])
+        # a heavy-letter word is cited caption-only: "… bagi kata yang artinya jalan di ayat keenam"
+        self.assertIn("kata ini pengganti bagi kata yang artinya jalan di ayat keenam", lines["al-fatihah:7:w1:compose:3"]["text"])
+        # the hedge the data carries, where the kitab differ
+        self.assertTrue(MANIFESTS["al-ikhlas"]["lines"]["al-ikhlas:2:structure:a"]["display"].startswith(
+            "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama:"))
+        # no ayah without data says it, and the ayat that start a sentence do not
+        for man in MANIFESTS.values():
+            for lid, ln in man["lines"].items():
+                if V.CONTINUES.search(ln["display"]):
+                    slug, a = lid.split(":")[:2]
+                    self.assertIn(int(a), CONTINUES[slug]["ayat"], lid)
+        for slug, ayah in (("al-fatihah", 2), ("al-fatihah", 5), ("al-fatihah", 6), ("al-ikhlas", 1), ("an-nas", 1)):
+            self.assertNotIn(ayah, CONTINUES[slug]["ayat"])
 
     def test_heavy_letter_words_are_shown_not_said(self):
         # Operator 2026-10-17: "better not to use heavy-letter words with elevenlabs, we just explain
@@ -2959,8 +3070,9 @@ def main() -> int:
     for name, mutate, expect in chosen:
         m, ls, lx, cp = copy.deepcopy(MANIFESTS), copy.deepcopy(LESSONS), copy.deepcopy(LEXDATA), copy.deepcopy(COMPOSE)
         mp, cur, pend = copy.deepcopy(LESSONMAP), copy.deepcopy(CURRICULUM), copy.deepcopy(PENDING)
-        mutate(m, ls, lx, cp, mp, cur, pend)
-        errs = run_check(m, ls, lx, cp, mp, cur, pend)
+        cont = copy.deepcopy(CONTINUES)
+        mutate(m, ls, lx, cp, mp, cur, pend, cont)
+        errs = run_check(m, ls, lx, cp, mp, cur, pend, cont)
         hit = next((e for e in errs if expect in e), None)
         failed += hit is None
         print(f"{name:{width}s}  {'caught' if hit else 'MISSED'}  {hit or errs[:2]}")
