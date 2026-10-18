@@ -1,5 +1,5 @@
 {
- "_comment": "Hand-authored sentence structure (tarkib) for Al-Falaq, QS 113: one `structure` per ayah (schema.ts Ayah.structure) and one `role` per word (schema.ts Word.role), same format as al-fatihah.structure.json. Every record is status draft as pipeline state; there is no human review step (plan L11). Read 2026-10-09 against the i'rab texts on tafsir.app and on Shamela (pagination = print, checked in each page title): Darwisy jil. 10 hlm. 622 = shamela.ws/book/2163/5780, hlm. 623 = /5781; al-Jadwal jil. 15 hlm. 427 = shamela.ws/book/22916/5919, hlm. 428 = /5920; al-Mujtaba jil. 4 hlm. 1492 = shamela.ws/book/9617/6024–6027; an-Nahhas jil. 5 hlm. 197 = shamela.ws/book/23587/1414, hlm. 198 = /1415; as-Samin jil. 11 hlm. 157–160 = shamela.ws/book/9057/10759–10764; ad-Da'as jil. 3 hlm. 476 = shamela.ws/book/23584/1398; Ibnu Katsir jil. 8 hlm. 535–536 = shamela.ws/book/8473/4581–4582; for definitions al-Ajurrumiyyah (Shamela 11371), Mughni al-Labib (Shamela 6972) and Syarh Ibn 'Aqil (Shamela 9904). Structure sources link the exact Shamela page. No Qur'anic Arabic is typed here: words are referred to in SKB transliteration exactly as in al-falaq.words.json. `structure.groups[].words` are 1-based indices within the ayah as taught (Tanzil tokens after the surah-heading basmalah = QAC 0.4 words). `structure.sources` are complete SourceRef objects. `role_src` lists the kitab (abbreviations of the `kitab` table in al-falaq.words.json) that state the role; every abbreviation listed is already in that word's `src`. An empty `role_src` means no cited page states the role in so many words; `role_note` then says what supports it. `role_note` and `review_notes` never reach the output. Grammar terms use pesantren spelling with ASCII apostrophes and no macrons (na'ib fa'il, not nā'ib fā'il); zharaf follows the build's QAC label 'zharaf zaman'.",
+ "_comment": "Hand-authored sentence structure (tarkib) for Al-Falaq, QS 113: one `structure` per ayah (schema.ts Ayah.structure) and one `role` per word (schema.ts Word.role), same format as al-fatihah.structure.json. Every record is status draft as pipeline state; there is no human review step (plan L11). Read 2026-10-09 against the i'rab texts on tafsir.app and on Shamela (pagination = print, checked in each page title): Darwisy jil. 10 hlm. 622 = shamela.ws/book/2163/5780, hlm. 623 = /5781; al-Jadwal jil. 15 hlm. 427 = shamela.ws/book/22916/5919, hlm. 428 = /5920; al-Mujtaba jil. 4 hlm. 1492 = shamela.ws/book/9617/6024–6027; an-Nahhas jil. 5 hlm. 197 = shamela.ws/book/23587/1414, hlm. 198 = /1415; as-Samin jil. 11 hlm. 157–160 = shamela.ws/book/9057/10759–10764; ad-Da'as jil. 3 hlm. 476 = shamela.ws/book/23584/1398; Ibnu Katsir jil. 8 hlm. 535–536 = shamela.ws/book/8473/4581–4582; for definitions al-Ajurrumiyyah (Shamela 11371), Mughni al-Labib (Shamela 6972) and Syarh Ibn 'Aqil (Shamela 9904). Structure sources link the exact Shamela page. No Qur'anic Arabic is typed here: words are referred to in SKB transliteration exactly as in al-falaq.words.json. `structure.groups[].words` are 1-based indices within the ayah as taught (Tanzil tokens after the surah-heading basmalah = QAC 0.4 words). `structure.sources` are complete SourceRef objects. `role_src` lists the kitab (abbreviations of the `kitab` table in al-falaq.words.json) that state the role; every abbreviation listed is already in that word's `src`. An empty `role_src` means no cited page states the role in so many words; `role_note` then says what supports it. `role_note` and `review_notes` never reach the output. Grammar terms use pesantren spelling with ASCII apostrophes and no macrons (na'ib fa'il, not nā'ib fā'il); zharaf follows the build's QAC label 'zharaf zaman'. `continues` (beside an ayah's `structure`, reviewer-only: build_surah.py reads only `structure`; operator 2026-10-18, pipeline/README.md wording rule 8): the ayah this one continues and what in it depends on which earlier word — {ayah, per (the hedge where the kitab differ, or null), links: [{words, kind, on (named-word refs of ONE earlier ayah), src (kitab abbreviations), said_in (word | structure)}]}; validate_narration.continuation_problems holds the lines to it (the structure part opens with 'Ayat ini melanjutkan ayat N.', the word's explanation cites the earlier word 'di ayat N').",
  "ayat": {
   "1": {
    "structure": {
@@ -73,9 +73,15 @@
    ]
   },
   "2": {
+   "continues": {
+    "ayah": 1, "per": null,
+    "links": [
+     {"words": [1], "kind": "ta'alluq: min syarri bergantung pada a‘ūżu", "on": ["113:1:2"], "src": ["D", "J", "S", "DA"], "said_in": ["word", "structure"]}
+    ]
+   },
    "structure": {
     "type": "lanjutan jumlah ayat 1 (jar-majrur terkait a‘ūżu), memuat jumlah shilah",
-    "summary": "Min syarri (“dari kejahatan”) bergantung pada a‘ūżu, begitu pula min syarri di ayat 3, 4 dan 5. Syarri disandarkan kepada mā (“yang”), isim maushul yang dijelaskan oleh shilah khalaqa (“Dia ciptakan”); kata ganti yang kembali kepada mā dibuang. Sebagian ulama membaca mā sebagai mā mashdariyyah, sehingga maknanya “ciptaan-Nya”.",
+    "summary": "Ayat ini melanjutkan ayat 1. Min syarri (“dari kejahatan”) bergantung pada a‘ūżu, begitu pula min syarri di ayat 3, 4 dan 5. Syarri disandarkan kepada mā (“yang”), isim maushul yang dijelaskan oleh shilah khalaqa (“Dia ciptakan”); kata ganti yang kembali kepada mā dibuang. Sebagian ulama membaca mā sebagai mā mashdariyyah, sehingga maknanya “ciptaan-Nya”.",
     "groups": [
      {
       "words": [
@@ -152,9 +158,17 @@
    ]
   },
   "3": {
+   "continues": {
+    "ayah": 1, "per": null,
+    "links": [
+     {"words": [1], "kind": "'athaf pada min syarri", "on": ["113:2:1", "113:2:2"], "src": ["D", "J", "DA"], "said_in": ["word", "structure"]},
+     {"words": [1], "kind": "ta'alluq: bergantung pada a‘ūżu", "on": ["113:1:2"], "src": ["D", "J", "DA"], "said_in": ["word", "structure"]},
+     {"words": [4], "kind": "ta'alluq zharaf iżā pada kata kerja a‘ūżu (pendapat al-Mujtaba dan as-Samin)", "on": ["113:1:2"], "src": ["M", "S"], "said_in": ["structure"]}
+    ]
+   },
    "structure": {
     "type": "lanjutan jumlah ayat 1 ('athaf), memuat zharaf iżā dan jumlah mudhaf ilaih",
-    "summary": "Wa (“dan”) menyambungkan ('athaf) frasa ini dengan min syarri di ayat 2, jadi ia bergantung pada a‘ūżu. Syarri disandarkan kepada gāsiqin (“malam”). Iżā (“apabila”) di sini keterangan waktu (zharaf) murni tanpa makna syarat, dan kalimat waqaba (“telah gelap gulita”) menjadi mudhaf ilaih baginya; iżā dikaitkan dengan kata kerja tempat frasa ini bergantung, menurut al-Mujtaba dan as-Samin, atau dengan syarri menurut al-Jadwal.",
+    "summary": "Ayat ini melanjutkan ayat 1. Wa (“dan”) menyambungkan ('athaf) frasa ini dengan min syarri di ayat 2, jadi ia bergantung pada a‘ūżu. Syarri disandarkan kepada gāsiqin (“malam”). Iżā (“apabila”) di sini keterangan waktu (zharaf) murni tanpa makna syarat, dan kalimat waqaba (“telah gelap gulita”) menjadi mudhaf ilaih baginya; iżā dikaitkan dengan kata kerja tempat frasa ini bergantung, menurut al-Mujtaba dan as-Samin, atau dengan syarri menurut al-Jadwal.",
     "groups": [
      {
       "words": [
@@ -236,9 +250,15 @@
    ]
   },
   "4": {
+   "continues": {
+    "ayah": 1, "per": null,
+    "links": [
+     {"words": [1], "kind": "ta'alluq: bergantung pada a‘ūżu", "on": ["113:1:2"], "src": ["D", "J", "DA"], "said_in": ["word", "structure"]}
+    ]
+   },
    "structure": {
     "type": "lanjutan jumlah ayat 1 ('athaf)",
-    "summary": "Frasa ini di-'athaf-kan dengan wa, jadi bergantung pada a‘ūżu. Syarri disandarkan kepada an-naffāṡāti (“para peniup”), bentuk jamak dari naffāṡah, yaitu bentuk mubalaghah (“yang banyak …”) dari isim fa'il. Frasa fī al-‘uqadi (“pada buhul-buhul”) bergantung pada an-naffāṡāti (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
+    "summary": "Ayat ini melanjutkan ayat 1. Frasa ini di-'athaf-kan dengan wa, jadi bergantung pada a‘ūżu. Syarri disandarkan kepada an-naffāṡāti (“para peniup”), bentuk jamak dari naffāṡah, yaitu bentuk mubalaghah (“yang banyak …”) dari isim fa'il. Frasa fī al-‘uqadi (“pada buhul-buhul”) bergantung pada an-naffāṡāti (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
     "groups": [
      {
       "words": [
@@ -322,9 +342,16 @@
    ]
   },
   "5": {
+   "continues": {
+    "ayah": 1, "per": null,
+    "links": [
+     {"words": [1], "kind": "ta'alluq: bergantung pada a‘ūżu", "on": ["113:1:2"], "src": ["D", "J", "DA"], "said_in": ["word"]},
+     {"words": [4], "kind": "ta'alluq zharaf iżā pada a‘ūżu (pendapat al-Mujtaba)", "on": ["113:1:2"], "src": ["M"], "said_in": ["structure"]}
+    ]
+   },
    "structure": {
     "type": "lanjutan jumlah ayat 1 ('athaf), memuat zharaf iżā dan jumlah mudhaf ilaih",
-    "summary": "Darwisy menyebut i'rab-nya “jelas”: frasa ini di-'athaf-kan dengan wa, syarri disandarkan kepada ḥāsidin (“orang yang dengki”), lalu iżā (“apabila”) menjadi keterangan waktu dengan kalimat ḥasada (“dia dengki”) sebagai mudhaf ilaih-nya. Al-Mujtaba mengaitkan iżā dengan a‘ūżu, sedangkan al-Jadwal dengan syarri.",
+    "summary": "Ayat ini melanjutkan ayat 1. Darwisy menyebut i'rab-nya “jelas”: frasa ini di-'athaf-kan dengan wa, syarri disandarkan kepada ḥāsidin (“orang yang dengki”), lalu iżā (“apabila”) menjadi keterangan waktu dengan kalimat ḥasada (“dia dengki”) sebagai mudhaf ilaih-nya. Al-Mujtaba mengaitkan iżā dengan a‘ūżu, sedangkan al-Jadwal dengan syarri.",
     "groups": [
      {
       "words": [

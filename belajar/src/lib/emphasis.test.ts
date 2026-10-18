@@ -528,7 +528,9 @@ describe("meanings (plan L22): always in “…”, always emphasised", () => {
       "“zharaf murni”",
     ],
     "a term named": ["“menyerupai kalimat”", "“karena adab”"],
-    "a word mentioned": ["“Allah”", "“Tambahan”"],
+    // (“Allah” — the Name in "bagi lafaz “Allah”" — left the captions on 2026-10-18: those lines now
+    // name the word itself, "bagi ٱللَّهِ (Allāhi) di ayat kedua", wording rule 8.)
+    "a word mentioned": ["“Tambahan”"],
     "a control or what is heard (messages and fallback captions, id and en)": [
       "“Mulai pelajaran”",
       "“Materi lengkap ayat ini”",

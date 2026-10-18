@@ -1,5 +1,5 @@
 {
-  "_comment": "Hand-authored sentence structure (tarkib) for Al-Ikhlas, QS 112: one `structure` per ayah (schema.ts Ayah.structure) and one `role` per word (schema.ts Word.role), same format as al-fatihah.structure.json. Every record is status draft as pipeline state; there is no human review step (plan L11). Read 2026-10-09 against the i'rab texts on tafsir.app and on Shamela, whose page titles give the printed volume and page (each edition states that its pagination follows the print): Darwisy jil. 10 (Shamela 2163), al-Jadwal jil. 15 (22916), al-Mujtaba jil. 4 (9617), an-Nahhas jil. 5 (23587), as-Samin jil. 11 (9057); for definitions and sentence types al-Ajurrumiyyah (11371), Mughni al-Labib (6972) and Syarh Qathr an-Nada (6970). Source urls are the exact Shamela pages. No Qur'anic Arabic is typed here: words are referred to in SKB transliteration exactly as in al-ikhlas.words.json. `structure.groups[].words` are 1-based indices within the ayah as taught (Tanzil tokens after the surah-heading basmalah = QAC 0.4 words). `structure.sources` are complete SourceRef objects. `role_src` lists the kitab abbreviations of the `kitab` table in al-ikhlas.words.json that state the role; each is in that word's `src`. `role_note` and `review_notes` never reach the output. Grammar terms use pesantren spelling with ASCII apostrophes and no macrons. Group concepts dhamir-syan, maqul-al-qaul, jazm-lam, fiil-majhul and kana-wa-akhawatuha are NEW ids proposed in al-ikhlas.new-concepts.md; the build fails until the integrator adds them to library.concepts.json.",
+  "_comment": "Hand-authored sentence structure (tarkib) for Al-Ikhlas, QS 112: one `structure` per ayah (schema.ts Ayah.structure) and one `role` per word (schema.ts Word.role), same format as al-fatihah.structure.json. Every record is status draft as pipeline state; there is no human review step (plan L11). Read 2026-10-09 against the i'rab texts on tafsir.app and on Shamela, whose page titles give the printed volume and page (each edition states that its pagination follows the print): Darwisy jil. 10 (Shamela 2163), al-Jadwal jil. 15 (22916), al-Mujtaba jil. 4 (9617), an-Nahhas jil. 5 (23587), as-Samin jil. 11 (9057); for definitions and sentence types al-Ajurrumiyyah (11371), Mughni al-Labib (6972) and Syarh Qathr an-Nada (6970). Source urls are the exact Shamela pages. No Qur'anic Arabic is typed here: words are referred to in SKB transliteration exactly as in al-ikhlas.words.json. `structure.groups[].words` are 1-based indices within the ayah as taught (Tanzil tokens after the surah-heading basmalah = QAC 0.4 words). `structure.sources` are complete SourceRef objects. `role_src` lists the kitab abbreviations of the `kitab` table in al-ikhlas.words.json that state the role; each is in that word's `src`. `role_note` and `review_notes` never reach the output. Grammar terms use pesantren spelling with ASCII apostrophes and no macrons. Group concepts dhamir-syan, maqul-al-qaul, jazm-lam, fiil-majhul and kana-wa-akhawatuha are NEW ids proposed in al-ikhlas.new-concepts.md; the build fails until the integrator adds them to library.concepts.json. `continues` (beside an ayah's `structure`, reviewer-only: build_surah.py reads only `structure`; operator 2026-10-18, pipeline/README.md wording rule 8): the ayah this one continues and what in it depends on which earlier word — {ayah, per (the hedge where the kitab differ, or null), links: [{words, kind, on (named-word refs of ONE earlier ayah), src (kitab abbreviations), said_in (word | structure)}]}; validate_narration.continuation_problems holds the lines to it (the structure part opens with 'Ayat ini melanjutkan ayat N.', the word's explanation cites the earlier word 'di ayat N').",
   "ayat": {
     "1": {
       "structure": {
@@ -31,9 +31,15 @@
       ]
     },
     "2": {
+      "continues": {
+        "ayah": 1, "per": "al-Mujtaba dan al-Jadwal",
+        "links": [
+          {"words": [1, 2], "kind": "khabar kedua bagi huwa (seluruh kalimat ini)", "on": ["112:1:2"], "src": ["M", "J"], "said_in": ["structure"]}
+        ]
+      },
       "structure": {
         "type": "jumlah ismiyyah",
-        "summary": "Kalimat nominal: Allāhu menjadi mubtada' dan aṣ-ṣamadu khabarnya (Darwisy, al-Mujtaba); al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khabar kedua bagi huwa di ayat 1, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu. Lafaz Allah diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
+        "summary": "Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat 1: seluruh kalimat ini khabar kedua bagi huwa di ayat 1, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu. Kalimat ini sendiri kalimat nominal: Allāhu menjadi mubtada' dan aṣ-ṣamadu khabarnya (Darwisy, al-Mujtaba). Lafaz Allah diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
         "groups": [
           { "words": [1, 2], "label": "Allāhu (mubtada') + aṣ-ṣamadu (khabar)", "concept": "jumlah-ismiyyah" }
         ],
@@ -53,9 +59,16 @@
       ]
     },
     "3": {
+      "continues": {
+        "ayah": 1, "per": "al-Mujtaba dan al-Jadwal",
+        "links": [
+          {"words": [1, 2], "kind": "khabar ketiga bagi huwa (kalimat lam yalid)", "on": ["112:1:2"], "src": ["M", "J"], "said_in": ["structure"]},
+          {"words": [1, 2], "kind": "penguat makna aṣ-ṣamad (karena itu tanpa wa)", "on": ["112:2:2"], "src": ["D"], "said_in": ["structure"]}
+        ]
+      },
       "structure": {
         "type": "dua jumlah fi'liyyah yang dinafikan dengan lam (yang kedua di-'athaf-kan)",
-        "summary": "Lam meniadakan fi'il mudhari' sesudahnya dan menjazmkannya, maka yalid dan yūlad sama-sama berakhiran sukun; Ibnu Hisyam (Mughni) menjadikan ayat ini contoh lam yang menjazmkan. Menurut al-Mujtaba dan al-Jadwal, lam yalid adalah khabar ketiga bagi huwa (al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru), dan kalimat wa lam yūlad di-'athaf-kan padanya, sedangkan yūlad majzum oleh lam-nya sendiri; menurut Darwisy, lam yalid sendiri tidak disambung dengan wa karena ia menguatkan makna aṣ-ṣamad: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
+        "summary": "Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat 1: lam yalid adalah khabar ketiga bagi huwa di ayat 1; al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru. Kalimat wa lam yūlad di-'athaf-kan padanya, sedangkan yūlad majzum oleh lam-nya sendiri. Menurut Darwisy, lam yalid sendiri tidak disambung dengan wa karena ia menguatkan makna aṣ-ṣamad: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan. Lam meniadakan fi'il mudhari' sesudahnya dan menjazmkannya, maka yalid dan yūlad sama-sama berakhiran sukun; Ibnu Hisyam (Mughni) menjadikan ayat ini contoh lam yang menjazmkan.",
         "groups": [
           { "words": [1, 2], "label": "lam yalid: lam menjazmkan yalid, maka akhirnya sukun", "concept": "jazm-lam" },
           { "words": [3, 4], "label": "wa lam yūlad: lam lagi, kini dengan kata kerja bentuk majhul (pasif)", "concept": "fiil-majhul" },
@@ -82,9 +95,15 @@
       ]
     },
     "4": {
+      "continues": {
+        "ayah": 3, "per": null,
+        "links": [
+          {"words": [1], "kind": "'athaf: wa menyambungkan kalimat ini pada lam yalid", "on": ["112:3:1", "112:3:2"], "src": ["D", "J"], "said_in": ["word", "structure"]}
+        ]
+      },
       "structure": {
         "type": "jumlah fi'liyyah dengan kāna yang dinafikan, di-'athaf-kan pada lam yalid",
-        "summary": "Wa menyambungkan kalimat ini pada lam yalid, dan lam menjazmkan yakun, bentuk mudhari' dari kāna yang merafa'kan isimnya dan menashabkan khabarnya: aḥadun adalah isimnya yang diletakkan di akhir, kufuwan khabarnya yang didahulukan, dan lahū bergantung pada kufuwan, sehingga maksudnya “tidak ada seorang pun yang setara bagi-Nya” (Abu Hayyan, dinukil Darwisy dan as-Samin). Lahū disebut lebih dulu karena inti ayat ini adalah meniadakan kesetaraan dari Allah (az-Zamakhsyari, dinukil Darwisy dan as-Samin), dan menurut Darwisy tiga kalimat terakhir disambung dengan wa karena tujuannya satu: meniadakan dari Allah segala keserupaan dan keterkaitan dalam bentuk apa pun.",
+        "summary": "Ayat ini melanjutkan ayat 3: wa menyambungkan kalimat ini pada lam yalid di ayat 3, dan lam menjazmkan yakun, bentuk mudhari' dari kāna yang merafa'kan isimnya dan menashabkan khabarnya: aḥadun adalah isimnya yang diletakkan di akhir, kufuwan khabarnya yang didahulukan, dan lahū bergantung pada kufuwan, sehingga maksudnya “tidak ada seorang pun yang setara bagi-Nya” (Abu Hayyan, dinukil Darwisy dan as-Samin). Lahū disebut lebih dulu karena inti ayat ini adalah meniadakan kesetaraan dari Allah (az-Zamakhsyari, dinukil Darwisy dan as-Samin), dan menurut Darwisy tiga kalimat terakhir disambung dengan wa karena tujuannya satu: meniadakan dari Allah segala keserupaan dan keterkaitan dalam bentuk apa pun.",
         "groups": [
           { "words": [1, 2], "label": "wa lam yakun: lam menjazmkan yakun", "concept": "jazm-lam" },
           { "words": [2, 3, 4, 5], "label": "yakun … kufuwan (khabar, didahulukan) … aḥadun (isim, diakhirkan)", "concept": "kana-wa-akhawatuha" },

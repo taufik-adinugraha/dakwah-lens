@@ -821,9 +821,12 @@ class Warmup(unittest.TestCase):
         self.assertEqual(by[(2, "sort-case", 3)]["why"], TERMS.annotate(basic["why_basic"]))
         self.assertNotIn("mudhaf ilaih", by[(2, "sort-case", 3)]["why"])
         self.assertIn("mudhaf ilaih", basic["why"])
-        plain = Q.word_at(self.lesson, "1:4:1")
+        # (1:4:1 was the example until 2026-10-18; it has a `why_basic` since, which names the word it
+        # describes and its ayah, "bagi ٱللَّهِ (Allāhi) di ayat kedua": wording rule 8.)
+        plain = Q.word_at(self.lesson, "1:4:2")
         self.assertFalse(plain.get("why_basic"))
-        self.assertEqual(by[(4, "why-harakat", 1)]["why"], by[(4, "why-harakat", 1)]["options"][0]["text"])
+        self.assertEqual(by[(4, "why-harakat", 2)]["word"], 2)
+        self.assertEqual(by[(4, "why-harakat", 2)]["why"], by[(4, "why-harakat", 2)]["options"][0]["text"])
         with_basic = Q.word_at(self.lesson, "1:2:2")
         q = by[(2, "label-role", 2)]
         self.assertEqual(q["word"], 2)

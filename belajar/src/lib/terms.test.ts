@@ -819,8 +819,11 @@ describe("the role is always na't: a marked “sifat” shows نَعْت, never 
     const quiz = strings(quizFor("al-fatihah"), "quiz").map(([, t]) => t);
     // The strings that said "sifat (صِفَة)" (one of them inside the prose's own bracket): twelve
     // on 2026-10-13, eleven in the quiz plan of the same day (the basic curriculum), ten once the
-    // explanation shown is a word's `why_basic` (1:7:5's says "menjadikannya sifat" in plain words).
-    expect(quiz.filter((t) => new RegExp(String.raw`sifat \(?${NAAT}`, "u").test(t))).toHaveLength(10);
+    // explanation shown is a word's `why_basic` (1:7:5's says "menjadikannya sifat" in plain words),
+    // seven since 2026-10-18: 1:3:1, 1:3:2 and 1:4:1 explain by a `why_basic` that names the word they
+    // describe, "na't (نَعْت), yaitu sifat, bagi ٱللَّهِ (Allāhi) di ayat kedua" (wording rule 8).
+    expect(quiz.filter((t) => new RegExp(String.raw`sifat \(?${NAAT}`, "u").test(t))).toHaveLength(7);
+    expect(quiz.filter((t) => t.includes(`na't (${NAAT}), yaitu sifat`) && t.includes("di ayat kedua"))).toHaveLength(3);
     // (The operator's own example, ayah 1's "sifat kedua bagi lafaz Allah", left the quiz with
     // ayah 1's reasons on 2026-10-13; ayah 4's "sifat keempat" is the same sentence.)
     expect(quiz).toContain(`Akhirnya kasrah (كَسْرَة) karena menjadi sifat (${NAAT}) keempat bagi lafaz Allah.`);

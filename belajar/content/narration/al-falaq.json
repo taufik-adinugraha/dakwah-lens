@@ -219,8 +219,8 @@
       "focus": null
     },
     "al-falaq:2:w1": {
-      "text": "Kata pertama, yaitu min, artinya: dari. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung.",
-      "display": "Kata pertama, yaitu مِن (min), artinya: “dari”. Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
+      "text": "Kata pertama, yaitu min, artinya: dari. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama.",
+      "display": "Kata pertama, yaitu مِن (min), artinya: “dari”. Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama.",
       "highlight": [
         1
       ],
@@ -251,8 +251,8 @@
       "focus": "113:2:4"
     },
     "al-falaq:2:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yaitu min syarri, yang artinya dari kejahatan, bergantung pada kata a'udzu yang artinya aku berlindung, begitu pula frasa yang artinya dan dari kejahatan di ayat tiga, empat dan lima.",
-      "display": "Sekarang susunan kalimatnya. Kata pertama dan kedua, yaitu مِن (min) شَرِّ (syarri), yang artinya “dari kejahatan”, bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”, begitu pula frasa yang artinya “dan dari kejahatan” di ayat tiga, empat dan lima.",
+      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama. Kata pertama dan kedua, yaitu min syarri, yang artinya dari kejahatan, bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama, begitu pula frasa yang artinya dan dari kejahatan di ayat tiga, empat dan lima.",
+      "display": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama. Kata pertama dan kedua, yaitu مِن (min) شَرِّ (syarri), yang artinya “dari kejahatan”, bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama, begitu pula frasa yang artinya “dan dari kejahatan” di ayat tiga, empat dan lima.",
       "highlight": [
         0
       ],
@@ -353,8 +353,8 @@
       "focus": null
     },
     "al-falaq:2:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف جَرّ. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung.",
-      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
+      "text": "Perannya: حَرْف جَرّ. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama.",
+      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama.",
       "highlight": [],
       "focus": null
     },
@@ -407,8 +407,8 @@
       "focus": null
     },
     "al-falaq:3:w1": {
-      "text": "Kata pertama, yaitu wa min, artinya: dan dari. وَاو adalah حَرْف عَطْف, yaitu penyambung, dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan pada frasa yang artinya dari kejahatan, sehingga bergantung pada kata a'udzu yang artinya aku berlindung.",
-      "display": "Kata pertama, yaitu وَمِن (wa min), artinya: “dan dari”. وَ adalah huruf ‘athaf (حَرْف عَطْف), yaitu penyambung, dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan pada frasa yang artinya “dari kejahatan”, sehingga bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
+      "text": "Kata pertama, yaitu wa min, artinya: dan dari. وَاو adalah حَرْف عَطْف, yaitu penyambung, dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan pada frasa min syarri yang artinya dari kejahatan di ayat kedua, sehingga bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama.",
+      "display": "Kata pertama, yaitu وَمِن (wa min), artinya: “dan dari”. وَ adalah huruf ‘athaf (حَرْف عَطْف), yaitu penyambung, dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan pada frasa مِن (min) شَرِّ (syarri) yang artinya “dari kejahatan” di ayat kedua, sehingga bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama.",
       "highlight": [
         1
       ],
@@ -447,8 +447,8 @@
       "focus": "113:3:5"
     },
     "al-falaq:3:structure:a": {
-      "text": "Sekarang susunan kalimatnya. وَاو yang artinya dan, menyambungkan, atau عَطْف, frasa ini dengan frasa yang artinya dari kejahatan, jadi ia bergantung pada kata a'udzu yang artinya aku berlindung. Kata kedua disandarkan kepada kata ketiga, yang artinya malam.",
-      "display": "Sekarang susunan kalimatnya. و yang artinya “dan”, menyambungkan, atau ‘athaf (عَطْف), frasa ini dengan frasa yang artinya “dari kejahatan”, jadi ia bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”. Kata kedua disandarkan kepada kata ketiga, yaitu غَاسِقٍ (gāsiqin), yang artinya “malam”.",
+      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama. وَاو yang artinya dan, menyambungkan, atau عَطْف, frasa ini dengan frasa min syarri yang artinya dari kejahatan di ayat kedua, jadi ia bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama. Kata kedua disandarkan kepada kata ketiga, yang artinya malam.",
+      "display": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama. و yang artinya “dan”, menyambungkan, atau ‘athaf (عَطْف), frasa ini dengan frasa مِن (min) شَرِّ (syarri) yang artinya “dari kejahatan” di ayat kedua, jadi ia bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama. Kata kedua disandarkan kepada kata ketiga, yaitu غَاسِقٍ (gāsiqin), yang artinya “malam”.",
       "highlight": [
         0
       ],
@@ -567,8 +567,8 @@
       "focus": null
     },
     "al-falaq:3:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف, yaitu penyambung, dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan pada frasa yang artinya dari kejahatan, sehingga bergantung pada kata a'udzu yang artinya aku berlindung.",
-      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). و adalah huruf ‘athaf (حَرْف عَطْف), yaitu penyambung, dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan pada frasa yang artinya “dari kejahatan”, sehingga bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
+      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف, yaitu penyambung, dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan pada frasa min syarri yang artinya dari kejahatan di ayat kedua, sehingga bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama.",
+      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). و adalah huruf ‘athaf (حَرْف عَطْف), yaitu penyambung, dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan pada frasa مِن (min) شَرِّ (syarri) yang artinya “dari kejahatan” di ayat kedua, sehingga bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama.",
       "highlight": [],
       "focus": null
     },
@@ -627,8 +627,8 @@
       "focus": null
     },
     "al-falaq:4:w1": {
-      "text": "Kata pertama, yaitu wa min, artinya: dan dari. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan dengan وَاو, jadi bergantung pada kata a'udzu yang artinya aku berlindung.",
-      "display": "Kata pertama, yaitu وَمِن (wa min), artinya: “dan dari”. وَ adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan dengan وَ, jadi bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
+      "text": "Kata pertama, yaitu wa min, artinya: dan dari. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan dengan وَاو, jadi bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama.",
+      "display": "Kata pertama, yaitu وَمِن (wa min), artinya: “dan dari”. وَ adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan dengan وَ, jadi bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama.",
       "highlight": [
         1
       ],
@@ -667,16 +667,16 @@
       "focus": "113:4:5"
     },
     "al-falaq:4:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Frasa ini disambungkan dengan عَطْف dengan وَاو, jadi bergantung pada kata a'udzu yang artinya aku berlindung. Kata kedua disandarkan kepada kata ketiga, yaitu an-naffatsati, yang artinya para peniup, bentuk jamak dari naffasah, yaitu bentuk mubalaghah, yang artinya yang banyak meniup, dari اِسْم فَاعِل.",
-      "display": "Sekarang susunan kalimatnya. Frasa ini disambungkan dengan ‘athaf (عَطْف) dengan و, jadi bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”. Kata kedua disandarkan kepada kata ketiga, yaitu ٱلنَّفَّٰثَٰتِ (an-naffāṡāti), yang artinya “para peniup”, bentuk jamak dari naffasah, yaitu bentuk mubalaghah, yang artinya “yang banyak meniup”, dari isim fa’il (اِسْم فَاعِل).",
+      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama. Frasa ini disambungkan dengan عَطْف dengan وَاو, jadi bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama.",
+      "display": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama. Frasa ini disambungkan dengan ‘athaf (عَطْف) dengan و, jadi bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama.",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-falaq:4:structure:b": {
-      "text": "Frasa kata keempat dan kelima, yaitu fi, yang artinya pada buhul-buhul, bergantung pada kata ketiga, Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as.",
-      "display": "Frasa kata keempat dan kelima, yaitu فِى (fī) ٱلْعُقَدِ (al-‘uqadi), yang artinya “pada buhul-buhul”, bergantung pada kata ketiga (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
+      "text": "Kata kedua disandarkan kepada kata ketiga, yaitu an-naffatsati, yang artinya para peniup, bentuk jamak dari naffasah, yaitu bentuk mubalaghah, yang artinya yang banyak meniup, dari اِسْم فَاعِل. Frasa kata keempat dan kelima, yaitu fi, yang artinya pada buhul-buhul, bergantung pada kata ketiga, Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as.",
+      "display": "Kata kedua disandarkan kepada kata ketiga, yaitu ٱلنَّفَّٰثَٰتِ (an-naffāṡāti), yang artinya “para peniup”, bentuk jamak dari naffasah, yaitu bentuk mubalaghah, yang artinya “yang banyak meniup”, dari isim fa’il (اِسْم فَاعِل). Frasa kata keempat dan kelima, yaitu فِى (fī) ٱلْعُقَدِ (al-‘uqadi), yang artinya “pada buhul-buhul”, bergantung pada kata ketiga (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
       "highlight": [
         0
       ],
@@ -775,8 +775,8 @@
       "focus": null
     },
     "al-falaq:4:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan dengan وَاو, jadi bergantung pada kata a'udzu yang artinya aku berlindung.",
-      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). و adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan dengan و, jadi bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
+      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa ini disambungkan dengan وَاو, jadi bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama.",
+      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). و adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa ini disambungkan dengan و, jadi bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama.",
       "highlight": [],
       "focus": null
     },
@@ -835,8 +835,8 @@
       "focus": null
     },
     "al-falaq:5:w1": {
-      "text": "Kata pertama, yaitu wa min, artinya: dan dari. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa terakhir ini disambungkan dengan وَاو dan bergantung pada kata a'udzu yang artinya aku berlindung.",
-      "display": "Kata pertama, yaitu وَمِن (wa min), artinya: “dan dari”. وَ adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa terakhir ini disambungkan dengan وَ dan bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
+      "text": "Kata pertama, yaitu wa min, artinya: dan dari. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa terakhir ini disambungkan dengan وَاو dan bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama.",
+      "display": "Kata pertama, yaitu وَمِن (wa min), artinya: “dan dari”. وَ adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa terakhir ini disambungkan dengan وَ dan bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama.",
       "highlight": [
         1
       ],
@@ -875,16 +875,24 @@
       "focus": "113:5:5"
     },
     "al-falaq:5:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Darwisy menyebut i'rab-nya jelas: frasa ini disambungkan dengan عَطْف dengan وَاو, kata kedua disandarkan kepada kata ketiga, yaitu hasidin, yang artinya orang yang dengki, lalu kata keempat, yaitu idza, yang artinya apabila, menjadi keterangan waktu dengan kalimat kata kelima, yaitu hasada, yang artinya dia dengki, sebagai mudhof ilaih baginya.",
-      "display": "Sekarang susunan kalimatnya. Darwisy menyebut i'rab-nya “jelas”: frasa ini disambungkan dengan ‘athaf (عَطْف) dengan و, kata kedua disandarkan kepada kata ketiga, yaitu حَاسِدٍ (ḥāsidin), yang artinya “orang yang dengki”, lalu kata keempat, yaitu إِذَا (iżā), yang artinya “apabila”, menjadi keterangan waktu dengan kalimat kata kelima, yaitu حَسَدَ (ḥasada), yang artinya “dia dengki”, sebagai mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
+      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama.",
+      "display": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama.",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-falaq:5:structure:b": {
-      "text": "Al-Mujtaba mengaitkan kata keempat dengan kata a'udzu yang artinya aku berlindung, sedangkan al-Jadwal dengan kata kedua.",
-      "display": "Al-Mujtaba mengaitkan kata keempat dengan kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”, sedangkan al-Jadwal dengan kata kedua.",
+      "text": "Darwisy menyebut i'rab-nya jelas: frasa ini disambungkan dengan عَطْف dengan وَاو, kata kedua disandarkan kepada kata ketiga, yaitu hasidin, yang artinya orang yang dengki, lalu kata keempat, yaitu idza, yang artinya apabila, menjadi keterangan waktu dengan kalimat kata kelima, yaitu hasada, yang artinya dia dengki, sebagai mudhof ilaih baginya.",
+      "display": "Darwisy menyebut i'rab-nya “jelas”: frasa ini disambungkan dengan ‘athaf (عَطْف) dengan و, kata kedua disandarkan kepada kata ketiga, yaitu حَاسِدٍ (ḥāsidin), yang artinya “orang yang dengki”, lalu kata keempat, yaitu إِذَا (iżā), yang artinya “apabila”, menjadi keterangan waktu dengan kalimat kata kelima, yaitu حَسَدَ (ḥasada), yang artinya “dia dengki”, sebagai mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
+      "highlight": [
+        0
+      ],
+      "focus": null
+    },
+    "al-falaq:5:structure:c": {
+      "text": "Al-Mujtaba mengaitkan kata keempat dengan kata a'udzu yang artinya aku berlindung di ayat pertama, sedangkan al-Jadwal dengan kata kedua.",
+      "display": "Al-Mujtaba mengaitkan kata keempat dengan kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama, sedangkan al-Jadwal dengan kata kedua.",
       "highlight": [
         0
       ],
@@ -995,8 +1003,8 @@
       "focus": null
     },
     "al-falaq:5:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa terakhir ini disambungkan dengan وَاو dan bergantung pada kata a'udzu yang artinya aku berlindung.",
-      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). و adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa terakhir ini disambungkan dengan و dan bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”.",
+      "text": "Perannya: حَرْف عَطْف dan حَرْف جَرّ. وَاو adalah حَرْف عَطْف dan kata ini حَرْف جَرّ yang artinya dari; frasa terakhir ini disambungkan dengan وَاو dan bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama.",
+      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ). و adalah huruf ‘athaf (حَرْف عَطْف) dan kata ini huruf jar (حَرْف جَرّ) yang artinya “dari”; frasa terakhir ini disambungkan dengan و dan bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama.",
       "highlight": [],
       "focus": null
     },

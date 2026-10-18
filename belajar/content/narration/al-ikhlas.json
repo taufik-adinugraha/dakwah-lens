@@ -243,16 +243,16 @@
       "focus": "112:2:2"
     },
     "al-ikhlas:2:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kalimat nominal: kata pertama menjadi مُبْتَدَأ dan kata kedua khabarnya, Darwisy, al-Mujtaba; al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khobar kedua bagi kata huwa yang artinya Dialah, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
-      "display": "Sekarang susunan kalimatnya. Kalimat nominal: kata pertama menjadi mubtada’ (مُبْتَدَأ) dan kata kedua khabarnya (Darwisy, al-Mujtaba); al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khabar (خَبَر) kedua bagi kata هُوَ (huwa) yang artinya “Dialah”, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
+      "text": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: seluruh kalimat ini khobar kedua bagi kata huwa yang artinya Dialah di ayat pertama, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
+      "display": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: seluruh kalimat ini khabar (خَبَر) kedua bagi kata هُوَ (huwa) yang artinya “Dialah” di ayat pertama, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-ikhlas:2:structure:b": {
-      "text": "Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
-      "display": "Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
+      "text": "Kalimat ini sendiri kalimat nominal: kata pertama menjadi مُبْتَدَأ dan kata kedua khabarnya, Darwisy, al-Mujtaba. Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
+      "display": "Kalimat ini sendiri kalimat nominal: kata pertama menjadi mubtada’ (مُبْتَدَأ) dan kata kedua khabarnya (Darwisy, al-Mujtaba). Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
       "highlight": [
         0
       ],
@@ -406,24 +406,24 @@
       "focus": null
     },
     "al-ikhlas:3:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kata pertama meniadakan fi'il mudhori' sesudahnya dan menjazmkannya, maka kata kedua dan kata keempat sama-sama berakhiran سُكُون; Ibnu Hisyam, Mughni, menjadikan ayat ini contoh kata pertama yang menjazmkan.",
-      "display": "Sekarang susunan kalimatnya. Kata pertama meniadakan fi’il mudhari’ (فِعْل مُضَارِع) sesudahnya dan menjazmkannya, maka kata kedua dan kata keempat sama-sama berakhiran sukun (سُكُون); Ibnu Hisyam (Mughni) menjadikan ayat ini contoh kata pertama yang menjazmkan.",
+      "text": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: kata pertama dan kedua adalah khobar ketiga bagi kata huwa yang artinya Dialah di ayat pertama; al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru.",
+      "display": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: kata pertama dan kedua adalah khabar (خَبَر) ketiga bagi kata هُوَ (huwa) yang artinya “Dialah” di ayat pertama; al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru.",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-ikhlas:3:structure:b": {
-      "text": "Menurut al-Mujtaba dan al-Jadwal, kata pertama dan kedua adalah khobar ketiga bagi kata huwa yang artinya Dialah, al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru, dan kalimat kata ketiga dan keempat disambungkan dengan عَطْف padanya, sedangkan kata keempat majzum oleh kata ketiga sendiri;",
-      "display": "Menurut al-Mujtaba dan al-Jadwal, kata pertama dan kedua adalah khabar (خَبَر) ketiga bagi kata هُوَ (huwa) yang artinya “Dialah” (al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru), dan kalimat kata ketiga dan keempat disambungkan dengan ‘athaf (عَطْف) padanya, sedangkan kata keempat majzum oleh kata ketiga sendiri;",
+      "text": "Kalimat kata ketiga dan keempat disambungkan dengan عَطْف padanya, sedangkan kata keempat majzum oleh kata ketiga sendiri. Menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan وَاو karena ia menguatkan makna kata yang artinya tempat meminta segala sesuatu di ayat kedua: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
+      "display": "Kalimat kata ketiga dan keempat disambungkan dengan ‘athaf (عَطْف) padanya, sedangkan kata keempat majzum oleh kata ketiga sendiri. Menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan و karena ia menguatkan makna kata ٱلصَّمَدُ (aṣ-ṣamadu) yang artinya “tempat meminta segala sesuatu” di ayat kedua: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-ikhlas:3:structure:c": {
-      "text": "menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan وَاو karena ia menguatkan makna kata yang artinya tempat meminta segala sesuatu: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
-      "display": "menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan و karena ia menguatkan makna kata ٱلصَّمَدُ (aṣ-ṣamadu) yang artinya “tempat meminta segala sesuatu”: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
+      "text": "Kata pertama meniadakan fi'il mudhori' sesudahnya dan menjazmkannya, maka kata kedua dan kata keempat sama-sama berakhiran سُكُون; Ibnu Hisyam, Mughni, menjadikan ayat ini contoh kata pertama yang menjazmkan.",
+      "display": "Kata pertama meniadakan fi’il mudhari’ (فِعْل مُضَارِع) sesudahnya dan menjazmkannya, maka kata kedua dan kata keempat sama-sama berakhiran sukun (سُكُون); Ibnu Hisyam (Mughni) menjadikan ayat ini contoh kata pertama yang menjazmkan.",
       "highlight": [
         0
       ],
@@ -522,8 +522,8 @@
       "focus": null
     },
     "al-ikhlas:4:w1": {
-      "text": "Kata pertama, yaitu wa lam, artinya: dan tidak. وَاو adalah حَرْف عَطْف yang menyambungkan kalimat ini dengan frasa yang artinya tidak beranak, dan kata ini menjazmkan kata kerja sesudahnya.",
-      "display": "Kata pertama, yaitu وَلَمْ (wa lam), artinya: “dan tidak”. وَ adalah huruf ‘athaf (حَرْف عَطْف) yang menyambungkan kalimat ini dengan frasa yang artinya “tidak beranak”, dan kata ini menjazmkan kata kerja sesudahnya.",
+      "text": "Kata pertama, yaitu wa lam, artinya: dan tidak. وَاو adalah حَرْف عَطْف yang menyambungkan kalimat ini dengan frasa lam yalid yang artinya tidak beranak di ayat ketiga, dan kata ini menjazmkan kata kerja sesudahnya.",
+      "display": "Kata pertama, yaitu وَلَمْ (wa lam), artinya: “dan tidak”. وَ adalah huruf ‘athaf (حَرْف عَطْف) yang menyambungkan kalimat ini dengan frasa لَمْ (lam) يَلِدْ (yalid) yang artinya “tidak beranak” di ayat ketiga, dan kata ini menjazmkan kata kerja sesudahnya.",
       "highlight": [
         1
       ],
@@ -573,16 +573,16 @@
       "focus": null
     },
     "al-ikhlas:4:structure:a": {
-      "text": "Sekarang susunan kalimatnya. وَاو menyambungkan kalimat ini pada frasa yang artinya tidak beranak, dan kata pertama menjazmkan kata kedua, bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir,",
-      "display": "Sekarang susunan kalimatnya. و menyambungkan kalimat ini pada frasa yang artinya “tidak beranak”, dan kata pertama menjazmkan kata kedua, bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir,",
+      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat ketiga: وَاو menyambungkan kalimat ini pada frasa lam yalid yang artinya tidak beranak di ayat ketiga, dan kata pertama menjazmkan kata kedua,",
+      "display": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat ketiga: و menyambungkan kalimat ini pada frasa لَمْ (lam) يَلِدْ (yalid) yang artinya “tidak beranak” di ayat ketiga, dan kata pertama menjazmkan kata kedua,",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-ikhlas:4:structure:b": {
-      "text": "kata keempat khabarnya yang didahulukan, dan kata ketiga bergantung pada kata keempat, sehingga maksudnya tidak ada seorang pun yang setara bagi-Nya, Abu Hayyan, dinukil Darwisy dan as-Samin.",
-      "display": "kata keempat khabarnya yang didahulukan, dan kata ketiga bergantung pada kata keempat, sehingga maksudnya “tidak ada seorang pun yang setara bagi-Nya” (Abu Hayyan, dinukil Darwisy dan as-Samin).",
+      "text": "bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir, kata keempat khabarnya yang didahulukan, dan kata ketiga bergantung pada kata keempat, sehingga maksudnya tidak ada seorang pun yang setara bagi-Nya, Abu Hayyan, dinukil Darwisy dan as-Samin.",
+      "display": "bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir, kata keempat khabarnya yang didahulukan, dan kata ketiga bergantung pada kata keempat, sehingga maksudnya “tidak ada seorang pun yang setara bagi-Nya” (Abu Hayyan, dinukil Darwisy dan as-Samin).",
       "highlight": [
         0
       ],
@@ -689,8 +689,8 @@
       "focus": null
     },
     "al-ikhlas:4:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف عَطْف dan huruf nafi dan jazm. وَاو adalah حَرْف عَطْف yang menyambungkan kalimat ini dengan frasa yang artinya tidak beranak, dan kata ini menjazmkan kata kerja sesudahnya.",
-      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf nafi dan jazm. و adalah huruf ‘athaf (حَرْف عَطْف) yang menyambungkan kalimat ini dengan frasa yang artinya “tidak beranak”, dan kata ini menjazmkan kata kerja sesudahnya.",
+      "text": "Perannya: حَرْف عَطْف dan huruf nafi dan jazm. وَاو adalah حَرْف عَطْف yang menyambungkan kalimat ini dengan frasa lam yalid yang artinya tidak beranak di ayat ketiga, dan kata ini menjazmkan kata kerja sesudahnya.",
+      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf nafi dan jazm. و adalah huruf ‘athaf (حَرْف عَطْف) yang menyambungkan kalimat ini dengan frasa لَمْ (lam) يَلِدْ (yalid) yang artinya “tidak beranak” di ayat ketiga, dan kata ini menjazmkan kata kerja sesudahnya.",
       "highlight": [],
       "focus": null
     },

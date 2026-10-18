@@ -14787,27 +14787,27 @@
       ]
     },
     "al-fatihah:3:w1:compose:4": {
-      "text": "Sebabnya, kata ini menjadi sifat, atau نَعْت, bagi nama Alloh subhanahu wa ta'ala, yang berakhir كَسْرَة.",
-      "display": "Sebabnya, kata ini menjadi sifat, atau na’t (نَعْت), bagi nama Allah subhanahu wa ta'ala, yang berakhir kasrah (كَسْرَة).",
+      "text": "Sebabnya, kata ini نَعْت, yaitu sifat, bagi Allohi di ayat kedua.",
+      "display": "Sebabnya, kata ini na’t (نَعْت), yaitu sifat, bagi ٱللَّهِ (Allāhi) di ayat kedua.",
       "highlight": [
         1
       ],
       "focus": "1:3:1",
       "frame": 2,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/51aa658f042733ff.mp3",
-        "ms": 7628,
-        "sha256": "b607a60459f3e167c3b84048ba5826cc1c45ed42af104fee988dd6253605275e"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/1a5a303a50d58e5a.mp3",
+        "ms": 5407,
+        "sha256": "502f0745f942099b427796677750e144545dc2a3a211b22df2fa0595dc34c648"
       },
       "tokens": [
         {
           "t": "Sebabnya,",
           "s": 0.0,
-          "e": 0.72
+          "e": 0.64
         },
         {
           "t": "kata",
-          "s": 0.768,
+          "s": 0.704,
           "e": 0.96
         },
         {
@@ -14816,69 +14816,44 @@
           "e": 1.2
         },
         {
-          "t": "menjadi",
-          "s": 1.26,
-          "e": 1.68
+          "t": "na’t (نَعْت),",
+          "s": 1.28,
+          "e": 2.0
+        },
+        {
+          "t": "yaitu",
+          "s": 2.04,
+          "e": 2.4
         },
         {
           "t": "sifat,",
-          "s": 1.72,
-          "e": 2.32
-        },
-        {
-          "t": "atau",
-          "s": 2.4,
-          "e": 2.72
-        },
-        {
-          "t": "na’t (نَعْت),",
-          "s": 2.84,
-          "e": 3.44
+          "s": 2.48,
+          "e": 3.12
         },
         {
           "t": "bagi",
-          "s": 3.504,
+          "s": 3.248,
           "e": 3.76
         },
         {
-          "t": "nama",
-          "s": 3.808,
-          "e": 4.0
+          "t": "ٱللَّهِ (Allāhi)",
+          "s": 3.84,
+          "e": 4.4
         },
         {
-          "t": "Allah",
-          "s": 4.053,
-          "e": 4.32
+          "t": "di",
+          "s": 4.48,
+          "e": 4.64
         },
         {
-          "t": "subhanahu",
-          "s": 4.38,
-          "e": 4.8
-        },
-        {
-          "t": "wa",
-          "s": 4.827,
+          "t": "ayat",
+          "s": 4.693,
           "e": 4.88
         },
         {
-          "t": "ta'ala,",
-          "s": 4.933,
-          "e": 5.44
-        },
-        {
-          "t": "yang",
-          "s": 5.552,
-          "e": 6.0
-        },
-        {
-          "t": "berakhir",
-          "s": 6.06,
-          "e": 6.56
-        },
-        {
-          "t": "kasrah (كَسْرَة).",
-          "s": 6.76,
-          "e": 7.6
+          "t": "kedua.",
+          "s": 4.94,
+          "e": 5.36
         }
       ]
     },
@@ -15227,17 +15202,17 @@
       ]
     },
     "al-fatihah:3:w2:compose:4": {
-      "text": "Sebabnya, kata ini sifat berikutnya bagi nama Alloh subhanahu wa ta'ala.",
-      "display": "Sebabnya, kata ini sifat berikutnya bagi nama Allah subhanahu wa ta'ala.",
+      "text": "Sebabnya, kata ini juga نَعْت, yaitu sifat berikutnya, bagi Allohi di ayat kedua.",
+      "display": "Sebabnya, kata ini juga na’t (نَعْت), yaitu sifat berikutnya, bagi ٱللَّهِ (Allāhi) di ayat kedua.",
       "highlight": [
         2
       ],
       "focus": "1:3:2",
       "frame": 2,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/fc961453cce750e3.mp3",
-        "ms": 5068,
-        "sha256": "8a8870ac167b72a1cb8f28242779038740bae46797bdcb3e4302bf2fc2451528"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0862781a708f3d7a.mp3",
+        "ms": 6269,
+        "sha256": "90124140b75961957102e0ea5bb7bb857f56f7402db6c5be4675c27be395dbfa"
       },
       "tokens": [
         {
@@ -15247,53 +15222,63 @@
         },
         {
           "t": "kata",
-          "s": 1.12,
-          "e": 1.44
+          "s": 1.088,
+          "e": 1.28
         },
         {
           "t": "ini",
-          "s": 1.5,
-          "e": 1.68
+          "s": 1.34,
+          "e": 1.52
+        },
+        {
+          "t": "juga",
+          "s": 1.584,
+          "e": 1.84
+        },
+        {
+          "t": "na’t (نَعْت),",
+          "s": 1.92,
+          "e": 2.56
+        },
+        {
+          "t": "yaitu",
+          "s": 2.6,
+          "e": 2.96
         },
         {
           "t": "sifat",
-          "s": 1.76,
-          "e": 2.08
+          "s": 3.0,
+          "e": 3.36
         },
         {
-          "t": "berikutnya",
-          "s": 2.12,
-          "e": 2.72
+          "t": "berikutnya,",
+          "s": 3.4,
+          "e": 4.32
         },
         {
           "t": "bagi",
-          "s": 2.784,
-          "e": 3.04
+          "s": 4.368,
+          "e": 4.56
         },
         {
-          "t": "nama",
-          "s": 3.088,
-          "e": 3.28
+          "t": "ٱللَّهِ (Allāhi)",
+          "s": 4.64,
+          "e": 5.12
         },
         {
-          "t": "Allah",
-          "s": 3.36,
-          "e": 3.68
+          "t": "di",
+          "s": 5.2,
+          "e": 5.36
         },
         {
-          "t": "subhanahu",
-          "s": 3.74,
-          "e": 4.4
+          "t": "ayat",
+          "s": 5.413,
+          "e": 5.68
         },
         {
-          "t": "wa",
-          "s": 4.427,
-          "e": 4.48
-        },
-        {
-          "t": "ta'ala.",
-          "s": 4.533,
-          "e": 5.04
+          "t": "kedua.",
+          "s": 5.74,
+          "e": 6.24
         }
       ]
     },
@@ -15706,17 +15691,17 @@
       ]
     },
     "al-fatihah:3:structure:1": {
-      "text": "Sekarang susunan kalimatnya. Ayat ini bukan kalimat baru: kedua katanya adalah نَعْت, yaitu dua sifat bagi nama Alloh subhanahu wa ta'ala, maka keduanya ikut مَجْرُور, berakhir كَسْرَة.",
-      "display": "Sekarang susunan kalimatnya. Ayat ini bukan kalimat baru: kedua katanya adalah na’t (نَعْت), yaitu dua sifat bagi nama Allah subhanahu wa ta'ala, maka keduanya ikut majrur (مَجْرُور), berakhir kasrah (كَسْرَة).",
+      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat kedua. Kedua katanya adalah نَعْت, yaitu dua sifat bagi Allohi di ayat kedua, maka keduanya ikut مَجْرُور, berakhir كَسْرَة.",
+      "display": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat kedua. Kedua katanya adalah na’t (نَعْت), yaitu dua sifat bagi ٱللَّهِ (Allāhi) di ayat kedua, maka keduanya ikut majrur (مَجْرُور), berakhir kasrah (كَسْرَة).",
       "highlight": [
         1,
         2
       ],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/59757d2da7a20a0b.mp3",
-        "ms": 14681,
-        "sha256": "d8c617347d227b728edf031989664ef94708e447cb46579c7b5b0f618512b0f4"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/7604f8994b1bcc14.mp3",
+        "ms": 14524,
+        "sha256": "ba78db4ede2e602b358c7566b93dc26c682af50466388d8dca373f3f5e560891"
       },
       "tokens": [
         {
@@ -15727,132 +15712,127 @@
         {
           "t": "susunan",
           "s": 0.46,
-          "e": 0.88
+          "e": 0.8
         },
         {
           "t": "kalimatnya.",
-          "s": 0.92,
+          "s": 0.86,
           "e": 1.6
         },
         {
           "t": "Ayat",
-          "s": 1.92,
-          "e": 2.64
+          "s": 1.893,
+          "e": 2.56
         },
         {
           "t": "ini",
-          "s": 2.72,
-          "e": 2.96
+          "s": 2.64,
+          "e": 2.88
         },
         {
-          "t": "bukan",
-          "s": 3.04,
+          "t": "melanjutkan",
+          "s": 2.92,
           "e": 3.52
         },
         {
-          "t": "kalimat",
-          "s": 3.56,
-          "e": 3.92
+          "t": "ayat",
+          "s": 3.573,
+          "e": 3.76
         },
         {
-          "t": "baru:",
-          "s": 4.0,
-          "e": 4.96
+          "t": "kedua.",
+          "s": 3.82,
+          "e": 4.32
         },
         {
-          "t": "kedua",
-          "s": 5.02,
-          "e": 5.28
+          "t": "Kedua",
+          "s": 4.72,
+          "e": 5.36
         },
         {
           "t": "katanya",
-          "s": 5.34,
-          "e": 5.84
+          "s": 5.42,
+          "e": 5.92
         },
         {
           "t": "adalah",
-          "s": 5.886,
-          "e": 6.16
+          "s": 5.989,
+          "e": 6.4
         },
         {
           "t": "na’t (نَعْت),",
-          "s": 6.28,
-          "e": 7.2
+          "s": 6.52,
+          "e": 7.52
         },
         {
           "t": "yaitu",
-          "s": 7.24,
-          "e": 7.76
+          "s": 7.56,
+          "e": 8.0
         },
         {
           "t": "dua",
-          "s": 7.84,
-          "e": 8.08
+          "s": 8.08,
+          "e": 8.32
         },
         {
           "t": "sifat",
-          "s": 8.16,
-          "e": 8.48
+          "s": 8.4,
+          "e": 8.72
         },
         {
           "t": "bagi",
-          "s": 8.544,
-          "e": 8.8
-        },
-        {
-          "t": "nama",
-          "s": 8.848,
+          "s": 8.784,
           "e": 9.04
         },
         {
-          "t": "Allah",
-          "s": 9.093,
-          "e": 9.28
+          "t": "ٱللَّهِ (Allāhi)",
+          "s": 9.12,
+          "e": 9.6
         },
         {
-          "t": "subhanahu",
-          "s": 9.34,
+          "t": "di",
+          "s": 9.68,
           "e": 9.84
         },
         {
-          "t": "wa",
-          "s": 9.867,
-          "e": 9.92
+          "t": "ayat",
+          "s": 9.893,
+          "e": 10.08
         },
         {
-          "t": "ta'ala,",
-          "s": 9.973,
-          "e": 10.4
+          "t": "kedua,",
+          "s": 10.14,
+          "e": 10.64
         },
         {
           "t": "maka",
-          "s": 10.624,
-          "e": 11.52
+          "s": 10.848,
+          "e": 11.68
         },
         {
           "t": "keduanya",
-          "s": 11.6,
-          "e": 12.16
+          "s": 11.72,
+          "e": 12.24
         },
         {
           "t": "ikut",
-          "s": 12.213,
-          "e": 12.48
+          "s": 12.293,
+          "e": 12.56
         },
         {
           "t": "majrur (مَجْرُور),",
-          "s": 12.52,
-          "e": 13.12
+          "s": 12.62,
+          "e": 13.44
         },
         {
           "t": "berakhir",
-          "s": 13.24,
+          "s": 13.5,
           "e": 13.92
         },
         {
           "t": "kasrah (كَسْرَة).",
-          "s": 14.04,
-          "e": 14.64
+          "s": 13.96,
+          "e": 14.48
         }
       ]
     },
@@ -16347,143 +16327,183 @@
       ]
     },
     "al-fatihah:3:ex:why-harakat:1:why": {
-      "text": "Akhirnya dibaca كَسْرَة, karena menjadi sifat bagi lafaz Alloh yang مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi sifat bagi lafaz “Allah” yang majrur (مَجْرُور).",
+      "text": "Akhirnya dibaca كَسْرَة, karena menjadi نَعْت, yaitu sifat, bagi Allohi di ayat kedua, yang مَجْرُور.",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi na’t (نَعْت), yaitu sifat, bagi ٱللَّهِ (Allāhi) di ayat kedua, yang majrur (مَجْرُور).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/2737724963fdcb66.mp3",
-        "ms": 5956,
-        "sha256": "de3ef46fb758dfd48e617c72882e3b4da5a5338703fa789118bbd3386d125ad3"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/344c99256dc00a5c.mp3",
+        "ms": 8438,
+        "sha256": "412c545118119a951247474bff3e6b018312b8c3fbcb05e4f2b7cf506b35ef86"
       },
       "tokens": [
         {
           "t": "Akhirnya",
           "s": 0.0,
-          "e": 0.4
+          "e": 0.56
         },
         {
           "t": "dibaca",
-          "s": 0.46,
-          "e": 0.96
+          "s": 0.62,
+          "e": 1.12
         },
         {
           "t": "kasrah (كَسْرَة),",
-          "s": 1.08,
-          "e": 1.76
+          "s": 1.28,
+          "e": 2.4
         },
         {
           "t": "karena",
-          "s": 1.92,
-          "e": 2.88
+          "s": 2.446,
+          "e": 2.72
         },
         {
           "t": "menjadi",
-          "s": 2.93,
-          "e": 3.28
+          "s": 2.76,
+          "e": 3.04
         },
         {
-          "t": "sifat",
-          "s": 3.32,
-          "e": 3.68
+          "t": "na’t (نَعْت),",
+          "s": 3.12,
+          "e": 3.521
+        },
+        {
+          "t": "yaitu",
+          "s": 3.68,
+          "e": 4.08
+        },
+        {
+          "t": "sifat,",
+          "s": 4.12,
+          "e": 4.64
         },
         {
           "t": "bagi",
-          "s": 3.744,
-          "e": 4.0
+          "s": 4.768,
+          "e": 5.28
         },
         {
-          "t": "lafaz",
-          "s": 4.08,
-          "e": 4.48
+          "t": "ٱللَّهِ (Allāhi)",
+          "s": 5.387,
+          "e": 6.0
         },
         {
-          "t": "Allah",
-          "s": 4.56,
-          "e": 4.88
+          "t": "di",
+          "s": 6.053,
+          "e": 6.16
+        },
+        {
+          "t": "ayat",
+          "s": 6.213,
+          "e": 6.48
+        },
+        {
+          "t": "kedua,",
+          "s": 6.54,
+          "e": 7.24
         },
         {
           "t": "yang",
-          "s": 4.944,
-          "e": 5.2
+          "s": 7.296,
+          "e": 7.52
         },
         {
           "t": "majrur (مَجْرُور).",
-          "s": 5.24,
-          "e": 5.92
+          "s": 7.68,
+          "e": 8.4
         }
       ]
     },
     "al-fatihah:3:ex:why-harakat:2:why": {
-      "text": "Akhirnya dibaca كَسْرَة, karena menjadi sifat berikutnya bagi lafaz Alloh yang مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi sifat berikutnya bagi lafaz “Allah” yang majrur (مَجْرُور).",
+      "text": "Akhirnya dibaca كَسْرَة, karena menjadi نَعْت, yaitu sifat berikutnya, bagi Allohi di ayat kedua, yang مَجْرُور.",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi na’t (نَعْت), yaitu sifat berikutnya, bagi ٱللَّهِ (Allāhi) di ayat kedua, yang majrur (مَجْرُور).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/1034f98aac4c4eb8.mp3",
-        "ms": 6426,
-        "sha256": "90e8f700c31c3aacf957e4fb9636dca1b437db6af85b975fe826ebd9c84d7fba"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/928f8574de1a25db.mp3",
+        "ms": 9169,
+        "sha256": "adb3199045896c18764fac78d5720964859c3627f5f5dc7a248f599111ef9bf8"
       },
       "tokens": [
         {
           "t": "Akhirnya",
           "s": 0.0,
-          "e": 0.32
+          "e": 0.48
         },
         {
           "t": "dibaca",
-          "s": 0.36,
-          "e": 0.88
+          "s": 0.52,
+          "e": 0.96
         },
         {
           "t": "kasrah (كَسْرَة),",
-          "s": 1.04,
-          "e": 1.76
+          "s": 1.16,
+          "e": 1.92
         },
         {
           "t": "karena",
-          "s": 1.874,
+          "s": 2.011,
           "e": 2.56
         },
         {
           "t": "menjadi",
-          "s": 2.6,
-          "e": 2.88
+          "s": 2.61,
+          "e": 2.96
         },
         {
-          "t": "sifat",
-          "s": 2.92,
-          "e": 3.2
+          "t": "na’t (نَعْت),",
+          "s": 3.04,
+          "e": 3.76
         },
         {
-          "t": "berikutnya",
-          "s": 3.24,
-          "e": 3.84
-        },
-        {
-          "t": "bagi",
-          "s": 3.92,
+          "t": "yaitu",
+          "s": 3.84,
           "e": 4.24
         },
         {
-          "t": "lafaz",
-          "s": 4.293,
-          "e": 4.64
+          "t": "sifat",
+          "s": 4.28,
+          "e": 4.56
         },
         {
-          "t": "Allah",
-          "s": 4.72,
-          "e": 5.12
+          "t": "berikutnya,",
+          "s": 4.6,
+          "e": 5.28
+        },
+        {
+          "t": "bagi",
+          "s": 5.408,
+          "e": 5.92
+        },
+        {
+          "t": "ٱللَّهِ (Allāhi)",
+          "s": 6.0,
+          "e": 6.48
+        },
+        {
+          "t": "di",
+          "s": 6.56,
+          "e": 6.72
+        },
+        {
+          "t": "ayat",
+          "s": 6.773,
+          "e": 6.96
+        },
+        {
+          "t": "kedua,",
+          "s": 7.02,
+          "e": 7.44
         },
         {
           "t": "yang",
-          "s": 5.184,
-          "e": 5.44
+          "s": 7.584,
+          "e": 8.16
         },
         {
           "t": "majrur (مَجْرُور).",
-          "s": 5.56,
-          "e": 6.4
+          "s": 8.32,
+          "e": 9.12
         }
       ]
     },
@@ -17819,17 +17839,17 @@
       ]
     },
     "al-fatihah:4:w1:compose:2": {
-      "text": "Di sini akhirnya menjadi كَسْرَة, bunyi i, karena kata ini sifat, atau نَعْت, bagi nama Alloh subhanahu wa ta'ala.",
-      "display": "Di sini akhirnya menjadi kasrah (كَسْرَة), bunyi i, karena kata ini sifat, atau na’t (نَعْت), bagi nama Allah subhanahu wa ta'ala.",
+      "text": "Di sini akhirnya menjadi كَسْرَة, bunyi i, karena kata ini نَعْت, yaitu sifat, bagi Allohi di ayat kedua.",
+      "display": "Di sini akhirnya menjadi kasrah (كَسْرَة), bunyi i, karena kata ini na’t (نَعْت), yaitu sifat, bagi ٱللَّهِ (Allāhi) di ayat kedua.",
       "highlight": [
         1
       ],
       "focus": "1:4:1",
       "frame": 2,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0376c4887e279e64.mp3",
-        "ms": 8202,
-        "sha256": "fa4d837ae7ca625ff98f4fd485207a01c974fd0b16ddd7295819c961f399f21c"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/acf948fc4d82aded.mp3",
+        "ms": 8046,
+        "sha256": "fe6c015ad9fadd2ffe93ad980b292bbbb9637c243dd9ba6602c8496ef2356486"
       },
       "tokens": [
         {
@@ -17839,93 +17859,88 @@
         },
         {
           "t": "sini",
-          "s": 0.16,
-          "e": 0.4
+          "s": 0.12,
+          "e": 0.32
         },
         {
           "t": "akhirnya",
-          "s": 0.453,
-          "e": 0.88
+          "s": 0.373,
+          "e": 0.72
         },
         {
           "t": "menjadi",
-          "s": 0.94,
-          "e": 1.36
+          "s": 0.77,
+          "e": 1.12
         },
         {
           "t": "kasrah (كَسْرَة),",
-          "s": 1.6,
-          "e": 2.72
+          "s": 1.2,
+          "e": 1.92
         },
         {
           "t": "bunyi",
-          "s": 2.76,
-          "e": 2.96
+          "s": 2.02,
+          "e": 2.4
         },
         {
           "t": "i,",
-          "s": 3.08,
-          "e": 3.28
+          "s": 2.56,
+          "e": 2.8
         },
         {
           "t": "karena",
-          "s": 3.337,
-          "e": 3.68
+          "s": 2.88,
+          "e": 3.36
         },
         {
           "t": "kata",
-          "s": 3.728,
-          "e": 3.92
+          "s": 3.408,
+          "e": 3.6
         },
         {
           "t": "ini",
-          "s": 3.96,
-          "e": 4.08
-        },
-        {
-          "t": "sifat,",
-          "s": 4.16,
-          "e": 4.64
-        },
-        {
-          "t": "atau",
-          "s": 4.752,
-          "e": 5.2
+          "s": 3.66,
+          "e": 3.84
         },
         {
           "t": "na’t (نَعْت),",
-          "s": 5.32,
-          "e": 5.76
+          "s": 3.92,
+          "e": 4.4
+        },
+        {
+          "t": "yaitu",
+          "s": 4.6,
+          "e": 5.12
+        },
+        {
+          "t": "sifat,",
+          "s": 5.16,
+          "e": 6.0
         },
         {
           "t": "bagi",
-          "s": 5.856,
-          "e": 6.24
+          "s": 6.064,
+          "e": 6.32
         },
         {
-          "t": "nama",
-          "s": 6.304,
-          "e": 6.56
+          "t": "ٱللَّهِ (Allāhi)",
+          "s": 6.373,
+          "e": 6.96
         },
         {
-          "t": "Allah",
-          "s": 6.613,
-          "e": 6.88
+          "t": "di",
+          "s": 7.04,
+          "e": 7.2
         },
         {
-          "t": "subhanahu",
-          "s": 6.94,
+          "t": "ayat",
+          "s": 7.253,
           "e": 7.44
         },
         {
-          "t": "wa",
-          "s": 7.467,
-          "e": 7.52
-        },
-        {
-          "t": "ta'ala.",
-          "s": 7.573,
-          "e": 8.16
+          "t": "kedua.",
+          "s": 7.5,
+          "e": 8.0
         }
       ]
     },
@@ -18865,82 +18880,102 @@
       ]
     },
     "al-fatihah:4:structure:1": {
-      "text": "Sekarang susunan kalimatnya. Kata pertama adalah نَعْت bagi nama Alloh subhanahu wa ta'ala.",
-      "display": "Sekarang susunan kalimatnya. Kata pertama adalah na’t (نَعْت) bagi nama Allah subhanahu wa ta'ala.",
+      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat kedua. Kata pertama adalah نَعْت bagi Allohi di ayat kedua.",
+      "display": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat kedua. Kata pertama adalah na’t (نَعْت) bagi ٱللَّهِ (Allāhi) di ayat kedua.",
       "highlight": [
         1
       ],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/af6810033a81aaf7.mp3",
-        "ms": 7236,
-        "sha256": "46d77aafcc00a0bf9ae335a891e37af49d7d947feb5664cf3e3f28ee2a13f1e4"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/d5deb1352862f83a.mp3",
+        "ms": 9169,
+        "sha256": "6049aee5f93bad3f6531d9446a8a54772debf9f1ab15668dcf52114efa7af6c0"
       },
       "tokens": [
         {
           "t": "Sekarang",
           "s": 0.0,
-          "e": 0.48
+          "e": 0.4
         },
         {
           "t": "susunan",
-          "s": 0.54,
-          "e": 0.96
+          "s": 0.46,
+          "e": 0.88
         },
         {
           "t": "kalimatnya.",
-          "s": 1.02,
-          "e": 1.76
+          "s": 0.92,
+          "e": 1.6
+        },
+        {
+          "t": "Ayat",
+          "s": 1.893,
+          "e": 2.56
+        },
+        {
+          "t": "ini",
+          "s": 2.62,
+          "e": 2.8
+        },
+        {
+          "t": "melanjutkan",
+          "s": 2.84,
+          "e": 3.36
+        },
+        {
+          "t": "ayat",
+          "s": 3.413,
+          "e": 3.6
+        },
+        {
+          "t": "kedua.",
+          "s": 3.66,
+          "e": 4.16
         },
         {
           "t": "Kata",
-          "s": 1.936,
-          "e": 2.64
+          "s": 4.32,
+          "e": 4.96
         },
         {
           "t": "pertama",
-          "s": 2.704,
-          "e": 3.2
-        },
-        {
-          "t": "adalah",
-          "s": 3.28,
-          "e": 3.76
-        },
-        {
-          "t": "na’t (نَعْت)",
-          "s": 3.92,
-          "e": 4.48
-        },
-        {
-          "t": "bagi",
-          "s": 4.64,
-          "e": 5.28
-        },
-        {
-          "t": "nama",
-          "s": 5.344,
+          "s": 5.024,
           "e": 5.6
         },
         {
-          "t": "Allah",
-          "s": 5.68,
-          "e": 6.0
+          "t": "adalah",
+          "s": 5.669,
+          "e": 6.08
         },
         {
-          "t": "subhanahu",
-          "s": 6.06,
-          "e": 6.56
+          "t": "na’t (نَعْت)",
+          "s": 6.28,
+          "e": 6.96
         },
         {
-          "t": "wa",
-          "s": 6.587,
-          "e": 6.64
+          "t": "bagi",
+          "s": 7.072,
+          "e": 7.52
         },
         {
-          "t": "ta'ala.",
-          "s": 6.72,
-          "e": 7.2
+          "t": "ٱللَّهِ (Allāhi)",
+          "s": 7.6,
+          "e": 8.16
+        },
+        {
+          "t": "di",
+          "s": 8.24,
+          "e": 8.4
+        },
+        {
+          "t": "ayat",
+          "s": 8.427,
+          "e": 8.56
+        },
+        {
+          "t": "kedua.",
+          "s": 8.62,
+          "e": 9.12
         }
       ]
     },
@@ -19655,85 +19690,110 @@
       ]
     },
     "al-fatihah:4:ex:why-harakat:1:why": {
-      "text": "Akhirnya dibaca كَسْرَة, karena menjadi sifat keempat bagi lafaz Alloh. Jadi, kata ini مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi sifat keempat bagi lafaz “Allah”. Jadi, kata ini majrur (مَجْرُور).",
+      "text": "Akhirnya dibaca كَسْرَة, karena menjadi نَعْت, yaitu sifat, bagi Allohi di ayat kedua, yang مَجْرُور; Darwisy menyebutnya sifat keempat.",
+      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena menjadi na’t (نَعْت), yaitu sifat, bagi ٱللَّهِ (Allāhi) di ayat kedua, yang majrur (مَجْرُور); Darwisy menyebutnya sifat keempat.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4c57d063b845b015.mp3",
-        "ms": 8281,
-        "sha256": "2e346cf04e9487a64f886a083b89d9fba4c3762b4bbb647d805a4e3483623900"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/53723923aae05543.mp3",
+        "ms": 11311,
+        "sha256": "b15bf73f16dd298940d23f98116f7bbaa3e4b89a3035eb682d3d76dfbd192e9d"
       },
       "tokens": [
         {
           "t": "Akhirnya",
           "s": 0.0,
-          "e": 0.48
+          "e": 0.32
         },
         {
           "t": "dibaca",
-          "s": 0.54,
-          "e": 1.04
+          "s": 0.38,
+          "e": 0.88
         },
         {
           "t": "kasrah (كَسْرَة),",
-          "s": 1.24,
-          "e": 2.08
+          "s": 0.96,
+          "e": 2.16
         },
         {
           "t": "karena",
-          "s": 2.183,
-          "e": 2.8
+          "s": 2.194,
+          "e": 2.4
         },
         {
           "t": "menjadi",
-          "s": 2.85,
-          "e": 3.2
+          "s": 2.45,
+          "e": 2.8
         },
         {
-          "t": "sifat",
-          "s": 3.24,
-          "e": 3.6
+          "t": "na’t (نَعْت),",
+          "s": 2.88,
+          "e": 3.44
         },
         {
-          "t": "keempat",
-          "s": 3.653,
-          "e": 4.08
+          "t": "yaitu",
+          "s": 3.56,
+          "e": 3.92
+        },
+        {
+          "t": "sifat,",
+          "s": 4.0,
+          "e": 4.76
         },
         {
           "t": "bagi",
-          "s": 4.144,
-          "e": 4.4
+          "s": 4.816,
+          "e": 5.04
         },
         {
-          "t": "lafaz",
-          "s": 4.48,
-          "e": 4.88
+          "t": "ٱللَّهِ (Allāhi)",
+          "s": 5.147,
+          "e": 5.68
         },
         {
-          "t": "Allah.",
-          "s": 4.987,
-          "e": 5.44
+          "t": "di",
+          "s": 5.76,
+          "e": 5.92
         },
         {
-          "t": "Jadi,",
-          "s": 5.8,
-          "e": 6.64
+          "t": "ayat",
+          "s": 5.973,
+          "e": 6.16
         },
         {
-          "t": "kata",
-          "s": 6.688,
-          "e": 6.88
+          "t": "kedua,",
+          "s": 6.22,
+          "e": 6.8
         },
         {
-          "t": "ini",
-          "s": 6.96,
-          "e": 7.2
+          "t": "yang",
+          "s": 6.928,
+          "e": 7.44
         },
         {
-          "t": "majrur (مَجْرُور).",
-          "s": 7.44,
+          "t": "majrur (مَجْرُور);",
+          "s": 7.56,
           "e": 8.24
+        },
+        {
+          "t": "Darwisy",
+          "s": 8.46,
+          "e": 9.52
+        },
+        {
+          "t": "menyebutnya",
+          "s": 9.552,
+          "e": 10.16
+        },
+        {
+          "t": "sifat",
+          "s": 10.28,
+          "e": 10.64
+        },
+        {
+          "t": "keempat.",
+          "s": 10.72,
+          "e": 11.28
         }
       ]
     },
@@ -32926,98 +32986,113 @@
       ]
     },
     "al-fatihah:7:w1:compose:3": {
-      "text": "Sebabnya, kata ini pengganti bagi kata yang artinya jalan, dan pengganti mengikuti akhiran kata yang digantikannya.",
-      "display": "Sebabnya, kata ini pengganti bagi kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan”, dan pengganti mengikuti akhiran kata yang digantikannya.",
+      "text": "Sebabnya, kata ini pengganti bagi kata yang artinya jalan di ayat keenam, dan pengganti mengikuti akhiran kata yang digantikannya.",
+      "display": "Sebabnya, kata ini pengganti bagi kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan” di ayat keenam, dan pengganti mengikuti akhiran kata yang digantikannya.",
       "highlight": [
         1
       ],
       "focus": "1:7:1",
       "frame": 2,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/4ed812993e9b5c79.mp3",
-        "ms": 8046,
-        "sha256": "37ce3f9061a6b7429bc78149a23c268f50b291659eda154a7d3f19859c1b2c30"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/df9cdc9838cb0034.mp3",
+        "ms": 9561,
+        "sha256": "501c68d6ac87e6dca2dff303d133d8628e48fa2e33f57cc7a0a7a24bd28057e3"
       },
       "tokens": [
         {
           "t": "Sebabnya,",
           "s": 0.0,
-          "e": 0.64
-        },
-        {
-          "t": "kata",
-          "s": 0.704,
           "e": 0.96
         },
         {
-          "t": "ini",
-          "s": 1.02,
+          "t": "kata",
+          "s": 1.008,
           "e": 1.2
         },
         {
-          "t": "pengganti",
-          "s": 1.264,
-          "e": 1.92
+          "t": "ini",
+          "s": 1.28,
+          "e": 1.52
         },
         {
-          "t": "bagi",
-          "s": 1.968,
+          "t": "pengganti",
+          "s": 1.568,
           "e": 2.16
         },
         {
-          "t": "kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa)",
+          "t": "bagi",
           "s": 2.224,
           "e": 2.48
         },
         {
+          "t": "kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa)",
+          "s": 2.56,
+          "e": 2.88
+        },
+        {
           "t": "yang",
-          "s": 2.512,
-          "e": 2.64
+          "s": 2.912,
+          "e": 3.04
         },
         {
           "t": "artinya",
-          "s": 2.7,
-          "e": 3.12
+          "s": 3.12,
+          "e": 3.6
         },
         {
-          "t": "jalan,",
-          "s": 3.2,
+          "t": "jalan",
+          "s": 3.72,
           "e": 4.24
         },
         {
+          "t": "di",
+          "s": 4.347,
+          "e": 4.56
+        },
+        {
+          "t": "ayat",
+          "s": 4.613,
+          "e": 4.8
+        },
+        {
+          "t": "keenam,",
+          "s": 4.864,
+          "e": 5.36
+        },
+        {
           "t": "dan",
-          "s": 4.28,
-          "e": 4.4
-        },
-        {
-          "t": "pengganti",
-          "s": 4.448,
-          "e": 5.12
-        },
-        {
-          "t": "mengikuti",
-          "s": 5.184,
-          "e": 5.84
-        },
-        {
-          "t": "akhiran",
-          "s": 5.893,
+          "s": 5.58,
           "e": 6.24
         },
         {
+          "t": "pengganti",
+          "s": 6.288,
+          "e": 6.96
+        },
+        {
+          "t": "mengikuti",
+          "s": 7.024,
+          "e": 7.68
+        },
+        {
+          "t": "akhiran",
+          "s": 7.733,
+          "e": 8.08
+        },
+        {
           "t": "kata",
-          "s": 6.336,
-          "e": 6.72
+          "s": 8.16,
+          "e": 8.48
         },
         {
           "t": "yang",
-          "s": 6.784,
-          "e": 7.04
+          "s": 8.512,
+          "e": 8.64
         },
         {
           "t": "digantikannya.",
-          "s": 7.1,
-          "e": 8.0
+          "s": 8.7,
+          "e": 9.52
         }
       ]
     },
@@ -38270,8 +38345,8 @@
       ]
     },
     "al-fatihah:7:structure:1": {
-      "text": "Sekarang susunan kalimatnya. Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata yang artinya jalan.",
-      "display": "Sekarang susunan kalimatnya. Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan”.",
+      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat keenam. Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata yang artinya jalan di ayat keenam.",
+      "display": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat keenam. Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan” di ayat keenam.",
       "highlight": [
         1,
         2,
@@ -38280,9 +38355,9 @@
       ],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/23f9848f316958de.mp3",
-        "ms": 7967,
-        "sha256": "80c3c098b5a56c09632a3a71f94508bc9955f168148be9f19aed084c526d4d58"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/6c532b0dd6d69b45.mp3",
+        "ms": 11389,
+        "sha256": "9dfcb9151f7437d9637b73a17e397e193bb7184434d862eb70e1b0535543f3e0"
       },
       "tokens": [
         {
@@ -38293,77 +38368,117 @@
         {
           "t": "susunan",
           "s": 0.46,
-          "e": 0.8
+          "e": 0.88
         },
         {
           "t": "kalimatnya.",
-          "s": 0.86,
-          "e": 1.96
+          "s": 0.94,
+          "e": 1.6
         },
         {
-          "t": "Empat",
-          "s": 2.07,
-          "e": 2.48
-        },
-        {
-          "t": "kata",
-          "s": 2.544,
-          "e": 2.8
-        },
-        {
-          "t": "pertama",
-          "s": 2.848,
-          "e": 3.28
-        },
-        {
-          "t": "ayat",
-          "s": 3.333,
-          "e": 3.52
+          "t": "Ayat",
+          "s": 1.92,
+          "e": 2.64
         },
         {
           "t": "ini",
-          "s": 3.62,
+          "s": 2.72,
+          "e": 2.96
+        },
+        {
+          "t": "melanjutkan",
+          "s": 3.0,
+          "e": 3.68
+        },
+        {
+          "t": "ayat",
+          "s": 3.707,
           "e": 3.92
         },
         {
+          "t": "keenam.",
+          "s": 3.984,
+          "e": 4.48
+        },
+        {
+          "t": "Empat",
+          "s": 4.7,
+          "e": 5.361
+        },
+        {
+          "t": "kata",
+          "s": 5.424,
+          "e": 5.68
+        },
+        {
+          "t": "pertama",
+          "s": 5.744,
+          "e": 6.16
+        },
+        {
+          "t": "ayat",
+          "s": 6.213,
+          "e": 6.4
+        },
+        {
+          "t": "ini",
+          "s": 6.48,
+          "e": 6.72
+        },
+        {
           "t": "menjadi",
-          "s": 4.0,
-          "e": 4.56
-        },
-        {
-          "t": "pengganti",
-          "s": 4.608,
-          "e": 5.28
-        },
-        {
-          "t": "yang",
-          "s": 5.328,
-          "e": 5.52
-        },
-        {
-          "t": "menjelaskan",
-          "s": 5.552,
-          "e": 6.24
-        },
-        {
-          "t": "kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa)",
-          "s": 6.32,
-          "e": 6.64
-        },
-        {
-          "t": "yang",
-          "s": 6.688,
-          "e": 6.88
-        },
-        {
-          "t": "artinya",
-          "s": 6.94,
+          "s": 6.79,
           "e": 7.28
         },
         {
-          "t": "jalan.",
-          "s": 7.4,
-          "e": 7.92
+          "t": "pengganti",
+          "s": 7.328,
+          "e": 7.84
+        },
+        {
+          "t": "yang",
+          "s": 7.872,
+          "e": 8.0
+        },
+        {
+          "t": "menjelaskan",
+          "s": 8.032,
+          "e": 8.8
+        },
+        {
+          "t": "kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa)",
+          "s": 8.88,
+          "e": 9.2
+        },
+        {
+          "t": "yang",
+          "s": 9.248,
+          "e": 9.44
+        },
+        {
+          "t": "artinya",
+          "s": 9.48,
+          "e": 9.84
+        },
+        {
+          "t": "jalan",
+          "s": 9.96,
+          "e": 10.4
+        },
+        {
+          "t": "di",
+          "s": 10.453,
+          "e": 10.56
+        },
+        {
+          "t": "ayat",
+          "s": 10.613,
+          "e": 10.8
+        },
+        {
+          "t": "keenam.",
+          "s": 10.864,
+          "e": 11.36
         }
       ]
     },
@@ -38972,110 +39087,125 @@
       ]
     },
     "al-fatihah:7:ex:sort-case:1:why": {
-      "text": "Akhirnya dibaca فَتْحَة, karena menjadi pengganti bagi kata yang artinya jalan, yang مَنْصُوب; pengganti mengikuti akhiran kata yang digantikannya.",
-      "display": "Akhirnya dibaca fathah (فَتْحَة), karena menjadi pengganti bagi kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan”, yang manshub (مَنْصُوب); pengganti mengikuti akhiran kata yang digantikannya.",
+      "text": "Akhirnya dibaca فَتْحَة, karena menjadi pengganti bagi kata yang artinya jalan di ayat keenam, yang مَنْصُوب; pengganti mengikuti akhiran kata yang digantikannya.",
+      "display": "Akhirnya dibaca fathah (فَتْحَة), karena menjadi pengganti bagi kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa) yang artinya “jalan” di ayat keenam, yang manshub (مَنْصُوب); pengganti mengikuti akhiran kata yang digantikannya.",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0833096c5772d6c7.mp3",
-        "ms": 11076,
-        "sha256": "1c9bbbb010d24b54e6744c617df0278351342b2f9448ce17998a778691cc03ad"
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/cdfafd7c25fba3f5.mp3",
+        "ms": 11886,
+        "sha256": "c0e53aafa3b18225f69f74ea78714342d5eb54639a0b8a3d7f0c5eabcaba4814"
       },
       "tokens": [
         {
           "t": "Akhirnya",
           "s": 0.0,
-          "e": 0.4
+          "e": 0.32
         },
         {
           "t": "dibaca",
-          "s": 0.46,
-          "e": 0.96
+          "s": 0.38,
+          "e": 0.88
         },
         {
           "t": "fathah (فَتْحَة),",
-          "s": 1.08,
-          "e": 1.68
+          "s": 1.12,
+          "e": 1.84
         },
         {
           "t": "karena",
-          "s": 1.817,
-          "e": 2.64
+          "s": 1.989,
+          "e": 2.88
         },
         {
           "t": "menjadi",
-          "s": 2.7,
-          "e": 3.12
+          "s": 2.93,
+          "e": 3.28
         },
         {
           "t": "pengganti",
-          "s": 3.168,
-          "e": 3.76
+          "s": 3.328,
+          "e": 3.92
         },
         {
           "t": "bagi",
-          "s": 3.84,
-          "e": 4.16
+          "s": 3.984,
+          "e": 4.24
         },
         {
           "t": "kata ٱلصِّرَٰطَ (aṣ-ṣirāṭa)",
-          "s": 4.24,
-          "e": 4.56
+          "s": 4.32,
+          "e": 4.64
         },
         {
           "t": "yang",
-          "s": 4.592,
-          "e": 4.72
+          "s": 4.688,
+          "e": 4.88
         },
         {
           "t": "artinya",
-          "s": 4.78,
-          "e": 5.2
+          "s": 4.94,
+          "e": 5.36
         },
         {
-          "t": "jalan,",
-          "s": 5.32,
+          "t": "jalan",
+          "s": 5.48,
+          "e": 5.84
+        },
+        {
+          "t": "di",
+          "s": 5.893,
+          "e": 6.0
+        },
+        {
+          "t": "ayat",
+          "s": 6.053,
           "e": 6.24
         },
         {
+          "t": "keenam,",
+          "s": 6.304,
+          "e": 6.8
+        },
+        {
           "t": "yang",
-          "s": 6.288,
-          "e": 6.48
+          "s": 6.912,
+          "e": 7.36
         },
         {
           "t": "manshub (مَنْصُوب);",
-          "s": 6.56,
-          "e": 7.84
+          "s": 7.4,
+          "e": 8.64
         },
         {
           "t": "pengganti",
-          "s": 7.888,
-          "e": 8.48
+          "s": 8.672,
+          "e": 9.2
         },
         {
           "t": "mengikuti",
-          "s": 8.512,
-          "e": 9.04
+          "s": 9.248,
+          "e": 9.76
         },
         {
           "t": "akhiran",
-          "s": 9.093,
-          "e": 9.52
+          "s": 9.813,
+          "e": 10.16
         },
         {
           "t": "kata",
-          "s": 9.6,
-          "e": 9.92
+          "s": 10.256,
+          "e": 10.64
         },
         {
           "t": "yang",
-          "s": 9.952,
-          "e": 10.08
+          "s": 10.688,
+          "e": 10.88
         },
         {
           "t": "digantikannya.",
-          "s": 10.14,
-          "e": 11.04
+          "s": 10.94,
+          "e": 11.84
         }
       ]
     },

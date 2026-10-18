@@ -2053,7 +2053,7 @@
         },
         {
           "frame": 2,
-          "say": "Sebabnya, kata ini menjadi sifat, atau na't, bagi nama Allah, yang berakhir kasrah."
+          "say": "Sebabnya, kata ini na't, yaitu sifat, bagi {{1:2:2/allahi}} di ayat kedua."
         },
         {
           "frame": 3,
@@ -2292,7 +2292,7 @@
         },
         {
           "frame": 2,
-          "say": "Sebabnya, kata ini sifat berikutnya bagi nama Allah."
+          "say": "Sebabnya, kata ini juga na't, yaitu sifat berikutnya, bagi {{1:2:2/allahi}} di ayat kedua."
         },
         {
           "frame": 3,
@@ -2403,7 +2403,7 @@
         },
         {
           "frame": 2,
-          "say": "Di sini akhirnya menjadi kasrah, bunyi i, karena kata ini sifat, atau na't, bagi nama Allah."
+          "say": "Di sini akhirnya menjadi kasrah, bunyi i, karena kata ini na't, yaitu sifat, bagi {{1:2:2/allahi}} di ayat kedua."
         },
         {
           "frame": 2,
@@ -3859,7 +3859,7 @@
         },
         {
           "frame": 2,
-          "say": "Sebabnya, kata ini pengganti bagi kata {{!1:6:2}} yang artinya “jalan”, dan pengganti mengikuti akhiran kata yang digantikannya."
+          "say": "Sebabnya, kata ini pengganti bagi kata {{!1:6:2}} yang artinya “jalan” di ayat keenam, dan pengganti mengikuti akhiran kata yang digantikannya."
         },
         {
           "frame": 2,
@@ -5519,7 +5519,7 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:ecd52b2dfd3e6f0a53d41520bf40401da43e0b494bab74cca44b621395856376",
+    "authored_compose": "authored/al-fatihah.compose.json sha256:68c046c717390f6a79a438c4a24618a9ced29224d91fd3ba0e1952129cd04984",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "_comment": "Hand-authored sentence structure (tarkib) for Al-Fatihah: one `structure` per ayah (schema.ts Ayah.structure) and one `role` per word (schema.ts Word.role). DRAFT pending ustadz review. Read against the i'rab texts on tafsir.app (Darwisy, al-Jadwal, al-Mujtaba, an-Nahhas, as-Samin, Ibnu Katsir 1:7) and, for definitions and sentence types, al-Ajurrumiyyah (Shamela 11371) and Mughni al-Labib (Shamela 6972); both Shamela editions state that their pagination follows the print. Darwisy pages were checked on Shamela 2163 (pagination = print): hlm. 9 = shamela.ws/book/2163/6, hlm. 14 = /11, hlm. 15 = /12, hlm. 16 = /13. No Qur'anic Arabic is typed here: words are referred to in SKB transliteration exactly as in al-fatihah.words.json. `structure.groups[].words` are 1-based indices within the ayah (Tanzil tokens). `structure.items` (optional; operator 2026-10-13: \"can we make this kind of explanation in items: harfjar in one item, idhafah in next item etc, it's kind of confusing which for which in this paragraph\"): the same analysis as SEPARATE narrated items, in the order they are said, each `{words, say}` — `words` the 1-based indices the item is about (lit on the mushaf line while it is said; one word is enough), `say` plain prose that is SPOKEN AS IT STANDS, like a composition's `say` (authored/<slug>.compose.json): no markup, no Qur'anic word (positions and meanings instead: \"kata kedua\", \"kata yang artinya …\"), a term only from the lesson that teaches it (authored/curriculum.json). When an ayah has `items`, its narration is one line per item (`structure:1` … `structure:n`) instead of the one `structure` line built from `summary`; the reference section of the page keeps `summary` and `groups`. `structure.sources` are complete SourceRef objects (no expansion needed). `role_src` lists the kitab (abbreviations of the `kitab` table in al-fatihah.words.json) that state the role; every abbreviation listed is already in that word's `src` unless `role_note` says otherwise. `role_note` and `review_notes` never reach the output; they are for the reviewer. Grammar terms use pesantren spelling with ASCII apostrophes and no macrons (na'ib fa'il, not nā'ib fā'il) so that validate.py's prose check (no ASCII apostrophe inside an SKB-marked word) passes.",
+  "_comment": "Hand-authored sentence structure (tarkib) for Al-Fatihah: one `structure` per ayah (schema.ts Ayah.structure) and one `role` per word (schema.ts Word.role). DRAFT pending ustadz review. Read against the i'rab texts on tafsir.app (Darwisy, al-Jadwal, al-Mujtaba, an-Nahhas, as-Samin, Ibnu Katsir 1:7) and, for definitions and sentence types, al-Ajurrumiyyah (Shamela 11371) and Mughni al-Labib (Shamela 6972); both Shamela editions state that their pagination follows the print. Darwisy pages were checked on Shamela 2163 (pagination = print): hlm. 9 = shamela.ws/book/2163/6, hlm. 14 = /11, hlm. 15 = /12, hlm. 16 = /13. No Qur'anic Arabic is typed here: words are referred to in SKB transliteration exactly as in al-fatihah.words.json. `structure.groups[].words` are 1-based indices within the ayah (Tanzil tokens). `structure.items` (optional; operator 2026-10-13: \"can we make this kind of explanation in items: harfjar in one item, idhafah in next item etc, it's kind of confusing which for which in this paragraph\"): the same analysis as SEPARATE narrated items, in the order they are said, each `{words, say}` — `words` the 1-based indices the item is about (lit on the mushaf line while it is said; one word is enough), `say` plain prose that is SPOKEN AS IT STANDS, like a composition's `say` (authored/<slug>.compose.json): no markup, no Qur'anic word (positions and meanings instead: \"kata kedua\", \"kata yang artinya …\"), a term only from the lesson that teaches it (authored/curriculum.json). When an ayah has `items`, its narration is one line per item (`structure:1` … `structure:n`) instead of the one `structure` line built from `summary`; the reference section of the page keeps `summary` and `groups`. `structure.sources` are complete SourceRef objects (no expansion needed). `role_src` lists the kitab (abbreviations of the `kitab` table in al-fatihah.words.json) that state the role; every abbreviation listed is already in that word's `src` unless `role_note` says otherwise. `role_note` and `review_notes` never reach the output; they are for the reviewer. Grammar terms use pesantren spelling with ASCII apostrophes and no macrons (na'ib fa'il, not nā'ib fā'il) so that validate.py's prose check (no ASCII apostrophe inside an SKB-marked word) passes. `continues` (beside an ayah's `structure`, reviewer-only: build_surah.py reads only `structure`; operator 2026-10-18, pipeline/README.md wording rule 8): the ayah this one continues and what in it depends on which earlier word — {ayah, per (the hedge where the kitab differ, or null), links: [{words, kind, on (named-word refs of ONE earlier ayah), src (kitab abbreviations), said_in (word | structure)}]}; validate_narration.continuation_problems holds the lines to it (the structure part opens with 'Ayat ini melanjutkan ayat N.', the word's explanation cites the earlier word 'di ayat N').",
   "ayat": {
     "1": {
       "structure": {
@@ -64,6 +64,13 @@
       ]
     },
     "3": {
+      "continues": {
+        "ayah": 2, "per": null,
+        "links": [
+          { "words": [1], "kind": "na't (sifat)", "on": ["1:2:2/allahi"], "src": ["D", "J"], "said_in": ["word", "structure"] },
+          { "words": [2], "kind": "na't (sifat)", "on": ["1:2:2/allahi"], "src": ["D", "J"], "said_in": ["word", "structure"] }
+        ]
+      },
       "structure": {
         "type": "lanjutan jumlah ayat 2 ([[na't]])",
         "summary": "Ayat ini bukan kalimat baru: [[ar-raḥmāni|q:1:3:1]] dan [[ar-raḥīmi|q:1:3:2]] adalah dua [[sifat]] lagi bagi lafaz Allah di ayat 2, maka keduanya ikut [[majrur]] (berakhiran [[kasrah]]). Al-Jadwal dan as-Samin juga membolehkan keduanya dibaca sebagai [[badal]].",
@@ -71,7 +78,7 @@
           { "words": [1, 2], "label": "[[ar-raḥmāni|q:1:3:1]], [[ar-raḥīmi|q:1:3:2]]: dua [[na't]] bagi lafaz Allah di ayat 2", "concept": "naat" }
         ],
         "items": [
-          { "words": [1, 2], "say": "Ayat ini bukan kalimat baru: kedua katanya adalah na't, yaitu dua sifat bagi nama Allah, maka keduanya ikut majrur, berakhir kasrah." },
+          { "words": [1, 2], "say": "Ayat ini melanjutkan ayat kedua. Kedua katanya adalah na't, yaitu dua sifat bagi {{1:2:2/allahi}} di ayat kedua, maka keduanya ikut majrur, berakhir kasrah." },
           { "words": [1, 2], "say": "Keduanya memakai alif lam, karena na't mengikuti kata yang disifatinya juga dalam tertentu atau tidaknya, dan nama Allah sudah ma'rifah." }
         ],
         "sources": [
@@ -84,6 +91,12 @@
       }
     },
     "4": {
+      "continues": {
+        "ayah": 2, "per": null,
+        "links": [
+          { "words": [1], "kind": "na't (sifat)", "on": ["1:2:2/allahi"], "src": ["D", "M", "J"], "said_in": ["word", "structure"] }
+        ]
+      },
       "structure": {
         "type": "lanjutan jumlah ayat 2 ([[na't]] + rangkaian [[idhafah]])",
         "summary": "Ayat ini masih melanjutkan ayat 2: [[māliki|q:1:4:1]] adalah [[sifat]] berikutnya bagi lafaz Allah (Darwisy menyebutnya [[sifat]] keempat), lalu ia disandarkan kepada [[yaumi|q:1:4:2]], dan [[yaumi|q:1:4:2]] disandarkan kepada [[ad-dīni|q:1:4:3]]. Inilah rangkaian [[idhafah]] tiga kata: [[yaumi|q:1:4:2]] dan [[ad-dīni|q:1:4:3]] sama-sama [[mudhaf ilaih]], maka keduanya berakhiran [[kasrah]].",
@@ -91,7 +104,7 @@
           { "words": [1, 2, 3], "label": "rangkaian [[idhafah]]: [[māliki|q:1:4:1]] → [[yaumi|q:1:4:2]] → [[ad-dīni|q:1:4:3]] (“Pemilik hari pembalasan”)", "concept": "idhafah" }
         ],
         "items": [
-          { "words": [1], "say": "Kata pertama adalah na't bagi nama Allah." },
+          { "words": [1], "say": "Ayat ini melanjutkan ayat kedua. Kata pertama adalah na't bagi {{1:2:2/allahi}} di ayat kedua." },
           { "words": [1, 2, 3], "say": "Lalu kata pertama disandarkan kepada kata kedua, dan kata kedua disandarkan kepada kata ketiga. Inilah rangkaian idhafah tiga kata, yang artinya “Pemilik hari pembalasan”." },
           { "words": [2, 3], "say": "Kata kedua dan kata ketiga sama-sama mudhaf ilaih, maka keduanya majrur. Dengan ini kita mengenal tiga sebab sebuah isim menjadi majrur: didahului huruf jar, menjadi mudhaf ilaih, dan mengikuti kata yang majrur, seperti na't." }
         ],
@@ -171,6 +184,12 @@
       ]
     },
     "7": {
+      "continues": {
+        "ayah": 6, "per": null,
+        "links": [
+          { "words": [1], "kind": "badal (pengganti)", "on": ["1:6:2"], "src": ["D", "J", "M", "S", "IK"], "said_in": ["word", "structure"] }
+        ]
+      },
       "structure": {
         "type": "lanjutan jumlah ayat 6 ([[badal]]), memuat [[jumlah]] [[shilah]]",
         "summary": "Kata [[ṣirāṭa|q:1:7:1]] adalah pengganti ([[badal]]) yang menjelaskan [[aṣ-ṣirāṭa|q:1:6:2]] di ayat 6; ia disandarkan kepada [[allażīna|q:1:7:2]], kata sambung “yang” ([[isim maushul]]) yang diterangkan oleh anak kalimat ([[shilah]]) [[an‘amta ‘alaihim|q:1:7:3-4]]. Berikutnya [[gairi al-magḍūbi ‘alaihim|q:1:7:5-7]] menjadi [[badal]] dari [[allażīna|q:1:7:2]] (sebagian ulama menjadikannya [[sifat]]), dengan [[‘alaihim|q:1:7:7]] sebagai pengganti pelaku ([[na'ib fa'il]]) bagi [[al-magḍūbi|q:1:7:6]], lalu [[aḍ-ḍāllīna|q:1:7:9]] disambung dengan [[wa lā|q:1:7:8]], dan [[lā|q:1:7:8/2]] di situ menegaskan makna “bukan”.",
@@ -183,7 +202,7 @@
           { "words": [8, 9], "label": "[[wa lā aḍ-ḍāllīna|q:1:7:8-9]]: [['athaf]], dengan [[lā|q:1:7:8/2]] sebagai penegas makna “bukan”", "concept": "athaf" }
         ],
         "items": [
-          { "words": [1, 2, 3, 4], "say": "Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata {{!1:6:2}} yang artinya “jalan”." },
+          { "words": [1, 2, 3, 4], "say": "Ayat ini melanjutkan ayat keenam. Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata {{!1:6:2}} yang artinya “jalan” di ayat keenam." },
           { "words": [1, 2], "say": "Kata pertama disandarkan kepada kata kedua: ini idhafah, yang artinya “jalan orang-orang yang”." },
           { "words": [2, 3, 4], "say": "Kata kedua adalah isim maushul, dan dua kata sesudahnya adalah shilah baginya, yaitu kalimat yang menjelaskannya, yang artinya “yang telah Engkau beri nikmat”." },
           { "words": [5, 6, 7], "say": "Tiga kata berikutnya menjadi pengganti bagi kata kedua; sebagian ulama menjadikannya sifat. Di dalamnya, kata ketujuh menempati posisi pelaku bagi kata keenam, yang bermakna dikenai perbuatan." },
