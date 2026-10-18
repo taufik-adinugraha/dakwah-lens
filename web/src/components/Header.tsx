@@ -32,6 +32,10 @@ export async function Header() {
     { href: `/${locale}/discussions`, label: t("discussions") },
     { href: `/${locale}/kitab`, label: t("kitab") },
     { href: `/${locale}/flyers/public`, label: t("flyers_library") },
+    // Belajar Al-Qur'an is its own app (own container, routed by Caddy
+    // under /belajar/<locale>), so it is a plain link with a full page
+    // load, never a locale-aware <Link>.
+    { href: `/belajar/${locale}`, label: t("belajar") },
     // Pustaka Kajian hidden from header nav 2026-06-06 while the
     // generation flow is being reworked. Route still accessible via
     // direct URL for operators.
@@ -117,6 +121,16 @@ export async function Header() {
             >
               {t("flyers_library")}
             </Link>
+            {/* Belajar Al-Qur'an: a separate app under /belajar/<locale>
+                (Caddy routes it), so a plain <a>, not the locale-aware
+                <Link> (operator 2026-10-18: "put Belajar as additional
+                menu in main header"). */}
+            <a
+              href={`/belajar/${locale}`}
+              className="hover:text-ink transition"
+            >
+              {t("belajar")}
+            </a>
             {/* Pustaka Kajian hidden from header nav 2026-06-06 — the
                 /pustaka-kajian route still works via direct URL for
                 operators, just no link surface for visitors. */}
