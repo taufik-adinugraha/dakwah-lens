@@ -67,6 +67,8 @@ type Op =
  *  ya' of a jamak's ending (operator 2026-10-17: the bentuk dasar of ٱلْعَٰلَمِينَ is ٱلْعَٰلَمُونَ). */
 const LONG_LETTERS = { wawu: "\u0648", ya: "\u064A" } as const;
 type LetterName = keyof typeof LONG_LETTERS;
+/** The ya' at a word's end as the Uthmani text writes it, without its dots (\u064A\u064E\u0647\u0652\u062F\u0650\u0649). */
+const DOTLESS_YA = "\u0649";
 
 function at(ps: string[], i: unknown): number {
   if (typeof i !== "number" || !Number.isInteger(i)) throw new Error(`piece index ${String(i)}`);
@@ -113,7 +115,10 @@ export function applyOp(ar: string, op: Op): string {
     const j = at(ps, o.letter);
     const to = o.to as LetterName;
     const letters: readonly string[] = Object.values(LONG_LETTERS);
-    if (!(to in LONG_LETTERS) || !letters.includes(ps[j][0]) || ps[j][0] === LONG_LETTERS[to]) {
+    // The dotless final ya' of the Uthmani text (ى) may be written as the ya' a learner knows (ي):
+    // the same letter in its other shape (pipeline/compose.py DOTLESS_YA, 2026-10-18).
+    const dotless = ps[j][0] === DOTLESS_YA && to === "ya";
+    if (!(to in LONG_LETTERS) || (!letters.includes(ps[j][0]) && !dotless) || ps[j][0] === LONG_LETTERS[to]) {
       throw new Error(`letter: piece ${ps[j]} → ${String(to)}`);
     }
     ps[j] = LONG_LETTERS[to] + ps[j].slice(1);

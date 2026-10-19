@@ -968,9 +968,13 @@ BACKREF_FREE_PARTS = {"map", "learned", "intro", "next", "done", "recap", "recit
 # al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama."
 CONTINUES = re.compile(rf"\b[Aa]yat ini (?:masih )?melanjutkan ayat ({_AYAT_WORDS})\b")
 # What a line says when it names a word of an earlier ayah because this ayah depends on it.
+# Since 2026-10-18 also the words that say WHY the earlier word ends as it does (operator: "give
+# more clear explanation"): "ٱللَّهِ (Allāhi) di ayat kedua, yang disifati kata ini, berakhir kasrah
+# karena didahului huruf jar …", "kata … di ayat keenam berakhir fathah, karena menjadi maf’ul bih
+# kedua bagi …".
 DEPENDENCY = re.compile(r"\b(?:na[’']t|sifat|badal|pengganti|[’'‘]athaf|[’'‘]athf|disambungkan|menyambungkan|melanjutkan|"
                         r"disandarkan|bergantung|dikaitkan|mengaitkan|mengikuti|menerangkan|menguatkan|khabar|mudhaf ilaih|"
-                        r"keterangan keadaan|penjelas)\b", re.I)
+                        r"keterangan keadaan|penjelas|disifati(?:nya)?|digantikan(?:nya)?|maf[’']ul bih)\b", re.I)
 COMPARISON = re.compile(r"\b(?:seperti|sama (?:seperti|dengan)|berbeda dengan|sekali lagi|polanya sama|"
                         r"sudah (?:kita )?(?:pelajari|bahas|lihat|temui))\b[^.;]*\bayat\b"
                         r"|\bayat\b[^.;]*\b(?:seperti|sama (?:seperti|dengan)|berbeda dengan)\b", re.I)
@@ -1168,25 +1172,63 @@ def continuation_problems(manifests: dict[str, dict], lessons: dict[str, dict], 
                 elif len(said_at) > 1:
                     errs.append(f"{said_at[1][0]}: {said_at[1][1].group()!r} again: the continuation is said once, at the "
                                 f"opening of the structure part ({parts[0]})")
+            # The reminder card (operator 2026-10-18: "remind user what that previous ayat looks like"):
+            # every line that says the continuation or cites an earlier word carries the card of that
+            # ayah with the cited word(s) highlighted (reminder_of), and no other line carries one; a
+            # card names an earlier ayah of the surah and words of it.
+            carded = False
+            for lid, ln in own.items():
+                pm = SLUG_ID.match(lid)
+                part = pm.group("part") if pm else ""
+                want = reminder_of(lid, ln["display"], part, c, named, S)
+                have = ln.get("reminder")
+                for e in have if isinstance(have, list) else ([] if have is None else [have]):
+                    if not isinstance(e, dict) or set(e) != {"ayah", "words"} or e.get("ayah") not in n_words \
+                            or not 1 <= e["ayah"] < A or not isinstance(e.get("words"), list) or not e["words"] \
+                            or any(not isinstance(x, int) or not 1 <= x <= n_words[e["ayah"]] for x in e["words"]):
+                        errs.append(f"{lid}: reminder {e!r} is not a card of an earlier ayah of the surah with words of it "
+                                    "highlighted ({ayah, words}: word numbers of that ayah)")
+                if have != want:
+                    errs.append(f"{lid}: reminder card {have!r}, and the line "
+                                + (f"says the continuation or cites {want!r} (the earlier ayah and its cited words): "
+                                   "the stage shows that ayah while the line is on (operator 2026-10-18)" if want else
+                                   "says no continuation and cites no earlier word: no card"))
+                carded = carded or bool(have)
+            if c is not None and not carded:
+                errs.append(f"{base}: continues ayah {c.get('ayah')} (the data), and no line of it carries the reminder card "
+                            "of that ayah (its structure part's opening)")
             known = links_of.get(A, [])
             # Every citation is a dependency of the data, of words of the ayah it names — in a word's own
             # lines, a dependency of THAT word.
             for lid, ln in own.items():
                 wm = re.match(rf"{re.escape(base)}:w(\d+)(?::|$)", lid)
                 mine = [x for x in known if wm is None or int(wm.group(1)) in x[2]["words"]]
-                for run, n in citations(lid, ln["display"]):
+                cits = citations(lid, ln["display"])
+                # The ayat this line cites a dependency of the data in: another word of that ayah
+                # may be cited beside it, to say why the depended-on word ends as it does
+                # (2026-10-18, "give more clear explanation": "… bagi ٱلْوَسْوَاسِ (al-waswāsi) di
+                # ayat keempat, yang majrur …", "pelaku yuwaswisu di ayat kelima, yang kembali kepada
+                # ٱلَّذِى (allażī) di ayat kelima").
+                linked = {n for run, n in cits if any(tuple(run) == pairs and n == on_a for pairs, on_a, _ in mine)}
+                for run, n in cits:
                     if any(n not in places.get(w, set()) for w in run):
                         errs.append(f"{lid}: cites {' '.join(run)!r} “di ayat {ordinal(n)}”, which is not a word of ayah {n}")
-                    elif not any(tuple(run) == pairs and n == on_a for pairs, on_a, _ in mine):
+                    elif not any(tuple(run) == pairs and n == on_a for pairs, on_a, _ in mine) and n not in linked:
                         errs.append(f"{lid}: cites {' '.join(run)!r} of ayah {n} as a dependency the data does not have "
                                     f"(authored/{slug}.structure.json `continues` of ayah {A}): never one the kitab do not state")
-                # … and a named word that stands only in an earlier ayah says which.
+                # … and a named word that stands only in an earlier ayah says which — or stands in an
+                # ayah the line cites (2026-10-18, the clearer explanation: "ٱللَّهِ (Allāhi) di ayat
+                # kedua … berakhir kasrah karena didahului huruf jar, yaitu لِ (li): لِلَّهِ
+                # (lillāhi)" — the word that explains the cited word's ending is a word of that ayah,
+                # which the reminder card shows).
                 cited_spans = [m.span("run") for m in CITATION.finditer(ln["display"])]
+                cited_ayat = {n for _run, n in citations(lid, ln["display"])}
                 if _line_ayah(lid) is None:
                     continue
                 for m in NAMED_SHOWN.finditer(ln["display"]):
                     at = places.get(m.group(), set())
-                    if at and max(at) < A and not any(s <= m.start() and m.end() <= e for s, e in cited_spans):
+                    if at and max(at) < A and not any(s <= m.start() and m.end() <= e for s, e in cited_spans) \
+                            and not (at & cited_ayat):
                         errs.append(f"{lid}: names {m.group()!r}, a word of ayah {max(at)}, without saying which ayah "
                                     f"(“… di ayat {ordinal(max(at))}”: rule 8, operator 2026-10-18)")
             # Every dependency of the data is said where the data says.
@@ -1205,6 +1247,50 @@ def continuation_problems(manifests: dict[str, dict], lessons: dict[str, dict], 
                         errs.append(f"{base}:structure: words {ln['words']} depend on {' '.join(pairs)!r} of ayah {on_a} "
                                     f"({ln['kind']}, the data): a structure line says so, “… di ayat {ordinal(on_a)}”")
     return errs
+
+
+# ------------------------------------------------------------------ the reminder card (2026-10-18)
+# Operator, 2026-10-18: "in some ayat it's explain like this: it becomes na'at from lafaz Allah in
+# ayat-2, better to remind user what that previous ayat looks like and give more clear
+# explanation. check any similar cases." While a line that says a continuation is on — the
+# structure part's opening "Ayat ini melanjutkan ayat N.", a structure line or a word's own line
+# (or one of its composition lines) that cites a word of an earlier ayah — the stage shows a
+# REMINDER CARD of that earlier ayah: its words (the content's bytes), the cited word(s)
+# highlighted, its translation and its number. The manifest line carries what the card shows,
+# `reminder`: [{ayah, words}], one entry per earlier ayah (ascending), `words` the word numbers to
+# highlight there — derived (reminder_of) from the line's own citations and, for the opening
+# sentence, from the `continues` data (its links' `on` words in the ayah it continues). A line of
+# an exercise (the stage shows the exercise there) and every line of an ayah that continues none
+# carry none. continuation_problems holds every line to it both ways.
+REMINDER_PART = re.compile(r"(?:w[1-9]\d*(?::compose:[1-9]\d*)?|structure(?::[1-9]\d*)?)")
+LOC_REF = re.compile(r"^\d{1,3}:\d{1,3}:\d{1,3}(?:/[^{}\s/]+)?$")
+
+
+def _ref_word(ref: str) -> tuple[int, int, int]:
+    s, a, w = (int(x) for x in ref.split("/")[0].split(":"))
+    return s, a, w
+
+
+def reminder_of(lid: str, display, part: str, cont: dict | None, named: "Named", surah: int) -> list[dict] | None:
+    """What the reminder card shows while line `lid` is on (the comment above): [{ayah, words}] or
+    None. `part` the line's part without its split letter, `cont` its ayah's `continues` (None: the
+    ayah continues none)."""
+    if not isinstance(cont, dict) or not isinstance(display, str) or not REMINDER_PART.fullmatch(part or ""):
+        return None
+    by: dict[int, set[int]] = {}
+    for run, n in citations(lid, display):
+        for shown in run:
+            words = {_ref_word(r)[2] for r, word in named.refs.items()
+                     if named_shown(*word) == shown and _ref_word(r)[:2] == (surah, n)}
+            by.setdefault(n, set()).update(words)
+    for m in CONTINUES.finditer(display):
+        n = AYAT_NUM[m.group(1)]
+        if n != cont.get("ayah"):
+            continue
+        words = {_ref_word(r)[2] for ln in cont.get("links") or [] if isinstance(ln, dict)
+                 for r in ln.get("on") or [] if isinstance(r, str) and LOC_REF.match(r) and _ref_word(r)[:2] == (surah, n)}
+        by.setdefault(n, set()).update(words)
+    return [{"ayah": n, "words": sorted(ws)} for n, ws in sorted(by.items())] or None
 
 
 def default_named_speech(translit: str) -> str:
@@ -1385,7 +1471,10 @@ LATIN_CONTEXT: dict[str, str] = {
     # … and where the warm-up names the three (quiz.warmup_marked, build_narration.ex_intro:
     # "isim, fi'il, atau huruf"; "… adalah huruf, karena ia kata tugas", and lesson zero's "…
     # adalah huruf, yaitu kata tugas").
-    "حَرْف": r"(?:(?<=fi'il, dan ){h}|(?<=atau ){h}(?= \(kata tugas\))|(?<=fi'il, atau ){h}|(?<=adalah ){h}(?=, (?:yaitu|karena ia) ))",
+    # … and where a lesson map line says which kinds of word an ayah has (lessonmap.KINDS_SENTENCE,
+    # 2026-10-18: "Dari tiga jenis kata itu, di ayat ini hanya ada isim dan huruf.").
+    "حَرْف": r"(?:(?<=fi'il, dan ){h}|(?<=atau ){h}(?= \(kata tugas\))|(?<=fi'il, atau ){h}|(?<=adalah ){h}(?=, (?:yaitu|karena ia) )"
+             r"|(?<=hanya ada ){h}|(?<=hanya ada isim dan ){h}|(?<=hanya ada fi'il dan ){h})",
     # The letter of a prefixed preposition (bi-, li-), never "alif lam" or a root letter (fa', 'ain, lam).
     "بَاء": r"(?:(?<=[Hh]uruf )|(?<=jar )){h}",
     # … and the last of a wazan's three root letters as build_narration names them ("tiga huruf fa',
@@ -2324,7 +2413,7 @@ def _split_groups(ids: list[str], rx: re.Pattern, name: str) -> tuple[dict[str, 
 
 
 LINE_KEYS = {"text", "display", "highlight", "focus"}
-LINE_OPTIONAL = {"frame", "audio", "tokens"}
+LINE_OPTIONAL = {"frame", "audio", "tokens", "reminder"}
 # Letter names (build_narration.ARABIC_LETTER_NAME, folded): a primer / compose line may say them
 # although a tile's transliteration is the same syllable ("ba" of بَ is the letter's name).
 LETTER_NAMES = {"alif", "ba", "ta", "tsa", "jim", "ha", "kha", "dal", "dzal", "ra", "zai", "sin", "syin", "shad",
@@ -2546,7 +2635,7 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
     ayat = {a["ayah"]: a for a in lesson_ayat(lesson, compose)}
     for lid, line in lines.items():
         if not isinstance(line, dict) or not LINE_KEYS <= set(line) or set(line) - LINE_KEYS - LINE_OPTIONAL:
-            errs.append(f"{lid}: a line is {{text, display, highlight, focus, frame?, audio?, tokens?}}")
+            errs.append(f"{lid}: a line is {{text, display, highlight, focus, frame?, reminder?, audio?, tokens?}}")
             continue
         m = rx.match(lid)
         ayah, part = None, (m.group("part") if m else "")
@@ -2700,6 +2789,9 @@ _MAP_NONE_REVIEW = re.compile(r"^Di ayat ini tidak ada hal baru; kita mengulang 
 # "map:total": the running total and EVERY step learnt by then, by name (operator 2026-10-15).
 MAP_TOTAL_LEAD = "Dengan itu"         # after an ayah that taught something new
 MAP_TOTAL_LEAD_NONE = "Sampai ayat ini"  # after one that did not
+# After a list of the steps met here, when the ayah has fewer than all three kinds of word
+# (lessonmap.KINDS_SENTENCE, operator 2026-10-18): which of them it has.
+_MAP_KINDS = re.compile(r"^Dari (?P<step>.+?) itu, di ayat ini hanya ada (?P<list>.+)\.$")
 _MAP_TOTAL = re.compile(rf"^(?P<lead>{MAP_TOTAL_LEAD}|{MAP_TOTAL_LEAD_NONE}), sudah (?P<n>[a-z ]+?) hal yang kita pelajari"
                         r"(?:, (?P<some>yaitu|di antaranya) (?P<list>.+))?\.$")
 
@@ -2770,6 +2862,54 @@ def _one_sentence(shown: str) -> bool:
     return len(re.split(r"(?<=\.) ", shown)) == 1
 
 
+def map_kinds_here(lid: str, shown: str, entry: dict, lessonmap: dict, known: dict[str, str]) -> tuple[str, dict[str, str], list[str]]:
+    """A line that lists the steps MET IN THIS AYAH (map:again; the closing and the reassurance of
+    an ayah with nothing new) against the kinds of word the ayah has (operator 2026-10-18: "we
+    always say in this ayat we find 3 jenis kata: isim, fi'il, huruf. But actually in that ayat
+    (example ayat-3) we only have isim"; lessonmap.KINDS_SENTENCE): with all three kinds the step is
+    named whole ("tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف)") and no more is
+    said; with fewer it is named bare ("tiga jenis kata") and a last sentence names exactly the
+    kinds the ayah has, in order: "Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم)." —
+    a kind no word of the ayah is of, or one left out, fails. Returns (the line without that
+    sentence, the names its list may use, problems)."""
+    kinds = lessonmap.get("kinds") if isinstance(lessonmap, dict) and isinstance(lessonmap.get("kinds"), dict) else None
+    if kinds is None or kinds.get("step") not in LESSONMAP.here_ids(entry):
+        return shown, known, []
+    errs: list[str] = []
+    sid = kinds["step"]
+    full = next((n for n, s in known.items() if s == sid), "")
+    bare = _low(kinds["name"])
+    have = [k for k in entry.get("kinds") or []]
+    members = kinds.get("members") or {}
+    names_of = lambda ks: ", ".join(members[k]["latin"].lower() for k in ks if k in members)  # noqa: E731
+    sentences = re.split(r"(?<=\.) ", shown)
+    k = _MAP_KINDS.match(sentences[-1]) if len(sentences) > 1 else None
+    rest = " ".join(sentences[:-1]) if k else shown
+    if not LESSONMAP.kinds_partial(lessonmap, entry):
+        if k:
+            errs.append(f"{lid}: says which kinds of word this ayah has (“{sentences[-1]}”), and it has all three: the step "
+                        f"is named whole, “{full}”")
+        if re.search(rf"(?<![\w’']){re.escape(bare)}(?!, yaitu)", rest) and full not in rest:
+            errs.append(f"{lid}: names the kinds of word bare (“{bare}”), and this ayah has all three: name them, “{full}”")
+        return rest, known, errs
+    if full and full in rest:
+        errs.append(f"{lid}: names {names_of(['isim', 'fiil', 'huruf'])} as met in this ayah (“{full}”), and its words are "
+                    f"only {names_of(have)} (quiz.word_parts): name the step bare, “{bare}”, then say which "
+                    "(operator 2026-10-18: “in that ayat (example ayat-3) we only have isim, no harf or fi'il”)")
+    if not k:
+        errs.append(f"{lid}: does not say which kinds of word this ayah has ({names_of(have)}): “"
+                    f"{LESSONMAP.KINDS_SENTENCE.format(step=bare, kinds='…')}”")
+    else:
+        if k.group("step") != bare:
+            errs.append(f"{lid}: the sentence on the kinds of word names the step “{k.group('step')}”, not “{bare}”")
+        got = named_concepts(k.group("list"), {_low(m["name"]): kid for kid, m in members.items()})
+        ids = [kid for kid, _a in got] if got is not None else None
+        if ids != have:
+            errs.append(f"{lid}: says this ayah has {k.group('list')!r} of the kinds of word; its words are "
+                        f"{names_of(have)} (quiz.word_parts), in that order")
+    return rest, {**known, bare: sid}, errs
+
+
 def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict, curriculum: dict | None = None) -> list[str]:
     """The map and learned lines of every ayah of a surah with a lesson map, read back from their
     captions against content/map/<slug>.json (module docstring, "The lesson map"). The captions
@@ -2830,6 +2970,8 @@ def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict, curricul
         lid = f"{base}:map:again"
         shown = _field_of(lines, lid, "display")
         if shown:
+            shown, known_here, kerrs = map_kinds_here(lid, shown, entry, lessonmap, known)
+            errs += kerrs
             m = _MAP_AGAIN.match(shown)
             if not learnt:
                 errs.append(f"{lid}: nothing was learnt before this ayah, and it has a line about what comes up again")
@@ -2846,7 +2988,7 @@ def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict, curricul
                 errs.append(f"{lid}: does not name, in one sentence, the learnt steps that come up again here "
                             f"({len(again)} in the lesson map)")
             else:
-                errs += _map_names(lid, "repeated step(s)", m.group("list"), again, known)
+                errs += _map_names(lid, "repeated step(s)", m.group("list"), again, known_here)
         # --- what is taught later, and how many next-level topics there are
         lid = f"{base}:map:later"
         shown = _field_of(lines, lid, "display")
@@ -2879,11 +3021,20 @@ def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict, curricul
         lid = f"{base}:map:focus"
         shown = _field_of(lines, lid, "display")
         if shown:
-            errs += _map_focus(lid, shown, entry, known)
+            if not new:
+                shown, known_focus, kerrs = map_kinds_here(lid, shown, entry, lessonmap, known)
+                errs += kerrs
+            else:
+                known_focus = known
+            errs += _map_focus(lid, shown, entry, known_focus)
         # --- the closing: what was new
         lid = f"{base}:learned"
         shown = _field_of(lines, lid, "display")
         if shown:
+            known_closing = known
+            if not new:
+                shown, known_closing, kerrs = map_kinds_here(lid, shown, entry, lessonmap, known)
+                errs += kerrs
             m = _MAP_LEARNED.match(shown)
             if not new:
                 r = _MAP_NONE_REVIEW.match(shown)
@@ -2896,7 +3047,7 @@ def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict, curricul
                                 "line does not say so")
                 else:
                     errs += _map_count(lid, "repeated step(s)", r, again)
-                    errs += _map_names(lid, "repeated step(s)", r.group("list"), again, known, count_value(r.group("n")))
+                    errs += _map_names(lid, "repeated step(s)", r.group("list"), again, known_closing, count_value(r.group("n")))
             elif not m or not _one_sentence(shown):
                 errs.append(f"{lid}: does not say, in one sentence, how many new steps the ayah taught, and which "
                             "(the running total is the next line, map:total)")

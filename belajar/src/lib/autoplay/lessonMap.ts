@@ -35,13 +35,28 @@ export type LessonMapStep = { name: string; latin: string; lesson: string };
 /** A next-level record as the file names it (from its Konsep title, or an explicit name). */
 export type LessonMapRecord = { name: string; latin: string; from: "title" | "authored" };
 
-/** One ayah of the file. */
+/** The three kinds of word, in the order the lessons name them (pipeline/quiz.py KINDS). */
+export const MAP_KINDS = ["isim", "fiil", "huruf"] as const;
+export type MapKind = (typeof MAP_KINDS)[number];
+
+/** One ayah of the file. `kinds`: the kinds of word its words are made of (the QAC tag of each
+ *  part, as the warm-up derives it; pipeline/lessonmap.py kinds_of). */
 export type LessonMapAyah = {
   ayah: number;
   new: string[];
   learnt: { id: string; here: boolean }[];
   later: string[];
   lanjut: string[];
+  kinds: MapKind[];
+};
+
+/** The file's step of the three kinds of word: its name without its members ("Tiga jenis kata")
+ *  and each kind's name ("Isim (اِسْم)"). */
+export type LessonMapKinds = {
+  step: string;
+  name: string;
+  latin: string;
+  members: Record<MapKind, { name: string; latin: string }>;
 };
 
 /** content/map/${slug}.json (zod: src/content/map-schema.ts). */
@@ -52,6 +67,7 @@ export type LessonMapFile = {
   steps: Record<string, LessonMapStep>;
   lanjut: Record<string, LessonMapRecord>;
   ayat: LessonMapAyah[];
+  kinds: LessonMapKinds | null;
 };
 
 /** A step or a record as the card lists it: its name as the captions show it. */
@@ -68,6 +84,23 @@ export type LessonMapInput = {
    *  whole ayah). */
   later: (LessonMapItem & { surah: number | null; ayah: number | null })[];
   lanjut: LessonMapItem[];
+  /** The step of the three kinds of word and the kinds this ayah has (null: the file has no such
+   *  step). Operator 2026-10-18: "we always say in this ayat we find 3 jenis kata: isim, fi'il,
+   *  huruf. But actually in that ayat (example ayat-3) we only have isim" — so where a line or the
+   *  card says it is met HERE, it names these, and all three only when `all`. */
+  kinds?: MapKindsHere | null;
+};
+
+/** What an ayah's map says of the three kinds of word. */
+export type MapKindsHere = {
+  step: string;
+  /** The step's name without its members: "Tiga jenis kata" (caption form, and as prose). */
+  name: string;
+  latin: string;
+  /** All three kinds occur in this ayah. */
+  all: boolean;
+  /** The kinds that do, in order, each as the captions name it ("Isim (اِسْم)"). */
+  here: (LessonMapItem & { latin: string })[];
 };
 
 /** The groups of the opening, in the order their steps are played. */
@@ -147,6 +180,27 @@ export function mapOpening(map: Pick<LessonMapInput, "learnt" | "later" | "lanju
 /** The steps learnt so far that come up again in this ayah. */
 export const mapHere = (map: Pick<LessonMapInput, "learnt">) => map.learnt.filter((x) => x.here);
 
+/** The step of the three kinds of word comes up again in this ayah, and the ayah has fewer than
+ *  all three (pipeline/lessonmap.py kinds_partial): whatever says it is met here names it bare and
+ *  says which kinds occur. */
+export const mapKindsPartial = (map: Pick<LessonMapInput, "learnt" | "kinds">): boolean =>
+  !!map.kinds && !map.kinds.all && map.learnt.some((x) => x.here && x.id === map.kinds!.step);
+
+/** The step names a caption gives the steps met again here (mapSaidName): the kinds step bare
+ *  when the ayah has fewer than all three (pipeline/build_narration.py _said_here). */
+export const mapHereSaid = (map: Pick<LessonMapInput, "learnt" | "kinds">): string[] =>
+  mapHere(map).map((it) => mapSaidName(mapKindsPartial(map) && it.id === map.kinds!.step ? map.kinds!.name : it.name));
+
+/** The caption's word for the kinds an ayah has, with the step's bare name (null: all three, or
+ *  the step does not come up here): what follows a list of the steps met here,
+ *  "Dari {step} itu, di ayat ini hanya ada {kinds}." (pipeline/lessonmap.py KINDS_SENTENCE). */
+export type MapKindsSaid = { step: string; kinds: readonly string[] };
+export const mapKindsSaid = (map: Pick<LessonMapInput, "learnt" | "kinds">): MapKindsSaid | null =>
+  mapKindsPartial(map) ? { step: mapSaidName(map.kinds!.name), kinds: map.kinds!.here.map((k) => mapSaidName(k.name)) } : null;
+
+/** A name with its first letter in lower case, its Arabic kept ("Isim (اِسْم)" → "isim (اِسْم)"). */
+export const mapLowFirst = (name: string): string => name.slice(0, 1).toLowerCase() + name.slice(1);
+
 /** How many steps have been learnt once this ayah's lesson is through. */
 export const mapTotal = (map: Pick<LessonMapInput, "learnt" | "new">) => map.learnt.length + map.new.length;
 
@@ -177,8 +231,18 @@ export function lessonMapInputOf(file: LessonMapFile | null | undefined, ayah: n
   const entry = file?.ayat.find((a) => a.ayah === ayah);
   if (!file || !entry) return null;
   const step = (id: string): LessonMapItem[] => (file.steps[id] ? [{ id, name: file.steps[id].name }] : []);
+  const kinds = file.kinds;
   return {
     surah: file.surah,
+    kinds: kinds
+      ? {
+          step: kinds.step,
+          name: kinds.name,
+          latin: kinds.latin,
+          all: MAP_KINDS.every((k) => entry.kinds.includes(k)),
+          here: MAP_KINDS.filter((k) => entry.kinds.includes(k)).map((k) => ({ id: k, name: kinds.members[k].name, latin: kinds.members[k].latin })),
+        }
+      : null,
     new: entry.new.flatMap(step),
     learnt: entry.learnt.flatMap((x) => step(x.id).map((it) => ({ ...it, here: x.here }))),
     later: entry.later.flatMap((id) =>
@@ -224,6 +288,11 @@ export function lessonMapProblems(file: LessonMapFile, curriculum: Pick<Curricul
     }
     const every = [...entry.new, ...entry.learnt.map((x) => x.id), ...entry.later];
     if (new Set(every).size !== every.length) out.push(`${where} ayah ${entry.ayah}: a step is listed twice (new, learnt and later are always apart)`);
+    // The kinds of word of the ayah's words, in order, each once (pipeline/lessonmap.py holds them
+    // to the QAC tags of the words; here: their shape).
+    if (!entry.kinds.length || JSON.stringify(entry.kinds) !== JSON.stringify(MAP_KINDS.filter((k) => entry.kinds.includes(k)))) {
+      out.push(`${where} ayah ${entry.ayah}: kinds ${JSON.stringify(entry.kinds)} are not kinds of word in the order ${MAP_KINDS.join(", ")}`);
+    }
     for (const sid of every) listed.add(sid);
     for (const cid of entry.lanjut) listedLanjut.add(cid);
     for (const sid of entry.learnt.map((x) => x.id)) {
@@ -248,5 +317,14 @@ export function lessonMapProblems(file: LessonMapFile, curriculum: Pick<Curricul
     if (!curriculum.lanjut.includes(cid)) out.push(`${where}: ${cid} is listed as next-level and is not in the curriculum's lanjut`);
   }
   for (const cid of Object.keys(file.lanjut)) if (!listedLanjut.has(cid)) out.push(`${where}: next-level record ${cid} has a name and no ayah lists it`);
+  // The step of the three kinds of word: the curriculum's step whose record is the Kalimah record.
+  const kstep = curriculum.steps.find((s) => s.concept === KALIMAH_RECORD)?.id ?? null;
+  if (kstep && listed.has(kstep)) {
+    if (!file.kinds || file.kinds.step !== kstep) out.push(`${where}: kinds must name the step ${kstep} (the three kinds of word), which its ayat list`);
+    else if (!file.steps[kstep]?.name.startsWith(file.kinds.name)) out.push(`${where}: kinds names the step “${file.kinds.name}”, not its own name without its members`);
+  } else if (file.kinds) out.push(`${where}: kinds is given, and no ayah lists the step of the three kinds of word`);
   return out;
 }
+
+/** The Konsep record of the three kinds of word (pipeline/quiz.py KALIMAH_RECORD). */
+export const KALIMAH_RECORD = "kalimah-isim-fiil-huruf";

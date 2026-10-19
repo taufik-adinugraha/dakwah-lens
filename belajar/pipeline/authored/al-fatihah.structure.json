@@ -78,7 +78,7 @@
           { "words": [1, 2], "label": "[[ar-raḥmāni|q:1:3:1]], [[ar-raḥīmi|q:1:3:2]]: dua [[na't]] bagi lafaz Allah di ayat 2", "concept": "naat" }
         ],
         "items": [
-          { "words": [1, 2], "say": "Ayat ini melanjutkan ayat kedua. Kedua katanya adalah na't, yaitu dua sifat bagi {{1:2:2/allahi}} di ayat kedua, maka keduanya ikut majrur, berakhir kasrah." },
+          { "words": [1, 2], "say": "Ayat ini melanjutkan ayat kedua. Kedua katanya adalah na't, yaitu dua sifat bagi {{1:2:2/allahi}} di ayat kedua. Nama itu majrur, berakhir kasrah, karena didahului huruf jar, yaitu {{1:2:2/li}}: {{1:2:2}}. Sifat selalu mengikuti kata yang disifatinya, jadi {{1:3:1}} dan {{1:3:2}} juga majrur, berakhir kasrah." },
           { "words": [1, 2], "say": "Keduanya memakai alif lam, karena na't mengikuti kata yang disifatinya juga dalam tertentu atau tidaknya, dan nama Allah sudah ma'rifah." }
         ],
         "sources": [
@@ -104,7 +104,7 @@
           { "words": [1, 2, 3], "label": "rangkaian [[idhafah]]: [[māliki|q:1:4:1]] → [[yaumi|q:1:4:2]] → [[ad-dīni|q:1:4:3]] (“Pemilik hari pembalasan”)", "concept": "idhafah" }
         ],
         "items": [
-          { "words": [1], "say": "Ayat ini melanjutkan ayat kedua. Kata pertama adalah na't bagi {{1:2:2/allahi}} di ayat kedua." },
+          { "words": [1], "say": "Ayat ini melanjutkan ayat kedua. Kata pertama adalah na't bagi {{1:2:2/allahi}} di ayat kedua. Nama itu majrur, berakhir kasrah, karena didahului huruf jar, yaitu {{1:2:2/li}}: {{1:2:2}}. Sifat selalu mengikuti kata yang disifatinya, jadi {{1:4:1}} juga majrur, berakhir kasrah." },
           { "words": [1, 2, 3], "say": "Lalu kata pertama disandarkan kepada kata kedua, dan kata kedua disandarkan kepada kata ketiga. Inilah rangkaian idhafah tiga kata, yang artinya “Pemilik hari pembalasan”." },
           { "words": [2, 3], "say": "Kata kedua dan kata ketiga sama-sama mudhaf ilaih, maka keduanya majrur. Dengan ini kita mengenal tiga sebab sebuah isim menjadi majrur: didahului huruf jar, menjadi mudhaf ilaih, dan mengikuti kata yang majrur, seperti na't." }
         ],
@@ -202,7 +202,7 @@
           { "words": [8, 9], "label": "[[wa lā aḍ-ḍāllīna|q:1:7:8-9]]: [['athaf]], dengan [[lā|q:1:7:8/2]] sebagai penegas makna “bukan”", "concept": "athaf" }
         ],
         "items": [
-          { "words": [1, 2, 3, 4], "say": "Ayat ini melanjutkan ayat keenam. Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata {{!1:6:2}} yang artinya “jalan” di ayat keenam." },
+          { "words": [1, 2, 3, 4], "say": "Ayat ini melanjutkan ayat keenam. Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata {{!1:6:2}} yang artinya “jalan” di ayat keenam. Kata itu manshub, berakhir fathah, karena menjadi maf'ul bih kedua bagi {{1:6:1}}. Pengganti mengikuti akhiran kata yang digantikannya, jadi kata pertama, {{!1:7:1}}, juga berakhir fathah." },
           { "words": [1, 2], "say": "Kata pertama disandarkan kepada kata kedua: ini idhafah, yang artinya “jalan orang-orang yang”." },
           { "words": [2, 3, 4], "say": "Kata kedua adalah isim maushul, dan dua kata sesudahnya adalah shilah baginya, yaitu kalimat yang menjelaskannya, yang artinya “yang telah Engkau beri nikmat”." },
           { "words": [5, 6, 7], "say": "Tiga kata berikutnya menjadi pengganti bagi kata kedua; sebagian ulama menjadikannya sifat. Di dalamnya, kata ketujuh menempati posisi pelaku bagi kata keenam, yang bermakna dikenai perbuatan." },

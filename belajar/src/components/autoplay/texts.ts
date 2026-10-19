@@ -16,7 +16,7 @@
  * promises a human review (plan L11). Pure: the page builds the sequence on
  * the server, and stage.test.ts runs the engine's checks with these sets.
  */
-import { ID_TEXTS, mapLaterWhere, type AutoplayTexts, type MapLaterName } from "@/lib/autoplay";
+import { ID_TEXTS, mapLaterWhere, type AutoplayTexts, type MapKindsSaid, type MapLaterName } from "@/lib/autoplay";
 
 const things = (n: number) => (n === 1 ? "thing" : "things");
 
@@ -39,6 +39,10 @@ function laterEn(later: readonly MapLaterName[]): string {
   if (where !== "each") return `${lead}, namely ${names}, but we only cover ${n === 1 ? "it" : "them"} in ayah ${where}.`;
   return `${lead}, but we only cover them later: ${listEn(later.map((x) => `${x.name} in ayah ${x.ayah}`))}.`;
 }
+
+/** After a list of the steps met here, when the ayah has fewer than all three kinds of word (the
+ *  Indonesian "Dari tiga jenis kata itu, di ayat ini hanya ada …"; operator 2026-10-18). */
+const kindsEn = (k: MapKindsSaid | null | undefined) => (k && Array.isArray(k.kinds) ? ` Of ${k.step}, this ayah has only ${listEn(k.kinds)}.` : "");
 
 const ID: AutoplayTexts = {
   ...ID_TEXTS,
@@ -113,12 +117,12 @@ const EN: AutoplayTexts = {
   lessonMap: {
     new: ({ new: fresh }) =>
       fresh.length ? `This ayah has ${fresh.length} new ${things(fresh.length)} to learn: ${listEn(fresh)}.` : "This ayah has nothing new.",
-    again: ({ again }) =>
+    again: ({ again, kinds }) =>
       again.length === 0
         ? "Nothing we have learnt comes up again in this ayah."
         : again.length === 1
-          ? `Of what we have learnt, the one we meet again in this ayah is ${again[0]}.`
-          : `Of what we have learnt, the ones we meet again in this ayah are ${listEn(again)}.`,
+          ? `Of what we have learnt, the one we meet again in this ayah is ${again[0]}.${kindsEn(kinds)}`
+          : `Of what we have learnt, the ones we meet again in this ayah are ${listEn(again)}.${kindsEn(kinds)}`,
     later: ({ later, lanjut }) =>
       [
         later.length ? laterEn(later) : "",
@@ -126,17 +130,17 @@ const EN: AutoplayTexts = {
       ]
         .filter(Boolean)
         .join(" "),
-    focus: ({ later, lanjut, new: fresh, again }) =>
+    focus: ({ later, lanjut, new: fresh, again, kinds }) =>
       [
         later ? `You do not need to memorise ${pronounEn(later)} now${lanjut ? ", nor think about the advanced topics" : ""}.` : `You do not need to think about ${pronounEn(lanjut)} now.`,
-        fresh.length ? `Let us focus on ${listEn(fresh)} first.` : again.length ? `Let us focus on going over ${listEn(again)} first.` : "Let us focus on this ayah first.",
+        fresh.length ? `Let us focus on ${listEn(fresh)} first.` : again.length ? `Let us focus on going over ${listEn(again)} first.${kindsEn(kinds)}` : "Let us focus on this ayah first.",
       ].join(" "),
   },
-  learned: ({ new: fresh, again }) =>
+  learned: ({ new: fresh, again, kinds }) =>
     fresh.length
       ? `In this ayah we learnt ${fresh.length} new ${things(fresh.length)}: ${listEn(fresh)}.`
       : again.length
-        ? `This ayah had nothing new; it repeated ${again.length} ${things(again.length)} we have already learnt, namely ${listEn(again)}.`
+        ? `This ayah had nothing new; it repeated ${again.length} ${things(again.length)} we have already learnt, namely ${listEn(again)}.${kindsEn(kinds)}`
         : "This ayah had nothing new.",
   total: ({ total, fresh }) =>
     fresh

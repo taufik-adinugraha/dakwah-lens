@@ -46,7 +46,7 @@ python3 validate_ayat.py           # the popup data against Tanzil, QuranEnc, th
 python3 test_validate_ayat.py      # plants 28 faults (a missing or extra entry, another ayah's bytes, a stale pin, a name the cards spell otherwise, …) (CI: --no-corpus)
 python3 build_compose.py           # word compositions + harakat primer + the imam's voice of each bentuk dasar ../content/compose/*.json, and fixtures/compose_examples.json (see "Komposisi kata"); after build_library.py, whose library.json it reads
 python3 validate_compose.py        # composition checks against the corpus, the example voices included (CI: --no-corpus); exit 1 on any failure
-python3 test_validate_compose.py   # plants 75 faults in copies of the compositions and of the examples' fixture (a base frame without its voice, a hamzat-washal form played alone, a clip shifted to the next word, a word that ends its ayah, an untrue reason, …), each must fail (CI: --no-corpus, 66 of them)
+python3 test_validate_compose.py   # plants 78 faults in copies of the compositions and of the examples' fixture (a base frame without its voice, a hamzat-washal form played alone, a clip shifted to the next word, a word that ends its ayah, an untrue reason, …), each must fail (CI: --no-corpus, 66 of them)
 python3 validate_terms.py          # Konsep terms in Arabic script + inline markup (CI: --no-corpus); see "Konsep"
 python3 test_validate_terms.py     # plants 54 faults (retyped term, unmarked term, wrong word bytes, a ref whose Latin names other bytes, ketuk, a gloss variant whose ref does not resolve, Arabic typed by hand, a marked lesson or Kosakata twin that drifted, …)
 python3 validate_clips.py          # the imam's voice of every Konsep example: library.json `clips` (CI: --no-corpus); see "Suara contoh"
@@ -61,9 +61,9 @@ python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Ku
 python3 build_map.py               # the lesson maps ../content/map/*.json, for the surahs switched on (see "Peta pelajaran"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi"); stops on a term said before its lesson that authored/curriculum.pending.json does not list (`--write-pending` writes that list: see "Kurikulum")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
-python3 test_validate_narration.py # plants 283 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum, the pending list and the continuation data (`continues`), each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
+python3 test_validate_narration.py # plants 296 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum, the pending list and the continuation data (`continues`), each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
 python3 validate_map.py            # the lesson maps: new / learnt so far / later / next-level against the curriculum, the names against the captions
-python3 test_validate_map.py       # plants 40 faults (a step in the wrong group, one taught later listed as learnt, a learnt step left out, `here` on a step that does not occur, a name that says a Qur'anic word, …)
+python3 test_validate_map.py       # plants 46 faults (a step in the wrong group, one taught later listed as learnt, a learnt step left out, `here` on a step that does not occur, a name that says a Qur'anic word, the kinds of word of an ayah wrong, …)
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah), or listed in authored/curriculum.pending.json; exit 1 on any failure
 python3 test_validate_quiz.py      # plants 65 faults (an untaught state, an untaught option, two correct options, an untaught question not listed, a listed one that is taught, the wazan exercise in a basic lesson; an explanation shown that names an untaught term; the warm-up: a pos that disagrees with the QAC tag, a part left out, a wrong answer, a sign before its lesson, an edited sentence, the general definition "yaitu nama benda, orang, atau sifat" again, a wrong class for a tag, a class said of the Name / a participle / a relative / gair, a class not taught before it is asked), each must fail
 python3 render_narration.py        # DRY RUN: characters and cost; never calls the API without --render --i-approve-spend
@@ -623,9 +623,30 @@ segment (`{"qac": "1:1:3:2"}`), or a deterministic edit of another form (`{"from
 records where each form stands as a token in the Qur'an (`attested`; `[]` = a teaching form such as
 رَحْمَٰن without article or ending). Ops: `mark`+`to` (swap the one vowel of a piece), `letter`+`to` (one long-vowel letter for
 another, by name — `wawu`, `ya` — its marks kept: the ya' of a jamak that is majrur back to the
-wawu of its bentuk dasar, ٱلْعَٰلَمِينَ → ٱلْعَٰلَمُونَ; 2026-10-17), `remove`+`piece`
+wawu of its bentuk dasar, ٱلْعَٰلَمِينَ → ٱلْعَٰلَمُونَ; 2026-10-17; and since 2026-10-18 the
+dotless final ya' of the Uthmani text, ى, as the ya' a learner knows, ي — the same letter in its
+other shape: Tanzil's يَهْدِى (2:142:16) → يَهْدِي), `remove`+`piece`
 (a mark taken off; `"vowel"` = its one vowel), `add`+`piece` (a mark put on; syaddah right after
-the letter), `drop` (a piece left out).
+the letter), `drop` (a piece left out). An edit of a Tanzil token is a form of its own on top of
+the quoted one (`yahdi-uthmani` → `yahdi`): CI has no Tanzil text and replays the edit from the
+quoted form's bytes.
+
+**A letter said to be dropped is SEEN dropped** (operator 2026-10-18: "in ayat-6, it says something
+like ihdina, lose 'ya' but not explained about the original word of ihdi, so it's unclear what it
+means by losing 'ya'. Check any similar cases."): a line that says a letter is dropped or not
+written ("huruf/alif … dibuang / tidak ditulis", "dibuangnya huruf") is said over a `drop` frame or
+a later one, whose tile shows the form WITH the letter fading into the form without it and whose
+chip names the letter (`compose.say_problems`, `_DROPPED`; faults "ihdi's ya' said to be dropped with
+no frame that shows it, as until 2026-10-18" and its kin). Al-Fatihah since 2026-10-18: ihdinā
+(1:6:1) — parts, then a `drop` frame ٱهْدِي → ٱهْدِ ("Kata kerja ini berasal dari يَهْدِي (yahdī), yang
+artinya “Dia menunjuki”; di akhirnya ada huruf ي." · "Pada kata perintah, huruf ي itu dibuang,
+sehingga tertulis ٱهْدِ (ihdi)."; an-Nahhas 1/20, as-Samin 1/61–62), then the join with نَا;
+lillāhi (1:2:2) — a join لِ + ٱللَّهِ → لِٱللَّهِ (the alif not read), then a `drop` لِٱللَّهِ → لِلَّهِ (the
+alif and one lam not written; Ibnu Qutaibah, al-'Ukbari); aḍ-ḍāllīna (1:7:9) names its original
+form, ٱلضَّالِلِينَ (an-Nahhas 1/22), where the two lams merge. A sound not heard at a pause, a
+hamzat washal or lam not read in a join are on their frames already (the word as written, the
+join's chips; the imam recites the word). The sweep of every such line: the operator's report of
+2026-10-18.
 
 **Frames** (stages): `parts` (the parts in reading order, "+" between; locally checked against
 QAC's segments, letter for letter), `base` (one part ringed as its bentuk dasar, with its last
@@ -1309,8 +1330,11 @@ is a step of the curriculum now, listed under "Nanti" by the rule.
 
 **File** (`content/map/<slug>.json`, version 2): `steps` (every step the ayat list: `name` its
 caption form, `latin` the prose, `lesson` the curriculum lesson that teaches it), `lanjut` (every
-next-level record listed: `name`, `latin`, `from` title | authored) and `ayat` (`{ayah, new,
-learnt: [{id, here}], later, lanjut}`, ids). Self-contained on purpose: the page needs no second
+next-level record listed: `name`, `latin`, `from` title | authored), `ayat` (`{ayah, new,
+learnt: [{id, here}], later, lanjut, kinds}`, ids; `kinds` the kinds of word the ayah's words are
+made of, below) and `kinds` (the step of the three kinds of word: `{step, name, latin, members:
+{isim, fiil, huruf: {name, latin}}}`, its name without its members and each kind's name from the
+pronunciation dictionary; null when no ayah lists that step). Self-contained on purpose: the page needs no second
 file to draw a card. Read by the narration build and validator, by the page
 (`src/lib/map-content.ts`: zod, then `lessonMapProblems` against the curriculum in TypeScript — a
 file that disagrees with it fails `next build`) and by the engine checks.
@@ -1342,7 +1366,7 @@ counts in words; lists `_names`):
 | line | when | template |
 |---|---|---|
 | `map:new` | always | "Di ayat ini ada N hal baru: A, B, dan C." · none: "Di ayat ini tidak ada hal baru." |
-| `map:again` | something was learnt before (the step `map:learnt`) | "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah A dan B." (every one met again; one: "… adalah A."; it stands on its own: until 2026-10-17 it followed the line below and opened "Yang kita temui lagi …") · none: "Tidak ada yang kita temui lagi di ayat ini." |
+| `map:again` | something was learnt before (the step `map:learnt`) | "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah A dan B." (every one met again; one: "… adalah A."; it stands on its own: until 2026-10-17 it followed the line below and opened "Yang kita temui lagi …") · none: "Tidak ada yang kita temui lagi di ayat ini." · the three kinds of word as the ayah has them (since 2026-10-18, below): with all three "tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف)"; with fewer the step bare, "tiga jenis kata", and a last sentence "Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم)." (the same in the reassurance and the closing of an ayah with nothing new) |
 | ~~`map:learnt`~~ | removed 2026-10-17 | was "Sebelum ayat ini, kita sudah mempelajari N hal, yaitu A, B, …, dan P."; the count of everything learnt so far is said only by `map:total` |
 | `map:later` | a step is postponed or a next-level topic is here | postponed, every one named — all taught in ONE ayah of this surah: "Ada N hal lagi di ayat ini, yaitu Z dan W, tetapi baru akan diajarkan lebih lengkap di ayat ketiga."; in several ayat of it: "Ada N hal lagi di ayat ini, tetapi baru akan diajarkan lebih lengkap nanti: Z di ayat ketiga, serta W di ayat ketujuh."; any of them taught in another surah (or no whole ayah): "Ada N hal lagi di ayat ini, yaitu Z dan W, tetapi baru akan diajarkan lebih lengkap nanti." (until 2026-10-17 "baru kita bahas …"; operator: "better to say konsep ini baru akan diajari lebih lengkap di ayat keXX") — then the next-level count: "Ada juga N hal tingkat lanjut, yang tidak kita bahas di tingkat dasar." (alone: "Di ayat ini ada N hal tingkat lanjut, …") |
 | `map:focus` | with `map:later` | "Sekarang Anda tidak perlu menghafal ⟨P⟩[, dan tidak perlu memikirkan hal tingkat lanjut tadi]." — ⟨P⟩ by the count of the postponed steps: 1 "yang satu ini", 2 "keduanya", 3 "ketiganya", more "semuanya"; the bracket when next-level topics are there too; next-level topics alone: "Sekarang Anda tidak perlu memikirkan ⟨P⟩." (⟨P⟩ by their count) — then "Mari kita fokus pada pelajaran A dan B terlebih dahulu." (the ayah's new steps, every one; at most three, the curriculum's limit) · nothing new: "Mari kita fokus mengulang A dan B terlebih dahulu." (the steps met again) · nothing new and nothing met again: "Mari kita fokus pada ayat ini terlebih dahulu." |
@@ -1392,12 +1416,31 @@ brackets beside its heading as one piece, so no line starts with a separator. A 
 karaoke caption goes one ≤180-character part at a time (`caption.ts karaokeParts`). On a word's
 card (Materi lengkap) a concept an earlier lesson taught says "sudah dipelajari di ayat N".
 
+**The kinds of word met HERE** (operator 2026-10-18: "we always say in this ayat we find 3 jenis
+kata: isim, fi'il, huruf. But actually in that ayat (example ayat-3) we only have isim, no harf or
+fi'il. Fix this in all lessons."). The step "Tiga jenis kata (isim, fi'il, dan huruf)" occurs in
+every ayah (`occurs.always`), but an ayah need not have all three kinds. Each map entry carries
+`kinds`, the kinds its words' parts are (`lessonmap.kinds_of` → `quiz.part_kinds`: each part's QAC
+tag through `quiz.QAC_KIND`, the article counted with its part — the warm-up's own rule, so the
+warm-up and the map always agree). Al-Fatihah: 1 and 2 isim and huruf, 3 and 4 isim only, 5 and 7
+all three, 6 isim and fi'il. Where a line or the card says the step is MET HERE it names those
+(`build_narration._said_here` / `kinds_sentence`, `lessonmap.KINDS_SENTENCE`; the card's row "Tiga
+jenis kata: di ayat ini hanya isim (اِسْم)", in a flowing line "Tiga jenis kata (di ayat ini hanya
+isim)", messages `Guided.map_kinds_here` / `map_kinds_flow`; TS `lessonMap.ts mapKindsPartial`,
+`mapHereSaid`, `mapKindsSaid`). Where the line is the DEFINITION — what was learnt (`map:total`),
+lesson zero's Konsep line, the warm-up's three buttons — the three stay. Held by
+`validate_narration.map_kinds_here` (fewer kinds named whole, "names isim, fi'il, huruf as met in
+this ayah"; a kind the ayah does not have, one left out; the sentence left out; the sentence where
+all three occur; the step named bare where all three occur) and `lessonmap.problems` (the entry's
+`kinds` against the words, the `kinds` table), each with planted faults; a new surah is covered the
+day its map is switched on (the rule needs only each word's QAC line).
+
 ```bash
 python3 build_map.py            # write content/map/*.json (after build_curriculum, BEFORE build_narration)
 python3 build_map.py --check    # exit 1 if a file differs from a fresh build
 python3 build_map.py --show     # the table and every name
 python3 validate_map.py         # the rules, each on its own; the names against the captions; a fresh build
-python3 test_validate_map.py    # 39 planted faults
+python3 test_validate_map.py    # 46 planted faults
 ```
 
 **Rendering the lines (2026-10-13: prepared, NOT rendered).** After the curriculum (21 map lines,
@@ -1813,6 +1856,87 @@ python3 render_narration.py "${args[@]}"
 # upload steps of "Rendering the lines" above.
 ```
 
+### Clarity (2026-10-18): the dropped ya' of ihdi, a reminder of the earlier ayah, the kinds of word met here; prepared, NOT rendered
+
+The operator's three findings of 2026-10-18 (wording rules 14–16 below):
+
+- **The dropped letter shown** ("in ayat-6, it says something like ihdina, lose 'ya' but not
+  explained about the original word of ihdi … Check any similar cases"): Komposisi kata, "A letter
+  said to be dropped is SEEN dropped" — ihdinā, lillāhi, aḍ-ḍāllīna; the quiz explanation of 1:6:1
+  names يَهْدِي (yahdī) and ٱهْدِ (ihdi) too. Not changed: Al-Falaq 2's dropped returning pronoun
+  (khalaqahū, a word outside the lesson surahs: no composition there to show it) — for the operator.
+- **The reminder card** ("it becomes na'at from lafaz Allah in ayat-2, better to remind user what
+  that previous ayat looks like and give more clear explanation"): while a line says the
+  continuation ("Ayat ini melanjutkan ayat kedua.") or cites a word of an earlier ayah (a word's
+  line, one of its composition lines, a structure line — never an exercise's), the stage shows that
+  ayah in the word card's slot: "Ayat 2", its words in the content's bytes and order with the cited
+  word(s) highlighted (a border, a tint and a ring), its marker, and its translation (the content's,
+  verbatim). DATA: the manifest line's `reminder`, `[{ayah, words}]`, derived by
+  `validate_narration.reminder_of` from the line's citations and, for the opening sentence, from the
+  `continues` links on the ayah it continues; the page hands the stage the bytes and translations of
+  just those ayat (`src/lib/autoplay/reminder.ts reminderTexts`), the stage draws
+  `src/components/lesson/ReminderCard.tsx` (a composition or a structure item gives it the slot for
+  that line; a word line keeps its word card above it). 35 lines carry one: Al-Fatihah 10, Al-Ikhlas
+  5, Al-Falaq 10, An-Nas 10; two lines show two ayat (Al-Falaq 3: min syarri of ayah 2, a‘ūżu of ayah
+  1; An-Nas 3's structure). Held by `continuation_problems` (a line that says or cites without its
+  card, a card on a line that cites nothing or on an exercise, a card of a later ayah or of a word the
+  ayah does not have, a highlighted word the line does not cite, a continuing ayah with no card at
+  all — each a planted fault), by `parseNarrationManifest` and `reminder.ts reminderProblems` in TS,
+  `src/components/autoplay/reminder.test.ts`, and `scripts/ci/screenshots.mjs reminderChecks` (Al-Fatihah
+  3's opening: the card, its words, its highlight, its translation, nothing sideways; whether it is
+  wholly above the panel is reported, not failed — NOT measured yet).
+- **The clearer reason** (the same message): the line that says the dependency now says why the
+  earlier word ends as it does, with the words shown — only what the authored data gives:
+  Al-Fatihah 3 and 4: "ٱللَّهِ (Allāhi) di ayat kedua, yang disifati kata ini, berakhir kasrah karena
+  didahului huruf jar, yaitu لِ (li)." + "Sifat selalu mengikuti akhiran kata yang disifatinya, jadi
+  kata ini juga berakhir kasrah." (compositions 1:3:1 and 1:4:1; structure items 3:1 and 4:1 with
+  لِلَّهِ and the dependents named); Al-Fatihah 7: aṣ-ṣirāṭa of ayah 6 "berakhir fathah, karena menjadi
+  maf'ul bih kedua bagi ٱهْدِنَا (ihdinā)" (1:7:1, item 7:1); the Mu'awwidzat from their summaries and
+  whys: huwa is the mubtada' that the khabar describes (Al-Ikhlas 2, 3), the meaning the ta'alluq
+  gives (Al-Falaq 2, An-Nas 4), birabbi majrur after its huruf jar (An-Nas 2), al-waswāsi majrur as
+  mudhaf ilaih and the na't following it (An-Nas 5), the doer of yuwaswisu that the hal describes
+  (An-Nas 6). A word of the cited ayah may be named beside the citation to give the reason (the
+  validator allows a named word, or a further citation, of an ayah the line cites as a dependency;
+  `DEPENDENCY` also reads "disifati", "digantikan", "maf'ul bih"). Judged sufficient as they are:
+  Al-Ikhlas 4, Al-Falaq 3–5 ("disambungkan …, sehingga/jadi bergantung pada a‘ūżu"), An-Nas 3 (its
+  maliki's case is explained in ayah 2's lesson).
+- **The kinds of word met here** ("we always say in this ayat we find 3 jenis kata … in that ayat
+  (example ayat-3) we only have isim"): "Peta pelajaran", "The kinds of word met HERE".
+
+**The audio**: 20 Al-Fatihah lines change their spoken text or are new and have no recording (5
+`map:again` lines of ayat 1, 2, 3, 4, 6; the compositions 2:w2 (3), 3:w1 (2 new), 4:w1 (2), 6:w1 (2 new),
+7:w1 (1 new), 7:w9 (1); structure items 3:1, 4:1, 7:1; `6:ex:sort-case:1:why`). Every other line kept
+its recording, under its new id where a composition's lines were renumbered. Dry run: **18 distinct
+texts, 2,940 characters, USD 0.24** (3:w1:compose:5/6 and 4:w1:compose:3/4 say the same two texts);
+nothing refused. No shared line changed; the other surahs have no audio.
+
+```bash
+OUT=/path/to/the/checkout/with/the/masters/belajar/pipeline/out
+args=(--surah al-fatihah
+  --only al-fatihah:1:map:again --only al-fatihah:2:map:again --only al-fatihah:2:w2:compose:4
+  --only al-fatihah:2:w2:compose:5 --only al-fatihah:2:w2:compose:6 --only al-fatihah:3:map:again
+  --only al-fatihah:3:w1:compose:5 --only al-fatihah:3:w1:compose:6 --only al-fatihah:3:structure:1
+  --only al-fatihah:4:map:again --only al-fatihah:4:w1:compose:3 --only al-fatihah:4:w1:compose:4
+  --only al-fatihah:4:structure:1 --only al-fatihah:6:map:again --only al-fatihah:6:w1:compose:3
+  --only al-fatihah:6:w1:compose:4 --only al-fatihah:6:ex:sort-case:1:why --only al-fatihah:7:w1:compose:4
+  --only al-fatihah:7:w9:compose:3 --only al-fatihah:7:structure:1)
+# must say: 18 distinct texts, 2940 characters, no "refused by --render"
+python3 render_narration.py "${args[@]}"
+# the render:
+#   python3 render_narration.py "${args[@]}" --render --i-approve-spend --voice-id aK834gEOxQEtviMPgurT \
+#     --voice-name "Kang Nandar" --env-file /path/to/dakwah-lens/.env --out "$OUT"
+# then build_narration.py --check, validate_narration.py, encode_narration.py --check --out "$OUT" --list …,
+# listen (yahdi, ihdi, Allohi, the Arabic terms of the kinds sentence), and the upload steps of
+# "Rendering the lines" above.
+```
+
+**Two word voices** too: the new tiles ٱهْدِي (ihdī, the drop frame's form before) and لِٱللَّهِ (the join
+of lillāhi) are teaching forms no reciter says, so content/wordvoice.json (`build_wordvoice.py
+--write`, done) lists them as the narrator's, without a recording yet: 2 texts, 15 characters.
+`build_wordvoice.py --check --require-audio` (CI) fails until they are recorded —
+`python3 build_wordvoice.py --render --i-approve-spend --env-file /path/to/dakwah-lens/.env --out "$OUT/words"`,
+then the delivery steps in its docstring.
+
 ## Operator's lesson-wording rules (2026-10)
 
 The rules the operator gave while reviewing the lessons, kept here so that work on any lesson
@@ -2013,6 +2137,24 @@ enforces it, its name; otherwise "not enforced: review by reading".
     since 2026-10-17 the back هِمْ of ‘alaihim (1:7:4) is the form `him`, as at 1:7:7, so "Bagian
     kedua kata keempat, yaitu هِمْ (him), yang artinya “mereka”, adalah isim …"; the front عَلَيْ
     of both has no form of its own (the composition shows عَلَى) and says its kind and class only.
+
+14. **A letter said to be dropped is shown dropped** (2026-10-18: "it says something like ihdina,
+    lose 'ya' but not explained about the original word of ihdi … Check any similar cases"): the form
+    WITH the letter and the form without it are on screen (a `drop` frame, its chip naming the
+    letter) or named in the line ("berasal dari يَهْدِي (yahdī) … sehingga tertulis ٱهْدِ (ihdi)").
+    Enforced: `compose.say_problems` `_DROPPED` (compositions); outside them (a `why`, a summary):
+    review by reading. See "Komposisi kata".
+15. **An ayah that continues an earlier one shows it, and says why** (2026-10-18: "better to remind
+    user what that previous ayat looks like and give more clear explanation"): the reminder card of
+    the earlier ayah on every line that says the continuation or cites its word, and the reason the
+    earlier word ends as it does with the words shown, from the authored data only. Enforced:
+    `continuation_problems` (the card both ways); the reason itself: review by reading. See
+    "Clarity (2026-10-18)".
+16. **"Met here" names what is here** (2026-10-18: "we always say in this ayat we find 3 jenis kata …
+    actually in that ayat (example ayat-3) we only have isim"): a line or card that says a step is
+    met in this ayah names the kinds of word the ayah has; a definition (what was learnt, what a
+    lesson teaches, the warm-up's choices) keeps the three. Enforced: `map_kinds_here`,
+    `lessonmap.problems`. See "Peta pelajaran".
 
 ## Narasi (guided-lesson narration)
 

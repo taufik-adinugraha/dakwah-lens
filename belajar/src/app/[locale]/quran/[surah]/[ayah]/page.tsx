@@ -29,7 +29,7 @@ import { Link } from "@/i18n/navigation";
 import { surahNamesFor } from "@/lib/ayat";
 import { composeFor } from "@/lib/compose-content";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
-import { primerAyah, stageExamples } from "@/lib/autoplay";
+import { primerAyah, reminderTexts, stageExamples } from "@/lib/autoplay";
 import { taughtAt, taughtBefore, ZERO_HOST } from "@/lib/curriculum";
 import { getConcept, getLexeme, LIBRARY, TERMS } from "@/lib/library";
 import { lessonMapInput } from "@/lib/map-content";
@@ -178,6 +178,10 @@ export default async function AyahPage({
   // What the page fetches ahead, at idle before "Mulai" (src/lib/media-prefetch.ts): this lesson's
   // recordings, and the next ayah's for the hand-off.
   const media = lessonMediaFor(s, a, locale, seq);
+  // The earlier ayat this lesson's lines show on a reminder card (operator 2026-10-18: "better to
+  // remind user what that previous ayat looks like"): their bytes and translations, from the
+  // content (src/lib/autoplay/reminder.ts).
+  const reminders = reminderTexts(seq, s);
   // The example beats' drawing (operator 2026-10-12: "each explanation should be followed by
   // examples (visual + voice)"; plan L20): each example's Arabic, exactly the content's bytes, its
   // transliteration and meaning, by beat id; the sequence above carries their captions only.
@@ -307,6 +311,7 @@ export default async function AyahPage({
             // one group at a time, and what it taught, for a surah that has a map (content/map);
             // the sequence above has its steps.
             lessonMap={lessonMap}
+            reminders={reminders}
           />
         </div>
 

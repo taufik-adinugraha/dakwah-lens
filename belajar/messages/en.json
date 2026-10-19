@@ -438,7 +438,11 @@
     "map_learned": "Just learnt",
     "map_total": "{n} learnt so far.",
     "structure_item_label": "Sentence structure: the words being explained",
-    "structure_item": "Sentence structure ({n} of {total})"
+    "structure_item": "Sentence structure ({n} of {total})",
+    "reminder_label": "Reminder: the ayah this one continues",
+    "reminder_ayah": "Ayah {n}",
+    "map_kinds_here": "{step}: in this ayah only {kinds}",
+    "map_kinds_flow": "{step} (in this ayah only {kinds})"
   },
   "Compose": {
     "word_n": "Word {n}",

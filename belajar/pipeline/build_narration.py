@@ -949,6 +949,30 @@ def _said(steps: dict, ids: list[str]) -> str:
     return _names([V._low(steps[sid]["latin"]) for sid in ids])
 
 
+def _said_here(content: dict, entry: dict, ids: list[str]) -> str:
+    """The steps of `ids` that are MET IN THIS AYAH, as a list inside a sentence: the step of the
+    three kinds of word bare ("tiga jenis kata") when the ayah has fewer than all three — its
+    members are named by kinds_sentence (operator 2026-10-18: "in that ayat (example ayat-3) we
+    only have isim, no harf or fi'il"); every other step, and that one with all three kinds, by
+    its name."""
+    return _names([V._low(LM.here_latin(content, entry, sid)) for sid in ids])
+
+
+def kinds_sentence(content: dict, entry: dict) -> str | None:
+    """The sentence after a list of the steps met here that names the kinds of word this ayah has,
+    when it has fewer than all three (lessonmap.KINDS_SENTENCE): "Dari tiga jenis kata itu, di ayat
+    ini hanya ada isim." None otherwise."""
+    if not LM.kinds_partial(content, entry):
+        return None
+    return LM.KINDS_SENTENCE.format(step=V._low(content["kinds"]["latin"]),
+                                    kinds=_names([V._low(n) for n in LM.kind_names(content, entry)]))
+
+
+def _with_kinds(sentence: str, content: dict, entry: dict) -> str:
+    k = kinds_sentence(content, entry)
+    return f"{sentence} {k}" if k else sentence
+
+
 def map_new(entry: dict, steps: dict) -> str:
     """What is new in this ayah: every step its lesson teaches, by name."""
     new = entry["new"]
@@ -957,17 +981,18 @@ def map_new(entry: dict, steps: dict) -> str:
     return f"Di ayat ini ada {num_id(len(new))} hal baru: {_said(steps, new)}."
 
 
-def map_again(entry: dict, steps: dict) -> str | None:
+def map_again(entry: dict, content: dict) -> str | None:
     """Which of the learnt steps come up again in this ayah, every one by name, in teaching order
     (the order of the card's "Kita temui lagi" rows) — or, plainly, none; None when nothing was
     learnt before. It stands on its own (operator 2026-10-17: the learnt-so-far line before it was
-    removed, so it says what it picks from: "Dari yang sudah kita pelajari, …")."""
+    removed, so it says what it picks from: "Dari yang sudah kita pelajari, …"). The three kinds of
+    word are named as this ayah has them (kinds_sentence; operator 2026-10-18)."""
     if not entry["learnt"]:
         return None
     again = LM.here_ids(entry)
     if not again:
         return V._MAP_NOT_AGAIN
-    return f"{V._MAP_AGAIN_LEAD} {_said(steps, again)}."
+    return _with_kinds(f"{V._MAP_AGAIN_LEAD} {_said_here(content, entry, again)}.", content, entry)
 
 
 def map_later(entry: dict, steps: dict, surah: int) -> str | None:
@@ -994,12 +1019,13 @@ def map_later(entry: dict, steps: dict, surah: int) -> str | None:
     return " ".join(out) or None
 
 
-def map_focus(entry: dict, steps: dict) -> str | None:
+def map_focus(entry: dict, content: dict) -> str | None:
     """The reassurance after map:later (operator 2026-10-15): what the ayah puts aside need not be
     learnt by heart now — the postponed steps by their count's pronoun ("ketiganya"), the
     next-level topics alone "memikirkan" (not to worry about), both: the two clauses — then what
     to focus on: the ayah's new steps by name, or with none the learnt ones it repeats. None when
     the ayah puts nothing aside."""
+    steps = content["steps"]
     new, later, lanjut = entry["new"], entry["later"], entry["lanjut"]
     if not later and not lanjut:
         return None
@@ -1011,19 +1037,21 @@ def map_focus(entry: dict, steps: dict) -> str | None:
     if new:
         focus = f"Mari kita fokus pada pelajaran {_said(steps, new)} terlebih dahulu."
     elif again:
-        focus = f"Mari kita fokus mengulang {_said(steps, again)} terlebih dahulu."
+        focus = _with_kinds(f"Mari kita fokus mengulang {_said_here(content, entry, again)} terlebih dahulu.", content, entry)
     else:
         focus = V.MAP_FOCUS_AYAH
     return f"{keep} {focus}"
 
 
-def map_closing(entry: dict, steps: dict) -> str:
-    """What this ayah taught, by name — or, with nothing new, which learnt steps it repeated."""
+def map_closing(entry: dict, content: dict) -> str:
+    """What this ayah taught, by name — or, with nothing new, which learnt steps it repeated (the
+    kinds of word as this ayah has them)."""
+    steps = content["steps"]
     new = entry["new"]
     if not new:
         again = LM.here_ids(entry)
-        return (f"Di ayat ini tidak ada hal baru; kita mengulang {num_id(len(again))} hal yang sudah kita pelajari, "
-                f"yaitu {_said(steps, again)}." if again else V._MAP_NONE)
+        return (_with_kinds(f"Di ayat ini tidak ada hal baru; kita mengulang {num_id(len(again))} hal yang sudah kita "
+                            f"pelajari, yaitu {_said_here(content, entry, again)}.", content, entry) if again else V._MAP_NONE)
     return f"Di ayat ini kita mempelajari {num_id(len(new))} hal baru: {_said(steps, new)}."
 
 
@@ -1096,8 +1124,8 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
         mapped = LM.ayah_entry(lessonmap, A)
         if mapped is not None:
             st = lessonmap["steps"]
-            said = {"map:new": map_new(mapped, st), "map:again": map_again(mapped, st),
-                    "map:later": map_later(mapped, st, S), "map:focus": map_focus(mapped, st)}
+            said = {"map:new": map_new(mapped, st), "map:again": map_again(mapped, lessonmap),
+                    "map:later": map_later(mapped, st, S), "map:focus": map_focus(mapped, lessonmap)}
             for part in V.map_opening_parts(mapped):
                 add(part, said[part])
         primer = V.primer_of(compose, A)
@@ -1150,7 +1178,7 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
         exercise_lines(False)
         # … and what it taught, before the imam recites the ayah once more.
         if mapped is not None:
-            closing = {"learned": map_closing(mapped, lessonmap["steps"]), "map:total": map_total(mapped, lessonmap["steps"])}
+            closing = {"learned": map_closing(mapped, lessonmap), "map:total": map_total(mapped, lessonmap["steps"])}
             for part in V.map_closing_parts(mapped):
                 add(part, closing[part])
         add("recap", f"Dengarkan sekali lagi seluruh ayat {ordinal(A)} dibacakan imam.")
@@ -1205,9 +1233,13 @@ def build_all(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = N
     raw["shared"] = shared_lines()
     out: dict[str, dict[str, dict]] = {}
     early: dict[str, list[str]] = {}
+    # What a reminder card shows while a line says a continuation (validate_narration.reminder_of).
+    continues = V.load_continues()
     for name, rows in raw.items():
         lines: dict[str, dict] = {}
         comp = compose.get(name)
+        cont_of = (continues.get(name) or {}).get("ayat") or {}
+        surah = (lessons.get(name) or {}).get("surah")
         uses: dict[str, list[str]] = {}
         for lid, prose, ayah, part in rows:
             errs += V.check_text(lid, prose, forms, max_len=None)
@@ -1237,6 +1269,9 @@ def build_all(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = N
                 line = {"text": text, "display": display, "highlight": list(highlight), "focus": focus}
                 if frame is not None:
                     line["frame"] = frame
+                card = V.reminder_of(pid, display, part, cont_of.get(ayah["ayah"]) if ayah else None, named, surah)
+                if card:
+                    line["reminder"] = card
                 errs += V.check_animation_line(pid, line, ayah, part, comp, lex, len(parts) > 1)
                 lines[pid] = line
         out[name] = lines

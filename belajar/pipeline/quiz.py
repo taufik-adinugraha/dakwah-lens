@@ -760,6 +760,24 @@ def part_class(p: dict, classes: dict[str, str]) -> str | None:
     return classes.get(p["tag"])
 
 
+def part_kinds(w: dict) -> list[str]:
+    """The kind of each part of a lesson word, in order: each QAC segment's tag as one of the three
+    kinds (QAC_KIND), the article counted with the part it stands on — the warm-up's one rule
+    (word_parts asks each of them; lessonmap.kinds_of says which kinds an ayah has, operator
+    2026-10-18). Needs only the word's QAC line, not its parts' bytes."""
+    segs = CUR.qac_segments(w)
+    if not segs:
+        raise QuizError(f"{w['loc']}: no QAC line in its sources — the warm-up derives the kind of each part from it")
+    out = []
+    for seg in segs:
+        if seg[0] == QAC_ARTICLE:
+            continue
+        if seg[0] not in QAC_KIND:
+            raise QuizError(f"{w['loc']}: QAC tag {seg[0]!r} has no kind in quiz.QAC_KIND (add it with its class; never guess)")
+        out.append(QAC_KIND[seg[0]])
+    return out
+
+
 def word_parts(lesson: dict, w: dict) -> list[dict]:
     """The parts of a lesson word the warm-up asks, in order: [{part, of, ar, tag, kind, article,
     lafaz (the Name of Allah), participle (QAC PCPL), lemma (QAC LEM), loc (the word's place)}].
@@ -785,7 +803,7 @@ def word_parts(lesson: dict, w: dict) -> list[dict]:
         raise QuizError(f"{loc}: QAC segments {[s[0] for s in segs]} end on the article, or are nothing but one")
     said = [p.strip() for p in str(w.get("pos", "")).split(" + ")]
     heads = [POS_KIND.get(p.split(" ", 1)[0]) for p in said]
-    derived = [QAC_KIND[g["tag"]] for g in groups]
+    derived = part_kinds(w)
     if heads != derived:
         raise QuizError(f"{loc}: the lesson says this word is {w.get('pos')!r} ({heads}), its QAC line says "
                         f"{[g['tag'] for g in groups]} ({derived}) — the two must agree part by part before a learner is asked")

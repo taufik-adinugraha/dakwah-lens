@@ -3737,6 +3737,68 @@ async function wordKindChecks(page, vp, index) {
 const MAP_HERE_FULL = 3;
 const MAP_LATER_FULL = 2;
 const MAP_ARABIC_GLOSS = / \([^()]*[\u0600-\u06FF][^()]*\)/g;
+/**
+ * THE REMINDER CARD (operator 2026-10-18: "in some ayat it's explain like this: it becomes na'at from
+ * lafaz Allah in ayat-2, better to remind user what that previous ayat looks like"), on Al-Fatihah 3:
+ * on the step "structure:1" — "Ayat ini melanjutkan ayat kedua." — the stage shows ONE card
+ * ([data-autoplay="reminder"]) of ayah 2: its words as content/al-fatihah.json has them, in order, the
+ * word(s) the line's manifest entry names (`reminder`) highlighted ([data-reminder-hit]), its
+ * translation, nothing sticking out sideways. Whether it is wholly above the bottom panel is MEASURED
+ * and reported (a warning), not failed: the card is new and its phone height has not been measured.
+ * Works rendered or not. Shots: the stage, and on a phone the viewport.
+ */
+async function reminderChecks(page, vp, index) {
+  const lesson = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "al-fatihah.json"), "utf8"));
+  const lines = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "narration", "al-fatihah.json"), "utf8")).lines ?? {};
+  const want = lines["al-fatihah:3:structure:1"]?.reminder;
+  const fail = (m) => {
+    throw new Error(`${vp}: reminder card — ${m}`);
+  };
+  if (!want?.length) fail("content/narration/al-fatihah.json: al-fatihah:3:structure:1 carries no reminder");
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  try {
+    await page.goto(BASE + "/belajar/id/quran/al-fatihah/3", { waitUntil: "networkidle" });
+    await page.evaluate((key) => localStorage.removeItem(key), "belajar:v1:autoplay:al-fatihah/3");
+    await page.reload({ waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('[data-autoplay="start"]').click();
+    await settleScroll(page);
+    await toStep(page, vp, "structure:1");
+    await page.locator('[data-autoplay="replay"]').click();
+    const card = page.locator('[data-autoplay="reminder"]');
+    await card.first().waitFor({ state: "visible", timeout: 10_000 }).catch(() => fail('on "structure:1" of Al-Fatihah 3 no reminder card shows'));
+    const middle = page.locator('[data-autoplay="middle"]');
+    if ((await middle.getAttribute("data-mode").catch(() => null)) === "pause") await middle.click();
+    await page.waitForTimeout(500);
+    const got = await card.first().evaluate((el) => ({
+      ayat: el.getAttribute("data-reminder-ayat"),
+      words: [...el.querySelectorAll("[data-reminder-word]")].map((w) => ({ n: Number(w.getAttribute("data-reminder-word")), ar: w.textContent, hit: w.hasAttribute("data-reminder-hit") })),
+      translation: (el.querySelector("[data-reminder-translation]")?.textContent ?? "").replace(/\s+/g, " ").trim(),
+      box: (({ left, right, top, bottom }) => ({ left, right, top, bottom }))(el.getBoundingClientRect()),
+      sideways: el.scrollWidth > el.clientWidth + 1 || document.documentElement.scrollWidth > window.innerWidth + 1,
+      width: window.innerWidth,
+    }));
+    const a = lesson.ayat.find((x) => x.ayah === want[0].ayah);
+    if (got.ayat !== want.map((r) => r.ayah).join(" ")) fail(`the card shows ayat “${got.ayat}”, the line names ${want.map((r) => r.ayah).join(" ")}`);
+    if (JSON.stringify(got.words.map((w) => w.ar)) !== JSON.stringify(a.words.map((w) => w.ar))) fail(`the card's words ${got.words.map((w) => w.ar).join(" ")} are not ayah ${a.ayah}'s`);
+    if (JSON.stringify(got.words.filter((w) => w.hit).map((w) => w.n)) !== JSON.stringify(want[0].words)) fail(`the card highlights ${got.words.filter((w) => w.hit).map((w) => w.n)}, the line names ${want[0].words}`);
+    if (!got.translation.includes(a.translation.text.replace(/\s+/g, " ").trim())) fail(`the card's translation “${got.translation.slice(0, 60)}” is not ayah ${a.ayah}'s`);
+    if (got.sideways || got.box.left < -1 || got.box.right > got.width + 1) fail(`the card ${fmt(got.box)} sticks out sideways at ${got.width}px`);
+    const panel = await page.locator('[data-autoplay="panel"]').first().boundingBox();
+    const inView = !!panel && got.box.top >= 0 && got.box.bottom <= panel.y + 1;
+    console.log(`  reminder card: ayah ${got.ayat}, ${got.words.length} words, ${fmt(got.box)} (${Math.round(got.box.bottom - got.box.top)}px) · panel top ${panel ? Math.round(panel.y) : "—"}${inView ? "" : " — NOT wholly in view"}`);
+    if (!inView) console.log(`::warning title=Belajar reminder card not wholly in view::${vp}: the card is at ${fmt(got.box)}, the bottom panel's top at ${panel ? Math.round(panel.y) : "—"} (viewport ${page.viewportSize().height} high). See shots/${vp}-autoplay-ayah3-reminder${vp === "phone" ? "-viewport" : ""}.png`);
+    await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-autoplay-ayah3-reminder.png` });
+    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-autoplay-ayah3-reminder-viewport.png` });
+    console.log(`shot ${vp}-autoplay-ayah3-reminder`);
+  } finally {
+    await page.unroute(isNarration, handler);
+    await page.goto("about:blank");
+  }
+}
+
 async function lessonMapChecks(page, vp, index) {
   const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
   const msgs = (await read("messages/id.json")).Guided;
@@ -3765,10 +3827,22 @@ async function lessonMapChecks(page, vp, index) {
     return Number(m[1]) === map.surah ? fill(msgs.map_later_ayah, { n: Number(m[2]) }) : fill(msgs.map_later_surah, { surah: Number(m[1]), ayah: Number(m[2]) });
   };
   const count = (n) => `(${fill(msgs.map_count, { n })})`;
+  /** The three kinds of word as an ayah has them (operator 2026-10-18: "in that ayat (example ayat-3)
+   *  we only have isim"): with fewer than three, the step met again here is named by the ones it has
+   *  (messages map_kinds_here on a row, map_kinds_flow in a flowing line; content/map `kinds`). */
+  let kindsOf = null;
+  const listId = (xs) => (xs.length <= 2 ? xs.join(" dan ") : `${xs.slice(0, -1).join(", ")}, dan ${xs.at(-1)}`);
+  const low = (x) => x[0].toLowerCase() + x.slice(1);
+  const hereName = (id, flowing) => {
+    const k = map.kinds;
+    if (!k || id !== k.step || !kindsOf || kindsOf.length === 3) return flowing ? latin(id) : nameOf(id);
+    const names = kindsOf.map((x) => low(flowing ? k.members[x].name.replace(MAP_ARABIC_GLOSS, "") : k.members[x].name));
+    return fill(flowing ? msgs.map_kinds_flow : msgs.map_kinds_here, { step: flowing ? k.latin : k.name, kinds: listId(names) });
+  };
   /** A name on a row of its own, and names as one flowing line (each but the last with its comma). */
-  const row = (id, { here = null, where = null, mark = false } = {}) => ({ id, text: [nameOf(id), where].filter(Boolean).join(" "), here, where, mark });
+  const row = (id, { here = null, where = null, mark = false } = {}) => ({ id, text: [here === "true" ? hereName(id, false) : nameOf(id), where].filter(Boolean).join(" "), here, where, mark });
   const flow = (ids, { here = null, where = () => null } = {}) =>
-    ids.map((id, i) => ({ id, text: `${[latin(id), where(id)].filter(Boolean).join(" ")}${i < ids.length - 1 ? "," : ""}`, here, where: null, mark: false }));
+    ids.map((id, i) => ({ id, text: `${[here === "true" ? hereName(id, true) : latin(id), where(id)].filter(Boolean).join(" ")}${i < ids.length - 1 ? "," : ""}`, here, where: null, mark: false }));
   const none = () => [{ id: null, text: msgs.map_none, here: null, where: null, mark: false }];
   const group = (g) => ({ count: null, subs: [], lists: [], note: null, total: null, ...g });
   /** The opening groups an ayah's map has, in the order their steps are played (mapOpening). */
@@ -3776,6 +3850,7 @@ async function lessonMapChecks(page, vp, index) {
   /** What the card of `kind` ("new" | "learnt" | "later" | "learned") must show for `entry`, on a
    *  screen below sm (`narrow`) or not. */
   const expected = (entry, kind, narrow) => {
+    kindsOf = entry.kinds ?? null;
     if (kind === "new") {
       return [group({ group: "new", heading: msgs.map_new, lists: [{ kind: "rows", drawn: true, items: entry.new.length ? entry.new.map((id) => row(id)) : none() }] })];
     }
@@ -4223,6 +4298,7 @@ try {
     await quizVoiceCheck(page, vp, narration);
     await wordKindChecks(page, vp, narration);
     await lessonMapChecks(page, vp, narration);
+    await reminderChecks(page, vp, narration);
     await introChecks(page, vp, narration);
     // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).
     // Lesson zero (ayah 0: the harakat primer) with ayah 1 at every size; all of them at the largest.

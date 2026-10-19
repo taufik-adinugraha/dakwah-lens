@@ -1149,7 +1149,7 @@
               1,
               2
             ],
-            "say": "Ayat ini melanjutkan ayat kedua. Kedua katanya adalah na't, yaitu dua sifat bagi {{1:2:2/allahi}} di ayat kedua, maka keduanya ikut majrur, berakhir kasrah."
+            "say": "Ayat ini melanjutkan ayat kedua. Kedua katanya adalah na't, yaitu dua sifat bagi {{1:2:2/allahi}} di ayat kedua. Nama itu majrur, berakhir kasrah, karena didahului huruf jar, yaitu {{1:2:2/li}}: {{1:2:2}}. Sifat selalu mengikuti kata yang disifatinya, jadi {{1:3:1}} dan {{1:3:2}} juga majrur, berakhir kasrah."
           },
           {
             "words": [
@@ -1449,7 +1449,7 @@
             "words": [
               1
             ],
-            "say": "Ayat ini melanjutkan ayat kedua. Kata pertama adalah na't bagi {{1:2:2/allahi}} di ayat kedua."
+            "say": "Ayat ini melanjutkan ayat kedua. Kata pertama adalah na't bagi {{1:2:2/allahi}} di ayat kedua. Nama itu majrur, berakhir kasrah, karena didahului huruf jar, yaitu {{1:2:2/li}}: {{1:2:2}}. Sifat selalu mengikuti kata yang disifatinya, jadi {{1:4:1}} juga majrur, berakhir kasrah."
           },
           {
             "words": [
@@ -1979,7 +1979,7 @@
             }
           ],
           "status": "draft",
-          "why_basic": "Kata kerja perintah yang bermakna doa ini mabni, ditandai dengan dibuangnya huruf ya' di akhirnya; fa'il kata ini tersirat, yaitu “Engkau”, dan dhamir, yaitu {{1:6:1/na}}, yang artinya “kami”, adalah maf'ul bih baginya.",
+          "why_basic": "Kata kerja perintah yang bermakna doa ini mabni, ditandai dengan dibuangnya huruf ya' yang ada di akhir {{1:6:1/yahdi}}, sehingga tertulis {{1:6:1/ihdi}}; fa'il kata ini tersirat, yaitu “Engkau”, dan dhamir, yaitu {{1:6:1/na}}, yang artinya “kami”, adalah maf'ul bih baginya.",
           "marked": {
             "why": "[[Fi'il amr|fiil-amr]] yang bermakna doa ini [[mabni|mabni]] dengan dibuangnya huruf ya' di akhir; pelakunya tersirat (“Engkau”), dan [[-nā|q:1:6:1/2]], yang artinya “kami”, adalah objeknya.",
             "role": "[[fi'il amr|fiil-amr]] (doa) + [[maf'ul bih|maful-bih]] pertama ([[-nā|q:1:6:1/2]]); [[fa'il|fail]] tersimpan: “Engkau”",
@@ -3032,7 +3032,7 @@
               3,
               4
             ],
-            "say": "Ayat ini melanjutkan ayat keenam. Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata {{!1:6:2}} yang artinya “jalan” di ayat keenam."
+            "say": "Ayat ini melanjutkan ayat keenam. Empat kata pertama ayat ini menjadi pengganti yang menjelaskan kata {{!1:6:2}} yang artinya “jalan” di ayat keenam. Kata itu manshub, berakhir fathah, karena menjadi maf'ul bih kedua bagi {{1:6:1}}. Pengganti mengikuti akhiran kata yang digantikannya, jadi kata pertama, {{!1:7:1}}, juga berakhir fathah."
           },
           {
             "words": [
@@ -5339,8 +5339,8 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
-    "authored_words": "authored/al-fatihah.words.json sha256:1b2069945312443f7b1d046915a65f36686a3c1de50590daae2d9d2010f28bff",
-    "authored_structure": "authored/al-fatihah.structure.json sha256:377d56b5559241a95c476528860b1694456cfa576f6980219e52d31128bb5607",
+    "authored_words": "authored/al-fatihah.words.json sha256:53597764fa9469d68f8ed8de98f3a684ac790abf74480c675d82974447ad5abc",
+    "authored_structure": "authored/al-fatihah.structure.json sha256:a5ec3b19918d9cee898dbd238915ba44f3cd86c8e84cc9bf02df05a84b4309ed",
     "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:e2513b4878e1704c60d8682e05701a3efb44e32ec5404f2d79a133394e7cf99b",
     "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:3eb46b48667a7c42d7be5431972db188e01ac2e3994c04e7619c1ab080c02420",
     "pipeline": "belajar/pipeline/build_fatihah.py + facts.py (stdlib only, no LLM)"

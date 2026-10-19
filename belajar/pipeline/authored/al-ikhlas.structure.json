@@ -39,7 +39,7 @@
       },
       "structure": {
         "type": "jumlah ismiyyah",
-        "summary": "Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat 1: seluruh kalimat ini khabar kedua bagi huwa di ayat 1, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu. Kalimat ini sendiri kalimat nominal: Allāhu menjadi mubtada' dan aṣ-ṣamadu khabarnya (Darwisy, al-Mujtaba). Lafaz Allah diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
+        "summary": "Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat 1: seluruh kalimat ini khabar kedua, yaitu berita kedua, bagi huwa di ayat 1, yang di sana menjadi mubtada' (pokok kalimat); al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu. Kalimat ini sendiri kalimat nominal: Allāhu menjadi mubtada' dan aṣ-ṣamadu khabarnya (Darwisy, al-Mujtaba). Lafaz Allah diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
         "groups": [
           { "words": [1, 2], "label": "Allāhu (mubtada') + aṣ-ṣamadu (khabar)", "concept": "jumlah-ismiyyah" }
         ],
@@ -68,7 +68,7 @@
       },
       "structure": {
         "type": "dua jumlah fi'liyyah yang dinafikan dengan lam (yang kedua di-'athaf-kan)",
-        "summary": "Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat 1: lam yalid adalah khabar ketiga bagi huwa di ayat 1; al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru. Kalimat wa lam yūlad di-'athaf-kan padanya, sedangkan yūlad majzum oleh lam-nya sendiri. Menurut Darwisy, lam yalid sendiri tidak disambung dengan wa karena ia menguatkan makna aṣ-ṣamad: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan. Lam meniadakan fi'il mudhari' sesudahnya dan menjazmkannya, maka yalid dan yūlad sama-sama berakhiran sukun; Ibnu Hisyam (Mughni) menjadikan ayat ini contoh lam yang menjazmkan.",
+        "summary": "Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat 1: lam yalid adalah khabar ketiga, yaitu berita ketiga, bagi huwa di ayat 1, yang di sana menjadi mubtada' (pokok kalimat); al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru. Kalimat wa lam yūlad di-'athaf-kan padanya, sedangkan yūlad majzum oleh lam-nya sendiri. Menurut Darwisy, lam yalid sendiri tidak disambung dengan wa karena ia menguatkan makna aṣ-ṣamad: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan. Lam meniadakan fi'il mudhari' sesudahnya dan menjazmkannya, maka yalid dan yūlad sama-sama berakhiran sukun; Ibnu Hisyam (Mughni) menjadikan ayat ini contoh lam yang menjazmkan.",
         "groups": [
           { "words": [1, 2], "label": "lam yalid: lam menjazmkan yalid, maka akhirnya sukun", "concept": "jazm-lam" },
           { "words": [3, 4], "label": "wa lam yūlad: lam lagi, kini dengan kata kerja bentuk majhul (pasif)", "concept": "fiil-majhul" },

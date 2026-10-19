@@ -243,12 +243,20 @@
       "focus": "112:2:2"
     },
     "al-ikhlas:2:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: seluruh kalimat ini khobar kedua bagi kata huwa yang artinya Dialah di ayat pertama, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
-      "display": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: seluruh kalimat ini khabar (خَبَر) kedua bagi kata هُوَ (huwa) yang artinya “Dialah” di ayat pertama, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
+      "text": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: seluruh kalimat ini khobar kedua, yaitu berita kedua, bagi kata huwa yang artinya Dialah di ayat pertama, yang di sana menjadi مُبْتَدَأ, yaitu pokok kalimat; al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
+      "display": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: seluruh kalimat ini khabar (خَبَر) kedua, yaitu berita kedua, bagi kata هُوَ (huwa) yang artinya “Dialah” di ayat pertama, yang di sana menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat; al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
       "highlight": [
         0
       ],
-      "focus": null
+      "focus": null,
+      "reminder": [
+        {
+          "ayah": 1,
+          "words": [
+            2
+          ]
+        }
+      ]
     },
     "al-ikhlas:2:structure:b": {
       "text": "Kalimat ini sendiri kalimat nominal: kata pertama menjadi مُبْتَدَأ dan kata kedua khabarnya, Darwisy, al-Mujtaba. Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
@@ -406,12 +414,20 @@
       "focus": null
     },
     "al-ikhlas:3:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: kata pertama dan kedua adalah khobar ketiga bagi kata huwa yang artinya Dialah di ayat pertama; al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru.",
-      "display": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: kata pertama dan kedua adalah khabar (خَبَر) ketiga bagi kata هُوَ (huwa) yang artinya “Dialah” di ayat pertama; al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru.",
+      "text": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: kata pertama dan kedua adalah khobar ketiga, yaitu berita ketiga, bagi kata huwa yang artinya Dialah di ayat pertama, yang di sana menjadi مُبْتَدَأ, yaitu pokok kalimat; al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru.",
+      "display": "Sekarang susunan kalimatnya. Menurut al-Mujtaba dan al-Jadwal, ayat ini melanjutkan ayat pertama: kata pertama dan kedua adalah khabar (خَبَر) ketiga, yaitu berita ketiga, bagi kata هُوَ (huwa) yang artinya “Dialah” di ayat pertama, yang di sana menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat; al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru.",
       "highlight": [
         0
       ],
-      "focus": null
+      "focus": null,
+      "reminder": [
+        {
+          "ayah": 1,
+          "words": [
+            2
+          ]
+        }
+      ]
     },
     "al-ikhlas:3:structure:b": {
       "text": "Kalimat kata ketiga dan keempat disambungkan dengan عَطْف padanya, sedangkan kata keempat majzum oleh kata ketiga sendiri. Menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan وَاو karena ia menguatkan makna kata yang artinya tempat meminta segala sesuatu di ayat kedua: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
@@ -419,7 +435,15 @@
       "highlight": [
         0
       ],
-      "focus": null
+      "focus": null,
+      "reminder": [
+        {
+          "ayah": 2,
+          "words": [
+            2
+          ]
+        }
+      ]
     },
     "al-ikhlas:3:structure:c": {
       "text": "Kata pertama meniadakan fi'il mudhori' sesudahnya dan menjazmkannya, maka kata kedua dan kata keempat sama-sama berakhiran سُكُون; Ibnu Hisyam, Mughni, menjadikan ayat ini contoh kata pertama yang menjazmkan.",
@@ -527,7 +551,16 @@
       "highlight": [
         1
       ],
-      "focus": "112:4:1"
+      "focus": "112:4:1",
+      "reminder": [
+        {
+          "ayah": 3,
+          "words": [
+            1,
+            2
+          ]
+        }
+      ]
     },
     "al-ikhlas:4:w2": {
       "text": "Kata kedua, yaitu yakun, artinya: ada. Fi'il mudhori' dari kana ini majzum oleh kata pertama, dengan tanda سُكُون pada نُون di akhirnya; seperti kana, ia merafa'kan isimnya, kata kelima, dan menashabkan khabarnya, kata keempat.",
@@ -578,7 +611,16 @@
       "highlight": [
         0
       ],
-      "focus": null
+      "focus": null,
+      "reminder": [
+        {
+          "ayah": 3,
+          "words": [
+            1,
+            2
+          ]
+        }
+      ]
     },
     "al-ikhlas:4:structure:b": {
       "text": "bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir, kata keempat khabarnya yang didahulukan, dan kata ketiga bergantung pada kata keempat, sehingga maksudnya tidak ada seorang pun yang setara bagi-Nya, Abu Hayyan, dinukil Darwisy dan as-Samin.",

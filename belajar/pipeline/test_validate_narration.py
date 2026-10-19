@@ -678,6 +678,20 @@ MUTATIONS = [
      both("al-falaq:3:structure:b", "dengan kata kerja tempat frasa ini bergantung,", "dengan kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”",
           "dengan kata kerja tempat frasa ini bergantung,", "dengan kata a'udzu yang artinya aku berlindung"),
      "al-falaq:3:structure: names 'أَعُوذُ (a‘ūżu)' in more than one of its parts"),
+    # the kinds of word MET HERE are the ayah's own (operator 2026-10-18: "we always say in this ayat we find
+    # 3 jenis kata: isim, fi'il, huruf. But actually in that ayat (example ayat-3) we only have isim")
+    ("ayah 3's map:again naming isim, fi'il and huruf, as until 2026-10-18",
+     then(set_display(G3, "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), serta majrur (مَجْرُور)."), set_text(G3, "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, serta مَجْرُور.")),
+     f"{G3}: names isim, fi'il, huruf as met in this ayah"),
+    ("ayah 3 said to have a fi'il", both(G3, "hanya ada isim (اِسْم).", "hanya ada isim (اِسْم) dan fi’il (فِعْل).", "hanya ada اِسْم.", "hanya ada اِسْم dan فِعْل."),
+     f"{G3}: says this ayah has 'isim (اِسْم) dan fi’il (فِعْل)' of the kinds of word; its words are isim"),
+    ("ayah 4's kinds of word left out", first_sentence_only("al-fatihah:4:map:again"),
+     "al-fatihah:4:map:again: does not say which kinds of word this ayah has (isim)"),
+    ("ayah 7 said to have fewer kinds than its three",
+     more("al-fatihah:7:map:again", "Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم).", "Dari tiga jenis kata itu, di ayat ini hanya ada اِسْم."),
+     "al-fatihah:7:map:again: says which kinds of word this ayah has"),
+    ("the lesson map's kinds of ayah 6 wrong (no fi'il)", in_map(lambda mp: map_entry(mp, 6)["kinds"].remove("fiil")),
+     "al-fatihah:6:map:again: says this ayah has 'isim (اِسْم) dan fi’il (فِعْل)' of the kinds of word; its words are isim"),
     ("a comparison with an earlier ayah", more(W, "Sama seperti di ayat pertama."),
      f"{W}: points back at an earlier ayah ('ayat pertama')"),
     ("“ayat sebelumnya”", more("al-ikhlas:2:structure:b", "Ia menegaskan isi ayat sebelumnya."),
@@ -688,8 +702,33 @@ MUTATIONS = [
     # is continuing previous ayat … mention which word"): the opening "Ayat ini melanjutkan ayat …"
     # and the earlier word named and cited, where the authored `continues` data says
     ("a dependency's citation taken out, as 2026-10-17 to 2026-10-18",
-     both("al-fatihah:3:w1:compose:4", " di ayat kedua", "", " di ayat kedua", ""),
+     then(both("al-fatihah:3:w1:compose:4", " di ayat kedua", "", " di ayat kedua", ""),
+          both("al-fatihah:3:w1:compose:5", " di ayat kedua", "", " di ayat kedua", "")),
      f"al-fatihah:3:w1: depends on '{ALLAHI}' of ayah 2 (na't (sifat), the data): its explanation says so"),
+    # the clearer explanation (operator 2026-10-18: "give more clear explanation"): the word that says
+    # why the earlier word ends as it does is a word of the ayah the line cites — never uncited
+    ("the reason's earlier word named without its ayah",
+     both("al-fatihah:3:w1:compose:5", " di ayat kedua,", ",", " di ayat kedua,", ","),
+     f"al-fatihah:3:w1:compose:5: names '{ALLAHI}', a word of ayah 2, without saying which ayah"),
+    # THE REMINDER CARD (operator 2026-10-18: "better to remind user what that previous ayat looks
+    # like"): every line that says the continuation or cites an earlier word carries the card of
+    # that ayah, its cited word highlighted, and no other line carries one
+    ("a continuing ayah's opening without its reminder card", lambda m, *_: line(m, "al-fatihah:3:structure:1").pop("reminder"),
+     "al-fatihah:3:structure:1: reminder card None, and the line says the continuation or cites [{'ayah': 2, 'words': [2]}]"),
+    ("a continuing ayah without any reminder card", lambda m, *_: [ln.pop("reminder", None) for lid, ln in m["al-fatihah"]["lines"].items()
+                                                                 if lid.startswith("al-fatihah:7:")],
+     "al-fatihah:7: continues ayah 6 (the data), and no line of it carries the reminder card of that ayah"),
+    ("a card whose highlighted word is not in the earlier ayah", set_field("al-fatihah:3:structure:1", "reminder", [{"ayah": 2, "words": [9]}]),
+     "al-fatihah:3:structure:1: reminder {'ayah': 2, 'words': [9]} is not a card of an earlier ayah of the surah with words of it highlighted"),
+    ("a card highlighting a word the line does not cite", set_field("al-fatihah:7:w1:compose:3", "reminder", [{"ayah": 6, "words": [1]}]),
+     "al-fatihah:7:w1:compose:3: reminder card [{'ayah': 6, 'words': [1]}], and the line says the continuation or cites [{'ayah': 6, 'words': [2]}]"),
+    ("a card of a later ayah", set_field("al-fatihah:3:structure:1", "reminder", [{"ayah": 4, "words": [1]}]),
+     "al-fatihah:3:structure:1: reminder {'ayah': 4, 'words': [1]} is not a card of an earlier ayah"),
+    ("a card on a line that cites nothing", set_field("al-fatihah:3:w1:compose:3", "reminder", [{"ayah": 2, "words": [2]}]),
+     "al-fatihah:3:w1:compose:3: reminder card [{'ayah': 2, 'words': [2]}], and the line says no continuation and cites no earlier word: no card"),
+    ("a card on a quiz explanation (the stage shows the exercise there)",
+     set_field("al-fatihah:3:ex:why-harakat:1:why", "reminder", [{"ayah": 2, "words": [2]}]),
+     "al-fatihah:3:ex:why-harakat:1:why: reminder card [{'ayah': 2, 'words': [2]}], and the line says no continuation"),
     ("… in a quiz explanation (An-Nas 2)", both("an-nas:2:ex:why-harakat:1:why", " di ayat pertama,", "", " di ayat pertama,", ""),
      f"an-nas:2:ex:why-harakat:1:why: names '{BIRABBI}', a word of ayah 1, without saying which ayah"),
     ("… in a structure line (An-Nas 6, a phrase's hal)", both("an-nas:6:structure:b", " di ayat kelima", "", " di ayat kelima", ""),
@@ -712,7 +751,7 @@ MUTATIONS = [
      f"al-fatihah:7:w1:compose:3: cites '{SIRATA}' “di ayat kelima”, which is not a word of ayah 5"),
     ("a citation the data does not have (its link taken out)", in_continues(lambda c: c["al-fatihah"]["ayat"][3]["links"].pop(1)),
      f"al-fatihah:3:w2:compose:4: cites '{ALLAHI}' of ayah 2 as a dependency the data does not have"),
-    ("a citation inside a comparison", both("an-nas:5:w1", "di ayat keempat;", "di ayat keempat, seperti di ayat kedua;"),
+    ("a citation inside a comparison", both("an-nas:5:w1", "di ayat keempat, yang", "di ayat keempat, seperti di ayat kedua, yang"),
      "an-nas:5:w1: points back at an earlier ayah ('ayat keempat')"),
     ("a lanjutan ayah without data", in_continues(lambda c: c["al-falaq"]["ayat"].pop(4)),
      "al-falaq:4: its structure is a continuation ("),
@@ -954,17 +993,17 @@ MUTATIONS = [
     ("a selection of the running total (“di antaranya”)", both(S1, ", yaitu harakat, tiga jenis kata, ", ", di antaranya "),
      "says “di antaranya”: every one of the step(s) learnt in all is named"),
     # what of it comes up again here: every one by name, in teaching order
-    ("the old shape “ada satu: …”", both(G1, "adalah harakat, serta", "ada satu: harakat, serta"),
+    ("the old shape “ada satu: …”", both(G1, "adalah harakat dan", "ada satu: harakat dan"),
      f"{G1}: counts the learnt steps that come up again (“ada …”) instead of naming every one"),
     ("the old shape “ada tiga, di antaranya …”", both(G2, "adalah harakat, ", "ada tiga, di antaranya "),
      f"{G2}: counts the learnt steps that come up again"),
-    ("a repeated step left out", both(G2, "tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), majrur (مَجْرُور), serta", "majrur (مَجْرُور), serta", "tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, serta", "مَجْرُور, serta"),
+    ("a repeated step left out", both(G2, "tiga jenis kata, majrur (مَجْرُور), dan", "majrur (مَجْرُور), dan", "tiga jenis kata, مَجْرُور, dan", "مَجْرُور, dan"),
      "(kalimah left out)"),
-    ("a repeated step the map does not mark here", both(G3, "serta majrur (مَجْرُور)", "serta huruf jar (حَرْف جَرّ)", "serta مَجْرُور", "serta حَرْف جَرّ"),
+    ("a repeated step the map does not mark here", both(G3, "dan majrur (مَجْرُور).", "dan huruf jar (حَرْف جَرّ).", "dan مَجْرُور.", "dan حَرْف جَرّ."),
      "names ['harakat', 'kalimah', 'huruf-jar'] as repeated step(s)"),
     ("the repeated steps most recent first, as until 2026-10-15",
-     both(G3, "adalah harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), serta majrur (مَجْرُور)", "adalah majrur (مَجْرُور), tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), serta harakat",
-          "adalah harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, serta مَجْرُور", "adalah مَجْرُور, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, serta harakat"),
+     both(G3, "adalah harakat, tiga jenis kata, dan majrur (مَجْرُور)", "adalah majrur (مَجْرُور), tiga jenis kata, dan harakat",
+          "adalah harakat, tiga jenis kata, dan مَجْرُور", "adalah مَجْرُور, tiga jenis kata, dan harakat"),
      "names ['majrur', 'kalimah', 'harakat'] as repeated step(s); the lesson map gives ['harakat', 'kalimah', 'majrur'] (another order"),
     ("“none comes up again” where steps do", then(set_field(G1, "display", "Tidak ada yang kita temui lagi di ayat ini."),
                                                    set_field(G1, "text", "Tidak ada yang kita temui lagi di ayat ini.")),
@@ -1208,17 +1247,28 @@ class LessonMapLines(unittest.TestCase):
     }
 
     @staticmethod
-    def entry(new="", again="", rest="", later="", lanjut=0):
-        """An ayah's entry: `again` the learnt steps that come up again here, `rest` the others."""
+    def entry(new="", again="", rest="", later="", lanjut=0, kinds=("isim", "fiil", "huruf")):
+        """An ayah's entry: `again` the learnt steps that come up again here, `rest` the others,
+        `kinds` the kinds of word its words are made of."""
         return {"new": list(new), "learnt": [{"id": x, "here": True} for x in again] + [{"id": x, "here": False} for x in rest],
-                "later": list(later), "lanjut": [f"r{i}" for i in range(lanjut)]}
+                "later": list(later), "lanjut": [f"r{i}" for i in range(lanjut)], "kinds": list(kinds)}
+
+    # The same steps as a map file holds them (no kinds table: the step "z" is a step like any other).
+    C = {"steps": S, "kinds": None}
+    # … and with the step of the three kinds of word named with its members, and the kinds table
+    # (lessonmap.kinds_table; operator 2026-10-18: "in that ayat (example ayat-3) we only have isim").
+    K = {"steps": {**S, "z": {"name": "Tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف)",
+                              "latin": "Tiga jenis kata (isim, fi'il, dan huruf)", "lesson": "0"}},
+         "kinds": {"step": "z", "name": "Tiga jenis kata", "latin": "Tiga jenis kata",
+                   "members": {"isim": {"name": "Isim (اِسْم)", "latin": "Isim"}, "fiil": {"name": "Fi’il (فِعْل)", "latin": "Fi'il"},
+                               "huruf": {"name": "Huruf (حَرْف)", "latin": "Huruf"}}}}
 
     def test_wording(self):
         n = lambda new: B.map_new(self.entry(new), self.S)  # noqa: E731
-        g = lambda again="", rest="": B.map_again(self.entry("", again, rest), self.S)  # noqa: E731
+        g = lambda again="", rest="": B.map_again(self.entry("", again, rest), self.C)  # noqa: E731
         t = lambda later="", lanjut=0: B.map_later(self.entry("", "", "", later, lanjut), self.S, 1)  # noqa: E731
-        f = lambda new="", again="", later="", lanjut=0: B.map_focus(self.entry(new, again, "", later, lanjut), self.S)  # noqa: E731
-        c = lambda new="", again="", rest="": B.map_closing(self.entry(new, again, rest), self.S)  # noqa: E731
+        f = lambda new="", again="", later="", lanjut=0: B.map_focus(self.entry(new, again, "", later, lanjut), self.C)  # noqa: E731
+        c = lambda new="", again="", rest="": B.map_closing(self.entry(new, again, rest), self.C)  # noqa: E731
         s = lambda new="", again="", rest="": B.map_total(self.entry(new, again, rest), self.S)  # noqa: E731
         # what is new: every step named (at most three), a name with a "dan" of its own set apart
         self.assertEqual(n(""), "Di ayat ini tidak ada hal baru.")
@@ -1287,6 +1337,56 @@ class LessonMapLines(unittest.TestCase):
         self.assertEqual(V.map_closing_parts(self.entry("a")), ["learned", "map:total"])
         self.assertEqual(V.map_closing_parts(None), [])
 
+    def test_the_kinds_of_word_met_here(self):
+        # Operator 2026-10-18: "we always say in this ayat we find 3 jenis kata: isim, fi'il, huruf. But
+        # actually in that ayat (example ayat-3) we only have isim, no harf or fi'il. Fix this in all
+        # lessons." Where a line says the step is MET HERE, it names the kinds the ayah has.
+        g = lambda kinds, again="za": B.map_again(self.entry("", again, "", kinds=kinds), self.K)  # noqa: E731
+        f = lambda kinds: B.map_focus(self.entry("", "za", "", "b", kinds=kinds), self.K)  # noqa: E731
+        c = lambda kinds: B.map_closing(self.entry("", "za", "", kinds=kinds), self.K)  # noqa: E731
+        self.assertEqual(g(["isim", "fiil", "huruf"]), "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah tiga jenis kata "
+                                                      "(isim, fi'il, dan huruf), serta na't.")
+        self.assertEqual(g(["isim"]), "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah tiga jenis kata dan na't. "
+                                      "Dari tiga jenis kata itu, di ayat ini hanya ada isim.")
+        self.assertEqual(g(["isim", "huruf"]), "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah tiga jenis kata dan "
+                                               "na't. Dari tiga jenis kata itu, di ayat ini hanya ada isim dan huruf.")
+        # the step not met here: nothing about the kinds
+        self.assertEqual(g(["isim"], "a"), "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah na't.")
+        # with nothing new: the reassurance and the closing say it the same way
+        self.assertTrue(f(["isim"]).endswith("Mari kita fokus mengulang tiga jenis kata dan na't terlebih dahulu. Dari tiga jenis kata itu, "
+                                             "di ayat ini hanya ada isim."))
+        self.assertEqual(c(["fiil", "huruf"]), "Di ayat ini tidak ada hal baru; kita mengulang dua hal yang sudah kita pelajari, yaitu tiga "
+                                               "jenis kata dan na't. Dari tiga jenis kata itu, di ayat ini hanya ada fi'il dan huruf.")
+        # … and read back, with its faults: the line in the old wording, a kind the ayah does not have,
+        # the sentence left out, the sentence where all three occur.
+        lesson = {"slug": "x", "surah": 1, "ayat": [{"ayah": 1}, {"ayah": 2}]}
+        shown = lambda prose: BC.Namer(LESSONS, LEX).shown(prose)  # noqa: E731
+        mp = {**self.K, "lanjut": {"r0": {"name": "Hal", "latin": "Hal", "from": "title"}}, "ayat": [
+            {"ayah": 1, **self.entry("b", "za", "", kinds=["isim"])},
+            {"ayah": 2, **self.entry("b", "za", "", kinds=["isim", "fiil", "huruf"])},
+        ]}
+        lines = {f"x:{a['ayah']}:map:again": {"display": shown(B.map_again(a, mp))} for a in mp["ayat"]}
+        self.assertEqual(lines["x:1:map:again"]["display"], "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah tiga "
+                                                            "jenis kata dan na’t (نَعْت). Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم).")
+        self.assertEqual(lines["x:2:map:again"]["display"], "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah tiga "
+                                                            "jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), serta na’t (نَعْت).")
+        again = lambda ls: [e for e in V.map_problems("x", ls, lesson, mp) if ":map:again" in e]  # noqa: E731
+        self.assertEqual(again(lines), [])
+
+        def put(lid, text):
+            ls = copy.deepcopy(lines)
+            ls[lid] = {"display": text}
+            return again(ls)
+        self.assertTrue(any("names isim, fi'il, huruf as met in this ayah" in e for e in put("x:1:map:again", lines["x:2:map:again"]["display"])))
+        self.assertTrue(any("says this ayah has 'isim (اِسْم) dan huruf (حَرْف)' of the kinds of word; its words are isim" in e
+                            for e in put("x:1:map:again", lines["x:1:map:again"]["display"].replace("hanya ada isim (اِسْم)", "hanya ada isim (اِسْم) dan huruf (حَرْف)"))))
+        self.assertTrue(any("does not say which kinds of word this ayah has (isim)" in e
+                            for e in put("x:1:map:again", lines["x:1:map:again"]["display"].split(" Dari tiga")[0])))
+        self.assertTrue(any("says which kinds of word this ayah has" in e and "it has all three" in e
+                            for e in put("x:2:map:again", lines["x:2:map:again"]["display"] + " Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم).")))
+        self.assertTrue(any("names the kinds of word bare" in e
+                            for e in put("x:2:map:again", lines["x:1:map:again"]["display"].split(" Dari tiga")[0])))
+
     def test_counts_and_names_read_back(self):
         for n in (0, 1, 9, 10, 11, 12, 19, 20, 21, 36, 40, 99):
             self.assertEqual(V.count_value(B.num_id(n)), n)
@@ -1312,9 +1412,9 @@ class LessonMapLines(unittest.TestCase):
         lines = {}
         for a in mp["ayat"]:
             base = f"x:{a['ayah']}"
-            said = {"map:new": B.map_new(a, self.S), "map:again": B.map_again(a, self.S),
-                    "map:later": B.map_later(a, self.S, 1), "map:focus": B.map_focus(a, self.S),
-                    "learned": B.map_closing(a, self.S), "map:total": B.map_total(a, self.S)}
+            said = {"map:new": B.map_new(a, self.S), "map:again": B.map_again(a, mp),
+                    "map:later": B.map_later(a, self.S, 1), "map:focus": B.map_focus(a, mp),
+                    "learned": B.map_closing(a, mp), "map:total": B.map_total(a, self.S)}
             for part in [*V.map_opening_parts(a), *V.map_closing_parts(a)]:
                 lines[f"{base}:{part}"] = {"display": shown(said[part])}
         self.assertEqual(V.map_problems("x", lines, lesson, mp), [])
@@ -1375,14 +1475,15 @@ class LessonMapLines(unittest.TestCase):
         self.assertEqual(order[end - len(V.MAP_CLOSING):end], [f"al-fatihah:2:{p}" for p in V.MAP_CLOSING])
         # Ayah 1: two new steps; two learnt before it (the lesson with no ayah), both met again in
         # every ayah (the harakat too since 2026-10-17: "in alfatihah ayat-1 it says no harakat?"),
-        # the three kinds named with their members (the same day: "add in parenthesis what are tiga
-        # jenis kata"); three steps seen and taught in ayat 3 and 4 ("baru akan diajarkan lebih
-        # lengkap", the same day); one next-level topic, counted; the reassurance; what was new; the
-        # running total — every counted step named (2026-10-15).
+        # the three kinds as this ayah has them — isim and huruf, no fi'il (2026-10-18: "in that
+        # ayat (example ayat-3) we only have isim"); with their members only where all three occur
+        # (the running total names them: what was learnt); three steps seen and taught in ayat 3 and 4
+        # ("baru akan diajarkan lebih lengkap", 2026-10-17); one next-level topic, counted; the
+        # reassurance; what was new; the running total — every counted step named (2026-10-15).
         self.assertEqual([lines[f"al-fatihah:1:{p}"]["display"] for p in V.MAP_PARTS], [
             "Di ayat ini ada dua hal baru: majrur (مَجْرُور) dan huruf jar (حَرْف جَرّ).",
-            "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, serta tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), "
-            "dan huruf (حَرْف).",
+            "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat dan tiga jenis kata. Dari tiga jenis kata itu, "
+            "di ayat ini hanya ada isim (اِسْم) dan huruf (حَرْف).",
             "Ada tiga hal lagi di ayat ini, tetapi baru akan diajarkan lebih lengkap nanti: alif lam (ال) di ayat ketiga, na’t (نَعْت) "
             "di ayat ketiga, dan idhafah (إِضَافَة) di ayat keempat. Ada juga satu hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
             "Sekarang Anda tidak perlu menghafal ketiganya, dan tidak perlu memikirkan hal tingkat lanjut tadi. Mari kita fokus pada "

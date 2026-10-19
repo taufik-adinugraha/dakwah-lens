@@ -31,7 +31,7 @@ import { TextSizeOptions } from "@/components/TextSizeSwitch";
 import type { ComposeFile } from "@/content/compose-schema";
 import type { RecitationSource } from "@/hooks/useSegmentPlayer";
 import { Link } from "@/i18n/navigation";
-import { MAP_GROUPS, type AutoplaySequence, type LessonMapInput, type StageExample } from "@/lib/autoplay";
+import { MAP_GROUPS, reminderAyat, type AutoplaySequence, type LessonMapInput, type ReminderText, type StageExample } from "@/lib/autoplay";
 import type { CurriculumLead } from "@/lib/autoplay/curriculum";
 import { glossSlot } from "@/lib/emphasis";
 import { PACES } from "@/lib/lessonSteps";
@@ -40,6 +40,7 @@ import { ayahHref } from "@/lib/routes";
 import { MushafLine, type PlayerWord } from "./AyahPlayer";
 import { ExampleCard, type ExampleCardState } from "./ExampleCard";
 import { LessonMapCard, type LessonMapCardGroup } from "./LessonMapCard";
+import { ReminderCard } from "./ReminderCard";
 import { StructureItemCard } from "./StructureItemCard";
 import { TermContrastCard } from "./TermContrastCard";
 import { type StageCompose, WordComposition } from "./WordComposition";
@@ -243,6 +244,7 @@ export function LessonStage({
   marks = null,
   lessonMap = null,
   leads = {},
+  reminders = {},
   media,
 }: {
   seq: AutoplaySequence;
@@ -270,6 +272,9 @@ export function LessonStage({
   lessonMap?: LessonMapInput | null;
   /** Lesson zero's slides, by step id ("concept:<id>:lead"): the cards each shows (content/curriculum.json). */
   leads?: Readonly<Record<string, CurriculumLead>>;
+  /** The earlier ayat this lesson's lines show on a reminder card, by ayah (content bytes and
+   *  translation; src/lib/autoplay/reminder.ts reminderTexts). */
+  reminders?: Readonly<Record<number, ReminderText>>;
   /** The recordings fetched ahead: this lesson's and the next ayah's (src/lib/media-prefetch.ts). */
   media?: LessonMedia;
 }) {
@@ -358,7 +363,12 @@ export function LessonStage({
   // The step and the narration line on screen, named on the stage and the
   // caption (data-step, data-line): the CI checks reach a step by what it
   // is, never by counting clicks (the primer and compose steps moved them).
-  const lineOnScreen = live ? (captionCue(seq, state)?.line ?? null) : null;
+  const cueOnScreen = live ? captionCue(seq, state) : null;
+  const lineOnScreen = cueOnScreen?.line ?? null;
+  // The REMINDER CARD (operator 2026-10-18: "better to remind user what that previous ayat looks
+  // like"): while a line says this ayah continues an earlier one, or cites a word of it, that ayah
+  // (src/lib/autoplay/reminder.ts). Never during an exercise: the stage is the exercise there.
+  const reminderCards = live && !spec && step.kind !== "exercise" ? reminderAyat(cueOnScreen?.reminder, reminders) : [];
 
   // The middle control: the one thing to do next in this state. Render
   // reads only this plain mode; the handler is chosen at click time.
@@ -522,6 +532,35 @@ export function LessonStage({
   // (globals.css; at once with reduced motion) and leaves the moment the sound plays. The panel is
   // pinned to the bottom of the screen, so it grows upwards: the caption and the controls stay
   // where they are, and the word card's slot (sticky above the panel, --panel-h) glides up with it.
+  // The large word card (Arabic · transliteration · "yang artinya …") of the word the line is about.
+  const wordCard = focusWord ? (
+    <div
+      data-guide="word-card"
+      data-autoplay="word-card"
+      className="mx-auto flex max-w-xl flex-wrap-reverse items-center gap-x-4 gap-y-1 rounded-2xl border-[1.5px] border-forest bg-forest-tint px-4 py-2 sm:flex-col sm:flex-nowrap sm:py-3 sm:text-center"
+    >
+      <div className="flex-[1_1_min-content] sm:contents">
+        <p className="text-base font-semibold text-forest sm:order-1">{t("word_n", { n: focusWord.index })}</p>
+        {/* MixedText: "al-ḥamdu", "orang-orang" are never cut at the hyphen while
+            they fit the column (line breaks, operator 2026-10-10). */}
+        <p className="text-lg text-ink-muted sm:order-3">
+          <MixedText text={focusWord.translit} />
+        </p>
+        {/* The meaning bold in forest, "yang artinya" plain ink (operator 2026-10-11:
+            "use bold text or different color to highlight the meanings"; 7.3:1 on
+            forest-tint). The slot is found in the message, so it holds in English too. */}
+        <p className="text-xl text-pretty text-ink sm:order-4">
+          <MixedText {...cardMeaning(focusWord.gloss)} />
+        </p>
+      </div>
+      {/* "Kata ke-N" above it and its transliteration under it (from sm; on a phone when it
+          takes a row of its own): room for its marks (ar-clear, operator 2026-10-17). */}
+      <p lang="ar" dir="rtl" className="quran ar-clear ml-auto text-ar-lg text-ink sm:order-2 sm:ml-0 sm:text-ar-xl">
+        {focusWord.ar}
+      </p>
+    </div>
+  ) : null;
+
   const ln = ap.loadingNotice;
   const loadingStatus = (
     <div role="status" aria-live="polite">
@@ -739,7 +778,19 @@ export function LessonStage({
             ref={cardSlotRef}
             className="pointer-events-none sticky bottom-[calc(var(--panel-h,0px)+0.5rem)] z-10 mt-4 min-h-36 *:pointer-events-auto motion-safe:transition-[bottom] motion-safe:duration-200 sm:min-h-56"
           >
-            {anim && ap.frame && compose ? (
+            {reminderCards.length ? (
+              // A word's own line that cites the earlier word keeps the word card above the reminder
+              // (a word line without a composition); a composition or a structure item gives the
+              // slot to the reminder for that line, and comes back with the next.
+              focusWord && !anim && step.kind === "explain" ? (
+                <div className="space-y-2">
+                  {wordCard}
+                  <ReminderCard cards={reminderCards} />
+                </div>
+              ) : (
+                <ReminderCard cards={reminderCards} />
+              )
+            ) : anim && ap.frame && compose ? (
               <WordComposition
                 unit={anim}
                 kind={ap.frame.step}
@@ -759,31 +810,7 @@ export function LessonStage({
             ) : itemWords && step.item ? (
               <StructureItemCard n={step.item.n} total={step.item.of} words={itemWords} />
             ) : focusWord ? (
-              <div
-                data-guide="word-card"
-                data-autoplay="word-card"
-                className="mx-auto flex max-w-xl flex-wrap-reverse items-center gap-x-4 gap-y-1 rounded-2xl border-[1.5px] border-forest bg-forest-tint px-4 py-2 sm:flex-col sm:flex-nowrap sm:py-3 sm:text-center"
-              >
-                <div className="flex-[1_1_min-content] sm:contents">
-                  <p className="text-base font-semibold text-forest sm:order-1">{t("word_n", { n: focusWord.index })}</p>
-                  {/* MixedText: "al-ḥamdu", "orang-orang" are never cut at the hyphen while
-                      they fit the column (line breaks, operator 2026-10-10). */}
-                  <p className="text-lg text-ink-muted sm:order-3">
-                    <MixedText text={focusWord.translit} />
-                  </p>
-                  {/* The meaning bold in forest, "yang artinya" plain ink (operator 2026-10-11:
-                      "use bold text or different color to highlight the meanings"; 7.3:1 on
-                      forest-tint). The slot is found in the message, so it holds in English too. */}
-                  <p className="text-xl text-pretty text-ink sm:order-4">
-                    <MixedText {...cardMeaning(focusWord.gloss)} />
-                  </p>
-                </div>
-                {/* "Kata ke-N" above it and its transliteration under it (from sm; on a phone when it
-                    takes a row of its own): room for its marks (ar-clear, operator 2026-10-17). */}
-                <p lang="ar" dir="rtl" className="quran ar-clear ml-auto text-ar-lg text-ink sm:order-2 sm:ml-0 sm:text-ar-xl">
-                  {focusWord.ar}
-                </p>
-              </div>
+              wordCard
             ) : null}
           </div>
         ) : null}

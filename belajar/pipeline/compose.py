@@ -26,6 +26,8 @@ names each FORM by where its bytes come from, and this module resolves it:
          {"remove": "shaddah", "piece": i} a mark taken off ("vowel" = its one vowel mark)
          {"add": "shaddah", "piece": i}    a mark put on (shaddah right after the letter)
          {"drop": i}                       piece i (letter and marks) left out
+         {"letter": i, "to": "ya"}         piece i's long-vowel letter written as another, by name
+                                           (wawu ↔ ya'; the dotless final ى as ya', ي), marks kept
 
 Piece indices may be negative (-1 = the last piece). The build records, for each form, where in
 the Qur'an exactly those bytes stand as a token (`attested`, Tanzil), so a reviewer sees which
@@ -122,6 +124,8 @@ MARKS: dict[str, str] = {
 MARK_OF = {v: k for k, v in MARKS.items()}
 # The letters the `letter` op may write, by name (the wawu and ya' of a jamak's ending).
 LONG_LETTERS = {"wawu": "\u0648", "ya": "\u064a"}
+# The ya' at a word's end as the Uthmani text writes it, without its dots (the alif maqsura's shape).
+DOTLESS_YA = "\u0649"
 VOWELS = ("fathah", "dhammah", "kasrah", "fathatain", "dhammatain", "kasratain")
 # The sound each vowel mark gives (shown on screen, never spoken as a syllable).
 SOUND = {"fathah": "a", "kasrah": "i", "dhammah": "u", "fathatain": "an", "kasratain": "in", "dhammatain": "un",
@@ -244,10 +248,14 @@ def apply_op(ar: str, op: dict, what: str = "op") -> str:
         # jamak mudzakkar salim that is majrur (ٱلْعَٰلَمِينَ) back to the wawu of its bentuk dasar
         # (operator 2026-10-17: "show example here what it looks like when in basic form and using
         # wawu"). Only the letters of that change, LONG_LETTERS.
+        # Since 2026-10-18 also the ya' a word ENDS with, which the Uthmani text writes without its
+        # dots (ى, U+0649: يَهْدِى), in the shape a learner knows (ي): the same letter in its other
+        # shape (SAME_LETTER), so "huruf ya' di akhir" points at a ya' (1:6:1, operator 2026-10-18:
+        # "lose 'ya' but not explained about the original word of ihdi").
         j = _idx(ps, op["letter"], what)
         if op["to"] not in LONG_LETTERS:
             raise ComposeError(f"{what}: 'to' must name a letter {tuple(LONG_LETTERS)}, got {op['to']!r}")
-        if ps[j][0] not in LONG_LETTERS.values():
+        if ps[j][0] not in LONG_LETTERS.values() and not (ps[j][0] == DOTLESS_YA and op["to"] == "ya"):
             raise ComposeError(f"{what}: piece {op['letter']} {ps[j]!r} is not one of the letters {tuple(LONG_LETTERS)}")
         if ps[j][0] == LONG_LETTERS[op["to"]]:
             raise ComposeError(f"{what}: piece {op['letter']} is already {op['to']}")
@@ -939,6 +947,11 @@ _BENTUK_DASAR = re.compile(r"\bbentuk dasar", re.I)
 _JOINED = re.compile(r"\b(?:ditulis bersambung|bersambung dengan|keduanya bersambung)\b", re.I)
 _PART_N = re.compile(r"\bBagian (?:pertama|kedua)\b", re.I)
 _AKAR = re.compile(r"\bakar\w*", re.I)
+# A letter said to be dropped, or not written (operator 2026-10-18: "in ayat-6, it says something like
+# ihdina, lose 'ya' but not explained about the original word of ihdi, so it's unclear what it means
+# by losing 'ya'. Check any similar cases."): the learner SEES the form with the letter and without
+# it — a `drop` frame at or before the line's frame (its chips fade the letter out).
+_DROPPED = re.compile(r"\b(?:huruf|alif)\b[^.;:]*?\b(?:dibuang|tidak ditulis)\b|\bdibuangnya huruf\b", re.I)
 
 
 def _plain(m: str | None) -> str | None:
@@ -994,6 +1007,10 @@ def say_problems(unit: dict, w: str) -> list[str]:
                 errs.append(f"{w} {where}: says the sound {sorted(sounds)} over a {fr['stage']} frame whose marks give "
                             f"{sorted(SOUND[m] for m in allowed if m in SOUND)}")
         st = fr.get("stage")
+        if _DROPPED.search(text) and not any(isinstance(b, dict) and b.get("stage") == "drop" for b in frames[:k]):
+            errs.append(f"{w} {where}: says a letter is dropped or not written, and no frame up to this one shows the form with "
+                        "it and without it (a `drop` frame; operator 2026-10-18: “lose 'ya' but not explained about the original "
+                        "word”)")
         if _BENTUK_DASAR.search(text) and st not in ("base", "change") and not _BENTUK_DASAR.search(fr.get("note") or ""):
             errs.append(f"{w} {where}: speaks of the bentuk dasar over a {st} frame that does not show it "
                         "(show it in a base frame, or name it in the note)")

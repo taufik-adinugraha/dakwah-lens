@@ -10,7 +10,7 @@
  * (plan L11), and nothing claims more than is true however the learner got
  * here.
  */
-import { mapLaterWhere, mapListId, mapPronounId, type MapLaterName } from "./lessonMap";
+import { mapLaterWhere, mapListId, mapPronounId, type MapKindsSaid, type MapLaterName } from "./lessonMap";
 import type { AutoplayTexts } from "./types";
 
 /** The sentence about the steps here and taught later, as the narration words it
@@ -26,6 +26,10 @@ function laterId(later: readonly MapLaterName[]): string {
   if (where !== "each") return `${lead}, yaitu ${names}, tetapi baru akan diajarkan lebih lengkap di ayat ${where}.`;
   return `${lead}, tetapi baru akan diajarkan lebih lengkap nanti: ${mapListId(later.map((x) => `${x.name} di ayat ${x.ayah}`))}.`;
 }
+
+/** After a list of the steps met here, when the ayah has fewer than all three kinds of word
+ *  (pipeline/lessonmap.py KINDS_SENTENCE; operator 2026-10-18). */
+const kindsId = (k: MapKindsSaid | null | undefined) => (k && Array.isArray(k.kinds) ? ` Dari ${k.step} itu, di ayat ini hanya ada ${mapListId(k.kinds)}.` : "");
 
 export const ID_TEXTS: AutoplayTexts = {
   intro: ({ surah, ayah, total }) => `${surah}, ayat ${ayah} dari ${total}. Dengarkan, dan perhatikan layar.`,
@@ -89,8 +93,8 @@ export const ID_TEXTS: AutoplayTexts = {
     new: ({ new: fresh }) => (fresh.length ? `Di ayat ini ada ${fresh.length} hal baru: ${mapListId(fresh)}.` : "Di ayat ini tidak ada hal baru."),
     // The learnt-so-far count is said only in the closing recap (map:total): operator 2026-10-17,
     // "better to remove this line in every ayat beginning" — the learnt step says what comes up again.
-    again: ({ again }) =>
-      again.length ? `Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah ${mapListId(again)}.` : "Tidak ada yang kita temui lagi di ayat ini.",
+    again: ({ again, kinds }) =>
+      again.length ? `Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah ${mapListId(again)}.${kindsId(kinds)}` : "Tidak ada yang kita temui lagi di ayat ini.",
     later: ({ later, lanjut }) =>
       [
         later.length ? laterId(later) : "",
@@ -98,7 +102,7 @@ export const ID_TEXTS: AutoplayTexts = {
       ]
         .filter(Boolean)
         .join(" "),
-    focus: ({ later, lanjut, new: fresh, again }) =>
+    focus: ({ later, lanjut, new: fresh, again, kinds }) =>
       [
         later
           ? `Sekarang Anda tidak perlu menghafal ${mapPronounId(later)}${lanjut ? ", dan tidak perlu memikirkan hal tingkat lanjut tadi" : ""}.`
@@ -106,15 +110,15 @@ export const ID_TEXTS: AutoplayTexts = {
         fresh.length
           ? `Mari kita fokus pada pelajaran ${mapListId(fresh)} terlebih dahulu.`
           : again.length
-            ? `Mari kita fokus mengulang ${mapListId(again)} terlebih dahulu.`
+            ? `Mari kita fokus mengulang ${mapListId(again)} terlebih dahulu.${kindsId(kinds)}`
             : "Mari kita fokus pada ayat ini terlebih dahulu.",
       ].join(" "),
   },
-  learned: ({ new: fresh, again }) =>
+  learned: ({ new: fresh, again, kinds }) =>
     fresh.length
       ? `Di ayat ini kita mempelajari ${fresh.length} hal baru: ${mapListId(fresh)}.`
       : again.length
-        ? `Di ayat ini tidak ada hal baru; kita mengulang ${again.length} hal yang sudah kita pelajari, yaitu ${mapListId(again)}.`
+        ? `Di ayat ini tidak ada hal baru; kita mengulang ${again.length} hal yang sudah kita pelajari, yaitu ${mapListId(again)}.${kindsId(kinds)}`
         : "Di ayat ini tidak ada hal baru.",
   total: ({ total, fresh }) => `${fresh ? "Dengan itu" : "Sampai ayat ini"}, sudah ${total.length} hal yang kita pelajari, yaitu ${mapListId(total)}.`,
   recap: "Dengarkan sekali lagi seluruh ayatnya, dan ikuti bacaan imam.",
