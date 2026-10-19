@@ -282,7 +282,9 @@ def split_compose(m, *_):
     lines[C1 + ":a"] = dict(old)
     lines[C1 + ":b"] = dict(old)
 # Audio faults go on a manifest that has no voice yet, on a line that is renderable (no Latin term).
-AUD = next(lid for lid, ln in MANIFESTS["al-ikhlas"]["lines"].items() if ":w" in lid and not V.held_line(ln, LEX))
+# (Al-Ikhlas has its voice since 2026-10-19: the first surah that has none.)
+AUD = next(lid for man in MANIFESTS.values() if not man.get("voice")
+           for lid, ln in man["lines"].items() if ":w" in lid and not V.held_line(ln, LEX))
 NA_EX = non_applicable_exercise()
 
 
@@ -1706,7 +1708,8 @@ class LessonMapLines(unittest.TestCase):
         self.assertEqual(built["al-fatihah"], B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, LESSONMAP)["al-fatihah"])
         m = copy.deepcopy(MANIFESTS)
         m["an-nas"] = B.manifest(built["an-nas"], m["an-nas"], LEX, FORMS)
-        m["al-ikhlas"] = B.manifest(built["al-ikhlas"], m["al-ikhlas"], LEX, FORMS)
+        m["al-ikhlas"] = B.manifest(built["al-ikhlas"], m["al-ikhlas"], LEX, FORMS,
+                                    V.letters_for("al-ikhlas", LESSONS, FORMS, COMPOSE, LIBRARY))
         self.assertNotIn("jamak taksir", m["al-ikhlas"]["lines"]["al-ikhlas:4:map:total:2"]["display"])
         self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=maps, curriculum=cur), [])
 

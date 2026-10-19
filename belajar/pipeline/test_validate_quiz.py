@@ -413,9 +413,9 @@ MUTATIONS = [
     ("the warm-up of Al-Ikhlas: a class said of aṣ-ṣamadu (a Name of Allah)",
      quizfile_of("al-ikhlas", lambda q: warm(q, 2)["questions"][1].__setitem__("class", "nama benda")),
      "al-ikhlas 2 word-kind q2 (word 2): names the class 'nama benda', and the part's QAC tag gives None"),
-    ("the warm-up of Al-Ikhlas: “nama benda” said of kufuwan (“setara”, withheld: quiz.CLASS_WITHHELD)",
-     quizfile_of("al-ikhlas", lambda q: warm(q, 4)["questions"][5].__setitem__("class", "nama benda")),
-     "al-ikhlas 4 word-kind q6 (word 4): names the class 'nama benda', and the part's QAC tag gives None"),
+    ("the warm-up of Al-Ikhlas: the class withheld from kufuwan (“setara”: a plain noun, “nama benda” since 2026-10-19)",
+     quizfile_of("al-ikhlas", lambda q: warm(q, 4)["questions"][5].pop("class")),
+     "al-ikhlas 4 word-kind q6 (word 4): names the class None, and the part's QAC tag gives 'nama benda'"),
     ("the warm-up of Al-Ikhlas: the class withheld from aḥadun of ayah 4 (“sesuatu”: not about Allah)",
      quizfile_of("al-ikhlas", lambda q: warm(q, 4)["questions"][6].pop("class")),
      "al-ikhlas 4 word-kind q7 (word 5): names the class None, and the part's QAC tag gives 'nama benda'"),
@@ -676,9 +676,9 @@ class WarmupIkhlas(unittest.TestCase):
         self.assertEqual(why[(1, 3)], "Kata ketiga adalah isim (اِسْم).")
         self.assertTrue(why[(1, 4)].endswith("“Yang Maha Esa”, adalah isim (اِسْم)."), why[(1, 4)])
         self.assertTrue(why[(2, 2)].endswith("adalah isim (اِسْم). Tandanya: memakai alif lam (ال)."), why[(2, 2)])
-        # kufuwan, “setara”: the class withheld (quiz.CLASS_WITHHELD kufuw) — a judgement call for the operator.
-        self.assertIsNone(cls[(4, 6)])
-        self.assertTrue(why[(4, 6)].endswith("yang artinya “setara”, adalah isim (اِسْم)."), why[(4, 6)])
+        # kufuwan, “setara”: a plain noun, "nama benda" (operator 2026-10-19; it was withheld for a day).
+        self.assertEqual(cls[(4, 6)], "nama benda")
+        self.assertTrue(why[(4, 6)].endswith("yang artinya “setara”, adalah isim (اِسْم), karena ia nama benda."), why[(4, 6)])
         # The parts of a word named by its composition's forms: وَ (wa), لَمْ (lam), لَّ (la), هُۥ (hū).
         self.assertIn("yaitu وَ (wa), yang artinya “dan”, adalah huruf (حَرْف), karena ia kata tugas.", why[(3, 3)])
         self.assertIn("yaitu لَمْ (lam), yang artinya “tidak”, adalah huruf (حَرْف), karena ia kata tugas.", why[(4, 2)])
@@ -826,7 +826,7 @@ class Warmup(unittest.TestCase):
                                 (2, 4): ["N"]})                                           # rabbi (ALLAH_KIND_ONLY)
         # gair (“bukan”): a plain QAC N, listed by its QAC lemma with its reason — and that lemma is the
         # Kosakata entry whose sources give the reason (always annexed; negation or exception).
-        self.assertEqual(list(Q.CLASS_WITHHELD), ["gayor", "kufuw"])
+        self.assertEqual(list(Q.CLASS_WITHHELD), ["gayor"])
         gair = next(x for x in LIBRARY["lexicon"] if x["id"] == Q.word_at(self.lesson, "1:7:5")["lemma_id"])
         self.assertIn("selalu disandarkan", gair["meaning"])
         self.assertEqual(Q.word_parts(self.lesson, Q.word_at(self.lesson, "1:7:5"))[0]["lemma"], "gayor")

@@ -2946,9 +2946,10 @@ rules; it is **derived, never authored** (a plan that lists it stops the build).
   of `validate.py` holds each to QAC, planted faults; a compound word without them stops the
   build). Al-Fatihah: 29 words, 8 of two parts, 37 questions (5 / 5 / 2 / 3 / 5 / 4 / 13).
   Al-Ikhlas: 15 words, 3 of two parts (wa-lam twice, lahū), 18 questions (4 / 2 / 5 / 7), 8
-  isim, 4 fi'il, 6 huruf; 13 with a class (kata tugas 6, kata kerja 4, kata ganti 2, nama benda
-  1: the aḥadun of ayah 4, no word about Allah there), 5 the kind alone (the Name twice; aḥadun at
-  112:1:4 and aṣ-ṣamadu, words about Allah, `ALLAH_KIND_ONLY`; kufuwan, `CLASS_WITHHELD`).
+  isim, 4 fi'il, 6 huruf; 14 with a class (kata tugas 6, kata kerja 4, kata ganti 2, nama benda
+  2: the aḥadun of ayah 4, no word about Allah there, and kufuwan, “setara”, which says "nama
+  benda" since the operator's decision of 2026-10-19), 4 the kind alone (the Name twice; aḥadun at
+  112:1:4 and aṣ-ṣamadu, words about Allah, `ALLAH_KIND_ONLY`).
 - **The answer** is the part's QAC tag as one of three kinds (`QAC_KIND`: N, PN, ADJ, PRON, DEM,
   REL, T, LOC → isim; V → fi'il; P, CONJ, NEG → huruf; any other tag stops the build until it is
   added with its class). It must agree with what the lesson says about the word, its `pos`, part
@@ -2993,11 +2994,10 @@ rules; it is **derived, never authored** (a plan that lists it stops the build).
   is the record's own "nama sifat"), and a lemma of **`quiz.CLASS_WITHHELD`**, each with its
   reason: gair (QAC lemma `gayor`, 1:7:5, “bukan”; operator 2026-10-17) — a plain QAC N, but a word
   meaning “bukan” / “selain” is an isim by its place (always annexed: al-Jadwal, Darwisy, as-Samin;
-  ar-Raghib: for negation or exception; Kosakata `ghayr`), not a nama benda; and kufuwan (lemma
-  `kufuw`, 112:4:4, “setara”; 2026-10-19, a judgement call for the operator) — the sources make it
-  a word for one's equal (al-mitsl wan-nazhir: Darwisy jil. 10 hlm. 615; “yang sepadan”: al-Jadwal
-  jil. 15 hlm. 426), and whether a learner should call that a nama benda or a nama sifat no source
-  here says. The question carries
+  ar-Raghib: for negation or exception; Kosakata `ghayr`), not a nama benda. (kufuwan, lemma
+  `kufuw`, 112:4:4, “setara”, was withheld on 2026-10-19 because no source names its class; the
+  operator decided the same day that it says "nama benda" like any plain noun, so it is not
+  listed.) The question carries
   `class` where its sentence names one: 30 of Al-Fatihah's 37 (nama benda 8, nama sifat 5, kata
   ganti 6, kata kerja 4, kata tugas 7); 7 say the kind alone (the Name twice, the three
   participles, allażīna, gair) — each with the word and its meaning but the Name's. The

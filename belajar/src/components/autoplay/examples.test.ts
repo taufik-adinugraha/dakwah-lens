@@ -838,9 +838,16 @@ describe("the lesson's own word is recited once, and its step does not wait for 
     }
   });
 
-  it("caption-only (the English pages; the Mu'awwidzat, whose own lines have no voice yet): the first hearing keeps its caption's reading time", () => {
-    const captionOnly = [...FATIHAH.ayat.map((a) => lessonOf(FATIHAH, a, "en")), ...every.filter((l) => l.slug !== "al-fatihah")];
-    expect(captionOnly.length).toBe(7 + 15);
+  it("caption-only (the English pages; Al-Falaq and An-Nas, whose own lines have no voice yet): the first hearing keeps its caption's reading time", () => {
+    // Al-Ikhlas has a voice since 2026-10-20 (its Indonesian pages are narrated like Al-Fatihah's);
+    // only its English pages stay caption-only.
+    const IKHLAS = surah("al-ikhlas");
+    const captionOnly = [
+      ...FATIHAH.ayat.map((a) => lessonOf(FATIHAH, a, "en")),
+      ...IKHLAS.ayat.map((a) => lessonOf(IKHLAS, a, "en")),
+      ...every.filter((l) => l.slug !== "al-fatihah" && l.slug !== "al-ikhlas"),
+    ];
+    expect(captionOnly.length).toBe(7 + 4 + 11);
     // The Mu'awwidzat's shared lines have a voice all the same: what decides is the word's own line.
     expect(every.filter((l) => l.slug !== "al-fatihah").every((l) => l.seq.hasAudio)).toBe(true);
     for (const l of captionOnly) {
