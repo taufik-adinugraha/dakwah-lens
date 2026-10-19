@@ -172,6 +172,24 @@ class LessonMarkup:
         return quran, segments
 
 
+def compound_segments(S: int, ayat: list[dict], W) -> dict[str, list[str]]:
+    """loc → QAC 0.4 segments (Arabic) of every lesson word made of TWO OR MORE PARTS: its segments
+    other than the article (DET), counted as the warm-up counts them (quiz.part_kinds: "dengan" +
+    "nama" are two parts, a word with alif lam is one). The warm-up shows each part of such a word
+    on its own, from the lesson's bytes (quiz.word_parts), so every lesson ships them — a marked
+    lesson already did for the words its prose names part by part (LessonMarkup.bytes: every
+    compound word of Al-Fatihah is one of them, so its file is unchanged), an unmarked one from
+    2026-10-19, when Al-Ikhlas's lesson map was switched on (its wa lam and lahū)."""
+    out: dict[str, list[str]] = {}
+    for ay in ayat:
+        for wd in ay["words"]:
+            s, a, w = (int(x) for x in wd["loc"].split(":"))
+            segs = W.get((s, a, w), [])
+            if s == S and sum(1 for g in segs if g.tag != "DET") >= 2:
+                out[wd["loc"]] = [bw_to_ar(g.form) for g in segs]
+    return out
+
+
 def no_markup(text: str | None, where: str) -> str | None:
     """A field of a lesson that is not marked yet (MARKED_SURAHS) must carry no markup."""
     if text and ("[[" in text or "]]" in text):
@@ -740,8 +758,12 @@ def build(spec: SurahSpec) -> int:
                                      + "".join(f" + {g}" for g in gens) + " (stdlib only, no LLM)")
     out = {"surah": S, "slug": slug, "name_ar": name_ar, "name_id": spec.name_id, "ayat": ayat,
            "facts": facts, "hadith": hadith}
+    quran, part_segments = mk.bytes() if mk is not None else ({}, {})
     if mk is not None:
-        out["quran"], out["segments"] = mk.bytes()
+        out["quran"] = quran
+    segments = {**part_segments, **compound_segments(S, ayat, W)}
+    if mk is not None or segments:
+        out["segments"] = dict(sorted(segments.items(), key=lambda kv: [int(x) for x in kv[0].split(":")]))
     out["data_versions"] = data_versions
     return finish(out, out_path, comparisons)
 

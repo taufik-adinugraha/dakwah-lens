@@ -383,8 +383,8 @@ class Curriculum(unittest.TestCase):
         kinds = {s["id"]: CUR.kind(s) for s in AUTHORED["steps"]}
         self.assertEqual(kinds["harakat"], "basics")
         self.assertEqual(kinds["kalimah"], "record")
-        self.assertEqual([kinds[s] for s in ("majrur", "marfu", "manshub", "alif-lam")], ["teach"] * 4)
-        self.assertIsNone(kinds["majzum"])       # a part of i'rab with no text yet
+        # majzum, the fourth part of i'rab, has its own text since 2026-10-19 (Al-Ikhlas's map switched on).
+        self.assertEqual([kinds[s] for s in ("majrur", "marfu", "manshub", "majzum", "alif-lam")], ["teach"] * 5)
         self.assertIsNone(kinds["jamak-taksir"])  # no record, no text yet
         self.assertEqual(sum(1 for k in kinds.values() if k == "record"), 18)
         # A whole record keeps the line id it always had; a step with its own text has its own.
@@ -392,7 +392,7 @@ class Curriculum(unittest.TestCase):
         self.assertEqual(step(CONTENT, "nafi-lam")["line"], "concept:jazm-lam")
         self.assertEqual(step(CONTENT, "majrur")["line"], "concept:majrur")
         self.assertIsNone(step(CONTENT, "harakat")["line"])
-        self.assertIsNone(step(CONTENT, "majzum")["line"])
+        self.assertEqual(step(CONTENT, "majzum")["line"], "concept:majzum")
         # No line for a next-level record, anywhere; a lesson says at most three.
         said = [t["line"] for l in CONTENT["lessons"] for t in l.get("lines") or []]
         self.assertEqual(len(set(said)), len(said))

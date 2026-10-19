@@ -845,6 +845,30 @@ def check_lesson(spec, data: dict, ctx: dict) -> tuple[list[tuple[str, str]], se
         for w, tok in enumerate(lesson_ayah(T, S, a)[0].split(" "), 1):
             if bw_to_ar("".join(g.form for g in qw.get((S, a, w), []))) != tok:
                 fail(f"QAC word {S}:{a}:{w} is not byte-identical to the Tanzil 1.1 token")
+    # 1b. `segments`: the QAC 0.4 segments of every word made of two or more parts (segments other
+    # than the article: the warm-up shows each part from these bytes, quiz.word_parts) — and, in a
+    # marked lesson, of the words its prose names part by part. Each entry is that word's QAC
+    # segments, Buckwalter converted, joining to its Tanzil token (build_surah.compound_segments).
+    shipped = data.get("segments")
+    if shipped is not None and not isinstance(shipped, dict):
+        fail(f"{lp}: segments must be an object of word loc → QAC segments")
+        shipped = {}
+    shipped = shipped or {}
+    for a in range(1, spec.n_ayat + 1):
+        for w in range(1, len(lesson_ayah(T, S, a)[0].split(" ")) + 1):
+            segs = qw.get((S, a, w), [])
+            if sum(1 for g in segs if g.tag != "DET") >= 2 and f"{S}:{a}:{w}" not in shipped:
+                fail(f"{lp}: segments has no entry for {S}:{a}:{w}, a word of {sum(1 for g in segs if g.tag != 'DET')} parts "
+                     "(the warm-up shows each part from these bytes; rebuild: build_surah.py)")
+    for loc, parts in shipped.items():
+        m = re.fullmatch(r"(\d+):(\d+):(\d+)", str(loc))
+        key = tuple(int(x) for x in m.groups()) if m else None
+        want = [bw_to_ar(g.form) for g in qw.get(key, [])] if key else None
+        if not want or parts != want:
+            fail(f"{lp}: segments[{loc}] {parts!r} are not the QAC 0.4 segments of that word {want!r}")
+        elif key[0] != S or ("quran" not in data and sum(1 for g in qw[key] if g.tag != "DET") < 2):
+            # A marked lesson (it ships `quran`) also carries the words its prose names part by part.
+            fail(f"{lp}: segments[{loc}]: an unmarked lesson ships the segments of its own words of two or more parts only")
     qe, qe_path = quranenc_sura(src, S)
     qe_rows = _cached(("quranenc", qe["sha256"]), lambda: {
         int(r["aya"]): r for r in json.loads(qe_path.read_text(encoding="utf-8"))["result"]})

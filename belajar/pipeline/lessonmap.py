@@ -70,8 +70,55 @@ NAME_WORDS = 4
 GROUPS = ("new", "learnt", "later", "lanjut")
 STEP_KEYS = {"name", "latin", "lesson"}
 RECORD_KEYS = {"name", "latin", "from"}
-ENTRY_KEYS = {"ayah", *GROUPS, "kinds"}
-FILE_KEYS = {"version", "slug", "surah", "steps", "lanjut", "ayat", "kinds"}
+ENTRY_KEYS = {"ayah", *GROUPS, "kinds", "total"}
+FILE_KEYS = {"version", "slug", "surah", "steps", "lanjut", "ayat", "kinds", "units"}
+TOTAL_KEYS = {"from", "steps"}
+
+# THE RUNNING TOTAL, UNIT BY UNIT (2026-10-19, when Al-Ikhlas was switched on). The closing line
+# map:total names every step learnt by the end of the ayah (operator 2026-10-15: "Dengan itu, sudah
+# empat hal yang kita pelajari, yaitu A, B, C, D … always re-mention what they are"), and a line is
+# never longer than validate_narration.MAX_LINE spoken characters nor split into :a/:b (operator
+# 2026-10-15: "a long list is its own line"). Al-Fatihah's longest total is 19 steps, 352
+# characters; Al-Ikhlas, the fourth unit of the curriculum, has 25 to 28, 458 to 498 — one
+# sentence no longer fits. So when it does not, the total is said in lines of their own: map:total
+# says the count ("Dengan itu, sudah dua puluh delapan hal yang kita pelajari."), and each line
+# map:total:<k> one group of curriculum units with its own count and every step it taught, in
+# teaching order ("Dari pelajaran pengantar dan Surah Al-Fatihah ada sembilan belas hal, yaitu …").
+# The groups are the fewest runs of whole units, in teaching order, whose lines fit (greedy; built
+# with the narration's own measure by build_map.Namer.total_groups); an entry's `total` is [] when
+# the one sentence fits, which is every ayah of Al-Fatihah. `units` names each unit a group names,
+# as the line says it (unit_phrase). The card ("Sudah N hal kita pelajari") is unchanged.
+UNIT_PHRASE_PENGANTAR = "pelajaran {name}"
+
+
+def unit_phrase(unit: dict) -> str:
+    """A curriculum unit as a total's line names it: a surah unit "Surah Al-Fatihah", a segment
+    unit by its name ("Ayat Kursi"), the unit of lesson zero "pelajaran pengantar"."""
+    if unit.get("surah") and not unit.get("ayah"):
+        return f"Surah {unit['name']}"
+    if unit.get("surah"):
+        return str(unit["name"])
+    return UNIT_PHRASE_PENGANTAR.format(name=str(unit["name"]).lower())
+
+
+def unit_of(curriculum: dict) -> dict[str, str]:
+    """step id → the id of the curriculum unit whose lesson teaches it."""
+    lesson_unit = {str(l.get("id")): l.get("unit") for l in curriculum.get("lessons") or []}
+    return {s["id"]: lesson_unit.get(s.get("lesson")) for s in curriculum.get("steps") or []}
+
+
+def total_runs(total: list[str], curriculum: dict) -> list[tuple[str, list[str]]]:
+    """The running total's steps cut into runs of one unit each, in teaching order: [(unit id,
+    [step ids])]."""
+    units = unit_of(curriculum)
+    out: list[tuple[str, list[str]]] = []
+    for sid in total:
+        u = units.get(sid)
+        if out and out[-1][0] == u:
+            out[-1][1].append(sid)
+        else:
+            out.append((u, [sid]))
+    return out
 
 # THE KINDS OF WORD MET IN AN AYAH (operator 2026-10-18: "we always say in this ayat we find 3 jenis
 # kata: isim, fi'il, huruf. But actually in that ayat (example ayat-3) we only have isim, no harf or
@@ -283,8 +330,18 @@ def build(slug: str, lessons: dict[str, dict], library: dict, curriculum: dict, 
         raise MapError(f"{slug}: {lost} are listed as next-level topics and are no Konsep of the library")
     ks = kinds_step(curriculum)
     kinds = kinds_table(ks, steps[ks], namer) if ks in steps else None
-    return {"version": MAP_VERSION, "slug": slug, "surah": surah, "steps": steps, "lanjut": lanjut, "ayat": ayat,
-            "kinds": kinds}
+    content = {"version": MAP_VERSION, "slug": slug, "surah": surah, "steps": steps, "lanjut": lanjut, "ayat": ayat,
+               "kinds": kinds, "units": {}}
+    # The running total said unit by unit where one sentence does not fit (THE RUNNING TOTAL above):
+    # the namer measures the lines as the narrator says them.
+    unit_by = {u["id"]: u for u in curriculum.get("units") or []}
+    for a in ayat:
+        a["total"] = namer.total_groups(content, a, curriculum) if hasattr(namer, "total_groups") else []
+        for g in a["total"]:
+            for u in g["from"]:
+                content["units"][u] = unit_phrase(unit_by[u])
+    content["units"] = {u["id"]: content["units"][u["id"]] for u in curriculum.get("units") or [] if u["id"] in content["units"]}
+    return content
 
 
 def kinds_table(sid: str, step: dict, namer) -> dict:
@@ -308,8 +365,8 @@ def kinds_table(sid: str, step: dict, namer) -> dict:
 def problems(content, lessons: dict[str, dict], library: dict, curriculum: dict | None) -> list[str]:
     """What a map file says against the lessons, the library and the curriculum
     (content/curriculum.json, itself held to the lessons by validate_curriculum.py)."""
-    if not isinstance(content, dict) or set(content) != FILE_KEYS:
-        return ["map: a file is exactly {version, slug, surah, steps, lanjut, ayat, kinds}"]
+    if not isinstance(content, dict) or set(content) != FILE_KEYS or not isinstance(content.get("units"), dict):
+        return ["map: a file is exactly {version, slug, surah, steps, lanjut, ayat, kinds, units} (units: an object)"]
     slug = content["slug"]
     w = f"map/{slug}"
     if slug not in SURAH_BY_SLUG or slug not in lessons:
@@ -336,14 +393,18 @@ def problems(content, lessons: dict[str, dict], library: dict, curriculum: dict 
     for entry, a in zip(ayat, lesson["ayat"]):
         n = a["ayah"]
         lid = CUR.ayah_lesson(lesson["surah"], n)
-        ok = set(entry) == ENTRY_KEYS and all(isinstance(entry[g], list) for g in (*GROUPS, "kinds")) \
+        ok = set(entry) == ENTRY_KEYS and all(isinstance(entry[g], list) for g in (*GROUPS, "kinds", "total")) \
             and all(isinstance(x, str) for g in ("new", "later", "lanjut", "kinds") for x in entry[g]) \
             and all(isinstance(x, dict) and set(x) == {"id", "here"} and isinstance(x["id"], str) and isinstance(x["here"], bool)
-                    for x in entry["learnt"])
+                    for x in entry["learnt"]) \
+            and all(isinstance(g, dict) and set(g) == TOTAL_KEYS and isinstance(g["from"], list) and isinstance(g["steps"], list)
+                    and all(isinstance(x, str) for x in g["from"] + g["steps"]) for g in entry["total"])
         if not ok:
-            errs.append(f"{w} ayah {n}: an entry is exactly {{ayah, new, learnt, later, lanjut, kinds}}: step ids, the learnt "
-                        "ones each {id, here}, next-level record ids, and the kinds of word of its words")
+            errs.append(f"{w} ayah {n}: an entry is exactly {{ayah, new, learnt, later, lanjut, kinds, total}}: step ids, the "
+                        "learnt ones each {id, here}, next-level record ids, the kinds of word of its words, and the running "
+                        "total's groups, each {from: unit ids, steps: step ids}")
             continue
+        errs += _total_problems(f"{w} ayah {n}", entry, curriculum, content.get("units"))
         # The kinds of word met here are the ayah's own (quiz.word_parts, the warm-up's rule): a
         # line that says a kind is met here when no word of the ayah is of it is wrong (operator
         # 2026-10-18, Al-Fatihah 3: "we only have isim, no harf or fi'il").
@@ -412,6 +473,46 @@ def problems(content, lessons: dict[str, dict], library: dict, curriculum: dict 
             errs.append(f"{w}: {cid}: from must be \"title\" or \"authored\"")
         errs += _name_problems(w, cid, c)
     errs += _kinds_problems(w, content, curriculum)
+    # The file's `units`: exactly the units a total's group names, in the curriculum's order, each
+    # as the line says it (unit_phrase).
+    named = {u for a in ayat for g in a.get("total") or [] for u in g.get("from") or []}
+    want_units = {u["id"]: unit_phrase(u) for u in curriculum.get("units") or [] if u["id"] in named}
+    if content["units"] != want_units or list(content["units"]) != list(want_units):
+        errs.append(f"{w}: units {content['units']!r} are not the names of the units the totals' groups name {want_units!r}")
+    return errs
+
+
+def _total_problems(w: str, entry: dict, curriculum: dict, units) -> list[str]:
+    """An entry's `total` (THE RUNNING TOTAL above): [] — the one sentence — or two or more groups
+    that cut the running total (every step learnt by the end of the ayah, in teaching order) into
+    runs of WHOLE curriculum units, in order, each group naming its units (`units` of the file has
+    their names). Whether the one sentence fits is the narration's measure: a fresh build_map.py run
+    decides it (validate_map.py compares)."""
+    groups = entry.get("total") or []
+    if not groups:
+        return []
+    errs: list[str] = []
+    total = [x["id"] for x in entry["learnt"]] + list(entry["new"])
+    runs = total_runs(total, curriculum)
+    if len(groups) < 2:
+        errs.append(f"{w}: total has one group: a total said in one group is the one sentence (total [])")
+    if [s for g in groups for s in g["steps"]] != total:
+        return errs + [f"{w}: total's groups name {[s for g in groups for s in g['steps']]}, not the running total {total}, "
+                       "every step once, in teaching order"]
+    at = 0
+    for g in groups:
+        want_units = []
+        got: list[str] = []
+        while at < len(runs) and len(got) < len(g["steps"]):
+            want_units.append(runs[at][0])
+            got += runs[at][1]
+            at += 1
+        if got != g["steps"] or g["from"] != want_units:
+            errs.append(f"{w}: total group {g['from']} → {g['steps']} is not a run of whole units of the running total "
+                        f"(units {want_units} teach {got})")
+    if not isinstance(units, dict) or any(u not in units or not isinstance(units[u], str) or not units[u].strip()
+                                          for g in groups for u in g["from"]):
+        errs.append(f"{w}: a unit its total names has no name in the file's units")
     return errs
 
 

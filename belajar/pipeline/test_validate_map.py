@@ -109,8 +109,36 @@ def later_to_learnt(ayah: int, sid: str):
 
 def other_surah():
     c = copy.deepcopy(CONTENTS)
-    c["al-ikhlas"] = {**copy.deepcopy(c[SLUG]), "slug": "al-ikhlas", "surah": 112}
+    c["an-nas"] = {**copy.deepcopy(c[SLUG]), "slug": "an-nas", "surah": 114}
     return run(c)
+
+
+def built_in(slug: str, fn):
+    """A fault in the built file content/map/<slug>.json of another switched-on surah."""
+    def f():
+        c = copy.deepcopy(CONTENTS)
+        fn(c[slug])
+        return run(c)
+    return f
+
+
+def one_group(c):
+    e = entry(c, 1)
+    e["total"] = [{"from": ["pengantar", "al-fatihah", "an-nas", "al-falaq"], "steps": [x["id"] for x in e["learnt"]] + e["new"]}]
+
+
+def unit_cut_in_two(c):
+    e = entry(c, 4)
+    e["total"][0]["steps"].append(e["total"][1]["steps"].pop(0))
+
+
+def fatihah_grouped(c):
+    """Al-Fatihah 7's total (19 steps, one sentence of 352 spoken characters) said unit by unit: a
+    shape the file allows, refused because a fresh build_map.py run says it in one line."""
+    e = entry(c, 7)
+    total = [x["id"] for x in e["learnt"]] + e["new"]
+    e["total"] = [{"from": ["pengantar"], "steps": total[:2]}, {"from": ["al-fatihah"], "steps": total[2:]}]
+    c["units"] = {"pengantar": "pelajaran pengantar", "al-fatihah": "Surah Al-Fatihah"}
 
 
 def version_one():
@@ -155,7 +183,7 @@ MUTATIONS = [
     ("a step that is no step of the curriculum", built(lambda c: entry(c, 1)["later"].append("tidak-ada")),
      "ayah 1: ['tidak-ada'] are no steps of the curriculum"),
     ("a learnt step without its `here`", built(lambda c: entry(c, 2)["learnt"].__setitem__(0, "harakat")),
-     "ayah 2: an entry is exactly {ayah, new, learnt, later, lanjut, kinds}"),
+     "ayah 2: an entry is exactly {ayah, new, learnt, later, lanjut, kinds, total}"),
     ("an ayah without its entry", built(lambda c: c["ayat"].pop()), "ayat must be the lesson's ayat, each once, in order"),
     # --- the names tables
     ("a step placed in another lesson", built(lambda c: c["steps"]["naat"].__setitem__("lesson", "1:1")),
@@ -172,8 +200,8 @@ MUTATIONS = [
      "is longer than 4 words"),
     ("a hand-edited file", built(lambda c: c["lanjut"]["ilal"].__setitem__("latin", "I'lall")), "out of date with build_map.py"),
     ("another format version", built(lambda c: c.__setitem__("version", 1)), "version must be 2"),
-    ("a key the format does not have", built(lambda c: c.__setitem__("note", "x")), "exactly {version, slug, surah, steps, lanjut, ayat, kinds}"),
-    ("a file of the format before the curriculum", version_one, "exactly {version, slug, surah, steps, lanjut, ayat, kinds}"),
+    ("a key the format does not have", built(lambda c: c.__setitem__("note", "x")), "exactly {version, slug, surah, steps, lanjut, ayat, kinds, units}"),
+    ("a file of the format before the curriculum", version_one, "exactly {version, slug, surah, steps, lanjut, ayat, kinds, units}"),
     # --- the kinds of word an ayah has (operator 2026-10-18: "in that ayat (example ayat-3) we only
     # have isim, no harf or fi'il")
     ("ayah 3 said to have all three kinds of word, as its line said until 2026-10-18",
@@ -181,14 +209,25 @@ MUTATIONS = [
      "ayah 3: kinds ['isim', 'fiil', 'huruf'] are not the kinds of its words' parts ['isim']"),
     ("a kind left out (ayah 6 has a fi'il)", built(lambda c: entry(c, 6)["kinds"].remove("fiil")),
      "ayah 6: kinds ['isim'] are not the kinds of its words' parts ['isim', 'fiil']"),
-    ("an entry without its kinds", built(lambda c: entry(c, 1).pop("kinds")), "ayah 1: an entry is exactly {ayah, new, learnt, later, lanjut, kinds}"),
+    ("an entry without its kinds", built(lambda c: entry(c, 1).pop("kinds")), "ayah 1: an entry is exactly {ayah, new, learnt, later, lanjut, kinds, total}"),
     ("the kinds table of another step", built(lambda c: c["kinds"].__setitem__("step", "majrur")),
      "kinds must be {step, name, latin, members} for the step 'kalimah'"),
     ("the kinds step named with its members", built(lambda c: c["kinds"].__setitem__("latin", "Tiga jenis kata (isim, fi'il, dan huruf)")),
      "kinds names the step"),
     ("a kind without its name", built(lambda c: c["kinds"]["members"].pop("huruf")), "kinds.members must name each of ['isim', 'fiil', 'huruf']"),
     # --- the per-surah switch
-    ("a map for a surah that is not switched on", other_surah, "no authored/al-ikhlas.map.json behind it"),
+    ("a map for a surah that is not switched on", other_surah, "no authored/an-nas.map.json behind it"),
+    # --- the running total unit by unit (2026-10-19: Al-Ikhlas's 25 to 28 steps no longer fit one line)
+    ("an entry without its total", built(lambda c: entry(c, 2).pop("total")), "ayah 2: an entry is exactly"),
+    ("a running total grouped in one group", built_in("al-ikhlas", one_group), "ayah 1: total has one group"),
+    ("a group's step left out", built_in("al-ikhlas", lambda c: entry(c, 3)["total"][1]["steps"].pop()),
+     "ayah 3: total's groups name"),
+    ("a group that cuts a unit in two", built_in("al-ikhlas", unit_cut_in_two), "ayah 4: total group ['pengantar', 'al-fatihah']"),
+    ("a unit of a group without its name", built_in("al-ikhlas", lambda c: c["units"].pop("an-nas")),
+     "a unit its total names has no name in the file's units"),
+    ("a unit named otherwise than its line says it", built_in("al-ikhlas", lambda c: c["units"].__setitem__("an-nas", "An-Nas")),
+     "units {"),
+    ("a total said unit by unit where one sentence fits (Al-Fatihah 7)", built(fatihah_grouped), "out of date with build_map.py"),
     ("switched on, never built", lambda: run({}), "authored/al-fatihah.map.json has no built file"),
     # --- the authored file
     ("a name for a record the surah does not list", in_authored(lambda a: a["names"].__setitem__("hal", "Hal")),
@@ -330,23 +369,69 @@ class LessonMap(unittest.TestCase):
                 self.assertEqual(c["from"], "title")
                 self.assertEqual(namer.shown(c["latin"]), c["name"])
                 self.assertEqual(LM.cut_name(namer.title(concepts[cid], *LM.first_example(concepts[cid]))), c["latin"])
-        # A title that names a Qur'anic word, or opens with a description, gets no guessed name.
-        for cid in ("jazm-lam", "zharaf-idza"):
+        # A title that names a Qur'anic word, or opens with a description, gets no guessed name. (The
+        # title of jazm-lam, "Lam: …", is said with its step's name since 2026-10-19 — build_narration
+        # PRE_REWRITES — and so opens with a name, "Huruf nafi yang menjazmkan", the one its map gives.)
+        self.assertEqual(namer(concepts["jazm-lam"], *LM.first_example(concepts["jazm-lam"]), None)["latin"], "Huruf nafi yang menjazmkan")
+        for cid in ("zharaf-idza",):
             with self.subTest(cid), self.assertRaises(LM.MapError):
                 namer(concepts[cid], *LM.first_example(concepts[cid]), None)
 
-    def test_other_surahs_are_off(self):
-        self.assertEqual(LM.authored_slugs(), [SLUG])
-        self.assertEqual(list(CONTENTS), [SLUG])
+    def test_switched_on(self):
+        # Al-Fatihah, and Al-Ikhlas since 2026-10-19 (operator: "let's proceed with next surah").
+        self.assertEqual(LM.authored_slugs(), [SLUG, "al-ikhlas"])
+        self.assertEqual(list(CONTENTS), [SLUG, "al-ikhlas"])
+
+    def test_ikhlas_table(self):
+        # Al-Ikhlas, measured on 2026-10-19 (the curriculum of 2026-10-13: the fourth unit, after
+        # An-Nas and Al-Falaq — every step of those two is "learnt" here, written or not).
+        content = CONTENTS["al-ikhlas"]
+        self.assertEqual({a["ayah"]: (a["new"], LM.here_ids(a), a["later"], a["lanjut"], a["kinds"]) for a in content["ayat"]}, {
+            1: ([], ["harakat", "kalimah", "jumlah-ismiyyah", "marfu", "dhamir", "murab-mabni", "jumlah-filiyyah", "fiil-amr"], [],
+                ["ilal", "maqul-al-qaul", "dhamir-syan", "khabar-jumlah"], ["isim", "fiil"]),
+            2: ([], ["harakat", "kalimah", "jumlah-ismiyyah", "marfu", "alif-lam", "naat"], [], ["wazan-dan-tashrif", "khabar-jumlah"], ["isim"]),
+            3: (["nafi-lam", "majzum"], ["harakat", "kalimah", "fiil-mudhari", "athaf"], [], ["ilal", "naib-fail", "fiil-majhul"],
+                ["fiil", "huruf"]),
+            4: (["kana"], ["harakat", "kalimah", "huruf-jar", "marfu", "dhamir", "fiil-mudhari", "manshub", "athaf", "nafi-lam", "majzum"], [],
+                ["wazan-dan-tashrif"], ["isim", "fiil", "huruf"]),
+        })
+        self.assertEqual([LM.learnt_total(a) for a in content["ayat"]], [25, 25, 27, 28])
+        # The running total no longer fits one line: two groups each time, units whole, in teaching order.
+        self.assertEqual([[g["from"] for g in a["total"]] for a in content["ayat"]], [
+            [["pengantar", "al-fatihah"], ["an-nas", "al-falaq"]], [["pengantar", "al-fatihah"], ["an-nas", "al-falaq"]],
+            [["pengantar", "al-fatihah"], ["an-nas", "al-falaq", "al-ikhlas"]], [["pengantar", "al-fatihah"], ["an-nas", "al-falaq", "al-ikhlas"]]])
+        self.assertEqual(content["units"], {"pengantar": "pelajaran pengantar", "al-fatihah": "Surah Al-Fatihah", "an-nas": "Surah An-Nas",
+                                            "al-falaq": "Surah Al-Falaq", "al-ikhlas": "Surah Al-Ikhlas"})
+        # Al-Fatihah's totals all fit one line: none is grouped, and its file names no unit.
+        self.assertEqual([a["total"] for a in CONTENTS[SLUG]["ayat"]], [[]] * 7)
+        self.assertEqual(CONTENTS[SLUG]["units"], {})
+        # The measure: each line within MAX_LINE spoken characters, the one sentence over it.
+        namer = BM.Namer(LESSONS, LEX)
+        import build_narration as B  # noqa: PLC0415
+        for a in content["ayat"]:
+            self.assertGreater(namer.spoken_len(B.map_total(a, content["steps"])), V.MAX_LINE)
+            for g in a["total"]:
+                self.assertLessEqual(namer.spoken_len(B.map_total_group(g, content["steps"], content["units"])), V.MAX_LINE)
+        self.assertLessEqual(namer.spoken_len(B.map_total(entry(CONTENTS[SLUG], 7), CONTENTS[SLUG]["steps"])), V.MAX_LINE)
+
+    def test_unit_phrase(self):
+        self.assertEqual(LM.unit_phrase({"id": "pengantar", "name": "Pengantar"}), "pelajaran pengantar")
+        self.assertEqual(LM.unit_phrase({"id": "an-nas", "name": "An-Nas", "surah": 114}), "Surah An-Nas")
+        self.assertEqual(LM.unit_phrase({"id": "ayat-kursi", "name": "Ayat Kursi", "surah": 2, "ayah": 255}), "Ayat Kursi")
 
     def test_switching_another_surah_on_asks_for_what_it_lacks(self):
         # An-Nas: two of its steps have no text yet (jamak taksir, mudzakkar dan mu'annats).
         with self.assertRaises(LM.MapError) as e:
             BM.build_all(LESSONS, LIBRARY, LEX, {**AUTHORED, "an-nas": {"slug": "an-nas", "names": {}}}, CURRICULUM)
         self.assertIn("an-nas 5: step jamak-taksir is new here and has no text to teach it", str(e.exception))
-        # Al-Ikhlas: majzum, the fourth part of the i'rab record, has no text yet.
+        # Al-Ikhlas: switched on since 2026-10-19, once majzum, the fourth part of the i'rab record,
+        # had a text of its own (PLANTED: that text taken away again).
+        untaught = copy.deepcopy(CURRICULUM)
+        majzum = next(x for x in untaught["steps"] if x["id"] == "majzum")
+        majzum.pop("teach", None)
+        majzum["line"] = None
         with self.assertRaises(LM.MapError) as e:
-            BM.build_all(LESSONS, LIBRARY, LEX, {**AUTHORED, "al-ikhlas": {"slug": "al-ikhlas", "names": {}}}, CURRICULUM)
+            BM.build_all(LESSONS, LIBRARY, LEX, copy.deepcopy(AUTHORED), untaught)
         self.assertIn("al-ikhlas 3: step majzum is new here and has no text to teach it", str(e.exception))
         # … and a step's name that holds a Qur'anic word is refused before that. PLANTED: the name
         # the step had until 2026-10-13 ("Lam nafi": lam is the first word of ayah 3; it is "Huruf
@@ -354,7 +439,7 @@ class LessonMap(unittest.TestCase):
         named = copy.deepcopy(CURRICULUM)
         next(x for x in named["steps"] if x["id"] == "nafi-lam")["latin"] = "Lam nafi"
         with self.assertRaises(LM.MapError) as e:
-            BM.build_all(LESSONS, LIBRARY, LEX, {**AUTHORED, "al-ikhlas": {"slug": "al-ikhlas", "names": {}}}, named)
+            BM.build_all(LESSONS, LIBRARY, LEX, copy.deepcopy(AUTHORED), named)
         self.assertIn("al-ikhlas: step nafi-lam is named “Lam nafi”, which the narrator cannot say", str(e.exception))
         # Al-Fatihah's own map is untouched by another switch.
         self.assertEqual(BM.build_all(LESSONS, LIBRARY, LEX, copy.deepcopy(AUTHORED), CURRICULUM)[SLUG], CONTENTS[SLUG])

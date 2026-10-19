@@ -23,6 +23,7 @@ import {
   MAP_HERE_FULL,
   MAP_LATER_FULL,
   MAP_LINES,
+  mapClosingLines,
   mapHere,
   mapHereSaid,
   mapKindsSaid,
@@ -171,11 +172,13 @@ describe("the lesson map file (content/map) and the per-surah switch", () => {
     const switched = readdirSync(join(BELAJAR, "pipeline", "authored")).flatMap((f) => (f.endsWith(".map.json") ? [f.slice(0, -".map.json".length)] : []));
     expect([...MAPPED_SLUGS].sort()).toEqual(files.sort());
     expect(files.sort()).toEqual(switched.sort());
-    expect([...MAPPED_SLUGS]).toEqual(["al-fatihah"]);
+    // Al-Fatihah, and Al-Ikhlas since 2026-10-19 (operator: "let's proceed with next surah"); a map says
+    // nothing about publishing (src/lib/features.ts BELAJAR_SURAHS hides Al-Ikhlas in production).
+    expect([...MAPPED_SLUGS]).toEqual(["al-fatihah", "al-ikhlas"]);
     for (const s of SURAHS) {
       for (const a of s.ayat) {
         const map = lessonMapInput(s.slug, a.ayah);
-        if (s.slug === "al-fatihah") expect(map).not.toBeNull();
+        if (MAPPED_SLUGS.includes(s.slug)) expect(map).not.toBeNull();
         else expect(map, `${s.slug} ${a.ayah}`).toBeNull();
       }
     }
@@ -242,7 +245,7 @@ describe("the lesson map file (content/map) and the per-surah switch", () => {
     expect(fault((f) => delete f.steps.badal)).toContain("badal is listed and has no record in steps");
     expect(fault((f) => (f.steps.kana = { name: "Kana", latin: "Kana", lesson: "112:4" }))).toContain("kana has a record and no ayah lists it");
     expect(fault((f) => delete f.lanjut.ilal)).toContain("next-level record ilal is listed and has no name");
-    expect(fault((f) => f.ayat.push({ ayah: 8, new: [], learnt: [], later: [], lanjut: [], kinds: ["isim"] }))).toContain("1:8 is no lesson of the curriculum");
+    expect(fault((f) => f.ayat.push({ ayah: 8, new: [], learnt: [], later: [], lanjut: [], kinds: ["isim"], total: [] }))).toContain("1:8 is no lesson of the curriculum");
     expect(fault((f) => (f.version = 1))).toContain("version 1 is not 2");
   });
 });
@@ -465,7 +468,8 @@ describe("the lesson map in the autoplay sequence", () => {
       for (const a of s.ayat) {
         const seq = stageSequence(s, a, "id");
         const mapSteps = seq.steps.filter((x) => x.kind === "map" || x.kind === "learned").map((x) => x.id);
-        expect(mapSteps, `${s.slug} ${a.ayah}`).toEqual(s.slug === "al-fatihah" ? [...OPENING, "learned"] : []);
+        const map = lessonMapInput(s.slug, a.ayah);
+        expect(mapSteps, `${s.slug} ${a.ayah}`).toEqual(map ? [...mapOpening(map).map((g) => `map:${g}`), "learned"] : []);
       }
     }
     // The same lesson with and without its map: the other steps are untouched, in the same order.
@@ -523,12 +527,23 @@ describe("the lesson map in the autoplay sequence", () => {
     expect([seq.steps[w.idx].id, w.phase]).toEqual(["map:new", "ready"]);
   });
 
-  it("Al-Fatihah's manifest has the six lines for every ayah, and no other surah's has any", () => {
-    const parts = [...MAP_LINES.new, ...MAP_LINES.learnt, ...MAP_LINES.later, ...MAP_LINES.learned];
+  it("a switched-on surah's manifest has the map lines of every ayah, and no other surah's has any", () => {
     for (const s of SURAHS) {
-      const lines = Object.keys(narrationFor(s.slug)!.lines).filter((l) => /:(?:map:[a-z]+|learned)(?::[a-z])?$/.test(l));
-      expect(lines, s.slug).toEqual(s.slug === "al-fatihah" ? s.ayat.flatMap((a) => parts.map((p) => `al-fatihah:${a.ayah}:${p}`)) : []);
+      const lines = Object.keys(narrationFor(s.slug)!.lines).filter((l) => /:(?:map:[a-z]+(?::[1-9][0-9]*)?|learned)(?::[a-z])?$/.test(l));
+      const want = s.ayat.flatMap((a) => {
+        const map = lessonMapInput(s.slug, a.ayah);
+        if (!map) return [];
+        const opening = mapOpening(map).flatMap((g) => MAP_LINES[g]);
+        return [...opening, ...mapClosingLines(map)].map((p) => `${s.slug}:${a.ayah}:${p}`);
+      });
+      expect(lines, s.slug).toEqual(want);
     }
+    // Al-Fatihah: the six lines of every ayah, its running total in one line each time.
+    const parts = [...MAP_LINES.new, ...MAP_LINES.learnt, ...MAP_LINES.later, ...MAP_LINES.learned];
+    expect(FATIHAH.ayat.every((a) => (lessonMapInput("al-fatihah", a.ayah)!.total ?? []).length === 0)).toBe(true);
+    expect(Object.keys(narrationFor("al-fatihah")!.lines).filter((l) => /:(?:map:[a-z]+|learned)$/.test(l))).toEqual(
+      FATIHAH.ayat.flatMap((a) => parts.map((p) => `al-fatihah:${a.ayah}:${p}`)),
+    );
     // The one line of before the curriculum is no line id any more.
     expect(LINE_ID_RE.test("al-fatihah:1:map")).toBe(false);
     expect(LINE_ID_RE.test("al-fatihah:1:map:review")).toBe(false);
@@ -850,13 +865,18 @@ describe("the lesson map's card: one group at a time", () => {
     // (data-step = the step's id), and reads what a card must show from the built files.
     for (const g of MAP_GROUPS) expect(stageSequence(FATIHAH, FATIHAH.ayat[0], "id").steps.map((x) => x.id)).toContain(`map:${g}`);
     expect(ci).toContain("`map:${g}`");
-    expect(ci).toContain('read("content/map/al-fatihah.json")');
+    // Al-Fatihah's file by default; every ayah of Al-Ikhlas's in the `--surahs` pass (2026-10-19).
+    expect(ci).toContain('async function lessonMapChecks(page, vp, index, { slug = "al-fatihah", ayat = [1, 2] } = {}) {');
+    expect(ci).toContain("read(`content/map/${slug}.json`)");
+    expect(ci).toContain('await lessonMapChecks(page, vp, narration, { slug: "al-ikhlas", ayat: [1, 2, 3, 4] });');
+    expect(lessonMapFor("al-ikhlas")?.ayat.map((a) => a.ayah)).toEqual([1, 2, 3, 4]);
     expect(ci).toContain('read("messages/id.json")');
     // The step two ahead of a lesson's first (the look-ahead check) is the map's first group.
     expect(ci).toContain(`const MAP_1 = "al-fatihah:1:map:${MAP_GROUPS[0]}";`);
     // No expectation typed: no step or record id of the curriculum stands in the check.
     const body = ci.slice(ci.indexOf("async function lessonMapChecks("), ci.indexOf("async function assertNotFoundShown("));
-    for (const sid of [...Object.keys(FILE.steps), ...Object.keys(FILE.lanjut)]) expect(body, sid).not.toMatch(new RegExp(`["'\`]${sid}["'\`]`));
+    for (const f of [FILE, lessonMapFor("al-ikhlas")!])
+      for (const sid of [...Object.keys(f.steps), ...Object.keys(f.lanjut)]) expect(body, sid).not.toMatch(new RegExp(`["'\`]${sid}["'\`]`));
     // The CSP refuses eval: no waitForFunction call.
     expect(body).not.toMatch(/\.waitForFunction\(/);
   });
@@ -919,5 +939,67 @@ describe("the word card marks a concept an earlier lesson taught (text only)", (
         if (step.concept && step.part === undefined && !step.occurs) expect(tagged.has(step.concept) || (a.structure?.groups ?? []).some((g) => g.concept === step.concept), `${a.loc} ${it.id}`).toBe(true);
       }
     }
+  });
+});
+
+describe("the running total unit by unit (2026-10-19: Al-Ikhlas's 25 to 28 steps no longer fit one line)", () => {
+  // Operator 2026-10-15: every counted step is named, a line is at most 400 spoken characters and never
+  // split into :a/:b. Al-Fatihah's longest total (19 steps) fits; Al-Ikhlas's do not, so the count is a
+  // line of its own and each group of whole curriculum units another (pipeline/lessonmap.py "THE RUNNING
+  // TOTAL, UNIT BY UNIT"; build_narration.map_total_count / map_total_group).
+  const ikhlas = SURAHS.find((s) => s.slug === "al-ikhlas")!;
+  const lines = narrationFor("al-ikhlas")!.lines;
+
+  it("every Al-Ikhlas ayah says the count, then each group with its units, its count and every step, in teaching order", () => {
+    for (const a of ikhlas.ayat) {
+      const map = lessonMapInput("al-ikhlas", a.ayah)!;
+      const groups = map.total ?? [];
+      expect(groups.length, `ayah ${a.ayah}`).toBeGreaterThanOrEqual(2);
+      const total = [...map.learnt, ...map.new];
+      expect(groups.flatMap((g) => g.steps.map((x) => x.id)), `ayah ${a.ayah}`).toEqual(total.map((x) => x.id));
+      expect(lines[`al-ikhlas:${a.ayah}:map:total`].display).toBe(`${map.new.length ? "Dengan itu" : "Sampai ayat ini"}, sudah ${["dua puluh lima", "dua puluh lima", "dua puluh tujuh", "dua puluh delapan"][a.ayah - 1]} hal yang kita pelajari.`);
+      groups.forEach((g, k) => {
+        const shown = lines[`al-ikhlas:${a.ayah}:map:total:${k + 1}`].display!;
+        expect(shown, `ayah ${a.ayah} group ${k + 1}`).toMatch(new RegExp(`^Dari ${mapListId(g.from).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} ada .+ hal, yaitu .+\\.$`));
+        for (const st of g.steps) expect(shown.replace(MAP_ARABIC_GLOSS, ""), st.id).toContain(mapSaidName(st.name));
+      });
+    }
+    expect(lessonMapInput("al-ikhlas", 4)!.total!.map((g) => g.from)).toEqual([
+      ["pelajaran pengantar", "Surah Al-Fatihah"],
+      ["Surah An-Nas", "Surah Al-Falaq", "Surah Al-Ikhlas"],
+    ]);
+  });
+
+  it("the learned step plays them as its lines, after learned; the caption-only fallback says the same", () => {
+    const a = ikhlas.ayat[3];
+    const seq = stageSequence(ikhlas, a, "id");
+    const learned = seq.steps.find((s) => s.id === "learned")!;
+    expect(learned.cues.map((c) => c.line)).toEqual(["learned", "map:total", "map:total:1", "map:total:2"].map((p) => `al-ikhlas:4:${p}`));
+    const map = lessonMapInput("al-ikhlas", 4)!;
+    const ctx = { ayah: a, last: true, exercises: availableExercises(quizAyah("al-ikhlas", 4)), introduced: taughtAt(a), compose: composeInput("al-ikhlas", a) };
+    expect(sequenceProblems(seq, { ...ctx, map })).toEqual([]);
+    // … and a learned step that leaves out a group of the total is refused.
+    const short = { ...seq, steps: seq.steps.map((s) => (s.id === "learned" ? { ...s, cues: s.cues.slice(0, -1) } : s)) };
+    expect(sequenceProblems(short, { ...ctx, map }).join("\n")).toContain("learned: a lesson map step is its lines");
+    const texts = AUTOPLAY_TEXT_SETS.id;
+    expect(texts.total({ total: ["a", "b"], fresh: true, grouped: true })).toBe("Dengan itu, sudah 2 hal yang kita pelajari.");
+    expect(texts.totalGroup({ from: ["pelajaran pengantar", "Surah Al-Fatihah"], steps: ["harakat", "na’t"] })).toBe(
+      "Dari pelajaran pengantar dan Surah Al-Fatihah ada 2 hal, yaitu harakat dan na’t.",
+    );
+    expect(LINE_ID_RE.test("al-ikhlas:4:map:total:2")).toBe(true);
+    expect(LINE_ID_RE.test("al-ikhlas:4:map:total:0")).toBe(false);
+  });
+
+  it("the map file's groups are checked: a step left out, one group alone, a unit without its name", () => {
+    const file = lessonMapFor("al-ikhlas")!;
+    const fault = (f: (x: LessonMapFile) => void) => {
+      const x = structuredClone(file) as LessonMapFile;
+      f(x);
+      return lessonMapProblems(x, CURRICULUM).join("\n");
+    };
+    expect(fault(() => {})).toBe("");
+    expect(fault((x) => x.ayat[0].total[1].steps.pop())).toContain("the total's groups are not the running total");
+    expect(fault((x) => (x.ayat[0].total = [{ from: ["pengantar"], steps: [...x.ayat[0].learnt.map((l) => l.id), ...x.ayat[0].new] }]))).toContain("a total of one group");
+    expect(fault((x) => delete x.units["an-nas"])).toContain("unit an-nas of the total has no name");
   });
 });

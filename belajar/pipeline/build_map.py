@@ -54,6 +54,42 @@ class Namer(BC.Namer):
     def step_problems(self, sid: str, latin: str) -> list[str]:
         return self.step({"id": sid, "name": latin})[1]
 
+    def spoken_len(self, prose: str) -> int:
+        """How many characters the narrator says for a line of prose (the measure of MAX_LINE)."""
+        return len(self.sp.spoken(self.sp.mark(prose)))
+
+    def total_groups(self, content: dict, entry: dict, curriculum: dict) -> list[dict]:
+        """An ayah's running total as the narration says it (lessonmap.py "THE RUNNING TOTAL, UNIT BY
+        UNIT"): [] while the one sentence (build_narration.map_total) fits V.MAX_LINE spoken
+        characters; else the fewest groups of whole curriculum units, in teaching order, each line
+        of which fits — greedy, a unit joining the group before it while that line still fits. A
+        single unit whose line does not fit stops the build: it needs a design of its own."""
+        total = [x["id"] for x in entry["learnt"]] + list(entry["new"])
+        if not total or self.spoken_len(B.map_total(entry, content["steps"])) <= V.MAX_LINE:
+            return []
+        unit_by = {u["id"]: u for u in curriculum.get("units") or []}
+        names = {u: LM.unit_phrase(unit_by[u]) for u in unit_by}
+        line = lambda g: B.map_total_group(g, content["steps"], names)  # noqa: E731
+        groups: list[dict] = []
+        for unit, sids in LM.total_runs(total, curriculum):
+            if unit not in unit_by:
+                raise LM.MapError(f"{content['slug']} {entry['ayah']}: steps {sids} belong to no unit of the curriculum")
+            if groups:
+                joined = {"from": groups[-1]["from"] + [unit], "steps": groups[-1]["steps"] + sids}
+                if self.spoken_len(line(joined)) <= V.MAX_LINE:
+                    groups[-1] = joined
+                    continue
+            one = {"from": [unit], "steps": list(sids)}
+            if self.spoken_len(line(one)) > V.MAX_LINE:
+                raise LM.MapError(f"{content['slug']} {entry['ayah']}: the steps of the unit {unit} alone make a line longer than "
+                                  f"{V.MAX_LINE} spoken characters: the running total needs a design of its own")
+            groups.append(one)
+        count = self.spoken_len(B.map_total_count(entry))
+        if len(groups) < 2 or count > V.MAX_LINE:
+            raise LM.MapError(f"{content['slug']} {entry['ayah']}: the running total does not fit one line and cannot be said "
+                              "unit by unit")
+        return groups
+
     def __call__(self, concept: dict, surah: int, ayah: int, explicit: str | None) -> dict:
         cid = concept["id"]
         if explicit is not None:

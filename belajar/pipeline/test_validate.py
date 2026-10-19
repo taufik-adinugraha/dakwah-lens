@@ -283,6 +283,18 @@ MULTI = [
     ("a second reciter's EveryAyah probes pinned again in sources.json", "sources",
      lambda src: src["inputs"].__setitem__("everyayah_husary_muallim", copy.deepcopy(src["inputs"]["everyayah_alafasy"])),
      "sources.json EveryAyah probe inputs"),
+    # The QAC segments of each word of two or more parts (validate.py check 1b; 2026-10-19: the warm-up
+    # shows each part from these bytes, and an unmarked lesson — Al-Ikhlas's map was switched on — ships them too).
+    ("a compound word's segments left out (the warm-up shows each part)", "second",
+     lambda d: d["segments"].pop(next(iter(d["segments"]))), "segments has no entry for"),
+    ("a word's segments that are not QAC's", "second",
+     lambda d: d["segments"].__setitem__(next(iter(d["segments"])), list(reversed(d["segments"][next(iter(d["segments"]))]))),
+     "are not the QAC 0.4 segments of that word"),
+    ("an unmarked lesson shipping the segments of a word of one part", "second",
+     lambda d: d["segments"].__setitem__(f"{d['surah']}:1:1", [word(d, f"{d['surah']}:1:1")["ar"]]),
+     "an unmarked lesson ships the segments of its own words of two or more parts only"),
+    ("a marked lesson's compound word without its segments", "surah",
+     lambda d: d["segments"].pop("1:5:3"), "segments has no entry for 1:5:3"),
     ("recitation streams the Al-Fatihah file of the same ayah", "second",
      lambda d: set_(ayah(d, 1)["recitation"][0], "url",
                     ayah(d, 1)["recitation"][0]["url"][:-10] + "001001.mp3"), "unexpected url"),

@@ -104,8 +104,29 @@ def lesson_clip(loc):
     return {"url": rec["url"], "start": seg[1], "end": seg[2], **({"last": True} if last else {})}
 
 
+def setf_in(slug, fn):
+    """A fault in the built composition file of another surah (content/compose/<slug>.json)."""
+    def f(c, a):
+        fn(c[slug])
+    return f
+
+
 # (name, mutation(contents, authored-sha map), expected substring, needs the corpus)
 MUTATIONS = [
+    # Al-Ikhlas (2026-10-19): the jazm — a change of a vowel into the SUKUN (compose.CHANGE_TO), and only that.
+    ("a jazm change whose form loses the vowel without the sukun", setf_in("al-ikhlas", lambda x: (
+        x["words"]["112:3:2"]["forms"]["yalid"].__setitem__("src", {"from": "yalidu", "ops": [{"remove": "vowel", "piece": -1}]}))),
+     "its source gives", False),
+    ("a change from the sukun back to a vowel (the jazm undone)", setf_in("al-ikhlas", lambda x: x["words"]["112:3:2"]["frames"][1].update(
+        {"from": "yalid", "to": "yalidu", "tiles": ["yalidu"]})), "change must change exactly one vowel mark, into another vowel or the sukun", False),
+    ("yakun's wawu said to be dropped with no frame that shows it", setf_in("al-ikhlas", lambda x: (
+        x["words"]["112:4:2"]["frames"][2].update({"stage": "whole"}), x["words"]["112:4:2"]["frames"][2].pop("from"),
+        x["words"]["112:4:2"]["frames"][2].pop("chips"))), "112:4:2 line 5: says a letter is dropped or not written", False),
+    ("yakūnu's bentuk dasar quoted from another place than the one its voice plays", setf_in("al-ikhlas", lambda x: x["words"]["112:4:2"]["forms"]["yakunu"].__setitem__(
+        "src", {"tanzil": "3:47:4"})), "the bentuk dasar quotes 3:47:4, but its voice is 101:4:2", False),
+    ("a stale quran-align pin in the second file only (hidden by the first's good one until 2026-10-19)",
+     setf_in("al-ikhlas", lambda x: x["data_versions"].__setitem__("quran_align", "release sha256:" + "0" * 64)),
+     "compose/al-ikhlas data_versions.quran_align does not pin", False),
     ("a form's bytes not its source's", setf(lambda x: x["words"]["1:1:1"]["forms"]["ismi"].__setitem__(
         "ar", x["words"]["1:1:1"]["forms"]["ismu"]["ar"])), "its source gives", False),
     ("a word slice that is not the word's", setf(lambda x: x["words"]["1:1:1"]["forms"]["bi"].__setitem__(

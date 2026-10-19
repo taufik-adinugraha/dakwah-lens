@@ -383,8 +383,11 @@ def map_opening_parts(entry: dict | None) -> list[str]:
 
 def map_closing_parts(entry: dict | None) -> list[str]:
     """The closing lines an ayah's map entry has: what the ayah taught, then the running total
-    with every step learnt so far."""
-    return [] if entry is None else ["learned", "map:total"]
+    with every step learnt so far — one line, or (the entry's `total` groups it; lessonmap.py "THE
+    RUNNING TOTAL, UNIT BY UNIT", 2026-10-19) the count and one line per group, map:total:<k>."""
+    if entry is None:
+        return []
+    return ["learned", "map:total"] + [f"map:total:{k}" for k in range(1, len(entry.get("total") or []) + 1)]
 
 
 def expected_parts(lesson: dict, library: dict, compose: dict | None = None,
@@ -456,6 +459,13 @@ WHOLE_AYAH = [0]
 MAP_OPENING = ("map:new", "map:again", "map:later", "map:focus")
 MAP_CLOSING = ("learned", "map:total")
 MAP_PARTS = (*MAP_OPENING, *MAP_CLOSING)
+# A group of a running total said unit by unit (map_closing_parts): a map line too, never split.
+MAP_TOTAL_GROUP = re.compile(r"map:total:([1-9]\d*)")
+
+
+def is_map_part(part: str) -> bool:
+    """A line of the lesson map: one of MAP_PARTS, or a group of the running total."""
+    return part in MAP_PARTS or MAP_TOTAL_GROUP.fullmatch(part) is not None
 # The pronoun the reassurance uses for what the line before it put aside (operator 2026-10-15:
 # "ketiganya / keduanya / semuanya to match the count … 1: yang satu ini").
 FOCUS_PRONOUN = {1: "yang satu ini", 2: "keduanya", 3: "ketiganya"}
@@ -1280,9 +1290,13 @@ def reminder_of(lid: str, display, part: str, cont: dict | None, named: "Named",
     by: dict[int, set[int]] = {}
     for run, n in citations(lid, display):
         for shown in run:
-            words = {_ref_word(r)[2] for r, word in named.refs.items()
-                     if named_shown(*word) == shown and _ref_word(r)[:2] == (surah, n)}
-            by.setdefault(n, set()).update(words)
+            refs = [r for r, word in named.refs.items() if named_shown(*word) == shown and _ref_word(r)[:2] == (surah, n)]
+            # A WORD of that ayah before a form of a word's composition with the same bytes and
+            # transliteration (2026-10-19: لَمْ (lam) of 112:3:1, cited in ayah 4, is also the form
+            # `lam` of 112:3:3's composition — the card would have lit wa lam too); a form only where
+            # no word is shown so (ٱللَّهِ (Allāhi) of 1:2:2/allahi, the back of lillāhi).
+            whole = [r for r in refs if "/" not in r]
+            by.setdefault(n, set()).update(_ref_word(r)[2] for r in (whole or refs))
     for m in CONTINUES.finditer(display):
         n = AYAT_NUM[m.group(1)]
         if n != cont.get("ayah"):
@@ -1994,7 +2008,7 @@ def held(text: str, lex: Lexicon) -> list[str]:
 
 # ------------------------------------------------------------------ checks
 SLUG_ID = re.compile(
-    r"^(?P<slug>[a-z-]+):(?P<ayah>0|[1-9]\d*):(?P<part>intro|recite|map:(?:new|again|later|focus|total)|primer:[1-9]\d*|w[1-9]\d*(?::compose:[1-9]\d*)?"
+    r"^(?P<slug>[a-z-]+):(?P<ayah>0|[1-9]\d*):(?P<part>intro|recite|map:(?:new|again|later|focus|total(?::[1-9]\d*)?)|primer:[1-9]\d*|w[1-9]\d*(?::compose:[1-9]\d*)?"
     r"|structure(?::[1-9]\d*)?|concept:[a-z0-9-]+(?::lead|:ex:[1-9]\d*)?|learned"
     r"|ex:(?:" + "|".join(EXERCISE_KEYS) + r"):(?:[a-z][a-z_]+|[1-9]\d*:why)|recap|next|done)(?::(?P<split>[a-z]))?$"
 )
@@ -2655,7 +2669,7 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
             errs += check_view(lid, line, ayah, part, compose, curriculum)
             errs += check_animation_line(lid, line, ayah, part, compose, lex, bool(m.group("split")))
             errs += check_renderable(lid, line, ayah, part, compose, lex, quiz)
-            if part in MAP_PARTS and m.group("split"):
+            if is_map_part(part) and m.group("split"):
                 errs.append(f"{lid}: a map / learned line is never split (one line with its card: name fewer concepts)")
             if STRUCTURE_ITEM.fullmatch(part) and m.group("split"):
                 errs.append(f"{lid}: a structure item is never split (one item, one line: shorten its `say` or make it two items)")
@@ -3055,9 +3069,12 @@ def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict, curricul
                 # Held to the map, as map:new is: the two name the same steps in the same order.
                 errs += _map_count(lid, "new step(s)", m, new)
                 errs += _map_names(lid, "new step(s)", m.group("list"), new, known, count_value(m.group("n")))
-        # --- the running total, every step learnt by then by name
+        # --- the running total, every step learnt by then by name: in one sentence, or (the entry's
+        # `total` groups it, lessonmap.py "THE RUNNING TOTAL, UNIT BY UNIT") the count, then one line
+        # per group with its units, its count and every one of its steps.
         lid = f"{base}:map:total"
         shown = _field_of(lines, lid, "display")
+        groups = [g for g in entry.get("total") or [] if isinstance(g, dict)]
         if shown:
             total = learnt + new
             m = _MAP_TOTAL.match(shown)
@@ -3067,7 +3084,52 @@ def map_problems(name: str, lines: dict, lesson: dict, lessonmap: dict, curricul
                 if (m.group("lead") == MAP_TOTAL_LEAD) != bool(new):
                     errs.append(f"{lid}: opens “{MAP_TOTAL_LEAD}” exactly when the ayah taught something new "
                                 f"(else “{MAP_TOTAL_LEAD_NONE}”)")
-                errs += _map_all_named(lid, "step(s) learnt in all", m, total, known)
+                if not groups:
+                    errs += _map_all_named(lid, "step(s) learnt in all", m, total, known)
+                else:
+                    errs += _map_count(lid, "step(s) learnt in all", m, total)
+                    if m.group("list") is not None:
+                        errs.append(f"{lid}: names the steps although the lines after it name them unit by unit "
+                                    f"(map:total:1 … map:total:{len(groups)}): it says the count only")
+                    errs += _map_total_groups(base, lines, groups, total, known, lessonmap)
+        for extra in sorted(k for k in lines if k.startswith(f"{base}:map:total:")):
+            g = MAP_TOTAL_GROUP.fullmatch(extra[len(base) + 1:].split(":a")[0])
+            if g is None or int(g.group(1)) > len(groups):
+                errs.append(f"{extra}: a group of the running total the lesson map does not have (its entry's total has "
+                            f"{len(groups)} group(s))")
+    return errs
+
+
+_MAP_TOTAL_GROUP_LINE = re.compile(r"^Dari (?P<from>.+?) ada (?P<n>[a-z ]+?) hal, yaitu (?P<list>.+)\.$")
+
+
+def _map_total_groups(base: str, lines: dict, groups: list[dict], total: list[str], known: dict[str, str],
+                      lessonmap: dict) -> list[str]:
+    """The lines map:total:<k> of a running total said unit by unit: each one sentence, "Dari <its
+    units, as the map's `units` names them> ada <n> hal, yaitu <every step of the group, in
+    teaching order>." — and the groups together are the whole total, each step once."""
+    errs: list[str] = []
+    units = (lessonmap or {}).get("units") or {}
+    said: list[str] = []
+    for k, g in enumerate(groups, 1):
+        lid = f"{base}:map:total:{k}"
+        shown = _field_of(lines, lid, "display")
+        m = _MAP_TOTAL_GROUP_LINE.match(shown) if shown else None
+        if not shown:
+            errs.append(f"{lid}: missing: group {k} of the running total ({', '.join(g.get('from') or [])}) is not said")
+            continue
+        if not m or not _one_sentence(shown):
+            errs.append(f"{lid}: does not say, in one sentence, which units group {k} is, how many steps they taught, and which")
+            continue
+        want_from = [units.get(u, u) for u in g.get("from") or []]
+        names = named_concepts(m.group("from"), {n: n for n in want_from})
+        if names is None or [x for x, _a in names] != want_from:
+            errs.append(f"{lid}: names the units “{m.group('from')}”, not {want_from}")
+        errs += _map_names(lid, f"step(s) of {', '.join(want_from)}", m.group("list"), list(g.get("steps") or []), known,
+                           count_value(m.group("n")))
+        said += list(g.get("steps") or [])
+    if not errs and said != total:
+        errs.append(f"{base}:map:total: its groups name {said}, not the running total {total}")
     return errs
 
 

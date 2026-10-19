@@ -298,6 +298,14 @@
     "end": 1871
    }
   },
+  "الصَّمَد": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/2c4547f7990ae880-f0dafcc3c5.mp3",
+    "ms": 575,
+    "sha256": "f0dafcc3c50273be8f2c7d730801ab8412203b143335f06c049972f50143a415"
+   }
+  },
   "الصَّمَدُ": {
    "source": "quran.com",
    "loc": "112:2:2",
@@ -969,6 +977,14 @@
     "url": "/belajar/media/narration/kang-nandar/words/1ee1bba230ce2ce2-26cb27b1b6.mp3",
     "ms": 1228,
     "sha256": "26cb27b1b62d0c5bfecfbee09f883051539f69526597e3c9ac94b1709fa6f7ca"
+   }
+  },
+  "صَمَد": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/ee9844f9adf48398-bad6abc453.mp3",
+    "ms": 575,
+    "sha256": "bad6abc453121a334eaadf3ab09fb8bc687e98756d272668cf0e33b124237aec"
    }
   },
   "صُدُورِ": {
@@ -1838,6 +1854,42 @@
     "sha256": "6b224e842093d8f52eba92023cfd14a4c819d9acfe3df2cd857eff565ea24a48"
    }
   },
+  "يَكُنْ": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/4493307b3017c82f-d6c238ec77.mp3",
+    "ms": 862,
+    "sha256": "d6c238ec77b4d8cc2c71bfdbab67fb27698bca8dd9f5a0a0608d347b8817e811"
+   }
+  },
+  "يَكُونُ": {
+   "source": "quran.com",
+   "loc": "101:4:2",
+   "audio": {
+    "url": "/belajar/media/narration/quran-com/wbw/101_004_002.mp3",
+    "upstream": "https://audio.qurancdn.com/wbw/101_004_002.mp3",
+    "ms": 940,
+    "sha256": "1edb2af3b021c16d4989c5f12eec6cfc2b39b9aa65f60790365f813a10f3bb40",
+    "start": 23,
+    "end": 940
+   }
+  },
+  "يَكُونْ": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/6dea16df2693c567-28c8f2bff9.mp3",
+    "ms": 784,
+    "sha256": "28c8f2bff96f237df89a426ce2ad95bc836459498729bd6cfd210e23624ba96a"
+   }
+  },
+  "يَلِدُ": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/5ba93324d5537b64-7fa491e1da.mp3",
+    "ms": 601,
+    "sha256": "7fa491e1da10d7e17c09ae7f747969a1d881492fbcc58c44d07ea7694170d24c"
+   }
+  },
   "يَلِدْ": {
    "source": "quran.com",
    "loc": "112:3:2",
@@ -1880,6 +1932,14 @@
     "url": "/belajar/media/narration/kang-nandar/words/ed132d80ef2ec7db-5c18bf65bb.mp3",
     "ms": 470,
     "sha256": "5c18bf65bb0c75060ab5424976af16414cde31f9ff9126b9f50ad2902e7f96f9"
+   }
+  },
+  "يُولَدُ": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/acc64b2af9c97d23-dbde5e45c7.mp3",
+    "ms": 705,
+    "sha256": "dbde5e45c77b43f9782fc2eedc3bfcc13bfbe1853b89640636d91903e5e3e7cf"
    }
   },
   "يُولَدْ": {

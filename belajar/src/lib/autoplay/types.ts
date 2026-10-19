@@ -491,7 +491,10 @@ export type AutoplayTexts = {
   learned: (a: { new: readonly string[]; again: readonly string[]; kinds?: MapKindsSaid | null }) => string;
   /** … and the running total after it, every step learnt by then named in teaching order
    *  (`fresh`: the ayah taught something new — "Dengan itu, …", else "Sampai ayat ini, …"). */
-  total: (a: { total: readonly string[]; fresh: boolean }) => string;
+  total: (a: { total: readonly string[]; fresh: boolean; grouped?: boolean }) => string;
+  /** … and, where the total is said unit by unit (`grouped` above: the count alone), one group:
+   *  its units as the map names them, and every step they taught. */
+  totalGroup: (a: { from: readonly string[]; steps: readonly string[] }) => string;
   recap: string;
   next: (a: { ayah: number }) => string;
   done: (a: { surah: string }) => string;

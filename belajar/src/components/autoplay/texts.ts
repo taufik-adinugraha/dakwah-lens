@@ -142,10 +142,11 @@ const EN: AutoplayTexts = {
       : again.length
         ? `This ayah had nothing new; it repeated ${again.length} ${things(again.length)} we have already learnt, namely ${listEn(again)}.${kindsEn(kinds)}`
         : "This ayah had nothing new.",
-  total: ({ total, fresh }) =>
+  total: ({ total, fresh, grouped }) =>
     fresh
-      ? `That makes ${total.length} ${things(total.length)} learnt so far, namely ${listEn(total)}.`
-      : `So far we have learnt ${total.length} ${things(total.length)}, namely ${listEn(total)}.`,
+      ? `That makes ${total.length} ${things(total.length)} learnt so far${grouped ? "" : `, namely ${listEn(total)}`}.`
+      : `So far we have learnt ${total.length} ${things(total.length)}${grouped ? "" : `, namely ${listEn(total)}`}.`,
+  totalGroup: ({ from, steps }) => `From ${listEn(from)}: ${steps.length} ${things(steps.length)}, namely ${listEn(steps)}.`,
   recap: "Listen to the whole ayah once more, and recite along with the imam.",
   next: ({ ayah }) => `This ayah's lesson is complete. Next: ayah ${ayah}.`,
   done: ({ surah }) => `This ayah's lesson is complete. It is the last ayah of surah ${surah}.`,

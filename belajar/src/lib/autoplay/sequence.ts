@@ -63,7 +63,7 @@ import type { ComposeInput } from "../composition";
 import { latinSentences, splitCaption, stripArabic } from "../lessonSteps";
 import type { ExampleInput } from "./examples";
 import { canonicalExercises, exerciseProgressId } from "./exercises";
-import { MAP_LINES, mapHereSaid, mapKindsSaid, mapLaterNames, mapOpening, mapSaidName, type LessonMapInput, type MapGroup } from "./lessonMap";
+import { MAP_LINES, mapClosingLines, mapHereSaid, mapKindsSaid, mapLaterNames, mapOpening, mapSaidName, type LessonMapInput, type MapGroup } from "./lessonMap";
 import { explainLineId, lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
 import { lineDisplay, lineMarks, lineSegments, lineText, unmarkNamed, wordRefs } from "./narration";
 import {
@@ -497,11 +497,14 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
   // … and what it taught, then the running total with every step named, before the imam recites
   // the ayah once more.
   if (map) {
-    const closing: Record<(typeof MAP_LINES)["learned"][number], string> = {
+    const groups = map.total ?? [];
+    const closing: Record<string, string> = {
       learned: texts.learned({ new: said(map.new), again: mapHereSaid(map), kinds: mapKindsSaid(map) }),
-      "map:total": texts.total({ total: said([...map.learnt, ...map.new]), fresh: map.new.length > 0 }),
+      "map:total": texts.total({ total: said([...map.learnt, ...map.new]), fresh: map.new.length > 0, grouped: groups.length > 0 }),
+      // The running total unit by unit (2026-10-19): the count above, then one line per group.
+      ...Object.fromEntries(groups.map((g, k) => [`map:total:${k + 1}`, texts.totalGroup({ from: g.from, steps: said(g.steps) })])),
     };
-    steps.push(step({ id: "learned", kind: "learned", cues: MAP_LINES.learned.map((part) => cue(p(part), closing[part])), guides: [] }));
+    steps.push(step({ id: "learned", kind: "learned", cues: mapClosingLines(map).map((part) => cue(p(part as LinePart), closing[part])), guides: [] }));
   }
 
   if (!zero) {

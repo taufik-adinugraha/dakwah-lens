@@ -59,7 +59,7 @@ const LIST_SLOT: unknown = new Proxy(
   },
 );
 /** The templates that take LIST_SLOT. */
-const LIST_TEMPLATE = /\.(?:lessonMap\.[a-z]+|learned|total)$/;
+const LIST_TEMPLATE = /\.(?:lessonMap\.[a-z]+|learned|total|totalGroup)$/;
 /** Every caption a text set can give (src/components/autoplay/texts.ts: the captions of lines
  *  without a narration display text): its strings, and its templates with their slots named. */
 function captionTexts(value: unknown, where: string, out: [string, string][] = []): [string, string][] {
@@ -221,8 +221,9 @@ describe("emphasisSpans: what a text emphasises", () => {
     expect(nameIn("Konsep baru: Maqul al-qaul (isi perkataan sesudah kata pertama).")).toBe("Maqul al-qaul");
     expect(nameIn("Konsep baru: Ruba'i mujarrad (kata kerja empat huruf asli).")).toBe("Ruba'i mujarrad");
     expect(nameIn("Konsep baru: Shighat mubalaghah (bentuk yang artinya “sangat, sering”).")).toBe("Shighat mubalaghah");
-    // A title that opens with a description, not the name: nothing ("Huruf yang menafikan …").
-    expect(name("jazm-lam")).toBeUndefined();
+    // The particle's title ("Lam: …") is said with its step's name since 2026-10-19, when Al-Ikhlas's
+    // lesson map was switched on (until then "Huruf yang menafikan …", a description: no name).
+    expect(name("jazm-lam")).toBe("Huruf nafi yang menjazmkan");
     expect(shown("Konsep baru — Kalimah: isim, fi'il, huruf (tiga jenis kata): …")).toEqual([["term", "Kalimah"]]);
     // The quiz explanation's answer, up to its full stop outside brackets, Arabic and all.
     expect(shown("Perannya: huruf jar (حَرْف جَرّ) + majrur (مَجْرُور). Akhirnya dibaca kasrah (كَسْرَة)")).toEqual([

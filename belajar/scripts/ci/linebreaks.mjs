@@ -72,6 +72,9 @@
 // src/lib/features.ts), where the track links the Mu'awwidzat too: the production-like run reaches
 // Al-Fatihah only (operator, 2026-10-10: the others "segera hadir", not linked). Its results go to
 // shots/linebreaks-semua-surah.json and lb-semua-surah-*.png, beside the production-like run's.
+// It also walks the lesson stage of every ayah of Al-Ikhlas (2026-10-19: brought to Al-Fatihah's
+// standard, still hidden on the live site), step by step like Al-Fatihah's, every composition of
+// its fifteen words ink-checked at every size.
 //
 // Before the real run, a self-test lays out linebreaks-fixture.html in a real page: one known-bad
 // case of every kind must be caught, the markup as it ships must not be, and a unit wider than its
@@ -112,7 +115,21 @@ const LESSONS = [
   ["/belajar/id/quran/al-fatihah/1", true],
   ["/belajar/id/quran/al-fatihah/2", false],
   ["/belajar/id/quran/al-fatihah/7", false],
+  // `--surahs` only (2026-10-19): every ayah of Al-Ikhlas, brought to Al-Fatihah's standard and
+  // hidden on the live site; caption-only (its narration is not rendered yet). Its ayat 1 and 2
+  // introduce no concept (the curriculum teaches Al-Ikhlas after An-Nas and Al-Falaq), so they
+  // show no example card: the third field says a lesson need not.
+  ...(SURAHS_ON
+    ? [
+        ["/belajar/id/quran/al-ikhlas/1", false, false],
+        ["/belajar/id/quran/al-ikhlas/2", false, false],
+        ["/belajar/id/quran/al-ikhlas/3", false],
+        ["/belajar/id/quran/al-ikhlas/4", false],
+      ]
+    : []),
 ];
+/** The surahs whose compositions the ink check must have measured on the lessons above. */
+const COMPOSED_SURAHS = SURAHS_ON ? ["al-fatihah", "al-ikhlas"] : ["al-fatihah"];
 const MAX_PRINTED = 600;
 /** Pages also shot at each size: the surah page (its "Tahukah Anda?" facts hold the longest
  *  inline Arabic), an ayah page with every disclosure open (word cards, Rujukan) and the
@@ -141,12 +158,14 @@ let INK_MODE = null;
 /** The compositions of each lesson (content/compose, the shapes inkMeasure reports: "primer",
  *  "word N"), by its path — what the ink check must have measured there at every size. */
 async function composedByLesson() {
-  const c = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", "al-fatihah.json"), "utf8"));
   const by = new Map();
   const add = (p, u) => by.set(p, [...(by.get(p) ?? []), u]);
-  for (const loc of Object.keys(c.words ?? {})) add(`/belajar/id/quran/al-fatihah/${loc.split(":")[1]}`, `word ${loc.split(":")[2]}`);
-  // The primer plays in the lesson that hosts it: lesson zero's ("0"), or its ayah's.
-  if (c.primer) add(c.primer.lesson === "0" ? INTRO_PATH : `/belajar/id/quran/al-fatihah/${c.primer.ayah}`, "primer");
+  for (const slug of COMPOSED_SURAHS) {
+    const c = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", `${slug}.json`), "utf8"));
+    for (const loc of Object.keys(c.words ?? {})) add(`/belajar/id/quran/${slug}/${loc.split(":")[1]}`, `word ${loc.split(":")[2]}`);
+    // The primer plays in the lesson that hosts it: lesson zero's ("0"), or its ayah's.
+    if (c.primer) add(c.primer.lesson === "0" ? INTRO_PATH : `/belajar/id/quran/${slug}/${c.primer.ayah}`, "primer");
+  }
   return by;
 }
 
@@ -473,7 +492,7 @@ async function leaveStep(page, n) {
 }
 async function lessonPages(page, vp, index, composed) {
   const answered = new Set();
-  for (const [urlPath, narrated] of LESSONS) {
+  for (const [urlPath, narrated, example = true] of LESSONS) {
     const served = [];
     const handler = narrationRoute(index, served);
     if (narrated) await page.route(isNarration, handler);
@@ -555,7 +574,7 @@ async function lessonPages(page, vp, index, composed) {
     );
     // Not vacuous: each of these lessons introduces a concept, so it shows an example card; the
     // narrated one (Al-Fatihah 1) also plays the bentuk dasar of its first word.
-    if (steps > 0 && examples === 0)
+    if (example && steps > 0 && examples === 0)
       record({ page: urlPath, viewport: vp, size: "-", kind: "nothing-measured", where: "example", detail: "no example card was on screen at any step", text: "" });
     if (narrated && steps > 0 && baseExample === 0)
       record({ page: urlPath, viewport: vp, size: "-", kind: "nothing-measured", where: "example", detail: "the bentuk dasar's example never showed in word 1's composition", text: "" });

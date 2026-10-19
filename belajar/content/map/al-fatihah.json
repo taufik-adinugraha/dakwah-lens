@@ -184,7 +184,8 @@
    "kinds": [
     "isim",
     "huruf"
-   ]
+   ],
+   "total": []
   },
   {
    "ayah": 2,
@@ -224,7 +225,8 @@
    "kinds": [
     "isim",
     "huruf"
-   ]
+   ],
+   "total": []
   },
   {
    "ayah": 3,
@@ -268,7 +270,8 @@
    ],
    "kinds": [
     "isim"
-   ]
+   ],
+   "total": []
   },
   {
    "ayah": 4,
@@ -320,7 +323,8 @@
    ],
    "kinds": [
     "isim"
-   ]
+   ],
+   "total": []
   },
   {
    "ayah": 5,
@@ -385,7 +389,8 @@
     "isim",
     "fiil",
     "huruf"
-   ]
+   ],
+   "total": []
   },
   {
    "ayah": 6,
@@ -459,7 +464,8 @@
    "kinds": [
     "isim",
     "fiil"
-   ]
+   ],
+   "total": []
   },
   {
    "ayah": 7,
@@ -547,7 +553,8 @@
     "isim",
     "fiil",
     "huruf"
-   ]
+   ],
+   "total": []
   }
  ],
  "kinds": {
@@ -568,5 +575,6 @@
     "latin": "Huruf"
    }
   }
- }
+ },
+ "units": {}
 }

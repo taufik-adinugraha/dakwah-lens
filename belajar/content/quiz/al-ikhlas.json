@@ -9,11 +9,66 @@
   "mabni": "mabni (مَبْنِيّ)"
  },
  "labels": {},
- "kinds": {},
+ "kinds": {
+  "isim": "isim (اِسْم)",
+  "fiil": "fi'il (فِعْل)",
+  "huruf": "huruf (حَرْف)"
+ },
  "ayat": [
   {
    "ayah": 1,
    "exercises": [
+    {
+     "key": "word-kind",
+     "questions": [
+      {
+       "n": 1,
+       "ask": "kind",
+       "word": 1,
+       "part": 1,
+       "of": 1,
+       "ar": "قُلْ",
+       "kind": "fiil",
+       "signs": [],
+       "class": "kata kerja",
+       "why": "Kata pertama, yaitu قُلْ (qul), yang artinya “katakanlah”, adalah fi'il (فِعْل), karena ia kata kerja."
+      },
+      {
+       "n": 2,
+       "ask": "kind",
+       "word": 2,
+       "part": 1,
+       "of": 1,
+       "ar": "هُوَ",
+       "kind": "isim",
+       "signs": [],
+       "class": "kata ganti",
+       "why": "Kata kedua, yaitu هُوَ (huwa), yang artinya “Dialah”, adalah isim (اِسْم), karena ia kata ganti."
+      },
+      {
+       "n": 3,
+       "ask": "kind",
+       "word": 3,
+       "part": 1,
+       "of": 1,
+       "ar": "ٱللَّهُ",
+       "kind": "isim",
+       "signs": [],
+       "why": "Kata ketiga adalah isim (اِسْم)."
+      },
+      {
+       "n": 4,
+       "ask": "kind",
+       "word": 4,
+       "part": 1,
+       "of": 1,
+       "ar": "أَحَدٌ",
+       "kind": "isim",
+       "signs": [],
+       "why": "Kata keempat, yaitu أَحَدٌ (aḥadun), yang artinya “Yang Maha Esa”, adalah isim (اِسْم)."
+      }
+     ]
+    },
     {
      "key": "tap-word",
      "questions": [
@@ -258,6 +313,35 @@
    "ayah": 2,
    "exercises": [
     {
+     "key": "word-kind",
+     "questions": [
+      {
+       "n": 1,
+       "ask": "kind",
+       "word": 1,
+       "part": 1,
+       "of": 1,
+       "ar": "ٱللَّهُ",
+       "kind": "isim",
+       "signs": [],
+       "why": "Kata pertama adalah isim (اِسْم)."
+      },
+      {
+       "n": 2,
+       "ask": "kind",
+       "word": 2,
+       "part": 1,
+       "of": 1,
+       "ar": "ٱلصَّمَدُ",
+       "kind": "isim",
+       "signs": [
+        "al"
+       ],
+       "why": "Kata kedua, yaitu ٱلصَّمَدُ (aṣ-ṣamadu), yang artinya “tempat meminta segala sesuatu”, adalah isim (اِسْم). Tandanya: memakai alif lam."
+      }
+     ]
+    },
+    {
      "key": "tap-word",
      "questions": [
       {
@@ -395,6 +479,71 @@
    "ayah": 3,
    "exercises": [
     {
+     "key": "word-kind",
+     "questions": [
+      {
+       "n": 1,
+       "ask": "kind",
+       "word": 1,
+       "part": 1,
+       "of": 1,
+       "ar": "لَمْ",
+       "kind": "huruf",
+       "signs": [],
+       "class": "kata tugas",
+       "why": "Kata pertama, yaitu لَمْ (lam), yang artinya “tidak”, adalah huruf (حَرْف), karena ia kata tugas."
+      },
+      {
+       "n": 2,
+       "ask": "kind",
+       "word": 2,
+       "part": 1,
+       "of": 1,
+       "ar": "يَلِدْ",
+       "kind": "fiil",
+       "signs": [],
+       "class": "kata kerja",
+       "why": "Kata kedua, yaitu يَلِدْ (yalid), yang artinya “beranak”, adalah fi'il (فِعْل), karena ia kata kerja."
+      },
+      {
+       "n": 3,
+       "ask": "kind",
+       "word": 3,
+       "part": 1,
+       "of": 2,
+       "ar": "وَ",
+       "kind": "huruf",
+       "signs": [],
+       "class": "kata tugas",
+       "why": "Bagian pertama kata ketiga, yaitu وَ (wa), yang artinya “dan”, adalah huruf (حَرْف), karena ia kata tugas."
+      },
+      {
+       "n": 4,
+       "ask": "kind",
+       "word": 3,
+       "part": 2,
+       "of": 2,
+       "ar": "لَمْ",
+       "kind": "huruf",
+       "signs": [],
+       "class": "kata tugas",
+       "why": "Bagian kedua kata ketiga, yaitu لَمْ (lam), yang artinya “tidak”, adalah huruf (حَرْف), karena ia kata tugas."
+      },
+      {
+       "n": 5,
+       "ask": "kind",
+       "word": 4,
+       "part": 1,
+       "of": 1,
+       "ar": "يُولَدْ",
+       "kind": "fiil",
+       "signs": [],
+       "class": "kata kerja",
+       "why": "Kata keempat, yaitu يُولَدْ (yūlad), yang artinya “diperanakkan”, adalah fi'il (فِعْل), karena ia kata kerja."
+      }
+     ]
+    },
+    {
      "key": "tap-word",
      "questions": [
       {
@@ -517,6 +666,96 @@
   {
    "ayah": 4,
    "exercises": [
+    {
+     "key": "word-kind",
+     "questions": [
+      {
+       "n": 1,
+       "ask": "kind",
+       "word": 1,
+       "part": 1,
+       "of": 2,
+       "ar": "وَ",
+       "kind": "huruf",
+       "signs": [],
+       "class": "kata tugas",
+       "why": "Bagian pertama kata pertama, yaitu وَ (wa), yang artinya “dan”, adalah huruf (حَرْف), karena ia kata tugas."
+      },
+      {
+       "n": 2,
+       "ask": "kind",
+       "word": 1,
+       "part": 2,
+       "of": 2,
+       "ar": "لَمْ",
+       "kind": "huruf",
+       "signs": [],
+       "class": "kata tugas",
+       "why": "Bagian kedua kata pertama, yaitu لَمْ (lam), yang artinya “tidak”, adalah huruf (حَرْف), karena ia kata tugas."
+      },
+      {
+       "n": 3,
+       "ask": "kind",
+       "word": 2,
+       "part": 1,
+       "of": 1,
+       "ar": "يَكُن",
+       "kind": "fiil",
+       "signs": [],
+       "class": "kata kerja",
+       "why": "Kata kedua, yaitu يَكُن (yakun), yang artinya “ada”, adalah fi'il (فِعْل), karena ia kata kerja."
+      },
+      {
+       "n": 4,
+       "ask": "kind",
+       "word": 3,
+       "part": 1,
+       "of": 2,
+       "ar": "لَّ",
+       "kind": "huruf",
+       "signs": [],
+       "class": "kata tugas",
+       "why": "Bagian pertama kata ketiga, yaitu لَّ (la), yang artinya “bagi”, adalah huruf (حَرْف), karena ia kata tugas."
+      },
+      {
+       "n": 5,
+       "ask": "kind",
+       "word": 3,
+       "part": 2,
+       "of": 2,
+       "ar": "هُۥ",
+       "kind": "isim",
+       "signs": [
+        "jar"
+       ],
+       "class": "kata ganti",
+       "why": "Bagian kedua kata ketiga, yaitu هُۥ (hū), yang artinya “Dia”, adalah isim (اِسْم), karena ia kata ganti. Tandanya: didahului huruf jar (حَرْف جَرّ)."
+      },
+      {
+       "n": 6,
+       "ask": "kind",
+       "word": 4,
+       "part": 1,
+       "of": 1,
+       "ar": "كُفُوًا",
+       "kind": "isim",
+       "signs": [],
+       "why": "Kata keempat, yaitu كُفُوًا (kufuwan), yang artinya “setara”, adalah isim (اِسْم)."
+      },
+      {
+       "n": 7,
+       "ask": "kind",
+       "word": 5,
+       "part": 1,
+       "of": 1,
+       "ar": "أَحَدٌۢ",
+       "kind": "isim",
+       "signs": [],
+       "class": "nama benda",
+       "why": "Kata kelima, yaitu أَحَدٌۢ (aḥadun), yang artinya “sesuatu”, adalah isim (اِسْم), karena ia nama benda."
+      }
+     ]
+    },
     {
      "key": "tap-word",
      "questions": [

@@ -87,7 +87,8 @@ def check(lessons: dict[str, dict], library: dict, terms: Q.Terms, quizzes: dict
         if Q.dump(content) != Q.dump(fresh.get(sp.slug) or {}):
             errs.append(f"{sp.slug}: content/quiz/{sp.slug}.json is out of date with build_quiz.py (rebuild, do not hand-edit)")
         errs += Q.plan_problems(content, lessons[sp.slug], library, terms, manifests.get(sp.slug), pending,
-                                curriculum=curriculum, mapped=None if mapped is None else sp.slug in mapped)
+                                curriculum=curriculum, mapped=None if mapped is None else sp.slug in mapped,
+                                zero=Q.zero_lines(manifests))
         errs += narration_problems(content, manifests.get(sp.slug))
     return errs
 

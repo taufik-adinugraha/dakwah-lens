@@ -70,7 +70,7 @@ import { availableExercises, questionNumbers, type QuizAyahLike } from "./exerci
 import { LINE_ID_RE, manifestParts, parseLineId, promptLineId, ZERO_AYAH } from "./ids";
 import { curriculumProblems, taughtIn, type CurriculumFile } from "./curriculum";
 import { hostsZero, zeroAyah } from "./zero";
-import { lessonMapInputOf, lessonMapProblems, MAP_GROUPS, MAP_LINES, mapOpening, type LessonMapFile, type LessonMapInput } from "./lessonMap";
+import { lessonMapInputOf, lessonMapProblems, MAP_GROUPS, MAP_LINES, mapClosingLines, mapOpening, type LessonMapFile, type LessonMapInput } from "./lessonMap";
 import {
   createAutoplayState,
   reduceAutoplay,
@@ -309,7 +309,7 @@ export function sequenceProblems(
     // Each step says its lines, one sentence each, in order (MAP_LINES; since 2026-10-15 every
     // counted step is named, so the learnt, later and closing steps have two lines).
     const group = s.kind === "learned" ? (s.id === "learned" ? "learned" : null) : (MAP_GROUPS.find((g) => s.id === `map:${g}`) ?? null);
-    const want = group ? MAP_LINES[group].map((part) => `${seq.slug}:${seq.ayah}:${part}`) : [];
+    const want = group ? (group === "learned" && ctx.map ? mapClosingLines(ctx.map) : MAP_LINES[group]).map((part) => `${seq.slug}:${seq.ayah}:${part}`) : [];
     if (!group || JSON.stringify(s.cues.map((c) => c.line)) !== JSON.stringify(want)) {
       out.push(`${s.id}: a lesson map step is its lines${group ? ` (${want.join(", ")})` : ""}, in order`);
     }
