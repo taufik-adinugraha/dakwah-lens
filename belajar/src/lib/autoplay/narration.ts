@@ -22,6 +22,7 @@ import type {
   NarrationSegment,
   Pronunciation,
   PronunciationTerm,
+  ReminderRef,
 } from "./types";
 
 /** Narration audio is served same-origin by Caddy (plan §7.1), never from
@@ -117,15 +118,24 @@ export function lineDisplay(manifest: NarrationManifest | null | undefined, id: 
 export function lineMarks(
   manifest: NarrationManifest | null | undefined,
   id: string,
-): { highlight: number[] | undefined; focus: string | null | undefined; frame: number | undefined } {
-  if (!manifest) return { highlight: undefined, focus: undefined, frame: undefined };
+): { highlight: number[] | undefined; focus: string | null | undefined; frame: number | undefined; reminder: ReminderRef[] | null } {
+  if (!manifest) return { highlight: undefined, focus: undefined, frame: undefined, reminder: null };
   const ids = manifestParts(manifest, id);
-  if (!ids) return { highlight: undefined, focus: undefined, frame: undefined };
+  if (!ids) return { highlight: undefined, focus: undefined, frame: undefined, reminder: null };
   const all = ids.map((k) => manifest.lines[k]);
   const highlight = all.find((l) => l.highlight !== undefined)?.highlight;
   const focused = all.find((l) => l.focus !== undefined);
   const frame = all.find((l) => l.frame !== undefined)?.frame;
-  return { highlight, focus: focused ? (focused.focus ?? null) : undefined, frame };
+  return { highlight, focus: focused ? (focused.focus ?? null) : undefined, frame, reminder: mergeReminders(all.map((l) => l.reminder)) };
+}
+
+/** The reminder cards of a line's split parts as one: each earlier ayah once (ascending), its
+ *  highlighted words merged; null when no part has one. */
+export function mergeReminders(cards: readonly (readonly ReminderRef[] | undefined)[]): ReminderRef[] | null {
+  const by = new Map<number, Set<number>>();
+  for (const list of cards) for (const c of list ?? []) by.set(c.ayah, new Set([...(by.get(c.ayah) ?? []), ...c.words]));
+  if (!by.size) return null;
+  return [...by.entries()].sort((a, b) => a[0] - b[0]).map(([ayah, ws]) => ({ ayah, words: [...ws].sort((a, b) => a - b) }));
 }
 
 /**
@@ -159,7 +169,7 @@ export function parseNarrationManifest(raw: unknown): { manifest: NarrationManif
       continue;
     }
     const entry: NarrationLine = { text: l.text };
-    const { display, highlight, focus, frame } = l;
+    const { display, highlight, focus, frame, reminder } = l;
     if (display !== undefined) {
       if (typeof display === "string" && display.trim()) entry.display = display;
       else problems.push(`${id}: display must be a non-empty string`);
@@ -177,6 +187,16 @@ export function parseNarrationManifest(raw: unknown): { manifest: NarrationManif
     if (frame !== undefined) {
       if (typeof frame === "number" && Number.isInteger(frame) && frame >= 1) entry.frame = frame;
       else problems.push(`${id}: frame must be a positive integer (the animation frame of a primer / compose line)`);
+    }
+    if (reminder !== undefined) {
+      const positive = (n: unknown) => typeof n === "number" && Number.isInteger(n) && n >= 1;
+      if (
+        Array.isArray(reminder) &&
+        reminder.length > 0 &&
+        reminder.every((c) => !!c && typeof c === "object" && positive((c as ReminderRef).ayah) && Array.isArray((c as ReminderRef).words) && (c as ReminderRef).words.length > 0 && (c as ReminderRef).words.every(positive))
+      ) {
+        entry.reminder = (reminder as ReminderRef[]).map((c) => ({ ayah: c.ayah, words: [...c.words] }));
+      } else problems.push(`${id}: reminder must be a non-empty list of { ayah, words } (an earlier ayah and its words to highlight)`);
     }
     if (l.audio !== undefined) {
       const audio = usableAudio(l.audio);

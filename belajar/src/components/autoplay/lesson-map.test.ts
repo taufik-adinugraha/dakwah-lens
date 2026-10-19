@@ -24,6 +24,8 @@ import {
   MAP_LATER_FULL,
   MAP_LINES,
   mapHere,
+  mapHereSaid,
+  mapKindsSaid,
   mapLaterWhere,
   mapLatinName,
   mapListId,
@@ -36,6 +38,7 @@ import {
   type AutoplayEvent,
   type LessonMapFile,
   type LessonMapInput,
+  type MapKind,
   type NarrationManifest,
 } from "@/lib/autoplay";
 import { loadCheckInput, sequenceProblems } from "@/lib/autoplay/checks";
@@ -98,12 +101,30 @@ const TABLE: Record<number, [string[], string[], string[], string[]]> = {
   ],
 };
 const LEARNT_BEFORE = [2, 4, 7, 9, 10, 13, 16];
+/** The kinds of word each ayah's words are made of (the warm-up's QAC tags; pipeline/lessonmap.py
+ *  kinds_of): ayah 3 and 4 have only isim (operator 2026-10-18). */
+const KINDS: Record<number, MapKind[]> = {
+  1: ["isim", "huruf"],
+  2: ["isim", "huruf"],
+  3: ["isim"],
+  4: ["isim"],
+  5: ["isim", "fiil", "huruf"],
+  6: ["isim", "fiil"],
+  7: ["isim", "fiil", "huruf"],
+};
 const asTable = (file: LessonMapFile) =>
   Object.fromEntries(file.ayat.map((a) => [a.ayah, [a.new, a.learnt.filter((x) => x.here).map((x) => x.id), a.later, a.lanjut]]));
 
 describe("the lesson map file (content/map) and the per-surah switch", () => {
   it("content/map/al-fatihah.json carries the curriculum's lists, each step named and placed as the curriculum has it", () => {
     expect(asTable(FILE)).toEqual(TABLE);
+    expect(Object.fromEntries(FILE.ayat.map((a) => [a.ayah, a.kinds]))).toEqual(KINDS);
+    expect(FILE.kinds).toEqual({
+      step: "kalimah",
+      name: "Tiga jenis kata",
+      latin: "Tiga jenis kata",
+      members: { isim: { name: "Isim (اِسْم)", latin: "Isim" }, fiil: { name: "Fi’il (فِعْل)", latin: "Fi'il" }, huruf: { name: "Huruf (حَرْف)", latin: "Huruf" } },
+    });
     expect(FILE.ayat.map((a) => a.learnt.length)).toEqual(LEARNT_BEFORE);
     expect(lessonMapProblems(FILE, CURRICULUM)).toEqual([]);
     for (const a of FILE.ayat) {
@@ -221,7 +242,7 @@ describe("the lesson map file (content/map) and the per-surah switch", () => {
     expect(fault((f) => delete f.steps.badal)).toContain("badal is listed and has no record in steps");
     expect(fault((f) => (f.steps.kana = { name: "Kana", latin: "Kana", lesson: "112:4" }))).toContain("kana has a record and no ayah lists it");
     expect(fault((f) => delete f.lanjut.ilal)).toContain("next-level record ilal is listed and has no name");
-    expect(fault((f) => f.ayat.push({ ayah: 8, new: [], learnt: [], later: [], lanjut: [] }))).toContain("1:8 is no lesson of the curriculum");
+    expect(fault((f) => f.ayat.push({ ayah: 8, new: [], learnt: [], later: [], lanjut: [], kinds: ["isim"] }))).toContain("1:8 is no lesson of the curriculum");
     expect(fault((f) => (f.version = 1))).toContain("version 1 is not 2");
   });
 });
@@ -299,9 +320,14 @@ describe("the lesson map in the autoplay sequence", () => {
           expect(said("map:new"), where).toContain(String(map.new.length));
           expect(said("map:later"), where).toContain(String(map.lanjut.length));
           expect(said("map:total"), where).toContain(String(mapTotal(map)));
-          for (const [part, items] of [["map:new", map.new], ["map:again", mapHere(map)], ["map:later", map.later], ["map:focus", map.new], ["learned", map.new], ["map:total", [...map.learnt, ...map.new]]] as const) {
+          for (const [part, items] of [["map:new", map.new], ["map:later", map.later], ["map:focus", map.new], ["learned", map.new], ["map:total", [...map.learnt, ...map.new]]] as const) {
             for (const n of named(items)) expect(said(part), `${where} ${part}`).toContain(n);
           }
+          // What comes up again: the three kinds of word as this ayah has them (2026-10-18).
+          for (const n of mapHereSaid(map)) expect(said("map:again"), where).toContain(n);
+          const k = mapKindsSaid(map);
+          expect(!!k, where).toBe(KINDS[a.ayah].length < 3);
+          if (k) expect(said("map:again"), where).toContain(`Of ${k.step}, this ayah has only ${k.kinds.join(" and ")}.`);
           for (const it of map.lanjut) expect(said("map:later") + said("map:focus"), where).not.toContain(mapLatinName(it.name));
         }
         const ctx = { ayah: a, last: a.ayah === 7, exercises: availableExercises(quizAyah("al-fatihah", a.ayah)), introduced: taughtAt(a), compose: composeInput("al-fatihah", a) };
@@ -702,12 +728,23 @@ describe("the lesson map's card: one group at a time", () => {
         ...(rest.length ? [["rest", fill(id.Guided.map_rest, { n: rest.length })]] : []),
       ]);
       const full = here.length <= MAP_HERE_FULL;
+      // The three kinds of word as this ayah has them (operator 2026-10-18: "in that ayat (example
+      // ayat-3) we only have isim, no harf or fi'il"): all three only in ayat 5 and 7.
+      const kinds = KINDS[a.ayah];
+      const kindNames = (latin: boolean) => mapListId(kinds.map((k) => (latin ? mapLatinName(FILE.kinds!.members[k].name) : FILE.kinds!.members[k].name)).map((n) => n[0].toLowerCase() + n.slice(1)));
       for (const it of g.items) {
-        const name = FILE.steps[it.id].name;
+        const partial = it.id === "kalimah" && it.here && kinds.length < 3;
+        const name = partial ? fill(id.Guided.map_kinds_here, { step: FILE.kinds!.name, kinds: kindNames(false) }) : FILE.steps[it.id].name;
+        const latin = partial ? fill(id.Guided.map_kinds_flow, { step: FILE.kinds!.latin, kinds: kindNames(true) }) : mapLatinName(name);
         // Up to three that come up again: one per row, with their Arabic and a mark (never colour
         // alone). More, and the ones that are not in this ayah: their Latin names in a flowing line.
         if (it.here && full) expect([it.text, it.marked], it.id).toEqual([name, true]);
-        else expect(it.text.replace(/,$/, ""), it.id).toBe(mapLatinName(name));
+        else expect(it.text.replace(/,$/, ""), it.id).toBe(latin);
+        if (it.id === "kalimah") {
+          // Never isim, fi'il and huruf where the ayah has fewer of them.
+          if (kinds.length < 3) expect(it.text, `ayah ${a.ayah}`).not.toMatch(/fi’il[\s\S]*huruf|isim[\s\S]*fi’il[\s\S]*huruf/);
+          else expect(it.text, `ayah ${a.ayah}`).toMatch(/isim[\s\S]*fi’il[\s\S]*huruf/);
+        }
       }
       // The names that are NOT in this ayah take no box on a phone (display none below sm), where
       // the line with their count stands for them; the ones that are, are drawn on every screen.

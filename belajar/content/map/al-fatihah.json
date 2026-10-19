@@ -180,6 +180,10 @@
    ],
    "lanjut": [
     "syibhul-jumlah"
+   ],
+   "kinds": [
+    "isim",
+    "huruf"
    ]
   },
   {
@@ -216,6 +220,10 @@
    "lanjut": [
     "syibhul-jumlah",
     "wazan-dan-tashrif"
+   ],
+   "kinds": [
+    "isim",
+    "huruf"
    ]
   },
   {
@@ -257,6 +265,9 @@
    "later": [],
    "lanjut": [
     "wazan-dan-tashrif"
+   ],
+   "kinds": [
+    "isim"
    ]
   },
   {
@@ -306,6 +317,9 @@
    "lanjut": [
     "wazan-dan-tashrif",
     "isim-fail"
+   ],
+   "kinds": [
+    "isim"
    ]
   },
   {
@@ -366,6 +380,11 @@
     "taqdim-maful",
     "bab-istifal",
     "ilal"
+   ],
+   "kinds": [
+    "isim",
+    "fiil",
+    "huruf"
    ]
   },
   {
@@ -436,6 +455,10 @@
     "isim-fail",
     "bab-istifal",
     "ilal"
+   ],
+   "kinds": [
+    "isim",
+    "fiil"
    ]
   },
   {
@@ -519,7 +542,31 @@
     "bab-ifal",
     "isim-maful",
     "naib-fail"
+   ],
+   "kinds": [
+    "isim",
+    "fiil",
+    "huruf"
    ]
   }
- ]
+ ],
+ "kinds": {
+  "step": "kalimah",
+  "name": "Tiga jenis kata",
+  "latin": "Tiga jenis kata",
+  "members": {
+   "isim": {
+    "name": "Isim (اِسْم)",
+    "latin": "Isim"
+   },
+   "fiil": {
+    "name": "Fi’il (فِعْل)",
+    "latin": "Fi'il"
+   },
+   "huruf": {
+    "name": "Huruf (حَرْف)",
+    "latin": "Huruf"
+   }
+  }
+ }
 }

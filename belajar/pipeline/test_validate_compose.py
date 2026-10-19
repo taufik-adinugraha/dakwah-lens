@@ -119,6 +119,18 @@ MUTATIONS = [
     ("a letter op to a letter it may not write", setf(lambda x: x["words"]["1:2:4"]["forms"]["al-alamuna"].__setitem__(
         "src", {"from": "al-alamina", "ops": [{"mark": -3, "to": "dhammah"}, {"letter": -2, "to": "alif"}]})),
      "'to' must name a letter", False),
+    # … and the dotless final ya' (ى) of the Uthmani text written as the ya' a learner knows (2026-10-18:
+    # يَهْدِى → يَهْدِي, the verb ihdi comes from), to ya' only
+    ("the dotless final ya' written as a wawu", setf(lambda x: x["words"]["1:6:1"]["forms"]["yahdi"].__setitem__(
+        "src", {"from": "yahdi-uthmani", "ops": [{"letter": -1, "to": "wawu"}]})), "is not one of the letters", False),
+    # a letter said to be dropped is SEEN with it and without it (operator 2026-10-18: "ihdina, lose
+    # 'ya' but not explained about the original word of ihdi")
+    ("ihdi's ya' said to be dropped with no frame that shows it, as until 2026-10-18", setf(lambda x: (
+        x["words"]["1:6:1"]["frames"][1].update({"stage": "whole"}), x["words"]["1:6:1"]["frames"][1].pop("from"),
+        x["words"]["1:6:1"]["frames"][1].pop("chips"))), "says a letter is dropped or not written, and no frame up to this one", False),
+    ("lillāhi's letters said not to be written over a frame that shows nothing left out", setf(lambda x: (
+        x["words"]["1:2:2"]["frames"][3].update({"stage": "whole"}), x["words"]["1:2:2"]["frames"][3].pop("from"),
+        x["words"]["1:2:2"]["frames"][3].pop("chips"))), "1:2:2 line 5: says a letter is dropped or not written", False),
     ("the jamak's bentuk dasar with its ya' kept", setf(lambda x: x["words"]["1:2:4"]["forms"]["al-alamuna"].__setitem__(
         "src", {"from": "al-alamina", "ops": [{"mark": -3, "to": "dhammah"}]})), "its source gives", False),
     ("a Tanzil token from the wrong place", setf(lambda x: x["words"]["1:1:1"]["forms"]["ismu"].__setitem__(

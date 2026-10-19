@@ -82,7 +82,7 @@
  * so `npx tsx scripts/autoplay-check.ts` can run it without node_modules.
  */
 import type { Pace } from "../lessonSteps";
-import type { MapLaterName } from "./lessonMap";
+import type { MapKindsSaid, MapLaterName } from "./lessonMap";
 
 export type { Pace };
 
@@ -209,10 +209,19 @@ export type NarrationLine = {
   /** A primer / compose line: the animation frame (1-based) on screen while
    *  it plays. */
   frame?: number;
+  /** A line that says a continuation (the structure part's "Ayat ini melanjutkan ayat N.", or a
+   *  structure / word line citing a word of an earlier ayah): the REMINDER CARD the stage shows
+   *  meanwhile, one entry per earlier ayah — its number and the word numbers to highlight there
+   *  (operator 2026-10-18: "better to remind user what that previous ayat looks like";
+   *  pipeline/validate_narration.py reminder_of). */
+  reminder?: ReminderRef[];
   audio?: NarrationAudio;
   /** Word timings of `audio` (only with audio). */
   tokens?: CaptionToken[];
 };
+
+/** An earlier ayah of the surah a reminder card shows, and its words (1-based) to highlight. */
+export type ReminderRef = { ayah: number; words: number[] };
 
 /** content/narration/${slug}.json and content/narration/shared.json. */
 export type NarrationManifest = {
@@ -259,6 +268,9 @@ export type Cue = {
    *  shown while it plays (the manifest's `frame`, else the composition's
    *  own line plan); null otherwise. */
   frame: number | null;
+  /** The reminder card(s) of earlier ayat shown while this line is on (the manifest's
+   *  `reminder`, its split parts merged: one entry per ayah, ascending); null: none. */
+  reminder: ReminderRef[] | null;
   /** The caption cut into ≤180-character parts (senior-ux §3.5): shown one
    *  at a time — by reading time without audio, by audio position with. */
   parts: string[];
@@ -464,16 +476,19 @@ export type AutoplayTexts = {
    *  here and taught later, with this surah's ayah that teaches each (mapLaterWhere), and how many
    *  next-level topics there are (counted, never named); `focus`: the reassurance after it — how
    *  many were put aside of each kind, and the ayah's new steps (or, with none, what it repeats)
-   *  to focus on. */
+   *  to focus on. `kinds` (operator 2026-10-18: "in that ayat (example ayat-3) we only have isim"):
+   *  with a list of the steps MET HERE, when the ayah has fewer than all three kinds of word — the
+   *  step's bare name ("tiga jenis kata", how `again` already names it) and the kinds it has; the
+   *  line then ends "Dari tiga jenis kata itu, di ayat ini hanya ada isim." (lessonMap.ts mapKindsSaid). */
   lessonMap: {
     new: (a: { new: readonly string[] }) => string;
-    again: (a: { again: readonly string[] }) => string;
+    again: (a: { again: readonly string[]; kinds?: MapKindsSaid | null }) => string;
     later: (a: { later: readonly MapLaterName[]; lanjut: number }) => string;
-    focus: (a: { later: number; lanjut: number; new: readonly string[]; again: readonly string[] }) => string;
+    focus: (a: { later: number; lanjut: number; new: readonly string[]; again: readonly string[]; kinds?: MapKindsSaid | null }) => string;
   };
   /** … and its closing: the new steps the ayah taught, by name — or, with nothing new, the learnt
-   *  steps it repeated ([] — nothing). */
-  learned: (a: { new: readonly string[]; again: readonly string[] }) => string;
+   *  steps it repeated ([] — nothing), the kinds of word as the ayah has them (`kinds`, above). */
+  learned: (a: { new: readonly string[]; again: readonly string[]; kinds?: MapKindsSaid | null }) => string;
   /** … and the running total after it, every step learnt by then named in teaching order
    *  (`fresh`: the ayah taught something new — "Dengan itu, …", else "Sampai ayat ini, …"). */
   total: (a: { total: readonly string[]; fresh: boolean }) => string;

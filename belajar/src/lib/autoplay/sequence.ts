@@ -63,7 +63,7 @@ import type { ComposeInput } from "../composition";
 import { latinSentences, splitCaption, stripArabic } from "../lessonSteps";
 import type { ExampleInput } from "./examples";
 import { canonicalExercises, exerciseProgressId } from "./exercises";
-import { MAP_LINES, mapHere, mapLaterNames, mapOpening, mapSaidName, type LessonMapInput, type MapGroup } from "./lessonMap";
+import { MAP_LINES, mapHereSaid, mapKindsSaid, mapLaterNames, mapOpening, mapSaidName, type LessonMapInput, type MapGroup } from "./lessonMap";
 import { explainLineId, lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
 import { lineDisplay, lineMarks, lineSegments, lineText, unmarkNamed, wordRefs } from "./narration";
 import {
@@ -227,6 +227,9 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
       highlight,
       focus,
       frame,
+      // The reminder card of an earlier ayah (operator 2026-10-18), from the manifest only: a line
+      // without narration has no display that cites a word, so no card.
+      reminder: part === null ? null : marks.reminder,
       parts: splitCaption(text),
       guides,
       audio: lineSegments(m, line),
@@ -298,12 +301,15 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
   const map = input.map ?? null;
   const said = (items: readonly { name: string }[]) => items.map((it) => mapSaidName(it.name));
   if (map) {
-    const again = said(mapHere(map));
+    // The steps met again here as a caption names them: the three kinds of word as this ayah has
+    // them (operator 2026-10-18: "in that ayat (example ayat-3) we only have isim").
+    const again = mapHereSaid(map);
+    const kinds = mapKindsSaid(map);
     const captions: Record<(typeof MAP_LINES)[MapGroup][number], string> = {
       "map:new": texts.lessonMap.new({ new: said(map.new) }),
-      "map:again": texts.lessonMap.again({ again }),
+      "map:again": texts.lessonMap.again({ again, kinds }),
       "map:later": texts.lessonMap.later({ later: mapLaterNames(map), lanjut: map.lanjut.length }),
-      "map:focus": texts.lessonMap.focus({ later: map.later.length, lanjut: map.lanjut.length, new: said(map.new), again }),
+      "map:focus": texts.lessonMap.focus({ later: map.later.length, lanjut: map.lanjut.length, new: said(map.new), again, kinds }),
     };
     for (const g of mapOpening(map)) {
       steps.push(step({ id: `map:${g}`, kind: "map", cues: MAP_LINES[g].map((part) => cue(p(part), captions[part])), guides: [] }));
@@ -492,7 +498,7 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
   // the ayah once more.
   if (map) {
     const closing: Record<(typeof MAP_LINES)["learned"][number], string> = {
-      learned: texts.learned({ new: said(map.new), again: said(mapHere(map)) }),
+      learned: texts.learned({ new: said(map.new), again: mapHereSaid(map), kinds: mapKindsSaid(map) }),
       "map:total": texts.total({ total: said([...map.learnt, ...map.new]), fresh: map.new.length > 0 }),
     };
     steps.push(step({ id: "learned", kind: "learned", cues: MAP_LINES.learned.map((part) => cue(p(part), closing[part])), guides: [] }));

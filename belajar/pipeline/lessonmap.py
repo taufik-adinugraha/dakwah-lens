@@ -70,6 +70,22 @@ NAME_WORDS = 4
 GROUPS = ("new", "learnt", "later", "lanjut")
 STEP_KEYS = {"name", "latin", "lesson"}
 RECORD_KEYS = {"name", "latin", "from"}
+ENTRY_KEYS = {"ayah", *GROUPS, "kinds"}
+FILE_KEYS = {"version", "slug", "surah", "steps", "lanjut", "ayat", "kinds"}
+
+# THE KINDS OF WORD MET IN AN AYAH (operator 2026-10-18: "we always say in this ayat we find 3 jenis
+# kata: isim, fi'il, huruf. But actually in that ayat (example ayat-3) we only have isim, no harf or
+# fi'il. Fix this in all lessons."). The step "Tiga jenis kata (isim, fi'il, dan huruf)" occurs in
+# every ayah (`occurs.always`), and a line that says it is MET HERE names the kinds that occur here:
+# each entry carries `kinds`, the kinds of its words' parts, derived the way the warm-up derives
+# them (quiz.part_kinds: the QAC tag of each part as one of quiz.KINDS), and the file a `kinds` table
+# — which step it is (the one whose Konsep record is quiz.KALIMAH_RECORD), its name without its
+# members ("Tiga jenis kata") and each member's name. With all three kinds the step is named whole
+# as before; with fewer, the list names it bare and one more sentence says which:
+# "Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم)." The DEFINITION of the step — what
+# was learnt (map:total), lesson zero's Konsep line — keeps the three: it is no claim about an ayah.
+KINDS_SENTENCE = "Dari {step} itu, di ayat ini hanya ada {kinds}."
+KINDS_KEYS = {"step", "name", "latin", "members"}
 _NAME = re.compile(r"[^\s,.:;()“”«»]+(?: [^\s,.:;()“”«»]+)*")
 _NAME_END = re.compile(r"(?:$|[,.:;]| \()")
 ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -125,6 +141,54 @@ def here_ids(entry: dict) -> list[str]:
 def learnt_total(entry: dict) -> int:
     """How many steps have been learnt once this ayah's lesson is through."""
     return len(entry.get("learnt") or []) + len(entry.get("new") or [])
+
+
+def kinds_of(lesson: dict, ayah: dict) -> list[str]:
+    """The kinds of word the ayah's words are made of, in quiz.KINDS order: each part's QAC tag as
+    one of the three kinds (quiz.part_kinds — the warm-up's own rule, so the two always agree)."""
+    import quiz as Q  # noqa: PLC0415 — quiz imports this module
+    found = {k for w in ayah["words"] for k in Q.part_kinds(w)}
+    return [k for k in Q.KINDS if k in found]
+
+
+def kinds_step(curriculum: dict) -> str | None:
+    """The step whose members are the three kinds of word: the one whose Konsep record is the
+    Kalimah record (quiz.KALIMAH_RECORD), or None."""
+    import quiz as Q  # noqa: PLC0415
+    return next((s["id"] for s in curriculum.get("steps") or [] if s.get("concept") == Q.KALIMAH_RECORD), None)
+
+
+def all_kinds(entry: dict) -> bool:
+    """Does the ayah have words of all three kinds?"""
+    import quiz as Q  # noqa: PLC0415
+    return list(entry.get("kinds") or []) == list(Q.KINDS)
+
+
+def bare_name(latin: str) -> str:
+    """A step's name without the members it lists in brackets: "Tiga jenis kata (isim, fi'il, dan
+    huruf)" → "Tiga jenis kata"."""
+    return re.sub(r"\s*\([^()]*\)$", "", latin.strip())
+
+
+def kinds_partial(content: dict | None, entry: dict) -> bool:
+    """The kinds step comes up again in this ayah, and the ayah has fewer than all three kinds: a
+    line that says it is met here names it bare and says which kinds occur (KINDS_SENTENCE)."""
+    k = (content or {}).get("kinds")
+    return isinstance(k, dict) and k.get("step") in here_ids(entry) and not all_kinds(entry)
+
+
+def here_latin(content: dict, entry: dict, sid: str) -> str:
+    """The prose name a "met here" list gives step `sid` in this ayah: the kinds step bare when the
+    ayah has fewer than all three kinds, every other step (and that one with all three) by its name."""
+    if kinds_partial(content, entry) and sid == content["kinds"]["step"]:
+        return content["kinds"]["latin"]
+    return content["steps"][sid]["latin"]
+
+
+def kind_names(content: dict, entry: dict, field: str = "latin") -> list[str]:
+    """The names (`latin` or caption `name`) of the kinds that occur in this ayah, in order."""
+    members = ((content or {}).get("kinds") or {}).get("members") or {}
+    return [members[k][field] for k in entry.get("kinds") or [] if k in members]
 
 
 def taught_ayah(step: dict, surah: int) -> int | None:
@@ -185,7 +249,7 @@ def build(slug: str, lessons: dict[str, dict], library: dict, curriculum: dict, 
             raise MapError(f"{slug} {a['ayah']}: content/curriculum.json has no lesson {CUR.ayah_lesson(surah, a['ayah'])} "
                            "with its derived lists (run build_curriculum.py)")
         ayat.append({"ayah": a["ayah"], "new": list(entry["new"]), "learnt": [dict(x) for x in entry["learnt"]],
-                     "later": list(entry["later"]), "lanjut": list(entry["lanjut"])})
+                     "later": list(entry["later"]), "lanjut": list(entry["lanjut"]), "kinds": kinds_of(lesson, a)})
     listed = {sid for a in ayat for sid in a["new"] + [x["id"] for x in a["learnt"]] + a["later"]}
     steps = {}
     for s in curriculum.get("steps") or []:
@@ -217,15 +281,35 @@ def build(slug: str, lessons: dict[str, dict], library: dict, curriculum: dict, 
     lost = sorted(set(used) - set(lanjut))
     if lost:
         raise MapError(f"{slug}: {lost} are listed as next-level topics and are no Konsep of the library")
-    return {"version": MAP_VERSION, "slug": slug, "surah": surah, "steps": steps, "lanjut": lanjut, "ayat": ayat}
+    ks = kinds_step(curriculum)
+    kinds = kinds_table(ks, steps[ks], namer) if ks in steps else None
+    return {"version": MAP_VERSION, "slug": slug, "surah": surah, "steps": steps, "lanjut": lanjut, "ayat": ayat,
+            "kinds": kinds}
+
+
+def kinds_table(sid: str, step: dict, namer) -> dict:
+    """The file's `kinds`: the step, its name without its members (as the caption shows it and as
+    prose) and each kind's name, "Isim (اِسْم)" — its term's display in the pronunciation dictionary
+    (the term table gives the kind's Arabic), exactly what its caption shows inside the step's own
+    name."""
+    import quiz as Q  # noqa: PLC0415
+    terms = Q.Terms(Q.load_terms())
+    bare = bare_name(step["latin"])
+    members = {}
+    for k in Q.KINDS:
+        t = namer.lex.by_term.get(terms.by_id[k]["ar"])
+        if t is None:
+            raise MapError(f"the kind {k!r} ({terms.by_id[k]['ar']}) has no term in the pronunciation dictionary")
+        members[k] = {"name": t.display[:1].upper() + t.display[1:], "latin": t.latin[:1].upper() + t.latin[1:]}
+    return {"step": sid, "name": namer.shown(bare), "latin": bare, "members": members}
 
 
 # ------------------------------------------------------------------ checks
 def problems(content, lessons: dict[str, dict], library: dict, curriculum: dict | None) -> list[str]:
     """What a map file says against the lessons, the library and the curriculum
     (content/curriculum.json, itself held to the lessons by validate_curriculum.py)."""
-    if not isinstance(content, dict) or set(content) != {"version", "slug", "surah", "steps", "lanjut", "ayat"}:
-        return ["map: a file is exactly {version, slug, surah, steps, lanjut, ayat}"]
+    if not isinstance(content, dict) or set(content) != FILE_KEYS:
+        return ["map: a file is exactly {version, slug, surah, steps, lanjut, ayat, kinds}"]
     slug = content["slug"]
     w = f"map/{slug}"
     if slug not in SURAH_BY_SLUG or slug not in lessons:
@@ -252,14 +336,21 @@ def problems(content, lessons: dict[str, dict], library: dict, curriculum: dict 
     for entry, a in zip(ayat, lesson["ayat"]):
         n = a["ayah"]
         lid = CUR.ayah_lesson(lesson["surah"], n)
-        ok = set(entry) == {"ayah", *GROUPS} and all(isinstance(entry[g], list) for g in GROUPS) \
-            and all(isinstance(x, str) for g in ("new", "later", "lanjut") for x in entry[g]) \
+        ok = set(entry) == ENTRY_KEYS and all(isinstance(entry[g], list) for g in (*GROUPS, "kinds")) \
+            and all(isinstance(x, str) for g in ("new", "later", "lanjut", "kinds") for x in entry[g]) \
             and all(isinstance(x, dict) and set(x) == {"id", "here"} and isinstance(x["id"], str) and isinstance(x["here"], bool)
                     for x in entry["learnt"])
         if not ok:
-            errs.append(f"{w} ayah {n}: an entry is exactly {{ayah, new, learnt, later, lanjut}}: step ids, the learnt ones "
-                        "each {id, here}, and next-level record ids")
+            errs.append(f"{w} ayah {n}: an entry is exactly {{ayah, new, learnt, later, lanjut, kinds}}: step ids, the learnt "
+                        "ones each {id, here}, next-level record ids, and the kinds of word of its words")
             continue
+        # The kinds of word met here are the ayah's own (quiz.word_parts, the warm-up's rule): a
+        # line that says a kind is met here when no word of the ayah is of it is wrong (operator
+        # 2026-10-18, Al-Fatihah 3: "we only have isim, no harf or fi'il").
+        want_kinds = kinds_of(lesson, a)
+        if entry["kinds"] != want_kinds:
+            errs.append(f"{w} ayah {n}: kinds {entry['kinds']} are not the kinds of its words' parts {want_kinds} "
+                        "(quiz.part_kinds, the QAC tag of each part)")
         learnt = [x["id"] for x in entry["learnt"]]
         every = entry["new"] + learnt + entry["later"]
         listed |= set(every)
@@ -320,6 +411,29 @@ def problems(content, lessons: dict[str, dict], library: dict, curriculum: dict 
         if c["from"] not in ("title", "authored"):
             errs.append(f"{w}: {cid}: from must be \"title\" or \"authored\"")
         errs += _name_problems(w, cid, c)
+    errs += _kinds_problems(w, content, curriculum)
+    return errs
+
+
+def _kinds_problems(w: str, content: dict, curriculum: dict) -> list[str]:
+    """The file's `kinds` table: the kinds step when the map lists it (else null), its bare name,
+    a name for each of the three kinds (quiz.KINDS)."""
+    import quiz as Q  # noqa: PLC0415
+    k, sid = content.get("kinds"), kinds_step(curriculum)
+    if sid not in content["steps"]:
+        return [] if k is None else [f"{w}: kinds is null when no ayah lists the step of the kinds of word"]
+    if not isinstance(k, dict) or set(k) != KINDS_KEYS or k.get("step") != sid:
+        return [f"{w}: kinds must be {{step, name, latin, members}} for the step {sid!r} (the kinds of word)"]
+    errs = []
+    if k["latin"] != bare_name(content["steps"][sid]["latin"]) or not isinstance(k["name"], str) \
+            or not content["steps"][sid]["name"].startswith(k["name"]):
+        errs.append(f"{w}: kinds names the step {k['latin']!r}, not its own name without its members "
+                    f"({bare_name(content['steps'][sid]['latin'])!r})")
+    members = k.get("members")
+    if not isinstance(members, dict) or list(members) != list(Q.KINDS) \
+            or not all(isinstance(m, dict) and set(m) == {"name", "latin"} and all(isinstance(m[x], str) and m[x] for x in m)
+                       for m in members.values()):
+        errs.append(f"{w}: kinds.members must name each of {list(Q.KINDS)}, in that order, as {{name, latin}}")
     return errs
 
 

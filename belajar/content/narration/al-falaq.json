@@ -219,12 +219,20 @@
       "focus": null
     },
     "al-falaq:2:w1": {
-      "text": "Kata pertama, yaitu min, artinya: dari. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama.",
-      "display": "Kata pertama, yaitu مِن (min), artinya: “dari”. Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama.",
+      "text": "Kata pertama, yaitu min, artinya: dari. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama: kejahatan itulah yang darinya orang berlindung.",
+      "display": "Kata pertama, yaitu مِن (min), artinya: “dari”. Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama: kejahatan itulah yang darinya orang berlindung.",
       "highlight": [
         1
       ],
-      "focus": "113:2:1"
+      "focus": "113:2:1",
+      "reminder": [
+        {
+          "ayah": 1,
+          "words": [
+            2
+          ]
+        }
+      ]
     },
     "al-falaq:2:w2": {
       "text": "Kata kedua, yaitu syarri, artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata sesudahnya, kata ketiga.",
@@ -251,12 +259,20 @@
       "focus": "113:2:4"
     },
     "al-falaq:2:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama. Kata pertama dan kedua, yaitu min syarri, yang artinya dari kejahatan, bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama, begitu pula frasa yang artinya dan dari kejahatan di ayat tiga, empat dan lima.",
-      "display": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama. Kata pertama dan kedua, yaitu مِن (min) شَرِّ (syarri), yang artinya “dari kejahatan”, bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama, begitu pula frasa yang artinya “dan dari kejahatan” di ayat tiga, empat dan lima.",
+      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama. Kata pertama dan kedua, yaitu min syarri, yang artinya dari kejahatan, bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama: kejahatan itulah yang darinya orang berlindung. Begitu pula frasa yang artinya dan dari kejahatan di ayat tiga, empat dan lima.",
+      "display": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat pertama. Kata pertama dan kedua, yaitu مِن (min) شَرِّ (syarri), yang artinya “dari kejahatan”, bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama: kejahatan itulah yang darinya orang berlindung. Begitu pula frasa yang artinya “dan dari kejahatan” di ayat tiga, empat dan lima.",
       "highlight": [
         0
       ],
-      "focus": null
+      "focus": null,
+      "reminder": [
+        {
+          "ayah": 1,
+          "words": [
+            2
+          ]
+        }
+      ]
     },
     "al-falaq:2:structure:b": {
       "text": "Kata kedua disandarkan kepada kata ketiga, yaitu ma, yang artinya yang, اِسْم مَوْصُول yang dijelaskan oleh صِلَة kata keempat, yang artinya Dia ciptakan; kata ganti yang kembali kepada kata ketiga dibuang. Sebagian ulama membaca kata ketiga sebagai huruf mashdariyyah, sehingga maknanya ciptaan-Nya.",
@@ -353,8 +369,8 @@
       "focus": null
     },
     "al-falaq:2:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف جَرّ. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama.",
-      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama.",
+      "text": "Perannya: حَرْف جَرّ. Kata ini adalah حَرْف جَرّ, yaitu kata depan, yang artinya dari; kata sesudahnya, kata kedua, menjadi مَجْرُور karenanya, dan frasa kata pertama dan kedua bergantung pada kata a'udzu yang artinya aku berlindung di ayat pertama: kejahatan itulah yang darinya orang berlindung.",
+      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini adalah huruf jar (حَرْف جَرّ), yaitu kata depan, yang artinya “dari”; kata sesudahnya, kata kedua, menjadi majrur (مَجْرُور) karenanya, dan frasa kata pertama dan kedua bergantung pada kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung” di ayat pertama: kejahatan itulah yang darinya orang berlindung.",
       "highlight": [],
       "focus": null
     },
@@ -412,7 +428,22 @@
       "highlight": [
         1
       ],
-      "focus": "113:3:1"
+      "focus": "113:3:1",
+      "reminder": [
+        {
+          "ayah": 1,
+          "words": [
+            2
+          ]
+        },
+        {
+          "ayah": 2,
+          "words": [
+            1,
+            2
+          ]
+        }
+      ]
     },
     "al-falaq:3:w2": {
       "text": "Kata kedua, yaitu syarri, artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata ketiga.",
@@ -452,7 +483,22 @@
       "highlight": [
         0
       ],
-      "focus": null
+      "focus": null,
+      "reminder": [
+        {
+          "ayah": 1,
+          "words": [
+            2
+          ]
+        },
+        {
+          "ayah": 2,
+          "words": [
+            1,
+            2
+          ]
+        }
+      ]
     },
     "al-falaq:3:structure:b": {
       "text": "Kata keempat, yaitu idza, yang artinya apabila, di sini keterangan waktu, zharaf, murni tanpa makna syarat, dan kalimat kata kelima, yang artinya telah gelap gulita, menjadi mudhof ilaih baginya; kata keempat dikaitkan dengan kata kerja tempat frasa ini bergantung, menurut al-Mujtaba dan as-Samin, atau dengan kata kedua menurut al-Jadwal.",
@@ -632,7 +678,15 @@
       "highlight": [
         1
       ],
-      "focus": "113:4:1"
+      "focus": "113:4:1",
+      "reminder": [
+        {
+          "ayah": 1,
+          "words": [
+            2
+          ]
+        }
+      ]
     },
     "al-falaq:4:w2": {
       "text": "Kata kedua, yaitu syarri, artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata ketiga.",
@@ -672,7 +726,15 @@
       "highlight": [
         0
       ],
-      "focus": null
+      "focus": null,
+      "reminder": [
+        {
+          "ayah": 1,
+          "words": [
+            2
+          ]
+        }
+      ]
     },
     "al-falaq:4:structure:b": {
       "text": "Kata kedua disandarkan kepada kata ketiga, yaitu an-naffatsati, yang artinya para peniup, bentuk jamak dari naffasah, yaitu bentuk mubalaghah, yang artinya yang banyak meniup, dari اِسْم فَاعِل. Frasa kata keempat dan kelima, yaitu fi, yang artinya pada buhul-buhul, bergantung pada kata ketiga, Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as.",
@@ -840,7 +902,15 @@
       "highlight": [
         1
       ],
-      "focus": "113:5:1"
+      "focus": "113:5:1",
+      "reminder": [
+        {
+          "ayah": 1,
+          "words": [
+            2
+          ]
+        }
+      ]
     },
     "al-falaq:5:w2": {
       "text": "Kata kedua, yaitu syarri, artinya: kejahatan. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama; kata ini juga disandarkan, mudhaf, kepada kata ketiga.",
@@ -880,7 +950,15 @@
       "highlight": [
         0
       ],
-      "focus": null
+      "focus": null,
+      "reminder": [
+        {
+          "ayah": 1,
+          "words": [
+            2
+          ]
+        }
+      ]
     },
     "al-falaq:5:structure:b": {
       "text": "Darwisy menyebut i'rab-nya jelas: frasa ini disambungkan dengan عَطْف dengan وَاو, kata kedua disandarkan kepada kata ketiga, yaitu hasidin, yang artinya orang yang dengki, lalu kata keempat, yaitu idza, yang artinya apabila, menjadi keterangan waktu dengan kalimat kata kelima, yaitu hasada, yang artinya dia dengki, sebagai mudhof ilaih baginya.",
@@ -896,7 +974,15 @@
       "highlight": [
         0
       ],
-      "focus": null
+      "focus": null,
+      "reminder": [
+        {
+          "ayah": 1,
+          "words": [
+            2
+          ]
+        }
+      ]
     },
     "al-falaq:5:ex:tap-word:intro": {
       "text": "Latihan dengar dan klik. Akan dibacakan lima kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, klik kata yang Anda dengar.",

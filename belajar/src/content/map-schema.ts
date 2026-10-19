@@ -56,9 +56,31 @@ export const LessonMapAyah = z
     later: z.array(Id),
     /** Next-level Konsep records on this ayah: named on the card, never taught at this level. */
     lanjut: z.array(Id),
+    /** The kinds of word its words are made of, in the order isim, fi'il, huruf (the QAC tag of
+     *  each part, as the warm-up derives it): a line that says the three kinds are met here names
+     *  only these (operator 2026-10-18: "in that ayat (example ayat-3) we only have isim"). */
+    kinds: z.array(z.enum(["isim", "fiil", "huruf"])).min(1).max(3),
   })
   .strict();
 export type LessonMapAyah = z.infer<typeof LessonMapAyah>;
+
+/** The step of the three kinds of word, its name without its members and each kind's name. */
+export const LessonMapKinds = z
+  .object({
+    step: Id,
+    /** "Tiga jenis kata": as the caption shows it, and as prose. */
+    name: z.string().min(1),
+    latin: Latin,
+    members: z
+      .object({
+        isim: z.object({ name: z.string().min(1), latin: Latin }).strict(),
+        fiil: z.object({ name: z.string().min(1), latin: Latin }).strict(),
+        huruf: z.object({ name: z.string().min(1), latin: Latin }).strict(),
+      })
+      .strict(),
+  })
+  .strict();
+export type LessonMapKinds = z.infer<typeof LessonMapKinds>;
 
 export const LessonMapFile = z
   .object({
@@ -68,6 +90,8 @@ export const LessonMapFile = z
     steps: z.record(Id, LessonMapStep),
     lanjut: z.record(Id, LessonMapRecord),
     ayat: z.array(LessonMapAyah).min(1),
+    /** null: no ayah lists the step of the three kinds of word. */
+    kinds: LessonMapKinds.nullable(),
   })
   .strict();
 export type LessonMapFile = z.infer<typeof LessonMapFile>;

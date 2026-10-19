@@ -438,7 +438,11 @@
     "map_learned": "Baru saja kita pelajari",
     "map_total": "Sudah {n} hal kita pelajari.",
     "structure_item_label": "Susunan kalimat: kata-kata yang sedang dijelaskan",
-    "structure_item": "Susunan kalimat ({n} dari {total})"
+    "structure_item": "Susunan kalimat ({n} dari {total})",
+    "reminder_label": "Pengingat: ayat yang dilanjutkan ayat ini",
+    "reminder_ayah": "Ayat {n}",
+    "map_kinds_here": "{step}: di ayat ini hanya {kinds}",
+    "map_kinds_flow": "{step} (di ayat ini hanya {kinds})"
   },
   "Compose": {
     "word_n": "Kata ke-{n}",

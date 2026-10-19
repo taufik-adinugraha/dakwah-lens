@@ -155,7 +155,7 @@ MUTATIONS = [
     ("a step that is no step of the curriculum", built(lambda c: entry(c, 1)["later"].append("tidak-ada")),
      "ayah 1: ['tidak-ada'] are no steps of the curriculum"),
     ("a learnt step without its `here`", built(lambda c: entry(c, 2)["learnt"].__setitem__(0, "harakat")),
-     "ayah 2: an entry is exactly {ayah, new, learnt, later, lanjut}"),
+     "ayah 2: an entry is exactly {ayah, new, learnt, later, lanjut, kinds}"),
     ("an ayah without its entry", built(lambda c: c["ayat"].pop()), "ayat must be the lesson's ayat, each once, in order"),
     # --- the names tables
     ("a step placed in another lesson", built(lambda c: c["steps"]["naat"].__setitem__("lesson", "1:1")),
@@ -172,8 +172,21 @@ MUTATIONS = [
      "is longer than 4 words"),
     ("a hand-edited file", built(lambda c: c["lanjut"]["ilal"].__setitem__("latin", "I'lall")), "out of date with build_map.py"),
     ("another format version", built(lambda c: c.__setitem__("version", 1)), "version must be 2"),
-    ("a key the format does not have", built(lambda c: c.__setitem__("note", "x")), "exactly {version, slug, surah, steps, lanjut, ayat}"),
-    ("a file of the format before the curriculum", version_one, "exactly {version, slug, surah, steps, lanjut, ayat}"),
+    ("a key the format does not have", built(lambda c: c.__setitem__("note", "x")), "exactly {version, slug, surah, steps, lanjut, ayat, kinds}"),
+    ("a file of the format before the curriculum", version_one, "exactly {version, slug, surah, steps, lanjut, ayat, kinds}"),
+    # --- the kinds of word an ayah has (operator 2026-10-18: "in that ayat (example ayat-3) we only
+    # have isim, no harf or fi'il")
+    ("ayah 3 said to have all three kinds of word, as its line said until 2026-10-18",
+     built(lambda c: entry(c, 3).__setitem__("kinds", ["isim", "fiil", "huruf"])),
+     "ayah 3: kinds ['isim', 'fiil', 'huruf'] are not the kinds of its words' parts ['isim']"),
+    ("a kind left out (ayah 6 has a fi'il)", built(lambda c: entry(c, 6)["kinds"].remove("fiil")),
+     "ayah 6: kinds ['isim'] are not the kinds of its words' parts ['isim', 'fiil']"),
+    ("an entry without its kinds", built(lambda c: entry(c, 1).pop("kinds")), "ayah 1: an entry is exactly {ayah, new, learnt, later, lanjut, kinds}"),
+    ("the kinds table of another step", built(lambda c: c["kinds"].__setitem__("step", "majrur")),
+     "kinds must be {step, name, latin, members} for the step 'kalimah'"),
+    ("the kinds step named with its members", built(lambda c: c["kinds"].__setitem__("latin", "Tiga jenis kata (isim, fi'il, dan huruf)")),
+     "kinds names the step"),
+    ("a kind without its name", built(lambda c: c["kinds"]["members"].pop("huruf")), "kinds.members must name each of ['isim', 'fiil', 'huruf']"),
     # --- the per-surah switch
     ("a map for a surah that is not switched on", other_surah, "no authored/al-ikhlas.map.json behind it"),
     ("switched on, never built", lambda: run({}), "authored/al-fatihah.map.json has no built file"),

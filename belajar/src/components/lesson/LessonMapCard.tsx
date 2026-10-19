@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import { MixedText } from "@/components/library/MixedText";
-import { MAP_HERE_FULL, MAP_LATER_FULL, mapHere, mapLatinName, mapTotal, type LessonMapInput, type LessonMapItem, type MapGroup } from "@/lib/autoplay";
+import { MAP_HERE_FULL, MAP_LATER_FULL, mapHere, mapKindsPartial, mapLatinName, mapListId, mapLowFirst, mapTotal, type LessonMapInput, type LessonMapItem, type MapGroup } from "@/lib/autoplay";
 
 /** Which card of the lesson map: one group of the opening — what is new, what has been learnt so
  *  far, what comes later (with the next-level topics) — or the closing ("learned"). */
@@ -70,6 +70,14 @@ export function LessonMapCard({ map, group }: { map: LessonMapInput; group: Less
    *  ("di QS 114:1"), nothing for a lesson that is no whole ayah. */
   const where = (it: LessonMapInput["later"][number]) =>
     it.surah === null || it.ayah === null ? undefined : it.surah === map.surah ? t("map_later_ayah", { n: it.ayah }) : t("map_later_surah", { surah: it.surah, ayah: it.ayah });
+  // The steps met again here, the three kinds of word as this ayah has them (operator 2026-10-18:
+  // "in that ayat (example ayat-3) we only have isim, no harf or fi'il"): "Tiga jenis kata: di ayat
+  // ini hanya isim (اِسْم)" on a row, "Tiga jenis kata (di ayat ini hanya isim)" in a flowing line.
+  const partial = mapKindsPartial(map);
+  const kindsRow = partial ? t("map_kinds_here", { step: map.kinds!.name, kinds: mapListId(map.kinds!.here.map((k) => mapLowFirst(k.name))) }) : "";
+  const kindsFlow = partial ? t("map_kinds_flow", { step: map.kinds!.latin, kinds: mapListId(map.kinds!.here.map((k) => mapLowFirst(mapLatinName(k.name)))) }) : "";
+  const hereName = (it: LessonMapItem) => (partial && it.id === map.kinds!.step ? kindsRow : it.name);
+  const hereFlow = (it: LessonMapItem) => (partial && it.id === map.kinds!.step ? kindsFlow : mapLatinName(it.name));
   const here = mapHere(map);
   const rest = map.learnt.filter((x) => !x.here);
   const rows = group === "learnt" ? (here.length > MAP_HERE_FULL ? 0 : here.length) : group === "later" ? (map.later.length > MAP_LATER_FULL ? 0 : map.later.length) : map.new.length;
@@ -98,11 +106,11 @@ export function LessonMapCard({ map, group }: { map: LessonMapInput; group: Less
               {here.length <= MAP_HERE_FULL ? (
                 <List>
                   {here.map((it) => (
-                    <Item key={it.id} item={it} here mark={<RotateCcw aria-hidden className="h-4 w-4 shrink-0 translate-y-[0.15em] text-forest" strokeWidth={2.5} />} />
+                    <Item key={it.id} item={{ ...it, name: hereName(it) }} here mark={<RotateCcw aria-hidden className="h-4 w-4 shrink-0 translate-y-[0.15em] text-forest" strokeWidth={2.5} />} />
                   ))}
                 </List>
               ) : (
-                <Flow items={here.map((it) => ({ id: it.id, text: mapLatinName(it.name) }))} here className="text-lg text-ink" />
+                <Flow items={here.map((it) => ({ id: it.id, text: hereFlow(it) }))} here className="text-lg text-ink" />
               )}
             </>
           ) : (

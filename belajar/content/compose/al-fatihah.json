@@ -1443,6 +1443,18 @@
             "2:61:44"
           ]
         },
+        "li+allahi": {
+          "ar": "لِٱللَّهِ",
+          "translit": "lillāhi",
+          "src": {
+            "join": [
+              "li",
+              "allahi"
+            ]
+          },
+          "gloss": "bagi Allah",
+          "attested": []
+        },
         "lillahi": {
           "ar": "لِلَّهِ",
           "translit": "lillāhi",
@@ -1490,11 +1502,53 @@
           ]
         },
         {
-          "stage": "whole",
+          "stage": "join",
+          "tiles": [
+            "li+allahi"
+          ],
+          "from": [
+            "li",
+            "allahi"
+          ],
+          "note": "alif ditulis, tetapi tidak dibaca",
+          "silent": [
+            1
+          ],
+          "chips": [
+            {
+              "from": "ٱ",
+              "to": "ٱ",
+              "marks": [
+                null,
+                null
+              ],
+              "silent": true
+            }
+          ]
+        },
+        {
+          "stage": "drop",
           "tiles": [
             "lillahi"
           ],
-          "note": "ditulis bersambung, lebih ringkas"
+          "from": "li+allahi",
+          "note": "alif dan satu lam tidak ditulis",
+          "letters": [
+            [
+              "li+allahi",
+              2
+            ]
+          ],
+          "chips": [
+            {
+              "from": "ٱ",
+              "to": ""
+            },
+            {
+              "from": "ل",
+              "to": ""
+            }
+          ]
         }
       ],
       "lines": [
@@ -1512,7 +1566,15 @@
         },
         {
           "frame": 3,
-          "say": "Kedua bagian lalu ditulis bersambung, dan tulisannya menjadi lebih ringkas."
+          "say": "Kedua bagian lalu ditulis bersambung, dan setelah {{1:2:2/li}}, alif di awal nama itu tidak dibaca."
+        },
+        {
+          "frame": 4,
+          "say": "Menurut Ibnu Qutaibah, alif itu juga tidak ditulis sesudah {{1:2:2/li}}."
+        },
+        {
+          "frame": 4,
+          "say": "Lalu ada tiga huruf lam berturut-turut, maka satu di antaranya tidak ditulis, agar tiga huruf lam tidak berkumpul."
         }
       ],
       "sources": [
@@ -1545,6 +1607,16 @@
           "kitab": "Tanzil Quran Text (Uthmani) 1.1",
           "ref": "QS 112:2:1 (lafaz Allah dengan dhammah), QS 1:1:2 (dengan kasrah), QS 1:2:2 (tulisan bersambung setelah huruf lam)",
           "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Ibnu Qutaibah, Adab al-Katib (tahqiq Muhammad ad-Dali, Beirut: Mu'assasat ar-Risalah)",
+          "ref": "hlm. 218: alif al- dibuang dalam tulisan bila lam jar masuk padanya (lil-qaumi, lil-ghulami, lin-nasi), tetapi tetap ditulis sesudah ba'; hlm. 244: kata yang demikian ditulis dengan dua lam dan satu dibuang, karena berat bila tiga lam berkumpul",
+          "url": "https://shamela.ws/book/26349/214"
+        },
+        {
+          "kitab": "Abu al-Baqa' al-'Ukbari, al-Lubab fi 'Ilal al-Bina' wa al-I'rab (tahqiq 'Abd al-Ilah an-Nabhan, Damaskus: Dar al-Fikr)",
+          "ref": "jil. 2, hlm. 490: lam yang masuk pada lam ta'rif yang diikuti lam lagi, seperti lillah, ditulis dengan dua lam agar tiga lam tidak berkumpul",
+          "url": "https://shamela.ws/book/6986/961"
         }
       ],
       "status": "draft"
@@ -2056,6 +2128,14 @@
           "say": "Sebabnya, kata ini na't, yaitu sifat, bagi {{1:2:2/allahi}} di ayat kedua."
         },
         {
+          "frame": 2,
+          "say": "{{1:2:2/allahi}} di ayat kedua, yang disifati kata ini, berakhir kasrah karena didahului huruf jar, yaitu {{1:2:2/li}}."
+        },
+        {
+          "frame": 2,
+          "say": "Sifat selalu mengikuti akhiran kata yang disifatinya, jadi kata ini juga berakhir kasrah."
+        },
+        {
           "frame": 3,
           "say": "Karena ayat ini dimulai dari kata ini, alif di awalnya dibaca."
         }
@@ -2095,6 +2175,16 @@
           "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
           "ref": "jil. 1, hlm. 21 (hamzah washal: tetap di awal bacaan, gugur di tengah sambungan)",
           "url": "https://shamela.ws/book/9057/10"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 1, hlm. 14 (al-I'rab: lillāhi jar dan majrur)",
+          "url": "https://tafsir.app/iraab-aldarweesh/1/2"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+          "ref": "hlm. 23, bab al-Makhfudhat: makhfudh bil-harf dan daftar hurufnya (termasuk lam)",
+          "url": "https://shamela.ws/book/11371/31"
         },
         {
           "kitab": "Rekaman imam pelajaran: Mishary Alafasy, EveryAyah 001003.mp3 (waktu kata quran-align)",
@@ -2407,7 +2497,11 @@
         },
         {
           "frame": 2,
-          "say": "Nama itu juga berakhir kasrah, dan sifat mengikuti akhiran kata yang disifatinya."
+          "say": "{{1:2:2/allahi}} di ayat kedua, yang disifati kata ini, berakhir kasrah karena didahului huruf jar, yaitu {{1:2:2/li}}."
+        },
+        {
+          "frame": 2,
+          "say": "Sifat selalu mengikuti akhiran kata yang disifatinya, jadi kata ini juga berakhir kasrah."
         },
         {
           "frame": 2,
@@ -2434,6 +2528,16 @@
           "kitab": "Quranic Arabic Corpus 0.4",
           "ref": "(1:4:1:1) satu bagian: N ACT PCPL ROOT:mlk GEN (isim, majrur); bentuk dasar berdhammah adalah bentuk ajar, bukan kutipan",
           "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=4"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 1, hlm. 14 (al-I'rab: lillāhi jar dan majrur)",
+          "url": "https://tafsir.app/iraab-aldarweesh/1/2"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+          "ref": "hlm. 23, bab al-Makhfudhat: makhfudh bil-harf dan daftar hurufnya (termasuk lam)",
+          "url": "https://shamela.ws/book/11371/31"
         }
       ],
       "status": "draft"
@@ -3209,6 +3313,75 @@
           "attested": [
             "1:6:1"
           ]
+        },
+        "yahdi-uthmani": {
+          "ar": "يَهْدِى",
+          "translit": "yahdī",
+          "src": {
+            "tanzil": "2:142:16"
+          },
+          "attested": [
+            "2:142:16",
+            "2:213:44",
+            "2:258:41",
+            "2:264:36",
+            "2:272:6"
+          ]
+        },
+        "yahdi": {
+          "ar": "يَهْدِي",
+          "translit": "yahdī",
+          "src": {
+            "from": "yahdi-uthmani",
+            "ops": [
+              {
+                "letter": -1,
+                "to": "ya"
+              }
+            ]
+          },
+          "label": "fi'il",
+          "gloss": "Dia menunjuki",
+          "attested": []
+        },
+        "ya-uthmani": {
+          "ar": "ى",
+          "translit": "ī",
+          "src": {
+            "tanzil": "2:142:16",
+            "pieces": [
+              -1,
+              null
+            ]
+          },
+          "attested": []
+        },
+        "ya": {
+          "ar": "ي",
+          "translit": "ī",
+          "src": {
+            "from": "ya-uthmani",
+            "ops": [
+              {
+                "letter": 0,
+                "to": "ya"
+              }
+            ]
+          },
+          "attested": []
+        },
+        "ihdi+ya": {
+          "ar": "ٱهْدِي",
+          "translit": "ihdī",
+          "src": {
+            "join": [
+              "ihdi",
+              "ya"
+            ]
+          },
+          "label": "fi'il",
+          "gloss": "tunjukilah",
+          "attested": []
         }
       },
       "frames": [
@@ -3217,6 +3390,26 @@
           "tiles": [
             "ihdi",
             "na"
+          ]
+        },
+        {
+          "stage": "drop",
+          "tiles": [
+            "ihdi"
+          ],
+          "from": "ihdi+ya",
+          "note": "huruf ya' di akhir dibuang",
+          "letters": [
+            [
+              "ihdi+ya",
+              -1
+            ]
+          ],
+          "chips": [
+            {
+              "from": "ي",
+              "to": ""
+            }
           ]
         },
         {
@@ -3249,26 +3442,34 @@
         },
         {
           "frame": 2,
-          "say": "Keduanya ditulis bersambung, dan dhamir itu menjadi objeknya: kamilah yang ditunjuki."
+          "say": "Kata kerja ini berasal dari {{1:6:1/yahdi}}, yang artinya “Dia menunjuki”; di akhirnya ada huruf ya'."
         },
         {
           "frame": 2,
+          "say": "Pada kata perintah, huruf ya' itu dibuang, sehingga tertulis {{1:6:1/ihdi}}."
+        },
+        {
+          "frame": 3,
+          "say": "Keduanya ditulis bersambung, dan dhamir itu menjadi objeknya: kamilah yang ditunjuki."
+        },
+        {
+          "frame": 3,
           "say": "Pelakunya tidak tertulis, yaitu “Engkau”."
         },
         {
-          "frame": 3,
+          "frame": 4,
           "say": "Kata kerja perintah akhirnya tetap, tidak berubah karena kata lain."
         },
         {
-          "frame": 3,
+          "frame": 4,
           "say": "Pada kata kerja ini, bentuk tetap itu ditandai dengan dibuangnya huruf terakhirnya, yaitu huruf ya'."
         },
         {
-          "frame": 3,
+          "frame": 4,
           "say": "Karena diucapkan hamba kepada Allah, perintah ini bermakna doa, yaitu permohonan."
         },
         {
-          "frame": 3,
+          "frame": 4,
           "say": "Karena ayat ini dimulai dari kata ini, alif di awalnya dibaca, kali ini dengan bunyi i."
         }
       ],
@@ -3863,6 +4064,10 @@
         },
         {
           "frame": 2,
+          "say": "Kata {{!1:6:2}} yang artinya “jalan” di ayat keenam berakhir fathah, karena menjadi maf'ul bih kedua bagi {{1:6:1}}."
+        },
+        {
+          "frame": 2,
           "say": "Dengan pengganti ini, jalan yang lurus itu dijelaskan: jalan orang-orang yang telah Engkau beri nikmat."
         }
       ],
@@ -3906,6 +4111,16 @@
           "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
           "ref": "hlm. 6, bab Ma'rifat 'Alamat al-I'rab: tanda rafa'",
           "url": "https://shamela.ws/book/11371/3"
+        },
+        {
+          "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+          "ref": "jil. 1, hlm. 5 (QS 1:6: aṣ-ṣirāṭa maf'ul bih kedua)",
+          "url": "https://shamela.ws/book/9617/9"
+        },
+        {
+          "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (catatan 'Abd al-Mun'im Khalil Ibrahim, Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+          "ref": "jil. 1, hlm. 20 (QS 1:6: ihdinā doa dan permohonan, mabni menurut Bashrah, maka ya' dibuang; alifnya alif washl, dibaca kasrah karena dari yahdī; nun dan alif (-nā) maf'ul pertama, aṣ-ṣirāṭa maf'ul kedua)",
+          "url": "https://shamela.ws/book/23587/15"
         }
       ],
       "status": "draft"
@@ -5157,6 +5372,77 @@
             "15:56:8",
             "56:51:4"
           ]
+        },
+        "ad-da": {
+          "ar": "ٱلضَّ",
+          "translit": "aḍ-ḍa",
+          "src": {
+            "word": "1:7:9",
+            "pieces": [
+              0,
+              3
+            ]
+          },
+          "attested": []
+        },
+        "alif": {
+          "ar": "ا",
+          "translit": "ā",
+          "src": {
+            "word": "1:6:1",
+            "pieces": [
+              4,
+              null
+            ]
+          },
+          "attested": []
+        },
+        "li": {
+          "ar": "لِ",
+          "translit": "li",
+          "src": {
+            "word": "1:2:2",
+            "pieces": [
+              0,
+              1
+            ]
+          },
+          "attested": []
+        },
+        "lina": {
+          "ar": "لِينَ",
+          "translit": "līna",
+          "src": {
+            "from": {
+              "word": "1:7:9",
+              "pieces": [
+                4,
+                null
+              ]
+            },
+            "ops": [
+              {
+                "remove": "shaddah",
+                "piece": 0
+              }
+            ]
+          },
+          "attested": []
+        },
+        "ad-dalilina": {
+          "ar": "ٱلضَّالِلِينَ",
+          "translit": "aḍ-ḍālilīna",
+          "src": {
+            "join": [
+              "ad-da",
+              "alif",
+              "li",
+              "lina"
+            ]
+          },
+          "label": "isim",
+          "gloss": "orang-orang yang sesat",
+          "attested": []
         }
       },
       "frames": [
@@ -5240,7 +5526,7 @@
         },
         {
           "frame": 2,
-          "say": "Tanda dobel pada huruf lam di tengahnya muncul karena dua huruf lam dilebur menjadi satu."
+          "say": "Tanda dobel pada huruf lam di tengahnya muncul karena asalnya {{!1:7:9/ad-dalilina}}: dua huruf yang sama berturut-turut, lalu dilebur menjadi satu."
         },
         {
           "frame": 2,
@@ -5519,7 +5805,7 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:68c046c717390f6a79a438c4a24618a9ced29224d91fd3ba0e1952129cd04984",
+    "authored_compose": "authored/al-fatihah.compose.json sha256:3c75655b05d309b8961fdf31e3d13bc0ca229f59dd104e4187c693180efd0742",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }
