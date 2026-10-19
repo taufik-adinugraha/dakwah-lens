@@ -15,7 +15,9 @@
 // `--waris`: only the Ilmu Waris pages, from a container started with
 // BELAJAR_WARIS=on. `--surahs`: the Mu'awwidzat lessons, from a container
 // started with every surah in BELAJAR_SURAHS (the end of Al-Fatihah then
-// offers Al-Ikhlas).
+// offers Al-Ikhlas) — and, since 2026-10-19, Al-Ikhlas's lesson checks
+// (warm-up, lesson map, reminder card, composition fit), which only this
+// container can reach while the live site hides it.
 import { mkdir, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -47,8 +49,13 @@ const AYAH_2 = "/belajar/id/quran/al-fatihah/2";
 // content its lines are the lines of "ayah 0" of Al-Fatihah.
 const INTRO = "/belajar/id/quran/pengantar";
 const ZERO_AYAH = 0;
-/** The page of an Al-Fatihah lesson: an ayah's, or lesson zero's (ayah 0). */
-const lessonPath = (ayah) => (ayah === ZERO_AYAH ? INTRO : `/belajar/id/quran/al-fatihah/${ayah}`);
+/** The page of an Al-Fatihah lesson (or of `slug`'s): an ayah's, or lesson zero's (ayah 0). */
+const lessonPath = (ayah, slug = "al-fatihah") => (ayah === ZERO_AYAH ? INTRO : `/belajar/id/quran/${slug}/${ayah}`);
+/** A surah's name as the checks' messages give it ("al-ikhlas" → "Al-Ikhlas"). */
+const surahTitle = (slug) => slug.replace(/(^|-)([a-z])/g, (_, dash, c) => dash + c.toUpperCase());
+/** An ayah in a shot's name: Al-Fatihah's as before ("ayah3"), another surah's with its slug
+ *  ("al-ikhlas-4"), so the `--surahs` pass (Al-Ikhlas, 2026-10-19) never takes Al-Fatihah's names. */
+const ayahTag = (slug, ayah) => (slug === "al-fatihah" ? `ayah${ayah}` : `${slug}-${ayah}`);
 // The basic curriculum's page (plan L30; src/lib/routes.ts curriculumHref).
 const CURRICULUM = "/belajar/id/quran/kurikulum";
 // The cheat sheet "Rumus singkat" (plan L32; src/lib/routes.ts rumusHref).
@@ -2846,9 +2853,10 @@ async function setTextSize(page, size) {
   await page.evaluate(() => document.fonts.ready);
 }
 
-/** Al-Fatihah's composed units per ayah (the primer and each composed word), from the content. */
-async function composedUnits() {
-  const c = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", "al-fatihah.json"), "utf8"));
+/** A surah's composed units per ayah (the primer and each composed word), from the content:
+ *  Al-Fatihah's, or `slug`'s (Al-Ikhlas since 2026-10-19: no primer, every word composed). */
+async function composedUnits(slug = "al-fatihah") {
+  const c = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", `${slug}.json`), "utf8"));
   const by = new Map();
   for (const loc of Object.keys(c.words)) {
     const ayah = Number(loc.split(":")[1]);
@@ -2861,21 +2869,23 @@ async function composedUnits() {
 }
 
 /**
- * Every composition of the given Al-Fatihah ayat at one text size: "Berikutnya ›" step by step
+ * Every composition of the given ayat of Al-Fatihah (or of `slug`: Al-Ikhlas in the `--surahs`
+ * pass) at one text size: "Berikutnya ›" step by step
  * through each lesson until every composed unit has shown, each checked with composeFit — which
  * covers all of a unit's frames at once, since they are all laid out in its figure. At the largest
- * size on a phone it also shoots word 1 of ayah 1 on its change frame (caption-only lines advance
- * by reading time). Fails the job on any clipped frame or a unit that never showed.
+ * size on a phone it also shoots word 1 of Al-Fatihah 1 on its change frame (caption-only lines
+ * advance by reading time). Fails the job on any clipped frame or a unit that never showed.
  */
-async function composeFitSweep(page, vp, size, ayat, units) {
+async function composeFitSweep(page, vp, size, ayat, units, slug = "al-fatihah") {
   let checked = 0;
-  await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+  const at = (ayah) => (slug === "al-fatihah" ? `ayah ${ayah}` : `${surahTitle(slug)} ${ayah}`);
+  await page.goto(BASE + lessonPath(1, slug), { waitUntil: "networkidle" });
   await setTextSize(page, size);
   try {
     for (const ayah of ayat) {
       const want = new Set(units.get(ayah) ?? []);
       if (!want.size) continue;
-      await page.goto(BASE + lessonPath(ayah), { waitUntil: "networkidle" });
+      await page.goto(BASE + lessonPath(ayah, slug), { waitUntil: "networkidle" });
       await page.evaluate(() => document.fonts.ready);
       await page.locator('[data-autoplay="start"]').click();
       await settleScroll(page);
@@ -2885,13 +2895,13 @@ async function composeFitSweep(page, vp, size, ayat, units) {
         const fit = await composeFit(page);
         if (fit) {
           if (fit.problems.length) {
-            await page.screenshot({ path: `shots/${vp}-compose-fit-${size}-FAILED.png`, fullPage: true }).catch(() => {});
-            throw new Error(`${vp}, text size ${size}, ayah ${ayah}: composition ${fit.unit} clipped — ${fit.problems.join("; ")}`);
+            await page.screenshot({ path: `shots/${vp}-compose-fit-${size}${slug === "al-fatihah" ? "" : `-${slug}`}-FAILED.png`, fullPage: true }).catch(() => {});
+            throw new Error(`${vp}, text size ${size}, ${at(ayah)}: composition ${fit.unit} clipped — ${fit.problems.join("; ")}`);
           }
           if (!seen.has(fit.unit)) {
             seen.add(fit.unit);
             checked++;
-            if (vp === "phone" && size === "sangat-besar" && ayah === 1 && fit.unit === "word 1") {
+            if (slug === "al-fatihah" && vp === "phone" && size === "sangat-besar" && ayah === 1 && fit.unit === "word 1") {
               // ↺ plays the step from its start even if the imam's stream paused the lesson.
               await page.locator('[data-autoplay="replay"]').click();
               const change = page.locator('[data-autoplay="composition"][data-compose-stage="change"]');
@@ -2911,12 +2921,12 @@ async function composeFitSweep(page, vp, size, ayat, units) {
         await page.waitForTimeout(300);
       }
       const missing = [...want].filter((u) => !seen.has(u));
-      if (missing.length) throw new Error(`${vp}, text size ${size}, ayah ${ayah}: never showed ${missing.join(", ")}`);
+      if (missing.length) throw new Error(`${vp}, text size ${size}, ${at(ayah)}: never showed ${missing.join(", ")}`);
     }
   } finally {
     await setTextSize(page, "normal").catch(() => {});
   }
-  console.log(`  composition fits: ${checked} unit(s), every frame, ${vp}, text size ${size}, ayat ${ayat.join(",")}`);
+  console.log(`  composition fits: ${checked} unit(s), every frame, ${vp}, text size ${size}, ${slug === "al-fatihah" ? "" : `${surahTitle(slug)} `}ayat ${ayat.join(",")}`);
   await page.goto("about:blank");
 }
 
@@ -3575,15 +3585,20 @@ async function quizVoiceCheck(page, vp, index) {
  *      pieces, the one asked in the frame, in the ayah's reading order;
  *   5. "Lewati latihan" leaves it for the first word.
  * Shot at question 1 (and the viewport on the phone). Fails the job otherwise.
+ * The `--surahs` pass runs the same check on Al-Ikhlas 3 (2026-10-19; { slug, ayah }): لَمْ, a word
+ * of one part, opens it, and وَلَمْ is a word of two; read from content/quiz/al-ikhlas.json.
  */
-async function wordKindChecks(page, vp, index) {
+async function wordKindChecks(page, vp, index, { slug = "al-fatihah", ayah = 2 } = {}) {
   const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
-  const quiz = await read("content/quiz/al-fatihah.json");
-  const warm = quiz.ayat.find((a) => a.ayah === 2).exercises.find((e) => e.key === "word-kind");
-  if (!warm) throw new Error("content/quiz/al-fatihah.json: ayah 2 has no warm-up (word-kind)");
+  const where = `${surahTitle(slug)} ${ayah}`;
+  /** Al-Fatihah's shots keep their names; another surah's carry it ("-al-ikhlas-3"). */
+  const tag = slug === "al-fatihah" ? "" : `-${slug}-${ayah}`;
+  const quiz = await read(`content/quiz/${slug}.json`);
+  const warm = quiz.ayat.find((a) => a.ayah === ayah)?.exercises.find((e) => e.key === "word-kind");
+  if (!warm) throw new Error(`content/quiz/${slug}.json: ayah ${ayah} has no warm-up (word-kind)`);
   const [q1] = warm.questions;
   const part = warm.questions.find((q) => q.of > 1);
-  if (!part || q1.of !== 1) throw new Error("the warm-up of Al-Fatihah 2 no longer opens with a word of one part and has a word of two: pick another ayah for this check");
+  if (!part || q1.of !== 1) throw new Error(`the warm-up of ${where} no longer opens with a word of one part and has a word of two: pick another ayah for this check`);
   const served = [];
   const handler = narrationRoute(index, served);
   await page.route(isNarration, handler);
@@ -3596,9 +3611,9 @@ async function wordKindChecks(page, vp, index) {
   const pieces = () =>
     exercise.locator("[data-kind-piece]").evaluateAll((els) => els.map((e) => ({ part: Number(e.getAttribute("data-kind-piece")), asked: e.getAttribute("data-asked") === "true", ar: e.textContent ?? "", x: e.getBoundingClientRect().left })));
   try {
-    await page.goto(BASE + AYAH_2, { waitUntil: "networkidle" });
+    await page.goto(BASE + lessonPath(ayah, slug), { waitUntil: "networkidle" });
     // The earlier checks left a remembered place on this ayah ("Lanjutkan dari langkah N").
-    await page.evaluate((key) => localStorage.removeItem(key), "belajar:v1:autoplay:al-fatihah/2");
+    await page.evaluate((key) => localStorage.removeItem(key), `belajar:v1:autoplay:${slug}/${ayah}`);
     await page.reload({ waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
     await page.locator('[data-autoplay="start"]').click();
@@ -3613,7 +3628,7 @@ async function wordKindChecks(page, vp, index) {
       await page.waitForTimeout(250);
     }
     await exercise.waitFor({ state: "visible", timeout: 10_000 }).catch(() => {
-      throw new Error(`${vp}: the warm-up never came up from the start of Al-Fatihah 2 (passed: ${passed.join(" → ")})`);
+      throw new Error(`${vp}: the warm-up never came up from the start of ${where} (passed: ${passed.join(" → ")})`);
     });
     if ((await stage.getAttribute("data-step")) !== "ex:word-kind") throw new Error(`${vp}: the warm-up is on the step "${await stage.getAttribute("data-step")}", not "ex:word-kind"`);
     if (passed.some((s) => /^w\d/.test(s))) throw new Error(`${vp}: the warm-up came after a word's step (passed: ${passed.join(" → ")}); it opens the lesson`);
@@ -3629,9 +3644,9 @@ async function wordKindChecks(page, vp, index) {
       const ar = /\(([^()]+)\)/.exec(quiz.kinds[kind])?.[1];
       if (!ar || !text.includes(ar)) throw new Error(`${vp}: the answer "${kind}" does not show its Arabic term (${quiz.kinds[kind]}): “${text}”`);
     }
-    await stage.screenshot({ path: `shots/${vp}-warm-up.png` });
-    console.log(`shot ${vp}-warm-up`);
-    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-warm-up-viewport.png` });
+    await stage.screenshot({ path: `shots/${vp}-warm-up${tag}.png` });
+    console.log(`shot ${vp}-warm-up${tag}`);
+    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-warm-up${tag}-viewport.png` });
     // The exercise waits once its introduction and its options prompt are through (caption-only
     // until they are rendered: read at reading pace): answer then, as quizVoiceCheck does.
     const caption = page.locator('[data-autoplay="caption"]');
@@ -3660,8 +3675,8 @@ async function wordKindChecks(page, vp, index) {
         if (JSON.stringify(both.map((p) => [p.part, p.asked, p.ar])) !== JSON.stringify(want)) throw new Error(`${vp}: question ${q.n} shows ${JSON.stringify(both)}, expected the pieces ${JSON.stringify(want)}`);
         // The ayah's reading order: the first part to the RIGHT of the second.
         if (!(both[0].x > both[1].x)) throw new Error(`${vp}: the parts of word ${q.word} are not drawn right to left (${both.map((p) => Math.round(p.x)).join(", ")})`);
-        await stage.screenshot({ path: `shots/${vp}-warm-up-part.png` });
-        console.log(`shot ${vp}-warm-up-part`);
+        await stage.screenshot({ path: `shots/${vp}-warm-up${tag}-part.png` });
+        console.log(`shot ${vp}-warm-up${tag}-part`);
         break;
       }
       await option(q.kind).click();
@@ -3671,10 +3686,10 @@ async function wordKindChecks(page, vp, index) {
     if (!(await until(page, async () => /^w1(?::|$)/.test((await stage.getAttribute("data-step")) ?? ""), 8_000))) {
       throw new Error(`${vp}: "Lewati latihan" on the warm-up led to "${await stage.getAttribute("data-step")}", not to the first word`);
     }
-    console.log(`  warm-up: first exercise of Al-Fatihah 2 (${warm.questions.length} questions), before its first word; passed ${passed.join(" → ")}`);
+    console.log(`  warm-up: first exercise of ${where} (${warm.questions.length} questions), before its first word; passed ${passed.join(" → ")}`);
   } catch (err) {
-    await page.screenshot({ path: `shots/${vp}-warm-up-FAILED.png`, fullPage: true }).catch(() => {});
-    console.error(`✗ ${vp}: the warm-up check on Al-Fatihah 2 failed`);
+    await page.screenshot({ path: `shots/${vp}-warm-up${tag}-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the warm-up check on ${where} failed`);
     console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
     throw err;
   } finally {
@@ -3731,6 +3746,9 @@ async function wordKindChecks(page, vp, index) {
  * warning on the run's summary gives the numbers — look at the viewport shots.
  * Works rendered or not: a map line without audio yet is shown at reading pace (caption-only).
  * Shots: each card (stage; on a phone also the viewport). Fails the job on 1–4.
+ * The `--surahs` pass runs the same walk on every ayah of Al-Ikhlas (2026-10-19; { slug, ayat }),
+ * read from content/map/al-ikhlas.json: the card's total is the same count, and the spoken total
+ * the narrator gives unit by unit ("map:total:<k>", lessonMap.ts mapClosingLines) follows the card.
  */
 /** = src/lib/autoplay/lessonMap.ts MAP_HERE_FULL, MAP_LATER_FULL and MAP_ARABIC_GLOSS, the pattern
  *  of mapLatinName (lesson-map.test.ts checks they agree). */
@@ -3746,29 +3764,42 @@ const MAP_ARABIC_GLOSS = / \([^()]*[\u0600-\u06FF][^()]*\)/g;
  * translation, nothing sticking out sideways. Whether it is wholly above the bottom panel is MEASURED
  * and reported (a warning), not failed: the card is new and its phone height has not been measured.
  * Works rendered or not. Shots: the stage, and on a phone the viewport.
+ * The `--surahs` pass runs it on Al-Ikhlas 4 (2026-10-19; { slug, ayah, step }): its one step
+ * "structure", a line split into parts, opens "Ayat ini melanjutkan ayat ketiga" — the card of
+ * ayah 3, the parts' cards merged as the app merges them.
  */
-async function reminderChecks(page, vp, index) {
-  const lesson = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "al-fatihah.json"), "utf8"));
-  const lines = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "narration", "al-fatihah.json"), "utf8")).lines ?? {};
-  const want = lines["al-fatihah:3:structure:1"]?.reminder;
+async function reminderChecks(page, vp, index, { slug = "al-fatihah", ayah = 3, step = "structure:1" } = {}) {
+  const lesson = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", `${slug}.json`), "utf8"));
+  const lines = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "narration", `${slug}.json`), "utf8")).lines ?? {};
+  // The step's line: whole, or its split parts "<id>:a", "<id>:b", … (narratedLine), their cards
+  // merged as src/lib/autoplay/narration.ts mergeReminders merges them (each earlier ayah once).
+  const id = `${slug}:${ayah}:${step}`;
+  const split = [];
+  for (let c = 97; c <= 122 && Object.hasOwn(lines, `${id}:${String.fromCharCode(c)}`); c++) split.push(lines[`${id}:${String.fromCharCode(c)}`]);
+  const parts = Object.hasOwn(lines, id) ? [lines[id]] : split;
+  const by = new Map();
+  for (const r of parts.flatMap((l) => l.reminder ?? [])) by.set(r.ayah, [...new Set([...(by.get(r.ayah) ?? []), ...r.words])].sort((a, b) => a - b));
+  const want = [...by].sort((a, b) => a[0] - b[0]).map(([n, words]) => ({ ayah: n, words }));
+  const where = `${surahTitle(slug)} ${ayah}`;
+  const tag = ayahTag(slug, ayah);
   const fail = (m) => {
     throw new Error(`${vp}: reminder card — ${m}`);
   };
-  if (!want?.length) fail("content/narration/al-fatihah.json: al-fatihah:3:structure:1 carries no reminder");
+  if (!want.length) fail(`content/narration/${slug}.json: ${id} carries no reminder`);
   const served = [];
   const handler = narrationRoute(index, served);
   await page.route(isNarration, handler);
   try {
-    await page.goto(BASE + "/belajar/id/quran/al-fatihah/3", { waitUntil: "networkidle" });
-    await page.evaluate((key) => localStorage.removeItem(key), "belajar:v1:autoplay:al-fatihah/3");
+    await page.goto(BASE + lessonPath(ayah, slug), { waitUntil: "networkidle" });
+    await page.evaluate((key) => localStorage.removeItem(key), `belajar:v1:autoplay:${slug}/${ayah}`);
     await page.reload({ waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
     await page.locator('[data-autoplay="start"]').click();
     await settleScroll(page);
-    await toStep(page, vp, "structure:1");
+    await toStep(page, vp, step);
     await page.locator('[data-autoplay="replay"]').click();
     const card = page.locator('[data-autoplay="reminder"]');
-    await card.first().waitFor({ state: "visible", timeout: 10_000 }).catch(() => fail('on "structure:1" of Al-Fatihah 3 no reminder card shows'));
+    await card.first().waitFor({ state: "visible", timeout: 10_000 }).catch(() => fail(`on "${step}" of ${where} no reminder card shows`));
     const middle = page.locator('[data-autoplay="middle"]');
     if ((await middle.getAttribute("data-mode").catch(() => null)) === "pause") await middle.click();
     await page.waitForTimeout(500);
@@ -3788,22 +3819,23 @@ async function reminderChecks(page, vp, index) {
     if (got.sideways || got.box.left < -1 || got.box.right > got.width + 1) fail(`the card ${fmt(got.box)} sticks out sideways at ${got.width}px`);
     const panel = await page.locator('[data-autoplay="panel"]').first().boundingBox();
     const inView = !!panel && got.box.top >= 0 && got.box.bottom <= panel.y + 1;
-    console.log(`  reminder card: ayah ${got.ayat}, ${got.words.length} words, ${fmt(got.box)} (${Math.round(got.box.bottom - got.box.top)}px) · panel top ${panel ? Math.round(panel.y) : "—"}${inView ? "" : " — NOT wholly in view"}`);
-    if (!inView) console.log(`::warning title=Belajar reminder card not wholly in view::${vp}: the card is at ${fmt(got.box)}, the bottom panel's top at ${panel ? Math.round(panel.y) : "—"} (viewport ${page.viewportSize().height} high). See shots/${vp}-autoplay-ayah3-reminder${vp === "phone" ? "-viewport" : ""}.png`);
-    await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-autoplay-ayah3-reminder.png` });
-    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-autoplay-ayah3-reminder-viewport.png` });
-    console.log(`shot ${vp}-autoplay-ayah3-reminder`);
+    console.log(`  reminder card (${where}, "${step}"): ayah ${got.ayat}, ${got.words.length} words, ${fmt(got.box)} (${Math.round(got.box.bottom - got.box.top)}px) · panel top ${panel ? Math.round(panel.y) : "—"}${inView ? "" : " — NOT wholly in view"}`);
+    if (!inView) console.log(`::warning title=Belajar reminder card not wholly in view::${vp}: ${where}: the card is at ${fmt(got.box)}, the bottom panel's top at ${panel ? Math.round(panel.y) : "—"} (viewport ${page.viewportSize().height} high). See shots/${vp}-autoplay-${tag}-reminder${vp === "phone" ? "-viewport" : ""}.png`);
+    await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-autoplay-${tag}-reminder.png` });
+    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-autoplay-${tag}-reminder-viewport.png` });
+    console.log(`shot ${vp}-autoplay-${tag}-reminder`);
   } finally {
     await page.unroute(isNarration, handler);
     await page.goto("about:blank");
   }
 }
 
-async function lessonMapChecks(page, vp, index) {
+async function lessonMapChecks(page, vp, index, { slug = "al-fatihah", ayat = [1, 2] } = {}) {
   const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
   const msgs = (await read("messages/id.json")).Guided;
-  const map = await read("content/map/al-fatihah.json");
-  const lines = (await read("content/narration/al-fatihah.json")).lines ?? {};
+  const map = await read(`content/map/${slug}.json`);
+  const lines = (await read(`content/narration/${slug}.json`)).lines ?? {};
+  const title = surahTitle(slug);
   const served = [];
   const handler = narrationRoute(index, served);
   await page.route(isNarration, handler);
@@ -3817,7 +3849,7 @@ async function lessonMapChecks(page, vp, index) {
   };
   const fill = (message, values) => Object.entries(values).reduce((text, [k, v]) => text.replace(`{${k}}`, String(v)), message);
   /** A step's name as the captions show it (the file's), and as a flowing line lists it. */
-  const nameOf = (id) => map.steps[id]?.name ?? fail(`content/map/al-fatihah.json lists the step "${id}" and does not name it`);
+  const nameOf = (id) => map.steps[id]?.name ?? fail(`content/map/${slug}.json lists the step "${id}" and does not name it`);
   const latin = (id) => nameOf(id).replace(MAP_ARABIC_GLOSS, "");
   /** Where a postponed step is taught, as the card says it ("di ayat 3"; with its surah when that
    *  is another one); nothing for a lesson that is no whole ayah. */
@@ -3899,7 +3931,7 @@ async function lessonMapChecks(page, vp, index) {
                     drawn: !narrow,
                     items: entry.lanjut.map((id) => ({
                       id,
-                      text: map.lanjut[id]?.name ?? fail(`content/map/al-fatihah.json lists the next-level topic "${id}" and does not name it`),
+                      text: map.lanjut[id]?.name ?? fail(`content/map/${slug}.json lists the next-level topic "${id}" and does not name it`),
                       here: null,
                       where: null,
                       mark: false,
@@ -3975,16 +4007,16 @@ async function lessonMapChecks(page, vp, index) {
    *  "learned" on the step of that name. */
   const check = async (ayah, entry, kind) => {
     const step = kind === "learned" ? kind : `map:${kind}`;
-    const what = `Al-Fatihah ${ayah}, ${kind === "learned" ? "the closing" : `the opening's “${kind}”`}`;
+    const what = `${title} ${ayah}, ${kind === "learned" ? "the closing" : `the opening's “${kind}”`}`;
     const card = stage.locator(`[data-autoplay="lesson-map"][data-map="${kind}"]`);
     await card.first().waitFor({ state: "visible", timeout: 5_000 }).catch(() => fail(`${what}: on the step "${step}" no card shows`));
     if ((await anyCard.count()) !== 1) fail(`${what}: ${await anyCard.count()} lesson-map cards on the stage (one group at a time: one card)`);
     // The step's first line, played from its start: the caption is that line, and says what the manifest
     // shows. The step "map:learnt" opens with "map:again" since 2026-10-17 (the operator removed its
     // learnt-so-far line, "Sebelum ayat ini, kita sudah mempelajari …"; lessonMap.ts MAP_LINES).
-    const id = `al-fatihah:${ayah}:${kind === "learnt" ? "map:again" : step}`;
+    const id = `${slug}:${ayah}:${kind === "learnt" ? "map:again" : step}`;
     const line = lines[id];
-    if (!line?.display) fail(`${what}: content/narration/al-fatihah.json has no line ${id}`);
+    if (!line?.display) fail(`${what}: content/narration/${slug}.json has no line ${id}`);
     await replay.click();
     const caption = page.locator(`[data-autoplay="caption"][data-line="${id}"]`);
     await caption.first().waitFor({ state: "attached", timeout: 10_000 }).catch(() => fail(`${what}: "↺ Ulangi" did not put the line ${id} on the caption`));
@@ -4000,7 +4032,7 @@ async function lessonMapChecks(page, vp, index) {
     const narrow = got.width < 640;
     const want = expected(entry, kind, narrow);
     if (shape(got.groups) !== shape(want)) {
-      fail(`${what}: at ${got.width}px the card shows ${shape(got.groups)}, expected ${shape(want)} (content/map/al-fatihah.json, messages/id.json)`);
+      fail(`${what}: at ${got.width}px the card shows ${shape(got.groups)}, expected ${shape(want)} (content/map/${slug}.json, messages/id.json)`);
     }
     // 4. Nothing hidden in a 1px box; a count in one piece on its heading's row.
     if (got.hiddenText.length) fail(`${what}: text in a visually hidden box (it must take no box at all): ${got.hiddenText.map((t) => `“${t}”`).join(", ")}`);
@@ -4017,7 +4049,7 @@ async function lessonMapChecks(page, vp, index) {
     const inView = !!panelBox && got.box.top >= 0 && got.box.bottom <= panelBox.top + 1;
     const drawn = got.groups.flatMap((g) => g.lists.filter((l) => l.drawn));
     const n = drawn.reduce((sum, l) => sum + l.items.length, 0);
-    const shot = `${vp}-autoplay-ayah${ayah}-${step.replace(":", "-")}`;
+    const shot = `${vp}-autoplay-${ayahTag(slug, ayah)}-${step.replace(":", "-")}`;
     console.log(
       `  lesson map ${ayah} ${step}: ${got.groups.map((g) => `${g.heading}${g.count ? ` ${g.count}` : ""} [${g.lists.map((l) => `${l.items.length} ${l.kind}${l.drawn ? "" : ", no box"}`).join("; ")}]`).join(" · ")}; ` +
         `card ${fmt(got.box)} (${Math.round(got.box.bottom - got.box.top)}px) · panel ${panelBox ? fmt(panelBox) : "—"}${inView ? "" : " — NOT wholly in view"}`,
@@ -4033,12 +4065,12 @@ async function lessonMapChecks(page, vp, index) {
     if (vp === "phone") await page.screenshot({ path: `shots/${shot}-viewport.png` });
   };
   try {
-    for (const ayah of [1, 2]) {
+    for (const ayah of ayat) {
       const entry = map.ayat.find((a) => a.ayah === ayah);
-      if (!entry) fail(`content/map/al-fatihah.json has no ayah ${ayah}`);
-      await page.goto(BASE + `/belajar/id/quran/al-fatihah/${ayah}`, { waitUntil: "networkidle" });
+      if (!entry) fail(`content/map/${slug}.json has no ayah ${ayah}`);
+      await page.goto(BASE + lessonPath(ayah, slug), { waitUntil: "networkidle" });
       // The earlier checks left a remembered place on these ayat ("Lanjutkan dari langkah N").
-      await page.evaluate((key) => localStorage.removeItem(key), `belajar:v1:autoplay:al-fatihah/${ayah}`);
+      await page.evaluate((key) => localStorage.removeItem(key), `belajar:v1:autoplay:${slug}/${ayah}`);
       await page.reload({ waitUntil: "networkidle" });
       await page.evaluate(() => document.fonts.ready);
       await page.locator('[data-autoplay="start"]').click();
@@ -4049,28 +4081,28 @@ async function lessonMapChecks(page, vp, index) {
       for (const g of openingOf(entry)) {
         await next.click();
         if (!(await until(page, async () => (await stage.getAttribute("data-step")) === `map:${g}`, 5_000))) {
-          fail(`Al-Fatihah ${ayah}: the step after "${before}" is "${await stage.getAttribute("data-step")}", not the lesson map's "map:${g}"`);
+          fail(`${title} ${ayah}: the step after "${before}" is "${await stage.getAttribute("data-step")}", not the lesson map's "map:${g}"`);
         }
         await check(ayah, entry, g);
         before = `map:${g}`;
       }
       await next.click();
-      if (!(await until(page, async () => ((await stage.getAttribute("data-step")) ?? before) !== before, 5_000))) fail(`Al-Fatihah ${ayah}: "Berikutnya ›" did not leave the step "${before}"`);
+      if (!(await until(page, async () => ((await stage.getAttribute("data-step")) ?? before) !== before, 5_000))) fail(`${title} ${ayah}: "Berikutnya ›" did not leave the step "${before}"`);
       const onward = await stage.getAttribute("data-step");
       if (onward?.startsWith("map:") || onward === "learned" || (await anyCard.count())) {
-        fail(`Al-Fatihah ${ayah}: after the opening's last group ("${before}") the lesson is on "${onward}" with ${await anyCard.count()} lesson-map card(s) on the stage, not on with the ayah`);
+        fail(`${title} ${ayah}: after the opening's last group ("${before}") the lesson is on "${onward}" with ${await anyCard.count()} lesson-map card(s) on the stage, not on with the ayah`);
       }
       // 2. Right before the recap.
       await toStep(page, vp, "learned");
       await check(ayah, entry, "learned");
       await next.click();
       if (!(await until(page, async () => (await stage.getAttribute("data-step")) === "recap", 5_000))) {
-        fail(`Al-Fatihah ${ayah}: the step after "learned" is "${await stage.getAttribute("data-step")}", not the recap`);
+        fail(`${title} ${ayah}: the step after "learned" is "${await stage.getAttribute("data-step")}", not the recap`);
       }
     }
   } catch (err) {
-    await page.screenshot({ path: `shots/${vp}-autoplay-lesson-map-FAILED.png`, fullPage: true }).catch(() => {});
-    console.error(`✗ ${vp}: the lesson map check (Al-Fatihah 1 and 2) failed`);
+    await page.screenshot({ path: `shots/${vp}-autoplay-lesson-map${slug === "al-fatihah" ? "" : `-${slug}`}-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the lesson map check (${title} ${ayat.join(", ")}) failed`);
     console.error(`  narration requests answered: ${served.length}`);
     throw err;
   } finally {
@@ -4236,9 +4268,11 @@ async function assertNotFoundShown(page, vp, urlPath, status) {
 
 await mkdir("shots", { recursive: true });
 const DEFAULT_RUN = !WARIS_ONLY && !SURAHS_ON;
-const narration = DEFAULT_RUN ? await narrationIndex() : new Map();
+const narration = DEFAULT_RUN || SURAHS_ON ? await narrationIndex() : new Map();
 const units = DEFAULT_RUN ? await composedUnits() : new Map();
-if (DEFAULT_RUN) console.log(`narration index: ${narration.size} file(s) named by the manifests in ${BELAJAR_DIR}`);
+// Al-Ikhlas's composed words, for its composition sweep in the `--surahs` pass (2026-10-19).
+const ikhlasUnits = SURAHS_ON ? await composedUnits("al-ikhlas") : new Map();
+if (DEFAULT_RUN || SURAHS_ON) console.log(`narration index: ${narration.size} file(s) named by the manifests in ${BELAJAR_DIR}`);
 const browser = await chromium.launch();
 try {
   for (const [vp, viewport, scale] of VIEWPORTS) {
@@ -4261,6 +4295,17 @@ try {
       await curriculumCheck(page, vp, true);
       await rumusCheck(page, vp, true);
       await endCardShots(page, vp, true);
+      // Al-Ikhlas, brought to Al-Fatihah's standard (2026-10-19) and hidden on the live site: the
+      // browser checks Al-Fatihah's lessons have, on this container only — the warm-up (ayah 3:
+      // a word of one part first, then one of two), the lesson map of every ayah, the reminder card
+      // of ayah 4 (it continues ayah 3), and every composition frame at the three text sizes (the
+      // largest on all four ayat).
+      await wordKindChecks(page, vp, narration, { slug: "al-ikhlas", ayah: 3 });
+      await lessonMapChecks(page, vp, narration, { slug: "al-ikhlas", ayat: [1, 2, 3, 4] });
+      await reminderChecks(page, vp, narration, { slug: "al-ikhlas", ayah: 4, step: "structure" });
+      await composeFitSweep(page, vp, "normal", [1], ikhlasUnits, "al-ikhlas");
+      await composeFitSweep(page, vp, "besar", [1], ikhlasUnits, "al-ikhlas");
+      await composeFitSweep(page, vp, "sangat-besar", [1, 2, 3, 4], ikhlasUnits, "al-ikhlas");
       await ctx.close();
       continue;
     }

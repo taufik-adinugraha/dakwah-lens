@@ -48,6 +48,9 @@ export type LessonMapAyah = {
   later: string[];
   lanjut: string[];
   kinds: MapKind[];
+  /** The running total said unit by unit ([]: one sentence): groups of whole curriculum units in
+   *  teaching order, each its own line "map:total:<k>" (pipeline/lessonmap.py, 2026-10-19). */
+  total: { from: string[]; steps: string[] }[];
 };
 
 /** The file's step of the three kinds of word: its name without its members ("Tiga jenis kata")
@@ -68,6 +71,8 @@ export type LessonMapFile = {
   lanjut: Record<string, LessonMapRecord>;
   ayat: LessonMapAyah[];
   kinds: LessonMapKinds | null;
+  /** The units a grouped total names, as its lines say them. */
+  units: Record<string, string>;
 };
 
 /** A step or a record as the card lists it: its name as the captions show it. */
@@ -89,6 +94,9 @@ export type LessonMapInput = {
    *  huruf. But actually in that ayat (example ayat-3) we only have isim" — so where a line or the
    *  card says it is met HERE, it names these, and all three only when `all`. */
   kinds?: MapKindsHere | null;
+  /** The running total unit by unit ([] or absent: one sentence names every step): each group's
+   *  units as its line names them, and its steps. */
+  total?: { from: string[]; steps: LessonMapItem[] }[];
 };
 
 /** What an ayah's map says of the three kinds of word. */
@@ -129,6 +137,14 @@ export const MAP_LINES = {
   later: ["map:later", "map:focus"],
   learned: ["learned", "map:total"],
 } as const satisfies Record<MapGroup | typeof MAP_CLOSING, readonly string[]>;
+
+/** The closing step's lines (pipeline/validate_narration.py map_closing_parts): MAP_LINES.learned
+ *  and, where the running total is said unit by unit (2026-10-19: Al-Ikhlas, 25–28 steps, no
+ *  longer one line of at most 400 spoken characters), one line per group, "map:total:<k>". */
+export const mapClosingLines = (map: Pick<LessonMapInput, "total">): string[] => [
+  ...MAP_LINES.learned,
+  ...(map.total ?? []).map((_, k) => `map:total:${k + 1}`),
+];
 
 /** A step's name inside a caption sentence: its Latin name (mapLatinName) with the first letter
  *  in lower case, after a leading ‘ain too ("‘Athaf (عَطْف)" → "‘athaf") — what the narration's
@@ -252,6 +268,7 @@ export function lessonMapInputOf(file: LessonMapFile | null | undefined, ayah: n
       }),
     ),
     lanjut: entry.lanjut.flatMap((id) => (file.lanjut[id] ? [{ id, name: file.lanjut[id].name }] : [])),
+    total: (entry.total ?? []).map((g) => ({ from: g.from.map((u) => file.units?.[u] ?? u), steps: g.steps.flatMap(step) })),
   };
 }
 
@@ -295,6 +312,15 @@ export function lessonMapProblems(file: LessonMapFile, curriculum: Pick<Curricul
     }
     for (const sid of every) listed.add(sid);
     for (const cid of entry.lanjut) listedLanjut.add(cid);
+    // The running total unit by unit: the groups name every step learnt by the end of the ayah,
+    // once, in teaching order, and each unit they name has its name in the file.
+    const groups = entry.total ?? [];
+    if (groups.length) {
+      const total = [...entry.learnt.map((x) => x.id), ...entry.new];
+      if (groups.length < 2) out.push(`${where} ayah ${entry.ayah}: a total of one group is the one sentence (total [])`);
+      if (JSON.stringify(groups.flatMap((g) => g.steps)) !== JSON.stringify(total)) out.push(`${where} ayah ${entry.ayah}: the total's groups are not the running total, in teaching order`);
+      for (const u of groups.flatMap((g) => g.from)) if (!file.units?.[u]) out.push(`${where} ayah ${entry.ayah}: unit ${u} of the total has no name in units`);
+    }
     for (const sid of entry.learnt.map((x) => x.id)) {
       const at = rank.get(steps.get(sid)?.lesson ?? "");
       if (at === undefined || at >= here) out.push(`${where} ayah ${entry.ayah}: learnt lists ${sid}, which is not taught earlier`);

@@ -72,9 +72,38 @@ describe("composition pieces and edits (the pipeline's cut, never the browser's)
   });
 });
 
+describe("content/compose/al-ikhlas.json (2026-10-19)", () => {
+  const ikhlas = JSON.parse(readFileSync(`${CONTENT}compose/al-ikhlas.json`, "utf8")) as ComposeFile;
+  it("loads at build time and replays without a problem: every word of the surah composed, no primer of its own", () => {
+    expect(composeFor("al-ikhlas")).not.toBeNull();
+    expect(composeFileProblems(ikhlas, WORDS)).toEqual([]);
+    const words = SURAHS.find((s) => s.slug === "al-ikhlas")!.ayat.flatMap((a) => a.words.map((w) => w.loc));
+    expect(Object.keys(ikhlas.words)).toEqual(words);
+    expect(ikhlas.primer).toBeNull();
+  });
+
+  it("the jazm: a vowel becomes the sukun (yalid, yūlad, yakun), and the wawu of yakūnu is seen dropped", () => {
+    const changes = (loc: string) => ikhlas.words[loc].frames.filter((f) => f.stage === "change").map((f) => f.chips);
+    for (const loc of ["112:3:2", "112:3:4"]) expect(changes(loc), loc).toEqual([[{ from: "\u062F\u064F", to: "\u062F\u0652", marks: ["dhammah", "sukun"] }]]);
+    expect(changes("112:4:2")).toEqual([[{ from: "\u0646\u064F", to: "\u0646\u0652", marks: ["dhammah", "sukun"] }]]);
+    const drop = ikhlas.words["112:4:2"].frames.find((f) => f.stage === "drop")!;
+    expect(drop.chips).toEqual([{ from: "\u0648", to: "" }]);
+    // a change into a letter's absence is not a change of a vowel: still refused
+    const broken = structuredClone(ikhlas);
+    broken.words["112:3:2"].frames[1].chips = [{ from: "\u062F\u064F", to: "\u062F", marks: ["dhammah", null] }];
+    expect(composeFileProblems(broken, WORDS).join("\n")).toContain("112:3:2");
+    // each ayah's last word ends on the stop frame
+    for (const loc of ["112:1:4", "112:2:2", "112:3:4", "112:4:5"]) {
+      const fr = ikhlas.words[loc].frames;
+      expect(fr[fr.length - 1].note, loc).toBe(STOP_NOTE);
+    }
+  });
+});
+
 describe("content/compose/al-fatihah.json", () => {
   it("loads at build time (zod + replay) and replays without a problem", () => {
-    expect(COMPOSED_SLUGS).toEqual(["al-fatihah"]);
+    // Al-Fatihah, and Al-Ikhlas since 2026-10-19: a surah without a file keeps its words' one-line explanation.
+    expect(COMPOSED_SLUGS).toEqual(["al-fatihah", "al-ikhlas"]);
     expect(composeFor("al-fatihah")).not.toBeNull();
     expect(composeFileProblems(raw, WORDS)).toEqual([]);
   });

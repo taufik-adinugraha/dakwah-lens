@@ -120,7 +120,10 @@ export const ID_TEXTS: AutoplayTexts = {
       : again.length
         ? `Di ayat ini tidak ada hal baru; kita mengulang ${again.length} hal yang sudah kita pelajari, yaitu ${mapListId(again)}.${kindsId(kinds)}`
         : "Di ayat ini tidak ada hal baru.",
-  total: ({ total, fresh }) => `${fresh ? "Dengan itu" : "Sampai ayat ini"}, sudah ${total.length} hal yang kita pelajari, yaitu ${mapListId(total)}.`,
+  total: ({ total, fresh, grouped }) =>
+    `${fresh ? "Dengan itu" : "Sampai ayat ini"}, sudah ${total.length} hal yang kita pelajari${grouped ? "" : `, yaitu ${mapListId(total)}`}.`,
+  // A group of a running total said unit by unit (pipeline/build_narration.py map_total_group).
+  totalGroup: ({ from, steps }) => `Dari ${mapListId(from)} ada ${steps.length} hal, yaitu ${mapListId(steps)}.`,
   recap: "Dengarkan sekali lagi seluruh ayatnya, dan ikuti bacaan imam.",
   next: ({ ayah }) => `Pelajaran ayat ini selesai. Berikutnya, ayat ${ayah}.`,
   done: ({ surah }) => `Pelajaran ayat ini selesai. Ini ayat terakhir surah ${surah}.`,

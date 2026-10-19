@@ -161,8 +161,11 @@ PRE_REWRITES: list[tuple[str, str]] = [
     # A place inside a place ("kata kedua dalam kata kedua sampai keempat") cannot be followed by ear.
     (r"seperti huwa dalam huwa Allāhu aḥad menurut banyak ulama",
      "seperti huwa menurut banyak ulama, yang isinya ialah Allāhu aḥad"),
-    # A title that is only the particle ("Lam: …") would be read "Kata pertama: …".
-    (r"^Lam: menafikan dan menjazmkan", "Huruf yang menafikan dan menjazmkan"),
+    # A title that is only the particle ("Lam: …") would be read "Kata pertama: …": the particle is
+    # named as the curriculum names its step (authored/curriculum.json nafi-lam), so the "Konsep baru"
+    # line opens with the name the lesson map gives it (validate_narration.map_problems; 2026-10-19,
+    # when Al-Ikhlas's map was switched on; until then "Huruf yang menafikan dan menjazmkan").
+    (r"^Lam: menafikan dan menjazmkan", "Huruf nafi yang menjazmkan: menafikan dan menjazmkan"),
     # Concept titles that end in an open fragment ("kata pelaku: “yang ...”", "kata “yang di-”",
     # "kata kerja pasif: “di-…”") cannot be read aloud: spoken they end "yang....", "yang di.",
     # "berawalan di.". The title names the concept; its summary, the next sentence, explains it.
@@ -1065,6 +1068,33 @@ def map_total(entry: dict, steps: dict) -> str:
     return f"{lead}, sudah {num_id(len(total))} hal yang kita pelajari, yaitu {_said(steps, total)}."
 
 
+def map_total_count(entry: dict) -> str:
+    """The running total's count, when its steps are named unit by unit in the lines after it
+    (lessonmap.py "THE RUNNING TOTAL, UNIT BY UNIT"): "Dengan itu, sudah dua puluh delapan hal yang
+    kita pelajari." — every one of them is named by map_total_group, in teaching order."""
+    n = len(entry["learnt"]) + len(entry["new"])
+    lead = V.MAP_TOTAL_LEAD if entry["new"] else V.MAP_TOTAL_LEAD_NONE
+    return f"{lead}, sudah {num_id(n)} hal yang kita pelajari."
+
+
+def map_total_group(group: dict, steps: dict, units: dict) -> str:
+    """One group of the running total: its units, how many steps they taught, and every one by name,
+    in teaching order: "Dari pelajaran pengantar dan Surah Al-Fatihah ada sembilan belas hal, yaitu
+    harakat, …, serta ‘athaf." (operator 2026-10-15: a count is always followed by its names)."""
+    return (f"Dari {_list_id([units[u] for u in group['from']])} ada {num_id(len(group['steps']))} hal, "
+            f"yaitu {_said(steps, group['steps'])}.")
+
+
+def map_total_lines(entry: dict, content: dict) -> list[tuple[str, str]]:
+    """The running total's lines: map:total alone — every step named in one sentence — or, when the
+    entry's `total` groups it (lessonmap.py), the count and then one line per group, map:total:<k>."""
+    groups = entry.get("total") or []
+    if not groups:
+        return [("map:total", map_total(entry, content["steps"]))]
+    return [("map:total", map_total_count(entry))] + [
+        (f"map:total:{k}", map_total_group(g, content["steps"], content["units"])) for k, g in enumerate(groups, 1)]
+
+
 Line = tuple[str, str, dict | None, str]  # id, prose, ayah (None for shared lines), part
 
 
@@ -1178,7 +1208,7 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
         exercise_lines(False)
         # … and what it taught, before the imam recites the ayah once more.
         if mapped is not None:
-            closing = {"learned": map_closing(mapped, lessonmap), "map:total": map_total(mapped, lessonmap["steps"])}
+            closing = {"learned": map_closing(mapped, lessonmap), **dict(map_total_lines(mapped, lessonmap))}
             for part in V.map_closing_parts(mapped):
                 add(part, closing[part])
         add("recap", f"Dengarkan sekali lagi seluruh ayat {ordinal(A)} dibacakan imam.")
@@ -1255,7 +1285,7 @@ def build_all(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = N
             if shown != uses[lid]:
                 errs.append(f"{lid}: its caption shows the terms {shown}, its prose uses {uses[lid]} (the two must agree)")
             parts = split_line(marked, measure=lambda x: len(sp.spoken(x)))
-            if part in V.MAP_PARTS and len(parts) > 1:
+            if V.is_map_part(part) and len(parts) > 1:
                 errs.append(f"{lid}: a map / learned line is one line, and this one is longer than {V.MAX_LINE} spoken "
                             "characters (every step is named: a list this long needs its own design, see README \"Peta pelajaran\")")
             if V.STRUCTURE_ITEM.fullmatch(part) and len(parts) > 1:

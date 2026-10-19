@@ -642,6 +642,13 @@ QAC_LAFAZ = "LEM:{ll~ah"
 CLASS_WITHHELD = {
     "gayor": "a word meaning “bukan” / “selain” is an isim by its place (always annexed: al-Jadwal, Darwisy, as-Samin; "
              "ar-Raghib: negation or exception), not a nama benda",
+    # 2026-10-19, when Al-Ikhlas's warm-up was switched on (a judgement call left for the operator):
+    # kufuwan (112:4:4), glossed “setara”, is a plain QAC N, so the rule would say "nama benda";
+    # the sources make it a word for one's EQUAL — al-mitsl wan-nazhir (Darwisy jil. 10 hlm. 615),
+    # "yang sepadan" (al-Jadwal jil. 15 hlm. 426), an-nazhir (as-Samin) — and whether a learner
+    # should call it a nama benda or a nama sifat no source here says (as with the participles).
+    "kufuw": "a word for one's equal (al-mitsl wan-nazhir: Darwisy; “yang sepadan”: al-Jadwal), glossed “setara”: "
+             "whether it is a nama benda or a nama sifat no source here says",
 }
 # AN ISIM THAT NAMES, TITLES OR DESCRIBES ALLAH says the kind alone (operator 2026-10-17: "when ism
 # is related to Allah, dont say it's nama benda"; "just say, it's ism."): "Kata ketiga, yaitu رَبِّ
@@ -1204,15 +1211,31 @@ def _words_rx(phrase: str) -> re.Pattern:
     return re.compile(rf"(?<![\w']){re.escape(_norm(phrase))}(?![\w'])", re.I)
 
 
-def class_taught_first(manifest: dict, slug: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[int, str]]:
-    """(kind, class) → (the first ayah whose lines teach it, the line), for each of `wanted`."""
+# LESSON ZERO's lines ("ayah 0" of the manifest of the surah that hosts it, al-fatihah:0:…) open
+# the course: what they teach is taught before the first ayah of EVERY surah. The classes the
+# warm-up names are all taught there (the Kalimah line and its examples), so a surah other than
+# the host (Al-Ikhlas, 2026-10-19, the first one switched on) reads them from the host's manifest.
+ZERO_LINE = re.compile(rf"^[a-z0-9]+(?:-[a-z0-9]+)*:0:(?:{CLASS_PART.pattern})(?::[a-z])?$")
+
+
+def zero_lines(manifests: dict[str, dict]) -> dict[str, dict]:
+    """Lesson zero's lines (every manifest's "ayah 0" teaching lines), by id."""
+    return {lid: line for m in (manifests or {}).values() for lid, line in ((m or {}).get("lines") or {}).items()
+            if ZERO_LINE.match(lid)}
+
+
+def class_taught_first(manifest: dict, slug: str, wanted: set[tuple[str, str]],
+                       zero: dict[str, dict] | None = None) -> dict[tuple[str, str], tuple[int, str]]:
+    """(kind, class) → (the first ayah whose lines teach it, the line), for each of `wanted`;
+    `zero`: lesson zero's lines (zero_lines), ayah 0 of every surah."""
     rx = re.compile(rf"^{re.escape(slug)}:(\d+):({CLASS_PART.pattern})(?::[a-z])?$")
     first: dict[tuple[str, str], tuple[int, str]] = {}
-    for lid, line in (manifest.get("lines") or {}).items():
-        m = rx.match(lid)
-        if not m or not isinstance(line, dict):
+    own = [(lid, line, m) for lid, line in (manifest.get("lines") or {}).items() if (m := rx.match(lid))]
+    rows = [(lid, line, int(m.group(1))) for lid, line, m in own] + [(lid, line, 0) for lid, line in (zero or {}).items()]
+    for lid, line, a in rows:
+        if not isinstance(line, dict):
             continue
-        text, a = _norm(str(line.get("display") or "")), int(m.group(1))
+        text = _norm(str(line.get("display") or ""))
         for kind, cls in wanted:
             if _words_rx(KIND_LATIN[kind]).search(text) and _words_rx(cls).search(text):
                 if (kind, cls) not in first or first[(kind, cls)][0] > a:
@@ -1220,12 +1243,13 @@ def class_taught_first(manifest: dict, slug: str, wanted: set[tuple[str, str]]) 
     return first
 
 
-def class_problems(quiz: dict, lesson: dict, manifest: dict) -> list[str]:
-    """Every class a warm-up sentence names was taught BEFORE the lesson it opens (above)."""
+def class_problems(quiz: dict, lesson: dict, manifest: dict, zero: dict[str, dict] | None = None) -> list[str]:
+    """Every class a warm-up sentence names was taught BEFORE the lesson it opens (above); `zero`:
+    lesson zero's lines (zero_lines; default: the surah's own manifest only)."""
     slug = lesson["slug"]
     asked = [(a["ayah"], q) for a in lesson["ayat"] for ex in ayah_plan(quiz, a["ayah"]) if ex["key"] == WARMUP
              for q in ex.get("questions") or [] if q.get("class")]
-    first = class_taught_first(manifest, slug, {(q["kind"], q["class"]) for _n, q in asked})
+    first = class_taught_first(manifest, slug, {(q["kind"], q["class"]) for _n, q in asked}, zero)
     errs = []
     for n, q in asked:
         at = first.get((q["kind"], q["class"]))
@@ -1367,11 +1391,12 @@ def warmup_problems(ex: dict | None, lesson: dict, ayah: dict, library: dict, te
 
 def plan_problems(quiz: dict, lesson: dict, library: dict, terms: Terms, manifest: dict | None,
                   pending: dict[str, list[str]] | None = None, *, curriculum: dict | None = None,
-                  mapped: bool | None = None) -> list[str]:
+                  mapped: bool | None = None, zero: dict[str, dict] | None = None) -> list[str]:
     """Every rule of the module docstring; the taught check needs the narration manifest.
     `pending`: authored/curriculum.pending.json `quiz` (default: from disk) — the questions that
     may still need an untaught term. `mapped`: the surah's lesson map is switched on (default:
-    has_map), `curriculum`: content/curriculum.json (default: from disk) — for the warm-up."""
+    has_map), `curriculum`: content/curriculum.json (default: from disk) — for the warm-up.
+    `zero`: lesson zero's lines from every manifest (zero_lines), taught before every surah."""
     errs: list[str] = []
     slug = lesson["slug"]
     lex = {x["id"]: x for x in library["lexicon"]}
@@ -1468,7 +1493,7 @@ def plan_problems(quiz: dict, lesson: dict, library: dict, terms: Terms, manifes
                     elif len({forms[o] for o in opts}) != len(opts):
                         errs.append(f"{where} q{q['n']}: two options are the same Arabic form (two correct options)")
     if mapped and manifest is not None:
-        errs += class_problems(quiz, lesson, manifest)
+        errs += class_problems(quiz, lesson, manifest, zero)
     if not authored or manifest is None:
         return errs
     # TAUGHT ⊇ REQUIRED, and the list of questions that may still fail it, held both ways.

@@ -390,6 +390,8 @@ G1, G2, G3 = (f"al-fatihah:{n}:map:again" for n in (1, 2, 3))
 T1, T2, T3 = (f"al-fatihah:{n}:map:later" for n in (1, 2, 3))
 F1, F2, F3 = (f"al-fatihah:{n}:map:focus" for n in (1, 2, 3))
 S1, S3, S7 = (f"al-fatihah:{n}:map:total" for n in (1, 3, 7))
+# Al-Ikhlas 4 (2026-10-19): its running total, 28 steps, said unit by unit — the count, then two groups.
+K4, K41, K42 = "al-ikhlas:4:map:total", "al-ikhlas:4:map:total:1", "al-ikhlas:4:map:total:2"
 
 
 def both(lid, old, new, old_said=None, new_said=None):
@@ -614,7 +616,8 @@ MUTATIONS = [
     # script سِين, which the voice drew out, is no longer the dictionary's
     ("sin spoken from Arabic script again", both("al-fatihah:0:primer:9", "huruf س ini", "huruf س ini", "huruf sin ini", "huruf سِين ini"),
      "Arabic script in spoken text that is not a pronunciation-dictionary term: 'سِين'"),
-    ("caption letter not as in the ayah", replace_in("al-ikhlas:4:w3", "display", f"Huruf {LAHU_L} ", "Huruf لِ "),
+    # (on lahū's composition since 2026-10-19: its word line no longer explains the letter)
+    ("caption letter not as in the ayah", replace_in("al-ikhlas:4:w3:compose:7", "display", f"Huruf {LAHU_L} ", "Huruf لِ "),
      f"the letter as in the ayah is {LAHU_L}"),
     ("quotes left in the spoken text", replace_in(WBA, "text", "artinya dengan.", "artinya “dengan”."),
      "character not allowed in spoken text"),
@@ -722,6 +725,12 @@ MUTATIONS = [
      "al-fatihah:3:structure:1: reminder {'ayah': 2, 'words': [9]} is not a card of an earlier ayah of the surah with words of it highlighted"),
     ("a card highlighting a word the line does not cite", set_field("al-fatihah:7:w1:compose:3", "reminder", [{"ayah": 6, "words": [1]}]),
      "al-fatihah:7:w1:compose:3: reminder card [{'ayah': 6, 'words': [1]}], and the line says the continuation or cites [{'ayah': 6, 'words': [2]}]"),
+    # 2026-10-19: لَمْ (lam), cited in Al-Ikhlas 4, is word 1 of ayah 3 and also the form `lam` of
+    # word 3's composition (wa lam): the card lights the cited WORDS, never a word only a form shares
+    # its bytes with (as it did, [1, 2, 3], once Al-Ikhlas had compositions).
+    ("a card that lights a word whose composition form shares the cited word's bytes (wa lam of 112:3:3)",
+     set_field("al-ikhlas:4:w1:compose:5", "reminder", [{"ayah": 3, "words": [1, 2, 3]}]),
+     "al-ikhlas:4:w1:compose:5: reminder card [{'ayah': 3, 'words': [1, 2, 3]}], and the line says the continuation or cites [{'ayah': 3, 'words': [1, 2]}]"),
     ("a card of a later ayah", set_field("al-fatihah:3:structure:1", "reminder", [{"ayah": 4, "words": [1]}]),
      "al-fatihah:3:structure:1: reminder {'ayah': 4, 'words': [1]} is not a card of an earlier ayah"),
     ("a card on a line that cites nothing", set_field("al-fatihah:3:w1:compose:3", "reminder", [{"ayah": 2, "words": [2]}]),
@@ -958,8 +967,27 @@ MUTATIONS = [
     ("map:focus line missing", drop(F3), f"missing line {F3}"),
     ("learned line missing", drop("al-fatihah:7:learned"), "missing line al-fatihah:7:learned"),
     ("map:total line missing", drop(S7), f"missing line {S7}"),
-    ("a map line in a surah without a lesson map", add("al-ikhlas:1:map:new", "Di ayat ini tidak ada hal baru."),
-     "unexpected line al-ikhlas:1:map:new"),
+    ("a map line in a surah without a lesson map", add("al-falaq:1:map:new", "Di ayat ini tidak ada hal baru."),
+     "unexpected line al-falaq:1:map:new"),
+    # the running total unit by unit (2026-10-19: Al-Ikhlas's 25 to 28 steps no longer fit one line of
+    # 400 spoken characters; lessonmap.py "THE RUNNING TOTAL, UNIT BY UNIT")
+    ("a group of the running total missing", drop(K42), f"missing line {K42}"),
+    ("a group the lesson map does not have", add("al-ikhlas:4:map:total:3", "Dari Surah Al-Ikhlas ada satu hal, yaitu majzum."),
+     "unexpected line al-ikhlas:4:map:total:3"),
+    ("the count of a running total said unit by unit naming its steps too",
+     both(K4, "hal yang kita pelajari.", "hal yang kita pelajari, yaitu harakat."),
+     f"{K4}: names the steps although the lines after it name them unit by unit"),
+    ("the count of a running total said unit by unit, wrong", both(K4, "dua puluh delapan", "dua puluh tujuh"),
+     f"{K4}: says dua puluh tujuh step(s) learnt in all, the lesson map has 28"),
+    ("a group that names other units", both(K42, "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas", "Dari Surah An-Nas dan Surah Al-Falaq"),
+     f"{K42}: names the units “Surah An-Nas dan Surah Al-Falaq”"),
+    ("a step of a group left out", both(K42, ", majzum (مَجْزُوم), serta", ", serta", ", مَجْزُوم, serta", ", serta"),
+     f"{K42}: names"),
+    ("a group's count that disagrees with its names", both(K41, "sembilan belas hal", "delapan belas hal"),
+     f"{K41}: says delapan belas step(s) of pelajaran pengantar, Surah Al-Fatihah and names 19"),
+    ("a group split", lambda m, *_: (m["al-ikhlas"]["lines"].__setitem__(K41 + ":a", dict(m["al-ikhlas"]["lines"][K41])),
+                                    m["al-ikhlas"]["lines"].__setitem__(K41 + ":b", m["al-ikhlas"]["lines"].pop(K41))),
+     "a map / learned line is never split"),
     ("the one map line of before the curriculum", add("al-fatihah:1:map", "Di ayat ini ada dua hal baru."),
      "does not follow the step-id contract"),
     ("the surah's map switched off, its lines left behind", lambda _m, _l, _x, _c, mp, *_: mp.pop("al-fatihah"),
@@ -1635,10 +1663,13 @@ class LessonMapLines(unittest.TestCase):
         quiz = V.load_quiz()
         without = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, {})
         with_map = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, LESSONMAP)
-        is_map = lambda lid: lid.split(":", 2)[2] in V.MAP_PARTS if lid.count(":") >= 2 and not lid.startswith("shared:") else False  # noqa: E731
+        is_map = lambda lid: V.is_map_part(lid.split(":", 2)[2]) if lid.count(":") >= 2 and not lid.startswith("shared:") else False  # noqa: E731
+        # Al-Fatihah: 7 ayat × 6 (map:learnt removed 2026-10-17); Al-Ikhlas (switched on 2026-10-19):
+        # 4 ayat × 8, its running total said unit by unit (map:total, map:total:1, map:total:2).
+        per = {"al-fatihah": 42, "al-ikhlas": 32}
         for name in with_map:
             added = [lid for lid in with_map[name] if lid not in without[name]]
-            self.assertEqual(len(added), 42 if name == "al-fatihah" else 0, name)  # 7 ayat × 6 (map:learnt removed 2026-10-17)
+            self.assertEqual(len(added), per.get(name, 0), name)
             self.assertTrue(all(is_map(lid) for lid in added))
             # … and every other line is what it was without the map, in the same order.
             self.assertEqual({k: v for k, v in with_map[name].items() if k not in added}, without[name], name)
@@ -1648,14 +1679,17 @@ class LessonMapLines(unittest.TestCase):
         # An-Nas with a map of its own. Two of its steps have no text yet, so the real curriculum
         # refuses the switch (test_validate_map.py); here they are left out, and the surah's lines
         # are built in the CURRICULUM's order (An-Nas comes right after Al-Fatihah: 19 steps are
-        # learnt before its first ayah), pass the validator, and move no other surah.
+        # learnt before its first ayah), pass the validator, and move no other surah but Al-Ikhlas
+        # (switched on 2026-10-19, taught after An-Nas: the two steps left out leave its learnt
+        # lists and its running total too, so its lines are built anew here as well).
         import build_map as BM
         import lessonmap as LM
         import terms as TERMS
         authored = copy.deepcopy(CUR.load_authored())
         authored["steps"] = [s for s in authored["steps"] if s["id"] not in ("jamak-taksir", "mudzakkar-muannats")]
         cur = BC.build(authored, LESSONS, LIBRARY, TERMS.load_terms(), BC.Namer(LESSONS, LEX))
-        maps = BM.build_all(LESSONS, LIBRARY, LEX, {"al-fatihah": LM.load_authored("al-fatihah"), "an-nas": {"slug": "an-nas", "names": {}}}, cur)
+        maps = BM.build_all(LESSONS, LIBRARY, LEX, {"al-fatihah": LM.load_authored("al-fatihah"), "al-ikhlas": LM.load_authored("al-ikhlas"),
+                                                    "an-nas": {"slug": "an-nas", "names": {}}}, cur)
         self.assertEqual(maps["al-fatihah"], LESSONMAP["al-fatihah"])
         self.assertEqual(maps["an-nas"]["steps"]["fiil-amr"]["lesson"], "114:1")
         quiz = V.load_quiz()
@@ -1672,6 +1706,8 @@ class LessonMapLines(unittest.TestCase):
         self.assertEqual(built["al-fatihah"], B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, LESSONMAP)["al-fatihah"])
         m = copy.deepcopy(MANIFESTS)
         m["an-nas"] = B.manifest(built["an-nas"], m["an-nas"], LEX, FORMS)
+        m["al-ikhlas"] = B.manifest(built["al-ikhlas"], m["al-ikhlas"], LEX, FORMS)
+        self.assertNotIn("jamak taksir", m["al-ikhlas"]["lines"]["al-ikhlas:4:map:total:2"]["display"])
         self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=maps, curriculum=cur), [])
 
     def test_rendered_map_lines_pass(self):
@@ -2738,8 +2774,10 @@ class SpeechAndRender(unittest.TestCase):
         # the front of ‘alaihim (never spoken, not even in Arabic), and a title that is only the particle
         self.assertEqual(san.prose("‘Alā adalah huruf jar.", 1, 7, 4),
                          "Bagian depan kata ini adalah huruf jar yang artinya “atas”.")
+        # (the step's name first since 2026-10-19, when Al-Ikhlas's map was switched on: a "Konsep
+        # baru" caption opens with its step's name, "Huruf nafi yang menjazmkan")
         self.assertEqual(san.prose("Lam: menafikan dan menjazmkan fi'il mudhari'", 112, 3),
-                         "Huruf yang menafikan dan menjazmkan fi'il mudhari'")
+                         "Huruf nafi yang menjazmkan: menafikan dan menjazmkan fi'il mudhari'")
         self.assertEqual(san.prose("Kalimat huwa Allāhu aḥadun.", 112, 1), "Kalimat kata kedua sampai keempat.")
         self.assertEqual(san.prose("Disambung dengan wa.", 1, 5), "Disambung dengan wawu.")
         # meanings with "yang artinya"; the letter of a preposition after "huruf jar"

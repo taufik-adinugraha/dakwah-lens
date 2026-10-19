@@ -191,6 +191,24 @@ def quizfile(fn):
     return f
 
 
+def quizfile_of(slug: str, fn):
+    """A fault in the built quiz file of another surah (content/quiz/<slug>.json)."""
+    def f():
+        q = copy.deepcopy(QUIZZES)
+        fn(q[slug])
+        return run(quizzes=q)
+    return f
+
+
+def zero_lines_dropped_for(slug: str):
+    """PLANTED: the warm-up of `slug` read against its own manifest only, as until 2026-10-19 — lesson
+    zero's lines are in the host's (Al-Fatihah's), so every class looks untaught."""
+    def f():
+        quiz = copy.deepcopy(QUIZZES[slug])
+        return Q.class_problems(quiz, LESSONS[slug], MANIFESTS[slug])
+    return f
+
+
 def library(fn):
     def f():
         lib = copy.deepcopy(LIBRARY)
@@ -388,6 +406,22 @@ MUTATIONS = [
      manifest(lambda lines: lines["al-fatihah:0:concept:kalimah-isim-fiil-huruf:ex:2"].__setitem__(
          "display", lines["al-fatihah:0:concept:kalimah-isim-fiil-huruf:ex:2"]["display"].replace("juga isim (اِسْم), tetapi ", ""))),
      "al-fatihah 1 word-kind q4: names the class 'nama sifat' of isim, not taught before ayah 1"),
+    # Al-Ikhlas (its map switched on 2026-10-19): the same rules on another surah.
+    ("the warm-up of Al-Ikhlas: a class said of aḥadun (“Yang Maha Esa”, said of Allah: quiz.ALLAH_KIND_ONLY)",
+     quizfile_of("al-ikhlas", lambda q: warm(q, 1)["questions"][3].__setitem__("class", "nama benda")),
+     "al-ikhlas 1 word-kind q4 (word 4): names the class 'nama benda', and the part's QAC tag gives None"),
+    ("the warm-up of Al-Ikhlas: a class said of aṣ-ṣamadu (a Name of Allah)",
+     quizfile_of("al-ikhlas", lambda q: warm(q, 2)["questions"][1].__setitem__("class", "nama benda")),
+     "al-ikhlas 2 word-kind q2 (word 2): names the class 'nama benda', and the part's QAC tag gives None"),
+    ("the warm-up of Al-Ikhlas: “nama benda” said of kufuwan (“setara”, withheld: quiz.CLASS_WITHHELD)",
+     quizfile_of("al-ikhlas", lambda q: warm(q, 4)["questions"][5].__setitem__("class", "nama benda")),
+     "al-ikhlas 4 word-kind q6 (word 4): names the class 'nama benda', and the part's QAC tag gives None"),
+    ("the warm-up of Al-Ikhlas: the class withheld from aḥadun of ayah 4 (“sesuatu”: not about Allah)",
+     quizfile_of("al-ikhlas", lambda q: warm(q, 4)["questions"][6].pop("class")),
+     "al-ikhlas 4 word-kind q7 (word 5): names the class None, and the part's QAC tag gives 'nama benda'"),
+    ("the warm-up of Al-Ikhlas read against its own manifest only (lesson zero's lines are Al-Fatihah's), as until 2026-10-19",
+     zero_lines_dropped_for("al-ikhlas"),
+     "al-ikhlas 1 word-kind q1: names the class 'kata kerja' of fi'il, not taught before ayah 1"),
     ("the warm-up: authored in the plan", plan(lambda a: a["1"].__setitem__("word-kind", [{"word": 1, "kind": "isim"}])),
      "the plan lists 'word-kind' — the warm-up is derived"),
     ("the warm-up: missing from an ayah of a surah with a lesson map", quizfile(lambda q: q["ayat"][3]["exercises"].pop(0)),
@@ -627,6 +661,37 @@ class Twin(unittest.TestCase):
         self.assertEqual(Q.seeded_shuffle(list(range(1, 11)), "113:5:3/x"), [1, 5, 2, 3, 4, 6, 9, 10, 8, 7])
 
 
+class WarmupIkhlas(unittest.TestCase):
+    """The warm-up of Al-Ikhlas (its lesson map switched on 2026-10-19), as built."""
+
+    def test_every_part_and_its_sentence(self):
+        q, lesson = QUIZZES["al-ikhlas"], LESSONS["al-ikhlas"]
+        # 15 words, 3 of two parts (wa lam twice, lahū): 18 questions, 4 / 2 / 5 / 7.
+        self.assertEqual([len(warm(q, n)["questions"]) for n in range(1, 5)], [4, 2, 5, 7])
+        why = {(n, x["n"]): x["why"] for n in range(1, 5) for x in warm(q, n)["questions"]}
+        cls = {(n, x["n"]): x.get("class") for n in range(1, 5) for x in warm(q, n)["questions"]}
+        # A word about Allah says the kind alone (aḥadun 112:1:4, aṣ-ṣamadu: quiz.ALLAH_KIND_ONLY; the
+        # Name twice); aḥadun of ayah 4, “sesuatu”, is not about Allah and keeps its class.
+        self.assertEqual([cls[k] for k in [(1, 3), (1, 4), (2, 1), (2, 2), (4, 7)]], [None, None, None, None, "nama benda"])
+        self.assertEqual(why[(1, 3)], "Kata ketiga adalah isim (اِسْم).")
+        self.assertTrue(why[(1, 4)].endswith("“Yang Maha Esa”, adalah isim (اِسْم)."), why[(1, 4)])
+        self.assertTrue(why[(2, 2)].endswith("adalah isim (اِسْم). Tandanya: memakai alif lam (ال)."), why[(2, 2)])
+        # kufuwan, “setara”: the class withheld (quiz.CLASS_WITHHELD kufuw) — a judgement call for the operator.
+        self.assertIsNone(cls[(4, 6)])
+        self.assertTrue(why[(4, 6)].endswith("yang artinya “setara”, adalah isim (اِسْم)."), why[(4, 6)])
+        # The parts of a word named by its composition's forms: وَ (wa), لَمْ (lam), لَّ (la), هُۥ (hū).
+        self.assertIn("yaitu وَ (wa), yang artinya “dan”, adalah huruf (حَرْف), karena ia kata tugas.", why[(3, 3)])
+        self.assertIn("yaitu لَمْ (lam), yang artinya “tidak”, adalah huruf (حَرْف), karena ia kata tugas.", why[(4, 2)])
+        self.assertEqual(why[(4, 5)], "Bagian kedua kata ketiga, yaitu هُۥ (hū), yang artinya “Dia”, adalah isim (اِسْم), karena ia kata ganti. "
+                                      "Tandanya: didahului huruf jar (حَرْف جَرّ).")
+        # A heavy-letter word is named on screen (the narration leaves it unsaid, rule 5): qul.
+        self.assertTrue(why[(1, 1)].startswith("Kata pertama, yaitu قُلْ (qul), yang artinya “katakanlah”, adalah fi'il"), why[(1, 1)])
+        self.assertEqual(Q.class_problems(q, lesson, MANIFESTS["al-ikhlas"], Q.zero_lines(MANIFESTS)), [])
+        # Every lesson zero line is "ayah 0" of the surah that hosts it; none in Al-Ikhlas's manifest.
+        self.assertTrue(Q.zero_lines(MANIFESTS))
+        self.assertTrue(all(k.startswith("al-fatihah:0:") for k in Q.zero_lines(MANIFESTS)))
+
+
 class Warmup(unittest.TestCase):
     """The warm-up as built for Al-Fatihah, and the rules it is derived by."""
 
@@ -676,9 +741,12 @@ class Warmup(unittest.TestCase):
         ar = w["ar"]
         parts = Q.word_parts({**nas, "segments": {"114:6:3": [ar[:2], ar[2:5], ar[5:]]}}, w)
         self.assertEqual([(p["kind"], p["article"], p["ar"]) for p in parts], [("huruf", False, ar[:2]), ("isim", True, ar[2:])])
+        # Since 2026-10-19 every lesson ships the QAC segments of its words of two or more parts
+        # (build_surah.compound_segments), An-Nas's too: the same parts from the lesson's own bytes.
+        self.assertEqual([(p["kind"], p["article"], p["ar"]) for p in Q.word_parts(nas, w)], [("huruf", False, ar[:2]), ("isim", True, ar[2:])])
         # Without the lesson's own parts a compound word cannot be asked (nothing is cut here).
         with self.assertRaisesRegex(Q.QuizError, "does not carry its 3 QAC segments"):
-            Q.word_parts(nas, w)
+            Q.word_parts({**nas, "segments": {}}, w)
 
     def test_a_sign_only_where_the_data_shows_it_and_an_earlier_lesson_taught_it(self):
         signs = {(n, q["n"]): q["signs"] for n in range(1, 8) for q in warm(self.q, n)["questions"] if q["signs"]}
@@ -758,7 +826,7 @@ class Warmup(unittest.TestCase):
                                 (2, 4): ["N"]})                                           # rabbi (ALLAH_KIND_ONLY)
         # gair (“bukan”): a plain QAC N, listed by its QAC lemma with its reason — and that lemma is the
         # Kosakata entry whose sources give the reason (always annexed; negation or exception).
-        self.assertEqual(list(Q.CLASS_WITHHELD), ["gayor"])
+        self.assertEqual(list(Q.CLASS_WITHHELD), ["gayor", "kufuw"])
         gair = next(x for x in LIBRARY["lexicon"] if x["id"] == Q.word_at(self.lesson, "1:7:5")["lemma_id"])
         self.assertIn("selalu disandarkan", gair["meaning"])
         self.assertEqual(Q.word_parts(self.lesson, Q.word_at(self.lesson, "1:7:5"))[0]["lemma"], "gayor")

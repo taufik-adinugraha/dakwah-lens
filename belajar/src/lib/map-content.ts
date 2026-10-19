@@ -7,11 +7,13 @@
  * mismatch fails `next build` instead of reaching a learner.
  *
  * A surah has a map only when the pipeline switched it on (pipeline/authored/<slug>.map.json; plan
- * L23: Al-Fatihah only today): a surah without a file here gets no map / learned step and no
- * card — nothing in the app names a surah to decide that. lesson-map.test.ts checks that this
+ * L23: Al-Fatihah, and Al-Ikhlas since 2026-10-19): a surah without a file here gets no map /
+ * learned step and no card — nothing in the app names a surah to decide that. A map says nothing
+ * about publishing: a hidden surah's pages answer 404 (src/lib/features.ts BELAJAR_SURAHS). lesson-map.test.ts checks that this
  * list is exactly the files in content/map/.
  */
 import alFatihah from "../../content/map/al-fatihah.json";
+import alIkhlas from "../../content/map/al-ikhlas.json";
 
 import { LessonMapFile, type LessonMapFile as File } from "@/content/map-schema";
 
@@ -31,6 +33,7 @@ function load(raw: unknown, name: string): File {
 
 const BY_SLUG: Readonly<Record<string, File>> = {
   "al-fatihah": load(alFatihah, "al-fatihah"),
+  "al-ikhlas": load(alIkhlas, "al-ikhlas"),
 };
 
 /** Slugs with a lesson map (for the checks). */

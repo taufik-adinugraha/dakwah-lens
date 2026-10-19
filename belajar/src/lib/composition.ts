@@ -274,7 +274,11 @@ export function unitProblems(
       const chips = frameChips(fr, get);
       if (JSON.stringify(chips.length ? chips : undefined) !== JSON.stringify(fr.chips)) out.push(`${f}: chips differ from a fresh cut`);
       if (fr.stage === "change") {
-        if (chips.length !== 1 || !chips[0].marks?.every((m) => m !== null && VOWELS.includes(m))) out.push(`${f}: change must change one vowel`);
+        // One vowel into another, or into the sukun of jazm (pipeline/compose.py CHANGE_TO, 2026-10-19).
+        const [m0, m1] = chips[0]?.marks ?? [null, null];
+        if (chips.length !== 1 || m0 === null || !VOWELS.includes(m0) || m1 === null || !(VOWELS.includes(m1) || m1 === "sukun")) {
+          out.push(`${f}: change must change one vowel (into another vowel or the sukun of jazm)`);
+        }
       }
     } catch (e) {
       out.push(`${f}: ${(e as Error).message}`);

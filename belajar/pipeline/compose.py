@@ -41,7 +41,7 @@ line "${slug}:${ayah}:w${n}:compose:${k}", primer lines "${slug}:${ayah}:primer:
     base     one part ringed as its bentuk dasar ("focus"), with its ending's mark and sound
     change   a part's ending changes ("from" → "to"; "cause" names the part that causes it): the
              build cuts the changed piece of each (مُ → مِ) and names both marks (dhammah →
-             kasrah, u → i)
+             kasrah, u → i); the vowel may also become the sukun of jazm (دُ → دْ, CHANGE_TO)
     join     parts written together ("from": the parts, "tiles": [the joined form]); pieces that
              change in the join (لْ + رَ → ل + رَّ) are cut by the build; "silent": pieces of the
              joined form that are written but not read (the alif of بِٱسْمِ)
@@ -140,6 +140,11 @@ EXPLAINED_MARKS = ("fathah", "kasrah", "dhammah", "sukun", "shaddah", "small_ali
 # The case ending of a bentuk dasar (rule 14: the marfu' form) — unless the frame declares
 # `base_mark`, the fixed ending of a mabni word (an‘ama: fathah).
 BASE_ENDINGS = ("dhammah", "dhammatain")
+# What a `change` frame may turn a vowel into: another vowel, or the SUKUN of jazm (2026-10-19,
+# Al-Ikhlas: a fi'il mudhari' whose bentuk dasar ends in dhammah, يَلِدُ, is majzum after lam and
+# ends in sukun, يَلِدْ — Ajurrumiyyah hlm. 8: "fa-ammā as-sukūn fa-yakūnu 'alāmatan lil-jazm fī
+# al-fi'l al-mudhāri' aṣ-ṣaḥīḥ al-ākhir"; the stage already draws "u → –" for it).
+CHANGE_TO = (*VOWELS, "sukun")
 # Two letters that are one letter in two shapes: the alif maqsura of عَلَى is written ya' before
 # a pronoun (عَلَيْهِمْ). A join may change one into the other (Tanzil bytes on both sides).
 SAME_LETTER = {("\u0649", "\u064a"), ("\u064a", "\u0649")}
@@ -824,6 +829,13 @@ def voice_problems(contents: dict[str, dict], lessons: dict[str, dict], corpus: 
     fx_T = CL.fixture_sources(fixture)[1]
     lib = voice_library(contents, lessons, T or fx_T)
     errs, warns = CL.problems(lib, lessons, src, align, T, fixture, EXAMPLES_FIXTURE.name)
+    # The quran-align pin, file by file: the library above joins every file's pin, so with two files
+    # (Al-Ikhlas's since 2026-10-19) a stale pin in one would hide behind the other's good one.
+    pin = src["inputs"]["quran_align"]["members"][CL.ALIGN_MEMBER]["sha256"]
+    for slug, c in contents.items():
+        if pin not in str((c.get("data_versions") or {}).get(CL.DATA_VERSION, "")):
+            errs.append(f"compose/{slug} data_versions.{CL.DATA_VERSION} does not pin {CL.ALIGN_MEMBER} sha256:{pin[:12]}… "
+                        "(rebuild: build_compose.py)")
     # One place, one clip: two base frames that play the same word play the same cut of it.
     seen: dict[str, tuple[str, dict]] = {}
     for slug, c in contents.items():
@@ -1246,8 +1258,9 @@ def stage_problems(unit: dict, w: str, *, kind: str, word_ar: str | None, corpus
             else:
                 try:
                     d = diff_pieces(ar(fr["from"]), ar(fr["to"]))
-                    if len(d) != 1 or not all(m in VOWELS for m in d[0]["marks"]):
-                        errs.append(f"{f}: change must change exactly one vowel mark ({d})")
+                    if len(d) != 1 or d[0]["marks"][0] not in VOWELS or d[0]["marks"][1] not in CHANGE_TO:
+                        errs.append(f"{f}: change must change exactly one vowel mark, into another vowel or the sukun of "
+                                    f"jazm ({d})")
                 except ComposeError as e:
                     errs.append(f"{f}: change must change one vowel mark of the same letters ({e})")
             if "cause" in fr and fr["cause"] not in tiles:

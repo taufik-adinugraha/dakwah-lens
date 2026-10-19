@@ -1,7 +1,7 @@
 {
  "_comment": "Written by pipeline/build_wordvoice.py --fetch-quran-com: Quran.com's own word list (words only, in its order) of every ayah a voiced text stands in, as api.quran.com answered on the date below. `audio_url` is the word's file on audio.qurancdn.com — not always the Tanzil word number (41:9). Never edited by hand.",
  "api": "https://api.quran.com/api/v4/verses/by_key/{key}?words=true&word_fields=text_uthmani,audio_url",
- "retrieved": "2026-10-15",
+ "retrieved": "2026-10-19",
  "ayat": {
   "1:1": [
    {
@@ -1091,6 +1091,28 @@
    {
     "text_uthmani": "ٱلْفَجْرِ",
     "audio_url": "wbw/097_005_005.mp3"
+   }
+  ],
+  "101:4": [
+   {
+    "text_uthmani": "يَوْمَ",
+    "audio_url": "wbw/101_004_001.mp3"
+   },
+   {
+    "text_uthmani": "يَكُونُ",
+    "audio_url": "wbw/101_004_002.mp3"
+   },
+   {
+    "text_uthmani": "ٱلنَّاسُ",
+    "audio_url": "wbw/101_004_003.mp3"
+   },
+   {
+    "text_uthmani": "كَٱلْفَرَاشِ",
+    "audio_url": "wbw/101_004_004.mp3"
+   },
+   {
+    "text_uthmani": "ٱلْمَبْثُوثِ",
+    "audio_url": "wbw/101_004_005.mp3"
    }
   ],
   "112:1": [

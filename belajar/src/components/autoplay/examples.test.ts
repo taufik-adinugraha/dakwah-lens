@@ -273,18 +273,30 @@ describe("which examples a lesson plays (src/lib/autoplay/examples.ts)", () => {
         if (st.kind === "compose") for (const b of st.examples ?? []) expect(b.word, `${where} ${b.id}`).not.toBe(st.word);
       }
     }
-    // The Mu'awwidzat (no compositions yet): Al-Ikhlas 1 had the beats "w2:word" and "w3:word"
-    // (huwa, Allāhu) and listed w4 (aḥadun: its tanwin is not heard at the ayah's end). A lesson's
-    // beats are the examples of the steps it teaches alone, and no word's line is listed as
-    // lacking one: Al-Ikhlas 1 teaches nothing new (its three concepts are next-level since
-    // 2026-10-13), Al-Ikhlas 3 the lam that negates and jazms.
+    // Al-Ikhlas, composed since 2026-10-19: Al-Ikhlas 1 teaches nothing new (its three concepts are
+    // next-level since 2026-10-13), so its only beats are its compositions' — none: each of its two
+    // base frames shows the word itself (Allāhu, aḥadun), which the lesson recites when the word's step
+    // opens (a gap with its reason, as al-ḥamdu's in Al-Fatihah 2). Al-Ikhlas 3 teaches the lam that
+    // negates and jazms, then majzum: one beat each, the lesson's own words — and, once the narrator's
+    // recordings of its two bentuk dasar exist (yalidu, yūladu: no reciter says them; recorded
+    // 2026-10-19), the compositions of words 2 and 4 play them before the concept lines.
     const ikhlas = lessonOf(surah("al-ikhlas"), surah("al-ikhlas").ayat[0]);
     expect(beatsOf(ikhlas.seq)).toEqual([]);
-    expect(ikhlas.derived.gaps).toEqual([]);
+    expect(ikhlas.derived.gaps.map((g) => `${g.step}: ${g.rule}`)).toEqual(["w3:compose: bentuk dasar Allāhu", "w4:compose: bentuk dasar aḥadun"]);
     const ikhlas3 = lessonOf(surah("al-ikhlas"), surah("al-ikhlas").ayat[2]);
-    expect(beatsOf(ikhlas3.seq).map((x) => `${x.step.id} → ${x.beat.key}`)).toEqual(["concept:jazm-lam:ex → 112:3:1"]);
-    expect(ikhlas3.derived.gaps).toEqual([]);
-    expect(stops).toEqual(["al-fatihah/1:w4", "al-fatihah/2:w4", "al-fatihah/3:w2", "al-fatihah/4:w3", "al-fatihah/5:w4", "al-fatihah/6:w3", "al-fatihah/7:w9"]);
+    expect(beatsOf(ikhlas3.seq).map((x) => `${x.step.id} → ${x.beat.key}`)).toEqual([
+      "w2:compose → 112:3:2#yalidu",
+      "w4:compose → 112:3:4#yuladu",
+      "concept:jazm-lam:ex → 112:3:1",
+      "concept:majzum:ex → 112:3:2",
+    ]);
+    // An-Nas has no compositions: its word lines are followed by no beat, and none is missing.
+    const nas = lessonOf(surah("an-nas"), surah("an-nas").ayat[0]);
+    expect(nas.derived.gaps).toEqual([]);
+    expect(stops).toEqual([
+      "al-fatihah/1:w4", "al-fatihah/2:w4", "al-fatihah/3:w2", "al-fatihah/4:w3", "al-fatihah/5:w4", "al-fatihah/6:w3", "al-fatihah/7:w9",
+      "al-ikhlas/1:w4", "al-ikhlas/2:w2", "al-ikhlas/3:w4", "al-ikhlas/4:w5",
+    ]);
     // What that line says is true of each of the seven: the pause drops its last harakah (heard.ts),
     // and its line — the composition's last, over its last frame — says the recitation stops on it
     // (until 2026-10-14 "dan imam berhenti padanya": a word heard on its own is the narrator's now).
@@ -518,7 +530,7 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     // Plan L24 (2026-10-13): this fault used to be the opposite one, "a word whose harakah its line
     // explains, with neither its recitation nor a reason". A word is now recited once, when its
     // step opens: a beat that recites it again after its own line is the fault.
-    ["a word's own line followed by a beat that recites the word again (a lesson without compositions)", -1, (l) => void (step(l, "w2").examples = [beat(l, "concept:jazm-lam:1")]), /w2: a explain step has example beats/],
+    ["a word's own line followed by a beat that recites the word again (a lesson without compositions)", -1, (l) => void (step(l, "w2").examples = [beat(l, "concept:fiil-amr:1")]), /w2: a explain step has example beats/],
     ["a base example played before its base frame's line", 1, (l) => void (beat(l, "w1:base:2").after = 0), /does not come after the last line of its base frame/],
     ["a base example on a frame that is not a base frame", 1, (l) => {
       const b = beat(l, "w1:base:2");
@@ -650,7 +662,7 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     const end = a.words[a.words.length - 1];
     const made = { id: "contoh", examples: [{ loc: end.loc, note: `${end.translit}: khabar, berakhir ${end.case.sign}.` }, { loc: "112:4:4", note: "contoh lain" }] };
     const introduced = [...taughtAt(a), made];
-    const derived = lessonExamples({ ayah: a, introduced, compose: null, voice: wordVoice, wordAt: (loc) => WORDS.get(loc) });
+    const derived = lessonExamples({ ayah: a, introduced, compose: composeFor(s.slug), voice: wordVoice, wordAt: (loc) => WORDS.get(loc) });
     const base = lessonOf(s, a);
     const seq = structuredClone(base.seq);
     const texts = base.ctx.texts.example;
@@ -669,9 +681,10 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     return { ...base, seq, derived, ctx: { ...base.ctx, introduced, derived } };
   };
   it.each(faults)("planted fault: %s", (_name, ayah, plant, expected) => {
-    // ayah -1: Al-Ikhlas 3, a lesson whose words have no composition (and that teaches a concept);
-    // -2: Al-Ikhlas 1 with a concept that takes a second example from another ayah.
-    const fresh = ayah === -2 ? withSecondExample() : ayah === -1 ? lessonOf(surah("al-ikhlas"), surah("al-ikhlas").ayat[2]) : lessonOf(FATIHAH, FATIHAH.ayat[ayah - 1]);
+    // ayah -1: An-Nas 1, a lesson whose words have no composition (and that teaches a concept; until
+    // 2026-10-19 Al-Ikhlas 3, composed since); -2: Al-Ikhlas 1 with a concept that takes a second
+    // example from another ayah.
+    const fresh = ayah === -2 ? withSecondExample() : ayah === -1 ? lessonOf(surah("an-nas"), surah("an-nas").ayat[0]) : lessonOf(FATIHAH, FATIHAH.ayat[ayah - 1]);
     // A copy to mutate (the page's own sequence is never touched).
     const l: Lesson = { ...fresh, seq: structuredClone(fresh.seq), derived: structuredClone(fresh.derived) };
     l.ctx = { ...fresh.ctx, derived: l.derived };
@@ -701,7 +714,7 @@ describe("the lesson's own word is recited once, and its step does not wait for 
   };
 
   it(
-    "every lesson, every pace, both languages: the whole ayah (its step and the recap), each word at its opening step — once, twice in Pelan — and only an Al-Fatihah ayah's last word once more, after its composition",
+    "every lesson, every pace, both languages: the whole ayah (its step and the recap), each word at its opening step — once, twice in Pelan — and only a composed ayah's last word once more, after its composition",
     () => {
       let lessons = 0;
       for (const s of SURAHS) {
@@ -711,7 +724,9 @@ describe("the lesson's own word is recited once, and its step does not wait for 
             for (const pace of PACES) {
               const times = pace === "pelan" ? 2 : 1;
               const n = a.words.length;
-              const again = s.slug === "al-fatihah" ? Array.from({ length: times }, () => `w${n}:compose=${n}`) : [];
+              // A composed ayah's last word, once more (its stop frame): Al-Fatihah, and Al-Ikhlas since
+              // 2026-10-19; the surahs without compositions recite each word once.
+              const again = composeFor(s.slug) ? Array.from({ length: times }, () => `w${n}:compose=${n}`) : [];
               const want = ["recite=ayah", ...a.words.flatMap((_, i) => Array.from({ length: times }, () => `w${i + 1}:recite=${i + 1}`)), ...again, "recap=ayah"];
               expect(recited(l.seq, pace).map((r) => r.what), `${l.seq.lessonKey} ${locale} ${pace}`).toEqual(want);
             }
@@ -1098,8 +1113,8 @@ describe("what the stage shows during a beat (caption.ts)", () => {
   // Until 2026-10-13 this test was "a word's own recitation after its line (a word without a
   // composition): the word card stays" — the beat "w2:word". Plan L24 took that second recitation
   // away: the line is followed by the next word's opening step.
-  it("a word without a composition (Al-Ikhlas 1): after its line the lesson goes straight to the next word — no beat, nothing recited in between", () => {
-    const s0 = surah("al-ikhlas");
+  it("a word without a composition (An-Nas 1; Al-Ikhlas 1 until it was composed, 2026-10-19): after its line the lesson goes straight to the next word — no beat, nothing recited in between", () => {
+    const s0 = surah("an-nas");
     const l = lessonOf(s0, s0.ayat[0]);
     const idx = l.seq.steps.findIndex((x) => x.id === "w2");
     expect(l.seq.steps[idx].kind).toBe("explain");

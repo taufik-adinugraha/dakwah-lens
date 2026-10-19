@@ -2139,6 +2139,14 @@
       3,
       4
      ]
+    },
+    {
+     "line": "concept:majzum",
+     "step": "majzum",
+     "words": [
+      2,
+      4
+     ]
     }
    ],
    "map": {
@@ -3045,14 +3053,34 @@
   {
    "id": "majzum",
    "lesson": "112:3",
-   "name": "Majzum",
+   "name": "Majzum (مَجْزُوم)",
    "latin": "Majzum",
    "concept": "tanda-irab",
    "part": 4,
    "occurs": {
     "case": "majzum"
    },
-   "line": null,
+   "line": "concept:majzum",
+   "teach": {
+    "title": "Majzum, dan tandanya: sukun",
+    "summary": "Keadaan keempat adalah majzum, khusus untuk fi'il: fi'il mudhari' yang majzum umumnya berakhir sukun. Jadi fi'il bisa marfu', manshub, atau majzum, tetapi tidak pernah majrur; sebaliknya, isim tidak pernah majzum.",
+    "marked": {
+     "title": "[[Majzum|majzum]], dan tandanya: [[sukun|sukun]]",
+     "summary": "Keadaan keempat adalah [[majzum|majzum]], khusus untuk [[fi'il|fiil]]: [[fi'il mudhari'|fiil-mudhari]] yang [[majzum|majzum]] umumnya berakhir [[sukun|sukun]]. Jadi [[fi'il|fiil]] bisa [[marfu'|marfu]], [[manshub|manshub]], atau [[majzum|majzum]], tetapi tidak pernah [[majrur|majrur]]; sebaliknya, [[isim|isim]] tidak pernah [[majzum|majzum]]."
+    },
+    "sources": [
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 6, bab al-I'rab: empat keadaan i'rab; isim tidak di-jazm, fi'il tidak di-khafdh",
+      "url": "https://shamela.ws/book/11371/2"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 8, bab Ma'rifat 'Alamat al-I'rab: tanda jazm adalah sukun dan hadzf; sukun bagi fi'il mudhari' yang huruf akhirnya sahih",
+      "url": "https://shamela.ws/book/11371/5"
+     }
+    ]
+   },
    "terms": [
     "majzum",
     "jazm"
@@ -3061,8 +3089,8 @@
   {
    "id": "kana",
    "lesson": "112:4",
-   "name": "Kana",
-   "latin": "Kana",
+   "name": "Kana dan saudaranya",
+   "latin": "Kana dan saudaranya",
    "concept": "kana-wa-akhawatuha",
    "line": "concept:kana-wa-akhawatuha",
    "terms": [

@@ -60,6 +60,11 @@ export const LessonMapAyah = z
      *  each part, as the warm-up derives it): a line that says the three kinds are met here names
      *  only these (operator 2026-10-18: "in that ayat (example ayat-3) we only have isim"). */
     kinds: z.array(z.enum(["isim", "fiil", "huruf"])).min(1).max(3),
+    /** The running total said unit by unit (pipeline/lessonmap.py "THE RUNNING TOTAL, UNIT BY
+     *  UNIT", 2026-10-19): [] while one sentence names every step (every Al-Fatihah ayah); else
+     *  the groups of whole curriculum units, in teaching order, each a line of its own
+     *  ("map:total:<k>") after the count ("map:total"). */
+    total: z.array(z.object({ from: z.array(Id).min(1), steps: z.array(Id).min(1) }).strict()),
   })
   .strict();
 export type LessonMapAyah = z.infer<typeof LessonMapAyah>;
@@ -92,6 +97,9 @@ export const LessonMapFile = z
     ayat: z.array(LessonMapAyah).min(1),
     /** null: no ayah lists the step of the three kinds of word. */
     kinds: LessonMapKinds.nullable(),
+    /** Each curriculum unit a running total's group names, as its line says it ("Surah
+     *  Al-Fatihah", "pelajaran pengantar"); {} when no total is grouped. */
+    units: z.record(Id, z.string().min(1)),
   })
   .strict();
 export type LessonMapFile = z.infer<typeof LessonMapFile>;

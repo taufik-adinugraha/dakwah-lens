@@ -268,9 +268,9 @@ describe("what an ayah's lesson teaches as “Konsep baru” (taughtAt: what con
   it("the other surahs follow mechanically: fi'il amr and badal in An-Nas, nothing where the curriculum teaches nothing", () => {
     expect(surah("an-nas").ayat.map((a) => taughtAt(a).map((t) => t.id))).toEqual([["fiil-amr"], ["badal"], [], [], [], []]);
     expect(surah("al-falaq").ayat.map((a) => taughtAt(a).map((t) => t.id))).toEqual([[], [], [], [], []]);
-    // Al-Ikhlas 3: the lam record whole (its line keeps the record's id); majzum, a part of i'rab,
-    // has no text yet, so it has no line.
-    expect(surah("al-ikhlas").ayat.map((a) => taughtAt(a).map((t) => t.id))).toEqual([[], [], ["jazm-lam"], ["kana-wa-akhawatuha"]]);
+    // Al-Ikhlas 3: the lam record whole (its line keeps the record's id), then majzum, the fourth
+    // part of i'rab, with a text of its own since 2026-10-19 (Al-Ikhlas's lesson map switched on).
+    expect(surah("al-ikhlas").ayat.map((a) => taughtAt(a).map((t) => t.id))).toEqual([[], [], ["jazm-lam", "majzum"], ["kana-wa-akhawatuha"]]);
     expect(taughtAt(surah("al-ikhlas").ayat[2])[0].step).toBe("nafi-lam");
     // No next-level record is taught anywhere, and no lesson teaches more than three.
     for (const s of SURAHS) {
