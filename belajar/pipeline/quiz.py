@@ -642,13 +642,8 @@ QAC_LAFAZ = "LEM:{ll~ah"
 CLASS_WITHHELD = {
     "gayor": "a word meaning “bukan” / “selain” is an isim by its place (always annexed: al-Jadwal, Darwisy, as-Samin; "
              "ar-Raghib: negation or exception), not a nama benda",
-    # 2026-10-19, when Al-Ikhlas's warm-up was switched on (a judgement call left for the operator):
-    # kufuwan (112:4:4), glossed “setara”, is a plain QAC N, so the rule would say "nama benda";
-    # the sources make it a word for one's EQUAL — al-mitsl wan-nazhir (Darwisy jil. 10 hlm. 615),
-    # "yang sepadan" (al-Jadwal jil. 15 hlm. 426), an-nazhir (as-Samin) — and whether a learner
-    # should call it a nama benda or a nama sifat no source here says (as with the participles).
-    "kufuw": "a word for one's equal (al-mitsl wan-nazhir: Darwisy; “yang sepadan”: al-Jadwal), glossed “setara”: "
-             "whether it is a nama benda or a nama sifat no source here says",
+    # kufuwan (112:4:4, “setara”) is NOT listed: it was withheld on 2026-10-19 (no source names its
+    # class), and the operator decided the same day that it says "nama benda" like any plain QAC N.
 }
 # AN ISIM THAT NAMES, TITLES OR DESCRIBES ALLAH says the kind alone (operator 2026-10-17: "when ism
 # is related to Allah, dont say it's nama benda"; "just say, it's ism."): "Kata ketiga, yaitu رَبِّ
