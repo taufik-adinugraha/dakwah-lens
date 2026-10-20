@@ -2470,16 +2470,16 @@
       "focus": null
     },
     "al-ikhlas:1:structure:b": {
-      "text": "Di dalamnya kata kedua menjadi مُبْتَدَأ: menurut al-Mujtaba dan pendapat pertama Darwisy, kata kedua adalah dhomir sya'n, yang artinya perkaranya ialah, yang dijelaskan oleh kalimat kata ketiga dan keempat, dengan kata ketiga sebagai مُبْتَدَأ kedua dan kata keempat sebagai khabarnya;",
-      "display": "Di dalamnya kata kedua menjadi mubtada’ (مُبْتَدَأ): menurut al-Mujtaba dan pendapat pertama Darwisy, kata kedua adalah dhamir (ضَمِير) sya'n, yang artinya “perkaranya ialah …”, yang dijelaskan oleh kalimat kata ketiga dan keempat, dengan kata ketiga sebagai mubtada’ (مُبْتَدَأ) kedua dan kata keempat sebagai khabarnya;",
+      "text": "Di dalamnya kata kedua menjadi مُبْتَدَأ: menurut al-Mujtaba dan pendapat pertama Darwisy, kata kedua adalah dhomir sya'n, yang artinya perkaranya ialah, yang dijelaskan oleh kalimat kata ketiga dan keempat, dengan kata ketiga sebagai مُبْتَدَأ kedua dan kata keempat sebagai khobarnya;",
+      "display": "Di dalamnya kata kedua menjadi mubtada’ (مُبْتَدَأ): menurut al-Mujtaba dan pendapat pertama Darwisy, kata kedua adalah dhamir (ضَمِير) sya'n, yang artinya “perkaranya ialah …”, yang dijelaskan oleh kalimat kata ketiga dan keempat, dengan kata ketiga sebagai mubtada’ (مُبْتَدَأ) kedua dan kata keempat sebagai khabarnya (خَبَر);",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-ikhlas:1:structure:c": {
-      "text": "menurut pendapat lain, kata kedua kembali kepada Tuhan yang ditanyakan kepada Nabi shallallahu 'alaihi wa sallam, lalu kata ketiga menjadi khabarnya.",
-      "display": "menurut pendapat lain, kata kedua kembali kepada Tuhan yang ditanyakan kepada Nabi shallallahu 'alaihi wa sallam, lalu kata ketiga menjadi khabarnya.",
+      "text": "menurut pendapat lain, kata kedua kembali kepada Tuhan yang ditanyakan kepada Nabi shallallahu 'alaihi wa sallam, lalu kata ketiga menjadi khobarnya.",
+      "display": "menurut pendapat lain, kata kedua kembali kepada Tuhan yang ditanyakan kepada Nabi shallallahu 'alaihi wa sallam, lalu kata ketiga menjadi khabarnya (خَبَر).",
       "highlight": [
         0
       ],
@@ -6634,12 +6634,174 @@
       ]
     },
     "al-ikhlas:2:structure:b": {
-      "text": "Kalimat ini sendiri kalimat nominal: kata pertama menjadi مُبْتَدَأ dan kata kedua khabarnya, Darwisy, al-Mujtaba. Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
-      "display": "Kalimat ini sendiri kalimat nominal: kata pertama menjadi mubtada’ (مُبْتَدَأ) dan kata kedua khabarnya (Darwisy, al-Mujtaba). Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
+      "text": "Kalimat ini sendiri kalimat nominal: kata pertama menjadi مُبْتَدَأ dan kata kedua khobarnya, yaitu Darwisy, al-Mujtaba. Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
+      "display": "Kalimat ini sendiri kalimat nominal: kata pertama menjadi mubtada’ (مُبْتَدَأ) dan kata kedua khabarnya (خَبَر), yaitu Darwisy, al-Mujtaba. Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan.",
       "highlight": [
         0
       ],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/9f52dadf6e803438.mp3",
+        "ms": 17476,
+        "sha256": "81db6c12f44d6d3555ba7d16424eef2e9122deafefdb74b619f0eff04b1b49a9"
+      },
+      "tokens": [
+        {
+          "t": "Kalimat",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "ini",
+          "s": 0.46,
+          "e": 0.64
+        },
+        {
+          "t": "sendiri",
+          "s": 0.688,
+          "e": 1.12
+        },
+        {
+          "t": "kalimat",
+          "s": 1.2,
+          "e": 1.68
+        },
+        {
+          "t": "nominal:",
+          "s": 1.76,
+          "e": 2.72
+        },
+        {
+          "t": "kata",
+          "s": 2.8,
+          "e": 3.12
+        },
+        {
+          "t": "pertama",
+          "s": 3.168,
+          "e": 3.6
+        },
+        {
+          "t": "menjadi",
+          "s": 3.66,
+          "e": 4.08
+        },
+        {
+          "t": "mubtada’ (مُبْتَدَأ)",
+          "s": 4.16,
+          "e": 4.72
+        },
+        {
+          "t": "dan",
+          "s": 4.92,
+          "e": 5.52
+        },
+        {
+          "t": "kata",
+          "s": 5.568,
+          "e": 5.76
+        },
+        {
+          "t": "kedua",
+          "s": 5.82,
+          "e": 6.16
+        },
+        {
+          "t": "khabarnya (خَبَر),",
+          "s": 6.213,
+          "e": 6.96
+        },
+        {
+          "t": "yaitu",
+          "s": 7.0,
+          "e": 7.28
+        },
+        {
+          "t": "Darwisy,",
+          "s": 7.36,
+          "e": 8.24
+        },
+        {
+          "t": "al-Mujtaba.",
+          "s": 8.347,
+          "e": 9.36
+        },
+        {
+          "t": "Kata",
+          "s": 9.536,
+          "e": 10.24
+        },
+        {
+          "t": "pertama",
+          "s": 10.288,
+          "e": 10.64
+        },
+        {
+          "t": "diulang,",
+          "s": 10.693,
+          "e": 11.2
+        },
+        {
+          "t": "bukan",
+          "s": 11.333,
+          "e": 11.84
+        },
+        {
+          "t": "diganti",
+          "s": 11.88,
+          "e": 12.32
+        },
+        {
+          "t": "dengan",
+          "s": 12.366,
+          "e": 12.64
+        },
+        {
+          "t": "kata",
+          "s": 12.688,
+          "e": 12.88
+        },
+        {
+          "t": "ganti,",
+          "s": 12.92,
+          "e": 13.76
+        },
+        {
+          "t": "dan",
+          "s": 13.82,
+          "e": 14.0
+        },
+        {
+          "t": "menurut",
+          "s": 14.04,
+          "e": 14.4
+        },
+        {
+          "t": "an-Nahhas",
+          "s": 14.453,
+          "e": 15.04
+        },
+        {
+          "t": "pengulangan",
+          "s": 15.12,
+          "e": 15.76
+        },
+        {
+          "t": "itu",
+          "s": 15.86,
+          "e": 16.16
+        },
+        {
+          "t": "untuk",
+          "s": 16.24,
+          "e": 16.64
+        },
+        {
+          "t": "mengagungkan.",
+          "s": 16.672,
+          "e": 17.44
+        }
+      ]
     },
     "al-ikhlas:2:ex:tap-word:intro": {
       "text": "Latihan dengar dan klik. Akan dibacakan dua kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, klik kata yang Anda dengar.",
@@ -6996,10 +7158,107 @@
       ]
     },
     "al-ikhlas:2:ex:why-harakat:1:why": {
-      "text": "Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ, yaitu pokok kalimat, dan kata kedua adalah khabarnya. Jadi, kata ini مَرْفُوع.",
-      "display": "Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat, dan kata kedua adalah khabarnya. Jadi, kata ini marfu’ (مَرْفُوع).",
+      "text": "Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ, yaitu pokok kalimat, dan kata kedua adalah khobarnya. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat, dan kata kedua adalah khabarnya (خَبَر). Jadi, kata ini marfu’ (مَرْفُوع).",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/0815ce34194f0c9b.mp3",
+        "ms": 10841,
+        "sha256": "cf923ab05f17e034e5afc8cdeede3e7197f46aa4c1749a505a50f8b5f756d79a"
+      },
+      "tokens": [
+        {
+          "t": "Akhirnya",
+          "s": 0.0,
+          "e": 0.32
+        },
+        {
+          "t": "dibaca",
+          "s": 0.36,
+          "e": 0.72
+        },
+        {
+          "t": "dhammah (ضَمَّة),",
+          "s": 0.747,
+          "e": 1.2
+        },
+        {
+          "t": "karena",
+          "s": 1.303,
+          "e": 1.92
+        },
+        {
+          "t": "menjadi",
+          "s": 2.01,
+          "e": 2.64
+        },
+        {
+          "t": "mubtada’ (مُبْتَدَأ),",
+          "s": 2.76,
+          "e": 4.0
+        },
+        {
+          "t": "yaitu",
+          "s": 4.04,
+          "e": 4.32
+        },
+        {
+          "t": "pokok",
+          "s": 4.38,
+          "e": 4.68
+        },
+        {
+          "t": "kalimat,",
+          "s": 4.71,
+          "e": 5.44
+        },
+        {
+          "t": "dan",
+          "s": 5.52,
+          "e": 5.76
+        },
+        {
+          "t": "kata",
+          "s": 5.824,
+          "e": 6.08
+        },
+        {
+          "t": "kedua",
+          "s": 6.14,
+          "e": 6.56
+        },
+        {
+          "t": "adalah",
+          "s": 6.629,
+          "e": 7.04
+        },
+        {
+          "t": "khabarnya (خَبَر).",
+          "s": 7.12,
+          "e": 7.92
+        },
+        {
+          "t": "Jadi,",
+          "s": 8.28,
+          "e": 9.04
+        },
+        {
+          "t": "kata",
+          "s": 9.168,
+          "e": 9.68
+        },
+        {
+          "t": "ini",
+          "s": 9.76,
+          "e": 10.0
+        },
+        {
+          "t": "marfu’ (مَرْفُوع).",
+          "s": 10.12,
+          "e": 10.8
+        }
+      ]
     },
     "al-ikhlas:2:ex:why-harakat:2:why": {
       "text": "Akhirnya dibaca dhommah, karena menjadi khobar, yaitu keterangan, bagi kata pertama. Jadi, kata ini مَرْفُوع.",
@@ -7208,10 +7467,107 @@
       ]
     },
     "al-ikhlas:2:ex:sort-case:1:why": {
-      "text": "Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ, yaitu pokok kalimat, dan kata kedua adalah khabarnya. Jadi, kata ini مَرْفُوع.",
-      "display": "Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat, dan kata kedua adalah khabarnya. Jadi, kata ini marfu’ (مَرْفُوع).",
+      "text": "Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ, yaitu pokok kalimat, dan kata kedua adalah khobarnya. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat, dan kata kedua adalah khabarnya (خَبَر). Jadi, kata ini marfu’ (مَرْفُوع).",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/0815ce34194f0c9b.mp3",
+        "ms": 10841,
+        "sha256": "cf923ab05f17e034e5afc8cdeede3e7197f46aa4c1749a505a50f8b5f756d79a"
+      },
+      "tokens": [
+        {
+          "t": "Akhirnya",
+          "s": 0.0,
+          "e": 0.32
+        },
+        {
+          "t": "dibaca",
+          "s": 0.36,
+          "e": 0.72
+        },
+        {
+          "t": "dhammah (ضَمَّة),",
+          "s": 0.747,
+          "e": 1.2
+        },
+        {
+          "t": "karena",
+          "s": 1.303,
+          "e": 1.92
+        },
+        {
+          "t": "menjadi",
+          "s": 2.01,
+          "e": 2.64
+        },
+        {
+          "t": "mubtada’ (مُبْتَدَأ),",
+          "s": 2.76,
+          "e": 4.0
+        },
+        {
+          "t": "yaitu",
+          "s": 4.04,
+          "e": 4.32
+        },
+        {
+          "t": "pokok",
+          "s": 4.38,
+          "e": 4.68
+        },
+        {
+          "t": "kalimat,",
+          "s": 4.71,
+          "e": 5.44
+        },
+        {
+          "t": "dan",
+          "s": 5.52,
+          "e": 5.76
+        },
+        {
+          "t": "kata",
+          "s": 5.824,
+          "e": 6.08
+        },
+        {
+          "t": "kedua",
+          "s": 6.14,
+          "e": 6.56
+        },
+        {
+          "t": "adalah",
+          "s": 6.629,
+          "e": 7.04
+        },
+        {
+          "t": "khabarnya (خَبَر).",
+          "s": 7.12,
+          "e": 7.92
+        },
+        {
+          "t": "Jadi,",
+          "s": 8.28,
+          "e": 9.04
+        },
+        {
+          "t": "kata",
+          "s": 9.168,
+          "e": 9.68
+        },
+        {
+          "t": "ini",
+          "s": 9.76,
+          "e": 10.0
+        },
+        {
+          "t": "marfu’ (مَرْفُوع).",
+          "s": 10.12,
+          "e": 10.8
+        }
+      ]
     },
     "al-ikhlas:2:ex:sort-case:2:why": {
       "text": "Akhirnya dibaca dhommah, karena menjadi khobar, yaitu keterangan, bagi kata pertama. Jadi, kata ini مَرْفُوع.",
@@ -7390,10 +7746,97 @@
       ]
     },
     "al-ikhlas:2:ex:label-role:1:why": {
-      "text": "Perannya: مُبْتَدَأ. Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ, yaitu pokok kalimat, dan kata kedua adalah khabarnya.",
-      "display": "Perannya: mubtada’ (مُبْتَدَأ). Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat, dan kata kedua adalah khabarnya.",
+      "text": "Perannya: مُبْتَدَأ. Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ, yaitu pokok kalimat, dan kata kedua adalah khobarnya.",
+      "display": "Perannya: mubtada’ (مُبْتَدَأ). Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat, dan kata kedua adalah khabarnya (خَبَر).",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/64e59e79e3b2c851.mp3",
+        "ms": 9404,
+        "sha256": "01bfcf656f79e1062719972ccdd9fb3a4cb5081438824de9403836d1893eaf1d"
+      },
+      "tokens": [
+        {
+          "t": "Perannya:",
+          "s": 0.0,
+          "e": 0.6
+        },
+        {
+          "t": "mubtada’ (مُبْتَدَأ).",
+          "s": 0.66,
+          "e": 1.36
+        },
+        {
+          "t": "Akhirnya",
+          "s": 1.573,
+          "e": 2.32
+        },
+        {
+          "t": "dibaca",
+          "s": 2.38,
+          "e": 2.8
+        },
+        {
+          "t": "dhammah (ضَمَّة),",
+          "s": 2.827,
+          "e": 3.28
+        },
+        {
+          "t": "karena",
+          "s": 3.371,
+          "e": 3.92
+        },
+        {
+          "t": "menjadi",
+          "s": 3.98,
+          "e": 4.4
+        },
+        {
+          "t": "mubtada’ (مُبْتَدَأ),",
+          "s": 4.48,
+          "e": 5.28
+        },
+        {
+          "t": "yaitu",
+          "s": 5.44,
+          "e": 6.0
+        },
+        {
+          "t": "pokok",
+          "s": 6.06,
+          "e": 6.32
+        },
+        {
+          "t": "kalimat,",
+          "s": 6.38,
+          "e": 6.88
+        },
+        {
+          "t": "dan",
+          "s": 7.02,
+          "e": 7.44
+        },
+        {
+          "t": "kata",
+          "s": 7.504,
+          "e": 7.76
+        },
+        {
+          "t": "kedua",
+          "s": 7.82,
+          "e": 8.16
+        },
+        {
+          "t": "adalah",
+          "s": 8.217,
+          "e": 8.56
+        },
+        {
+          "t": "khabarnya (خَبَر).",
+          "s": 8.64,
+          "e": 9.36
+        }
+      ]
     },
     "al-ikhlas:2:ex:label-role:2:why": {
       "text": "Perannya: khobar. Akhirnya dibaca dhommah, karena menjadi khobar, yaitu keterangan, bagi kata pertama.",
@@ -10521,15 +10964,147 @@
       ]
     },
     "al-ikhlas:3:concept:jazm-lam": {
-      "text": "Konsep baru: Huruf nafi yang menjazmkan: menafikan dan menjazmkan fi'il mudhori'. Kata pertama meniadakan fi'il mudhori' sesudahnya dan membuatnya مَجْزُوم; bila huruf akhirnya sahih, tanda jazm-nya سُكُون.",
-      "display": "Konsep baru: Huruf nafi yang menjazmkan: menafikan dan menjazmkan fi’il mudhari’ (فِعْل مُضَارِع). Kata pertama meniadakan fi’il mudhari’ (فِعْل مُضَارِع) sesudahnya dan membuatnya majzum (مَجْزُوم); bila huruf akhirnya sahih, tanda jazm-nya sukun (سُكُون).",
+      "text": "Konsep baru: Huruf nafi yang menjazmkan: menafikan dan menjazmkan fi'il mudhori'. Kata pertama meniadakan fi'il mudhori' sesudahnya dan membuatnya مَجْزُوم; bila huruf akhirnya sahih, tanda جَزْمnya سُكُون.",
+      "display": "Konsep baru: Huruf nafi yang menjazmkan: menafikan dan menjazmkan fi’il mudhari’ (فِعْل مُضَارِع). Kata pertama meniadakan fi’il mudhari’ (فِعْل مُضَارِع) sesudahnya dan membuatnya majzum (مَجْزُوم); bila huruf akhirnya sahih, tanda jazm-nya (جَزْم) sukun (سُكُون).",
       "highlight": [
         1,
         2,
         3,
         4
       ],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/452c7765b9dde74f.mp3",
+        "ms": 17868,
+        "sha256": "c4c0b7a7ca60e54eeb666403a665922630735c79fda299d38f98cec77d4c9f9d"
+      },
+      "tokens": [
+        {
+          "t": "Konsep",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "baru:",
+          "s": 0.48,
+          "e": 1.16
+        },
+        {
+          "t": "Huruf",
+          "s": 1.25,
+          "e": 1.68
+        },
+        {
+          "t": "nafi",
+          "s": 1.76,
+          "e": 2.24
+        },
+        {
+          "t": "yang",
+          "s": 2.288,
+          "e": 2.48
+        },
+        {
+          "t": "menjazmkan:",
+          "s": 2.56,
+          "e": 3.52
+        },
+        {
+          "t": "menafikan",
+          "s": 3.7,
+          "e": 4.72
+        },
+        {
+          "t": "dan",
+          "s": 4.78,
+          "e": 4.96
+        },
+        {
+          "t": "menjazmkan",
+          "s": 5.024,
+          "e": 5.76
+        },
+        {
+          "t": "fi’il mudhari’ (فِعْل مُضَارِع).",
+          "s": 5.867,
+          "e": 6.96
+        },
+        {
+          "t": "Kata",
+          "s": 7.2,
+          "e": 8.16
+        },
+        {
+          "t": "pertama",
+          "s": 8.208,
+          "e": 8.72
+        },
+        {
+          "t": "meniadakan",
+          "s": 8.8,
+          "e": 9.6
+        },
+        {
+          "t": "fi’il mudhari’ (فِعْل مُضَارِع)",
+          "s": 9.653,
+          "e": 10.48
+        },
+        {
+          "t": "sesudahnya",
+          "s": 10.54,
+          "e": 11.28
+        },
+        {
+          "t": "dan",
+          "s": 11.42,
+          "e": 11.84
+        },
+        {
+          "t": "membuatnya",
+          "s": 11.91,
+          "e": 12.56
+        },
+        {
+          "t": "majzum (مَجْزُوم);",
+          "s": 12.72,
+          "e": 13.44
+        },
+        {
+          "t": "bila",
+          "s": 13.84,
+          "e": 14.48
+        },
+        {
+          "t": "huruf",
+          "s": 14.52,
+          "e": 14.8
+        },
+        {
+          "t": "akhirnya",
+          "s": 14.853,
+          "e": 15.2
+        },
+        {
+          "t": "sahih,",
+          "s": 15.28,
+          "e": 16.16
+        },
+        {
+          "t": "tanda",
+          "s": 16.2,
+          "e": 16.48
+        },
+        {
+          "t": "jazm-nya (جَزْم)",
+          "s": 16.52,
+          "e": 17.12
+        },
+        {
+          "t": "sukun (سُكُون).",
+          "s": 17.24,
+          "e": 17.84
+        }
+      ]
     },
     "al-ikhlas:3:concept:majzum": {
       "text": "Konsep baru: مَجْزُوم, dan tandanya: سُكُون. Keadaan keempat adalah مَجْزُوم, khusus untuk فِعْل: fi'il mudhori' yang مَجْزُوم umumnya berakhir سُكُون. Jadi فِعْل bisa مَرْفُوع, مَنْصُوب, atau مَجْزُوم, tetapi tidak pernah مَجْرُور; sebaliknya, اِسْم tidak pernah مَجْزُوم.",
@@ -13002,10 +13577,67 @@
       ]
     },
     "al-ikhlas:4:map:new": {
-      "text": "Di ayat ini ada satu hal baru: kana dan saudaranya.",
-      "display": "Di ayat ini ada satu hal baru: kana dan saudaranya.",
+      "text": "Di ayat ini ada satu hal baru: كَانَ dan saudaranya.",
+      "display": "Di ayat ini ada satu hal baru: kana (كَانَ) dan saudaranya.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/5a4a4eb6a013b2f3.mp3",
+        "ms": 4362,
+        "sha256": "1b0e7216680520dcaa8e01a8a7853f0bb0554300dd3f1887130d068b61cdded6"
+      },
+      "tokens": [
+        {
+          "t": "Di",
+          "s": 0.0,
+          "e": 0.16
+        },
+        {
+          "t": "ayat",
+          "s": 0.187,
+          "e": 0.4
+        },
+        {
+          "t": "ini",
+          "s": 0.5,
+          "e": 0.8
+        },
+        {
+          "t": "ada",
+          "s": 0.88,
+          "e": 1.12
+        },
+        {
+          "t": "satu",
+          "s": 1.168,
+          "e": 1.36
+        },
+        {
+          "t": "hal",
+          "s": 1.42,
+          "e": 1.6
+        },
+        {
+          "t": "baru:",
+          "s": 1.68,
+          "e": 2.08
+        },
+        {
+          "t": "kana (كَانَ)",
+          "s": 2.4,
+          "e": 3.12
+        },
+        {
+          "t": "dan",
+          "s": 3.2,
+          "e": 3.44
+        },
+        {
+          "t": "saudaranya.",
+          "s": 3.52,
+          "e": 4.32
+        }
+      ]
     },
     "al-ikhlas:4:map:again": {
       "text": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, حَرْف جَرّ, مَرْفُوع, dhomir, fi'il mudhori', مَنْصُوب, عَطْف, huruf nafi yang menjazmkan, serta مَجْزُوم.",
@@ -13279,10 +13911,107 @@
       ]
     },
     "al-ikhlas:4:map:focus": {
-      "text": "Sekarang Anda tidak perlu memikirkan yang satu ini. Mari kita fokus pada pelajaran kana dan saudaranya terlebih dahulu.",
-      "display": "Sekarang Anda tidak perlu memikirkan yang satu ini. Mari kita fokus pada pelajaran kana dan saudaranya terlebih dahulu.",
+      "text": "Sekarang Anda tidak perlu memikirkan yang satu ini. Mari kita fokus pada pelajaran كَانَ dan saudaranya terlebih dahulu.",
+      "display": "Sekarang Anda tidak perlu memikirkan yang satu ini. Mari kita fokus pada pelajaran kana (كَانَ) dan saudaranya terlebih dahulu.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/3201d726a06b0a62.mp3",
+        "ms": 7889,
+        "sha256": "d457f33b75ed31599bb9e5958f65e0873c86c9077324acc0a31aa23bfff3b37d"
+      },
+      "tokens": [
+        {
+          "t": "Sekarang",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "Anda",
+          "s": 0.448,
+          "e": 0.64
+        },
+        {
+          "t": "tidak",
+          "s": 0.693,
+          "e": 0.96
+        },
+        {
+          "t": "perlu",
+          "s": 1.0,
+          "e": 1.28
+        },
+        {
+          "t": "memikirkan",
+          "s": 1.32,
+          "e": 1.92
+        },
+        {
+          "t": "yang",
+          "s": 1.952,
+          "e": 2.08
+        },
+        {
+          "t": "satu",
+          "s": 2.128,
+          "e": 2.32
+        },
+        {
+          "t": "ini.",
+          "s": 2.42,
+          "e": 3.16
+        },
+        {
+          "t": "Mari",
+          "s": 3.248,
+          "e": 3.6
+        },
+        {
+          "t": "kita",
+          "s": 3.648,
+          "e": 3.84
+        },
+        {
+          "t": "fokus",
+          "s": 3.92,
+          "e": 4.32
+        },
+        {
+          "t": "pada",
+          "s": 4.384,
+          "e": 4.64
+        },
+        {
+          "t": "pelajaran",
+          "s": 4.68,
+          "e": 5.2
+        },
+        {
+          "t": "kana (كَانَ)",
+          "s": 5.28,
+          "e": 5.84
+        },
+        {
+          "t": "dan",
+          "s": 5.9,
+          "e": 6.08
+        },
+        {
+          "t": "saudaranya",
+          "s": 6.16,
+          "e": 6.8
+        },
+        {
+          "t": "terlebih",
+          "s": 6.86,
+          "e": 7.28
+        },
+        {
+          "t": "dahulu.",
+          "s": 7.34,
+          "e": 7.84
+        }
+      ]
     },
     "al-ikhlas:4:ex:word-kind:intro": {
       "text": "Latihan pemanasan, tujuh soal. Setiap soal menampilkan satu kata atau satu bagian kata dari ayat ini; tebak dulu jenisnya: اِسْم, فِعْل, atau حَرْف.",
@@ -16208,15 +16937,177 @@
       ]
     },
     "al-ikhlas:4:concept:kana-wa-akhawatuha": {
-      "text": "Konsep baru: Kana dan saudaranya, yaitu isimnya مَرْفُوع, khabarnya مَنْصُوب. Kana dan saudara-saudaranya masuk pada مُبْتَدَأ dan khobar: isimnya menjadi مَرْفُوع dan khabarnya مَنْصُوب, dan khobar itu boleh diletakkan sebelum isimnya.",
-      "display": "Konsep baru: Kana dan saudaranya, yaitu isimnya marfu’ (مَرْفُوع), khabarnya manshub (مَنْصُوب). Kana dan saudara-saudaranya masuk pada mubtada’ (مُبْتَدَأ) dan khabar (خَبَر): isimnya menjadi marfu’ (مَرْفُوع) dan khabarnya manshub (مَنْصُوب), dan khabar (خَبَر) itu boleh diletakkan sebelum isimnya.",
+      "text": "Konsep baru: كَانَ dan saudaranya, yaitu اِسْمnya مَرْفُوع, khobarnya مَنْصُوب. كَانَ dan saudara-saudaranya masuk pada مُبْتَدَأ dan khobar: اِسْمnya menjadi مَرْفُوع dan khobarnya مَنْصُوب, dan khobar itu boleh diletakkan sebelum اِسْمnya.",
+      "display": "Konsep baru: Kana (كَانَ) dan saudaranya, yaitu isimnya (اِسْم) marfu’ (مَرْفُوع), khabarnya (خَبَر) manshub (مَنْصُوب). Kana (كَانَ) dan saudara-saudaranya masuk pada mubtada’ (مُبْتَدَأ) dan khabar (خَبَر): isimnya (اِسْم) menjadi marfu’ (مَرْفُوع) dan khabarnya (خَبَر) manshub (مَنْصُوب), dan khabar (خَبَر) itu boleh diletakkan sebelum isimnya (اِسْم).",
       "highlight": [
         2,
         3,
         4,
         5
       ],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/47dd79e5f16897fb.mp3",
+        "ms": 19958,
+        "sha256": "d83f3aa5cc0557bc42d66aa7455923598b00b60190551b50e6bf49a0441dde4b"
+      },
+      "tokens": [
+        {
+          "t": "Konsep",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "baru:",
+          "s": 0.464,
+          "e": 0.8
+        },
+        {
+          "t": "Kana (كَانَ)",
+          "s": 1.16,
+          "e": 1.92
+        },
+        {
+          "t": "dan",
+          "s": 2.04,
+          "e": 2.4
+        },
+        {
+          "t": "saudaranya,",
+          "s": 2.453,
+          "e": 3.52
+        },
+        {
+          "t": "yaitu",
+          "s": 3.56,
+          "e": 4.0
+        },
+        {
+          "t": "isimnya (اِسْم)",
+          "s": 4.16,
+          "e": 4.72
+        },
+        {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 4.76,
+          "e": 5.6
+        },
+        {
+          "t": "khabarnya (خَبَر)",
+          "s": 5.653,
+          "e": 6.32
+        },
+        {
+          "t": "manshub (مَنْصُوب).",
+          "s": 6.4,
+          "e": 7.84
+        },
+        {
+          "t": "Kana (كَانَ)",
+          "s": 7.9,
+          "e": 8.32
+        },
+        {
+          "t": "dan",
+          "s": 8.42,
+          "e": 8.72
+        },
+        {
+          "t": "saudara-saudaranya",
+          "s": 8.8,
+          "e": 9.76
+        },
+        {
+          "t": "masuk",
+          "s": 9.86,
+          "e": 10.24
+        },
+        {
+          "t": "pada",
+          "s": 10.32,
+          "e": 10.64
+        },
+        {
+          "t": "mubtada’ (مُبْتَدَأ)",
+          "s": 10.68,
+          "e": 11.28
+        },
+        {
+          "t": "dan",
+          "s": 11.34,
+          "e": 11.52
+        },
+        {
+          "t": "khabar (خَبَر):",
+          "s": 11.573,
+          "e": 12.8
+        },
+        {
+          "t": "isimnya (اِسْم)",
+          "s": 12.84,
+          "e": 13.28
+        },
+        {
+          "t": "menjadi",
+          "s": 13.33,
+          "e": 13.68
+        },
+        {
+          "t": "marfu’ (مَرْفُوع)",
+          "s": 13.72,
+          "e": 14.32
+        },
+        {
+          "t": "dan",
+          "s": 14.44,
+          "e": 14.8
+        },
+        {
+          "t": "khabarnya (خَبَر)",
+          "s": 14.853,
+          "e": 15.44
+        },
+        {
+          "t": "manshub (مَنْصُوب),",
+          "s": 15.52,
+          "e": 16.08
+        },
+        {
+          "t": "dan",
+          "s": 16.28,
+          "e": 16.88
+        },
+        {
+          "t": "khabar (خَبَر)",
+          "s": 16.933,
+          "e": 17.2
+        },
+        {
+          "t": "itu",
+          "s": 17.3,
+          "e": 17.6
+        },
+        {
+          "t": "boleh",
+          "s": 17.707,
+          "e": 18.16
+        },
+        {
+          "t": "diletakkan",
+          "s": 18.2,
+          "e": 18.8
+        },
+        {
+          "t": "sebelum",
+          "s": 18.88,
+          "e": 19.28
+        },
+        {
+          "t": "isimnya (اِسْم).",
+          "s": 19.36,
+          "e": 19.92
+        }
+      ]
     },
     "al-ikhlas:4:structure:a": {
       "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat ketiga: وَاو menyambungkan kalimat ini pada frasa lam yalid yang artinya tidak beranak di ayat ketiga, dan kata pertama menjazmkan kata kedua,",
@@ -16388,8 +17279,8 @@
       ]
     },
     "al-ikhlas:4:structure:b": {
-      "text": "bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir, kata keempat khabarnya yang didahulukan, dan kata ketiga bergantung pada kata keempat, sehingga maksudnya tidak ada seorang pun yang setara bagi-Nya, Abu Hayyan, dinukil Darwisy dan as-Samin.",
-      "display": "bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir, kata keempat khabarnya yang didahulukan, dan kata ketiga bergantung pada kata keempat, sehingga maksudnya “tidak ada seorang pun yang setara bagi-Nya” (Abu Hayyan, dinukil Darwisy dan as-Samin).",
+      "text": "bentuk mudhari' dari كَانَ yang merafa'kan اِسْمnya dan menashabkan khobarnya: kata kelima adalah اِسْمnya yang diletakkan di akhir, kata keempat khobarnya yang didahulukan, dan kata ketiga bergantung pada kata keempat, sehingga maksudnya tidak ada seorang pun yang setara bagi-Nya, Abu Hayyan, dinukil Darwisy dan as-Samin.",
+      "display": "bentuk mudhari' dari kana (كَانَ) yang merafa'kan isimnya (اِسْم) dan menashabkan khabarnya (خَبَر): kata kelima adalah isimnya (اِسْم) yang diletakkan di akhir, kata keempat khabarnya (خَبَر) yang didahulukan, dan kata ketiga bergantung pada kata keempat, sehingga maksudnya “tidak ada seorang pun yang setara bagi-Nya” (Abu Hayyan, dinukil Darwisy dan as-Samin).",
       "highlight": [
         0
       ],
@@ -17327,8 +18218,8 @@
       ]
     },
     "al-ikhlas:4:ex:why-harakat:2:why": {
-      "text": "Akhirnya fathatain, yaitu فَتْحَة bertanwin, karena menjadi khobar kata kedua yang didahulukan sebelum isimnya, kata kelima. Jadi, kata ini مَنْصُوب.",
-      "display": "Akhirnya fathatain, yaitu fathah (فَتْحَة) bertanwin, karena menjadi khabar (خَبَر) kata kedua yang didahulukan sebelum isimnya, kata kelima. Jadi, kata ini manshub (مَنْصُوب).",
+      "text": "Akhirnya fathatain, yaitu فَتْحَة bertanwin, karena menjadi khobar kata kedua yang didahulukan sebelum اِسْمnya, kata kelima. Jadi, kata ini مَنْصُوب.",
+      "display": "Akhirnya fathatain, yaitu fathah (فَتْحَة) bertanwin, karena menjadi khabar (خَبَر) kata kedua yang didahulukan sebelum isimnya (اِسْم), kata kelima. Jadi, kata ini manshub (مَنْصُوب).",
       "highlight": [],
       "focus": null
     },
@@ -17620,8 +18511,8 @@
       ]
     },
     "al-ikhlas:4:ex:sort-case:2:why": {
-      "text": "Akhirnya fathatain, yaitu فَتْحَة bertanwin, karena menjadi khobar kata kedua yang didahulukan sebelum isimnya, kata kelima. Jadi, kata ini مَنْصُوب.",
-      "display": "Akhirnya fathatain, yaitu fathah (فَتْحَة) bertanwin, karena menjadi khabar (خَبَر) kata kedua yang didahulukan sebelum isimnya, kata kelima. Jadi, kata ini manshub (مَنْصُوب).",
+      "text": "Akhirnya fathatain, yaitu فَتْحَة bertanwin, karena menjadi khobar kata kedua yang didahulukan sebelum اِسْمnya, kata kelima. Jadi, kata ini مَنْصُوب.",
+      "display": "Akhirnya fathatain, yaitu fathah (فَتْحَة) bertanwin, karena menjadi khabar (خَبَر) kata kedua yang didahulukan sebelum isimnya (اِسْم), kata kelima. Jadi, kata ini manshub (مَنْصُوب).",
       "highlight": [],
       "focus": null
     },
@@ -17893,8 +18784,8 @@
       ]
     },
     "al-ikhlas:4:ex:label-role:2:why": {
-      "text": "Perannya: fi'il mudhori' مَجْزُوم dari kana. Fi'il mudhori' dari kana ini مَجْزُوم oleh kata pertama, dengan tanda سُكُون pada نُون di akhirnya; seperti kana, ia merafa'kan isimnya, kata kelima, dan menashabkan khabarnya, kata keempat.",
-      "display": "Perannya: fi’il mudhari’ (فِعْل مُضَارِع) majzum (مَجْزُوم) dari kana. Fi’il mudhari’ (فِعْل مُضَارِع) dari kana ini majzum (مَجْزُوم) oleh kata pertama, dengan tanda sukun (سُكُون) pada ن di akhirnya; seperti kana, ia merafa'kan isimnya (kata kelima) dan menashabkan khabarnya (kata keempat).",
+      "text": "Perannya: fi'il mudhori' مَجْزُوم dari كَانَ. Fi'il mudhori' dari كَانَ ini مَجْزُوم oleh kata pertama, dengan tanda سُكُون pada نُون di akhirnya; seperti كَانَ, ia merafa'kan اِسْمnya, yaitu kata kelima, dan menashabkan khobarnya, yaitu kata keempat.",
+      "display": "Perannya: fi’il mudhari’ (فِعْل مُضَارِع) majzum (مَجْزُوم) dari kana (كَانَ). Fi’il mudhari’ (فِعْل مُضَارِع) dari kana (كَانَ) ini majzum (مَجْزُوم) oleh kata pertama, dengan tanda sukun (سُكُون) pada ن di akhirnya; seperti kana (كَانَ), ia merafa'kan isimnya (اِسْم), yaitu kata kelima, dan menashabkan khabarnya (خَبَر), yaitu kata keempat.",
       "highlight": [],
       "focus": null
     },
@@ -18082,8 +18973,8 @@
       ]
     },
     "al-ikhlas:4:ex:label-role:4:why": {
-      "text": "Perannya: khobar kata kedua. Akhirnya fathatain, yaitu فَتْحَة bertanwin, karena menjadi khobar kata kedua yang didahulukan sebelum isimnya, kata kelima.",
-      "display": "Perannya: khabar (خَبَر) kata kedua. Akhirnya fathatain, yaitu fathah (فَتْحَة) bertanwin, karena menjadi khabar (خَبَر) kata kedua yang didahulukan sebelum isimnya, kata kelima.",
+      "text": "Perannya: khobar kata kedua. Akhirnya fathatain, yaitu فَتْحَة bertanwin, karena menjadi khobar kata kedua yang didahulukan sebelum اِسْمnya, kata kelima.",
+      "display": "Perannya: khabar (خَبَر) kata kedua. Akhirnya fathatain, yaitu fathah (فَتْحَة) bertanwin, karena menjadi khabar (خَبَر) kata kedua yang didahulukan sebelum isimnya (اِسْم), kata kelima.",
       "highlight": [],
       "focus": null
     },
@@ -18094,10 +18985,72 @@
       "focus": null
     },
     "al-ikhlas:4:learned": {
-      "text": "Di ayat ini kita mempelajari satu hal baru: kana dan saudaranya.",
-      "display": "Di ayat ini kita mempelajari satu hal baru: kana dan saudaranya.",
+      "text": "Di ayat ini kita mempelajari satu hal baru: كَانَ dan saudaranya.",
+      "display": "Di ayat ini kita mempelajari satu hal baru: kana (كَانَ) dan saudaranya.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/09ff3f0a3bd43b64.mp3",
+        "ms": 4989,
+        "sha256": "663fccfc4e3453dd3baa87124f7ed385066d8a51020c123276df09b7cdbd0fd5"
+      },
+      "tokens": [
+        {
+          "t": "Di",
+          "s": 0.0,
+          "e": 0.08
+        },
+        {
+          "t": "ayat",
+          "s": 0.133,
+          "e": 0.4
+        },
+        {
+          "t": "ini",
+          "s": 0.46,
+          "e": 0.64
+        },
+        {
+          "t": "kita",
+          "s": 0.704,
+          "e": 0.96
+        },
+        {
+          "t": "mempelajari",
+          "s": 1.02,
+          "e": 1.6
+        },
+        {
+          "t": "satu",
+          "s": 1.664,
+          "e": 1.92
+        },
+        {
+          "t": "hal",
+          "s": 1.96,
+          "e": 2.08
+        },
+        {
+          "t": "baru:",
+          "s": 2.16,
+          "e": 3.2
+        },
+        {
+          "t": "kana (كَانَ)",
+          "s": 3.24,
+          "e": 3.76
+        },
+        {
+          "t": "dan",
+          "s": 3.86,
+          "e": 4.16
+        },
+        {
+          "t": "saudaranya.",
+          "s": 4.213,
+          "e": 4.96
+        }
+      ]
     },
     "al-ikhlas:4:map:total": {
       "text": "Dengan itu, sudah dua puluh delapan hal yang kita pelajari.",
@@ -18376,8 +19329,8 @@
       ]
     },
     "al-ikhlas:4:map:total:2": {
-      "text": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada sembilan hal, yaitu فِعْل أَمْر, بَدَل, jamak taksir, mudzakkar dan mu'annats, tanwin pada اِسْم, jamak mu'annats salim, huruf nafi yang menjazmkan, مَجْزُوم, serta kana dan saudaranya.",
-      "display": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada sembilan hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir, mudzakkar dan mu'annats, tanwin pada isim (اِسْم), jamak mu'annats salim, huruf nafi yang menjazmkan, majzum (مَجْزُوم), serta kana dan saudaranya.",
+      "text": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada sembilan hal, yaitu فِعْل أَمْر, بَدَل, jamak taksir, mudzakkar dan mu'annats, tanwin pada اِسْم, jamak mu'annats salim, huruf nafi yang menjazmkan, مَجْزُوم, serta كَانَ dan saudaranya.",
+      "display": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada sembilan hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir, mudzakkar dan mu'annats, tanwin pada isim (اِسْم), jamak mu'annats salim, huruf nafi yang menjazmkan, majzum (مَجْزُوم), serta kana (كَانَ) dan saudaranya.",
       "highlight": [],
       "focus": null
     },

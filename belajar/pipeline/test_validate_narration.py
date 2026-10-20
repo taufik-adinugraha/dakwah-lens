@@ -169,6 +169,12 @@ def lex_term(term, **changes):
     return f
 
 
+def lex_rename(old, new):
+    def f(_m, _l, lx, *_):
+        next(x for x in lx["terms"] if x["term"] == old)["term"] = new
+    return f
+
+
 def drop_shown_piece(ln):
     """The karaoke token that carries a shown-only word without it (as if it were never shown)."""
     for tk in ln["tokens"]:
@@ -597,6 +603,12 @@ MUTATIONS = [
      "Qur'anic word 'عَلَى'"),
     ("dictionary: Arabic speak that is not the term", lex_term("نَعْت", speak="نَعْتٌ"),
      "speak must be the term itself"),
+    ("dictionary: a +nya term whose base is no entry", lex_rename("اِسْم+nya", "سُورَة+nya"),
+     "is built on another entry of the dictionary"),
+    ("dictionary: a +nya term that does not speak its base with nya", lex_term("اِسْم+nya", speak="اِسْمٌnya"),
+     "speak must be its base's speak with nya joined to it"),
+    ("dictionary: a +nya term built on a +nya term", lex_add(term="اِسْم+nya+nya", speak="اِسْمnyanya", display="isimnyanya (اِسْم)"),
+     "is built on another entry of the dictionary"),
     ("caption differs from the speech", replace_in(W11, "display", "kasrah (كَسْرَة)", "fathah (فَتْحَة)"),
      "display does not say what is spoken"),
     ("caption names the letter", replace_in(LAM3, "display", "huruf ل ", "huruf لَام "),
@@ -1158,6 +1170,16 @@ MUTATIONS = [
 class NarrationValidation(unittest.TestCase):
     def test_unmutated_passes(self):
         self.assertEqual(run_check(copy.deepcopy(MANIFESTS), copy.deepcopy(LESSONS), copy.deepcopy(LEXDATA)), [])
+
+    def test_suffixed_term_counts_as_its_base(self):
+        # isimnya / khabarnya / jazm-nya (operator 2026-10-20) use the library term they are built on,
+        # so "no term before its lesson" still sees them.
+        ids = V.term_ids(LEX)
+        for base in ("اِسْم", "خَبَر", "جَزْم"):
+            self.assertEqual(ids[base + "+nya"], ids[base])
+        said = V.prose_terms("Kata kelima isimnya, kata keempat khabarnya, tanda jazm-nya.", LEX, ids)
+        self.assertEqual(said, [ids["اِسْم"], ids["خَبَر"], ids["جَزْم"]])
+        self.assertEqual(LEX.by_term["اِسْم+nya"].speak, LEX.by_term["اِسْم"].speak + "nya")
 
     def test_build_is_deterministic(self):
         self.assertEqual(B.build_lines(LESSONS, LIBRARY, LEX), B.build_lines(LESSONS, LIBRARY, LEX))

@@ -61,7 +61,7 @@ python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Ku
 python3 build_map.py               # the lesson maps ../content/map/*.json, for the surahs switched on (see "Peta pelajaran"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi"); stops on a term said before its lesson that authored/curriculum.pending.json does not list (`--write-pending` writes that list: see "Kurikulum")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
-python3 test_validate_narration.py # plants 305 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum, the pending list and the continuation data (`continues`), each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
+python3 test_validate_narration.py # plants 308 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum, the pending list and the continuation data (`continues`), each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
 python3 validate_map.py            # the lesson maps: new / learnt so far / later / next-level against the curriculum, the names against the captions
 python3 test_validate_map.py       # plants 53 faults (a step in the wrong group, one taught later listed as learnt, a learnt step left out, `here` on a step that does not occur, a name that says a Qur'anic word, the kinds of word of an ayah wrong, a running total grouped where one line fits or cutting a unit in two, …)
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (every surah with a lesson map: Al-Fatihah, Al-Ikhlas), or listed in authored/curriculum.pending.json; exit 1 on any failure
@@ -174,6 +174,7 @@ does not speak, or a heavy-letter word said): kāna and its "isimnya"/"khabarnya
 "dhammatain", "fathatain", "shallallahu" in lines that were held before 2026-10-19; and, new, the
 four `map:total:2` lines, which name An-Nas's and Al-Falaq's steps "jamak taksir", "mudzakkar dan
 mu'annats", "tanwin pada isim" and "jamak mu'annats salim" (no Arabic for them in the dictionary).
+Since 2026-10-20 (operator): kāna is spoken from Arabic script (كَانَ, caption "kana (كَانَ)", the map step "Kana (كَانَ) dan saudaranya"); majzum, jazm and penjazm are approved by ear; and "isimnya", "khabarnya", "jazm-nya" are dictionary entries "<term>+nya" ("Arabic term + nya", joined: اِسْمnya, khobarnya, جَزْمnya; validate_narration.NYA). That leaves 22 lines held (the `map:total:2` terms, shallallahu, dhammatain, fathatain, qaul, maqul, sya'n, majhul, na'ib, fa'il, mudhari', menashabkan).
 With `--skip-held`: **178 distinct texts, 18,181 characters, about USD 1.45**; pending their ear
 check there, among others, majzum (12 lines), jazm (3) and penjazm (جَازِم, 1). Word voices
 (`build_wordvoice.py`): 6 texts, 39 characters — ٱلصَّمَد and صَمَد (the join of aṣ-ṣamad), يَلِدُ, يُولَدُ,
@@ -2577,7 +2578,8 @@ form set) and the build stops until each mention has a rule.
 `validate_narration.py` re-checks everything independently of the files' history: shape (v2),
 id contract and coverage (every ayah/word/shown exercise and every "Konsep baru" line the
 curriculum gives the lesson, no extras), split
-parts; the dictionary (an Arabic `speak` is the term itself; a heavy letter + fathah/alif has a
+parts; the dictionary (an Arabic `speak` is the term itself, or, for an entry whose `term` is
+"<another term>+nya" (isimnya, khabarnya, jazm-nya), its base's `speak` with nya joined to it; a heavy letter + fathah/alif has a
 Latin respelling; no term, in Arabic or in its Latin caption head, is a lesson word or its front);
 the spoken text (≤ 400 characters, Arabic only from the dictionary, no dictionary term left in its
 Latin spelling, "Alloh" not "Allah", ASCII letters and `. , ; : ! ? ' -` only, no digits, ALL
