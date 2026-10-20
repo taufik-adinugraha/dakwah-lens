@@ -129,10 +129,21 @@ def master_audio(m, lid):
     return {**good_audio(m, lid), "url": V.master_url(VOICE, name_of(lid), line(m, lid)["text"])}
 
 
+def before_its_render(m, name):
+    """A manifest as it was before its first render: a null voice, no line with audio or tokens (every
+    surah has a voice since 2026-10-21, so the clean baseline of the audio checks is made, not found)."""
+    m[name]["voice"] = None
+    for ln in m[name]["lines"].values():
+        ln.pop("audio", None)
+        ln.pop("tokens", None)
+
+
 def with_audio(lid, *, voice=True, tokens=True, audio=None, tweak=None):
     def f(m, *_):
         if voice:
             m[name_of(lid)]["voice"] = dict(VOICE)
+        else:
+            m[name_of(lid)]["voice"] = None  # a line with audio on a manifest that names no voice
         ln = line(m, lid)
         ln["audio"] = audio(m) if audio else good_audio(m, lid)
         if tokens:
@@ -287,10 +298,10 @@ def split_compose(m, *_):
     old = lines.pop(C1)
     lines[C1 + ":a"] = dict(old)
     lines[C1 + ":b"] = dict(old)
-# Audio faults go on a manifest that has no voice yet, on a line that is renderable (no Latin term).
-# (Al-Ikhlas has its voice since 2026-10-19: the first surah that has none.)
-AUD = next(lid for man in MANIFESTS.values() if not man.get("voice")
-           for lid, ln in man["lines"].items() if ":w" in lid and not V.held_line(ln, LEX))
+# Audio faults go on a line that is renderable (no Latin term). No surah is left without a voice
+# (Al-Falaq was the last, 2026-10-21), so a fault only needs its message among the errors, and the one
+# test that wants none (test_good_audio_passes) strips the manifest of its voice first (`before_its_render`).
+AUD = next(lid for lid, ln in MANIFESTS["al-falaq"]["lines"].items() if ":w" in lid and not V.held_line(ln, LEX))
 NA_EX = non_applicable_exercise()
 
 
@@ -1271,6 +1282,7 @@ class NarrationValidation(unittest.TestCase):
 
     def test_good_audio_passes(self):
         m = copy.deepcopy(MANIFESTS)
+        before_its_render(m, name_of(AUD))
         with_audio(AUD)(m)
         self.assertEqual(V.check(m, LESSONS, LIBRARY, build=False, lex=LEX), [])
 
