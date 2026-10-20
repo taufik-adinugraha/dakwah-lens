@@ -77,6 +77,11 @@ const surah = (slug: string): SurahContent => {
 };
 const FATIHAH = surah("al-fatihah");
 const WORDS = new Map(SURAHS.flatMap((s) => s.ayat.flatMap((a) => a.words.map((w) => [w.loc, w] as const))));
+/** A surah whose words have no composition. Every surah of the module is composed since 2026-10-20 (Al-Falaq's
+ *  compositions were the last; An-Nas had none until the same day, Al-Ikhlas until 2026-10-19), so the lesson
+ *  "without compositions" is Al-Falaq's own words under a slug no content file answers to: no composition, no
+ *  narration, no quiz, no lesson map (content/compose, narration, quiz and map are all looked up by slug). */
+const UNCOMPOSED: SurahContent = { ...surah("al-falaq"), slug: "uncomposed" };
 
 type Lesson = { slug: string; ayah: Ayah; seq: AutoplaySequence; derived: ReturnType<typeof lessonExamplesFor>; ctx: ExampleContext };
 const lessonOf = (s: SurahContent, a: Ayah, locale: "id" | "en" = "id"): Lesson => {
@@ -290,13 +295,16 @@ describe("which examples a lesson plays (src/lib/autoplay/examples.ts)", () => {
       "concept:jazm-lam:ex → 112:3:1",
       "concept:majzum:ex → 112:3:2",
     ]);
-    // Al-Falaq has no compositions yet (An-Nas's were written 2026-10-20): its word lines are followed by
-    // no beat, and none is missing.
-    const falaq = lessonOf(surah("al-falaq"), surah("al-falaq").ayat[0]);
-    expect(falaq.derived.gaps).toEqual([]);
+    // A lesson without compositions (UNCOMPOSED: Al-Falaq's words under a slug no file answers to; every real
+    // surah is composed since 2026-10-20): its word lines are followed by no beat, and none is missing.
+    const bare = lessonOf(UNCOMPOSED, UNCOMPOSED.ayat[0]);
+    expect(bare.derived.gaps).toEqual([]);
+    expect(beatsOf(bare.seq)).toEqual([]);
+    expect(bare.seq.steps.some((st) => st.kind === "compose")).toBe(false);
     expect(stops).toEqual([
       "al-fatihah/1:w4", "al-fatihah/2:w4", "al-fatihah/3:w2", "al-fatihah/4:w3", "al-fatihah/5:w4", "al-fatihah/6:w3", "al-fatihah/7:w9",
       "al-ikhlas/1:w4", "al-ikhlas/2:w2", "al-ikhlas/3:w4", "al-ikhlas/4:w5",
+      "al-falaq/1:w4", "al-falaq/2:w4", "al-falaq/3:w5", "al-falaq/4:w5", "al-falaq/5:w5",
       "an-nas/1:w4", "an-nas/2:w2", "an-nas/3:w2", "an-nas/4:w4", "an-nas/5:w5", "an-nas/6:w3",
     ]);
     // What that line says is true of each of the seven: the pause drops its last harakah (heard.ts),
@@ -840,17 +848,10 @@ describe("the lesson's own word is recited once, and its step does not wait for 
     }
   });
 
-  it("caption-only (the English pages; Al-Falaq, whose own lines have no voice yet): the first hearing keeps its caption's reading time", () => {
-    // Al-Ikhlas has a voice since 2026-10-20 and An-Nas since the same day's next render (their
-    // Indonesian pages are narrated like Al-Fatihah's); only their English pages stay caption-only.
-    const IKHLAS = surah("al-ikhlas");
-    const ANNAS = surah("an-nas");
-    const captionOnly = [
-      ...FATIHAH.ayat.map((a) => lessonOf(FATIHAH, a, "en")),
-      ...IKHLAS.ayat.map((a) => lessonOf(IKHLAS, a, "en")),
-      ...ANNAS.ayat.map((a) => lessonOf(ANNAS, a, "en")),
-      ...every.filter((l) => l.slug !== "al-fatihah" && l.slug !== "al-ikhlas" && l.slug !== "an-nas"),
-    ];
+  it("caption-only (the English pages: no surah's own lines are voiced in English): the first hearing keeps its caption's reading time", () => {
+    // Al-Ikhlas, An-Nas and Al-Falaq have a voice since 2026-10-20/21 (their Indonesian pages are
+    // narrated like Al-Fatihah's); only the English pages of every surah stay caption-only.
+    const captionOnly = ["al-fatihah", "al-ikhlas", "an-nas", "al-falaq"].flatMap((slug) => surah(slug).ayat.map((a) => lessonOf(surah(slug), a, "en")));
     expect(captionOnly.length).toBe(7 + 4 + 6 + 5);
     // The Mu'awwidzat's shared lines have a voice all the same: what decides is the word's own line.
     expect(every.filter((l) => l.slug !== "al-fatihah").every((l) => l.seq.hasAudio)).toBe(true);
@@ -1124,9 +1125,8 @@ describe("what the stage shows during a beat (caption.ts)", () => {
   // Until 2026-10-13 this test was "a word's own recitation after its line (a word without a
   // composition): the word card stays" — the beat "w2:word". Plan L24 took that second recitation
   // away: the line is followed by the next word's opening step.
-  it("a word without a composition (Al-Falaq 1; An-Nas 1 until 2026-10-20 and Al-Ikhlas 1 until 2026-10-19, when they were composed): after its line the lesson goes straight to the next word — no beat, nothing recited in between", () => {
-    const s0 = surah("al-falaq");
-    const l = lessonOf(s0, s0.ayat[0]);
+  it("a word without a composition (UNCOMPOSED: Al-Falaq 1's words with no file behind the slug; the real Al-Falaq 1 until 2026-10-20, An-Nas 1 until the same day and Al-Ikhlas 1 until 2026-10-19, when they were composed): after its line the lesson goes straight to the next word — no beat, nothing recited in between", () => {
+    const l = lessonOf(UNCOMPOSED, UNCOMPOSED.ayat[0]);
     const idx = l.seq.steps.findIndex((x) => x.id === "w2");
     expect(l.seq.steps[idx].kind).toBe("explain");
     const states = run(l.seq, started(l.seq, "biasa", idx), (x) => x.idx !== idx);

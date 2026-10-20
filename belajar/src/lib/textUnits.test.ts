@@ -582,9 +582,14 @@ describe("textUnits over every string the module shows", () => {
       const last = `${m![2]} ${m![3]}`;
       for (const [where, s] of CORPUS.filter(([, s]) => s.includes(d))) {
         const at = s.indexOf(d);
+        // A term-table form glued to a prefix ("bertanwin (تَنْوِين)", Al-Falaq's quiz) ends in the
+        // display: the unit then starts at that word, and still holds the whole display.
+        let start = at;
+        while (start > 0 && /\p{L}/u.test(s[start - 1])) start--;
         const segs = textUnits(s);
-        expect(boxes(segs).some(([a, b]) => a === at && b >= at + d.length), `${where}: "${d}" is not one unit`).toBe(true);
-        const from = at + d.length - last.length;
+        expect(boxes(segs).some(([a, b]) => a === start && b >= at + d.length), `${where}: "${d}" is not one unit`).toBe(true);
+        // (a single-word display glued to a prefix: its seam word is the whole glued word)
+        const from = m![1] ? at + d.length - last.length : start;
         expect(seams(segs).some(([a, b]) => a === from && b >= from + last.length), `${where}: "${last}" is not its seam`).toBe(true);
       }
     }

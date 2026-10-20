@@ -112,6 +112,11 @@ def a_map(c, lid):
     return lesson(c, lid)["map"]
 
 
+def learnt_entry(c, lid, sid):
+    """The entry of step `sid` in the `learnt` list of lesson `lid`'s map."""
+    return next(x for x in a_map(c, lid)["learnt"] if x["id"] == sid)
+
+
 # (name, run() → the guard's problems, substring the failure must contain)
 MUTATIONS = [
     # --- 1. units and lessons
@@ -199,6 +204,10 @@ MUTATIONS = [
      "step alif-lam: occurs must be one of"),
     ("occurs with a tag that is no QAC tag", on_step("alif-lam", lambda s: s.__setitem__("occurs", {"qac": "det"})),
      "step alif-lam: occurs must be one of"),
+    ("occurs indefinite that is not true", on_step("tanwin-nakirah", lambda s: s.__setitem__("occurs", {"indefinite": False})),
+     "step tanwin-nakirah: occurs must be one of"),
+    ("occurs indefinite with another rule", on_step("tanwin-nakirah", lambda s: s.__setitem__("occurs", {"indefinite": True, "case": "majrur"})),
+     "step tanwin-nakirah: occurs must be one of"),
     # --- 5b. lesson zero's slides (operator 2026-10-15: kalimah is one word, the Indonesian kalimat is
     # kalam; the narrator explains each example)
     ("a slide on a step of an ayah's lesson", on_step("huruf-jar", lambda s: s.__setitem__("lead", copy.deepcopy(step(AUTHORED, "kalimah")["lead"]))),
@@ -261,6 +270,14 @@ MUTATIONS = [
      "lesson 1:1: learnt says harakat does not occur in this ayah; it does"),
     ("a learnt step that occurs, not marked", built(lambda c: a_map(c, "1:3")["learnt"][2].__setitem__("here", False)),
      "lesson 1:3: learnt says majrur does not occur in this ayah; it does"),
+    # Tanwin pada isim (Al-Falaq 3) is met again wherever a word wears tanwin or is nakirah
+    # (operator 2026-10-21): ahadun in Al-Ikhlas 1, gasiqin / hasidin's ayat, and not in Al-Ikhlas 2.
+    ("tanwin said not to occur in an ayah that has it (Al-Ikhlas 1)", built(lambda c: learnt_entry(c, "112:1", "tanwin-nakirah").__setitem__("here", False)),
+     "lesson 112:1: learnt says tanwin-nakirah does not occur in this ayah; it does"),
+    ("tanwin said not to occur in an ayah that has it (Al-Falaq 5)", built(lambda c: learnt_entry(c, "113:5", "tanwin-nakirah").__setitem__("here", False)),
+     "lesson 113:5: learnt says tanwin-nakirah does not occur in this ayah; it does"),
+    ("tanwin said to occur in an ayah that has none (Al-Ikhlas 2)", built(lambda c: learnt_entry(c, "112:2", "tanwin-nakirah").__setitem__("here", True)),
+     "lesson 112:2: learnt says tanwin-nakirah occurs in this ayah; it does not"),
     ("later: a step that does not occur here", built(lambda c: a_map(c, "1:3")["later"].append("idhafah")),
      "lesson 1:3: later lists idhafah, which does not occur in this ayah"),
     ("later: a step taught earlier", built(lambda c: a_map(c, "1:3")["later"].append("majrur")),
@@ -386,7 +403,12 @@ class Curriculum(unittest.TestCase):
         # majzum, the fourth part of i'rab, has its own text since 2026-10-19 (Al-Ikhlas's map switched on),
         # and jamak taksir since 2026-10-20 (An-Nas 5: Ajurrumiyyah hlm. 6-8, the only pinned pages that say it).
         self.assertEqual([kinds[s] for s in ("majrur", "marfu", "manshub", "majzum", "alif-lam", "jamak-taksir")], ["teach"] * 6)
-        self.assertIsNone(kinds["tanwin-nakirah"])  # no record, no text yet (Al-Falaq 3)
+        # … and tanwin pada isim (with nakirah: Ajurrumiyyah hlm. 5 and 14, Qathr an-Nada hlm. 12) and jamak
+        # mu'annats salim (Ajurrumiyyah hlm. 6, 7 and 9) since 2026-10-20 (Al-Falaq 3 and 4: Al-Falaq's map switched on),
+        # each from pages the library pins. Mudzakkar dan mu'annats (Syadza al-'Arf, approved by the operator 2026-10-20) too.
+        self.assertEqual([kinds[s] for s in ("mudzakkar-muannats", "tanwin-nakirah", "jamak-muannats-salim")], ["teach"] * 3)
+        # What has no record and no text yet is Ayat Kursi's (not written).
+        self.assertIsNone(kinds["istitsna"])
         self.assertEqual(sum(1 for k in kinds.values() if k == "record"), 18)
         # A whole record keeps the line id it always had; a step with its own text has its own.
         self.assertEqual(step(CONTENT, "naat")["line"], "concept:naat")
@@ -435,6 +457,25 @@ class Curriculum(unittest.TestCase):
         # Majzum exists only at 112:3-4.
         hits = {f"{s}:{a['ayah']}" for s, l in LESSONS.items() for a in l["ayat"] if CUR.occurs(by["majzum"], a)}
         self.assertEqual(hits, {"al-ikhlas:3", "al-ikhlas:4"})
+
+    def test_tanwin_and_nakirah_occur_where_a_word_wears_either(self):
+        # Tanwin pada isim, with nakirah (Al-Falaq 3; the rule `indefinite`, operator 2026-10-21): a tanwin
+        # mark in the Arabic, or INDEF in the word's QAC line.
+        step = next(s for s in AUTHORED["steps"] if s["id"] == "tanwin-nakirah")
+        self.assertEqual(step["occurs"], {"indefinite": True})
+        at = lambda slug: [CUR.occurs(step, a) for a in LESSONS[slug]["ayat"]]  # noqa: E731
+        self.assertEqual(at("al-falaq"), [[], [], [3], [], [3]])         # gasiqin, hasidin
+        self.assertEqual(at("al-ikhlas"), [[4], [], [], [4, 5]])         # ahadun; kufuwan, ahadun
+        self.assertEqual(at("al-fatihah"), [[]] * 7)                    # none: nothing there is met "later"
+        self.assertEqual(at("an-nas"), [[]] * 6)
+        qac = lambda f: {"ar": "x", "sources": [{"kitab": CUR.QAC_KITAB + " 0.4", "ref": f"(1:1:1:*) — kelas kata: {f}"}]}  # noqa: E731
+        self.assertTrue(CUR.is_indefinite({"ar": "زَيْدٌ"}))              # tanwin alone (a proper noun is not INDEF)
+        self.assertTrue(CUR.is_indefinite({"ar": "كُفُوًا"}))             # the carrier alif after the fathatan
+        self.assertTrue(CUR.is_indefinite({"ar": "غَاسِقٍ"}))             # kasratan
+        self.assertTrue(CUR.is_indefinite(qac("N|STEM|POS:N|M|INDEF|GEN")))  # INDEF alone, no mark in the Arabic
+        self.assertFalse(CUR.is_indefinite(qac("N|STEM|POS:N|M|GEN")))
+        self.assertFalse(CUR.is_indefinite({"ar": "ٱلصَّمَدُ"}))          # a dammah is not tanwin
+        self.assertFalse(CUR.is_indefinite({}))
 
     def test_the_lines_light_the_words_the_step_occurs_on(self):
         # The narration validator reads the same words back (validate_narration.line_view).

@@ -683,8 +683,10 @@ describe("captionSpans: a stage caption emphasises every meaning", () => {
     // second only when chained to it, “…” atau “…”), and 181 of the captions' 450 glosses were plain.
     // 74 before An-Nas had compositions, 65 since: a composed word's own line keeps one gloss and
     // its explanation is said in the composition's frames (9 of An-Nas's 22 such captions went),
-    // so the floor follows the data, not the rule — the checks below are the rule.
-    expect(several).toBeGreaterThan(60);
+    // so the floor follows the data, not the rule — the checks below are the rule. Al-Falaq's words were
+    // composed the same day (2026-10-20) and its word captions went the same way (29 such captions became
+    // 15): 51 in all (Al-Fatihah 19, Al-Falaq 15, An-Nas 13, Al-Ikhlas 4), the floor a margin under that.
+    expect(several).toBeGreaterThan(45);
     // Isim maushul's caption above (was 4: one meaning group and three terms). What is on screen at
     // once is less: a text caption shows a part (≤ 180 characters), and no part carries more than
     // four.

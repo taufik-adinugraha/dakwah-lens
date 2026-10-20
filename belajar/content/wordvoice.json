@@ -442,6 +442,22 @@
     "end": 2500
    }
   },
+  "النَّفَّاثَات": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/e442c81649575567-f76cae23ac.mp3",
+    "ms": 888,
+    "sha256": "f76cae23ac14d44073230ddaead63d8d495457ad9fa72871973ed43503540d3c"
+   }
+  },
+  "النَّفَّاثَاتُ": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/4fbdf5037f526369-8254c033e1.mp3",
+    "ms": 1019,
+    "sha256": "8254c033e1ff00c0a00bcfc0454c6978d4bec94b5485321123500836bb1780b2"
+   }
+  },
   "النَّفَّاثَاتِ": {
    "source": "quran.com",
    "loc": "113:4:3",
@@ -582,6 +598,22 @@
     "end": 2375
    }
   },
+  "الْعُقَد": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/5e5c7c82684929f5-989d411769.mp3",
+    "ms": 758,
+    "sha256": "989d411769d5fdb6532846b2db4441b94f57ab2f58e3733b365cdc5f6b5b57b5"
+   }
+  },
+  "الْعُقَدُ": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/653e6e8c99a78484-87a4995e4e.mp3",
+    "ms": 758,
+    "sha256": "87a4995e4ef0f96ecd3a2ad41bb6f813b01a19f6331d78b9e7c9aca054d59122"
+   }
+  },
   "الْعُقَدِ": {
    "source": "quran.com",
    "loc": "113:4:5",
@@ -592,6 +624,22 @@
     "sha256": "e08bd0d42b63912ae1915822136ce216454fa690f91dac049d3f37bc28c3d87a",
     "start": 77,
     "end": 1280
+   }
+  },
+  "الْفَلَق": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/86aa815a71cc8546-544ec71666.mp3",
+    "ms": 758,
+    "sha256": "544ec7166650a76789c92d18d6c27b3dabbaca639a8fc838b089798085368ec4"
+   }
+  },
+  "الْفَلَقُ": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/d990f157586814f5-b5a8df26a3.mp3",
+    "ms": 967,
+    "sha256": "b5a8df26a3029f028ed542a491a2c4df89cb2899b17abf0400c749a7787f9861"
    }
   },
   "الْفَلَقِ": {
@@ -843,6 +891,14 @@
     "url": "/belajar/media/narration/kang-nandar/words/d030bed6ab8c7ca4-06bd44fc72.mp3",
     "ms": 601,
     "sha256": "06bd44fc724ce79e4e5523a3e1a56fd7021cf8770e4fe2b020610724a3a3ae67"
+   }
+  },
+  "حَاسِدٌ": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/d52cad4abd874f3e-26d190be85.mp3",
+    "ms": 836,
+    "sha256": "26d190be855c3c356aeac7c9b80cfe2da8ece8b0413a4164d995f67c37b726f3"
    }
   },
   "حَاسِدٍ": {
@@ -1239,6 +1295,22 @@
     "end": 1898
    }
   },
+  "عُقَد": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/936a83795d88b92d-6d52f1d08b.mp3",
+    "ms": 653,
+    "sha256": "6d52f1d08b748ce9a7a58763ec9a4cf76d23d66f63dc21d9409d291a58f79fc0"
+   }
+  },
+  "غَاسِقٌ": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/5f607b5bbfb0bb92-2f6f975d51.mp3",
+    "ms": 810,
+    "sha256": "2f6f975d511b8d08a1e88c620a00b160a73d1cb76f6bddd3fe5e9cfde514b0cb"
+   }
+  },
   "غَاسِقٍ": {
    "source": "quran.com",
    "loc": "113:3:3",
@@ -1317,6 +1389,14 @@
     "url": "/belajar/media/narration/kang-nandar/words/139a6ba5cae19dca-75bbf92380.mp3",
     "ms": 444,
     "sha256": "75bbf923809fba4ddcf2c1c70b0e643ae256a64939dd2cfc06af53f17dc46fd8"
+   }
+  },
+  "فَلَق": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/79b2436024eed047-e704d0848c.mp3",
+    "ms": 549,
+    "sha256": "e704d0848c6bcdd1799ee0203d21212fb5281c737fdb32260cc78ce6c8634df6"
    }
   },
   "فِي": {
@@ -1736,6 +1816,14 @@
     "sha256": "b8712441256bfccb5bd90e9d2912bd93f0c6216cac90a9561d688a81695ad1dc",
     "start": 468,
     "end": 1747
+   }
+  },
+  "نَفَّاثَات": {
+   "source": "elevenlabs",
+   "audio": {
+    "url": "/belajar/media/narration/kang-nandar/words/e62170effaf4a4f4-d61450e191.mp3",
+    "ms": 967,
+    "sha256": "d61450e191a2a732b5c034cdbb872346788b86b6d3148edbe2b857b45a341367"
    }
   },
   "هَدَى": {

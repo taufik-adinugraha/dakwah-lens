@@ -240,210 +240,225 @@
       ]
     },
     "al-ikhlas:1:map:again": {
-      "text": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, جُمْلَة اِسْمِيَّة, مَرْفُوع, dhomir, مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, serta فِعْل أَمْر. Dari tiga jenis kata itu, di ayat ini hanya ada اِسْم dan فِعْل.",
-      "display": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dhamir (ضَمِير), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), serta fi’il amr (فِعْل أَمْر). Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم) dan fi’il (فِعْل).",
+      "text": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, جُمْلَة اِسْمِيَّة, مَرْفُوع, dhomir, مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, فِعْل أَمْر, serta تَنْوِين pada اِسْم. Dari tiga jenis kata itu, di ayat ini hanya ada اِسْم dan فِعْل.",
+      "display": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dhamir (ضَمِير), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), fi’il amr (فِعْل أَمْر), serta tanwin (تَنْوِين) pada isim (اِسْم). Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم) dan fi’il (فِعْل).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/8f5745e982cb88de.mp3",
-        "ms": 23327,
-        "sha256": "6d1a17783fa0059cbc32a533d5be64a3068c253413e2ffcdade06467b000f745"
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/9581a8c2374797ff.mp3",
+        "ms": 24607,
+        "sha256": "9fbfa6d9f3e5c4b4ab59429ea201d34299b84614dcac7200c398442e5c9bff96"
       },
       "tokens": [
         {
           "t": "Dari",
           "s": 0.0,
-          "e": 0.24
+          "e": 0.16
         },
         {
           "t": "yang",
-          "s": 0.272,
-          "e": 0.4
+          "s": 0.192,
+          "e": 0.32
         },
         {
           "t": "sudah",
-          "s": 0.44,
-          "e": 0.64
+          "s": 0.36,
+          "e": 0.56
         },
         {
           "t": "kita",
-          "s": 0.688,
-          "e": 0.88
+          "s": 0.608,
+          "e": 0.8
         },
         {
           "t": "pelajari,",
-          "s": 0.94,
-          "e": 1.84
+          "s": 0.84,
+          "e": 1.6
         },
         {
           "t": "yang",
-          "s": 1.888,
-          "e": 2.08
+          "s": 1.632,
+          "e": 1.76
         },
         {
           "t": "kita",
-          "s": 2.112,
-          "e": 2.24
+          "s": 1.792,
+          "e": 1.92
         },
         {
           "t": "temui",
-          "s": 2.3,
-          "e": 2.64
+          "s": 1.98,
+          "e": 2.32
         },
         {
           "t": "lagi",
-          "s": 2.72,
-          "e": 3.04
+          "s": 2.384,
+          "e": 2.64
         },
         {
           "t": "di",
-          "s": 3.093,
-          "e": 3.2
+          "s": 2.693,
+          "e": 2.8
         },
         {
           "t": "ayat",
-          "s": 3.253,
-          "e": 3.52
+          "s": 2.853,
+          "e": 3.12
         },
         {
           "t": "ini",
-          "s": 3.6,
-          "e": 3.84
+          "s": 3.2,
+          "e": 3.44
         },
         {
           "t": "adalah",
-          "s": 3.897,
-          "e": 4.24
+          "s": 3.497,
+          "e": 3.84
         },
         {
           "t": "harakat,",
-          "s": 4.32,
-          "e": 5.44
+          "s": 3.92,
+          "e": 5.04
         },
         {
           "t": "tiga",
-          "s": 5.48,
-          "e": 5.76
+          "s": 5.08,
+          "e": 5.28
         },
         {
           "t": "jenis",
-          "s": 5.827,
-          "e": 6.16
+          "s": 5.347,
+          "e": 5.68
         },
         {
           "t": "kata,",
-          "s": 6.24,
-          "e": 7.36
+          "s": 5.76,
+          "e": 6.72
         },
         {
           "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 7.44,
-          "e": 8.88
+          "s": 6.8,
+          "e": 8.16
         },
         {
           "t": "marfu’ (مَرْفُوع),",
-          "s": 9.16,
-          "e": 10.08
+          "s": 8.48,
+          "e": 9.36
         },
         {
           "t": "dhamir (ضَمِير),",
-          "s": 10.267,
-          "e": 11.12
+          "s": 9.52,
+          "e": 10.32
         },
         {
           "t": "mu’rab (مُعْرَب)",
-          "s": 11.44,
-          "e": 12.32
+          "s": 10.64,
+          "e": 11.52
         },
         {
           "t": "dan",
-          "s": 12.48,
-          "e": 12.96
+          "s": 11.64,
+          "e": 12.0
         },
         {
           "t": "mabni (مَبْنِيّ),",
-          "s": 13.0,
-          "e": 14.16
+          "s": 12.12,
+          "e": 13.36
         },
         {
           "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
-          "s": 14.2,
-          "e": 15.68
+          "s": 13.4,
+          "e": 14.8
+        },
+        {
+          "t": "fi’il amr (فِعْل أَمْر),",
+          "s": 15.12,
+          "e": 16.16
         },
         {
           "t": "serta",
-          "s": 15.813,
-          "e": 16.48
+          "s": 16.333,
+          "e": 17.2
         },
         {
-          "t": "fi’il amr (فِعْل أَمْر).",
-          "s": 16.68,
-          "e": 17.6
+          "t": "tanwin (تَنْوِين)",
+          "s": 17.32,
+          "e": 17.92
+        },
+        {
+          "t": "pada",
+          "s": 18.0,
+          "e": 18.32
+        },
+        {
+          "t": "isim (اِسْم).",
+          "s": 18.36,
+          "e": 18.8
         },
         {
           "t": "Dari",
-          "s": 18.16,
-          "e": 18.88
+          "s": 19.32,
+          "e": 20.0
         },
         {
           "t": "tiga",
-          "s": 18.92,
-          "e": 19.12
+          "s": 20.04,
+          "e": 20.24
         },
         {
           "t": "jenis",
-          "s": 19.173,
-          "e": 19.44
+          "s": 20.293,
+          "e": 20.56
         },
         {
           "t": "kata",
-          "s": 19.504,
-          "e": 19.76
-        },
-        {
-          "t": "itu,",
-          "s": 19.86,
-          "e": 20.32
-        },
-        {
-          "t": "di",
-          "s": 20.427,
-          "e": 20.64
-        },
-        {
-          "t": "ayat",
-          "s": 20.693,
+          "s": 20.624,
           "e": 20.88
         },
         {
-          "t": "ini",
+          "t": "itu,",
           "s": 20.96,
-          "e": 21.2
+          "e": 21.28
+        },
+        {
+          "t": "di",
+          "s": 21.413,
+          "e": 21.68
+        },
+        {
+          "t": "ayat",
+          "s": 21.733,
+          "e": 21.92
+        },
+        {
+          "t": "ini",
+          "s": 22.02,
+          "e": 22.32
         },
         {
           "t": "hanya",
-          "s": 21.267,
-          "e": 21.6
+          "s": 22.387,
+          "e": 22.72
         },
         {
           "t": "ada",
-          "s": 21.66,
-          "e": 21.84
+          "s": 22.78,
+          "e": 22.96
         },
         {
           "t": "isim (اِسْم)",
-          "s": 21.92,
-          "e": 22.4
+          "s": 23.04,
+          "e": 23.52
         },
         {
           "t": "dan",
-          "s": 22.5,
-          "e": 22.8
+          "s": 23.64,
+          "e": 24.0
         },
         {
           "t": "fi’il (فِعْل).",
-          "s": 22.88,
-          "e": 23.28
+          "s": 24.08,
+          "e": 24.56
         }
       ]
     },
@@ -536,14 +551,14 @@
       ]
     },
     "al-ikhlas:1:map:focus": {
-      "text": "Sekarang Anda tidak perlu memikirkan semuanya. Mari kita fokus mengulang harakat, tiga jenis kata, جُمْلَة اِسْمِيَّة, مَرْفُوع, dhomir, مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, serta فِعْل أَمْر terlebih dahulu. Dari tiga jenis kata itu, di ayat ini hanya ada اِسْم dan فِعْل.",
-      "display": "Sekarang Anda tidak perlu memikirkan semuanya. Mari kita fokus mengulang harakat, tiga jenis kata, jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dhamir (ضَمِير), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), serta fi’il amr (فِعْل أَمْر) terlebih dahulu. Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم) dan fi’il (فِعْل).",
+      "text": "Sekarang Anda tidak perlu memikirkan semuanya. Mari kita fokus mengulang harakat, tiga jenis kata, جُمْلَة اِسْمِيَّة, مَرْفُوع, dhomir, مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, فِعْل أَمْر, serta تَنْوِين pada اِسْم terlebih dahulu. Dari tiga jenis kata itu, di ayat ini hanya ada اِسْم dan فِعْل.",
+      "display": "Sekarang Anda tidak perlu memikirkan semuanya. Mari kita fokus mengulang harakat, tiga jenis kata, jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dhamir (ضَمِير), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), fi’il amr (فِعْل أَمْر), serta tanwin (تَنْوِين) pada isim (اِسْم) terlebih dahulu. Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم) dan fi’il (فِعْل).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/eb3964968f585397.mp3",
-        "ms": 24111,
-        "sha256": "f5dd22a07ebd370540eb76508d7ca25bf21696d3f57dd572419c9b085130ce6d"
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/288aebfd43da3d37.mp3",
+        "ms": 30851,
+        "sha256": "f7d1391a9ffa3bfc2fd32ea29b359fee10638a8e19e2f1822ced682e53f836d6"
       },
       "tokens": [
         {
@@ -558,183 +573,198 @@
         },
         {
           "t": "tidak",
-          "s": 0.84,
-          "e": 1.04
+          "s": 0.853,
+          "e": 1.12
         },
         {
           "t": "perlu",
-          "s": 1.08,
-          "e": 1.36
+          "s": 1.16,
+          "e": 1.44
         },
         {
           "t": "memikirkan",
-          "s": 1.4,
-          "e": 1.92
+          "s": 1.5,
+          "e": 2.08
         },
         {
           "t": "semuanya.",
-          "s": 1.98,
-          "e": 2.64
+          "s": 2.14,
+          "e": 2.88
         },
         {
           "t": "Mari",
-          "s": 2.8,
-          "e": 3.44
+          "s": 3.072,
+          "e": 3.84
         },
         {
           "t": "kita",
-          "s": 3.504,
-          "e": 3.76
+          "s": 3.888,
+          "e": 4.08
         },
         {
           "t": "fokus",
-          "s": 3.8,
-          "e": 4.24
+          "s": 4.12,
+          "e": 4.48
         },
         {
           "t": "mengulang",
-          "s": 4.288,
-          "e": 4.72
+          "s": 4.544,
+          "e": 5.04
         },
         {
           "t": "harakat,",
-          "s": 4.76,
-          "e": 5.6
+          "s": 5.08,
+          "e": 6.0
         },
         {
           "t": "tiga",
-          "s": 5.64,
-          "e": 5.92
+          "s": 6.04,
+          "e": 6.4
         },
         {
           "t": "jenis",
-          "s": 5.987,
-          "e": 6.32
+          "s": 6.48,
+          "e": 6.88
         },
         {
           "t": "kata,",
-          "s": 6.384,
-          "e": 7.36
+          "s": 6.96,
+          "e": 8.08
         },
         {
           "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 7.44,
-          "e": 8.56
+          "s": 8.12,
+          "e": 9.36
         },
         {
           "t": "marfu’ (مَرْفُوع),",
-          "s": 8.96,
-          "e": 9.92
+          "s": 9.8,
+          "e": 10.88
         },
         {
           "t": "dhamir (ضَمِير),",
-          "s": 10.107,
-          "e": 11.32
+          "s": 11.173,
+          "e": 12.16
         },
         {
           "t": "mu’rab (مُعْرَب)",
-          "s": 11.54,
-          "e": 12.24
+          "s": 12.6,
+          "e": 13.6
         },
         {
           "t": "dan",
-          "s": 12.38,
-          "e": 12.8
+          "s": 13.82,
+          "e": 14.48
         },
         {
           "t": "mabni (مَبْنِيّ),",
-          "s": 12.92,
-          "e": 14.32
+          "s": 14.68,
+          "e": 16.32
         },
         {
           "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
-          "s": 14.4,
-          "e": 15.6
+          "s": 16.4,
+          "e": 17.68
+        },
+        {
+          "t": "fi’il amr (فِعْل أَمْر),",
+          "s": 18.2,
+          "e": 19.84
         },
         {
           "t": "serta",
-          "s": 15.76,
-          "e": 16.56
+          "s": 20.053,
+          "e": 21.12
         },
         {
-          "t": "fi’il amr (فِعْل أَمْر)",
-          "s": 16.72,
-          "e": 17.52
+          "t": "tanwin (تَنْوِين)",
+          "s": 21.32,
+          "e": 22.08
         },
         {
-          "t": "terlebih",
-          "s": 17.6,
-          "e": 18.0
-        },
-        {
-          "t": "dahulu.",
-          "s": 18.06,
-          "e": 18.56
-        },
-        {
-          "t": "Dari",
-          "s": 19.04,
-          "e": 19.68
-        },
-        {
-          "t": "tiga",
-          "s": 19.76,
-          "e": 19.92
-        },
-        {
-          "t": "jenis",
-          "s": 19.973,
-          "e": 20.24
-        },
-        {
-          "t": "kata",
-          "s": 20.288,
-          "e": 20.48
-        },
-        {
-          "t": "itu,",
-          "s": 20.58,
-          "e": 21.28
-        },
-        {
-          "t": "di",
-          "s": 21.307,
-          "e": 21.36
-        },
-        {
-          "t": "ayat",
-          "s": 21.44,
-          "e": 21.68
-        },
-        {
-          "t": "ini",
-          "s": 21.76,
-          "e": 22.0
-        },
-        {
-          "t": "hanya",
-          "s": 22.067,
-          "e": 22.4
-        },
-        {
-          "t": "ada",
-          "s": 22.46,
-          "e": 22.64
+          "t": "pada",
+          "s": 22.256,
+          "e": 22.96
         },
         {
           "t": "isim (اِسْم)",
-          "s": 22.72,
-          "e": 23.04
+          "s": 23.16,
+          "e": 23.68
+        },
+        {
+          "t": "terlebih",
+          "s": 23.74,
+          "e": 24.16
+        },
+        {
+          "t": "dahulu.",
+          "s": 24.22,
+          "e": 24.72
+        },
+        {
+          "t": "Dari",
+          "s": 25.2,
+          "e": 25.84
+        },
+        {
+          "t": "tiga",
+          "s": 25.88,
+          "e": 26.08
+        },
+        {
+          "t": "jenis",
+          "s": 26.147,
+          "e": 26.48
+        },
+        {
+          "t": "kata",
+          "s": 26.528,
+          "e": 26.72
+        },
+        {
+          "t": "itu,",
+          "s": 26.84,
+          "e": 27.4
+        },
+        {
+          "t": "di",
+          "s": 27.467,
+          "e": 27.6
+        },
+        {
+          "t": "ayat",
+          "s": 27.653,
+          "e": 27.84
+        },
+        {
+          "t": "ini",
+          "s": 27.92,
+          "e": 28.16
+        },
+        {
+          "t": "hanya",
+          "s": 28.213,
+          "e": 28.48
+        },
+        {
+          "t": "ada",
+          "s": 28.58,
+          "e": 28.88
+        },
+        {
+          "t": "isim (اِسْم)",
+          "s": 29.04,
+          "e": 29.6
         },
         {
           "t": "dan",
-          "s": 23.16,
-          "e": 23.52
+          "s": 29.72,
+          "e": 30.08
         },
         {
           "t": "fi’il (فِعْل).",
-          "s": 23.6,
-          "e": 24.08
+          "s": 30.24,
+          "e": 30.8
         }
       ]
     },
@@ -3971,14 +4001,14 @@
       "focus": null
     },
     "al-ikhlas:1:learned": {
-      "text": "Di ayat ini tidak ada hal baru; kita mengulang delapan hal yang sudah kita pelajari, yaitu harakat, tiga jenis kata, جُمْلَة اِسْمِيَّة, مَرْفُوع, dhomir, مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, serta فِعْل أَمْر. Dari tiga jenis kata itu, di ayat ini hanya ada اِسْم dan فِعْل.",
-      "display": "Di ayat ini tidak ada hal baru; kita mengulang delapan hal yang sudah kita pelajari, yaitu harakat, tiga jenis kata, jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dhamir (ضَمِير), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), serta fi’il amr (فِعْل أَمْر). Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم) dan fi’il (فِعْل).",
+      "text": "Di ayat ini tidak ada hal baru; kita mengulang sembilan hal yang sudah kita pelajari, yaitu harakat, tiga jenis kata, جُمْلَة اِسْمِيَّة, مَرْفُوع, dhomir, مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, فِعْل أَمْر, serta تَنْوِين pada اِسْم. Dari tiga jenis kata itu, di ayat ini hanya ada اِسْم dan فِعْل.",
+      "display": "Di ayat ini tidak ada hal baru; kita mengulang sembilan hal yang sudah kita pelajari, yaitu harakat, tiga jenis kata, jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), dhamir (ضَمِير), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), fi’il amr (فِعْل أَمْر), serta tanwin (تَنْوِين) pada isim (اِسْم). Dari tiga jenis kata itu, di ayat ini hanya ada isim (اِسْم) dan fi’il (فِعْل).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/a8165ea8928812cc.mp3",
-        "ms": 24346,
-        "sha256": "b504f30b38512f8b7461c27eef5a920513ec460174b6575ae0ebdf000dce50b9"
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/b145f09c2d6fcfb7.mp3",
+        "ms": 26828,
+        "sha256": "9b764d456f292858498503aac3c372dcd6abff0fdd8a90858a15623443147a8c"
       },
       "tokens": [
         {
@@ -3989,31 +4019,31 @@
         {
           "t": "ayat",
           "s": 0.187,
-          "e": 0.4
+          "e": 0.32
         },
         {
           "t": "ini",
-          "s": 0.48,
-          "e": 0.72
+          "s": 0.38,
+          "e": 0.56
         },
         {
           "t": "tidak",
-          "s": 0.773,
-          "e": 1.04
+          "s": 0.613,
+          "e": 0.88
         },
         {
           "t": "ada",
-          "s": 1.08,
-          "e": 1.2
+          "s": 0.94,
+          "e": 1.12
         },
         {
           "t": "hal",
-          "s": 1.26,
-          "e": 1.44
+          "s": 1.18,
+          "e": 1.36
         },
         {
           "t": "baru;",
-          "s": 1.52,
+          "s": 1.456,
           "e": 2.48
         },
         {
@@ -4024,172 +4054,187 @@
         {
           "t": "mengulang",
           "s": 2.768,
-          "e": 3.2
+          "e": 3.28
         },
         {
-          "t": "delapan",
-          "s": 3.24,
-          "e": 3.6
+          "t": "sembilan",
+          "s": 3.32,
+          "e": 3.76
         },
         {
           "t": "hal",
-          "s": 3.68,
-          "e": 3.92
-        },
-        {
-          "t": "yang",
-          "s": 3.968,
+          "s": 3.86,
           "e": 4.16
         },
         {
-          "t": "sudah",
-          "s": 4.213,
-          "e": 4.48
+          "t": "yang",
+          "s": 4.192,
+          "e": 4.32
         },
         {
-          "t": "kita",
-          "s": 4.512,
+          "t": "sudah",
+          "s": 4.373,
           "e": 4.64
         },
         {
+          "t": "kita",
+          "s": 4.688,
+          "e": 4.88
+        },
+        {
           "t": "pelajari,",
-          "s": 4.7,
-          "e": 5.84
+          "s": 4.92,
+          "e": 6.0
         },
         {
           "t": "yaitu",
-          "s": 5.88,
-          "e": 6.32
+          "s": 6.04,
+          "e": 6.72
         },
         {
           "t": "harakat,",
-          "s": 6.4,
-          "e": 7.68
+          "s": 6.82,
+          "e": 7.6
         },
         {
           "t": "tiga",
-          "s": 7.72,
-          "e": 7.92
-        },
-        {
-          "t": "jenis",
-          "s": 7.973,
+          "s": 7.84,
           "e": 8.24
         },
         {
+          "t": "jenis",
+          "s": 8.307,
+          "e": 8.64
+        },
+        {
           "t": "kata,",
-          "s": 8.336,
-          "e": 9.36
+          "s": 8.72,
+          "e": 9.68
         },
         {
           "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 9.4,
-          "e": 10.64
+          "s": 9.72,
+          "e": 10.88
         },
         {
           "t": "marfu’ (مَرْفُوع),",
-          "s": 11.0,
-          "e": 11.92
+          "s": 11.2,
+          "e": 12.24
         },
         {
           "t": "dhamir (ضَمِير),",
-          "s": 12.08,
-          "e": 12.8
+          "s": 12.293,
+          "e": 13.12
         },
         {
           "t": "mu’rab (مُعْرَب)",
-          "s": 13.12,
-          "e": 14.0
+          "s": 13.28,
+          "e": 13.84
         },
         {
           "t": "dan",
-          "s": 14.06,
-          "e": 14.24
+          "s": 13.92,
+          "e": 14.16
         },
         {
           "t": "mabni (مَبْنِيّ),",
-          "s": 14.28,
-          "e": 15.44
+          "s": 14.24,
+          "e": 15.36
         },
         {
           "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
-          "s": 15.48,
-          "e": 17.12
+          "s": 15.44,
+          "e": 16.72
+        },
+        {
+          "t": "fi’il amr (فِعْل أَمْر),",
+          "s": 17.08,
+          "e": 18.72
         },
         {
           "t": "serta",
-          "s": 17.2,
-          "e": 17.6
+          "s": 18.813,
+          "e": 19.28
         },
         {
-          "t": "fi’il amr (فِعْل أَمْر).",
-          "s": 17.72,
-          "e": 18.56
+          "t": "tanwin (تَنْوِين)",
+          "s": 19.44,
+          "e": 20.08
+        },
+        {
+          "t": "pada",
+          "s": 20.144,
+          "e": 20.4
+        },
+        {
+          "t": "isim (اِسْم).",
+          "s": 20.44,
+          "e": 20.88
         },
         {
           "t": "Dari",
-          "s": 19.08,
-          "e": 19.84
+          "s": 21.36,
+          "e": 22.0
         },
         {
           "t": "tiga",
-          "s": 19.88,
-          "e": 20.0
-        },
-        {
-          "t": "jenis",
-          "s": 20.053,
-          "e": 20.32
-        },
-        {
-          "t": "kata",
-          "s": 20.384,
-          "e": 20.64
-        },
-        {
-          "t": "itu,",
-          "s": 20.74,
-          "e": 21.44
-        },
-        {
-          "t": "di",
-          "s": 21.493,
-          "e": 21.6
-        },
-        {
-          "t": "ayat",
-          "s": 21.653,
-          "e": 21.92
-        },
-        {
-          "t": "ini",
-          "s": 22.0,
+          "s": 22.04,
           "e": 22.24
         },
         {
+          "t": "jenis",
+          "s": 22.293,
+          "e": 22.56
+        },
+        {
+          "t": "kata",
+          "s": 22.608,
+          "e": 22.8
+        },
+        {
+          "t": "itu,",
+          "s": 22.9,
+          "e": 23.52
+        },
+        {
+          "t": "di",
+          "s": 23.627,
+          "e": 23.84
+        },
+        {
+          "t": "ayat",
+          "s": 23.893,
+          "e": 24.16
+        },
+        {
+          "t": "ini",
+          "s": 24.22,
+          "e": 24.4
+        },
+        {
           "t": "hanya",
-          "s": 22.32,
-          "e": 22.72
+          "s": 24.453,
+          "e": 24.72
         },
         {
           "t": "ada",
-          "s": 22.8,
-          "e": 23.04
+          "s": 24.82,
+          "e": 25.12
         },
         {
           "t": "isim (اِسْم)",
-          "s": 23.08,
-          "e": 23.36
+          "s": 25.28,
+          "e": 25.84
         },
         {
           "t": "dan",
-          "s": 23.46,
-          "e": 23.76
+          "s": 25.92,
+          "e": 26.16
         },
         {
           "t": "fi’il (فِعْل).",
-          "s": 23.84,
-          "e": 24.32
+          "s": 26.28,
+          "e": 26.8
         }
       ]
     },
@@ -4475,10 +4520,122 @@
       ]
     },
     "al-ikhlas:1:map:total:2": {
-      "text": "Dari Surah An-Nas dan Surah Al-Falaq ada enam hal, yaitu فِعْل أَمْر, بَدَل, جَمْع تَكْسِير, مُذَكَّر dan مُؤَنَّث, tanwin pada اِسْم, serta jamak مُؤَنَّث salim.",
-      "display": "Dari Surah An-Nas dan Surah Al-Falaq ada enam hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir (جَمْع تَكْسِير), mudzakkar (مُذَكَّر) dan mu’annats (مُؤَنَّث), tanwin pada isim (اِسْم), serta jamak mu’annats (مُؤَنَّث) salim.",
+      "text": "Dari Surah An-Nas dan Surah Al-Falaq ada enam hal, yaitu فِعْل أَمْر, بَدَل, جَمْع تَكْسِير, مُذَكَّر dan مُؤَنَّث, تَنْوِين pada اِسْم, serta جَمْع مُؤَنَّث سَالِم.",
+      "display": "Dari Surah An-Nas dan Surah Al-Falaq ada enam hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir (جَمْع تَكْسِير), mudzakkar (مُذَكَّر) dan mu’annats (مُؤَنَّث), tanwin (تَنْوِين) pada isim (اِسْم), serta jamak mu’annats salim (جَمْع مُؤَنَّث سَالِم).",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/92c3ab4004364c24.mp3",
+        "ms": 14524,
+        "sha256": "9cd557353f8c99a1a9c06a73158c9c0a69648b114b3439211fb576cb512138b5"
+      },
+      "tokens": [
+        {
+          "t": "Dari",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "Surah",
+          "s": 0.28,
+          "e": 0.48
+        },
+        {
+          "t": "An-Nas",
+          "s": 0.56,
+          "e": 0.96
+        },
+        {
+          "t": "dan",
+          "s": 1.02,
+          "e": 1.2
+        },
+        {
+          "t": "Surah",
+          "s": 1.24,
+          "e": 1.44
+        },
+        {
+          "t": "Al-Falaq",
+          "s": 1.493,
+          "e": 2.0
+        },
+        {
+          "t": "ada",
+          "s": 2.06,
+          "e": 2.24
+        },
+        {
+          "t": "enam",
+          "s": 2.288,
+          "e": 2.48
+        },
+        {
+          "t": "hal,",
+          "s": 2.58,
+          "e": 2.96
+        },
+        {
+          "t": "yaitu",
+          "s": 3.2,
+          "e": 3.92
+        },
+        {
+          "t": "fi’il amr (فِعْل أَمْر),",
+          "s": 4.24,
+          "e": 5.36
+        },
+        {
+          "t": "badal (بَدَل),",
+          "s": 5.64,
+          "e": 6.48
+        },
+        {
+          "t": "jamak taksir (جَمْع تَكْسِير),",
+          "s": 6.8,
+          "e": 8.16
+        },
+        {
+          "t": "mudzakkar (مُذَكَّر)",
+          "s": 8.48,
+          "e": 9.36
+        },
+        {
+          "t": "dan",
+          "s": 9.4,
+          "e": 9.52
+        },
+        {
+          "t": "mu’annats (مُؤَنَّث),",
+          "s": 9.56,
+          "e": 10.16
+        },
+        {
+          "t": "tanwin (تَنْوِين)",
+          "s": 10.48,
+          "e": 11.2
+        },
+        {
+          "t": "pada",
+          "s": 11.264,
+          "e": 11.52
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 11.56,
+          "e": 12.0
+        },
+        {
+          "t": "serta",
+          "s": 12.147,
+          "e": 12.88
+        },
+        {
+          "t": "jamak mu’annats salim (جَمْع مُؤَنَّث سَالِم).",
+          "s": 12.96,
+          "e": 14.48
+        }
+      ]
     },
     "al-ikhlas:1:recap": {
       "text": "Dengarkan sekali lagi seluruh ayat pertama dibacakan imam.",
@@ -8391,10 +8548,122 @@
       ]
     },
     "al-ikhlas:2:map:total:2": {
-      "text": "Dari Surah An-Nas dan Surah Al-Falaq ada enam hal, yaitu فِعْل أَمْر, بَدَل, جَمْع تَكْسِير, مُذَكَّر dan مُؤَنَّث, tanwin pada اِسْم, serta jamak مُؤَنَّث salim.",
-      "display": "Dari Surah An-Nas dan Surah Al-Falaq ada enam hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir (جَمْع تَكْسِير), mudzakkar (مُذَكَّر) dan mu’annats (مُؤَنَّث), tanwin pada isim (اِسْم), serta jamak mu’annats (مُؤَنَّث) salim.",
+      "text": "Dari Surah An-Nas dan Surah Al-Falaq ada enam hal, yaitu فِعْل أَمْر, بَدَل, جَمْع تَكْسِير, مُذَكَّر dan مُؤَنَّث, تَنْوِين pada اِسْم, serta جَمْع مُؤَنَّث سَالِم.",
+      "display": "Dari Surah An-Nas dan Surah Al-Falaq ada enam hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir (جَمْع تَكْسِير), mudzakkar (مُذَكَّر) dan mu’annats (مُؤَنَّث), tanwin (تَنْوِين) pada isim (اِسْم), serta jamak mu’annats salim (جَمْع مُؤَنَّث سَالِم).",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/92c3ab4004364c24.mp3",
+        "ms": 14524,
+        "sha256": "9cd557353f8c99a1a9c06a73158c9c0a69648b114b3439211fb576cb512138b5"
+      },
+      "tokens": [
+        {
+          "t": "Dari",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "Surah",
+          "s": 0.28,
+          "e": 0.48
+        },
+        {
+          "t": "An-Nas",
+          "s": 0.56,
+          "e": 0.96
+        },
+        {
+          "t": "dan",
+          "s": 1.02,
+          "e": 1.2
+        },
+        {
+          "t": "Surah",
+          "s": 1.24,
+          "e": 1.44
+        },
+        {
+          "t": "Al-Falaq",
+          "s": 1.493,
+          "e": 2.0
+        },
+        {
+          "t": "ada",
+          "s": 2.06,
+          "e": 2.24
+        },
+        {
+          "t": "enam",
+          "s": 2.288,
+          "e": 2.48
+        },
+        {
+          "t": "hal,",
+          "s": 2.58,
+          "e": 2.96
+        },
+        {
+          "t": "yaitu",
+          "s": 3.2,
+          "e": 3.92
+        },
+        {
+          "t": "fi’il amr (فِعْل أَمْر),",
+          "s": 4.24,
+          "e": 5.36
+        },
+        {
+          "t": "badal (بَدَل),",
+          "s": 5.64,
+          "e": 6.48
+        },
+        {
+          "t": "jamak taksir (جَمْع تَكْسِير),",
+          "s": 6.8,
+          "e": 8.16
+        },
+        {
+          "t": "mudzakkar (مُذَكَّر)",
+          "s": 8.48,
+          "e": 9.36
+        },
+        {
+          "t": "dan",
+          "s": 9.4,
+          "e": 9.52
+        },
+        {
+          "t": "mu’annats (مُؤَنَّث),",
+          "s": 9.56,
+          "e": 10.16
+        },
+        {
+          "t": "tanwin (تَنْوِين)",
+          "s": 10.48,
+          "e": 11.2
+        },
+        {
+          "t": "pada",
+          "s": 11.264,
+          "e": 11.52
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 11.56,
+          "e": 12.0
+        },
+        {
+          "t": "serta",
+          "s": 12.147,
+          "e": 12.88
+        },
+        {
+          "t": "jamak mu’annats salim (جَمْع مُؤَنَّث سَالِم).",
+          "s": 12.96,
+          "e": 14.48
+        }
+      ]
     },
     "al-ikhlas:2:recap": {
       "text": "Dengarkan sekali lagi seluruh ayat kedua dibacakan imam.",
@@ -13263,10 +13532,157 @@
       ]
     },
     "al-ikhlas:3:map:total:2": {
-      "text": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada delapan hal, yaitu فِعْل أَمْر, بَدَل, جَمْع تَكْسِير, مُذَكَّر dan مُؤَنَّث, tanwin pada اِسْم, jamak مُؤَنَّث salim, huruf nafi yang menjazmkan, serta مَجْزُوم.",
-      "display": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada delapan hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir (جَمْع تَكْسِير), mudzakkar (مُذَكَّر) dan mu’annats (مُؤَنَّث), tanwin pada isim (اِسْم), jamak mu’annats (مُؤَنَّث) salim, huruf nafi yang menjazmkan, serta majzum (مَجْزُوم).",
+      "text": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada delapan hal, yaitu فِعْل أَمْر, بَدَل, جَمْع تَكْسِير, مُذَكَّر dan مُؤَنَّث, تَنْوِين pada اِسْم, جَمْع مُؤَنَّث سَالِم, huruf nafi yang menjazmkan, serta مَجْزُوم.",
+      "display": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada delapan hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir (جَمْع تَكْسِير), mudzakkar (مُذَكَّر) dan mu’annats (مُؤَنَّث), tanwin (تَنْوِين) pada isim (اِسْم), jamak mu’annats salim (جَمْع مُؤَنَّث سَالِم), huruf nafi yang menjazmkan, serta majzum (مَجْزُوم).",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/995984e8bdc73da0.mp3",
+        "ms": 20611,
+        "sha256": "4bfe919e4e404e2690341334e079c8e94b66600547849dd95a92bc7298a5dc5f"
+      },
+      "tokens": [
+        {
+          "t": "Dari",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "Surah",
+          "s": 0.3,
+          "e": 0.56
+        },
+        {
+          "t": "An-Nas,",
+          "s": 0.613,
+          "e": 1.28
+        },
+        {
+          "t": "Surah",
+          "s": 1.34,
+          "e": 1.6
+        },
+        {
+          "t": "Al-Falaq,",
+          "s": 1.653,
+          "e": 2.32
+        },
+        {
+          "t": "dan",
+          "s": 2.36,
+          "e": 2.48
+        },
+        {
+          "t": "Surah",
+          "s": 2.56,
+          "e": 2.88
+        },
+        {
+          "t": "Al-Ikhlas",
+          "s": 2.933,
+          "e": 3.68
+        },
+        {
+          "t": "ada",
+          "s": 3.8,
+          "e": 4.16
+        },
+        {
+          "t": "delapan",
+          "s": 4.2,
+          "e": 4.48
+        },
+        {
+          "t": "hal,",
+          "s": 4.56,
+          "e": 4.88
+        },
+        {
+          "t": "yaitu",
+          "s": 5.12,
+          "e": 5.76
+        },
+        {
+          "t": "fi’il amr (فِعْل أَمْر),",
+          "s": 6.12,
+          "e": 7.12
+        },
+        {
+          "t": "badal (بَدَل),",
+          "s": 7.36,
+          "e": 8.44
+        },
+        {
+          "t": "jamak taksir (جَمْع تَكْسِير),",
+          "s": 8.62,
+          "e": 9.84
+        },
+        {
+          "t": "mudzakkar (مُذَكَّر)",
+          "s": 10.12,
+          "e": 10.96
+        },
+        {
+          "t": "dan",
+          "s": 11.02,
+          "e": 11.2
+        },
+        {
+          "t": "mu’annats (مُؤَنَّث),",
+          "s": 11.24,
+          "e": 11.84
+        },
+        {
+          "t": "tanwin (تَنْوِين)",
+          "s": 12.24,
+          "e": 13.04
+        },
+        {
+          "t": "pada",
+          "s": 13.104,
+          "e": 13.36
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 13.44,
+          "e": 13.92
+        },
+        {
+          "t": "jamak mu’annats salim (جَمْع مُؤَنَّث سَالِم),",
+          "s": 14.32,
+          "e": 16.6
+        },
+        {
+          "t": "huruf",
+          "s": 16.71,
+          "e": 17.2
+        },
+        {
+          "t": "nafi",
+          "s": 17.24,
+          "e": 17.68
+        },
+        {
+          "t": "yang",
+          "s": 17.712,
+          "e": 17.84
+        },
+        {
+          "t": "menjazmkan,",
+          "s": 17.872,
+          "e": 19.04
+        },
+        {
+          "t": "serta",
+          "s": 19.12,
+          "e": 19.52
+        },
+        {
+          "t": "majzum (مَجْزُوم).",
+          "s": 19.64,
+          "e": 20.4
+        }
+      ]
     },
     "al-ikhlas:3:recap": {
       "text": "Dengarkan sekali lagi seluruh ayat ketiga dibacakan imam.",
@@ -13640,14 +14056,14 @@
       ]
     },
     "al-ikhlas:4:map:again": {
-      "text": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, حَرْف جَرّ, مَرْفُوع, dhomir, fi'il mudhori', مَنْصُوب, عَطْف, huruf nafi yang menjazmkan, serta مَجْزُوم.",
-      "display": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), huruf jar (حَرْف جَرّ), marfu’ (مَرْفُوع), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), manshub (مَنْصُوب), ‘athaf (عَطْف), huruf nafi yang menjazmkan, serta majzum (مَجْزُوم).",
+      "text": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, حَرْف جَرّ, مَرْفُوع, dhomir, fi'il mudhori', مَنْصُوب, عَطْف, تَنْوِين pada اِسْم, huruf nafi yang menjazmkan, serta مَجْزُوم.",
+      "display": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), huruf jar (حَرْف جَرّ), marfu’ (مَرْفُوع), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), manshub (مَنْصُوب), ‘athaf (عَطْف), tanwin (تَنْوِين) pada isim (اِسْم), huruf nafi yang menjazmkan, serta majzum (مَجْزُوم).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/3b4e4cf12145349c.mp3",
-        "ms": 20193,
-        "sha256": "0ff610dd244ff352b52b719dab1935cfbe0122c58b27439b390d99ec349c484b"
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/2fda3d5762ba20aa.mp3",
+        "ms": 26044,
+        "sha256": "16d23fcf9d75cb63f8f68a0f2ffadcc52609bf49b11cc2f3374bc1119acddfd6"
       },
       "tokens": [
         {
@@ -13662,163 +14078,178 @@
         },
         {
           "t": "sudah",
-          "s": 0.44,
-          "e": 0.64
+          "s": 0.453,
+          "e": 0.72
         },
         {
           "t": "kita",
-          "s": 0.688,
-          "e": 0.88
+          "s": 0.768,
+          "e": 0.96
         },
         {
           "t": "pelajari,",
-          "s": 0.92,
-          "e": 1.76
-        },
-        {
-          "t": "yang",
-          "s": 1.792,
+          "s": 1.0,
           "e": 1.92
         },
         {
-          "t": "kita",
+          "t": "yang",
           "s": 1.968,
           "e": 2.16
         },
         {
-          "t": "temui",
-          "s": 2.22,
-          "e": 2.56
+          "t": "kita",
+          "s": 2.208,
+          "e": 2.4
         },
         {
-          "t": "lagi",
-          "s": 2.624,
+          "t": "temui",
+          "s": 2.46,
           "e": 2.88
         },
         {
+          "t": "lagi",
+          "s": 2.944,
+          "e": 3.2
+        },
+        {
           "t": "di",
-          "s": 2.933,
-          "e": 3.04
+          "s": 3.253,
+          "e": 3.36
         },
         {
           "t": "ayat",
-          "s": 3.093,
-          "e": 3.28
+          "s": 3.413,
+          "e": 3.68
         },
         {
           "t": "ini",
-          "s": 3.36,
-          "e": 3.6
+          "s": 3.76,
+          "e": 4.0
         },
         {
           "t": "adalah",
-          "s": 3.646,
-          "e": 3.92
+          "s": 4.08,
+          "e": 4.56
         },
         {
           "t": "harakat,",
-          "s": 3.98,
-          "e": 4.96
+          "s": 4.68,
+          "e": 5.68
         },
         {
           "t": "tiga",
-          "s": 5.0,
-          "e": 5.28
+          "s": 5.8,
+          "e": 6.16
         },
         {
           "t": "jenis",
-          "s": 5.333,
-          "e": 5.6
+          "s": 6.227,
+          "e": 6.56
         },
         {
           "t": "kata,",
-          "s": 5.68,
-          "e": 6.48
+          "s": 6.64,
+          "e": 7.68
         },
         {
           "t": "yaitu",
-          "s": 6.52,
-          "e": 6.88
+          "s": 7.72,
+          "e": 8.32
         },
         {
           "t": "isim (اِسْم),",
-          "s": 6.96,
-          "e": 7.92
+          "s": 8.48,
+          "e": 9.12
         },
         {
           "t": "fi’il (فِعْل),",
-          "s": 7.96,
-          "e": 8.8
+          "s": 9.36,
+          "e": 10.08
         },
         {
           "t": "dan",
-          "s": 8.86,
-          "e": 9.04
+          "s": 10.2,
+          "e": 10.56
         },
         {
           "t": "huruf (حَرْف),",
-          "s": 9.08,
-          "e": 10.16
+          "s": 10.64,
+          "e": 11.76
         },
         {
           "t": "huruf jar (حَرْف جَرّ),",
-          "s": 10.2,
-          "e": 10.88
-        },
-        {
-          "t": "marfu’ (مَرْفُوع),",
-          "s": 11.0,
-          "e": 12.16
-        },
-        {
-          "t": "dhamir (ضَمِير),",
-          "s": 12.213,
+          "s": 11.8,
           "e": 12.72
         },
         {
+          "t": "marfu’ (مَرْفُوع),",
+          "s": 12.92,
+          "e": 13.76
+        },
+        {
+          "t": "dhamir (ضَمِير),",
+          "s": 13.973,
+          "e": 14.88
+        },
+        {
           "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 12.907,
-          "e": 14.56
+          "s": 15.147,
+          "e": 16.8
         },
         {
           "t": "manshub (مَنْصُوب),",
-          "s": 14.6,
-          "e": 15.28
+          "s": 17.0,
+          "e": 18.4
         },
         {
           "t": "‘athaf (عَطْف),",
-          "s": 15.6,
-          "e": 16.4
+          "s": 18.44,
+          "e": 18.96
+        },
+        {
+          "t": "tanwin (تَنْوِين)",
+          "s": 19.16,
+          "e": 19.92
+        },
+        {
+          "t": "pada",
+          "s": 20.096,
+          "e": 20.8
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 20.88,
+          "e": 21.36
         },
         {
           "t": "huruf",
-          "s": 16.56,
-          "e": 17.2
+          "s": 21.52,
+          "e": 22.16
         },
         {
           "t": "nafi",
-          "s": 17.24,
-          "e": 17.6
+          "s": 22.24,
+          "e": 22.64
         },
         {
           "t": "yang",
-          "s": 17.632,
-          "e": 17.76
+          "s": 22.688,
+          "e": 22.88
         },
         {
           "t": "menjazmkan,",
-          "s": 17.808,
-          "e": 18.72
+          "s": 22.944,
+          "e": 24.44
         },
         {
           "t": "serta",
-          "s": 18.84,
-          "e": 19.44
+          "s": 24.54,
+          "e": 25.04
         },
         {
           "t": "majzum (مَجْزُوم).",
-          "s": 19.52,
-          "e": 20.16
+          "s": 25.2,
+          "e": 26.0
         }
       ]
     },
@@ -19329,10 +19760,172 @@
       ]
     },
     "al-ikhlas:4:map:total:2": {
-      "text": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada sembilan hal, yaitu فِعْل أَمْر, بَدَل, جَمْع تَكْسِير, مُذَكَّر dan مُؤَنَّث, tanwin pada اِسْم, jamak مُؤَنَّث salim, huruf nafi yang menjazmkan, مَجْزُوم, serta كَانَ dan saudaranya.",
-      "display": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada sembilan hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir (جَمْع تَكْسِير), mudzakkar (مُذَكَّر) dan mu’annats (مُؤَنَّث), tanwin pada isim (اِسْم), jamak mu’annats (مُؤَنَّث) salim, huruf nafi yang menjazmkan, majzum (مَجْزُوم), serta kana (كَانَ) dan saudaranya.",
+      "text": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada sembilan hal, yaitu فِعْل أَمْر, بَدَل, جَمْع تَكْسِير, مُذَكَّر dan مُؤَنَّث, تَنْوِين pada اِسْم, جَمْع مُؤَنَّث سَالِم, huruf nafi yang menjazmkan, مَجْزُوم, serta كَانَ dan saudaranya.",
+      "display": "Dari Surah An-Nas, Surah Al-Falaq, dan Surah Al-Ikhlas ada sembilan hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir (جَمْع تَكْسِير), mudzakkar (مُذَكَّر) dan mu’annats (مُؤَنَّث), tanwin (تَنْوِين) pada isim (اِسْم), jamak mu’annats salim (جَمْع مُؤَنَّث سَالِم), huruf nafi yang menjazmkan, majzum (مَجْزُوم), serta kana (كَانَ) dan saudaranya.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-ikhlas/13156464086c83f1.mp3",
+        "ms": 22518,
+        "sha256": "0a419712897441efc3366787044935175028eda6c7df6e90f28e3672678186ec"
+      },
+      "tokens": [
+        {
+          "t": "Dari",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "Surah",
+          "s": 0.28,
+          "e": 0.48
+        },
+        {
+          "t": "An-Nas,",
+          "s": 0.533,
+          "e": 1.28
+        },
+        {
+          "t": "Surah",
+          "s": 1.34,
+          "e": 1.6
+        },
+        {
+          "t": "Al-Falaq,",
+          "s": 1.653,
+          "e": 2.4
+        },
+        {
+          "t": "dan",
+          "s": 2.44,
+          "e": 2.56
+        },
+        {
+          "t": "Surah",
+          "s": 2.62,
+          "e": 2.88
+        },
+        {
+          "t": "Al-Ikhlas",
+          "s": 2.933,
+          "e": 3.6
+        },
+        {
+          "t": "ada",
+          "s": 3.7,
+          "e": 4.0
+        },
+        {
+          "t": "sembilan",
+          "s": 4.04,
+          "e": 4.4
+        },
+        {
+          "t": "hal,",
+          "s": 4.48,
+          "e": 4.8
+        },
+        {
+          "t": "yaitu",
+          "s": 5.16,
+          "e": 5.92
+        },
+        {
+          "t": "fi’il amr (فِعْل أَمْر),",
+          "s": 6.24,
+          "e": 7.36
+        },
+        {
+          "t": "badal (بَدَل),",
+          "s": 7.64,
+          "e": 8.48
+        },
+        {
+          "t": "jamak taksir (جَمْع تَكْسِير),",
+          "s": 8.8,
+          "e": 10.08
+        },
+        {
+          "t": "mudzakkar (مُذَكَّر)",
+          "s": 10.36,
+          "e": 11.2
+        },
+        {
+          "t": "dan",
+          "s": 11.26,
+          "e": 11.44
+        },
+        {
+          "t": "mu’annats (مُؤَنَّث),",
+          "s": 11.48,
+          "e": 12.08
+        },
+        {
+          "t": "tanwin (تَنْوِين)",
+          "s": 12.36,
+          "e": 13.04
+        },
+        {
+          "t": "pada",
+          "s": 13.104,
+          "e": 13.36
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 13.4,
+          "e": 13.84
+        },
+        {
+          "t": "jamak mu’annats salim (جَمْع مُؤَنَّث سَالِم),",
+          "s": 14.2,
+          "e": 16.08
+        },
+        {
+          "t": "huruf",
+          "s": 16.28,
+          "e": 17.04
+        },
+        {
+          "t": "nafi",
+          "s": 17.08,
+          "e": 17.44
+        },
+        {
+          "t": "yang",
+          "s": 17.472,
+          "e": 17.6
+        },
+        {
+          "t": "menjazmkan,",
+          "s": 17.664,
+          "e": 18.56
+        },
+        {
+          "t": "majzum (مَجْزُوم),",
+          "s": 18.88,
+          "e": 20.32
+        },
+        {
+          "t": "serta",
+          "s": 20.4,
+          "e": 20.8
+        },
+        {
+          "t": "kana (كَانَ)",
+          "s": 20.92,
+          "e": 21.36
+        },
+        {
+          "t": "dan",
+          "s": 21.46,
+          "e": 21.76
+        },
+        {
+          "t": "saudaranya.",
+          "s": 21.813,
+          "e": 22.48
+        }
+      ]
     },
     "al-ikhlas:4:recap": {
       "text": "Dengarkan sekali lagi seluruh ayat keempat dibacakan imam.",

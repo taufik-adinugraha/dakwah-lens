@@ -119,12 +119,12 @@
    "lesson": "114:6"
   },
   "tanwin-nakirah": {
-   "name": "Tanwin pada isim (اِسْم)",
+   "name": "Tanwin (تَنْوِين) pada isim (اِسْم)",
    "latin": "Tanwin pada isim",
    "lesson": "113:3"
   },
   "jamak-muannats-salim": {
-   "name": "Jamak mu’annats (مُؤَنَّث) salim",
+   "name": "Jamak mu’annats salim (جَمْع مُؤَنَّث سَالِم)",
    "latin": "Jamak mu'annats salim",
    "lesson": "113:4"
   },
@@ -280,7 +280,7 @@
     },
     {
      "id": "tanwin-nakirah",
-     "here": false
+     "here": true
     },
     {
      "id": "jamak-muannats-salim",
@@ -764,7 +764,7 @@
     },
     {
      "id": "tanwin-nakirah",
-     "here": false
+     "here": true
     },
     {
      "id": "jamak-muannats-salim",

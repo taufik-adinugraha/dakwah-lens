@@ -40,7 +40,7 @@ Checks on the AUTHORED file, each stated on its own (authored_problems, speech_p
      the record's note on it names; both said by the narrator as written (checked with check 5's
      rule: no Qur'anic word);
   6. `occurs` is exactly one of {case: marfu | manshub | majrur | majzum}, {qac: a QAC tag},
-     {always: true};
+     {always: true}, {indefinite: true};
   7. a step taught in a lesson whose surah has lessons on disk AND a lesson map
      (authored/<slug>.map.json) is teachable today — a whole record or `teach` — and every step
      such a map lists has a name the narrator can say (no Qur'anic word, at most four words).
@@ -292,11 +292,11 @@ def authored_problems(authored, lessons: dict[str, dict], library: dict, table: 
         if "occurs" in s:
             o = s["occurs"]
             ok = isinstance(o, dict) and len(o) == 1 and (
-                o.get("case") in CUR.CASE_STATES or o.get("always") is True
+                o.get("case") in CUR.CASE_STATES or o.get("always") is True or o.get("indefinite") is True
                 or (isinstance(o.get("qac"), str) and CUR.QAC_TAG.match(o["qac"]) is not None))
             if not ok:
                 errs.append(f"{w}: step {sid}: occurs must be one of {{case: {' | '.join(CUR.CASE_STATES)}}}, {{qac: a QAC tag}}, "
-                            "{always: true}")
+                            "{always: true}, {indefinite: true}")
 
     # --- 5b. lesson zero's slides
     concepts = {c.get("id"): c for c in library.get("concepts") or [] if isinstance(c, dict)}

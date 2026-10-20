@@ -526,6 +526,9 @@
    "step": "tanwin-nakirah",
    "lesson": "113:3",
    "rumus": "[[Tanwin|tanwin]] adalah tanda [[isim|isim]]. [[Nakirah|nakirah]] adalah [[isim|isim]] yang umum, tidak menunjuk satu saja; ciri mudahnya: bisa dimasuki alif lam.",
+   "example": {
+    "loc": "113:3:3"
+   },
    "sumber": [
     {
      "page": "11371/1",

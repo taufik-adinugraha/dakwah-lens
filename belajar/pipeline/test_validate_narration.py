@@ -443,6 +443,14 @@ def in_map(fn):
     return f
 
 
+def without_map(slug):
+    """A surah's lesson map taken away (content/map/<slug>.json gone, as if its switch were off) while its
+    manifest keeps the map lines it has."""
+    def f(_m, _l, _x, _c, mp, *_):
+        del mp[slug]
+    return f
+
+
 def in_cur(fn):
     """A fault in the curriculum (content/curriculum.json)."""
     def f(_m, _l, _x, _c, _mp, cur, *_):
@@ -688,9 +696,11 @@ MUTATIONS = [
     ("… in the composition's own say", compose_say("1:7:4", 7, "Dhamir yang artinya “mereka” ini merujuk kepada kata kedua: merekalah yang diberi nikmat."),
      "al-fatihah:7:w4:compose:7: names a part by its kind and meaning only ('Dhamir (ضَمِير)'"),
     # (An-Nas 4 until 2026-10-20, when its words were composed and its word lines became the short ones)
+    # (Al-Falaq 2's word line was "Kata ini adalah huruf jar …" before its words were composed, 2026-10-20; the fault is
+    # planted by adding that sentence to the short line it is now)
     ("a word named twice in its own line, as until 2026-10-17 (Al-Falaq 2)",
-     both("al-falaq:2:w1", "Kata ini adalah", "Kata ini, yaitu مِن (min), yang artinya “dari”, adalah", "Kata ini adalah",
-          "Kata ini, yaitu min, yang artinya dari, adalah"),
+     more("al-falaq:2:w1", "Kata ini, yaitu مِن (min), yang artinya “dari”, adalah huruf jar.",
+          "Kata ini, yaitu min, yang artinya dari, adalah huruf jar."),
      "al-falaq:2:w1: names 'مِن (min)' twice in one line"),
     ("a word named in two parts of one split line, as until 2026-10-17 (Al-Falaq 3)",
      both("al-falaq:3:structure:b", "dengan kata kerja tempat frasa ini bergantung,", "dengan kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”",
@@ -982,8 +992,9 @@ MUTATIONS = [
     ("map:focus line missing", drop(F3), f"missing line {F3}"),
     ("learned line missing", drop("al-fatihah:7:learned"), "missing line al-fatihah:7:learned"),
     ("map:total line missing", drop(S7), f"missing line {S7}"),
-    ("a map line in a surah without a lesson map", add("al-falaq:1:map:new", "Di ayat ini tidak ada hal baru."),
-     "unexpected line al-falaq:1:map:new"),
+    # (Every surah of the module has a lesson map since 2026-10-20: the fault is planted by taking Al-Falaq's map away,
+    # the manifest keeping the map lines it has. Until then it added a line to Al-Falaq's manifest, a surah with no map.)
+    ("a map line in a surah without a lesson map", without_map("al-falaq"), "unexpected line al-falaq:1:map:new"),
     # the running total unit by unit (2026-10-19: Al-Ikhlas's 25 to 28 steps no longer fit one line of
     # 400 spoken characters; lessonmap.py "THE RUNNING TOTAL, UNIT BY UNIT")
     ("a group of the running total missing", drop(K42), f"missing line {K42}"),
@@ -1691,8 +1702,10 @@ class LessonMapLines(unittest.TestCase):
         is_map = lambda lid: V.is_map_part(lid.split(":", 2)[2]) if lid.count(":") >= 2 and not lid.startswith("shared:") else False  # noqa: E731
         # Al-Fatihah: 7 ayat × 6 (map:learnt removed 2026-10-17); Al-Ikhlas (switched on 2026-10-19):
         # 4 ayat × 8, its running total said unit by unit (map:total, map:total:1, map:total:2); An-Nas
-        # (switched on 2026-10-20): 6 ayat × 6, and ayah 6 × 8 (its total of 23 steps is said unit by unit).
-        per = {"al-fatihah": 42, "al-ikhlas": 32, "an-nas": 38}
+        # (switched on 2026-10-20): 6 ayat × 6, and ayah 6 × 8 (its total of 23 steps is said unit by unit); Al-Falaq
+        # (switched on 2026-10-20): 5 ayat × 8, but ayah 2 × 6 (no next-level topic there: no map:later, no map:focus);
+        # every one of its totals (23 to 25 steps) is said unit by unit.
+        per = {"al-fatihah": 42, "al-ikhlas": 32, "al-falaq": 38, "an-nas": 38}
         for name in with_map:
             added = [lid for lid in with_map[name] if lid not in without[name]]
             self.assertEqual(len(added), per.get(name, 0), name)
@@ -1703,11 +1716,11 @@ class LessonMapLines(unittest.TestCase):
 
     def test_another_surah_switched_on(self):
         # An-Nas, the second surah brought to Al-Ikhlas's standard (its map switched on 2026-10-20). Until then
-        # this test switched it on in a copy, with its two steps that had no text left out; its map is real now
-        # (a hypothetical switch-on of Al-Falaq cannot leave its steps out: the lines of Al-Falaq use their terms).
+        # this test switched it on in a copy, with its two steps that had no text left out; its map is real now,
+        # and so is Al-Falaq's (the third, below): no surah is left to switch on in a copy.
         # Its lines are built in the CURRICULUM's order (An-Nas comes right after Al-Fatihah: 19 steps are learnt
         # before its first ayah), are what the manifest on disk holds, and moved no other surah.
-        self.assertEqual(sorted(LESSONMAP), ["al-fatihah", "al-ikhlas", "an-nas"])
+        self.assertEqual(sorted(LESSONMAP), ["al-falaq", "al-fatihah", "al-ikhlas", "an-nas"])
         quiz = V.load_quiz()
         built = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, LESSONMAP)
         self.assertEqual(LESSONMAP["an-nas"]["steps"]["fiil-amr"]["lesson"], "114:1")
@@ -1726,9 +1739,22 @@ class LessonMapLines(unittest.TestCase):
         self.assertEqual(built["an-nas"]["an-nas:6:map:total:2"]["display"],
                          "Dari Surah An-Nas ada empat hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir (جَمْع تَكْسِير), "
                          "serta mudzakkar (مُذَكَّر) dan mu’annats (مُؤَنَّث).")
+        # Al-Falaq, the third (its map switched on the same day, with tanwin pada isim and jamak mu'annats salim given
+        # their texts): it comes after An-Nas in the curriculum (23 steps are learnt before its first ayah), and its
+        # ayat 3 and 4 each bring one new step; every total (23 to 25 steps) is said unit by unit.
+        self.assertEqual(LESSONMAP["al-falaq"]["steps"]["tanwin-nakirah"]["lesson"], "113:3")
+        self.assertEqual(LESSONMAP["al-falaq"]["steps"]["jamak-muannats-salim"]["lesson"], "113:4")
+        new = [lid for lid in built["al-falaq"] if lid.count(":") >= 2 and V.is_map_part(lid.split(":", 2)[2])]
+        self.assertEqual(sorted(new), sorted([f"al-falaq:{n}:{p}" for n in (1, 3, 4, 5) for p in (*V.MAP_PARTS, "map:total:1", "map:total:2")]
+                                             + [f"al-falaq:2:{p}" for p in (*(x for x in V.MAP_PARTS if x not in ("map:later", "map:focus")),
+                                                                           "map:total:1", "map:total:2")]))
+        self.assertEqual(built["al-falaq"]["al-falaq:3:map:new"]["display"], "Di ayat ini ada satu hal baru: tanwin (تَنْوِين) pada isim (اِسْم).")
+        self.assertEqual(built["al-falaq"]["al-falaq:4:map:new"]["display"], "Di ayat ini ada satu hal baru: jamak mu’annats salim (جَمْع مُؤَنَّث سَالِم).")
+        self.assertEqual(built["al-falaq"]["al-falaq:1:map:new"]["display"], "Di ayat ini tidak ada hal baru.")
+        self.assertEqual(built["al-falaq"]["al-falaq:5:map:total:2"]["display"].split(", yaitu ")[0], "Dari Surah An-Nas dan Surah Al-Falaq ada enam hal")
         # The manifests on disk are what the build gives, and valid; the other surahs are as they were.
         m = copy.deepcopy(MANIFESTS)
-        for slug in ("al-fatihah", "al-ikhlas", "an-nas"):
+        for slug in ("al-fatihah", "al-ikhlas", "al-falaq", "an-nas"):
             m[slug] = B.manifest(built[slug], m[slug], LEX, FORMS, V.letters_for(slug, LESSONS, FORMS, COMPOSE, LIBRARY))
             self.assertEqual(B.dump(m[slug]), B.dump(MANIFESTS[slug]), slug)
         self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=LESSONMAP), [])
@@ -1948,11 +1974,11 @@ class WordPlaces(unittest.TestCase):
                          "Kata ini adalah isim.")
         self.assertEqual(B.named_once("Akhirnya kasrah, karena kata ini, yaitu {{114:4:1}}, yang artinya “dari”, …", "114:4:1"),
                          "Akhirnya kasrah, karena kata ini, yaitu {{114:4:1}}, yang artinya “dari”, …")  # not the why's opening
-        # (An-Nas 4 until 2026-10-20, when its words were composed and its word lines became the short ones;
-        # Al-Falaq's are not composed yet and keep the shape)
+        # (An-Nas 4 and Al-Falaq 2 until 2026-10-20, when their words were composed and their word lines became the
+        # short ones; a quiz explanation still says the why whole and names the word once more)
         w = MANIFESTS["al-falaq"]["lines"]["al-falaq:2:w1"]["display"]
         self.assertEqual(V.named_twice(w), [])
-        self.assertTrue(w.startswith("Kata pertama, yaitu مِن (min), artinya: “dari”. Kata ini adalah huruf jar"))
+        self.assertEqual(w, "Kata pertama, yaitu مِن (min), artinya: “dari”.")
         self.assertEqual(MANIFESTS["an-nas"]["lines"]["an-nas:4:w1"]["display"], "Kata pertama, yaitu مِن (min), artinya: “dari”.")
         why = MANIFESTS["an-nas"]["lines"]["an-nas:4:ex:label-role:1:why"]["display"]
         self.assertIn("Kata ini, yaitu مِن (min), yang artinya “dari”, adalah", why)

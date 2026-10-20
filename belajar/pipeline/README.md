@@ -144,7 +144,8 @@ order it has to be done — the checklist for the next surah:
     the files touched. The `src` tests that list the switched-on surahs (`MAPPED_SLUGS`,
     `COMPOSED_SLUGS`) take the new one in; Al-Ikhlas has describe blocks of its own in
     `compose.test.ts` and `lesson-map.test.ts`, and its beats, gaps and stops pinned in
-    `examples.test.ts` (the lessons without compositions there are An-Nas's now).
+    `examples.test.ts` (the lesson without compositions there is `UNCOMPOSED`, Al-Falaq's words under a slug no file
+    answers to, since every real surah is composed from 2026-10-20).
 11. **The browser checks** (CI, the every-surah container): `scripts/ci/screenshots.mjs --surahs`
     runs `wordKindChecks`, `lessonMapChecks`, `reminderChecks` and `composeFitSweep` with
     `{ slug }` on the new surah, and `scripts/ci/linebreaks.mjs --surahs` walks its lessons;
@@ -255,6 +256,84 @@ production like Al-Falaq). What it took, beyond the checklist above:
   runs the reminder card of An-Nas 2 and the composition sweep (three text sizes, the largest on all six
   ayat). Its warm-up and lesson-map checks and `frames.test.ts`'s walk to "learned" take the new surah in.
   The production-like run still finds An-Nas hidden (nothing there changed). None of them runs locally.
+- *A follow-up, the same day*: the `why` of 114:6:1 (min) said "nunnya berharakat fathah"; the operator approved
+  "huruf nun" (the prose writes a letter by its Latin name, the dictionary turns it into the bare letter ن), which
+  released `an-nas:6:ex:label-role:1:why` (now spoken "huruf نُون berharakat فَتْحَة …", shown "huruf ن …"). One line
+  changed text, and it had no audio; 270 characters to render (USD 0.02). An-Nas now holds one line, `an-nas:1:structure:a`
+  ("maqul al-qaul").
+
+**Al-Falaq as built (2026-10-20)**: the third surah after Al-Fatihah at the same standard, switched on and prepared, NOT
+rendered and NOT published (`BELAJAR_SURAHS` and the deploy config are untouched; hidden in production like Al-Ikhlas
+and An-Nas). Every item of the checklist but the render:
+
+- *The two steps with no text* (`authored/curriculum.json`), written only from pages the library already pins:
+  **tanwin pada isim** (113:3, with nakirah): tanwin is a sign of the isim (Ajurrumiyyah hlm. 5, Shamela 11371/1), the
+  nun that is added at a word's end, silent, in the sound and not in the writing (Qathr an-Nada hlm. 12, 6970/3), and the
+  nakirah is the isim that is common to its kind and belongs to no one in particular, which any isim that accepts alif lam is
+  (Ajurrumiyyah hlm. 14, 11371/15). **Nakirah itself is on a pinned page** (11371/15, "wan-nakirah: kullu ismin sya'i'in fi
+  jinsihi la yakhtashshu bihi wahidun duna akhar, wa-taqribuhu kullu ma shaluha dukhulu al-alif wal-lam 'alaihi"; the term
+  table's attestation is 11371/23, and the cheat sheet's formula for the step already quotes 11371/15): the note that it was
+  not found came from searching the term's attestation page only. The text does NOT say that a tanwin makes a word nakirah
+  (the kitab does not: zaid takes tanwin and is not nakirah). **Jamak mu'annats salim** (113:4): the isim that is raised by
+  dhammah and lowered by kasrah like the single isim and, unlike it, is accusative by kasrah, not fathah (Ajurrumiyyah hlm. 6,
+  7 and 9, 11371/3, 4 and 6; the cheat sheet's formula says the same). **No line says that an-naffāṡāti is a jamak mu'annats
+  salim**: no pinned page labels the word so (the words' review note), as with ṣudūri and jamak taksir; the step is taught
+  as the rule the kitab states.
+- *Tanwin and nakirah, met again* (operator 2026-10-21): the step had no `occurs` rule, so "learnt so far" never marked it as
+  met again, and Al-Falaq 5's "again" and "learned" lines left it out although ḥāsidin carries both. The new rule
+  `occurs: {"indefinite": true}` (`curriculum.py is_indefinite`, its twin `isIndefinite` in `src/lib/autoplay/curriculum.ts`, the
+  zod union of `curriculum-schema.ts`, and check 6 of `validate_curriculum.py`) marks the words that wear tanwin (a fathatan,
+  dammatan or kasratan in the lesson's Arabic, before a carrier alif if there is one) or that QAC 0.4 tags `INDEF`. It occurs
+  at Al-Falaq 3 (gāsiqin) and 5 (ḥāsidin) and at Al-Ikhlas 1 (aḥadun) and 4 (kufuwan, aḥadun), and nowhere in Al-Fatihah or
+  An-Nas, so no published line changed: four recorded Al-Ikhlas lines (1:map:again, 1:map:focus, 1:learned, 4:map:again) gained
+  "tanwin pada isim" and were recorded again. Planted faults: a rule that is not `{indefinite: true}` or has a second key, and
+  `here` flipped on Al-Ikhlas 1, Al-Falaq 5 and (the other way) Al-Ikhlas 2; `test_tanwin_and_nakirah_occur_where_a_word_wears_either`
+  and the twin test in `curriculum.test.ts` pin the positions.
+- *The switch* (`authored/al-falaq.map.json`, one explicit name: `zharaf-idza` → "Zharaf zaman", because the title "Zharaf iżā
+  (…)" holds a Qur'anic word and the sanitiser turns it into "Zharaf kata keempat"): 25 steps listed (2 taught here), 5
+  next-level records; every ayah's running total is said unit by unit (23 to 25 steps).
+- *Its 23 words composed* (`authored/al-falaq.compose.json`, 119 composition lines in 70 frames; no Arabic typed, the file
+  is plain JSON): the forms of qul, a‘ūżu, birabbi, syarri and the wa + min words are those of An-Nas and Al-Ikhlas
+  (so most of their sentences are the same text and share their audio); new here: the article before a read lam (al-falaqi,
+  al-‘uqadi) and before a sun letter (an-naffāṡāti), a noun with tanwin shown from its bentuk dasar with dhammatain to
+  kasratain (gāsiqin, ḥāsidin: one mark changed), mā (isim maushul, its returning pronoun dropped, the "ciptaan-Nya" reading
+  kept as the other scholars' view; the second meaning of al-khalq that the words' review note leaves out stays out), the three past
+  verbs (khalaqa, waqaba, ḥasada: mabni on fathah, the doer, the sentence), iżā (keterangan waktu; its two views on what it hangs
+  on; "zharaf" is not said), the dependencies on an earlier ayah (min syarri on a‘ūżu; the wa-phrases of ayat 3 to 5) cited in the
+  word's own line with their reminder card (12 lines carry a card), and the STOP note on the last word of each ayah. 8
+  base frames: 5 voiced (rabbu 41:9:13 and syarru 98:6:15 four times: both places were pinned for An-Nas), 1 "own" (a‘ūżu), 2
+  teaching forms no ayah has (gāsiqun, ḥāsidun: the narrator's). Left out because the data gives nothing to say: the wazan, the
+  isim fa'il of gāsiqin and ḥāsidin and the mubalaghah of an-naffāṡāti (next level), and that an-naffāṡāti is a jamak mu'annats
+  salim.
+- *The warm-up* is derived (27 questions): `quiz.ALLAH_KIND_ONLY` already lists 113:1:3 (rabbi); mā, gāsiqin, iżā and ḥāsidin say the
+  kind alone (a relative, participles, an adverb of time); the plain nouns (al-falaqi, syarri, an-naffāṡāti, al-‘uqadi) say "nama
+  benda" (the operator's ruling of 2026-10-19/20); nothing needed `CLASS_WITHHELD`.
+- *Continuations* (`continues`, ayat 2 to 5) were checked against the words' and structures' own sources and stand; the pending list
+  lost five lines (seven terms: `al-falaq:1:w2`, `3:w4`, `4:w3`, `5:w3`, `5:w4`, whose word lines are the short ones now) and gained none.
+- *The dictionary* (all pending ear check): جَمْع مُؤَنَّث سَالِم (11371/3, the entry An-Nas's note asked for), تَنْوِين and نَكِرَة (the
+  term table's own Arabic), and, to release two held structure lines, إِعْرَاب+nya ("Arabic term + nya") and مَصْدَرِيَّة (the sad has a
+  sukun, so rule 2 does not apply). Four lines of Al-Ikhlas (`map:total:2`, none with audio) now name the two steps with their Arabic.
+- *Narration*: 347 lines, 38,880 spoken characters; **24 are held**, the rest (323) can be rendered
+  (`render_narration.py --surah al-falaq --skip-held`: 225 distinct texts, 24,122 characters, about USD 1.93; 3 more distinct texts,
+  636 characters, USD 0.05, for Al-Ikhlas's four released lines, and 1 text, 270 characters, USD 0.02, for An-Nas's). The held lines
+  and what each needs from the operator, a respelling in `pronunciation.json` or a rewording: "mudhaf" ×12 (the `why` of each syarri,
+  "disandarkan (mudhaf) kepada …": three exercise lines per ayah in ayat 2 to 5; An-Nas's syarri says "disandarkan kepada …" and holds
+  none), "zharaf" ×7 (`3:structure:b` and the exercise lines of iżā in ayat 3 and 5), "maqul al-qaul" ×1 (`1:structure:b`), and "mubalaghah" with
+  "naffasah" ×4 (`4:structure:b` and the three exercise lines of an-naffāṡāti). Word voices (`build_wordvoice.py`): 11 narrator texts
+  without a recording, 95 characters (USD 0.01): فَلَق, الْفَلَق, الْفَلَقُ, عُقَد, الْعُقَد, الْعُقَدُ, نَفَّاثَات, النَّفَّاثَات,
+  النَّفَّاثَاتُ, غَاسِقٌ, حَاسِدٌ; until they are recorded `build_wordvoice.py --check --require-audio`, `test_validate_wordvoice.py` ("the
+  committed manifest") and `src/lib/clips.test.ts` fail, on purpose.
+- *The tests that used Al-Falaq as "the surah without compositions / without a map"* were restructured, none of their planted faults
+  dropped: `examples.test.ts` takes Al-Falaq's words under a slug no file answers to (`UNCOMPOSED`); `test_validate_map.py`'s
+  "a map for a surah that is not switched on" takes Al-Falaq's authored switch away and keeps its built file; its "switching another
+  surah on asks for what it lacks" plants the missing text (jamak taksir, tanwin pada isim, jamak mu'annats salim);
+  `test_validate_narration.py`'s "a map line in a surah without a lesson map" takes Al-Falaq's map away; the two "named twice"
+  faults that edited Al-Falaq's short word lines plant their sentence instead. `emphasis.test.ts`'s floor of captions with
+  several meanings follows the data again (see its comment).
+- *The browser checks*: `linebreaks.mjs --surahs` walks the five lessons (no example card is required: none teaches a whole record) and
+  `screenshots.mjs --surahs` runs the warm-up (ayah 1), the lesson map of every ayah, the reminder card (ayah 2) and the
+  composition sweep. `frames.test.ts`'s walk to "learned" takes the surah in. The production-like run still finds Al-Falaq hidden. None of
+  them runs locally.
 
 ## Files
 
@@ -305,7 +384,7 @@ production like Al-Falaq). What it took, beyond the checklist above:
 | `encode_narration.py` | 4 | The delivery encode: each master → 64 kbps mono MP3 with ffmpeg (fixed flags, same bytes every run), named by its text, format and bytes; writes the manifests' `audio {url, ms, sha256}`; refuses a drift over 80 ms or a karaoke token that no longer fits |
 | `authored/curriculum.json` | 3 | THE BASIC CURRICULUM (operator-approved 2026-10-13): the units, the 32 lessons in teaching order, the 36 steps (each in one lesson; a Konsep record, a part of one with its own `teach` text and kitab sources, or a basics record), where a step occurs (`occurs`), the terms each step owns, the free terms and the next-level records (see "Kurikulum") |
 | `authored/curriculum.pending.json` | — | What is still said before its lesson: `lines` (narration line id → the terms) and `quiz` (question → the terms). Written by `build_narration.py --write-pending`, never by hand; the build and the validators fail on a use that is not listed and on a listed one that is gone, so it only shrinks (see "Kurikulum") |
-| `curriculum.py` | — | The curriculum's rules (stdlib): teaching order, which lesson teaches a step, where a step occurs (case state, QAC tag, always, the record's tags and structure groups), the lists derived per written lesson (`lines`; `map`: new, learnt so far with `here`, later, next-level), who owns a term, what is too early, the pending list both ways |
+| `curriculum.py` | — | The curriculum's rules (stdlib): teaching order, which lesson teaches a step, where a step occurs (case state, QAC tag, always, indefinite = tanwin or nakirah, the record's tags and structure groups), the lists derived per written lesson (`lines`; `map`: new, learnt so far with `here`, later, next-level), who owns a term, what is too early, the pending list both ways |
 | `build_curriculum.py` | 2 | Writes `belajar/content/curriculum.json` (the authored file + each step's spoken name and text through the narration's sanitiser and dictionary + the derived lists); `--show` prints the table |
 | `validate_curriculum.py` | 6 | The curriculum checks, each on its own (see "Kurikulum"); equality with a fresh build; prints the per-lesson table and the totals |
 | `test_validate_curriculum.py` | 6 | Planted-fault tests for the curriculum + unit tests of the occurrence rule, the teaching order and the pending list |
@@ -1287,7 +1366,9 @@ and `src/components/autoplay/curriculum.test.ts` holds the TypeScript derivation
   `concept:<step id>`); a `basics` record (harakat); or a step not written yet (no line).
 - **Where a step occurs** (`occurs`, `curriculum.occurs`) is a rule, never a list: `case` (the
   word's i'rab state), `qac` (a tag of the word's Quranic Arabic Corpus segments, read from the
-  word's own `sources` line: `DET` for alif lam), `always` (the three kinds of word), and for a
+  word's own `sources` line: `DET` for alif lam), `always` (the three kinds of word), `indefinite`
+  (the words that wear tanwin or are nakirah: a tanwin mark in the word's Arabic, or the feature `INDEF` in
+  its QAC line; the step "Tanwin pada isim", Al-Falaq 3, since 2026-10-21 — see "Al-Falaq as built"), and for a
   record taught whole the record's tags on the words and its structure groups. A `basics` step
   (the harakat) occurs on every word, since 2026-10-17 (it occurred nowhere until then: the map
   said "Tidak ada di ayat ini: Harakat" of every ayah).

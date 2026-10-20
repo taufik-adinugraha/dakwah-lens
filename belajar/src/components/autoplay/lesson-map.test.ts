@@ -172,9 +172,10 @@ describe("the lesson map file (content/map) and the per-surah switch", () => {
     const switched = readdirSync(join(BELAJAR, "pipeline", "authored")).flatMap((f) => (f.endsWith(".map.json") ? [f.slice(0, -".map.json".length)] : []));
     expect([...MAPPED_SLUGS].sort()).toEqual(files.sort());
     expect(files.sort()).toEqual(switched.sort());
-    // Al-Fatihah, Al-Ikhlas since 2026-10-19 (operator: "let's proceed with next surah") and An-Nas since
-    // 2026-10-20; a map says nothing about publishing (src/lib/features.ts BELAJAR_SURAHS hides them in production).
-    expect([...MAPPED_SLUGS]).toEqual(["al-fatihah", "al-ikhlas", "an-nas"]);
+    // Al-Fatihah, Al-Ikhlas since 2026-10-19 (operator: "let's proceed with next surah"), Al-Falaq and An-Nas
+    // since 2026-10-20 (every surah of the module); a map says nothing about publishing (src/lib/features.ts
+    // BELAJAR_SURAHS hides them in production).
+    expect([...MAPPED_SLUGS]).toEqual(["al-fatihah", "al-ikhlas", "al-falaq", "an-nas"]);
     for (const s of SURAHS) {
       for (const a of s.ayat) {
         const map = lessonMapInput(s.slug, a.ayah);
@@ -865,19 +866,21 @@ describe("the lesson map's card: one group at a time", () => {
     // (data-step = the step's id), and reads what a card must show from the built files.
     for (const g of MAP_GROUPS) expect(stageSequence(FATIHAH, FATIHAH.ayat[0], "id").steps.map((x) => x.id)).toContain(`map:${g}`);
     expect(ci).toContain("`map:${g}`");
-    // Al-Fatihah's file by default; every ayah of Al-Ikhlas's (2026-10-19) and of An-Nas's (2026-10-20) in the `--surahs` pass.
+    // Al-Fatihah's file by default; every ayah of Al-Ikhlas's (2026-10-19), of Al-Falaq's and of An-Nas's (2026-10-20) in the `--surahs` pass.
     expect(ci).toContain('async function lessonMapChecks(page, vp, index, { slug = "al-fatihah", ayat = [1, 2] } = {}) {');
     expect(ci).toContain("read(`content/map/${slug}.json`)");
     expect(ci).toContain('await lessonMapChecks(page, vp, narration, { slug: "al-ikhlas", ayat: [1, 2, 3, 4] });');
+    expect(ci).toContain('await lessonMapChecks(page, vp, narration, { slug: "al-falaq", ayat: [1, 2, 3, 4, 5] });');
     expect(ci).toContain('await lessonMapChecks(page, vp, narration, { slug: "an-nas", ayat: [1, 2, 3, 4, 5, 6] });');
     expect(lessonMapFor("al-ikhlas")?.ayat.map((a) => a.ayah)).toEqual([1, 2, 3, 4]);
+    expect(lessonMapFor("al-falaq")?.ayat.map((a) => a.ayah)).toEqual([1, 2, 3, 4, 5]);
     expect(lessonMapFor("an-nas")?.ayat.map((a) => a.ayah)).toEqual([1, 2, 3, 4, 5, 6]);
     expect(ci).toContain('read("messages/id.json")');
     // The step two ahead of a lesson's first (the look-ahead check) is the map's first group.
     expect(ci).toContain(`const MAP_1 = "al-fatihah:1:map:${MAP_GROUPS[0]}";`);
     // No expectation typed: no step or record id of the curriculum stands in the check.
     const body = ci.slice(ci.indexOf("async function lessonMapChecks("), ci.indexOf("async function assertNotFoundShown("));
-    for (const f of [FILE, lessonMapFor("al-ikhlas")!, lessonMapFor("an-nas")!])
+    for (const f of [FILE, lessonMapFor("al-ikhlas")!, lessonMapFor("al-falaq")!, lessonMapFor("an-nas")!])
       for (const sid of [...Object.keys(f.steps), ...Object.keys(f.lanjut)]) expect(body, sid).not.toMatch(new RegExp(`["'\`]${sid}["'\`]`));
     // The CSP refuses eval: no waitForFunction call.
     expect(body).not.toMatch(/\.waitForFunction\(/);
@@ -1013,5 +1016,27 @@ describe("the running total unit by unit (2026-10-19: Al-Ikhlas's 25 to 28 steps
     expect(lines["an-nas:6:map:total"].display).toBe("Dengan itu, sudah dua puluh tiga hal yang kita pelajari.");
     expect(lines["an-nas:5:map:total"].display).toMatch(/^Dengan itu, sudah dua puluh dua hal yang kita pelajari, yaitu harakat,/);
     expect(lines["an-nas:6:map:total:2"].display).toMatch(/^Dari Surah An-Nas ada empat hal, yaitu /);
+  });
+
+  it("Al-Falaq (2026-10-20): every ayah's total, 23 to 25 steps, is over one line — the count, then a group for each run of whole units", () => {
+    const groups = (n: number) => (lessonMapInput("al-falaq", n)!.total ?? []).map((g) => g.from);
+    const pre = ["pelajaran pengantar", "Surah Al-Fatihah"];
+    expect([1, 2, 3, 4, 5].map(groups)).toEqual([
+      [pre, ["Surah An-Nas"]],
+      [pre, ["Surah An-Nas"]],
+      [pre, ["Surah An-Nas", "Surah Al-Falaq"]],
+      [pre, ["Surah An-Nas", "Surah Al-Falaq"]],
+      [pre, ["Surah An-Nas", "Surah Al-Falaq"]],
+    ]);
+    const lines = narrationFor("al-falaq")!.lines;
+    // 23 steps before Al-Falaq teaches anything; tanwin pada isim (ayah 3) and jamak mu'annats salim (ayah 4) make 24 and 25.
+    expect([1, 2, 3, 4, 5].map((n) => lines[`al-falaq:${n}:map:total`].display)).toEqual([
+      "Sampai ayat ini, sudah dua puluh tiga hal yang kita pelajari.",
+      "Sampai ayat ini, sudah dua puluh tiga hal yang kita pelajari.",
+      "Dengan itu, sudah dua puluh empat hal yang kita pelajari.",
+      "Dengan itu, sudah dua puluh lima hal yang kita pelajari.",
+      "Sampai ayat ini, sudah dua puluh lima hal yang kita pelajari.",
+    ]);
+    expect(lines["al-falaq:5:map:total:2"].display).toMatch(/^Dari Surah An-Nas dan Surah Al-Falaq ada enam hal, yaitu .*tanwin \(تَنْوِين\) pada isim \(اِسْم\), serta jamak mu’annats salim \(جَمْع مُؤَنَّث سَالِم\)\.$/);
   });
 });
