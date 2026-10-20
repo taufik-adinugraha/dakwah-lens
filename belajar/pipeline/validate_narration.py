@@ -1539,6 +1539,10 @@ def letter_name_rx(t: "Term") -> str:
 # `approved` of a dictionary term: the date the operator approved its sound by ear, or PENDING and the
 # date he waived the pre-render review (the term renders and is always reported).
 PENDING = "pending-ear-check"
+# A term + the possessive suffix, one dictionary entry (operator 2026-10-20: "arabic term + nya"):
+# `term` is "<another entry's term>+nya", `speak` is that entry's `speak` with "nya" joined to it
+# (اِسْمnya, khobarnya), `display` shows the Latin word and the base term's Arabic ("isimnya (اِسْم)").
+NYA = "+nya"
 APPROVED = re.compile(rf"^(?:{PENDING} )?\d{{4}}-\d{{2}}-\d{{2}}(?: .+)?$")
 
 
@@ -1562,6 +1566,11 @@ class Term:
     approved: str = ""   # the date the operator approved its sound by ear, or "pending-ear-check …"
 
     @property
+    def base(self) -> str | None:
+        """The entry a suffixed term (isimnya) is built on: its `term` without "+nya", or None."""
+        return self.term[:-len(NYA)] if self.term.endswith(NYA) else None
+
+    @property
     def pending(self) -> bool:
         """Added without the operator's ear check (he waived the pre-render review, 2026-10-10):
         it renders, and every validate / render run lists it until it is dated."""
@@ -1579,7 +1588,7 @@ class Term:
     @property
     def letter(self) -> bool:
         """A letter: its NAME is spoken (bā’), the letter as in the ayah is shown (بِ)."""
-        return bool(self.shown) and ar_skeleton(self.shown) != ar_skeleton(self.term)
+        return bool(self.shown) and ar_skeleton(self.shown) != ar_skeleton(self.base or self.term)
 
     @property
     def bare(self) -> bool:
@@ -1866,14 +1875,22 @@ class Lexicon:
         for t in self.terms:
             if ARABIC.search(t.head):
                 errs.append(f"{src}: {t.term}: the display's head must be Latin, Arabic goes in brackets")
-            if t.arabic_speak and t.speak != t.term:
+            if t.base is not None:
+                base = self.by_term.get(t.base)
+                if base is None or base.base is not None:
+                    errs.append(f"{src}: {t.term}: a term with {NYA} is built on another entry of the dictionary "
+                                f"({t.base!r} is not one, or is itself suffixed)")
+                elif t.speak != base.speak + "nya":
+                    errs.append(f"{src}: {t.term}: speak must be its base's speak with nya joined to it "
+                                f"({base.speak + 'nya'!r}), got {t.speak!r}")
+            elif t.arabic_speak and t.speak != t.term:
                 errs.append(f"{src}: {t.term}: speak must be the term itself (Arabic script) or a Latin respelling")
-            if HEAVY_A.search(t.term) and t.arabic_speak:
+            if HEAVY_A.search(t.base or t.term) and t.arabic_speak:
                 errs.append(f"{src}: {t.term}: heavy letter with fathah/alif needs a fixed Latin respelling in speak "
                             "(eleven_v3 reads it light and inconsistently)")
             if ARABIC.search(t.term) and not t.shown:
                 errs.append(f"{src}: {t.term}: display must show the Arabic in brackets")
-            if t.shown and not t.letter and t.shown != t.term:
+            if t.shown and not t.letter and t.shown != (t.base or t.term):
                 errs.append(f"{src}: {t.term}: display shows {t.shown!r}, not the term")
             if t.approved and not APPROVED.match(t.approved):
                 errs.append(f"{src}: {t.term}: approved must be a date (YYYY-MM-DD) or \"{PENDING} <date> …\", "
@@ -3242,7 +3259,8 @@ def term_ids(lex: "Lexicon", table: list[dict] | None = None) -> dict[str, str]:
     an example word, "alif lam" — has no id: it is free."""
     table = QUIZ.load_terms() if table is None else table
     by_ar = {t["ar"]: t["id"] for t in table if t.get("ar")}
-    out = TermIds({t.term: by_ar[t.term] for t in lex.terms if t.term in by_ar})
+    # (a suffixed entry, isimnya, uses the term it is built on)
+    out = TermIds({t.term: by_ar[t.base or t.term] for t in lex.terms if (t.base or t.term) in by_ar})
     out.forms = TERMS.TermForms(table)
     return out
 
