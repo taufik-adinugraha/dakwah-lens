@@ -77,7 +77,8 @@ const PAGES = [
   ["kredit", "/belajar/id/kredit"],
   // What a visitor gets at a hidden address: the module's own 404.
   ["waris-tersembunyi-404", "/belajar/id/waris"],
-  ["ikhlas-tersembunyi-404", "/belajar/id/quran/al-ikhlas/1"],
+  // (Al-Ikhlas answers at its address since 2026-10-20: lib/features.ts DEFAULT_UNLISTED.)
+  ["falaq-tersembunyi-404", "/belajar/id/quran/al-falaq/1"],
 ];
 // The Mu'awwidzat (hidden on the live site), `--surahs` only: the track with every surah a link,
 // and a lesson of two of them.

@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 
 import { routing } from "@/i18n/routing";
-import { publishedSurahs, warisSwitchOn } from "@/lib/features";
+import { reachableSurahs, warisSwitchOn } from "@/lib/features";
 import { SURAH_SLUGS } from "@/lib/routes";
 
 // Locale routing, plus the runtime switches of what is hidden. The module has
@@ -31,9 +31,10 @@ const NOT_FOUND = "/_tersembunyi";
  * (lib/features.ts), all of it gated by the one check below:
  *   - Ilmu Waris, unless BELAJAR_WARIS=on (operator, 2026-10-10): every
  *     /{locale}/waris… URL;
- *   - every surah BELAJAR_SURAHS does not publish (operator, 2026-10-10:
- *     Al-Fatihah first, the others "segera hadir"): its /{locale}/quran/{slug}…
- *     URLs. A pre-hub /{locale}/{slug} URL is redirected there first
+ *   - every surah that is neither published (BELAJAR_SURAHS; operator, 2026-10-10:
+ *     Al-Fatihah first, the others "segera hadir") nor unlisted (BELAJAR_UNLISTED:
+ *     answers at its address, linked from nowhere; operator, 2026-10-20): its
+ *     /{locale}/quran/{slug}… URLs. A pre-hub /{locale}/{slug} URL is redirected there first
  *     (next.config.ts, 308) and gated when the redirected request comes back.
  *
  * Gated here, before anything renders, rather than with notFound() in a
@@ -68,7 +69,7 @@ export default function proxy(request: NextRequest) {
 type Hidden = { waris: boolean; published: ReadonlySet<string> };
 
 function hiddenNow(): Hidden {
-  return { waris: !warisSwitchOn(), published: new Set(publishedSurahs()) };
+  return { waris: !warisSwitchOn(), published: new Set(reachableSurahs()) };
 }
 
 /**

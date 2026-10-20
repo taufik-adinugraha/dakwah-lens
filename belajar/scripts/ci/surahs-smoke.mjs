@@ -46,6 +46,13 @@ if (SLUGS.length < 2) fail("setup", "could not read SURAH_SLUGS from src/lib/rou
 /** The production default (lib/features.ts DEFAULT_SURAHS). */
 const DEFAULT = ["al-fatihah"];
 const MUAWWIDZAT = ["al-ikhlas", "al-falaq", "an-nas"];
+/**
+ * The production default of BELAJAR_UNLISTED (lib/features.ts DEFAULT_UNLISTED; operator 2026-10-20):
+ * surahs that answer at their address and are linked from nowhere. Read from the source, not typed.
+ */
+const featuresSrc = await readText("src/lib/features.ts");
+const UNLISTED = [...(/export const DEFAULT_UNLISTED[^=]*= \[([^\]]*)\]/.exec(featuresSrc)?.[1] ?? "").matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+if (!UNLISTED.every((slug) => SLUGS.includes(slug))) fail("setup", "DEFAULT_UNLISTED names a slug that is no lesson");
 
 const SURAH = Object.fromEntries(await Promise.all(SLUGS.map(async (slug) => [slug, await readJson(`content/${slug}.json`)])));
 const BY_NUMBER = Object.fromEntries(SLUGS.map((slug) => [SURAH[slug].surah, slug]));
@@ -348,17 +355,23 @@ async function api(expected) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// --hidden (production: BELAJAR_SURAHS unset, Al-Fatihah only).
+// --hidden (production: BELAJAR_SURAHS unset, Al-Fatihah only; the default unlisted surahs answer
+// at their address and are linked from nowhere).
 // ---------------------------------------------------------------------------------------------
 async function checkHidden() {
   await api(DEFAULT);
+  // `hidden`: not published, so a "Segera hadir" card and no link into it anywhere. `gone`: not even
+  // reachable (the module's 404). The unlisted ones are hidden but not gone.
   const hidden = SLUGS.filter((s) => !DEFAULT.includes(s));
+  const gone = hidden.filter((s) => !UNLISTED.includes(s));
   for (const slug of MUAWWIDZAT) if (!hidden.includes(slug)) fail("setup", `${slug} is not among the hidden surahs`);
+  if (gone.length === 0) fail("setup", "every hidden surah is unlisted: the 404 is not checked on any");
   const ayatOf = (slug) => SURAH[slug].ayat.map((a) => a.ar);
   const leaks = (slug, body) => ayatOf(slug).filter((ar) => body.includes(ar)).length;
 
-  // 1. Every page of a hidden surah, both locales: the module's own 404, nothing of the lesson in it.
-  for (const slug of hidden) {
+  // 1. Every page of a surah that is neither published nor unlisted, both locales: the module's own
+  //    404, nothing of the lesson in it.
+  for (const slug of gone) {
     for (const locale of ["id", "en"]) {
       for (const path of lessonPaths(locale, slug)) {
         const { status, html } = await get(path);
@@ -377,16 +390,33 @@ async function checkHidden() {
     if (leaks(slug, body)) fail(`${path} (RSC request)`, `the response carries ${slug}'s ayat`);
   }
 
+  // 1b. An unlisted surah answers at its address, both locales: its lesson stage is there.
+  for (const slug of UNLISTED) {
+    for (const locale of ["id", "en"]) {
+      for (const path of lessonPaths(locale, slug)) {
+        const { status, html } = await get(path);
+        console.log(`${path} -> ${status} (unlisted)`);
+        if (status !== 200) {
+          fail(path, `status ${status}, expected 200 (${slug} is unlisted: it answers at its address)`);
+          continue;
+        }
+        if (/\/\d+$/.test(path)) {
+          if (!html.includes('data-autoplay="start"')) fail(path, "no autoplay start button");
+        }
+      }
+    }
+  }
+
   // 2. Encoded spellings, and the ones next-intl cleans into the page's own path (src/proxy.ts).
   for (const path of [
-    "/belajar/id/quran/al-%69khlas",
+    "/belajar/id/quran/al-fa%6Caq",
     "/belajar/en/quran%2Fan-nas",
     "/belajar/id/quran/an-nas%2F3",
-    "/belajar/id/quran/al-ikh%09las/1",
+    "/belajar/id/quran/al-fa%09laq/1",
     "/belajar/en/quran%0A/al-falaq/1",
     "/belajar/i%0Dd/quran/an-nas/2",
-    "/belajar/id/quran/al-ikhlas%20",
-    "/belajar/id/quran/al-fatihah/..%2Fal-ikhlas",
+    "/belajar/id/quran/al-falaq%20",
+    "/belajar/id/quran/al-fatihah/..%2Fal-falaq",
   ]) {
     const { status, html } = await get(path);
     console.log(`${path} -> ${status}`);
@@ -402,6 +432,7 @@ async function checkHidden() {
     ["/belajar/al-falaq", "/belajar/id/quran/al-falaq"],
     ["/belajar/al-falaq/3", "/belajar/id/quran/al-falaq/3"],
   ]) {
+    const unlisted = UNLISTED.some((slug) => to.includes(`/quran/${slug}`));
     const { status, location } = await get(from);
     const path = location ? new URL(location, BASE).pathname : "";
     console.log(`${from} -> ${status} ${path}`);
@@ -411,7 +442,8 @@ async function checkHidden() {
     }
     const next = await get(to);
     console.log(`  ${to} -> ${next.status}`);
-    if (next.status !== 404) fail(to, `status ${next.status} after the redirect, expected 404`);
+    const expected = unlisted ? 200 : 404;
+    if (next.status !== expected) fail(to, `status ${next.status} after the redirect, expected ${expected}`);
   }
 
   // 4. The track page: Al-Fatihah is a link; every hidden surah a "Segera hadir" card that is no
