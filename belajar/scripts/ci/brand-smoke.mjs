@@ -19,7 +19,9 @@
 //   - every card: 200, image/png, a real PNG of 1200×630; unknown lessons' cards 404; nothing
 //     hidden is shared: the waris address's 404 page carries no card and no share button, and
 //     where the image lists its published surahs (/belajar/api/surahs, BELAJAR_SURAHS) an
-//     unpublished lesson's page and card both answer 404.
+//     unpublished lesson's page and card both answer 404 — except an unlisted one (BELAJAR_UNLISTED,
+//     lib/features.ts DEFAULT_UNLISTED; operator 2026-10-20), which answers at its address (page and
+//     card 200) and is linked from nowhere (surahs-smoke.mjs checks that).
 //
 // Every problem is listed, then the script exits 1. Node 20+ (global fetch), no dependencies.
 import { readdir, readFile } from "node:fs/promises";
@@ -191,8 +193,12 @@ let published = null;
   }
 }
 const lessons = published ? all.filter((l) => published.has(l.slug)) : all;
-const hidden = published ? all.filter((l) => !published.has(l.slug)) : [];
-console.log(`${lessons.length} published lesson(s)${hidden.length ? `, ${hidden.length} hidden` : ""}`);
+// The default of BELAJAR_UNLISTED, read from the source rather than typed.
+const unlistedSlugs = [...(/export const DEFAULT_UNLISTED[^=]*= \[([^\]]*)\]/.exec(await readFile(new URL("src/lib/features.ts", BELAJAR), "utf8"))?.[1] ?? "").matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+const notPublished = published ? all.filter((l) => !published.has(l.slug)) : [];
+const unlisted = notPublished.filter((l) => unlistedSlugs.includes(l.slug));
+const hidden = notPublished.filter((l) => !unlistedSlugs.includes(l.slug));
+console.log(`${lessons.length} published lesson(s)${hidden.length ? `, ${hidden.length} hidden` : ""}${unlisted.length ? `, ${unlisted.length} unlisted` : ""}`);
 
 for (const locale of ["id", "en"]) {
   console.log(`— ${locale}`);
@@ -270,6 +276,15 @@ for (const { slug, ayah } of hidden) {
   }
 }
 if (hidden.length) ok(`${hidden.length} unpublished lesson(s): page and card 404 in id + en`);
+// An unlisted lesson answers at its address: page and card both 200, the card a real PNG.
+for (const { slug, ayah } of unlisted) {
+  for (const locale of ["id", "en"]) {
+    const path = `/belajar/${locale}/quran/${slug}/${ayah}`;
+    const [pg, card] = [await get(path), await get(`${path}/og`)];
+    if (pg.status !== 200 || card.status !== 200) fail(path, `unlisted lesson: page ${pg.status}, card ${card.status} (expected 200, 200)`);
+  }
+}
+if (unlisted.length) ok(`${unlisted.length} unlisted lesson(s): page and card answer 200 in id + en`);
 
 if (problems.length) {
   console.log(`\n✗ ${problems.length} brand / bridge / share problem(s) (listed above)`);
