@@ -94,6 +94,12 @@ describe("ar-clear: room for the marks of every box of Arabic", () => {
     // the composition draws only content/compose's forms: its own room (rabbu 1.287em, measured
     // 1.317 at Sangat besar; ar-rahimi 0.759em). src/lib/arabicInk.test.ts: no composed form is taller.
     expect(css).toMatch(/\[data-autoplay="composition"\] \{\s*--ar-ink-above: 1\.33;\s*--ar-ink-below: 0\.77;\s*\}/);
+    // … except a composition with a form of a taller stack (ٱلنَّفَّٰثَٰتِ, 1.455em; CI 2026-10-21), which takes the
+    // module's full room above (--ar-ink-tall): marked by the component, and only that one.
+    expect(css).toMatch(/\[data-autoplay="composition"\]\[data-compose-tall\] \{\s*--ar-ink-above: var\(--ar-ink-tall\);\s*\}/);
+    const comp = read("src/components/lesson/WordComposition.tsx");
+    expect(comp).toContain('tallStack(f.ar)');
+    expect(comp).toContain('data-compose-tall={tall ? "true" : undefined}');
   });
 
   it("the composition's Arabic is a box (an inline element's padding moves nothing) with it", () => {

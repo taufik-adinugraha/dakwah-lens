@@ -23,6 +23,7 @@ import {
   type AutoplayState,
   type NarrationManifest,
 } from "./autoplay";
+import { tallStack } from "./arabicInk";
 import { composeFor, composeInput, COMPOSED_SLUGS } from "./compose-content";
 import { applyOp, composeFileProblems, composeInputFor, diffPieces, pieces, STOP_NOTE } from "./composition";
 import { SURAHS } from "./content";
@@ -144,6 +145,16 @@ describe("content/compose/al-falaq.json (2026-10-20)", () => {
     expect(falaq.words["113:1:4"].lines.some((l) => l.say.includes("{{!113:1:4/falaq}}"))).toBe(true);
     expect(falaq.words["113:4:5"].lines.some((l) => l.say.includes("{{!113:4:5/uqad}}"))).toBe(true);
     expect(falaq.words["113:4:3"].lines.some((l) => l.say.includes("{{113:4:3/naffas}}"))).toBe(true);
+  });
+});
+
+describe("compositions with a form of a tall stack of marks (the figure's room, globals.css data-compose-tall)", () => {
+  it("only Al-Falaq 4's an-naffāṡāt: the other figures keep their tighter room (CI 2026-10-21)", () => {
+    const tall = COMPOSED_SLUGS.flatMap((slug) =>
+      Object.entries(composeFor(slug)!.words).flatMap(([key, w]) => (Object.values(w.forms).some((f) => tallStack(f.ar)) ? [`${slug} ${key}`] : [])),
+    );
+    // A composition that joins this list wants the browser check (inkMeasure) to say its figure is clear.
+    expect(tall).toEqual(["al-falaq 113:4:3"]);
   });
 });
 

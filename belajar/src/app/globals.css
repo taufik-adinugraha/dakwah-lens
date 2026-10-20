@@ -732,10 +732,20 @@ label:has(> .sr-only:focus-visible) {
    already rides up over the end of the mushaf line, and every em counts
    there. A composed form with a taller stack (a dotted letter with shaddah
    and a vowel, ٱلنَّفَّٰثَٰتِ) must raise these two first: the browser check
-   (inkMeasure) measures every frame of the compositions its walk visits. */
+   (inkMeasure) measures every frame of the compositions its walk visits.
+   That one composition does, below (data-compose-tall), and no other. */
 [data-autoplay="composition"] {
   --ar-ink-above: 1.33;
   --ar-ink-below: 0.77;
+}
+/* A composition with a form whose stack stands taller (WordComposition: tallStack): Al-Falaq 4's
+   an-naffāṡāt, ٱلنَّفَّٰثَٰتِ, 1.455em over the baseline at 44px (CI 2026-10-21: its marks ran 3.6px on
+   a phone to 5.6px on a desktop into the "isim" label above its tile, at every text size). It takes the
+   module's full room over the baseline (--ar-ink-tall, 1.48em); only that composition, so Al-Fatihah's,
+   Al-Ikhlas's and An-Nas's figures keep their size. The room under the baseline (0.77) already holds
+   its 0.5em. */
+[data-autoplay="composition"][data-compose-tall] {
+  --ar-ink-above: var(--ar-ink-tall);
 }
 [data-autoplay="composition"] :is(.arabic-inline, .quran) {
   --ar-lh: 1.6;
