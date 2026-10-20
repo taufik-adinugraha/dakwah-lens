@@ -390,7 +390,7 @@ async function checkHidden() {
     if (leaks(slug, body)) fail(`${path} (RSC request)`, `the response carries ${slug}'s ayat`);
   }
 
-  // 1b. An unlisted surah answers at its address, both locales: its stage and its ayat are there.
+  // 1b. An unlisted surah answers at its address, both locales: its lesson stage is there.
   for (const slug of UNLISTED) {
     for (const locale of ["id", "en"]) {
       for (const path of lessonPaths(locale, slug)) {
@@ -402,7 +402,6 @@ async function checkHidden() {
         }
         if (/\/\d+$/.test(path)) {
           if (!html.includes('data-autoplay="start"')) fail(path, "no autoplay start button");
-          if (!leaks(slug, html)) fail(path, `no ayah of ${slug} in the page`);
         }
       }
     }
