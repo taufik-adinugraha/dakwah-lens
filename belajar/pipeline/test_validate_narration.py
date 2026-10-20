@@ -687,10 +687,11 @@ MUTATIONS = [
      "al-fatihah:7:w7:compose:1: names a part by its kind and meaning only ('bersambung dengan dhamir (ضَمِير)'"),
     ("… in the composition's own say", compose_say("1:7:4", 7, "Dhamir yang artinya “mereka” ini merujuk kepada kata kedua: merekalah yang diberi nikmat."),
      "al-fatihah:7:w4:compose:7: names a part by its kind and meaning only ('Dhamir (ضَمِير)'"),
-    ("a word named twice in its own line, as until 2026-10-17 (An-Nas 4)",
-     both("an-nas:4:w1", "Kata ini adalah", "Kata ini, yaitu مِن (min), yang artinya “dari”, adalah", "Kata ini adalah",
+    # (An-Nas 4 until 2026-10-20, when its words were composed and its word lines became the short ones)
+    ("a word named twice in its own line, as until 2026-10-17 (Al-Falaq 2)",
+     both("al-falaq:2:w1", "Kata ini adalah", "Kata ini, yaitu مِن (min), yang artinya “dari”, adalah", "Kata ini adalah",
           "Kata ini, yaitu min, yang artinya dari, adalah"),
-     "an-nas:4:w1: names 'مِن (min)' twice in one line"),
+     "al-falaq:2:w1: names 'مِن (min)' twice in one line"),
     ("a word named in two parts of one split line, as until 2026-10-17 (Al-Falaq 3)",
      both("al-falaq:3:structure:b", "dengan kata kerja tempat frasa ini bergantung,", "dengan kata أَعُوذُ (a‘ūżu) yang artinya “aku berlindung”",
           "dengan kata kerja tempat frasa ini bergantung,", "dengan kata a'udzu yang artinya aku berlindung"),
@@ -774,8 +775,8 @@ MUTATIONS = [
      f"al-fatihah:7:w1:compose:3: cites '{SIRATA}' “di ayat kelima”, which is not a word of ayah 5"),
     ("a citation the data does not have (its link taken out)", in_continues(lambda c: c["al-fatihah"]["ayat"][3]["links"].pop(1)),
      f"al-fatihah:3:w2:compose:4: cites '{ALLAHI}' of ayah 2 as a dependency the data does not have"),
-    ("a citation inside a comparison", both("an-nas:5:w1", "di ayat keempat, yang", "di ayat keempat, seperti di ayat kedua, yang"),
-     "an-nas:5:w1: points back at an earlier ayah ('ayat keempat')"),
+    ("a citation inside a comparison", both("an-nas:5:w1:compose:6", "di ayat keempat, yang", "di ayat keempat, seperti di ayat kedua, yang"),
+     "an-nas:5:w1:compose:6: points back at an earlier ayah ('ayat keempat')"),
     ("a lanjutan ayah without data", in_continues(lambda c: c["al-falaq"]["ayat"].pop(4)),
      "al-falaq:4: its structure is a continuation ("),
     ("data that continues the ayah itself", in_continues(lambda c: c["al-fatihah"]["ayat"][7].__setitem__("ayah", 7)),
@@ -1689,8 +1690,9 @@ class LessonMapLines(unittest.TestCase):
         with_map = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, LESSONMAP)
         is_map = lambda lid: V.is_map_part(lid.split(":", 2)[2]) if lid.count(":") >= 2 and not lid.startswith("shared:") else False  # noqa: E731
         # Al-Fatihah: 7 ayat × 6 (map:learnt removed 2026-10-17); Al-Ikhlas (switched on 2026-10-19):
-        # 4 ayat × 8, its running total said unit by unit (map:total, map:total:1, map:total:2).
-        per = {"al-fatihah": 42, "al-ikhlas": 32}
+        # 4 ayat × 8, its running total said unit by unit (map:total, map:total:1, map:total:2); An-Nas
+        # (switched on 2026-10-20): 6 ayat × 6, and ayah 6 × 8 (its total of 23 steps is said unit by unit).
+        per = {"al-fatihah": 42, "al-ikhlas": 32, "an-nas": 38}
         for name in with_map:
             added = [lid for lid in with_map[name] if lid not in without[name]]
             self.assertEqual(len(added), per.get(name, 0), name)
@@ -1700,26 +1702,18 @@ class LessonMapLines(unittest.TestCase):
             self.assertEqual([k for k in with_map[name] if k not in added], list(without[name]), name)
 
     def test_another_surah_switched_on(self):
-        # An-Nas with a map of its own. Two of its steps have no text yet, so the real curriculum
-        # refuses the switch (test_validate_map.py); here they are left out, and the surah's lines
-        # are built in the CURRICULUM's order (An-Nas comes right after Al-Fatihah: 19 steps are
-        # learnt before its first ayah), pass the validator, and move no other surah but Al-Ikhlas
-        # (switched on 2026-10-19, taught after An-Nas: the two steps left out leave its learnt
-        # lists and its running total too, so its lines are built anew here as well).
-        import build_map as BM
-        import lessonmap as LM
-        import terms as TERMS
-        authored = copy.deepcopy(CUR.load_authored())
-        authored["steps"] = [s for s in authored["steps"] if s["id"] not in ("jamak-taksir", "mudzakkar-muannats")]
-        cur = BC.build(authored, LESSONS, LIBRARY, TERMS.load_terms(), BC.Namer(LESSONS, LEX))
-        maps = BM.build_all(LESSONS, LIBRARY, LEX, {"al-fatihah": LM.load_authored("al-fatihah"), "al-ikhlas": LM.load_authored("al-ikhlas"),
-                                                    "an-nas": {"slug": "an-nas", "names": {}}}, cur)
-        self.assertEqual(maps["al-fatihah"], LESSONMAP["al-fatihah"])
-        self.assertEqual(maps["an-nas"]["steps"]["fiil-amr"]["lesson"], "114:1")
+        # An-Nas, the second surah brought to Al-Ikhlas's standard (its map switched on 2026-10-20). Until then
+        # this test switched it on in a copy, with its two steps that had no text left out; its map is real now
+        # (a hypothetical switch-on of Al-Falaq cannot leave its steps out: the lines of Al-Falaq use their terms).
+        # Its lines are built in the CURRICULUM's order (An-Nas comes right after Al-Fatihah: 19 steps are learnt
+        # before its first ayah), are what the manifest on disk holds, and moved no other surah.
+        self.assertEqual(sorted(LESSONMAP), ["al-fatihah", "al-ikhlas", "an-nas"])
         quiz = V.load_quiz()
-        built = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, maps, cur)
-        new = [lid for lid in built["an-nas"] if lid not in MANIFESTS["an-nas"]["lines"]]
-        self.assertEqual(sorted(new), sorted(f"an-nas:{n}:{p}" for n in range(1, 7) for p in V.MAP_PARTS))
+        built = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, LESSONMAP)
+        self.assertEqual(LESSONMAP["an-nas"]["steps"]["fiil-amr"]["lesson"], "114:1")
+        new = [lid for lid in built["an-nas"] if lid.count(":") >= 2 and V.is_map_part(lid.split(":", 2)[2])]
+        self.assertEqual(sorted(new), sorted([f"an-nas:{n}:{p}" for n in range(1, 6) for p in V.MAP_PARTS]
+                                             + [f"an-nas:6:{p}" for p in (*V.MAP_PARTS, "map:total:1", "map:total:2")]))
         self.assertEqual(built["an-nas"]["an-nas:1:map:new"]["display"], "Di ayat ini ada satu hal baru: fi’il amr (فِعْل أَمْر).")
         self.assertNotIn("an-nas:1:map:learnt", built["an-nas"])  # the learnt-so-far line, removed 2026-10-17
         self.assertTrue(built["an-nas"]["an-nas:1:map:again"]["display"].startswith(
@@ -1727,13 +1721,17 @@ class LessonMapLines(unittest.TestCase):
         self.assertEqual(built["an-nas"]["an-nas:3:map:new"]["display"], "Di ayat ini tidak ada hal baru.")
         # (six until 2026-10-17: harakat is met again in every ayah, operator addition A)
         self.assertTrue(built["an-nas"]["an-nas:3:learned"]["display"].startswith("Di ayat ini tidak ada hal baru; kita mengulang tujuh hal"))
-        self.assertEqual(built["al-fatihah"], B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE, quiz, LESSONMAP)["al-fatihah"])
+        # Ayah 6's running total (23 steps) is over one line: the count, then the two groups of whole units.
+        self.assertEqual(built["an-nas"]["an-nas:6:map:total"]["display"], "Dengan itu, sudah dua puluh tiga hal yang kita pelajari.")
+        self.assertEqual(built["an-nas"]["an-nas:6:map:total:2"]["display"],
+                         "Dari Surah An-Nas ada empat hal, yaitu fi’il amr (فِعْل أَمْر), badal (بَدَل), jamak taksir (جَمْع تَكْسِير), "
+                         "serta mudzakkar (مُذَكَّر) dan mu’annats (مُؤَنَّث).")
+        # The manifests on disk are what the build gives, and valid; the other surahs are as they were.
         m = copy.deepcopy(MANIFESTS)
-        m["an-nas"] = B.manifest(built["an-nas"], m["an-nas"], LEX, FORMS)
-        m["al-ikhlas"] = B.manifest(built["al-ikhlas"], m["al-ikhlas"], LEX, FORMS,
-                                    V.letters_for("al-ikhlas", LESSONS, FORMS, COMPOSE, LIBRARY))
-        self.assertNotIn("jamak taksir", m["al-ikhlas"]["lines"]["al-ikhlas:4:map:total:2"]["display"])
-        self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=maps, curriculum=cur), [])
+        for slug in ("al-fatihah", "al-ikhlas", "an-nas"):
+            m[slug] = B.manifest(built[slug], m[slug], LEX, FORMS, V.letters_for(slug, LESSONS, FORMS, COMPOSE, LIBRARY))
+            self.assertEqual(B.dump(m[slug]), B.dump(MANIFESTS[slug]), slug)
+        self.assertEqual(V.check(m, LESSONS, LIBRARY, lex=LEX, compose=COMPOSE, lessonmap=LESSONMAP), [])
 
     def test_rendered_map_lines_pass(self):
         # With the delivered file's audio and its tokens on each of the 42 lines, the validator
@@ -1950,9 +1948,12 @@ class WordPlaces(unittest.TestCase):
                          "Kata ini adalah isim.")
         self.assertEqual(B.named_once("Akhirnya kasrah, karena kata ini, yaitu {{114:4:1}}, yang artinya “dari”, …", "114:4:1"),
                          "Akhirnya kasrah, karena kata ini, yaitu {{114:4:1}}, yang artinya “dari”, …")  # not the why's opening
-        w = MANIFESTS["an-nas"]["lines"]["an-nas:4:w1"]["display"]
+        # (An-Nas 4 until 2026-10-20, when its words were composed and its word lines became the short ones;
+        # Al-Falaq's are not composed yet and keep the shape)
+        w = MANIFESTS["al-falaq"]["lines"]["al-falaq:2:w1"]["display"]
         self.assertEqual(V.named_twice(w), [])
         self.assertTrue(w.startswith("Kata pertama, yaitu مِن (min), artinya: “dari”. Kata ini adalah huruf jar"))
+        self.assertEqual(MANIFESTS["an-nas"]["lines"]["an-nas:4:w1"]["display"], "Kata pertama, yaitu مِن (min), artinya: “dari”.")
         why = MANIFESTS["an-nas"]["lines"]["an-nas:4:ex:label-role:1:why"]["display"]
         self.assertIn("Kata ini, yaitu مِن (min), yang artinya “dari”, adalah", why)
 

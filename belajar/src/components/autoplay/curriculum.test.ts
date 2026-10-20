@@ -265,8 +265,10 @@ describe("what an ayah's lesson teaches as “Konsep baru” (taughtAt: what con
     expect(gap.examples[0].loc).toBe("1:5:2");
   });
 
-  it("the other surahs follow mechanically: fi'il amr and badal in An-Nas, nothing where the curriculum teaches nothing", () => {
-    expect(surah("an-nas").ayat.map((a) => taughtAt(a).map((t) => t.id))).toEqual([["fiil-amr"], ["badal"], [], [], [], []]);
+  it("the other surahs follow mechanically: fi'il amr, badal and jamak taksir in An-Nas, nothing where the curriculum teaches nothing", () => {
+    // Jamak taksir (Ajurrumiyyah hlm. 6-8) and mudzakkar dan mu'annats (Syadza al-'Arf hlm. 73-74) have a text of
+    // their own since 2026-10-20 (An-Nas's lesson map switched on).
+    expect(surah("an-nas").ayat.map((a) => taughtAt(a).map((t) => t.id))).toEqual([["fiil-amr"], ["badal"], [], [], ["jamak-taksir"], ["mudzakkar-muannats"]]);
     expect(surah("al-falaq").ayat.map((a) => taughtAt(a).map((t) => t.id))).toEqual([[], [], [], [], []]);
     // Al-Ikhlas 3: the lam record whole (its line keeps the record's id), then majzum, the fourth
     // part of i'rab, with a text of its own since 2026-10-19 (Al-Ikhlas's lesson map switched on).

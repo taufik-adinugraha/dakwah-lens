@@ -1092,7 +1092,13 @@
    ],
    "before": 21,
    "after": 22,
-   "lines": [],
+   "lines": [
+    {
+     "line": "concept:jamak-taksir",
+     "step": "jamak-taksir",
+     "words": []
+    }
+   ],
    "map": {
     "new": [
      "jamak-taksir"
@@ -1199,7 +1205,13 @@
    ],
    "before": 22,
    "after": 23,
-   "lines": [],
+   "lines": [
+    {
+     "line": "concept:mudzakkar-muannats",
+     "step": "mudzakkar-muannats",
+     "words": []
+    }
+   ],
    "map": {
     "new": [
      "mudzakkar-muannats"
@@ -3005,17 +3017,64 @@
   {
    "id": "jamak-taksir",
    "lesson": "114:5",
-   "name": "Jamak taksir",
+   "name": "Jamak taksir (جَمْع تَكْسِير)",
    "latin": "Jamak taksir",
-   "line": null,
-   "terms": []
+   "line": "concept:jamak-taksir",
+   "teach": {
+    "title": "Jamak taksir, dan tandanya: sama seperti isim tunggal",
+    "summary": "Jamak taksir adalah salah satu bentuk jamak dari isim. Dalam i'rab, ia umumnya diperlakukan seperti isim tunggal: marfu' dengan dhammah, manshub dengan fathah, dan majrur dengan kasrah.",
+    "marked": {
+     "title": "[[Jamak taksir|jamak-taksir]], dan tandanya: sama seperti [[isim|isim]] tunggal",
+     "summary": "[[Jamak taksir|jamak-taksir]] adalah salah satu bentuk jamak dari [[isim|isim]]. Dalam [[i'rab|irab]], ia umumnya diperlakukan seperti [[isim|isim]] tunggal: [[marfu'|marfu]] dengan [[dhammah|dhammah]], [[manshub|manshub]] dengan [[fathah|fathah]], dan [[majrur|majrur]] dengan [[kasrah|kasrah]]."
+    },
+    "sources": [
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 6, bab Ma'rifat 'Alamat al-I'rab: dhammah tanda rafa' pada isim mufrad, jamak taksir, jamak mu'annats salim dan fi'il mudhari'",
+      "url": "https://shamela.ws/book/11371/3"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 7, bab Ma'rifat 'Alamat al-I'rab: fathah tanda nashab pada isim mufrad dan jamak taksir; kasrah tanda khafdh pada isim mufrad munsharif dan jamak taksir munsharif",
+      "url": "https://shamela.ws/book/11371/4"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 8, fashl al-Mu'rabat: yang di-i'rab dengan harakat ada empat, yaitu isim mufrad, jamak taksir, jamak mu'annats salim dan fi'il mudhari'",
+      "url": "https://shamela.ws/book/11371/5"
+     }
+    ]
+   },
+   "terms": [
+    "jamak-taksir"
+   ]
   },
   {
    "id": "mudzakkar-muannats",
    "lesson": "114:6",
-   "name": "Mudzakkar dan mu'annats",
+   "name": "Mudzakkar (مُذَكَّر) dan mu’annats (مُؤَنَّث)",
    "latin": "Mudzakkar dan mu'annats",
-   "line": null,
+   "line": "concept:mudzakkar-muannats",
+   "teach": {
+    "title": "Mudzakkar dan mu'annats, dua jenis isim",
+    "summary": "Isim terbagi menjadi mudzakkar dan mu'annats. Mudzakkar adalah asal, jadi tidak memerlukan tanda. Mu'annats punya dua tanda: huruf ta' dan huruf alif.",
+    "marked": {
+     "title": "Mudzakkar dan mu'annats, dua jenis [[isim|isim]]",
+     "summary": "[[Isim|isim]] terbagi menjadi mudzakkar dan mu'annats. Mudzakkar adalah asal, jadi tidak memerlukan tanda. Mu'annats punya dua tanda: huruf ta' dan huruf alif."
+    },
+    "sources": [
+     {
+      "kitab": "Ahmad al-Hamalawi, Syadza al-'Arf fi Fann ash-Sharf (tahqiq Nashrullah 'Abd ar-Rahman Nashrullah, Riyadh: Maktabah ar-Rusyd)",
+      "ref": "hlm. 73, at-Taqsim ats-Tsalits li-l-Ism min Haitsu Kaunihi Mudzakkaran aw Mu'annatsan: isim terbagi mudzakkar dan mu'annats; mudzakkar adalah asal sehingga tidak memerlukan tanda, sedangkan mu'annats punya dua tanda, yang pertama ta' (di isim, seperti shā’imah dan ẓarīfah)",
+      "url": "https://shamela.ws/book/11243/76"
+     },
+     {
+      "kitab": "Ahmad al-Hamalawi, Syadza al-'Arf fi Fann ash-Sharf (tahqiq Nashrullah 'Abd ar-Rahman Nashrullah, Riyadh: Maktabah ar-Rusyd)",
+      "ref": "hlm. 74, lanjutan at-Taqsim ats-Tsalits: tanda mu'annats yang kedua adalah alif",
+      "url": "https://shamela.ws/book/11243/77"
+     }
+    ]
+   },
    "terms": [
     "ta-tanits"
    ]
@@ -3033,7 +3092,7 @@
   {
    "id": "jamak-muannats-salim",
    "lesson": "113:4",
-   "name": "Jamak mu'annats salim",
+   "name": "Jamak mu’annats (مُؤَنَّث) salim",
    "latin": "Jamak mu'annats salim",
    "line": null,
    "terms": []

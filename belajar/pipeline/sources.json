@@ -2458,6 +2458,24 @@
           "text_sha256": "c87feae120746da56e890f2d8b625253342948cc242d4bfe796e358af9ae9511",
           "chars": 408,
           "retrieved": "2026-10-14"
+        },
+        "11243/76": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/76",
+          "print_page": "73",
+          "title": "ص73 - كتاب شذا العرف في فن الصرف - التقسيم الثالث للاسم من حيث كونه مذكرا أو مؤنثا - المكتبة الشاملة",
+          "text_sha256": "c09ac9df3b5a841888c3afcf671cbcd75a865265c9bacf8ae1288639de44e40e",
+          "chars": 1427,
+          "retrieved": "2026-10-20"
+        },
+        "11243/77": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/77",
+          "print_page": "74",
+          "title": "ص74 - كتاب شذا العرف في فن الصرف - التقسيم الثالث للاسم من حيث كونه مذكرا أو مؤنثا - المكتبة الشاملة",
+          "text_sha256": "e0a5e5f618f3f3fd538b76d5951c730f8a704e363486b5a76bcc5670761f1a4b",
+          "chars": 1593,
+          "retrieved": "2026-10-20"
         }
       },
       "licence": "al-Maktabah asy-Syamilah publishes the texts for reading; the classical matn are public domain, modern works (Darwisy, al-Jadwal, al-Mujtaba, the editors' footnotes) are not, so the pages are cached locally for verification only and never shipped or committed (cache/ is git-ignored).",

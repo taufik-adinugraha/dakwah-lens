@@ -336,19 +336,21 @@ describe("‹ Sebelumnya / Berikutnya › move frame by frame on a step with fra
     }
     expect(seq.steps[s.idx].id).toBe("learned");
     expect(cap).toBeGreaterThan(presses + 10);
-    // … and every ayah of Al-Ikhlas, whose "learned" and "structure" the `--surahs` pass walks to
-    // (2026-10-19: lessonMapChecks, reminderChecks).
-    const ikhlas = SURAHS.find((x) => x.slug === "al-ikhlas")!;
-    for (const a of ikhlas.ayat) {
-      const sq = stageSequence(ikhlas, a, "id");
-      let t = reduceAutoplay(sq, reduceAutoplay(sq, createAutoplayState(sq), { type: "start", reason: "fresh" }), { type: "pause" });
-      let n = 0;
-      while (sq.steps[t.idx].id !== "learned" && n < 500) {
-        t = reduceAutoplay(sq, t, viewAutoplay(sq, t).showSkip ? { type: "skip" } : { type: "next", jump: true });
-        n++;
+    // … and every ayah of Al-Ikhlas and of An-Nas, whose "learned" and "structure" the `--surahs` pass walks to
+    // (2026-10-19 and 2026-10-20: lessonMapChecks, reminderChecks).
+    for (const [slug, label] of [["al-ikhlas", "Al-Ikhlas"], ["an-nas", "An-Nas"]] as const) {
+      const surah = SURAHS.find((x) => x.slug === slug)!;
+      for (const a of surah.ayat) {
+        const sq = stageSequence(surah, a, "id");
+        let t = reduceAutoplay(sq, reduceAutoplay(sq, createAutoplayState(sq), { type: "start", reason: "fresh" }), { type: "pause" });
+        let n = 0;
+        while (sq.steps[t.idx].id !== "learned" && n < 500) {
+          t = reduceAutoplay(sq, t, viewAutoplay(sq, t).showSkip ? { type: "skip" } : { type: "next", jump: true });
+          n++;
+        }
+        expect(sq.steps[t.idx].id, `${label} ${a.ayah}`).toBe("learned");
+        expect(cap, `${label} ${a.ayah}`).toBeGreaterThan(n + 10);
       }
-      expect(sq.steps[t.idx].id, `Al-Ikhlas ${a.ayah}`).toBe("learned");
-      expect(cap, `Al-Ikhlas ${a.ayah}`).toBeGreaterThan(n + 10);
     }
   });
 });

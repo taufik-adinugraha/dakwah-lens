@@ -4273,6 +4273,8 @@ const narration = DEFAULT_RUN || SURAHS_ON ? await narrationIndex() : new Map();
 const units = DEFAULT_RUN ? await composedUnits() : new Map();
 // Al-Ikhlas's composed words, for its composition sweep in the `--surahs` pass (2026-10-19).
 const ikhlasUnits = SURAHS_ON ? await composedUnits("al-ikhlas") : new Map();
+// … and An-Nas's, in the same pass (2026-10-20).
+const nasUnits = SURAHS_ON ? await composedUnits("an-nas") : new Map();
 if (DEFAULT_RUN || SURAHS_ON) console.log(`narration index: ${narration.size} file(s) named by the manifests in ${BELAJAR_DIR}`);
 const browser = await chromium.launch();
 try {
@@ -4307,6 +4309,16 @@ try {
       await composeFitSweep(page, vp, "normal", [1], ikhlasUnits, "al-ikhlas");
       await composeFitSweep(page, vp, "besar", [1], ikhlasUnits, "al-ikhlas");
       await composeFitSweep(page, vp, "sangat-besar", [1, 2, 3, 4], ikhlasUnits, "al-ikhlas");
+      // An-Nas (2026-10-20), hidden on the live site as well: the warm-up (ayah 1: qul, a word of one part,
+      // first; birabbi is a word of two), the lesson map of every ayah (ayah 6's total is said unit by unit),
+      // the reminder card of ayah 2 (it continues ayah 1: birabbi highlighted), and every composition frame at
+      // the three text sizes (the largest on all six ayat).
+      await wordKindChecks(page, vp, narration, { slug: "an-nas", ayah: 1 });
+      await lessonMapChecks(page, vp, narration, { slug: "an-nas", ayat: [1, 2, 3, 4, 5, 6] });
+      await reminderChecks(page, vp, narration, { slug: "an-nas", ayah: 2, step: "structure" });
+      await composeFitSweep(page, vp, "normal", [1], nasUnits, "an-nas");
+      await composeFitSweep(page, vp, "besar", [1], nasUnits, "an-nas");
+      await composeFitSweep(page, vp, "sangat-besar", [1, 2, 3, 4, 5, 6], nasUnits, "an-nas");
       await ctx.close();
       continue;
     }

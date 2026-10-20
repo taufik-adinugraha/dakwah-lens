@@ -100,10 +100,45 @@ describe("content/compose/al-ikhlas.json (2026-10-19)", () => {
   });
 });
 
+describe("content/compose/an-nas.json (2026-10-20)", () => {
+  const nas = JSON.parse(readFileSync(`${CONTENT}compose/an-nas.json`, "utf8")) as ComposeFile;
+  const words = SURAHS.find((s) => s.slug === "an-nas")!.ayat.flatMap((a) => a.words.map((w) => w.loc));
+  it("loads at build time and replays without a problem: every word of the surah composed, no primer of its own", () => {
+    expect(composeFor("an-nas")).not.toBeNull();
+    expect(composeFileProblems(nas, WORDS)).toEqual([]);
+    expect(Object.keys(nas.words)).toEqual(words);
+    expect(words).toHaveLength(20);
+    expect(nas.primer).toBeNull();
+  });
+
+  it("each ayah's last word ends on the stop frame, and nothing else carries that note", () => {
+    const last = ["114:1:4", "114:2:2", "114:3:2", "114:4:4", "114:5:5", "114:6:3"];
+    for (const loc of last) {
+      const fr = nas.words[loc].frames;
+      expect(fr[fr.length - 1].note, loc).toBe(STOP_NOTE);
+    }
+    const noted = Object.entries(nas.words).flatMap(([loc, u]) => u.frames.flatMap((f) => (f.note === STOP_NOTE ? [loc] : [])));
+    expect(noted).toEqual(last);
+  });
+
+  it("a noun with the article is joined (the lam melts into a sun letter, or is read), then its ending changes: an-nāsi, al-waswāsi, al-khannāsi, al-jinnati, wa an-nāsi", () => {
+    const stages = (loc: string) => nas.words[loc].frames.map((f) => f.stage);
+    for (const loc of ["114:1:4", "114:2:2", "114:3:2", "114:5:5"]) expect(stages(loc), loc).toEqual(["join", "change", "whole"]);
+    expect(stages("114:4:3")).toEqual(["parts", "join", "change"]);
+    expect(stages("114:4:4")).toEqual(["parts", "join", "change", "whole"]);
+    expect(stages("114:6:2")).toEqual(["parts", "join", "change"]);
+    // wa + alif lam + nās: three parts, the alif of the article silent after the wawu
+    expect(stages("114:6:3")).toEqual(["parts", "join", "change", "whole"]);
+    expect(nas.words["114:6:3"].frames[0].tiles).toHaveLength(3);
+    // a heavy-letter word's part is named in the caption only: its recording is the narrator's, not a line's word
+    expect(nas.words["114:4:4"].lines.some((l) => l.say.includes("{{!114:4:4/khannas}}"))).toBe(true);
+  });
+});
+
 describe("content/compose/al-fatihah.json", () => {
   it("loads at build time (zod + replay) and replays without a problem", () => {
-    // Al-Fatihah, and Al-Ikhlas since 2026-10-19: a surah without a file keeps its words' one-line explanation.
-    expect(COMPOSED_SLUGS).toEqual(["al-fatihah", "al-ikhlas"]);
+    // Al-Fatihah, Al-Ikhlas since 2026-10-19 and An-Nas since 2026-10-20: a surah without a file keeps its words' one-line explanation.
+    expect(COMPOSED_SLUGS).toEqual(["al-fatihah", "al-ikhlas", "an-nas"]);
     expect(composeFor("al-fatihah")).not.toBeNull();
     expect(composeFileProblems(raw, WORDS)).toEqual([]);
   });

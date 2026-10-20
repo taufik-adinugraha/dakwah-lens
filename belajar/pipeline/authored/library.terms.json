@@ -630,6 +630,21 @@
       ]
     },
     {
+      "id": "jamak-taksir",
+      "latin": "jamak taksir",
+      "forms": [
+        "jamak taksir"
+      ],
+      "group": "istilah",
+      "ar": "جَمْع تَكْسِير",
+      "attest": [
+        {
+          "page": "11371/3",
+          "text": "الاسم المُفرد، وجَمع التكسير، وجمع المؤنث السالم"
+        }
+      ]
+    },
+    {
       "id": "mulhaq",
       "latin": "mulhaq",
       "forms": [

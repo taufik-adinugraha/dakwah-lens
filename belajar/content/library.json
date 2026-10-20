@@ -9748,6 +9748,19 @@
       ]
     },
     {
+      "id": "jamak-taksir",
+      "latin": "jamak taksir",
+      "ar": "جَمْع تَكْسِير",
+      "group": "istilah",
+      "sources": [
+        {
+          "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+          "ref": "hlm. 6: ejaan istilah",
+          "url": "https://shamela.ws/book/11371/3"
+        }
+      ]
+    },
+    {
       "id": "mulhaq",
       "latin": "mulhaq",
       "ar": "مُلْحَق",
@@ -12857,8 +12870,8 @@
     "tanzil": "uthmani-1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8 (only to byte-check «…» quotations in prose)",
     "authored_lexicon": "authored/library.lexicon.json sha256:245f33c8c033af498d332e1c1bc1dda3140c446bc0118f9ebe64512835805d51",
     "authored_concepts": "authored/library.concepts.json sha256:54225f43c2b519d5dd476f917ff2aae8d50eae54f0da500ff5233c2e92bb6b46",
-    "authored_terms": "authored/library.terms.json sha256:9c823ee53ebebcb22cfc37cab4792fa5285cc7443bba7c6a7df3c520084e7e91",
-    "shamela_istilah": "129 Shamela pages pinned by text sha256 (sources.json shamela_istilah)",
+    "authored_terms": "authored/library.terms.json sha256:cb7b422525eb33e3c38b3393e6a42d43e3383bb2bb5f81907549c3a84bc26f8c",
+    "shamela_istilah": "131 Shamela pages pinned by text sha256 (sources.json shamela_istilah)",
     "authored_basics": "authored/library.basics.json sha256:2dbea8c7915784645cc4e1079f53e029a59aa9264cd28ead2a360b60178c5162",
     "authored_parts": "authored/library.parts.json sha256:a0262681a8b8cd5c47b9e6ea29eb18670a73ea2a0120d7d74db98fd0dacecaf3",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (clips: Konsep example voices)",
