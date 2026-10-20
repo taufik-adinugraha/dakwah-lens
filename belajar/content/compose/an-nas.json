@@ -1,0 +1,3346 @@
+{
+  "version": 1,
+  "slug": "an-nas",
+  "surah": 114,
+  "marks": {
+    "fathah": {
+      "char": "َ",
+      "sound": "a",
+      "display": "fathah (فَتْحَة)"
+    },
+    "kasrah": {
+      "char": "ِ",
+      "sound": "i",
+      "display": "kasrah (كَسْرَة)"
+    },
+    "dhammah": {
+      "char": "ُ",
+      "sound": "u",
+      "display": "dhammah (ضَمَّة)"
+    },
+    "sukun": {
+      "char": "ْ",
+      "sound": null,
+      "display": "sukun"
+    },
+    "shaddah": {
+      "char": "ّ",
+      "sound": null,
+      "display": "syaddah"
+    },
+    "small_alif": {
+      "char": "ٰ",
+      "sound": "a panjang",
+      "display": "alif kecil"
+    }
+  },
+  "primer": null,
+  "words": {
+    "114:1:1": {
+      "loc": "114:1:1",
+      "ar": "قُلْ",
+      "forms": {
+        "qul": {
+          "ar": "قُلْ",
+          "translit": "qul",
+          "src": {
+            "word": "114:1:1"
+          },
+          "label": "fi'il",
+          "gloss": "katakanlah",
+          "attested": [
+            "2:80:8",
+            "2:91:21",
+            "2:93:20",
+            "2:94:1",
+            "2:97:1"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "whole",
+          "tiles": [
+            "qul"
+          ],
+          "note": "kata perintah: akhirnya sukun, tetap"
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "qul"
+          ],
+          "note": "pelakunya: “engkau”"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Kata ini adalah fi'il amr, yaitu kata perintah."
+        },
+        {
+          "frame": 1,
+          "say": "Akhirnya sukun, tanda huruf mati, dan akhir kata perintah ini tetap, tidak berubah karena kata lain."
+        },
+        {
+          "frame": 1,
+          "say": "Jadi kata perintah ini mabni di atas sukun."
+        },
+        {
+          "frame": 2,
+          "say": "Pelakunya tidak tertulis, yaitu “engkau”."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/1"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:1; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/1"
+        },
+        {
+          "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+          "ref": "hlm. 31, Fi'l al-Amr: hukum asal fi'il amr adalah mabni di atas sukun",
+          "url": "https://shamela.ws/book/6970/19"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:1:1:*) — akar, lemma, kelas kata: V|STEM|POS:V|IMPV|LEM:qaAla|ROOT:qwl|2MS",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=1"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:1:2": {
+      "loc": "114:1:2",
+      "ar": "أَعُوذُ",
+      "forms": {
+        "audzu": {
+          "ar": "أَعُوذُ",
+          "translit": "a‘ūżu",
+          "src": {
+            "word": "114:1:2"
+          },
+          "label": "fi'il",
+          "gloss": "aku berlindung",
+          "attested": [
+            "2:67:15",
+            "11:47:4",
+            "19:18:3",
+            "23:97:3",
+            "113:1:2"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "whole",
+          "tiles": [
+            "audzu"
+          ],
+          "note": "huruf hamzah di awal: pelakunya “aku”"
+        },
+        {
+          "stage": "base",
+          "tiles": [
+            "audzu"
+          ],
+          "focus": "audzu"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Fi'il ini menyebut perbuatan yang sedang atau akan dilakukan."
+        },
+        {
+          "frame": 1,
+          "say": "Huruf hamzah di awalnya menunjukkan pelakunya, yaitu “aku”; pelaku itu tidak ditulis sebagai kata tersendiri."
+        },
+        {
+          "frame": 2,
+          "say": "Akhirnya dhammah, bunyi u, dan di sini ia tetap dalam bentuk dasarnya."
+        },
+        {
+          "frame": 2,
+          "say": "Kata kerja seperti ini baru berubah akhirnya bila didahului kata tertentu; di sini tidak ada kata seperti itu."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/1"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/1"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:1; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/1"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 10, Bab al-Af'al: fi'il amr 'majzum selamanya'; fi'il mudhari' marfu' sampai didahului huruf penashab atau penjazm",
+          "url": "https://shamela.ws/book/11371/7"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:1:2:*) — akar, lemma, kelas kata: V|STEM|POS:V|IMPF|LEM:Eu*o|ROOT:Ew*|1S",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=1"
+        },
+        {
+          "kitab": "Ahmad Zaini Dahlan, Syarh Mukhtashar Jiddan 'ala Matn al-Ajurrumiyyah (Beirut: Dar al-Masyari', cet. 7, 1435 H/2014 M)",
+          "ref": "hlm. 42, bab al-Af'al: mudhari' untuk masa sekarang dan akan datang",
+          "url": "https://archive.org/details/mukhtasarjiddan/page/n42/mode/1up"
+        },
+        {
+          "kitab": "Ahmad Zaini Dahlan, Syarh Mukhtashar Jiddan 'ala Matn al-Ajurrumiyyah (Beirut: Dar al-Masyari', cet. 7, 1435 H/2014 M)",
+          "ref": "hlm. 44, syarh 'anaitu': makna tiap huruf awal",
+          "url": "https://archive.org/details/mukhtasarjiddan/page/n44/mode/1up"
+        },
+        {
+          "kitab": "Ahmad Zaini Dahlan, Syarh Mukhtashar Jiddan 'ala Matn al-Ajurrumiyyah (Beirut: Dar al-Masyari', cet. 7, 1435 H/2014 M)",
+          "ref": "hlm. 45, syarh 'wa huwa marfu'un abadan': rafa' karena bebas dari nashib dan jazim",
+          "url": "https://archive.org/details/mukhtasarjiddan/page/n45/mode/1up"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:1:3": {
+      "loc": "114:1:3",
+      "ar": "بِرَبِّ",
+      "lead": "Kata ini terdiri dari dua bagian.",
+      "forms": {
+        "bi": {
+          "ar": "بِ",
+          "translit": "bi",
+          "src": {
+            "word": "114:1:3",
+            "pieces": [
+              0,
+              1
+            ]
+          },
+          "label": "huruf jar",
+          "gloss": "kepada",
+          "attested": []
+        },
+        "rabbu": {
+          "ar": "رَبُّ",
+          "translit": "rabbu",
+          "src": {
+            "tanzil": "41:9:13"
+          },
+          "label": "isim",
+          "gloss": "Tuhan",
+          "attested": [
+            "6:164:7",
+            "7:54:31",
+            "9:129:13",
+            "17:102:8",
+            "18:14:8"
+          ]
+        },
+        "rabbi": {
+          "ar": "رَبِّ",
+          "translit": "rabbi",
+          "src": {
+            "word": "114:1:3",
+            "pieces": [
+              1,
+              null
+            ]
+          },
+          "label": "isim",
+          "gloss": "Tuhan",
+          "attested": [
+            "1:2:3",
+            "2:126:4",
+            "2:260:4",
+            "3:35:5",
+            "3:36:4"
+          ]
+        },
+        "birabbi": {
+          "ar": "بِرَبِّ",
+          "translit": "birabbi",
+          "src": {
+            "join": [
+              "bi",
+              "rabbi"
+            ]
+          },
+          "gloss": "kepada Tuhan",
+          "attested": [
+            "7:121:3",
+            "20:70:6",
+            "26:47:3",
+            "26:98:3",
+            "37:87:3"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "parts",
+          "tiles": [
+            "bi",
+            "rabbu"
+          ]
+        },
+        {
+          "stage": "base",
+          "tiles": [
+            "bi",
+            "rabbu"
+          ],
+          "focus": "rabbu",
+          "note": "seperti di QS 41:9"
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "bi",
+            "rabbi"
+          ],
+          "from": "rabbu",
+          "to": "rabbi",
+          "cause": "bi",
+          "chips": [
+            {
+              "from": "بُّ",
+              "to": "بِّ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        },
+        {
+          "stage": "join",
+          "tiles": [
+            "birabbi"
+          ],
+          "from": [
+            "bi",
+            "rabbi"
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Bagian pertama adalah huruf jar, yaitu {{114:1:3/bi}}, yang artinya “kepada”."
+        },
+        {
+          "frame": 1,
+          "say": "Bagian kedua adalah isim, yaitu {{114:1:3/rabbu}}, yang artinya “Tuhan”."
+        },
+        {
+          "frame": 2,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u."
+        },
+        {
+          "frame": 3,
+          "say": "Karena didahului huruf jar, akhirnya berubah: dhammah menjadi kasrah, bunyi i."
+        },
+        {
+          "frame": 3,
+          "say": "Isim yang berubah seperti ini disebut majrur."
+        },
+        {
+          "frame": 4,
+          "say": "Lalu kedua bagian ditulis bersambung."
+        },
+        {
+          "frame": 4,
+          "say": "Gabungan keduanya adalah jar-majrur, yang bergantung pada kata kedua."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/1"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/1"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:1; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/1"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': makhfudh karena huruf (min, fī, bi- …) dan karena idhafah",
+          "url": "https://shamela.ws/book/11371/31"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:1:3:*) — akar, lemma, kelas kata: P|PREFIX|bi+ + N|STEM|POS:N|LEM:rab~|ROOT:rbb|M|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=1"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 41:9:13 (żālika rabbu al-‘ālamīna): bentuk dengan dhammah; juga 7:54:31 dan 26:23:4",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:1:4": {
+      "loc": "114:1:4",
+      "ar": "ٱلنَّاسِ",
+      "lead": "Kata ini terdiri dari dua bagian.",
+      "forms": {
+        "al": {
+          "ar": "ٱلْ",
+          "translit": "al",
+          "src": {
+            "word": "1:2:1",
+            "pieces": [
+              0,
+              2
+            ]
+          },
+          "label": "alif lam",
+          "gloss": "penanda tertentu",
+          "attested": []
+        },
+        "nas": {
+          "ar": "نَاس",
+          "translit": "nās",
+          "src": {
+            "from": {
+              "word": "114:1:4",
+              "pieces": [
+                2,
+                null
+              ]
+            },
+            "ops": [
+              {
+                "remove": "shaddah",
+                "piece": 0
+              },
+              {
+                "remove": "vowel",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": []
+        },
+        "an-nas": {
+          "ar": "ٱلنَّاس",
+          "translit": "an-nās",
+          "src": {
+            "join": [
+              "al",
+              "nas"
+            ],
+            "ops": [
+              {
+                "remove": "sukun",
+                "piece": 1
+              },
+              {
+                "add": "shaddah",
+                "piece": 2
+              }
+            ]
+          },
+          "gloss": "manusia",
+          "attested": []
+        },
+        "an-nasu": {
+          "ar": "ٱلنَّاسُ",
+          "translit": "an-nāsu",
+          "src": {
+            "from": "an-nas",
+            "ops": [
+              {
+                "add": "dhammah",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": [
+            "2:13:7",
+            "2:21:2",
+            "2:24:10",
+            "2:168:2",
+            "2:199:6"
+          ]
+        },
+        "an-nasi": {
+          "ar": "ٱلنَّاسِ",
+          "translit": "an-nāsi",
+          "src": {
+            "word": "114:1:4"
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": [
+            "2:8:2",
+            "2:94:12",
+            "2:96:3",
+            "2:142:4",
+            "2:143:8"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "join",
+          "tiles": [
+            "an-nas"
+          ],
+          "from": [
+            "al",
+            "nas"
+          ],
+          "note": "alif dan lam tidak dibaca, nun dibaca dobel",
+          "silent": [
+            0
+          ],
+          "chips": [
+            {
+              "from": "لْ",
+              "to": "ل",
+              "marks": [
+                "sukun",
+                null
+              ]
+            },
+            {
+              "from": "نَ",
+              "to": "نَّ",
+              "marks": [
+                null,
+                "shaddah"
+              ]
+            },
+            {
+              "from": "ٱ",
+              "to": "ٱ",
+              "marks": [
+                null,
+                null
+              ],
+              "silent": true
+            }
+          ]
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "an-nasi"
+          ],
+          "from": "an-nasu",
+          "to": "an-nasi",
+          "chips": [
+            {
+              "from": "سُ",
+              "to": "سِ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "an-nasi"
+          ],
+          "note": "bacaan berhenti di sini"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Alif lam bersambung dengan isim, yaitu {{114:1:4/nas}}, yang artinya “manusia”."
+        },
+        {
+          "frame": 1,
+          "say": "Alif dan huruf lam tidak dibaca; bunyi huruf lam melebur ke huruf nun, sehingga huruf nun dibaca dobel."
+        },
+        {
+          "frame": 2,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini kasrah, bunyi i, karena kata ini mudhaf ilaih bagi kata ketiga."
+        },
+        {
+          "frame": 3,
+          "say": "Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:1; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/1"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/1"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+          "ref": "jil. 11, hlm. 161–162 (az-Zamakhsyari, dinukil: rabbi disandarkan kepada an-nāsi secara khusus; Shamela 9057/10765–10766)",
+          "url": "https://tafsir.app/aldur-almasoon/114/2"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': makhfudh karena huruf (min, fī, bi- …) dan karena idhafah",
+          "url": "https://shamela.ws/book/11371/31"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:1:4:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:n~aAs|ROOT:nws|MP|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=1"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 114:1:4: ditulis tanpa sukun pada lam dan dengan syaddah pada huruf sesudahnya; alif di awal kata ditulis sebagai alif washal (U+0671)",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 21 (hamzah washal: tetap di awal bacaan, gugur di tengah sambungan)",
+          "url": "https://shamela.ws/book/9057/10"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:2:1": {
+      "loc": "114:2:1",
+      "ar": "مَلِكِ",
+      "forms": {
+        "maliku": {
+          "ar": "مَلِكُ",
+          "translit": "maliku",
+          "src": {
+            "from": {
+              "word": "114:2:1"
+            },
+            "ops": [
+              {
+                "mark": -1,
+                "to": "dhammah"
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "Raja",
+          "attested": []
+        },
+        "maliki": {
+          "ar": "مَلِكِ",
+          "translit": "maliki",
+          "src": {
+            "word": "114:2:1"
+          },
+          "label": "isim",
+          "gloss": "Raja",
+          "attested": [
+            "114:2:1"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "base",
+          "tiles": [
+            "maliku"
+          ],
+          "focus": "maliku"
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "maliki"
+          ],
+          "from": "maliku",
+          "to": "maliki",
+          "note": "badal dari “Tuhan” di ayat 1",
+          "chips": [
+            {
+              "from": "كُ",
+              "to": "كِ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u, di atas huruf kaf."
+        },
+        {
+          "frame": 2,
+          "say": "Di sini akhirnya menjadi kasrah, bunyi i."
+        },
+        {
+          "frame": 2,
+          "say": "Sebabnya, kata ini badal, yaitu pengganti yang menjelaskan, bagi {{114:1:3}} yang artinya “kepada Tuhan” di ayat pertama."
+        },
+        {
+          "frame": 2,
+          "say": "{{114:1:3}} yang artinya “kepada Tuhan” di ayat pertama, yang digantikan kata ini, berakhir kasrah karena didahului huruf jar."
+        },
+        {
+          "frame": 2,
+          "say": "Badal selalu mengikuti akhiran kata yang digantikannya, jadi kata ini juga berakhir kasrah."
+        },
+        {
+          "frame": 2,
+          "say": "Itu pendapat al-Jadwal, al-Mujtaba dan ad-Da'as; sebagian ulama lain menjadikan kata ini na't, yaitu sifat."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/2"
+        },
+        {
+          "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+          "ref": "jil. 4, hlm. 1493 (QS 114:2; Shamela 9617/6029)",
+          "url": "https://tafsir.app/mujtaba-mushkil-iraab/114/2"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:2; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/2"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/2"
+        },
+        {
+          "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+          "ref": "jil. 5, hlm. 199 (QS 114:2; Shamela 23587/1416)",
+          "url": "https://tafsir.app/iraab-alnahas/114/2"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+          "ref": "jil. 11, hlm. 161–162 (QS 114:2–3; Shamela 9057/10765–10766)",
+          "url": "https://tafsir.app/aldur-almasoon/114/2"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 16, Bab al-Badal: badal mengikuti kata yang digantinya dalam seluruh i'rab-nya",
+          "url": "https://shamela.ws/book/11371/18"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:2:1:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:malik|ROOT:mlk|MS|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=2"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:2:2": {
+      "loc": "114:2:2",
+      "ar": "ٱلنَّاسِ",
+      "lead": "Kata ini terdiri dari dua bagian.",
+      "forms": {
+        "al": {
+          "ar": "ٱلْ",
+          "translit": "al",
+          "src": {
+            "word": "1:2:1",
+            "pieces": [
+              0,
+              2
+            ]
+          },
+          "label": "alif lam",
+          "gloss": "penanda tertentu",
+          "attested": []
+        },
+        "nas": {
+          "ar": "نَاس",
+          "translit": "nās",
+          "src": {
+            "from": {
+              "word": "114:2:2",
+              "pieces": [
+                2,
+                null
+              ]
+            },
+            "ops": [
+              {
+                "remove": "shaddah",
+                "piece": 0
+              },
+              {
+                "remove": "vowel",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": []
+        },
+        "an-nas": {
+          "ar": "ٱلنَّاس",
+          "translit": "an-nās",
+          "src": {
+            "join": [
+              "al",
+              "nas"
+            ],
+            "ops": [
+              {
+                "remove": "sukun",
+                "piece": 1
+              },
+              {
+                "add": "shaddah",
+                "piece": 2
+              }
+            ]
+          },
+          "gloss": "manusia",
+          "attested": []
+        },
+        "an-nasu": {
+          "ar": "ٱلنَّاسُ",
+          "translit": "an-nāsu",
+          "src": {
+            "from": "an-nas",
+            "ops": [
+              {
+                "add": "dhammah",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": [
+            "2:13:7",
+            "2:21:2",
+            "2:24:10",
+            "2:168:2",
+            "2:199:6"
+          ]
+        },
+        "an-nasi": {
+          "ar": "ٱلنَّاسِ",
+          "translit": "an-nāsi",
+          "src": {
+            "word": "114:2:2"
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": [
+            "2:8:2",
+            "2:94:12",
+            "2:96:3",
+            "2:142:4",
+            "2:143:8"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "join",
+          "tiles": [
+            "an-nas"
+          ],
+          "from": [
+            "al",
+            "nas"
+          ],
+          "note": "alif dan lam tidak dibaca, nun dibaca dobel",
+          "silent": [
+            0
+          ],
+          "chips": [
+            {
+              "from": "لْ",
+              "to": "ل",
+              "marks": [
+                "sukun",
+                null
+              ]
+            },
+            {
+              "from": "نَ",
+              "to": "نَّ",
+              "marks": [
+                null,
+                "shaddah"
+              ]
+            },
+            {
+              "from": "ٱ",
+              "to": "ٱ",
+              "marks": [
+                null,
+                null
+              ],
+              "silent": true
+            }
+          ]
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "an-nasi"
+          ],
+          "from": "an-nasu",
+          "to": "an-nasi",
+          "chips": [
+            {
+              "from": "سُ",
+              "to": "سِ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "an-nasi"
+          ],
+          "note": "bacaan berhenti di sini"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Alif lam bersambung dengan isim, yaitu {{114:2:2/nas}}, yang artinya “manusia”."
+        },
+        {
+          "frame": 1,
+          "say": "Alif dan huruf lam tidak dibaca; bunyi huruf lam melebur ke huruf nun, sehingga huruf nun dibaca dobel."
+        },
+        {
+          "frame": 2,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini kasrah, bunyi i, karena kata ini mudhaf ilaih bagi kata pertama."
+        },
+        {
+          "frame": 3,
+          "say": "Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:2; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/2"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/2"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': makhfudh karena huruf (min, fī, bi- …) dan karena idhafah",
+          "url": "https://shamela.ws/book/11371/31"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:2:2:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:n~aAs|ROOT:nws|MP|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=2"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 114:2:2: ditulis tanpa sukun pada lam dan dengan syaddah pada huruf sesudahnya; alif di awal kata ditulis sebagai alif washal (U+0671)",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 21 (hamzah washal: tetap di awal bacaan, gugur di tengah sambungan)",
+          "url": "https://shamela.ws/book/9057/10"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:3:1": {
+      "loc": "114:3:1",
+      "ar": "إِلَٰهِ",
+      "forms": {
+        "ilahu": {
+          "ar": "إِلَٰهُ",
+          "translit": "ilāhu",
+          "src": {
+            "from": {
+              "word": "114:3:1"
+            },
+            "ops": [
+              {
+                "mark": -1,
+                "to": "dhammah"
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "sembahan",
+          "attested": []
+        },
+        "ilahi": {
+          "ar": "إِلَٰهِ",
+          "translit": "ilāhi",
+          "src": {
+            "word": "114:3:1"
+          },
+          "label": "isim",
+          "gloss": "sembahan",
+          "attested": [
+            "28:38:22",
+            "40:37:5",
+            "114:3:1"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "base",
+          "tiles": [
+            "ilahu"
+          ],
+          "focus": "ilahu"
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "ilahi"
+          ],
+          "from": "ilahu",
+          "to": "ilahi",
+          "note": "badal dari “Raja” di ayat 2",
+          "chips": [
+            {
+              "from": "هُ",
+              "to": "هِ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u, di atas huruf ha'."
+        },
+        {
+          "frame": 2,
+          "say": "Di sini akhirnya menjadi kasrah, bunyi i."
+        },
+        {
+          "frame": 2,
+          "say": "Sebabnya, kata ini badal, yaitu pengganti yang menjelaskan, bagi {{114:2:1}} yang artinya “Raja” di ayat kedua."
+        },
+        {
+          "frame": 2,
+          "say": "{{114:2:1}} yang artinya “Raja” di ayat kedua, yang digantikan kata ini, berakhir kasrah; badal mengikuti akhiran kata yang digantikannya."
+        },
+        {
+          "frame": 2,
+          "say": "Itu pendapat al-Jadwal dan al-Mujtaba; sebagian ulama lain menjadikan kata ini na't, yaitu sifat."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/3"
+        },
+        {
+          "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+          "ref": "jil. 4, hlm. 1493 (QS 114:3; Shamela 9617/6030)",
+          "url": "https://tafsir.app/mujtaba-mushkil-iraab/114/3"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:3; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/3"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/3"
+        },
+        {
+          "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+          "ref": "jil. 5, hlm. 199 (QS 114:3; Shamela 23587/1416)",
+          "url": "https://tafsir.app/iraab-alnahas/114/3"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+          "ref": "jil. 11, hlm. 161–162 (QS 114:2–3; Shamela 9057/10765–10766)",
+          "url": "https://tafsir.app/aldur-almasoon/114/2"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 16, Bab al-Badal: badal mengikuti kata yang digantinya dalam seluruh i'rab-nya",
+          "url": "https://shamela.ws/book/11371/18"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:3:1:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:<ila`h|ROOT:Alh|MS|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=3"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:3:2": {
+      "loc": "114:3:2",
+      "ar": "ٱلنَّاسِ",
+      "lead": "Kata ini terdiri dari dua bagian.",
+      "forms": {
+        "al": {
+          "ar": "ٱلْ",
+          "translit": "al",
+          "src": {
+            "word": "1:2:1",
+            "pieces": [
+              0,
+              2
+            ]
+          },
+          "label": "alif lam",
+          "gloss": "penanda tertentu",
+          "attested": []
+        },
+        "nas": {
+          "ar": "نَاس",
+          "translit": "nās",
+          "src": {
+            "from": {
+              "word": "114:3:2",
+              "pieces": [
+                2,
+                null
+              ]
+            },
+            "ops": [
+              {
+                "remove": "shaddah",
+                "piece": 0
+              },
+              {
+                "remove": "vowel",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": []
+        },
+        "an-nas": {
+          "ar": "ٱلنَّاس",
+          "translit": "an-nās",
+          "src": {
+            "join": [
+              "al",
+              "nas"
+            ],
+            "ops": [
+              {
+                "remove": "sukun",
+                "piece": 1
+              },
+              {
+                "add": "shaddah",
+                "piece": 2
+              }
+            ]
+          },
+          "gloss": "manusia",
+          "attested": []
+        },
+        "an-nasu": {
+          "ar": "ٱلنَّاسُ",
+          "translit": "an-nāsu",
+          "src": {
+            "from": "an-nas",
+            "ops": [
+              {
+                "add": "dhammah",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": [
+            "2:13:7",
+            "2:21:2",
+            "2:24:10",
+            "2:168:2",
+            "2:199:6"
+          ]
+        },
+        "an-nasi": {
+          "ar": "ٱلنَّاسِ",
+          "translit": "an-nāsi",
+          "src": {
+            "word": "114:3:2"
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": [
+            "2:8:2",
+            "2:94:12",
+            "2:96:3",
+            "2:142:4",
+            "2:143:8"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "join",
+          "tiles": [
+            "an-nas"
+          ],
+          "from": [
+            "al",
+            "nas"
+          ],
+          "note": "alif dan lam tidak dibaca, nun dibaca dobel",
+          "silent": [
+            0
+          ],
+          "chips": [
+            {
+              "from": "لْ",
+              "to": "ل",
+              "marks": [
+                "sukun",
+                null
+              ]
+            },
+            {
+              "from": "نَ",
+              "to": "نَّ",
+              "marks": [
+                null,
+                "shaddah"
+              ]
+            },
+            {
+              "from": "ٱ",
+              "to": "ٱ",
+              "marks": [
+                null,
+                null
+              ],
+              "silent": true
+            }
+          ]
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "an-nasi"
+          ],
+          "from": "an-nasu",
+          "to": "an-nasi",
+          "chips": [
+            {
+              "from": "سُ",
+              "to": "سِ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "an-nasi"
+          ],
+          "note": "bacaan berhenti di sini"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Alif lam bersambung dengan isim, yaitu {{114:3:2/nas}}, yang artinya “manusia”."
+        },
+        {
+          "frame": 1,
+          "say": "Alif dan huruf lam tidak dibaca; bunyi huruf lam melebur ke huruf nun, sehingga huruf nun dibaca dobel."
+        },
+        {
+          "frame": 2,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini kasrah, bunyi i, karena kata ini mudhaf ilaih bagi kata pertama."
+        },
+        {
+          "frame": 3,
+          "say": "Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:3; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/3"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/3"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': makhfudh karena huruf (min, fī, bi- …) dan karena idhafah",
+          "url": "https://shamela.ws/book/11371/31"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:3:2:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:n~aAs|ROOT:nws|MP|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=3"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 114:3:2: ditulis tanpa sukun pada lam dan dengan syaddah pada huruf sesudahnya; alif di awal kata ditulis sebagai alif washal (U+0671)",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 21 (hamzah washal: tetap di awal bacaan, gugur di tengah sambungan)",
+          "url": "https://shamela.ws/book/9057/10"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:4:1": {
+      "loc": "114:4:1",
+      "ar": "مِن",
+      "forms": {
+        "min": {
+          "ar": "مِن",
+          "translit": "min",
+          "src": {
+            "word": "114:4:1"
+          },
+          "label": "huruf jar",
+          "gloss": "dari",
+          "attested": [
+            "2:4:8",
+            "2:21:8",
+            "2:25:10",
+            "2:25:16",
+            "2:25:23"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "whole",
+          "tiles": [
+            "min"
+          ],
+          "note": "huruf jar: akhirnya tetap"
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "min"
+          ],
+          "note": "bergantung pada kata di ayat 1"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Kata ini adalah huruf jar."
+        },
+        {
+          "frame": 1,
+          "say": "Ia mabni di atas sukun, karena semua huruf mabni: akhirnya tetap."
+        },
+        {
+          "frame": 2,
+          "say": "Frasa kata ini dan kata kedua bergantung pada {{114:1:2}} yang artinya “aku berlindung” di ayat pertama: berlindung kepada Tuhan manusia, dari kejahatan."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/4"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/4"
+        },
+        {
+          "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+          "ref": "jil. 4, hlm. 1493 (QS 114:4; Shamela 9617/6031)",
+          "url": "https://tafsir.app/mujtaba-mushkil-iraab/114/4"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:4; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/4"
+        },
+        {
+          "kitab": "Ibnu 'Aqil, Syarh Ibn 'Aqil 'ala Alfiyyah Ibn Malik (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, Kairo: Dar at-Turats, cet. 20, 1400 H/1980 M)",
+          "ref": "jil. 1, hlm. 40, bab al-Mu'rab wal-Mabni: semua huruf mabni (contohnya min); asal bina' adalah sukun; kata mabni hanya digerakkan karena sebab, misalnya menghindari bertemunya dua huruf mati",
+          "url": "https://shamela.ws/book/9904/39"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:4:1:*) — akar, lemma, kelas kata: P|STEM|POS:P|LEM:min",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=4"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:4:2": {
+      "loc": "114:4:2",
+      "ar": "شَرِّ",
+      "forms": {
+        "syarru": {
+          "ar": "شَرُّ",
+          "translit": "syarru",
+          "src": {
+            "from": {
+              "word": "114:4:2"
+            },
+            "ops": [
+              {
+                "mark": -1,
+                "to": "dhammah"
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "kejahatan",
+          "attested": [
+            "98:6:15"
+          ]
+        },
+        "syarri": {
+          "ar": "شَرِّ",
+          "translit": "syarri",
+          "src": {
+            "word": "114:4:2"
+          },
+          "label": "isim",
+          "gloss": "kejahatan",
+          "attested": [
+            "113:2:2",
+            "113:3:2",
+            "113:4:2",
+            "113:5:2",
+            "114:4:2"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "base",
+          "tiles": [
+            "syarru"
+          ],
+          "focus": "syarru"
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "syarri"
+          ],
+          "from": "syarru",
+          "to": "syarri",
+          "chips": [
+            {
+              "from": "رُّ",
+              "to": "رِّ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u, di atas huruf ra'."
+        },
+        {
+          "frame": 2,
+          "say": "Di sini akhirnya menjadi kasrah, bunyi i, karena didahului huruf jar, yaitu kata pertama."
+        },
+        {
+          "frame": 2,
+          "say": "Kata ini lalu disandarkan kepada kata ketiga."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/4"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/4"
+        },
+        {
+          "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+          "ref": "jil. 4, hlm. 1493 (QS 114:4; Shamela 9617/6031)",
+          "url": "https://tafsir.app/mujtaba-mushkil-iraab/114/4"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:4; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/4"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': makhfudh karena huruf (min, fī, bi- …) dan karena idhafah",
+          "url": "https://shamela.ws/book/11371/31"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:4:2:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:$ar~|ROOT:$rr|MS|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=4"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:4:3": {
+      "loc": "114:4:3",
+      "ar": "ٱلْوَسْوَاسِ",
+      "lead": "Kata ini terdiri dari dua bagian.",
+      "forms": {
+        "al": {
+          "ar": "ٱلْ",
+          "translit": "al",
+          "src": {
+            "word": "1:2:1",
+            "pieces": [
+              0,
+              2
+            ]
+          },
+          "label": "alif lam",
+          "gloss": "penanda tertentu",
+          "attested": []
+        },
+        "waswas": {
+          "ar": "وَسْوَاس",
+          "translit": "waswās",
+          "src": {
+            "from": {
+              "word": "114:4:3",
+              "pieces": [
+                2,
+                null
+              ]
+            },
+            "ops": [
+              {
+                "remove": "vowel",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "pembisik",
+          "attested": []
+        },
+        "al-waswas": {
+          "ar": "ٱلْوَسْوَاس",
+          "translit": "al-waswās",
+          "src": {
+            "join": [
+              "al",
+              "waswas"
+            ]
+          },
+          "gloss": "pembisik",
+          "attested": []
+        },
+        "al-waswasu": {
+          "ar": "ٱلْوَسْوَاسُ",
+          "translit": "al-waswāsu",
+          "src": {
+            "from": "al-waswas",
+            "ops": [
+              {
+                "add": "dhammah",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "pembisik",
+          "attested": []
+        },
+        "al-waswasi": {
+          "ar": "ٱلْوَسْوَاسِ",
+          "translit": "al-waswāsi",
+          "src": {
+            "word": "114:4:3"
+          },
+          "label": "isim",
+          "gloss": "pembisik",
+          "attested": [
+            "114:4:3"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "parts",
+          "tiles": [
+            "al",
+            "waswas"
+          ]
+        },
+        {
+          "stage": "join",
+          "tiles": [
+            "al-waswas"
+          ],
+          "from": [
+            "al",
+            "waswas"
+          ],
+          "note": "alif tidak dibaca; lam dibaca mati",
+          "silent": [
+            0
+          ],
+          "chips": [
+            {
+              "from": "ٱ",
+              "to": "ٱ",
+              "marks": [
+                null,
+                null
+              ],
+              "silent": true
+            }
+          ]
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "al-waswasi"
+          ],
+          "from": "al-waswasu",
+          "to": "al-waswasi",
+          "chips": [
+            {
+              "from": "سُ",
+              "to": "سِ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Bagian pertama adalah alif lam."
+        },
+        {
+          "frame": 1,
+          "say": "Bagian kedua adalah isim, yaitu {{114:4:3/waswas}}, yang artinya “pembisik”."
+        },
+        {
+          "frame": 2,
+          "say": "Huruf lam dibaca, sebagai huruf mati: perhatikan tanda kecil di atasnya."
+        },
+        {
+          "frame": 2,
+          "say": "Alif di awalnya tidak dibaca, karena di tengah ayat bacaan bersambung dari kata sebelumnya."
+        },
+        {
+          "frame": 3,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini kasrah, bunyi i, karena kata ini mudhaf ilaih bagi kata kedua."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/4"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:4; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/4"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 430 (QS 114, bagian ash-Sharf: al-waswās nama bagi yang membisikkan, wazannya fa‘lāl dengan fathah pada fa'; Shamela 22916/5922)",
+          "url": "https://tafsir.app/aljadwal/114/4"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 624 (al-Lughah: al-waswās kata benda bermakna al-waswasah; mashdarnya wiswās dengan kasrah; yang dimaksud setan; Shamela 2163/5782)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/4"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+          "ref": "jil. 11, hlm. 162 (QS 114:4; Shamela 9057/10767)",
+          "url": "https://tafsir.app/aldur-almasoon/114/4"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+          "ref": "jil. 8, hlm. 539–540 (tafsir QS 114:4; Shamela 8473/4585–4586)",
+          "url": "https://tafsir.app/ibn-katheer/114/4"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:4:3:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:wasowaAs|ROOT:wsws|MS|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=4"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 114:4:3: ditulis dengan sukun pada lam; alif di awal kata ditulis sebagai alif washal (U+0671)",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 21 (hamzah washal: tetap di awal bacaan, gugur di tengah sambungan)",
+          "url": "https://shamela.ws/book/9057/10"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:4:4": {
+      "loc": "114:4:4",
+      "ar": "ٱلْخَنَّاسِ",
+      "lead": "Kata ini terdiri dari dua bagian.",
+      "forms": {
+        "al": {
+          "ar": "ٱلْ",
+          "translit": "al",
+          "src": {
+            "word": "1:2:1",
+            "pieces": [
+              0,
+              2
+            ]
+          },
+          "label": "alif lam",
+          "gloss": "penanda tertentu",
+          "attested": []
+        },
+        "khannas": {
+          "ar": "خَنَّاس",
+          "translit": "khannās",
+          "src": {
+            "from": {
+              "word": "114:4:4",
+              "pieces": [
+                2,
+                null
+              ]
+            },
+            "ops": [
+              {
+                "remove": "vowel",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "yang bersembunyi",
+          "attested": []
+        },
+        "al-khannas": {
+          "ar": "ٱلْخَنَّاس",
+          "translit": "al-khannās",
+          "src": {
+            "join": [
+              "al",
+              "khannas"
+            ]
+          },
+          "gloss": "yang bersembunyi",
+          "attested": []
+        },
+        "al-khannasu": {
+          "ar": "ٱلْخَنَّاسُ",
+          "translit": "al-khannāsu",
+          "src": {
+            "from": "al-khannas",
+            "ops": [
+              {
+                "add": "dhammah",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "yang bersembunyi",
+          "attested": []
+        },
+        "al-khannasi": {
+          "ar": "ٱلْخَنَّاسِ",
+          "translit": "al-khannāsi",
+          "src": {
+            "word": "114:4:4"
+          },
+          "label": "isim",
+          "gloss": "yang bersembunyi",
+          "attested": [
+            "114:4:4"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "parts",
+          "tiles": [
+            "al",
+            "khannas"
+          ]
+        },
+        {
+          "stage": "join",
+          "tiles": [
+            "al-khannas"
+          ],
+          "from": [
+            "al",
+            "khannas"
+          ],
+          "note": "alif tidak dibaca; lam dibaca mati",
+          "silent": [
+            0
+          ],
+          "chips": [
+            {
+              "from": "ٱ",
+              "to": "ٱ",
+              "marks": [
+                null,
+                null
+              ],
+              "silent": true
+            }
+          ]
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "al-khannasi"
+          ],
+          "from": "al-khannasu",
+          "to": "al-khannasi",
+          "chips": [
+            {
+              "from": "سُ",
+              "to": "سِ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "al-khannasi"
+          ],
+          "note": "bacaan berhenti di sini"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Bagian pertama adalah alif lam."
+        },
+        {
+          "frame": 1,
+          "say": "Bagian kedua adalah isim, yaitu {{!114:4:4/khannas}}, yang artinya “yang bersembunyi”."
+        },
+        {
+          "frame": 2,
+          "say": "Huruf lam dibaca, sebagai huruf mati: perhatikan tanda kecil di atasnya."
+        },
+        {
+          "frame": 2,
+          "say": "Alif di awalnya tidak dibaca, karena di tengah ayat bacaan bersambung dari kata sebelumnya."
+        },
+        {
+          "frame": 3,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini kasrah, bunyi i, karena kata ini na't, yaitu sifat, bagi kata ketiga."
+        },
+        {
+          "frame": 3,
+          "say": "Sifat selalu mengikuti akhiran kata yang disifatinya, jadi kata ini juga berakhir kasrah."
+        },
+        {
+          "frame": 3,
+          "say": "Itu pendapat Darwisy; ad-Da'as menjadikan kata ini badal dari kata ketiga."
+        },
+        {
+          "frame": 4,
+          "say": "Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/4"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:4; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/4"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 430 (QS 114, bagian ash-Sharf: al-khannās bentuk mubalaghah dari isim fa'il khanasa, “bersembunyi, menghilang”; Shamela 22916/5922)",
+          "url": "https://tafsir.app/aljadwal/114/4"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+          "ref": "jil. 11, hlm. 162 (QS 114:4; Shamela 9057/10767)",
+          "url": "https://tafsir.app/aldur-almasoon/114/4"
+        },
+        {
+          "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+          "ref": "jil. 5, hlm. 199 (QS 114:4; Shamela 23587/1416)",
+          "url": "https://tafsir.app/iraab-alnahas/114/4"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+          "ref": "jil. 8, hlm. 539–540 (tafsir QS 114:4; Shamela 8473/4585–4586)",
+          "url": "https://tafsir.app/ibn-katheer/114/4"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 14, Bab an-Na't: na't mengikuti kata yang disifatinya dalam rafa', nashab dan khafdh",
+          "url": "https://shamela.ws/book/11371/15"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:4:4:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + ADJ|STEM|POS:ADJ|LEM:xan~aAs|ROOT:xns|MS|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=4"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 114:4:4: ditulis dengan sukun pada lam; alif di awal kata ditulis sebagai alif washal (U+0671)",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 21 (hamzah washal: tetap di awal bacaan, gugur di tengah sambungan)",
+          "url": "https://shamela.ws/book/9057/10"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:5:1": {
+      "loc": "114:5:1",
+      "ar": "ٱلَّذِى",
+      "forms": {
+        "allazi": {
+          "ar": "ٱلَّذِى",
+          "translit": "allażī",
+          "src": {
+            "word": "114:5:1"
+          },
+          "label": "isim",
+          "gloss": "yang",
+          "attested": [
+            "2:17:3",
+            "2:21:5",
+            "2:22:1",
+            "2:25:21",
+            "2:29:2"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "whole",
+          "tiles": [
+            "allazi"
+          ],
+          "note": "kata penghubung: bentuknya tetap"
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "allazi"
+          ],
+          "note": "awal ayat: alif dibaca"
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "allazi"
+          ],
+          "note": "kedudukannya jar: na't bagi kata di ayat 4"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Kata ini adalah isim maushul, yaitu kata penghubung: maknanya baru lengkap dengan kalimat sesudahnya."
+        },
+        {
+          "frame": 1,
+          "say": "Kalimat yang melengkapinya, yaitu kata kedua sampai kelima, disebut shilah."
+        },
+        {
+          "frame": 1,
+          "say": "Akhirnya tetap, karena isim maushul ini mabni di atas sukun."
+        },
+        {
+          "frame": 2,
+          "say": "Karena ayat ini dimulai dari kata ini, alif di awalnya dibaca."
+        },
+        {
+          "frame": 3,
+          "say": "Kedudukannya jar, karena kata ini na't, yaitu sifat, bagi {{114:4:3}} yang artinya “pembisik (setan)” di ayat keempat."
+        },
+        {
+          "frame": 3,
+          "say": "{{114:4:3}} yang artinya “pembisik (setan)” di ayat keempat, yang disifati kata ini, majrur sebagai mudhaf ilaih."
+        },
+        {
+          "frame": 3,
+          "say": "Jadi akhirnya tidak berubah menjadi kasrah, bunyi i; hanya kedudukannya yang jar."
+        },
+        {
+          "frame": 3,
+          "say": "Itu pendapat Darwisy, al-Jadwal, al-Mujtaba, an-Nahhas, ad-Da'as dan as-Samin."
+        },
+        {
+          "frame": 3,
+          "say": "As-Samin juga membolehkan kata ini badal."
+        },
+        {
+          "frame": 3,
+          "say": "An-Nahhas dan as-Samin membolehkannya dipisah dari kata sebelumnya, dengan kedudukan rafa' (as-Samin juga nashab)."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/5"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/5"
+        },
+        {
+          "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+          "ref": "jil. 4, hlm. 1493 (QS 114:5; Shamela 9617/6032)",
+          "url": "https://tafsir.app/mujtaba-mushkil-iraab/114/5"
+        },
+        {
+          "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+          "ref": "jil. 5, hlm. 199 (QS 114:5; Shamela 23587/1416)",
+          "url": "https://tafsir.app/iraab-alnahas/114/5"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:5; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/5"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 1, hlm. 15 (QS 2:21: allażī isim maushul mabni di atas sukun dalam kedudukan nashab sebagai sifat; Shamela 23584/11)",
+          "url": "https://shamela.ws/book/23584/11"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+          "ref": "jil. 11, hlm. 162 (QS 114:5; Shamela 9057/10768)",
+          "url": "https://tafsir.app/aldur-almasoon/114/5"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:5:1:*) — akar, lemma, kelas kata: REL|STEM|POS:REL|LEM:{l~a*iY|MS",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=5"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:5:2": {
+      "loc": "114:5:2",
+      "ar": "يُوَسْوِسُ",
+      "forms": {
+        "yuwaswisu": {
+          "ar": "يُوَسْوِسُ",
+          "translit": "yuwaswisu",
+          "src": {
+            "word": "114:5:2"
+          },
+          "label": "fi'il",
+          "gloss": "membisikkan",
+          "attested": [
+            "114:5:2"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "whole",
+          "tiles": [
+            "yuwaswisu"
+          ],
+          "note": "huruf ya' di awal: pelakunya “ia”"
+        },
+        {
+          "stage": "base",
+          "tiles": [
+            "yuwaswisu"
+          ],
+          "focus": "yuwaswisu"
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "yuwaswisu"
+          ],
+          "note": "bersama sesudahnya: shilah"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Fi'il ini menyebut perbuatan yang sedang atau akan dilakukan."
+        },
+        {
+          "frame": 1,
+          "say": "Huruf ya' di awalnya menunjukkan pelakunya, yaitu “ia”, yang kembali kepada kata pertama; pelaku itu tidak ditulis sebagai kata tersendiri."
+        },
+        {
+          "frame": 2,
+          "say": "Akhirnya dhammah, bunyi u, dan di sini ia tetap dalam bentuk dasarnya."
+        },
+        {
+          "frame": 2,
+          "say": "Kata kerja seperti ini baru berubah akhirnya bila didahului kata tertentu; di sini tidak ada kata seperti itu."
+        },
+        {
+          "frame": 3,
+          "say": "Bersama kata ketiga sampai kelima, kata ini membentuk kalimat yang melengkapi kata pertama; kalimat itu disebut shilah."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/5"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:5; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/5"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/5"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 10, Bab al-Af'al: fi'il amr 'majzum selamanya'; fi'il mudhari' marfu' sampai didahului huruf penashab atau penjazm",
+          "url": "https://shamela.ws/book/11371/7"
+        },
+        {
+          "kitab": "Ibnu 'Aqil, Syarh Ibn 'Aqil 'ala Alfiyyah Ibn Malik (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, Kairo: Dar at-Turats, cet. 20, 1400 H/1980 M)",
+          "ref": "jil. 1, hlm. 153, bab al-Maushul: shilah isim maushul harus memuat kata ganti yang sesuai dengan maushul-nya",
+          "url": "https://shamela.ws/book/9904/152"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:5:2:*) — akar, lemma, kelas kata: V|STEM|POS:V|IMPF|LEM:wasowasa|ROOT:wsws|3MS",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=5"
+        },
+        {
+          "kitab": "Ahmad Zaini Dahlan, Syarh Mukhtashar Jiddan 'ala Matn al-Ajurrumiyyah (Beirut: Dar al-Masyari', cet. 7, 1435 H/2014 M)",
+          "ref": "hlm. 42, bab al-Af'al: mudhari' untuk masa sekarang dan akan datang",
+          "url": "https://archive.org/details/mukhtasarjiddan/page/n42/mode/1up"
+        },
+        {
+          "kitab": "Ahmad Zaini Dahlan, Syarh Mukhtashar Jiddan 'ala Matn al-Ajurrumiyyah (Beirut: Dar al-Masyari', cet. 7, 1435 H/2014 M)",
+          "ref": "hlm. 44, syarh 'anaitu': makna tiap huruf awal",
+          "url": "https://archive.org/details/mukhtasarjiddan/page/n44/mode/1up"
+        },
+        {
+          "kitab": "Ahmad Zaini Dahlan, Syarh Mukhtashar Jiddan 'ala Matn al-Ajurrumiyyah (Beirut: Dar al-Masyari', cet. 7, 1435 H/2014 M)",
+          "ref": "hlm. 45, syarh 'wa huwa marfu'un abadan': rafa' karena bebas dari nashib dan jazim",
+          "url": "https://archive.org/details/mukhtasarjiddan/page/n45/mode/1up"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:5:3": {
+      "loc": "114:5:3",
+      "ar": "فِى",
+      "forms": {
+        "fi": {
+          "ar": "فِى",
+          "translit": "fī",
+          "src": {
+            "word": "114:5:3"
+          },
+          "label": "huruf jar",
+          "gloss": "ke dalam",
+          "attested": [
+            "2:10:1",
+            "2:11:6",
+            "2:15:5",
+            "2:17:14",
+            "2:23:3"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "whole",
+          "tiles": [
+            "fi"
+          ],
+          "note": "huruf jar: akhirnya tetap"
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "fi"
+          ],
+          "note": "bergantung pada kata kedua"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Kata ini adalah huruf jar."
+        },
+        {
+          "frame": 1,
+          "say": "Ia mabni di atas sukun, karena semua huruf mabni: akhirnya tetap."
+        },
+        {
+          "frame": 2,
+          "say": "Frasa kata ini dan kata keempat bergantung pada kata kedua."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/5"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/5"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:5; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/5"
+        },
+        {
+          "kitab": "Ibnu 'Aqil, Syarh Ibn 'Aqil 'ala Alfiyyah Ibn Malik (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, Kairo: Dar at-Turats, cet. 20, 1400 H/1980 M)",
+          "ref": "jil. 1, hlm. 40, bab al-Mu'rab wal-Mabni: semua huruf mabni (contohnya min); asal bina' adalah sukun; kata mabni hanya digerakkan karena sebab, misalnya menghindari bertemunya dua huruf mati",
+          "url": "https://shamela.ws/book/9904/39"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:5:3:*) — akar, lemma, kelas kata: P|STEM|POS:P|LEM:fiY",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=5"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:5:4": {
+      "loc": "114:5:4",
+      "ar": "صُدُورِ",
+      "forms": {
+        "sadr": {
+          "ar": "صَدْر",
+          "translit": "ṣadr",
+          "src": {
+            "from": {
+              "word": "114:5:4"
+            },
+            "ops": [
+              {
+                "mark": 0,
+                "to": "fathah"
+              },
+              {
+                "remove": "vowel",
+                "piece": 1
+              },
+              {
+                "add": "sukun",
+                "piece": 1
+              },
+              {
+                "drop": 2
+              },
+              {
+                "remove": "vowel",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "dada",
+          "attested": []
+        },
+        "sudur-u": {
+          "ar": "صُدُورُ",
+          "translit": "ṣudūru",
+          "src": {
+            "from": {
+              "word": "114:5:4"
+            },
+            "ops": [
+              {
+                "mark": -1,
+                "to": "dhammah"
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "dada",
+          "attested": []
+        },
+        "sudur-i": {
+          "ar": "صُدُورِ",
+          "translit": "ṣudūri",
+          "src": {
+            "word": "114:5:4"
+          },
+          "label": "isim",
+          "gloss": "dada",
+          "attested": [
+            "29:10:30",
+            "29:49:6",
+            "114:5:4"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "whole",
+          "tiles": [
+            "sudur-i"
+          ],
+          "note": "bentuk jamak dari “dada”"
+        },
+        {
+          "stage": "base",
+          "tiles": [
+            "sudur-u"
+          ],
+          "focus": "sudur-u"
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "sudur-i"
+          ],
+          "from": "sudur-u",
+          "to": "sudur-i",
+          "chips": [
+            {
+              "from": "رُ",
+              "to": "رِ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Kata ini bentuk jamak dari kata {{!114:5:4/sadr}} yang artinya “dada”."
+        },
+        {
+          "frame": 2,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u, di atas huruf ra'."
+        },
+        {
+          "frame": 3,
+          "say": "Di sini akhirnya menjadi kasrah, bunyi i, karena didahului huruf jar, yaitu kata ketiga."
+        },
+        {
+          "frame": 3,
+          "say": "Kata ini lalu disandarkan kepada kata kelima."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/5"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/5"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:5; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/5"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': makhfudh karena huruf (min, fī, bi- …) dan karena idhafah",
+          "url": "https://shamela.ws/book/11371/31"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:5:4:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:Sador|ROOT:Sdr|MP|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=5"
+        },
+        {
+          "kitab": "ar-Raghib al-Ashfahani, al-Mufradat fi Gharib al-Qur'an, tahqiq Shafwan 'Adnan ad-Dawudi (cet. 1, 1412 H)",
+          "ref": "hlm. 477, entri (صدر): ash-shadr anggota tubuh, jamaknya shudur; dipinjam untuk bagian depan sesuatu, seperti shadr al-majlis",
+          "url": "https://shamela.ws/book/23636/459"
+        },
+        {
+          "kitab": "al-Fayyumi, al-Mishbah al-Munir fi Gharib asy-Syarh al-Kabir (al-Maktabah al-'Ilmiyyah, Beirut)",
+          "ref": "jil. 1, hlm. 335, entri (ص د ر): ash-shadr dari manusia; jamaknya shudur seperti fals dan fulus; shadr al-majlis",
+          "url": "https://shamela.ws/book/12145/1707"
+        },
+        {
+          "kitab": "Ibnu Faris, Mu'jam Maqayis al-Lughah, tahqiq 'Abdussalam Harun (Mustafa al-Babi al-Halabi, cet. 2, 1389-1392 H)",
+          "ref": "jil. 3, hlm. 337, entri (صدر): dua ashl; yang kedua dada manusia, jamaknya shudur",
+          "url": "https://shamela.ws/book/21710/1405"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:5:5": {
+      "loc": "114:5:5",
+      "ar": "ٱلنَّاسِ",
+      "lead": "Kata ini terdiri dari dua bagian.",
+      "forms": {
+        "al": {
+          "ar": "ٱلْ",
+          "translit": "al",
+          "src": {
+            "word": "1:2:1",
+            "pieces": [
+              0,
+              2
+            ]
+          },
+          "label": "alif lam",
+          "gloss": "penanda tertentu",
+          "attested": []
+        },
+        "nas": {
+          "ar": "نَاس",
+          "translit": "nās",
+          "src": {
+            "from": {
+              "word": "114:5:5",
+              "pieces": [
+                2,
+                null
+              ]
+            },
+            "ops": [
+              {
+                "remove": "shaddah",
+                "piece": 0
+              },
+              {
+                "remove": "vowel",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": []
+        },
+        "an-nas": {
+          "ar": "ٱلنَّاس",
+          "translit": "an-nās",
+          "src": {
+            "join": [
+              "al",
+              "nas"
+            ],
+            "ops": [
+              {
+                "remove": "sukun",
+                "piece": 1
+              },
+              {
+                "add": "shaddah",
+                "piece": 2
+              }
+            ]
+          },
+          "gloss": "manusia",
+          "attested": []
+        },
+        "an-nasu": {
+          "ar": "ٱلنَّاسُ",
+          "translit": "an-nāsu",
+          "src": {
+            "from": "an-nas",
+            "ops": [
+              {
+                "add": "dhammah",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": [
+            "2:13:7",
+            "2:21:2",
+            "2:24:10",
+            "2:168:2",
+            "2:199:6"
+          ]
+        },
+        "an-nasi": {
+          "ar": "ٱلنَّاسِ",
+          "translit": "an-nāsi",
+          "src": {
+            "word": "114:5:5"
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": [
+            "2:8:2",
+            "2:94:12",
+            "2:96:3",
+            "2:142:4",
+            "2:143:8"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "join",
+          "tiles": [
+            "an-nas"
+          ],
+          "from": [
+            "al",
+            "nas"
+          ],
+          "note": "alif dan lam tidak dibaca, nun dibaca dobel",
+          "silent": [
+            0
+          ],
+          "chips": [
+            {
+              "from": "لْ",
+              "to": "ل",
+              "marks": [
+                "sukun",
+                null
+              ]
+            },
+            {
+              "from": "نَ",
+              "to": "نَّ",
+              "marks": [
+                null,
+                "shaddah"
+              ]
+            },
+            {
+              "from": "ٱ",
+              "to": "ٱ",
+              "marks": [
+                null,
+                null
+              ],
+              "silent": true
+            }
+          ]
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "an-nasi"
+          ],
+          "from": "an-nasu",
+          "to": "an-nasi",
+          "chips": [
+            {
+              "from": "سُ",
+              "to": "سِ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "an-nasi"
+          ],
+          "note": "bacaan berhenti di sini"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Alif lam bersambung dengan isim, yaitu {{114:5:5/nas}}, yang artinya “manusia”."
+        },
+        {
+          "frame": 1,
+          "say": "Alif dan huruf lam tidak dibaca; bunyi huruf lam melebur ke huruf nun, sehingga huruf nun dibaca dobel."
+        },
+        {
+          "frame": 2,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini kasrah, bunyi i, karena kata ini mudhaf ilaih bagi kata keempat."
+        },
+        {
+          "frame": 3,
+          "say": "Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:5; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/5"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+          "ref": "jil. 8, hlm. 540 (tafsir QS 114:5; Shamela 8473/4586)",
+          "url": "https://tafsir.app/ibn-katheer/114/5"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': makhfudh karena huruf (min, fī, bi- …) dan karena idhafah",
+          "url": "https://shamela.ws/book/11371/31"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:5:5:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:n~aAs|ROOT:nws|MP|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=5"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 114:5:5: ditulis tanpa sukun pada lam dan dengan syaddah pada huruf sesudahnya; alif di awal kata ditulis sebagai alif washal (U+0671)",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 21 (hamzah washal: tetap di awal bacaan, gugur di tengah sambungan)",
+          "url": "https://shamela.ws/book/9057/10"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:6:1": {
+      "loc": "114:6:1",
+      "ar": "مِنَ",
+      "forms": {
+        "mina": {
+          "ar": "مِنَ",
+          "translit": "mina",
+          "src": {
+            "word": "114:6:1"
+          },
+          "label": "huruf jar",
+          "gloss": "dari",
+          "attested": [
+            "2:22:9",
+            "2:22:14",
+            "2:34:12",
+            "2:35:17",
+            "2:67:19"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "whole",
+          "tiles": [
+            "mina"
+          ],
+          "note": "huruf jar: akhirnya tetap"
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "mina"
+          ],
+          "note": "nun berfathah: bertemu huruf mati"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Kata ini adalah huruf jar."
+        },
+        {
+          "frame": 1,
+          "say": "Ia mabni di atas sukun, karena semua huruf mabni: akhirnya tetap."
+        },
+        {
+          "frame": 2,
+          "say": "Huruf nun di akhirnya berharakat fathah, bunyi a, hanya karena bertemu huruf mati pada alif lam sesudahnya."
+        },
+        {
+          "frame": 2,
+          "say": "Kata mabni boleh bergerak untuk menghindari dua huruf mati bertemu."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/6"
+        },
+        {
+          "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+          "ref": "jil. 4, hlm. 1493 (QS 114:6; Shamela 9617/6033)",
+          "url": "https://tafsir.app/mujtaba-mushkil-iraab/114/6"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:6; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/6"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/6"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+          "ref": "jil. 11, hlm. 162–164 (QS 114:6, delapan pendapat; Shamela 9057/10769–10771)",
+          "url": "https://tafsir.app/aldur-almasoon/114/6"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+          "ref": "jil. 8, hlm. 540 (tafsir QS 114:6; Shamela 8473/4586)",
+          "url": "https://tafsir.app/ibn-katheer/114/6"
+        },
+        {
+          "kitab": "Ibnu 'Aqil, Syarh Ibn 'Aqil 'ala Alfiyyah Ibn Malik (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, Kairo: Dar at-Turats, cet. 20, 1400 H/1980 M)",
+          "ref": "jil. 1, hlm. 40, bab al-Mu'rab wal-Mabni: semua huruf mabni (contohnya min); asal bina' adalah sukun; kata mabni hanya digerakkan karena sebab, misalnya menghindari bertemunya dua huruf mati",
+          "url": "https://shamela.ws/book/9904/39"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:6:1:*) — akar, lemma, kelas kata: P|STEM|POS:P|LEM:min",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=6"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:6:2": {
+      "loc": "114:6:2",
+      "ar": "ٱلْجِنَّةِ",
+      "lead": "Kata ini terdiri dari dua bagian.",
+      "forms": {
+        "al": {
+          "ar": "ٱلْ",
+          "translit": "al",
+          "src": {
+            "word": "1:2:1",
+            "pieces": [
+              0,
+              2
+            ]
+          },
+          "label": "alif lam",
+          "gloss": "penanda tertentu",
+          "attested": []
+        },
+        "jinnah": {
+          "ar": "جِنَّة",
+          "translit": "jinnah",
+          "src": {
+            "from": {
+              "word": "114:6:2",
+              "pieces": [
+                2,
+                null
+              ]
+            },
+            "ops": [
+              {
+                "remove": "vowel",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "golongan jin",
+          "attested": []
+        },
+        "al-jinnah": {
+          "ar": "ٱلْجِنَّة",
+          "translit": "al-jinnah",
+          "src": {
+            "join": [
+              "al",
+              "jinnah"
+            ]
+          },
+          "gloss": "golongan jin",
+          "attested": []
+        },
+        "al-jinnahu": {
+          "ar": "ٱلْجِنَّةُ",
+          "translit": "al-jinnatu",
+          "src": {
+            "from": "al-jinnah",
+            "ops": [
+              {
+                "add": "dhammah",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "golongan jin",
+          "attested": [
+            "37:158:8"
+          ]
+        },
+        "al-jinnahi": {
+          "ar": "ٱلْجِنَّةِ",
+          "translit": "al-jinnati",
+          "src": {
+            "word": "114:6:2"
+          },
+          "label": "isim",
+          "gloss": "golongan jin",
+          "attested": [
+            "11:119:13",
+            "32:13:14",
+            "37:158:4",
+            "114:6:2"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "parts",
+          "tiles": [
+            "al",
+            "jinnah"
+          ]
+        },
+        {
+          "stage": "join",
+          "tiles": [
+            "al-jinnah"
+          ],
+          "from": [
+            "al",
+            "jinnah"
+          ],
+          "note": "alif tidak dibaca; lam dibaca mati",
+          "silent": [
+            0
+          ],
+          "chips": [
+            {
+              "from": "ٱ",
+              "to": "ٱ",
+              "marks": [
+                null,
+                null
+              ],
+              "silent": true
+            }
+          ]
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "al-jinnahi"
+          ],
+          "from": "al-jinnahu",
+          "to": "al-jinnahi",
+          "chips": [
+            {
+              "from": "ةُ",
+              "to": "ةِ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Bagian pertama adalah alif lam."
+        },
+        {
+          "frame": 1,
+          "say": "Bagian kedua adalah isim, yaitu {{114:6:2/jinnah}}, yang artinya “golongan jin”."
+        },
+        {
+          "frame": 2,
+          "say": "Huruf lam dibaca, sebagai huruf mati: perhatikan tanda kecil di atasnya."
+        },
+        {
+          "frame": 2,
+          "say": "Alif di awalnya tidak dibaca, karena di tengah ayat bacaan bersambung dari kata sebelumnya."
+        },
+        {
+          "frame": 3,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini kasrah, bunyi i, karena didahului huruf jar, yaitu kata pertama."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 625 (al-I'rab QS 114:1–6; Shamela 2163/5783)",
+          "url": "https://tafsir.app/iraab-aldarweesh/114/6"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 429 (QS 114, bagian al-I'rab; Shamela 22916/5921)",
+          "url": "https://tafsir.app/aljadwal/114/6"
+        },
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:6; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/6"
+        },
+        {
+          "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+          "ref": "jil. 5, hlm. 200 (QS 114:6; Shamela 23587/1417)",
+          "url": "https://tafsir.app/iraab-alnahas/114/6"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': makhfudh karena huruf (min, fī, bi- …) dan karena idhafah",
+          "url": "https://shamela.ws/book/11371/31"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:6:2:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:jin~ap|ROOT:jnn|F|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=6"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 114:6:2: ditulis dengan sukun pada lam; alif di awal kata ditulis sebagai alif washal (U+0671)",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 21 (hamzah washal: tetap di awal bacaan, gugur di tengah sambungan)",
+          "url": "https://shamela.ws/book/9057/10"
+        }
+      ],
+      "status": "draft"
+    },
+    "114:6:3": {
+      "loc": "114:6:3",
+      "ar": "وَٱلنَّاسِ",
+      "lead": "Kata ini terdiri dari tiga bagian.",
+      "forms": {
+        "wa": {
+          "ar": "وَ",
+          "translit": "wa",
+          "src": {
+            "word": "114:6:3",
+            "pieces": [
+              0,
+              1
+            ]
+          },
+          "label": "huruf 'athaf",
+          "gloss": "dan",
+          "attested": []
+        },
+        "al": {
+          "ar": "ٱلْ",
+          "translit": "al",
+          "src": {
+            "word": "1:2:1",
+            "pieces": [
+              0,
+              2
+            ]
+          },
+          "label": "alif lam",
+          "gloss": "penanda tertentu",
+          "attested": []
+        },
+        "nas": {
+          "ar": "نَاس",
+          "translit": "nās",
+          "src": {
+            "from": {
+              "word": "114:6:3",
+              "pieces": [
+                3,
+                null
+              ]
+            },
+            "ops": [
+              {
+                "remove": "shaddah",
+                "piece": 0
+              },
+              {
+                "remove": "vowel",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "manusia",
+          "attested": []
+        },
+        "wa-an-nas": {
+          "ar": "وَٱلنَّاس",
+          "translit": "wa an-nās",
+          "src": {
+            "join": [
+              "wa",
+              "al",
+              "nas"
+            ],
+            "ops": [
+              {
+                "remove": "sukun",
+                "piece": 2
+              },
+              {
+                "add": "shaddah",
+                "piece": 3
+              }
+            ]
+          },
+          "gloss": "dan manusia",
+          "attested": []
+        },
+        "wa-an-nasu": {
+          "ar": "وَٱلنَّاسُ",
+          "translit": "wa an-nāsu",
+          "src": {
+            "from": "wa-an-nas",
+            "ops": [
+              {
+                "add": "dhammah",
+                "piece": -1
+              }
+            ]
+          },
+          "label": "isim",
+          "gloss": "dan manusia",
+          "attested": []
+        },
+        "wa-an-nasi": {
+          "ar": "وَٱلنَّاسِ",
+          "translit": "wa an-nāsi",
+          "src": {
+            "word": "114:6:3"
+          },
+          "label": "isim",
+          "gloss": "dan manusia",
+          "attested": [
+            "2:161:12",
+            "3:87:8",
+            "11:119:14",
+            "32:13:15",
+            "114:6:3"
+          ]
+        }
+      },
+      "frames": [
+        {
+          "stage": "parts",
+          "tiles": [
+            "wa",
+            "al",
+            "nas"
+          ]
+        },
+        {
+          "stage": "join",
+          "tiles": [
+            "wa-an-nas"
+          ],
+          "from": [
+            "wa",
+            "al",
+            "nas"
+          ],
+          "note": "alif dan lam tidak dibaca, nun dibaca dobel",
+          "silent": [
+            1
+          ],
+          "chips": [
+            {
+              "from": "لْ",
+              "to": "ل",
+              "marks": [
+                "sukun",
+                null
+              ]
+            },
+            {
+              "from": "نَ",
+              "to": "نَّ",
+              "marks": [
+                null,
+                "shaddah"
+              ]
+            },
+            {
+              "from": "ٱ",
+              "to": "ٱ",
+              "marks": [
+                null,
+                null
+              ],
+              "silent": true
+            }
+          ]
+        },
+        {
+          "stage": "change",
+          "tiles": [
+            "wa-an-nasi"
+          ],
+          "from": "wa-an-nasu",
+          "to": "wa-an-nasi",
+          "chips": [
+            {
+              "from": "سُ",
+              "to": "سِ",
+              "marks": [
+                "dhammah",
+                "kasrah"
+              ]
+            }
+          ]
+        },
+        {
+          "stage": "whole",
+          "tiles": [
+            "wa-an-nasi"
+          ],
+          "note": "bacaan berhenti di sini"
+        }
+      ],
+      "lines": [
+        {
+          "frame": 1,
+          "say": "Bagian pertama adalah huruf 'athaf, yaitu {{114:6:3/wa}}, yang artinya “dan”."
+        },
+        {
+          "frame": 1,
+          "say": "Bagian kedua adalah alif lam."
+        },
+        {
+          "frame": 1,
+          "say": "Bagian ketiga adalah isim, yaitu {{114:6:3/nas}}, yang artinya “manusia”."
+        },
+        {
+          "frame": 2,
+          "say": "Ketiganya ditulis bersambung."
+        },
+        {
+          "frame": 2,
+          "say": "Alif dan huruf lam tidak dibaca; bunyi huruf lam melebur ke huruf nun, sehingga huruf nun dibaca dobel."
+        },
+        {
+          "frame": 3,
+          "say": "Bentuk dasarnya berakhir dengan dhammah, bunyi u; di sini kasrah, bunyi i."
+        },
+        {
+          "frame": 3,
+          "say": "Sebabnya, kata ini disambungkan dengan ‘athaf kepada kata kedua yang majrur, maka ikut berakhir kasrah."
+        },
+        {
+          "frame": 3,
+          "say": "Itu pendapat ad-Da'as; sebagian ulama lain memahami sambungan kata ini dengan cara yang berbeda."
+        },
+        {
+          "frame": 4,
+          "say": "Ini kata terakhir ayat, dan bacaan berhenti padanya, jadi kasrah ini hanya terlihat dalam tulisan, tidak terdengar."
+        }
+      ],
+      "sources": [
+        {
+          "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+          "ref": "jil. 3, hlm. 477 (QS 114:6; Shamela 23584/1399)",
+          "url": "https://tafsir.app/iraab-daas/114/6"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+          "ref": "jil. 11, hlm. 162–164 (QS 114:6, delapan pendapat; Shamela 9057/10769–10771)",
+          "url": "https://tafsir.app/aldur-almasoon/114/6"
+        },
+        {
+          "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+          "ref": "jil. 5, hlm. 200 (QS 114:6; Shamela 23587/1417)",
+          "url": "https://tafsir.app/iraab-alnahas/114/6"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+          "ref": "jil. 8, hlm. 540 (tafsir QS 114:6; Shamela 8473/4586)",
+          "url": "https://tafsir.app/ibn-katheer/114/6"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+          "ref": "hlm. 15, Bab al-'Athf: wa termasuk huruf 'athaf; yang di-'athaf-kan pada kata makhfudh ikut makhfudh",
+          "url": "https://shamela.ws/book/11371/16"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(114:6:3:*) — akar, lemma, kelas kata: CONJ|PREFIX|w:CONJ+ + DET|PREFIX|Al+ + N|STEM|POS:N|LEM:n~aAs|ROOT:nws|MP|GEN",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=114&verse=6"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 114:6:3: ditulis tanpa sukun pada lam dan dengan syaddah pada nun; alif sesudah wawu ditulis sebagai alif washal (U+0671)",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 21 (hamzah washal: tetap di awal bacaan, gugur di tengah sambungan)",
+          "url": "https://shamela.ws/book/9057/10"
+        }
+      ],
+      "status": "draft"
+    }
+  },
+  "examples": {
+    "114:1:2": [
+      {
+        "frame": 2,
+        "form": "audzu",
+        "unvoiced": "own"
+      }
+    ],
+    "114:1:3": [
+      {
+        "frame": 2,
+        "form": "rabbu",
+        "loc": "41:9:13",
+        "key": "41:9:13",
+        "clip": {
+          "url": "/belajar/media/narration/alafasy/041009.mp3",
+          "start": 13760,
+          "end": 14370
+        }
+      }
+    ],
+    "114:2:1": [
+      {
+        "frame": 1,
+        "form": "maliku",
+        "unvoiced": "unattested"
+      }
+    ],
+    "114:3:1": [
+      {
+        "frame": 1,
+        "form": "ilahu",
+        "unvoiced": "unattested"
+      }
+    ],
+    "114:4:2": [
+      {
+        "frame": 1,
+        "form": "syarru",
+        "loc": "98:6:15",
+        "key": "98:6:15",
+        "clip": {
+          "url": "/belajar/media/narration/alafasy/098006.mp3",
+          "start": 15730,
+          "end": 16370
+        }
+      }
+    ],
+    "114:5:2": [
+      {
+        "frame": 2,
+        "form": "yuwaswisu",
+        "unvoiced": "own"
+      }
+    ],
+    "114:5:4": [
+      {
+        "frame": 2,
+        "form": "sudur-u",
+        "unvoiced": "unattested"
+      }
+    ]
+  },
+  "data_versions": {
+    "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
+    "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
+    "authored_compose": "authored/an-nas.compose.json sha256:59b83d20a97dcca170e95390346357606c84dbc7935ed253cd71174c9784731b",
+    "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
+  }
+}

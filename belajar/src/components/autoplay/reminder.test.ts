@@ -55,8 +55,10 @@ describe("the reminder card: from the manifest's data to what the stage shows", 
         }
       }
     }
-    // Al-Fatihah 10, Al-Ikhlas 5, Al-Falaq 10, An-Nas 10 (the rendered list in the README).
-    expect(lines).toBe(35);
+    // Al-Fatihah 10, Al-Ikhlas 5, Al-Falaq 9, An-Nas 14 (the rendered list in the README; An-Nas had 11 until
+    // 2026-10-20, when its words were composed: the dependencies of maliki, ilāhi, min and allażī are said in
+    // their composition lines now, two of them each for maliki and allażī).
+    expect(lines).toBe(38);
   });
 
   it("every ayah that continues an earlier one has its card: the structure part's opening shows the ayah it continues", () => {

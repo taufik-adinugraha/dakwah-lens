@@ -173,7 +173,7 @@ does not speak, or a heavy-letter word said): kāna and its "isimnya"/"khabarnya
 "khabarnya", "maqul", "qaul", "syan", "fail", "majhul", "naib", "menashabkan", "mudhari",
 "dhammatain", "fathatain", "shallallahu" in lines that were held before 2026-10-19; and, new, the
 four `map:total:2` lines, which name An-Nas's and Al-Falaq's steps "jamak taksir", "mudzakkar dan
-mu'annats", "tanwin pada isim" and "jamak mu'annats salim" (no Arabic for them in the dictionary).
+mu'annats", "tanwin pada isim" and "jamak mu'annats salim" (no Arabic for them in the dictionary; "jamak taksir" has had its Arabic, جَمْع تَكْسِير, since 2026-10-20).
 Since 2026-10-20 (operator): kāna is spoken from Arabic script (كَانَ, caption "kana (كَانَ)", the map step "Kana (كَانَ) dan saudaranya"); majzum, jazm and penjazm are approved by ear; and "isimnya", "khabarnya", "jazm-nya" are dictionary entries "<term>+nya" ("Arabic term + nya", joined: اِسْمnya, khobarnya, جَزْمnya; validate_narration.NYA). That leaves 22 lines held (the `map:total:2` terms, shallallahu, dhammatain, fathatain, qaul, maqul, sya'n, majhul, na'ib, fa'il, mudhari', menashabkan).
 With `--skip-held`: **178 distinct texts, 18,181 characters, about USD 1.45**; pending their ear
 check there, among others, majzum (12 lines), jazm (3) and penjazm (جَازِم, 1). Word voices
@@ -196,6 +196,65 @@ python3 render_narration.py "${args[@]}"
 # then build_narration.py --check, validate_narration.py, encode_narration.py --check --out "$OUT" --list …,
 # listen (majzum, jazm, penjazm; the Arabic of every named word), and the upload steps of "Narasi".
 ```
+
+**An-Nas as built (2026-10-20)**: the second surah after Al-Fatihah at the same standard, switched on and
+narrated, and still NOT published (`BELAJAR_SURAHS` and the deploy config are untouched; it is hidden in
+production like Al-Falaq). What it took, beyond the checklist above:
+
+- *Its 20 words composed* (`authored/an-nas.compose.json`, 101 composition lines; no Arabic typed): the join of
+  the article with a sun letter (nās) and with a read lam (al-waswāsi, al-khannāsi, al-jinnati), wa + alif lam
+  + nās as three parts, the alif of the article silent mid-ayah, the three heavy-letter words (qul,
+  al-khannāsi, ṣudūri) named in the caption only, the six ayah-final words ending on the stop frame. Seven
+  `base` frames: two voiced by the imam (rabbu at 41:9:13; **syarru at 98:6:15**, new: Quran.com's
+  `wbw/098_006_015.mp3` and the imam's `098006.mp3`, 291,862 bytes, both pinned), two "own" (a‘ūżu,
+  yuwaswisu) and three teaching forms no ayah has (maliku, ilāhu, ṣudūru: the narrator's). The seventeen
+  narrator texts it needed were recorded on 2026-10-20 (142 characters, about USD 0.01); the word-voice
+  manifest is complete again (220 of 220).
+- *Jamak taksir* has its text (`authored/curriculum.json`, from Ajurrumiyyah hlm. 6–8, the pinned pages
+  11371/3–5) and its term (`library.terms.json`; dictionary entry جَمْع تَكْسِير, pending ear check). **No
+  line says that ṣudūri is a jamak taksir**: no pinned kitab says so; its composition says only that it is
+  the plural of the word that means "dada" (the Kosakata's sources).
+- *Mudzakkar dan mu'annats* (An-Nas 6) had no pinned source, and the switch stopped on it. The operator
+  (2026-10-20) approved **Syadza al-'Arf hlm. 73–74** (Shamela 11243/76–77, "at-Taqsim ats-Tsalits li-l-Ism min
+  Haitsu Kaunihi Mudzakkaran aw Mu'annatsan"), a kitab whose other pages the library already pins:
+  `sources.json` `shamela_istilah.pages` 11243/76 and 11243/77 (sha256 verified against the live pages,
+  and the cited sentences read on the pages: "wa-li-kaun al-mudzakkar huwa al-ashl, lam yuhtaj fihi ila
+  'alamah, bi-khilaf al-mu'annats fa-lahu 'alamatan: al-ula at-ta' … al-'alamah ats-tsaniyah: al-alif").
+  The step's `teach` text says only that: "Mudzakkar adalah asal, jadi tidak memerlukan tanda. Mu'annats
+  punya dua tanda: huruf ta' dan huruf alif." The dictionary entries مُذَكَّر and مُؤَنَّث (spelled as in
+  11371/6 and 11371/3, without a term-table entry: one would make Al-Fatihah's facts and the cheat sheet
+  mark the word) are pending ear check. For whoever adds Al-Falaq: its step name "Jamak mu'annats salim"
+  would show as "jamak mu’annats (مُؤَنَّث) salim" until a dictionary entry جَمْع مُؤَنَّث سَالِم (11371/3)
+  is added.
+- *The map* (`authored/an-nas.map.json`): 23 steps listed (4 taught here); 38 map and learned lines (ayah 6's
+  total of 23 steps is said unit by unit); the warm-up has 22 questions (a quiz of 30 exercises and 96
+  questions in all). It needs no new rule: `quiz.ALLAH_KIND_ONLY` already lists rabbi 114:1:3, maliki
+  114:2:1 and ilāhi 114:3:1; every plain noun says "nama benda" (an-nāsi, syarri, al-waswāsi, ṣudūri,
+  al-jinnati: the operator's ruling of 2026-10-19 for kufuwan, confirmed for these on 2026-10-20),
+  al-khannāsi "nama sifat", allażī the kind alone. Four Al-Ikhlas lines (`map:total:2`, none with audio) now
+  name the step with its Arabic.
+- *Continuations* (`continues`): ayat 2–6 were checked against the words' and the structures' own sources and
+  stand; 38 lines carry a reminder card in all (Al-Fatihah 10, Al-Ikhlas 5, Al-Falaq 9, An-Nas 14;
+  `reminder.test.ts`). The pending list (which only shrinks) lost two entries, `an-nas:1:w2` and `an-nas:5:w2`.
+- *The dictionary* (all pending ear check): `صِلَة+nya` ("Arabic term + nya", the form approved for isimnya,
+  khabarnya and jazm-nya; it also released two Al-Falaq lines) and the three above. Tried and refused, so
+  not added: `نُون+nya` (the letter name and its -nya both display as the bare letter ن, so a caption cannot
+  say which was spoken: the validator reads other lines wrongly; not patched) and `عَطْف بَيَان` (see below).
+- *'Athf bayan, reworded* (operator 2026-10-20): the dictionary could not see the Latin "'athf bayan", which
+  hid that An-Nas 2 and 3 named a next-level term before its lesson (decision 7). Adding the entry made the
+  rule fire, so the four spoken sources lost "atau 'athf bayan" (`an-nas.words.json`, the `why` of 114:2:1
+  and 114:3:1; `an-nas.structure.json`, the summaries of ayat 2 and 3): "sebagian ulama menjadikannya sifat"
+  says the rest. Still naming it, unspoken: the two word `role` labels ("badal (atau na't, atau 'athf
+  bayan)"), `role_note` and the kitab `ref` strings, which say what the cited pages say.
+- *Narration*: 328 lines, 37,747 spoken characters, 326 with audio (rendered 2026-10-20 with `--skip-held`:
+  259 distinct texts; 24,490 characters were sent, about USD 1.96, the rest copied from texts rendered for
+  other surahs); 259 files in `kang-nandar/an-nas/` and the 17 word files uploaded and served byte-identical.
+  Two lines stay held: **"maqul al-qaul"** (an-nas:1:structure:a; the qaf with fathah is a heavy letter, so it
+  needs an approved Latin respelling, or a rewording) and **"nunnya"** (an-nas:6:ex:label-role:1:why).
+- *The browser checks*: `linebreaks.mjs --surahs` walks every An-Nas lesson and `screenshots.mjs --surahs`
+  runs the reminder card of An-Nas 2 and the composition sweep (three text sizes, the largest on all six
+  ayat). Its warm-up and lesson-map checks and `frames.test.ts`'s walk to "learned" take the new surah in.
+  The production-like run still finds An-Nas hidden (nothing there changed). None of them runs locally.
 
 ## Files
 
@@ -903,6 +962,18 @@ as-Samin, Ibnu 'Aqil, al-Ajurrumiyyah, ar-Razi), the hedges kept ("Itu pendapat 
 sebagian ulama lain …"). Left out because the data gives nothing to say: the qalqalah of the
 dal, the small mim of iqlab on aḥadun at 112:4:5, the sound of the tanwin beyond "bertanwin", the dropped wawu of yalid (i'lal, next level), the fathah of lahū's lam.
 
+An-Nas (`authored/an-nas.compose.json`, 2026-10-20): every one of its 20 words is composed, 101 lines. 7
+base frames: 2 voiced (rabbu 41:9:13; syarru 98:6:15, the one place where it is heard whole), 2 "own"
+(a‘ūżu, yuwaswisu), 3 "unattested" (maliku, ilāhu, ṣudūru). New since Al-Ikhlas: a word of THREE QAC parts
+(wa + alif lam + nās, a `join` of three with the alif silent), a noun whose lam is read (al-waswāsi,
+al-khannāsi, al-jinnati: no `shaddah` op) beside the sun-letter nouns (an-nāsi ×4, wa an-nāsi), a part named
+in the caption only because of its heavy letter ({{!114:4:4/khannas}}: the spoken line says "yang artinya yang
+bersembunyi"), and a singular made by edits (ṣadr from ṣudūri, named in the caption only). Left out because the
+data gives nothing to say: the wazan of a‘ūżu and al-waswāsi, the ruba'i mujarrad of yuwaswisu and the
+mubalaghah of al-khannāsi (next level), that ṣudūri is a jamak taksir (no pinned kitab says it), the ta'
+marbuthah of al-jinnati (an-Nahhas: its ha' marks a group; not the mu'annats rule), the 'athf bayan of maliki
+and ilāhi (a next-level record, held in the structure lines), hal and bayan for mina al-jinnati wa an-nāsi.
+
 ## Konsep: istilah dalam huruf Arab, kata Qur'an dari byte konten
 
 Operator, 2026-10-10, on /belajar/id/konsep: "mention the arabic word like majrur in arabic letter
@@ -1545,9 +1616,9 @@ Al-Ikhlas (switched on 2026-10-19), as built — the curriculum teaches it after
 | 4 | 1: kana dan saudaranya | 27 (10) | 0 | 1 | 28 |
 
 (The 25 learnt before it: lesson zero's 2, Al-Fatihah's 17, An-Nas's 4 — fi'il amr, badal, jamak
-taksir, mudzakkar dan mu'annats — and Al-Falaq's 2, tanwin pada isim and jamak mu'annats salim. Four
-of those names have no Arabic in the dictionary, so the four `map:total:2` lines that name them are
-held back from a render: "Adding a surah".)
+taksir, mudzakkar dan mu'annats — and Al-Falaq's 2, tanwin pada isim and jamak mu'annats salim. Three
+of those names have no Arabic in the dictionary (jamak taksir has since 2026-10-20), so the four
+`map:total:2` lines that name them are held back from a render: "Adding a surah".)
 
 `validate_narration.map_problems` reads the lines back from their captions: each count; that the
 names after it are EVERY step of the group, in the map's order, each once (a step left out, another
@@ -2036,8 +2107,8 @@ The operator's three findings of 2026-10-18 (wording rules 14–16 below):
   `continues` links on the ayah it continues; the page hands the stage the bytes and translations of
   just those ayat (`src/lib/autoplay/reminder.ts reminderTexts`), the stage draws
   `src/components/lesson/ReminderCard.tsx` (a composition or a structure item gives it the slot for
-  that line; a word line keeps its word card above it). 35 lines carry one: Al-Fatihah 10, Al-Ikhlas
-  5, Al-Falaq 10, An-Nas 10; two lines show two ayat (Al-Falaq 3: min syarri of ayah 2, a‘ūżu of ayah
+  that line; a word line keeps its word card above it). 38 lines carry one since 2026-10-20: Al-Fatihah 10,
+  Al-Ikhlas 5, Al-Falaq 9, An-Nas 14 (35 before An-Nas was composed, when it had 11); two lines show two ayat (Al-Falaq 3: min syarri of ayah 2, a‘ūżu of ayah
   1; An-Nas 3's structure). Held by `continuation_problems` (a line that says or cites without its
   card, a card on a line that cites nothing or on an exercise, a card of a later ayah or of a word the
   ayah does not have, a highlighted word the line does not cite, a continuing ayah with no card at

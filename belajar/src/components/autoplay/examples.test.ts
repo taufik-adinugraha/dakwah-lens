@@ -290,12 +290,14 @@ describe("which examples a lesson plays (src/lib/autoplay/examples.ts)", () => {
       "concept:jazm-lam:ex → 112:3:1",
       "concept:majzum:ex → 112:3:2",
     ]);
-    // An-Nas has no compositions: its word lines are followed by no beat, and none is missing.
-    const nas = lessonOf(surah("an-nas"), surah("an-nas").ayat[0]);
-    expect(nas.derived.gaps).toEqual([]);
+    // Al-Falaq has no compositions yet (An-Nas's were written 2026-10-20): its word lines are followed by
+    // no beat, and none is missing.
+    const falaq = lessonOf(surah("al-falaq"), surah("al-falaq").ayat[0]);
+    expect(falaq.derived.gaps).toEqual([]);
     expect(stops).toEqual([
       "al-fatihah/1:w4", "al-fatihah/2:w4", "al-fatihah/3:w2", "al-fatihah/4:w3", "al-fatihah/5:w4", "al-fatihah/6:w3", "al-fatihah/7:w9",
       "al-ikhlas/1:w4", "al-ikhlas/2:w2", "al-ikhlas/3:w4", "al-ikhlas/4:w5",
+      "an-nas/1:w4", "an-nas/2:w2", "an-nas/3:w2", "an-nas/4:w4", "an-nas/5:w5", "an-nas/6:w3",
     ]);
     // What that line says is true of each of the seven: the pause drops its last harakah (heard.ts),
     // and its line — the composition's last, over its last frame — says the recitation stops on it
@@ -530,7 +532,7 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     // Plan L24 (2026-10-13): this fault used to be the opposite one, "a word whose harakah its line
     // explains, with neither its recitation nor a reason". A word is now recited once, when its
     // step opens: a beat that recites it again after its own line is the fault.
-    ["a word's own line followed by a beat that recites the word again (a lesson without compositions)", -1, (l) => void (step(l, "w2").examples = [beat(l, "concept:fiil-amr:1")]), /w2: a explain step has example beats/],
+    ["a word's own line followed by a beat that recites the word again (the explain step, composed or not)", -1, (l) => void (step(l, "w2").examples = [beat(l, "concept:fiil-amr:1")]), /w2: a explain step has example beats/],
     ["a base example played before its base frame's line", 1, (l) => void (beat(l, "w1:base:2").after = 0), /does not come after the last line of its base frame/],
     ["a base example on a frame that is not a base frame", 1, (l) => {
       const b = beat(l, "w1:base:2");
@@ -681,9 +683,9 @@ describe("every beat has its Arabic and a recording, and says what is heard (che
     return { ...base, seq, derived, ctx: { ...base.ctx, introduced, derived } };
   };
   it.each(faults)("planted fault: %s", (_name, ayah, plant, expected) => {
-    // ayah -1: An-Nas 1, a lesson whose words have no composition (and that teaches a concept; until
-    // 2026-10-19 Al-Ikhlas 3, composed since); -2: Al-Ikhlas 1 with a concept that takes a second
-    // example from another ayah.
+    // ayah -1: An-Nas 1, a lesson that teaches a concept with an example (fi'il amr; its words had no
+    // composition until 2026-10-20, Al-Ikhlas 3 until 2026-10-19: the fault is about the explain step, which
+    // a composed word has as well); -2: Al-Ikhlas 1 with a concept that takes a second example from another ayah.
     const fresh = ayah === -2 ? withSecondExample() : ayah === -1 ? lessonOf(surah("an-nas"), surah("an-nas").ayat[0]) : lessonOf(FATIHAH, FATIHAH.ayat[ayah - 1]);
     // A copy to mutate (the page's own sequence is never touched).
     const l: Lesson = { ...fresh, seq: structuredClone(fresh.seq), derived: structuredClone(fresh.derived) };
@@ -838,16 +840,18 @@ describe("the lesson's own word is recited once, and its step does not wait for 
     }
   });
 
-  it("caption-only (the English pages; Al-Falaq and An-Nas, whose own lines have no voice yet): the first hearing keeps its caption's reading time", () => {
-    // Al-Ikhlas has a voice since 2026-10-20 (its Indonesian pages are narrated like Al-Fatihah's);
-    // only its English pages stay caption-only.
+  it("caption-only (the English pages; Al-Falaq, whose own lines have no voice yet): the first hearing keeps its caption's reading time", () => {
+    // Al-Ikhlas has a voice since 2026-10-20 and An-Nas since the same day's next render (their
+    // Indonesian pages are narrated like Al-Fatihah's); only their English pages stay caption-only.
     const IKHLAS = surah("al-ikhlas");
+    const ANNAS = surah("an-nas");
     const captionOnly = [
       ...FATIHAH.ayat.map((a) => lessonOf(FATIHAH, a, "en")),
       ...IKHLAS.ayat.map((a) => lessonOf(IKHLAS, a, "en")),
-      ...every.filter((l) => l.slug !== "al-fatihah" && l.slug !== "al-ikhlas"),
+      ...ANNAS.ayat.map((a) => lessonOf(ANNAS, a, "en")),
+      ...every.filter((l) => l.slug !== "al-fatihah" && l.slug !== "al-ikhlas" && l.slug !== "an-nas"),
     ];
-    expect(captionOnly.length).toBe(7 + 4 + 11);
+    expect(captionOnly.length).toBe(7 + 4 + 6 + 5);
     // The Mu'awwidzat's shared lines have a voice all the same: what decides is the word's own line.
     expect(every.filter((l) => l.slug !== "al-fatihah").every((l) => l.seq.hasAudio)).toBe(true);
     for (const l of captionOnly) {
@@ -1120,8 +1124,8 @@ describe("what the stage shows during a beat (caption.ts)", () => {
   // Until 2026-10-13 this test was "a word's own recitation after its line (a word without a
   // composition): the word card stays" — the beat "w2:word". Plan L24 took that second recitation
   // away: the line is followed by the next word's opening step.
-  it("a word without a composition (An-Nas 1; Al-Ikhlas 1 until it was composed, 2026-10-19): after its line the lesson goes straight to the next word — no beat, nothing recited in between", () => {
-    const s0 = surah("an-nas");
+  it("a word without a composition (Al-Falaq 1; An-Nas 1 until 2026-10-20 and Al-Ikhlas 1 until 2026-10-19, when they were composed): after its line the lesson goes straight to the next word — no beat, nothing recited in between", () => {
+    const s0 = surah("al-falaq");
     const l = lessonOf(s0, s0.ayat[0]);
     const idx = l.seq.steps.findIndex((x) => x.id === "w2");
     expect(l.seq.steps[idx].kind).toBe("explain");

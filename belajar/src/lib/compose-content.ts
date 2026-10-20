@@ -9,6 +9,7 @@
  */
 import alFatihah from "../../content/compose/al-fatihah.json";
 import alIkhlas from "../../content/compose/al-ikhlas.json";
+import anNas from "../../content/compose/an-nas.json";
 
 import { ComposeFile, type ComposeFile as File } from "@/content/compose-schema";
 
@@ -31,6 +32,7 @@ function load(raw: unknown, name: string): File {
 const BY_SLUG: Readonly<Record<string, File>> = {
   "al-fatihah": load(alFatihah, "al-fatihah"),
   "al-ikhlas": load(alIkhlas, "al-ikhlas"),
+  "an-nas": load(anNas, "an-nas"),
 };
 
 /** content/compose/${slug}.json, or null. */

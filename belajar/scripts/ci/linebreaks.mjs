@@ -74,7 +74,8 @@
 // shots/linebreaks-semua-surah.json and lb-semua-surah-*.png, beside the production-like run's.
 // It also walks the lesson stage of every ayah of Al-Ikhlas (2026-10-19: brought to Al-Fatihah's
 // standard, still hidden on the live site), step by step like Al-Fatihah's, every composition of
-// its fifteen words ink-checked at every size.
+// its fifteen words ink-checked at every size — and, since 2026-10-20, of every ayah of An-Nas
+// (twenty words, the same).
 //
 // Before the real run, a self-test lays out linebreaks-fixture.html in a real page: one known-bad
 // case of every kind must be caught, the markup as it ships must not be, and a unit wider than its
@@ -125,11 +126,22 @@ const LESSONS = [
         ["/belajar/id/quran/al-ikhlas/2", false, false],
         ["/belajar/id/quran/al-ikhlas/3", false],
         ["/belajar/id/quran/al-ikhlas/4", false],
+        // `--surahs` only (2026-10-20): every ayah of An-Nas, whose words are composed now, hidden on the
+        // live site and caption-only as well. Ayat 1 and 2 teach fi'il amr and badal, whole Konsep records
+        // with examples; ayat 3, 4 and 6 teach nothing (6: its step has no text yet) and ayah 5 teaches
+        // jamak taksir, a step with a text of its own and no record, so it has no example to show: the
+        // third field says a lesson need not.
+        ["/belajar/id/quran/an-nas/1", false],
+        ["/belajar/id/quran/an-nas/2", false],
+        ["/belajar/id/quran/an-nas/3", false, false],
+        ["/belajar/id/quran/an-nas/4", false, false],
+        ["/belajar/id/quran/an-nas/5", false, false],
+        ["/belajar/id/quran/an-nas/6", false, false],
       ]
     : []),
 ];
 /** The surahs whose compositions the ink check must have measured on the lessons above. */
-const COMPOSED_SURAHS = SURAHS_ON ? ["al-fatihah", "al-ikhlas"] : ["al-fatihah"];
+const COMPOSED_SURAHS = SURAHS_ON ? ["al-fatihah", "al-ikhlas", "an-nas"] : ["al-fatihah"];
 const MAX_PRINTED = 600;
 /** Pages also shot at each size: the surah page (its "Tahukah Anda?" facts hold the longest
  *  inline Arabic), an ayah page with every disclosure open (word cards, Rujukan) and the

@@ -109,7 +109,7 @@ def later_to_learnt(ayah: int, sid: str):
 
 def other_surah():
     c = copy.deepcopy(CONTENTS)
-    c["an-nas"] = {**copy.deepcopy(c[SLUG]), "slug": "an-nas", "surah": 114}
+    c["al-falaq"] = {**copy.deepcopy(c[SLUG]), "slug": "al-falaq", "surah": 113}
     return run(c)
 
 
@@ -216,7 +216,7 @@ MUTATIONS = [
      "kinds names the step"),
     ("a kind without its name", built(lambda c: c["kinds"]["members"].pop("huruf")), "kinds.members must name each of ['isim', 'fiil', 'huruf']"),
     # --- the per-surah switch
-    ("a map for a surah that is not switched on", other_surah, "no authored/an-nas.map.json behind it"),
+    ("a map for a surah that is not switched on", other_surah, "no authored/al-falaq.map.json behind it"),
     # --- the running total unit by unit (2026-10-19: Al-Ikhlas's 25 to 28 steps no longer fit one line)
     ("an entry without its total", built(lambda c: entry(c, 2).pop("total")), "ayah 2: an entry is exactly"),
     ("a running total grouped in one group", built_in("al-ikhlas", one_group), "ayah 1: total has one group"),
@@ -378,9 +378,9 @@ class LessonMap(unittest.TestCase):
                 namer(concepts[cid], *LM.first_example(concepts[cid]), None)
 
     def test_switched_on(self):
-        # Al-Fatihah, and Al-Ikhlas since 2026-10-19 (operator: "let's proceed with next surah").
-        self.assertEqual(LM.authored_slugs(), [SLUG, "al-ikhlas"])
-        self.assertEqual(list(CONTENTS), [SLUG, "al-ikhlas"])
+        # Al-Fatihah, Al-Ikhlas since 2026-10-19 (operator: "let's proceed with next surah") and An-Nas since 2026-10-20.
+        self.assertEqual(LM.authored_slugs(), [SLUG, "al-ikhlas", "an-nas"])
+        self.assertEqual(list(CONTENTS), [SLUG, "al-ikhlas", "an-nas"])
 
     def test_ikhlas_table(self):
         # Al-Ikhlas, measured on 2026-10-19 (the curriculum of 2026-10-13: the fourth unit, after
@@ -414,16 +414,40 @@ class LessonMap(unittest.TestCase):
                 self.assertLessEqual(namer.spoken_len(B.map_total_group(g, content["steps"], content["units"])), V.MAX_LINE)
         self.assertLessEqual(namer.spoken_len(B.map_total(entry(CONTENTS[SLUG], 7), CONTENTS[SLUG]["steps"])), V.MAX_LINE)
 
+    def test_nas_table(self):
+        # An-Nas, measured on 2026-10-20: the second unit of the curriculum, right after Al-Fatihah, so only
+        # lesson zero's and Al-Fatihah's 19 steps are learnt before its first ayah; it teaches fi'il amr
+        # (114:1), badal (114:2), jamak taksir (114:5) and mudzakkar dan mu'annats (114:6).
+        content = CONTENTS["an-nas"]
+        self.assertEqual({a["ayah"]: (a["new"], LM.here_ids(a), a["later"], a["lanjut"], a["kinds"]) for a in content["ayat"]}, {
+            1: (["fiil-amr"], ["harakat", "kalimah", "majrur", "huruf-jar", "marfu", "alif-lam", "idhafah", "dhamir", "fiil-mudhari",
+                               "murab-mabni", "jumlah-filiyyah"], [], ["maqul-al-qaul"], ["isim", "fiil", "huruf"]),
+            2: (["badal"], ["harakat", "kalimah", "majrur", "alif-lam", "naat", "idhafah"], [], ["athaf-bayan"], ["isim"]),
+            3: ([], ["harakat", "kalimah", "majrur", "alif-lam", "naat", "idhafah", "badal"], [], ["athaf-bayan"], ["isim"]),
+            4: ([], ["harakat", "kalimah", "majrur", "huruf-jar", "alif-lam", "naat", "idhafah", "murab-mabni"], [],
+                ["wazan-dan-tashrif", "sighat-mubalaghah", "rubai-mujarrad"], ["isim", "huruf"]),
+            5: (["jamak-taksir"], ["harakat", "kalimah", "majrur", "huruf-jar", "marfu", "alif-lam", "naat", "idhafah", "dhamir",
+                                   "fiil-mudhari", "murab-mabni", "isim-maushul"], [], ["rubai-mujarrad"], ["isim", "fiil", "huruf"]),
+            6: (["mudzakkar-muannats"], ["harakat", "kalimah", "majrur", "huruf-jar", "alif-lam", "murab-mabni", "athaf"], [], ["hal"],
+                ["isim", "huruf"]),
+        })
+        self.assertEqual([LM.learnt_total(a) for a in content["ayat"]], [20, 21, 21, 21, 22, 23])
+        # Only the last ayah's running total (23 steps) is over one line: the count, then two groups of whole units.
+        self.assertEqual([[g["from"] for g in a["total"]] for a in content["ayat"]], [[], [], [], [], [], [["pengantar", "al-fatihah"], ["an-nas"]]])
+        self.assertEqual(content["units"], {"pengantar": "pelajaran pengantar", "al-fatihah": "Surah Al-Fatihah", "an-nas": "Surah An-Nas"})
+        # Nothing taught later occurs in An-Nas (the steps of Al-Falaq, Al-Ikhlas and Ayat Kursi have no rule that finds them here).
+        self.assertTrue(all(a["later"] == [] for a in content["ayat"]))
+
     def test_unit_phrase(self):
         self.assertEqual(LM.unit_phrase({"id": "pengantar", "name": "Pengantar"}), "pelajaran pengantar")
         self.assertEqual(LM.unit_phrase({"id": "an-nas", "name": "An-Nas", "surah": 114}), "Surah An-Nas")
         self.assertEqual(LM.unit_phrase({"id": "ayat-kursi", "name": "Ayat Kursi", "surah": 2, "ayah": 255}), "Ayat Kursi")
 
     def test_switching_another_surah_on_asks_for_what_it_lacks(self):
-        # An-Nas: two of its steps have no text yet (jamak taksir, mudzakkar dan mu'annats).
+        # Al-Falaq: two of its steps have no text yet (tanwin pada isim, jamak mu'annats salim).
         with self.assertRaises(LM.MapError) as e:
-            BM.build_all(LESSONS, LIBRARY, LEX, {**AUTHORED, "an-nas": {"slug": "an-nas", "names": {}}}, CURRICULUM)
-        self.assertIn("an-nas 5: step jamak-taksir is new here and has no text to teach it", str(e.exception))
+            BM.build_all(LESSONS, LIBRARY, LEX, {**AUTHORED, "al-falaq": {"slug": "al-falaq", "names": {}}}, CURRICULUM)
+        self.assertIn("al-falaq 3: step tanwin-nakirah is new here and has no text to teach it", str(e.exception))
         # Al-Ikhlas: switched on since 2026-10-19, once majzum, the fourth part of the i'rab record,
         # had a text of its own (PLANTED: that text taken away again).
         untaught = copy.deepcopy(CURRICULUM)

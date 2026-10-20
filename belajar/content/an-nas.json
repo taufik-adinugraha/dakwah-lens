@@ -401,7 +401,7 @@
             "state": "majrur",
             "sign": "kasrah"
           },
-          "why": "Akhirnya kasrah karena menjadi badal (pengganti yang menjelaskan) dari rabbi di ayat 1, yang majrur karena didahului huruf jar; sebagian ulama menjadikannya sifat atau 'athf bayan.",
+          "why": "Akhirnya kasrah karena menjadi badal (pengganti yang menjelaskan) dari rabbi di ayat 1, yang majrur karena didahului huruf jar; sebagian ulama menjadikannya sifat.",
           "lemma_id": "malik-raja",
           "concepts": [
             "idhafah",
@@ -550,7 +550,7 @@
       ],
       "structure": {
         "type": "lanjutan jumlah ayat 1 (badal + idhafah)",
-        "summary": "Ayat ini melanjutkan ayat 1. Maliki (“Raja”) mengikuti rabbi di ayat 1, yang majrur karena didahului huruf jar, sebagai badal (pengganti yang menjelaskan) menurut al-Jadwal, al-Mujtaba dan ad-Da'as, maka ikut majrur; Darwisy, al-Jadwal dan as-Samin juga membolehkannya dibaca sebagai na't (sifat) atau 'athf bayan. Maliki disandarkan kepada an-nāsi; menurut Darwisy, idhafah kepada an-nāsi diulang untuk menambah kejelasan.",
+        "summary": "Ayat ini melanjutkan ayat 1. Maliki (“Raja”) mengikuti rabbi di ayat 1, yang majrur karena didahului huruf jar, sebagai badal (pengganti yang menjelaskan) menurut al-Jadwal, al-Mujtaba dan ad-Da'as, maka ikut majrur; Darwisy, al-Jadwal dan as-Samin juga membolehkannya dibaca sebagai na't (sifat). Maliki disandarkan kepada an-nāsi; menurut Darwisy, idhafah kepada an-nāsi diulang untuk menambah kejelasan.",
         "groups": [
           {
             "words": [
@@ -630,7 +630,7 @@
             "state": "majrur",
             "sign": "kasrah"
           },
-          "why": "Akhirnya kasrah karena menjadi badal (pengganti yang menjelaskan) dari maliki, sehingga ikut majrur; sebagian ulama menjadikannya sifat atau 'athf bayan.",
+          "why": "Akhirnya kasrah karena menjadi badal (pengganti yang menjelaskan) dari maliki, sehingga ikut majrur; sebagian ulama menjadikannya sifat.",
           "lemma_id": "ilah",
           "concepts": [
             "idhafah",
@@ -779,7 +779,7 @@
       ],
       "structure": {
         "type": "lanjutan jumlah ayat 1 (badal + idhafah)",
-        "summary": "Ayat ini melanjutkan ayat 1. Ilāhi (“Sembahan”) ikut majrur: badal dari maliki menurut al-Jadwal dan al-Mujtaba (ad-Da'as: dari rabbi), dan sebagian ulama menjadikannya sifat atau 'athf bayan; ia disandarkan kepada an-nāsi. Az-Zamakhsyari (dinukil as-Samin) menjelaskan urutannya: “tuhan manusia” dan “raja manusia” kadang diucapkan untuk selain Allah, sedangkan “sembahan manusia” khusus bagi-Nya tanpa sekutu, maka sebutan ini menjadi puncak penjelasan. Ibnu Katsir menyebut ketiga ayat ini tiga sifat Allah: Dialah Tuhan, Raja, dan Sembahan segala sesuatu.",
+        "summary": "Ayat ini melanjutkan ayat 1. Ilāhi (“Sembahan”) ikut majrur: badal dari maliki menurut al-Jadwal dan al-Mujtaba (ad-Da'as: dari rabbi), dan sebagian ulama menjadikannya sifat; ia disandarkan kepada an-nāsi. Az-Zamakhsyari (dinukil as-Samin) menjelaskan urutannya: “tuhan manusia” dan “raja manusia” kadang diucapkan untuk selain Allah, sedangkan “sembahan manusia” khusus bagi-Nya tanpa sekutu, maka sebutan ini menjadi puncak penjelasan. Ibnu Katsir menyebut ketiga ayat ini tiga sifat Allah: Dialah Tuhan, Raja, dan Sembahan segala sesuatu.",
         "groups": [
           {
             "words": [
@@ -2830,8 +2830,8 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:c2ad413ccfcc97d833774096a916bf5b4ba2dfad6f107f851ba1129103cacd00",
-    "authored_words": "authored/an-nas.words.json sha256:b2be680ade0355f5d264fee7fc8957f10bdcca08b331eb1744aabb2a40d41127",
-    "authored_structure": "authored/an-nas.structure.json sha256:d30e184deafca42e757b4b2981889519c822b7bd56d0d72c7bbd3413776d6e0e",
+    "authored_words": "authored/an-nas.words.json sha256:cc927b9ae12179935644fd4c2934b73ce22f5b119567602166382dbca002e8ef",
+    "authored_structure": "authored/an-nas.structure.json sha256:f6805111f7c2b5350fe716379d5bd8a7db822cf0d4c85e91359b7567e544e603",
     "authored_concepts_map": "authored/an-nas.concepts-map.json sha256:247e8cec628d4004061730ffc68423641f3eb088dccf494b9aeeb18cc02433e6",
     "authored_facts": "authored/an-nas.facts.generated.json sha256:2916189ff7df55717be9e386d12fafd9e8399fcd6486ab07fbd6ef5bceb82fff",
     "authored_hadith": "authored/an-nas.hadith.json sha256:e0f0e3cff8ad2a7c95cb2b2d6d7f680b0f01e809aea3e4ea487e45e9ac475747",

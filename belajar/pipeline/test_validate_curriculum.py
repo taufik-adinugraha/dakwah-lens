@@ -324,7 +324,7 @@ class Curriculum(unittest.TestCase):
     def test_totals(self):
         # kurikulum-dasar.md E, and the task's own count of the terms.
         self.assertEqual(VC.totals(AUTHORED, TABLE), {
-            "lessons": 32, "steps": 36, "lessons without a new step": 10, "owned terms": 86, "free terms": 4,
+            "lessons": 32, "steps": 36, "lessons without a new step": 10, "owned terms": 87, "free terms": 4,
             "next-level terms": 76, "next-level records": 18})
         self.assertEqual(len(LIBRARY["concepts"]), 37)
         per_unit = {u["id"]: sum(len(l["steps"]) for l in CONTENT["lessons"] if l["unit"] == u["id"]) for u in CONTENT["units"]}
@@ -383,9 +383,10 @@ class Curriculum(unittest.TestCase):
         kinds = {s["id"]: CUR.kind(s) for s in AUTHORED["steps"]}
         self.assertEqual(kinds["harakat"], "basics")
         self.assertEqual(kinds["kalimah"], "record")
-        # majzum, the fourth part of i'rab, has its own text since 2026-10-19 (Al-Ikhlas's map switched on).
-        self.assertEqual([kinds[s] for s in ("majrur", "marfu", "manshub", "majzum", "alif-lam")], ["teach"] * 5)
-        self.assertIsNone(kinds["jamak-taksir"])  # no record, no text yet
+        # majzum, the fourth part of i'rab, has its own text since 2026-10-19 (Al-Ikhlas's map switched on),
+        # and jamak taksir since 2026-10-20 (An-Nas 5: Ajurrumiyyah hlm. 6-8, the only pinned pages that say it).
+        self.assertEqual([kinds[s] for s in ("majrur", "marfu", "manshub", "majzum", "alif-lam", "jamak-taksir")], ["teach"] * 6)
+        self.assertIsNone(kinds["tanwin-nakirah"])  # no record, no text yet (Al-Falaq 3)
         self.assertEqual(sum(1 for k in kinds.values() if k == "record"), 18)
         # A whole record keeps the line id it always had; a step with its own text has its own.
         self.assertEqual(step(CONTENT, "naat")["line"], "concept:naat")

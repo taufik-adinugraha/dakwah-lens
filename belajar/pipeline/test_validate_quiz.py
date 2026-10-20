@@ -422,6 +422,16 @@ MUTATIONS = [
     ("the warm-up of Al-Ikhlas read against its own manifest only (lesson zero's lines are Al-Fatihah's), as until 2026-10-19",
      zero_lines_dropped_for("al-ikhlas"),
      "al-ikhlas 1 word-kind q1: names the class 'kata kerja' of fi'il, not taught before ayah 1"),
+    # An-Nas (its map switched on 2026-10-20): maliki and ilāhi are titles of Allah (quiz.ALLAH_KIND_ONLY), syarri a plain noun.
+    ("the warm-up of An-Nas: a class said of maliki (“Raja”, a title of Allah: quiz.ALLAH_KIND_ONLY)",
+     quizfile_of("an-nas", lambda q: warm(q, 2)["questions"][0].__setitem__("class", "nama benda")),
+     "an-nas 2 word-kind q1 (word 1): names the class 'nama benda', and the part's QAC tag gives None"),
+    ("the warm-up of An-Nas: a class said of ilāhi (“sembahan”, said of Allah: quiz.ALLAH_KIND_ONLY)",
+     quizfile_of("an-nas", lambda q: warm(q, 3)["questions"][0].__setitem__("class", "nama benda")),
+     "an-nas 3 word-kind q1 (word 1): names the class 'nama benda', and the part's QAC tag gives None"),
+    ("the warm-up of An-Nas: the class withheld from syarri (“kejahatan”: a plain noun, “nama benda” like kufuwan)",
+     quizfile_of("an-nas", lambda q: warm(q, 4)["questions"][1].pop("class")),
+     "an-nas 4 word-kind q2 (word 2): names the class None, and the part's QAC tag gives 'nama benda'"),
     ("the warm-up: authored in the plan", plan(lambda a: a["1"].__setitem__("word-kind", [{"word": 1, "kind": "isim"}])),
      "the plan lists 'word-kind' — the warm-up is derived"),
     ("the warm-up: missing from an ayah of a surah with a lesson map", quizfile(lambda q: q["ayat"][3]["exercises"].pop(0)),
@@ -690,6 +700,34 @@ class WarmupIkhlas(unittest.TestCase):
         # Every lesson zero line is "ayah 0" of the surah that hosts it; none in Al-Ikhlas's manifest.
         self.assertTrue(Q.zero_lines(MANIFESTS))
         self.assertTrue(all(k.startswith("al-fatihah:0:") for k in Q.zero_lines(MANIFESTS)))
+
+
+class WarmupNas(unittest.TestCase):
+    """The warm-up of An-Nas (its lesson map switched on 2026-10-20), as built."""
+
+    def test_every_part_and_its_sentence(self):
+        q, lesson = QUIZZES["an-nas"], LESSONS["an-nas"]
+        # 20 words, 2 of two parts (birabbi, wa an-nāsi): 22 questions, 5 / 2 / 2 / 4 / 5 / 4.
+        self.assertEqual([len(warm(q, n)["questions"]) for n in range(1, 7)], [5, 2, 2, 4, 5, 4])
+        cls = {(n, x["n"]): x.get("class") for n in range(1, 7) for x in warm(q, n)["questions"]}
+        why = {(n, x["n"]): x["why"] for n in range(1, 7) for x in warm(q, n)["questions"]}
+        # A title of Allah says the kind alone (the rabbi of birabbi 114:1:3, maliki, ilāhi: quiz.ALLAH_KIND_ONLY), and so does the relative.
+        self.assertEqual([cls[k] for k in [(1, 4), (2, 1), (3, 1), (5, 1)]], [None] * 4)
+        self.assertEqual(why[(2, 1)], "Kata pertama, yaitu مَلِكِ (maliki), yang artinya “Raja”, adalah isim (اِسْم).")
+        self.assertEqual(why[(3, 1)], "Kata pertama, yaitu إِلَٰهِ (ilāhi), yang artinya “sembahan”, adalah isim (اِسْم).")
+        self.assertEqual(why[(1, 4)], "Bagian kedua kata ketiga, yaitu رَبِّ (rabbi), yang artinya “Tuhan”, adalah isim (اِسْم). Tandanya: didahului huruf jar (حَرْف جَرّ).")
+        # The other nouns are plain QAC nouns, "nama benda" (like kufuwan, operator 2026-10-19), and al-khannāsi an adjective, "nama sifat".
+        self.assertEqual([cls[k] for k in [(1, 5), (4, 2), (4, 3), (5, 4), (5, 5), (6, 2), (6, 4)]], ["nama benda"] * 7)
+        self.assertEqual(cls[(4, 4)], "nama sifat")
+        self.assertEqual([cls[k] for k in [(1, 1), (1, 2), (5, 2)]], ["kata kerja"] * 3)
+        self.assertEqual([cls[k] for k in [(1, 3), (4, 1), (5, 3), (6, 1), (6, 3)]], ["kata tugas"] * 5)
+        # The parts of a word named by its composition's forms: بِ (bi), رَبِّ (rabbi), وَ (wa); the part اَلنَّاسِ of wa an-nāsi is named by no form.
+        self.assertIn("yaitu بِ (bi), yang artinya “kepada”, adalah huruf (حَرْف), karena ia kata tugas.", why[(1, 3)])
+        self.assertIn("yaitu وَ (wa), yang artinya “dan”, adalah huruf (حَرْف), karena ia kata tugas.", why[(6, 3)])
+        self.assertEqual(why[(6, 4)], "Bagian kedua kata ketiga adalah isim (اِسْم), karena ia nama benda. Tandanya: memakai alif lam (ال).")
+        # Heavy-letter words are named on screen and left unsaid by the narration: qul, ṣudūri.
+        self.assertTrue(why[(1, 1)].startswith("Kata pertama, yaitu قُلْ (qul), yang artinya “katakanlah”, adalah fi’il"), why[(1, 1)])
+        self.assertEqual(Q.class_problems(q, lesson, MANIFESTS["an-nas"], Q.zero_lines(MANIFESTS)), [])
 
 
 class Warmup(unittest.TestCase):

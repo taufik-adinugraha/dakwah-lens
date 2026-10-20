@@ -1,0 +1,5 @@
+{
+  "_comment": "The lesson map of An-Nas — the per-surah switch (see authored/al-fatihah.map.json for the format and the rules): a surah with this file gets content/map/<slug>.json (build_map.py), its map and learned narration lines per ayah and their card on the stage, and the warm-up that opens every ayah (quiz.has_map). What is new, learnt so far, taught later and next-level in an ayah is the curriculum's (authored/curriculum.json -> content/curriculum.json, lessonmap.py), never typed here. `names`: next-level Konsep record id -> an explicit short name, ONLY for a record whose Konsep title opens with no clean name (build_map.py stops and names the record when one is needed). Switched on 2026-10-20 (operator: bring An-Nas to the Al-Ikhlas standard).",
+  "slug": "an-nas",
+  "names": {}
+}

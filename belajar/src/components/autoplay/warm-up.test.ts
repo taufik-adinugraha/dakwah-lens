@@ -101,7 +101,7 @@ describe("the warm-up is an exercise of its own, the first on the page and the o
       }
       expect(Object.keys(quizFor(s.slug)!.kinds), s.slug).toEqual(mapped ? ["isim", "fiil", "huruf"] : []);
     }
-    expect(SURAHS.filter((s) => lessonMapFor(s.slug) !== null).map((s) => s.slug)).toEqual(["al-fatihah", "al-ikhlas"]);
+    expect(SURAHS.filter((s) => lessonMapFor(s.slug) !== null).map((s) => s.slug)).toEqual(["al-fatihah", "al-ikhlas", "an-nas"]);
   });
 });
 
@@ -439,11 +439,12 @@ describe("the CI scripts know it", () => {
     expect(shots).toContain('async function wordKindChecks(page, vp, index, { slug = "al-fatihah", ayah = 2 } = {}) {');
     expect(shots).toContain("await wordKindChecks(page, vp, narration);");
     expect(shots).toContain('[data-exercise="word-kind"]');
-    // … and, in the `--surahs` pass, on Al-Ikhlas 3 (2026-10-19). The check needs a warm-up that
-    // opens with a word of one part and has a word of two (it throws otherwise): Al-Fatihah 2's
-    // and Al-Ikhlas 3's have that shape.
+    // … and, in the `--surahs` pass, on Al-Ikhlas 3 (2026-10-19) and An-Nas 1 (2026-10-20). The check
+    // needs a warm-up that opens with a word of one part and has a word of two (it throws otherwise):
+    // Al-Fatihah 2's, Al-Ikhlas 3's (wa lam) and An-Nas 1's (qul first, birabbi of two parts) have that shape.
     expect(shots).toContain('await wordKindChecks(page, vp, narration, { slug: "al-ikhlas", ayah: 3 });');
-    for (const [slug, ayah] of [["al-fatihah", 2], ["al-ikhlas", 3]] as const) {
+    expect(shots).toContain('await wordKindChecks(page, vp, narration, { slug: "an-nas", ayah: 1 });');
+    for (const [slug, ayah] of [["al-fatihah", 2], ["al-ikhlas", 3], ["an-nas", 1]] as const) {
       const qs = questionsOf(slug, ayah);
       expect(qs[0]?.of, `${slug} ${ayah}`).toBe(1);
       expect(qs.some((q) => q.of > 1), `${slug} ${ayah}`).toBe(true);
