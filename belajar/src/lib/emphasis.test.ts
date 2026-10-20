@@ -204,7 +204,7 @@ describe("emphasisSpans: what a text emphasises", () => {
     const nameIn = (caption: string) => shown(caption).find(([k]) => k === "term")?.[1];
     const name = (id: string) => nameIn(concept(id));
     expect(name("murab-mabni")).toBe("Mu’rab (مُعْرَب) dan mabni (مَبْنِيّ)");
-    expect(name("kana-wa-akhawatuha")).toBe("Kana dan saudaranya");
+    expect(name("kana-wa-akhawatuha")).toBe("Kana (كَانَ) dan saudaranya");
     // A step with its own text (the curriculum, 2026-10-13): named the same way.
     expect(name("majrur")).toBe("Majrur (مَجْرُور)");
     expect(name("alif-lam")).toBe("Alif lam (ال)");
