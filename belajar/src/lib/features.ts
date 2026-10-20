@@ -76,6 +76,36 @@ export function surahPublished(slug: string): boolean {
 }
 
 /**
+ * BELAJAR_UNLISTED — surahs that ANSWER at their URL but are not listed or linked anywhere
+ * (operator, 2026-10-20, on Al-Ikhlas: "slug is active but not linked yet until i say so after
+ * review"). A comma-separated list of lesson slugs; unset, the default is DEFAULT_UNLISTED; set
+ * (even to nothing) it is the list. A surah in BELAJAR_SURAHS is published and listed; one here
+ * that is not there is reachable only by its address:
+ *   - src/proxy.ts lets its /{locale}/quran/{slug}… URLs through (reachableSurahs());
+ *   - everything that lists or links a surah keeps reading publishedSurahs(), so the track page
+ *     still shows it as a "Segera hadir" card that is not a link, the hub, the curriculum, the
+ *     cheat sheet, the credits and the concept and word pages do not mention it as a lesson, and
+ *     /belajar/api/surahs (the end of the surah before it) does not send anyone there.
+ * Showing it for real later is one line: add the slug to BELAJAR_SURAHS (it needs no change here).
+ * Read per request, like BELAJAR_SURAHS.
+ */
+export const DEFAULT_UNLISTED: readonly string[] = ["al-ikhlas"];
+
+/** Slugs of the unlisted surahs (not published, but reachable), in mushaf order. */
+export function unlistedSurahs(): string[] {
+  const raw = process.env.BELAJAR_UNLISTED;
+  const listed = new Set(raw === undefined ? DEFAULT_UNLISTED : raw.split(",").map((s) => s.trim().toLowerCase()));
+  const published = new Set(publishedSurahs());
+  return SURAH_SLUGS.filter((slug) => listed.has(slug) && !published.has(slug));
+}
+
+/** Slugs of the surahs whose URLs answer: the published ones and the unlisted ones. Only the proxy asks. */
+export function reachableSurahs(): string[] {
+  const reachable = new Set([...publishedSurahs(), ...unlistedSurahs()]);
+  return SURAH_SLUGS.filter((slug) => reachable.has(slug));
+}
+
+/**
  * The published surahs, for a page: after connection(), so the page renders at request time and
  * never bakes the build machine's value into a prerendered page (as warisVisible()).
  */

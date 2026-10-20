@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const request = vi.hoisted(() => ({ arrive: (): void => undefined }));
 vi.mock("next/server", () => ({ connection: async () => request.arrive() }));
 
-import { publishedSurahs, visibleSurahs, warisSwitchOn, warisVisible } from "./features";
+import { publishedSurahs, reachableSurahs, unlistedSurahs, visibleSurahs, warisSwitchOn, warisVisible } from "./features";
 
 const BELAJAR = fileURLToPath(new URL("../../", import.meta.url));
 const read = (rel: string) => readFileSync(join(BELAJAR, rel), "utf8");
@@ -74,5 +74,47 @@ describe("BELAJAR_SURAHS (operator, 2026-10-10: Al-Fatihah first, the Mu'awwidza
       process.env.BELAJAR_SURAHS = "al-fatihah,an-nas";
     };
     expect(await visibleSurahs()).toEqual(["al-fatihah", "an-nas"]);
+  });
+});
+
+describe("BELAJAR_UNLISTED (operator, 2026-10-20: Al-Ikhlas answers at its address, linked from nowhere)", () => {
+  const savedSurahs = process.env.BELAJAR_SURAHS;
+  const savedUnlisted = process.env.BELAJAR_UNLISTED;
+  afterEach(() => {
+    if (savedSurahs === undefined) delete process.env.BELAJAR_SURAHS;
+    else process.env.BELAJAR_SURAHS = savedSurahs;
+    if (savedUnlisted === undefined) delete process.env.BELAJAR_UNLISTED;
+    else process.env.BELAJAR_UNLISTED = savedUnlisted;
+  });
+
+  it("is Al-Ikhlas by default: reachable, never published", () => {
+    delete process.env.BELAJAR_SURAHS;
+    delete process.env.BELAJAR_UNLISTED;
+    expect(unlistedSurahs()).toEqual(["al-ikhlas"]);
+    expect(publishedSurahs()).toEqual(["al-fatihah"]);
+    expect(reachableSurahs()).toEqual(["al-fatihah", "al-ikhlas"]);
+  });
+
+  it("is only a listing of what the switch does not publish: publishing it takes it off the list", () => {
+    process.env.BELAJAR_SURAHS = "al-fatihah,al-ikhlas";
+    delete process.env.BELAJAR_UNLISTED;
+    expect(unlistedSurahs()).toEqual([]);
+    expect(publishedSurahs()).toEqual(["al-fatihah", "al-ikhlas"]);
+    expect(reachableSurahs()).toEqual(["al-fatihah", "al-ikhlas"]);
+  });
+
+  it("is the list when set (trimmed, lower-cased, unknown slugs ignored); empty means none", () => {
+    delete process.env.BELAJAR_SURAHS;
+    process.env.BELAJAR_UNLISTED = " AN-NAS, al-falaq ,semua";
+    expect(unlistedSurahs()).toEqual(["al-falaq", "an-nas"]);
+    process.env.BELAJAR_UNLISTED = "";
+    expect(unlistedSurahs()).toEqual([]);
+    expect(reachableSurahs()).toEqual(["al-fatihah"]);
+  });
+
+  it("never reaches a page that lists or links: visibleSurahs() stays the published set", async () => {
+    delete process.env.BELAJAR_SURAHS;
+    delete process.env.BELAJAR_UNLISTED;
+    expect(await visibleSurahs()).toEqual(["al-fatihah"]);
   });
 });

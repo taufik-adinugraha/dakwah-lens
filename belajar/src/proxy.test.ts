@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import proxy from "./proxy";
 
@@ -89,6 +89,16 @@ function setSurahs(value: string | undefined) {
 }
 afterEach(() => setSurahs(savedSurahs));
 
+// BELAJAR_UNLISTED (operator, 2026-10-20): a surah that answers at its address and is linked from
+// nowhere. Its default is Al-Ikhlas, so the tests of "what the switch does not publish" run with
+// none unlisted, and the unlisted state has its own tests below.
+const savedUnlisted = process.env.BELAJAR_UNLISTED;
+function setUnlisted(value: string | undefined) {
+  if (value === undefined) delete process.env.BELAJAR_UNLISTED;
+  else process.env.BELAJAR_UNLISTED = value;
+}
+afterEach(() => setUnlisted(savedUnlisted));
+
 const EVERY_SURAH = "al-fatihah,al-ikhlas,al-falaq,an-nas";
 const MUAWWIDZAT_PAGE = /^\/belajar\/(id|en)\/quran\/(al-ikhlas|al-falaq|an-nas)(?:\/|$)/;
 const MUAWWIDZAT = [
@@ -100,6 +110,8 @@ const MUAWWIDZAT = [
 ];
 
 describe("proxy: only the surahs BELAJAR_SURAHS publishes (unset: Al-Fatihah only)", () => {
+  beforeEach(() => setUnlisted(""));
+
   it("answers every page of an unpublished surah with the module's 404, however it is spelled", () => {
     setSwitch(undefined);
     setSurahs(undefined);
@@ -194,5 +206,50 @@ describe("proxy: only the surahs BELAJAR_SURAHS publishes (unset: Al-Fatihah onl
     setSurahs(EVERY_SURAH);
     expect(landing("/belajar/id/waris/hitung")).toMatch(HIDDEN_404);
     expect(landing("/belajar/id/quran/al-ikhlas")).toBe("/belajar/id/quran/al-ikhlas");
+  });
+});
+
+describe("proxy: an unlisted surah answers at its address (BELAJAR_UNLISTED; default Al-Ikhlas)", () => {
+  it("serves Al-Ikhlas by default while Al-Falaq and An-Nas stay hidden", () => {
+    setSwitch(undefined);
+    setSurahs(undefined);
+    setUnlisted(undefined);
+    for (const path of ["/belajar/id/quran/al-ikhlas", "/belajar/en/quran/al-ikhlas/4", "/belajar/id/quran/al-ikhlas/1/og"]) {
+      expect(landing(path), path).toBe(path);
+    }
+    for (const path of ["/belajar/id/quran/al-falaq/5", "/belajar/en/quran/an-nas", "/belajar/id/quran/an-nas/6"]) {
+      expect(landing(path), path).toMatch(HIDDEN_404);
+    }
+    // The pre-hub address is redirected into it and then served.
+    expect(landing("/belajar/quran/al-ikhlas")).toBe("307 /belajar/id/quran/al-ikhlas");
+  });
+
+  it("is the list when set, and an empty value hides every surah that is not published", () => {
+    setSurahs(undefined);
+    setUnlisted("al-falaq, AN-NAS");
+    expect(landing("/belajar/id/quran/al-falaq/5")).toBe("/belajar/id/quran/al-falaq/5");
+    expect(landing("/belajar/id/quran/an-nas/6")).toBe("/belajar/id/quran/an-nas/6");
+    expect(landing("/belajar/id/quran/al-ikhlas")).toMatch(HIDDEN_404);
+    setUnlisted("");
+    expect(landing("/belajar/id/quran/al-falaq/5")).toMatch(HIDDEN_404);
+    expect(landing("/belajar/id/quran/al-ikhlas")).toMatch(HIDDEN_404);
+    // Only a lesson can be unlisted: a typo hides nothing and shows nothing.
+    setUnlisted("al-ikhla,semua");
+    expect(landing("/belajar/id/quran/al-ikhlas")).toMatch(HIDDEN_404);
+  });
+
+  it("does not hide Al-Fatihah, and a spelling next-intl cleans does not reach a hidden surah", () => {
+    setSurahs(undefined);
+    setUnlisted("al-ikhlas");
+    expect(landing("/belajar/id/quran/al-fatihah/1")).toBe("/belajar/id/quran/al-fatihah/1");
+    expect(landing("/belajar/id/quran/al-ikh%09las")).toBe("/belajar/id/quran/al-ikhlas");
+    expect(landing("/belajar/id/quran/al-fa%09laq")).toMatch(HIDDEN_404);
+    expect(landing("/belajar/id/quran/an-nas%20")).toMatch(HIDDEN_404);
+  });
+
+  it("is published by the other switch alone: BELAJAR_SURAHS wins, and the unlisted list needs no change", () => {
+    setSurahs(EVERY_SURAH);
+    setUnlisted("al-ikhlas");
+    for (const path of MUAWWIDZAT) expect(landing(path), path).toBe(path);
   });
 });

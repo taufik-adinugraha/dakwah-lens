@@ -20,7 +20,10 @@ services:
     # hidden while the line is absent (operator, 2026-10-10;
     # belajar/src/lib/features.ts); BELAJAR_SURAHS=al-fatihah,al-ikhlas,…
     # lists the surahs of the Qur'an track to show, Al-Fatihah only while the
-    # line is absent (operator, 2026-10-10: the others "segera hadir"). The
+    # line is absent (operator, 2026-10-10: the others "segera hadir");
+    # BELAJAR_UNLISTED=al-ikhlas,… lists surahs that answer at their address
+    # but are linked from nowhere (default al-ikhlas while the line is absent,
+    # empty = none; operator, 2026-10-20). The
     # file is read when the container is created: after editing it,
     # `up -d --force-recreate` (a restart keeps the old values).
     env_file: /srv/dakwah-lens/belajar.env
