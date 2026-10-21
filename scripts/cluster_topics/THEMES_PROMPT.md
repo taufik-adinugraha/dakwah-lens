@@ -180,6 +180,37 @@ sample of the corpus. Write `<RUN>/themes.json`:
   almost nothing. Reach for a domain magnet first — that is the lever that
   actually moves rescue-admitted posts.
 
+- ⛔ **Labels with an elastic word are silently dropped.** `topic_discovery` rejects any
+  label containing misterius, horor, aneh, tragis, viral, polemik, kontroversi, heboh,
+  geger, gempar or fenomena, and logs ONE warning line — the theme's posts fall to
+  Lainnya and nothing else tells you. 2026-10-22: "Polemik Ijazah Wapres…" vanished that
+  way on the first inject. `check_keywords.py` now fails on these before prod is touched
+  (it reads the set out of `topic_discovery.py`, so there is one list). Use "Sengketa",
+  "Perdebatan" or the event itself.
+- **A label's generic nouns pull in the neighbouring beat.** 2026-10-22: "Insiden Ajudan
+  Gubernur Kaltim dan Mahasiswa Demonstran" scored 0.53 because it absorbed every
+  demo-day post (massa aksi, DPRD DIY, Monas); relabelled on the distinctive part
+  ("Permintaan Maaf Ajudan Kaltim dan Pemeriksaan Propam") and given 0.42 → 0.70. Put the
+  beat's own words (massa aksi, demonstran, unjuk rasa, sidang kabinet) in the theme that
+  owns the beat.
+- **A beat-wide label needs the beat's bare token.** "Penindakan KPK: …" held 0.65 while
+  half its KPK posts (sprindik, pengembalian uang, a new tersangka) matched no keyword;
+  adding `kpk`, `sprindik`, `pengembalian uang` took it to 0.79. This is the same lesson
+  as the 2026-09-24 HGB relabel.
+- **Move the neighbours' words into the neighbours' magnet.** The BBM theme (0.63) absorbed
+  migas, PLN outages and cabai prices because no magnet claimed them; `migas`, `lifting`,
+  `subsidi gas`, `bahan pokok`, `cabai`, `mobil listrik` in the economy magnet took it to
+  0.74. Same fix for the ijazah theme (0.44 → 0.56): `mahkamah konstitusi`, `praperadilan`,
+  `gugatan` in the politics magnet. Do NOT add a bare person-subject token (`gibran`) to
+  lift the metric: it claims every post about the person, on-story or not.
+- Fold a single-event story into the domain magnet instead of minting a theme for it
+  (KMP Batumandi fire, the police-shoots-police case, the PSS supporters' crash went into
+  the disaster and law magnets this week; none became a reservoir).
+- Reports from the survey agents arrive inside the hand-back message. Copy them to
+  `shards/report_NN.md` mechanically (the text is in the agent's transcript, in its
+  `SubagentHandback` call) rather than retyping ten 10 KB reports; `verify_reports.py`
+  re-counts them either way.
+
 Never call Gemini. The themes are your own reading of the sample; `inject` does
 assignment arithmetically with no model call.
 
