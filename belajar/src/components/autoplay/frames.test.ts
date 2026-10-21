@@ -336,9 +336,9 @@ describe("‹ Sebelumnya / Berikutnya › move frame by frame on a step with fra
     }
     expect(seq.steps[s.idx].id).toBe("learned");
     expect(cap).toBeGreaterThan(presses + 10);
-    // … and every ayah of Al-Ikhlas and of An-Nas, whose "learned" and "structure" the `--surahs` pass walks to
+    // … and every ayah of Al-Ikhlas, of Al-Falaq and of An-Nas, whose "learned" and "structure" the `--surahs` pass walks to
     // (2026-10-19 and 2026-10-20: lessonMapChecks, reminderChecks).
-    for (const [slug, label] of [["al-ikhlas", "Al-Ikhlas"], ["an-nas", "An-Nas"]] as const) {
+    for (const [slug, label] of [["al-ikhlas", "Al-Ikhlas"], ["al-falaq", "Al-Falaq"], ["an-nas", "An-Nas"]] as const) {
       const surah = SURAHS.find((x) => x.slug === slug)!;
       for (const a of surah.ayat) {
         const sq = stageSequence(surah, a, "id");

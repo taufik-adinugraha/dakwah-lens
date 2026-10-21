@@ -30,7 +30,7 @@ export const CurriculumStep = z
     concept: Id.optional(),
     part: N.optional(),
     basics: Id.optional(),
-    occurs: z.union([z.object({ case: z.string() }).strict(), z.object({ qac: z.string() }).strict(), z.object({ always: z.literal(true) }).strict()]).optional(),
+    occurs: z.union([z.object({ case: z.string() }).strict(), z.object({ qac: z.string() }).strict(), z.object({ always: z.literal(true) }).strict(), z.object({ indefinite: z.literal(true) }).strict()]).optional(),
     /** "concept:<record id>" (a whole record) or "concept:<step id>" (its own text); null: none. */
     line: z.string().regex(/^concept:[a-z0-9]+(?:-[a-z0-9]+)*$/).nullable(),
     teach: z

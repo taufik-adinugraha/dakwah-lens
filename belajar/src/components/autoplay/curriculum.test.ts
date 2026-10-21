@@ -9,6 +9,7 @@ import {
   ayahLessonId,
   curriculumProblems,
   deriveLesson,
+  isIndefinite,
   LESSON_ZERO,
   lessonAyah,
   lessonRanks,
@@ -175,6 +176,25 @@ describe("the curriculum file is what the lessons give (the app's twin of pipeli
     expect(FATIHAH.ayat.map((a) => stepOccurs(step("majrur"), a).length)).toEqual([4, 3, 2, 3, 0, 0, 3]);
   });
 
+  it("tanwin pada isim occurs where a word wears tanwin or is nakirah (the rule `indefinite`, operator 2026-10-21)", () => {
+    const tanwin = step("tanwin-nakirah");
+    expect(tanwin.occurs).toEqual({ indefinite: true });
+    const at = (slug: string) => surah(slug).ayat.map((a) => stepOccurs(tanwin, a));
+    expect(at("al-falaq")).toEqual([[], [], [3], [], [3]]); // gāsiqin, ḥāsidin
+    expect(at("al-ikhlas")).toEqual([[4], [], [], [4, 5]]); // aḥadun; kufuwan, aḥadun
+    expect(at("al-fatihah")).toEqual(Array(7).fill([])); // none: nothing there is met "later"
+    expect(at("an-nas")).toEqual(Array(6).fill([]));
+    const word = (ar: string, qac?: string) =>
+      ({ ar, sources: qac ? [{ kitab: "Quranic Arabic Corpus 0.4", ref: `(1:1:1:*) — kelas kata: ${qac}`, url: "" }] : [] }) as Parameters<typeof isIndefinite>[0];
+    expect(isIndefinite(word("زَيْدٌ"))).toBe(true); // tanwin alone (a proper noun is not INDEF)
+    expect(isIndefinite(word("كُفُوًا"))).toBe(true); // the carrier alif after the fathatan
+    expect(isIndefinite(word("غَاسِقٍ"))).toBe(true); // kasratan
+    expect(isIndefinite(word("x", "N|STEM|POS:N|M|INDEF|GEN"))).toBe(true); // INDEF alone, no mark in the Arabic
+    expect(isIndefinite(word("x", "N|STEM|POS:N|M|GEN"))).toBe(false);
+    expect(isIndefinite(word("ٱلصَّمَدُ"))).toBe(false); // a dammah is not tanwin
+    expect(isIndefinite(word(""))).toBe(false);
+  });
+
   it("a file that lies about the lessons is refused (planted faults)", () => {
     const fault = (fn: (f: CurriculumFile) => void) => {
       const f = structuredClone(CURRICULUM) as CurriculumFile;
@@ -265,11 +285,13 @@ describe("what an ayah's lesson teaches as “Konsep baru” (taughtAt: what con
     expect(gap.examples[0].loc).toBe("1:5:2");
   });
 
-  it("the other surahs follow mechanically: fi'il amr, badal and jamak taksir in An-Nas, nothing where the curriculum teaches nothing", () => {
+  it("the other surahs follow mechanically: fi'il amr, badal and jamak taksir in An-Nas, tanwin and jamak mu'annats salim in Al-Falaq, nothing where the curriculum teaches nothing", () => {
     // Jamak taksir (Ajurrumiyyah hlm. 6-8) and mudzakkar dan mu'annats (Syadza al-'Arf hlm. 73-74) have a text of
     // their own since 2026-10-20 (An-Nas's lesson map switched on).
     expect(surah("an-nas").ayat.map((a) => taughtAt(a).map((t) => t.id))).toEqual([["fiil-amr"], ["badal"], [], [], ["jamak-taksir"], ["mudzakkar-muannats"]]);
-    expect(surah("al-falaq").ayat.map((a) => taughtAt(a).map((t) => t.id))).toEqual([[], [], [], [], []]);
+    // Tanwin pada isim (with nakirah: Ajurrumiyyah hlm. 5 and 14, Qathr an-Nada hlm. 12) and jamak mu'annats salim
+    // (Ajurrumiyyah hlm. 6, 7 and 9) have a text of their own since the same day (Al-Falaq's lesson map switched on).
+    expect(surah("al-falaq").ayat.map((a) => taughtAt(a).map((t) => t.id))).toEqual([[], [], ["tanwin-nakirah"], ["jamak-muannats-salim"], []]);
     // Al-Ikhlas 3: the lam record whole (its line keeps the record's id), then majzum, the fourth
     // part of i'rab, with a text of its own since 2026-10-19 (Al-Ikhlas's lesson map switched on).
     expect(surah("al-ikhlas").ayat.map((a) => taughtAt(a).map((t) => t.id))).toEqual([[], [], ["jazm-lam", "majzum"], ["kana-wa-akhawatuha"]]);

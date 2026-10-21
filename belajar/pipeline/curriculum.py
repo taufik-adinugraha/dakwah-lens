@@ -60,6 +60,12 @@ WHERE A STEP OCCURS (`occurs`), in the words of one ayah:
                      the first field of each segment) — the lesson content already carries it, so
                      nothing here needs pipeline/cache;
   occurs {always}    every word (the three kinds of word: every word is one of them);
+  occurs {indefinite: true}
+                     the words that are nakirah or wear tanwin (`is_indefinite`): a tanwin mark in
+                     the word's Arabic (a final fathatan, dammatan or kasratan, before a carrier
+                     alif if there is one), or the feature INDEF in the word's QAC line — the step
+                     that teaches tanwin and nakirah together (Al-Falaq 3), met again wherever a
+                     word has either (operator 2026-10-21; until then: nowhere);
   a whole record     without `occurs`: the words tagged with its record, and the words of the ayah's
                      structure groups of that record (validate_narration.concept_words);
   a basics step      every word: the harakat are on every letter of every ayah, so the step is met
@@ -126,6 +132,10 @@ CASE_STATES = ("marfu", "manshub", "majrur", "majzum")
 QAC_TAG = re.compile(r"^[A-Z]+$")
 QAC_KITAB = "Quranic Arabic Corpus"
 _QAC_LINE = re.compile(r"kelas kata: (.+)$")
+# The marks of tanwin in the Qur'an's Arabic (fathatan, dammatan, kasratan, and the open forms of
+# the Uthmani text); the QAC 0.4 feature of an indefinite noun.
+TANWIN_MARKS = "\u064b\u064c\u064d\u08f0\u08f1\u08f2"
+QAC_INDEF = "INDEF"
 NEXT_LEVEL = "tingkat lanjut"  # where a term no step owns is taught
 
 
@@ -293,6 +303,16 @@ def qac_tags(word: dict) -> list[str]:
     return [seg[0] for seg in qac_segments(word)]
 
 
+def is_indefinite(word: dict) -> bool:
+    """Is a lesson word nakirah or does it wear tanwin: a tanwin mark in its Arabic (`ar`), or the
+    feature INDEF in one of its QAC segments (the QAC line of its `sources`; src/lib/autoplay/
+    curriculum.ts isIndefinite is the twin). Both are read from the lesson content, nothing from
+    pipeline/cache."""
+    if any(c in TANWIN_MARKS for c in str(word.get("ar") or "")):
+        return True
+    return any(QAC_INDEF in seg for seg in qac_segments(word))
+
+
 def record_words(ayah: dict, record: str) -> list[int]:
     """The words of an ayah that carry a Konsep record: tagged with it, or in a structure group of
     it (validate_narration.concept_words, src/lib/autoplay/sequence.ts kindHighlight)."""
@@ -319,6 +339,8 @@ def occurs(step: dict, ayah: dict) -> list[int]:
             return [i for i, w in enumerate(words, 1) if (w.get("case") or {}).get("state") == rule["case"]]
         if "qac" in rule:
             return [i for i, w in enumerate(words, 1) if rule["qac"] in qac_tags(w)]
+        if rule.get("indefinite") is True:
+            return [i for i, w in enumerate(words, 1) if is_indefinite(w)]
         return []
     if step.get("concept") and "part" not in step:
         return record_words(ayah, step["concept"])

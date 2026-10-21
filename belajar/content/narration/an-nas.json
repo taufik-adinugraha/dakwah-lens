@@ -30821,10 +30821,212 @@
       ]
     },
     "an-nas:6:ex:label-role:1:why": {
-      "text": "Perannya: حَرْف جَرّ. Kata ini adalah حَرْف جَرّ yang artinya dari, yang مَبْنِيّ di atas سُكُون; nunnya berharakat فَتْحَة di sini hanya karena bertemu huruf mati pada alif lam sesudahnya, sebab kata مَبْنِيّ boleh bergerak untuk menghindari dua huruf mati bertemu.",
-      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini adalah huruf jar (حَرْف جَرّ) yang artinya “dari”, yang mabni (مَبْنِيّ) di atas sukun (سُكُون); nunnya berharakat fathah (فَتْحَة) di sini hanya karena bertemu huruf mati pada alif lam (ال) sesudahnya, sebab kata mabni (مَبْنِيّ) boleh bergerak untuk menghindari dua huruf mati bertemu.",
+      "text": "Perannya: حَرْف جَرّ. Kata ini adalah حَرْف جَرّ yang artinya dari, yang مَبْنِيّ di atas سُكُون; huruf نُون berharakat فَتْحَة di sini hanya karena bertemu huruf mati pada alif lam sesudahnya, sebab kata مَبْنِيّ boleh bergerak untuk menghindari dua huruf mati bertemu.",
+      "display": "Perannya: huruf jar (حَرْف جَرّ). Kata ini adalah huruf jar (حَرْف جَرّ) yang artinya “dari”, yang mabni (مَبْنِيّ) di atas sukun (سُكُون); huruf ن berharakat fathah (فَتْحَة) di sini hanya karena bertemu huruf mati pada alif lam (ال) sesudahnya, sebab kata mabni (مَبْنِيّ) boleh bergerak untuk menghindari dua huruf mati bertemu.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/an-nas/86c94b7383219914.mp3",
+        "ms": 20611,
+        "sha256": "a2b2e220308eab5a7780eb4f6ab1efa82281b644f9025af7d8c838af2d13aaf1"
+      },
+      "tokens": [
+        {
+          "t": "Perannya:",
+          "s": 0.0,
+          "e": 0.64
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ).",
+          "s": 0.92,
+          "e": 2.16
+        },
+        {
+          "t": "Kata",
+          "s": 2.384,
+          "e": 3.28
+        },
+        {
+          "t": "ini",
+          "s": 3.34,
+          "e": 3.52
+        },
+        {
+          "t": "adalah",
+          "s": 3.589,
+          "e": 4.0
+        },
+        {
+          "t": "huruf jar (حَرْف جَرّ)",
+          "s": 4.12,
+          "e": 5.04
+        },
+        {
+          "t": "yang",
+          "s": 5.12,
+          "e": 5.44
+        },
+        {
+          "t": "artinya",
+          "s": 5.5,
+          "e": 5.92
+        },
+        {
+          "t": "dari,",
+          "s": 6.032,
+          "e": 6.56
+        },
+        {
+          "t": "yang",
+          "s": 6.672,
+          "e": 7.12
+        },
+        {
+          "t": "mabni (مَبْنِيّ)",
+          "s": 7.16,
+          "e": 7.76
+        },
+        {
+          "t": "di",
+          "s": 7.813,
+          "e": 7.92
+        },
+        {
+          "t": "atas",
+          "s": 7.984,
+          "e": 8.24
+        },
+        {
+          "t": "sukun (سُكُون);",
+          "s": 8.28,
+          "e": 8.8
+        },
+        {
+          "t": "huruf",
+          "s": 9.02,
+          "e": 9.84
+        },
+        {
+          "t": "ن",
+          "s": 9.88,
+          "e": 10.08
+        },
+        {
+          "t": "berharakat",
+          "s": 10.12,
+          "e": 10.56
+        },
+        {
+          "t": "fathah (فَتْحَة)",
+          "s": 10.64,
+          "e": 11.04
+        },
+        {
+          "t": "di",
+          "s": 11.067,
+          "e": 11.12
+        },
+        {
+          "t": "sini",
+          "s": 11.2,
+          "e": 11.52
+        },
+        {
+          "t": "hanya",
+          "s": 11.573,
+          "e": 11.84
+        },
+        {
+          "t": "karena",
+          "s": 11.886,
+          "e": 12.16
+        },
+        {
+          "t": "bertemu",
+          "s": 12.224,
+          "e": 12.72
+        },
+        {
+          "t": "huruf",
+          "s": 12.78,
+          "e": 13.04
+        },
+        {
+          "t": "mati",
+          "s": 13.12,
+          "e": 13.52
+        },
+        {
+          "t": "pada",
+          "s": 13.584,
+          "e": 13.84
+        },
+        {
+          "t": "alif lam (ال)",
+          "s": 13.893,
+          "e": 14.4
+        },
+        {
+          "t": "sesudahnya,",
+          "s": 14.44,
+          "e": 15.6
+        },
+        {
+          "t": "sebab",
+          "s": 15.653,
+          "e": 16.0
+        },
+        {
+          "t": "kata",
+          "s": 16.064,
+          "e": 16.32
+        },
+        {
+          "t": "mabni (مَبْنِيّ)",
+          "s": 16.36,
+          "e": 16.88
+        },
+        {
+          "t": "boleh",
+          "s": 17.04,
+          "e": 17.52
+        },
+        {
+          "t": "bergerak",
+          "s": 17.58,
+          "e": 18.0
+        },
+        {
+          "t": "untuk",
+          "s": 18.067,
+          "e": 18.4
+        },
+        {
+          "t": "menghindari",
+          "s": 18.448,
+          "e": 18.96
+        },
+        {
+          "t": "dua",
+          "s": 19.04,
+          "e": 19.28
+        },
+        {
+          "t": "huruf",
+          "s": 19.34,
+          "e": 19.6
+        },
+        {
+          "t": "mati",
+          "s": 19.66,
+          "e": 19.92
+        },
+        {
+          "t": "bertemu.",
+          "s": 19.984,
+          "e": 20.56
+        }
+      ]
     },
     "an-nas:6:ex:label-role:2:why": {
       "text": "Perannya: مَجْرُور. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu kata pertama.",

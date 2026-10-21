@@ -23,6 +23,7 @@ import {
   type AutoplayState,
   type NarrationManifest,
 } from "./autoplay";
+import { tallStack } from "./arabicInk";
 import { composeFor, composeInput, COMPOSED_SLUGS } from "./compose-content";
 import { applyOp, composeFileProblems, composeInputFor, diffPieces, pieces, STOP_NOTE } from "./composition";
 import { SURAHS } from "./content";
@@ -100,6 +101,63 @@ describe("content/compose/al-ikhlas.json (2026-10-19)", () => {
   });
 });
 
+describe("content/compose/al-falaq.json (2026-10-20)", () => {
+  const falaq = JSON.parse(readFileSync(`${CONTENT}compose/al-falaq.json`, "utf8")) as ComposeFile;
+  const words = SURAHS.find((s) => s.slug === "al-falaq")!.ayat.flatMap((a) => a.words.map((w) => w.loc));
+  it("loads at build time and replays without a problem: every word of the surah composed, no primer of its own", () => {
+    expect(composeFor("al-falaq")).not.toBeNull();
+    expect(composeFileProblems(falaq, WORDS)).toEqual([]);
+    expect(Object.keys(falaq.words)).toEqual(words);
+    expect(words).toHaveLength(23);
+    expect(falaq.primer).toBeNull();
+  });
+
+  it("each ayah's last word ends on the stop frame, and nothing else carries that note", () => {
+    const last = ["113:1:4", "113:2:4", "113:3:5", "113:4:5", "113:5:5"];
+    for (const loc of last) {
+      const fr = falaq.words[loc].frames;
+      expect(fr[fr.length - 1].note, loc).toBe(STOP_NOTE);
+    }
+    const noted = Object.entries(falaq.words).flatMap(([loc, u]) => u.frames.flatMap((f) => (f.note === STOP_NOTE ? [loc] : [])));
+    expect(noted).toEqual(last);
+  });
+
+  it("a noun with tanwin goes from its bentuk dasar (dhammatain) to kasratain, one mark changed: gāsiqin and ḥāsidin", () => {
+    // Written as code points, never retyped Arabic: qaf and dal with their tanwin.
+    for (const [loc, letter] of [["113:3:3", "\u0642"], ["113:5:3", "\u062F"]] as const) {
+      const frames = falaq.words[loc].frames;
+      expect(frames.filter((f) => f.stage === "change").map((f) => f.chips), loc).toEqual([[{ from: `${letter}\u064C`, to: `${letter}\u064D`, marks: ["dhammatain", "kasratain"] }]]);
+      expect(frames.some((f) => f.stage === "base"), loc).toBe(true);
+    }
+  });
+
+  it("a noun with the article is joined (the lam read, or melting into the sun letter nun), then its ending changes: al-falaqi, an-naffāṡāti, al-‘uqadi", () => {
+    const stages = (loc: string) => falaq.words[loc].frames.map((f) => f.stage);
+    expect(stages("113:1:4")).toEqual(["parts", "join", "change", "whole"]);
+    expect(stages("113:4:3")).toEqual(["join", "change", "whole"]);
+    expect(stages("113:4:5")).toEqual(["parts", "join", "change", "whole"]);
+    // wa + min: two parts, joined, the dependency on an earlier ayah said over the last frame
+    for (const loc of ["113:3:1", "113:4:1", "113:5:1"]) {
+      expect(stages(loc), loc).toEqual(["parts", "join", "whole"]);
+      expect(falaq.words[loc].frames[0].tiles, loc).toHaveLength(2);
+    }
+    // a heavy-letter part is named in the caption only; a simple one is said (an-naffāṡāt)
+    expect(falaq.words["113:1:4"].lines.some((l) => l.say.includes("{{!113:1:4/falaq}}"))).toBe(true);
+    expect(falaq.words["113:4:5"].lines.some((l) => l.say.includes("{{!113:4:5/uqad}}"))).toBe(true);
+    expect(falaq.words["113:4:3"].lines.some((l) => l.say.includes("{{113:4:3/naffas}}"))).toBe(true);
+  });
+});
+
+describe("compositions with a form of a tall stack of marks (the figure's room, globals.css data-compose-tall)", () => {
+  it("only Al-Falaq 4's an-naffāṡāt: the other figures keep their tighter room (CI 2026-10-21)", () => {
+    const tall = COMPOSED_SLUGS.flatMap((slug) =>
+      Object.entries(composeFor(slug)!.words).flatMap(([key, w]) => (Object.values(w.forms).some((f) => tallStack(f.ar)) ? [`${slug} ${key}`] : [])),
+    );
+    // A composition that joins this list wants the browser check (inkMeasure) to say its figure is clear.
+    expect(tall).toEqual(["al-falaq 113:4:3"]);
+  });
+});
+
 describe("content/compose/an-nas.json (2026-10-20)", () => {
   const nas = JSON.parse(readFileSync(`${CONTENT}compose/an-nas.json`, "utf8")) as ComposeFile;
   const words = SURAHS.find((s) => s.slug === "an-nas")!.ayat.flatMap((a) => a.words.map((w) => w.loc));
@@ -137,8 +195,9 @@ describe("content/compose/an-nas.json (2026-10-20)", () => {
 
 describe("content/compose/al-fatihah.json", () => {
   it("loads at build time (zod + replay) and replays without a problem", () => {
-    // Al-Fatihah, Al-Ikhlas since 2026-10-19 and An-Nas since 2026-10-20: a surah without a file keeps its words' one-line explanation.
-    expect(COMPOSED_SLUGS).toEqual(["al-fatihah", "al-ikhlas", "an-nas"]);
+    // Al-Fatihah, Al-Ikhlas since 2026-10-19, Al-Falaq and An-Nas since 2026-10-20 (every surah of the module): a surah
+    // without a file keeps its words' one-line explanation.
+    expect(COMPOSED_SLUGS).toEqual(["al-fatihah", "al-ikhlas", "al-falaq", "an-nas"]);
     expect(composeFor("al-fatihah")).not.toBeNull();
     expect(composeFileProblems(raw, WORDS)).toEqual([]);
   });

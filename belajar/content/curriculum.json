@@ -1543,7 +1543,15 @@
    ],
    "before": 23,
    "after": 24,
-   "lines": [],
+   "lines": [
+    {
+     "line": "concept:tanwin-nakirah",
+     "step": "tanwin-nakirah",
+     "words": [
+      3
+     ]
+    }
+   ],
    "map": {
     "new": [
      "tanwin-nakirah"
@@ -1659,7 +1667,13 @@
    ],
    "before": 24,
    "after": 25,
-   "lines": [],
+   "lines": [
+    {
+     "line": "concept:jamak-muannats-salim",
+     "step": "jamak-muannats-salim",
+     "words": []
+    }
+   ],
    "map": {
     "new": [
      "jamak-muannats-salim"
@@ -1874,7 +1888,7 @@
      },
      {
       "id": "tanwin-nakirah",
-      "here": false
+      "here": true
      },
      {
       "id": "jamak-muannats-salim",
@@ -1994,7 +2008,7 @@
      },
      {
       "id": "tanwin-nakirah",
-      "here": false
+      "here": true
      },
      {
       "id": "jamak-muannats-salim",
@@ -2397,7 +2411,7 @@
      },
      {
       "id": "tanwin-nakirah",
-      "here": false
+      "here": true
      },
      {
       "id": "jamak-muannats-salim",
@@ -3082,9 +3096,37 @@
   {
    "id": "tanwin-nakirah",
    "lesson": "113:3",
-   "name": "Tanwin pada isim (اِسْم)",
+   "name": "Tanwin (تَنْوِين) pada isim (اِسْم)",
    "latin": "Tanwin pada isim",
-   "line": null,
+   "occurs": {
+    "indefinite": true
+   },
+   "line": "concept:tanwin-nakirah",
+   "teach": {
+    "title": "Tanwin pada isim, dan nakirah",
+    "summary": "Tanwin di akhir kata adalah salah satu tanda isim: huruf nun tambahan yang mati, terdengar dalam bacaan tetapi tidak ditulis. Nakirah adalah isim yang tak tentu: umum bagi jenisnya, tidak khusus bagi satu saja. Cara mudah mengenalnya: isim yang boleh dimasuki alif lam.",
+    "marked": {
+     "title": "[[Tanwin|tanwin]] pada [[isim|isim]], dan [[nakirah|nakirah]]",
+     "summary": "[[Tanwin|tanwin]] di akhir kata adalah salah satu tanda [[isim|isim]]: huruf nun tambahan yang mati, terdengar dalam bacaan tetapi tidak ditulis. [[Nakirah|nakirah]] adalah [[isim|isim]] yang tak tentu: umum bagi jenisnya, tidak khusus bagi satu saja. Cara mudah mengenalnya: [[isim|isim]] yang boleh dimasuki alif lam."
+    },
+    "sources": [
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 5, muqaddimah: «fal-ismu yu'rafu: bil-khafdhi, wat-tanwini, wa-dukhuli al-alif wal-lam, wa-huruf al-khafdh», isim dikenali dengan khafdh, tanwin, masuknya alif lam dan huruf khafdh",
+      "url": "https://shamela.ws/book/11371/1"
+     },
+     {
+      "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+      "ref": "hlm. 12, 'Alamat al-Ism: tanwin adalah «nun zaidah sakinah talhaq al-akhir lafzhan la khatthan li-ghair tawkid», nun tambahan yang mati, melekat di akhir kata dalam ucapan dan bukan dalam tulisan, bukan untuk penegasan",
+      "url": "https://shamela.ws/book/6970/3"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 14, bab an-Na't: «wan-nakirah: kullu ismin sya'i'in fi jinsihi la yakhtashshu bihi wahidun duna akhar, wa-taqribuhu kullu ma shaluha dukhulu al-alif wal-lam 'alaihi», nakirah adalah isim yang umum bagi jenisnya, tidak khusus bagi satu saja; ciri mudahnya, isim yang boleh dimasuki alif lam",
+      "url": "https://shamela.ws/book/11371/15"
+     }
+    ]
+   },
    "terms": [
     "nakirah"
    ]
@@ -3092,9 +3134,34 @@
   {
    "id": "jamak-muannats-salim",
    "lesson": "113:4",
-   "name": "Jamak mu’annats (مُؤَنَّث) salim",
+   "name": "Jamak mu’annats salim (جَمْع مُؤَنَّث سَالِم)",
    "latin": "Jamak mu'annats salim",
-   "line": null,
+   "line": "concept:jamak-muannats-salim",
+   "teach": {
+    "title": "Jamak mu'annats salim, dan tandanya: kasrah juga pada manshub",
+    "summary": "Jamak mu'annats salim adalah salah satu bentuk jamak dari isim. Dalam i'rab, ia marfu' dengan dhammah dan majrur dengan kasrah, seperti isim tunggal. Yang berbeda: ia manshub dengan kasrah, bukan fathah.",
+    "marked": {
+     "title": "Jamak mu'annats salim, dan tandanya: [[kasrah|kasrah]] juga pada [[manshub|manshub]]",
+     "summary": "Jamak mu'annats salim adalah salah satu bentuk jamak dari [[isim|isim]]. Dalam [[i'rab|irab]], ia [[marfu'|marfu]] dengan [[dhammah|dhammah]] dan [[majrur|majrur]] dengan [[kasrah|kasrah]], seperti [[isim|isim]] tunggal. Yang berbeda: ia [[manshub|manshub]] dengan [[kasrah|kasrah]], bukan [[fathah|fathah]]."
+    },
+    "sources": [
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 6, bab Ma'rifat 'Alamat al-I'rab: dhammah tanda rafa' pada isim mufrad, jamak taksir, jamak mu'annats salim dan fi'il mudhari'",
+      "url": "https://shamela.ws/book/11371/3"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 7, bab Ma'rifat 'Alamat al-I'rab: kasrah tanda nashab pada jamak mu'annats salim; kasrah tanda khafdh pada isim mufrad munsharif, jamak taksir munsharif dan jamak mu'annats salim",
+      "url": "https://shamela.ws/book/11371/4"
+     },
+     {
+      "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+      "ref": "hlm. 9, fashl al-Mu'rabat: semuanya dirafa' dengan dhammah, dinashab dengan fathah dan dikhafdh dengan kasrah; yang keluar dari kaidah itu tiga, di antaranya jamak mu'annats salim dinashab dengan kasrah",
+      "url": "https://shamela.ws/book/11371/6"
+     }
+    ]
+   },
    "terms": []
   },
   {

@@ -74,8 +74,8 @@
 // shots/linebreaks-semua-surah.json and lb-semua-surah-*.png, beside the production-like run's.
 // It also walks the lesson stage of every ayah of Al-Ikhlas (2026-10-19: brought to Al-Fatihah's
 // standard, still hidden on the live site), step by step like Al-Fatihah's, every composition of
-// its fifteen words ink-checked at every size — and, since 2026-10-20, of every ayah of An-Nas
-// (twenty words, the same).
+// its fifteen words ink-checked at every size — and, since 2026-10-20, of every ayah of Al-Falaq
+// (twenty-three words) and of An-Nas (twenty words, the same).
 //
 // Before the real run, a self-test lays out linebreaks-fixture.html in a real page: one known-bad
 // case of every kind must be caught, the markup as it ships must not be, and a unit wider than its
@@ -126,6 +126,15 @@ const LESSONS = [
         ["/belajar/id/quran/al-ikhlas/2", false, false],
         ["/belajar/id/quran/al-ikhlas/3", false],
         ["/belajar/id/quran/al-ikhlas/4", false],
+        // `--surahs` only (2026-10-20): every ayah of Al-Falaq, whose words are composed now, hidden on the
+        // live site and caption-only as well. None of its lessons teaches a whole Konsep record, so none shows
+        // an example card (ayah 3 teaches tanwin pada isim and ayah 4 jamak mu'annats salim, steps with a text
+        // of their own and no record; ayat 1, 2 and 5 teach nothing): the third field says a lesson need not.
+        ["/belajar/id/quran/al-falaq/1", false, false],
+        ["/belajar/id/quran/al-falaq/2", false, false],
+        ["/belajar/id/quran/al-falaq/3", false, false],
+        ["/belajar/id/quran/al-falaq/4", false, false],
+        ["/belajar/id/quran/al-falaq/5", false, false],
         // `--surahs` only (2026-10-20): every ayah of An-Nas, whose words are composed now, hidden on the
         // live site and caption-only as well. Ayat 1 and 2 teach fi'il amr and badal, whole Konsep records
         // with examples; ayat 3, 4 and 6 teach nothing (6: its step has no text yet) and ayah 5 teaches
@@ -141,7 +150,7 @@ const LESSONS = [
     : []),
 ];
 /** The surahs whose compositions the ink check must have measured on the lessons above. */
-const COMPOSED_SURAHS = SURAHS_ON ? ["al-fatihah", "al-ikhlas", "an-nas"] : ["al-fatihah"];
+const COMPOSED_SURAHS = SURAHS_ON ? ["al-fatihah", "al-ikhlas", "al-falaq", "an-nas"] : ["al-fatihah"];
 const MAX_PRINTED = 600;
 /** Pages also shot at each size: the surah page (its "Tahukah Anda?" facts hold the longest
  *  inline Arabic), an ayah page with every disclosure open (word cards, Rujukan) and the

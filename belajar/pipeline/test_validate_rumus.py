@@ -338,8 +338,10 @@ class Example(unittest.TestCase):
         self.assertEqual(got["kana"], "112:4:2")
         # the lesson's own line has no words for it: the rule (case majzum) finds yalid
         self.assertEqual(got["majzum"], "112:3:2")
+        # tanwin pada isim has the rule `indefinite` since 2026-10-21 (a tanwin mark or QAC INDEF): gasiqin
+        self.assertEqual(got["tanwin-nakirah"], "113:3:3")
         # no ayah on disk (Ayat Kursi), lesson zero, a step with no rule: no example
-        for sid in ("kalimah", "harakat", "zharaf", "mutsanna", "jamak-taksir", "tanwin-nakirah"):
+        for sid in ("kalimah", "harakat", "zharaf", "mutsanna", "jamak-taksir"):
             self.assertIsNone(got[sid], sid)
 
     def test_every_example_is_a_word_of_its_own_lesson(self):

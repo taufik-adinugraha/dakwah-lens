@@ -1726,7 +1726,7 @@
             "state": "none",
             "sign": "—"
           },
-          "why": "Mina adalah huruf jar min (“dari”) yang mabni di atas sukun; nunnya berharakat fathah di sini hanya karena bertemu huruf mati pada al- sesudahnya, sebab kata mabni boleh bergerak untuk menghindari dua huruf mati bertemu.",
+          "why": "Mina adalah huruf jar min (“dari”) yang mabni di atas sukun; huruf nun berharakat fathah di sini hanya karena bertemu huruf mati pada al- sesudahnya, sebab kata mabni boleh bergerak untuk menghindari dua huruf mati bertemu.",
           "lemma_id": "min",
           "concepts": [
             "huruf-jar",
@@ -2830,7 +2830,7 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:c2ad413ccfcc97d833774096a916bf5b4ba2dfad6f107f851ba1129103cacd00",
-    "authored_words": "authored/an-nas.words.json sha256:cc927b9ae12179935644fd4c2934b73ce22f5b119567602166382dbca002e8ef",
+    "authored_words": "authored/an-nas.words.json sha256:2078db3f357d231c305ee4fe50b88afc92abff8eb0dea0b6abaec198a2432c10",
     "authored_structure": "authored/an-nas.structure.json sha256:f6805111f7c2b5350fe716379d5bd8a7db822cf0d4c85e91359b7567e544e603",
     "authored_concepts_map": "authored/an-nas.concepts-map.json sha256:247e8cec628d4004061730ffc68423641f3eb088dccf494b9aeeb18cc02433e6",
     "authored_facts": "authored/an-nas.facts.generated.json sha256:2916189ff7df55717be9e386d12fafd9e8399fcd6486ab07fbd6ef5bceb82fff",

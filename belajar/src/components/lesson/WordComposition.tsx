@@ -6,6 +6,7 @@ import { Fragment, type ReactNode } from "react";
 
 import { MixedText } from "@/components/library/MixedText";
 import type { ComposeChip, ComposeFile, ComposeForm, ComposeFrame, ComposeMark, Composition, Primer } from "@/content/compose-schema";
+import { tallStack } from "@/lib/arabicInk";
 
 import { MarkGlyph } from "./MarkGlyph";
 
@@ -98,9 +99,14 @@ export function WordComposition({
       <WordFrame fr={f} form={form} recited={live && recited} voiced={live && example?.state === "reciting"} markText={markText} sound={sound} t={t} />
     );
   const LAYER = "col-start-1 row-start-1 flex min-w-0 flex-col items-center justify-center gap-1 sm:gap-2";
+  // A composition with a form whose stack of marks stands taller than the figure's own room over the
+  // baseline (ٱلنَّفَّٰثَٰتِ of QS 113:4: 1.475em, CI 2026-10-21) takes the module's full room, and only
+  // that one: the other compositions keep the tighter figure (globals.css).
+  const tall = Object.values(unit.forms).some((f) => tallStack(f.ar));
   return (
     <figure
       data-autoplay="composition"
+      data-compose-tall={tall ? "true" : undefined}
       data-guide="word-card"
       data-compose-kind={kind}
       data-compose-stage={fr.stage}

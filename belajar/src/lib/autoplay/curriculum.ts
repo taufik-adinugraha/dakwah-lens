@@ -23,7 +23,9 @@
  *
  * Where a step OCCURS in an ayah (pipeline/curriculum.py occurs): `occurs.case` — the words in that
  * i'rab state; `occurs.qac` — the words with a QAC segment of that tag, read from the QAC line of
- * the word's own sources; `occurs.always` — every word; a whole record without `occurs` — the words
+ * the word's own sources; `occurs.always` — every word; `occurs.indefinite` — the words that are
+ * nakirah or wear tanwin (isIndefinite: a tanwin mark in the Arabic, or INDEF in the QAC line; the
+ * step that teaches both, Al-Falaq 3); a whole record without `occurs` — the words
  * tagged with it and the words of its structure groups; a basics step (harakat) — every word (the
  * harakat sit on every letter: met again in every ayah, operator 2026-10-17 — until then nowhere).
  *
@@ -49,7 +51,7 @@ export type CurriculumStep = {
   part?: number;
   /** A Dasar membaca record (the harakat primer). */
   basics?: string;
-  occurs?: { case?: string; qac?: string; always?: boolean };
+  occurs?: { case?: string; qac?: string; always?: boolean; indefinite?: boolean };
   /** The part of its narration line id ("concept:…"), or null: no "Konsep baru" text of its own. */
   line: string | null;
   /** Its own text: plain prose, the marked twin (terms by id) and its kitab sources. */
@@ -128,7 +130,7 @@ export function lessonAyah(lessonId: string): { surah: number; ayah: number } | 
   return m ? { surah: Number(m[1]), ayah: Number(m[2]) } : null;
 }
 
-type CurriculumWord = Pick<Ayah["words"][number], "concepts" | "case" | "sources">;
+type CurriculumWord = Pick<Ayah["words"][number], "concepts" | "case" | "sources"> & { ar?: string };
 export type CurriculumAyah = { surah: number; ayah: number; words: readonly CurriculumWord[]; structure?: Ayah["structure"] };
 
 const QAC_KITAB = "Quranic Arabic Corpus";
@@ -142,6 +144,23 @@ export function qacTags(word: Pick<CurriculumWord, "sources">): string[] {
     if (m) return m[1].split(" + ").map((seg) => seg.split("|", 1)[0]);
   }
   return [];
+}
+
+/** The marks of tanwin in the Qur'an's Arabic (fathatan, dammatan, kasratan, and the open forms of
+ *  the Uthmani text); pipeline/curriculum.py TANWIN_MARKS. */
+const TANWIN_MARKS = "\u064b\u064c\u064d\u08f0\u08f1\u08f2";
+
+/** Is a lesson word nakirah, or does it wear tanwin: a tanwin mark in its Arabic, or the feature
+ *  INDEF in one of its QAC segments (the QAC line of its sources). The twin of pipeline/
+ *  curriculum.py is_indefinite. */
+export function isIndefinite(word: Pick<CurriculumWord, "sources" | "ar">): boolean {
+  if ([...(word.ar ?? "")].some((c) => TANWIN_MARKS.includes(c))) return true;
+  for (const s of word.sources ?? []) {
+    if (!s.kitab.startsWith(QAC_KITAB)) continue;
+    const m = /kelas kata: (.+)$/.exec(s.ref ?? "");
+    if (m) return m[1].split(" + ").some((seg) => seg.split("|").includes("INDEF"));
+  }
+  return false;
 }
 
 /** The words (1-based) of an ayah that carry a Konsep record: tagged with it, or in a structure
@@ -165,6 +184,7 @@ export function stepOccurs(step: OccurStep, ayah: Pick<CurriculumAyah, "words" |
     if (rule.always === true) return ayah.words.map((_, i) => i + 1);
     if (rule.case !== undefined) return ayah.words.flatMap((w, i) => (w.case.state === rule.case ? [i + 1] : []));
     if (rule.qac !== undefined) return ayah.words.flatMap((w, i) => (qacTags(w).includes(rule.qac as string) ? [i + 1] : []));
+    if (rule.indefinite === true) return ayah.words.flatMap((w, i) => (isIndefinite(w) ? [i + 1] : []));
     return [];
   }
   return step.concept && step.part === undefined ? recordWords(ayah, step.concept) : [];

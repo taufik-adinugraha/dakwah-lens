@@ -14,10 +14,6 @@
    "majhul",
    "naib-fail"
   ],
-  "al-falaq:1:w2": [
-   "nashib",
-   "jazim"
-  ],
   "al-falaq:1:structure": [
    "maqul-al-qaul"
   ],
@@ -36,9 +32,6 @@
   "al-falaq:2:structure": [
    "mashdariyyah"
   ],
-  "al-falaq:3:w4": [
-   "zharaf"
-  ],
   "al-falaq:3:structure": [
    "zharaf"
   ],
@@ -50,10 +43,6 @@
   ],
   "al-falaq:3:ex:label-role:4:why": [
    "zharaf"
-  ],
-  "al-falaq:4:w3": [
-   "mubalaghah",
-   "isim-fail"
   ],
   "al-falaq:4:structure": [
    "mubalaghah",
@@ -70,12 +59,6 @@
   "al-falaq:4:ex:label-role:3:why": [
    "mubalaghah",
    "isim-fail"
-  ],
-  "al-falaq:5:w3": [
-   "isim-fail"
-  ],
-  "al-falaq:5:w4": [
-   "zharaf"
   ],
   "al-falaq:5:ex:why-harakat:2:why": [
    "isim-fail"

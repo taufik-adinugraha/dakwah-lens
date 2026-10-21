@@ -55,10 +55,12 @@ describe("the reminder card: from the manifest's data to what the stage shows", 
         }
       }
     }
-    // Al-Fatihah 10, Al-Ikhlas 5, Al-Falaq 9, An-Nas 14 (the rendered list in the README; An-Nas had 11 until
+    // Al-Fatihah 10, Al-Ikhlas 5, Al-Falaq 12, An-Nas 14 (the rendered list in the README; An-Nas had 11 until
     // 2026-10-20, when its words were composed: the dependencies of maliki, ilāhi, min and allażī are said in
-    // their composition lines now, two of them each for maliki and allażī).
-    expect(lines).toBe(38);
+    // their composition lines now, two of them each for maliki and allażī. Al-Falaq had 9 and has 12 since its
+    // words were composed the same day: the wa-phrases of ayat 3, 4 and 5 say their dependency in a composition
+    // line of their own, and the iżā of ayat 3 and 5 cites the verb it hangs on).
+    expect(lines).toBe(41);
   });
 
   it("every ayah that continues an earlier one has its card: the structure part's opening shows the ayah it continues", () => {
@@ -121,10 +123,14 @@ describe("the reminder card: from the manifest's data to what the stage shows", 
     }
     for (const lid of ["al-fatihah:7:w1:compose:3", "al-fatihah:7:structure:1"]) expect(narrationFor("al-fatihah")!.lines[lid].reminder, lid).toEqual([{ ayah: 6, words: [2] }]);
     // Two earlier ayat on one line (Al-Falaq 3: 'athaf on min syarri of ayah 2, which hangs on a‘ūżu of ayah 1).
-    expect(narrationFor("al-falaq")!.lines["al-falaq:3:w1"].reminder).toEqual([
+    // Its word 1 says the two in two composition lines now (:compose:5 cites ayah 2, :compose:6 ayah 1), so the line
+    // that carries both cards is the structure's opening (2026-10-20).
+    expect(narrationFor("al-falaq")!.lines["al-falaq:3:structure:a"].reminder).toEqual([
       { ayah: 1, words: [2] },
       { ayah: 2, words: [1, 2] },
     ]);
+    expect(narrationFor("al-falaq")!.lines["al-falaq:3:w1:compose:5"].reminder).toEqual([{ ayah: 2, words: [1, 2] }]);
+    expect(narrationFor("al-falaq")!.lines["al-falaq:3:w1:compose:6"].reminder).toEqual([{ ayah: 1, words: [2] }]);
   });
 
   it("planted faults: a card of a later ayah, a word the ayah does not have, two cards out of order; a manifest with a malformed card", () => {
