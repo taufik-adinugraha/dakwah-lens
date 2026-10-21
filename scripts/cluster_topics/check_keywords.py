@@ -88,13 +88,34 @@ ship a token that matches inside other words.
 Exit 1 if any keyword is inflated or incoherent past its threshold, so it can
 gate.
 """
+import ast
 import json
 import re
 import sys
+from pathlib import Path
 
 INFLATION_LIMIT = 0.15  # >15% of matches coming from inside other words
 COHESION_LIMIT = 0.30   # <30% of matches sharing ANY other keyword of its theme
 COHESION_MIN_N = 40     # below this the fraction is too noisy to judge
+
+
+def elastic_ban() -> set[str]:
+    """The label words topic_discovery silently rejects, read from its source.
+
+    inject drops a theme whose label contains one of these and only logs a
+    warning (2026-10-22: "Polemik Ijazah..." vanished into Lainnya and the
+    only trace was one log line). The set is a local variable inside the
+    pipeline function, so it cannot be imported; parsing it out of the file
+    keeps ONE copy instead of a second list that drifts
+    (project_manual_auto_parity).
+    """
+    src = Path(__file__).resolve().parents[2] / "api/src/api/services/topic_discovery.py"
+    for node in ast.walk(ast.parse(src.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.Assign) and any(
+            isinstance(t, ast.Name) and t.id == "ELASTIC_HARD_BAN" for t in node.targets
+        ):
+            return {str(x).lower() for x in ast.literal_eval(node.value)}
+    raise SystemExit("ELASTIC_HARD_BAN not found in topic_discovery.py — update elastic_ban()")
 
 
 def main() -> int:
@@ -107,6 +128,14 @@ def main() -> int:
     ]
     raw = json.load(open(f"{run}/themes.json", encoding="utf-8"))
     themes = raw.get("themes") if isinstance(raw, dict) else raw
+
+    ban = elastic_ban()
+    banned = [(t["label"], w) for t in themes for w in sorted(ban) if w in t["label"].lower()]
+    for label, w in banned:
+        print(f"  BANNED LABEL WORD {w!r} in {label!r}")
+    if banned:
+        print("FAIL: inject would silently drop these themes (their posts fall to Lainnya)")
+        return 1
 
     def word_re(k: str):
         return re.compile(rf"(?<![a-z]){re.escape(k.lower())}(?![a-z])")
