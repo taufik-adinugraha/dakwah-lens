@@ -131,6 +131,11 @@ function answer(seq: AutoplaySequence, s: AutoplayState): AutoplayEvent | null {
 }
 const started = (seq: AutoplaySequence, pace: Pace, from?: number): AutoplayState =>
   reduceAutoplay(seq, createAutoplayState(seq, { pace }), { type: "start", pace, from, reason: from ? "restore" : "fresh" });
+/** On step `from` playing its own first line, past any opening line: where Berikutnya from that
+ *  step starts. (From "Mari kita mulai…" / "Kita lanjutkan…" Berikutnya opens the step itself —
+ *  operator 2026-10-25.) */
+const onStep = (seq: AutoplaySequence, pace: Pace, from: number): AutoplayState =>
+  reduceAutoplay(seq, createAutoplayState(seq, { pace }), { type: "start", pace, from, reason: "continue" });
 /** Every state from `s` until the lesson has finished (or `until` says stop: that state is last). */
 function run(seq: AutoplaySequence, s: AutoplayState, until?: (s: AutoplayState) => boolean): AutoplayState[] {
   const states = [s];
@@ -963,7 +968,7 @@ describe("how the lesson plays an example beat (machine.ts)", () => {
         const where = `${l.seq.lessonKey} ${b.id}`;
         const plays = (s: AutoplayState) => run(l.seq, s, (x) => exampleOf(x.activity) === b.id || x.idx !== idx).some((x) => exampleOf(x.activity) === b.id);
         // Berikutnya › from the step before, ‹ Sebelumnya from the step after: on its step, and it plays.
-        const before = reduceAutoplay(l.seq, started(l.seq, "biasa", idx - 1), { type: "next" });
+        const before = reduceAutoplay(l.seq, onStep(l.seq, "biasa", idx - 1), { type: "next" });
         expect([before.idx, plays(before)], `${where}: Berikutnya`).toEqual([idx, true]);
         const after = reduceAutoplay(l.seq, started(l.seq, "biasa", idx + 1), { type: "prev" });
         expect([after.idx, plays(after)], `${where}: Sebelumnya`).toEqual([idx, true]);
@@ -979,7 +984,7 @@ describe("how the lesson plays an example beat (machine.ts)", () => {
         expect([resumed.phase, plays(resumed)], `${where}: Lanjutkan`).toEqual(["running", true]);
         // A step entered while paused shows its example before anything plays (an example step).
         if (st.kind === "example") {
-          const shown = reduceAutoplay(l.seq, reduceAutoplay(l.seq, started(l.seq, "biasa", idx - 1), { type: "pause" }), { type: "next" });
+          const shown = reduceAutoplay(l.seq, reduceAutoplay(l.seq, onStep(l.seq, "biasa", idx - 1), { type: "pause" }), { type: "next" });
           expect([shown.phase, stageExample(l.seq, shown)?.beat.id, stageExample(l.seq, shown)?.reciting], where).toEqual(["paused", st.examples![0].id, false]);
         }
       }
@@ -1293,7 +1298,7 @@ describe("the next word's or example's recording fetched ahead (warm.ts exampleT
     // A concept's example on this ayah's own word: that word's recording.
     expect(exampleToWarm(l.seq, atBeat(l.seq, "concept:majrur:1"))).toBe(bismi);
     // The composition step begins: its clip is asked for while the narrator says the lines before it …
-    const entered = reduceAutoplay(l.seq, started(l.seq, "biasa", idx - 1), { type: "next" });
+    const entered = reduceAutoplay(l.seq, onStep(l.seq, "biasa", idx - 1), { type: "next" });
     expect([entered.idx, entered.activity?.kind === "recite"]).toEqual([idx, false]);
     expect(exampleToWarm(l.seq, entered)).toBe(ismu);
     // … not when the browser asks to save data (it loads when it plays), not while paused.

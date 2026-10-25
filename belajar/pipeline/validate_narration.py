@@ -1651,8 +1651,12 @@ class Lexicon:
         self.display_rx = re.compile(f"(?<![{_CONT}])(?:{'|'.join(display_alts) or never})(?![{_CONT}])")
         rules = []
         for t in sorted(self.terms, key=lambda t: -len(t.latin)):
-            if t.latin == t.speak and not t.letter:
-                continue  # said as written (Bashrah): nothing to convert (a letter, alif, is still shown as on screen)
+            if t.latin == t.speak and not t.letter and t.shown is None:
+                # Said as written and shown as written (Bashrah): nothing to convert (a letter, alif,
+                # is still shown as on screen). A term whose Latin is also how it is SAID but whose
+                # caption shows its Arabic (isim maushul, operator 2026-10-25) is still converted, so
+                # the caption keeps "isim maushul" with the term's Arabic in brackets.
+                continue
             pat = LATIN_CONTEXT.get(t.term, "{h}").replace("{h}", _ci(t.latin))
             rules.append((t, re.compile(f"(?<![\\w'‘’\\-]){pat}(?![\\w'‘’\\-])")))
         self.latin_rules = rules

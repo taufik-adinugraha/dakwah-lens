@@ -827,6 +827,25 @@ function onEnd(seq: AutoplaySequence, s: AutoplayState): AutoplayState {
   return run(seq, { ...s, at: s.at + 1, part: 0, seg: 0, activity: null }, false);
 }
 
+/**
+ * Whether the lesson is on the line said before a step's own plan begins — the start's
+ * "Mari kita mulai…" or "Kita lanjutkan…" (enter's `prefix`), or a resume's "Kita lanjutkan…" said
+ * over a plan not yet begun: the plan is that line (with its pause) and then the whole plan the
+ * step gets on entry, and the lesson is still in that line.
+ */
+function beforeOwnPlan(seq: AutoplaySequence, s: AutoplayState): boolean {
+  const opening = (a: Action | undefined) => a?.t === "say" && "s" in a.ref && (a.ref.s === "start" || a.ref.s === "resume");
+  let lead = 0;
+  while (opening(s.plan[lead])) {
+    lead++;
+    const a = s.plan[lead];
+    if (a?.t === "settle" && a.after === "narration") lead++;
+  }
+  if (lead === 0 || s.at >= lead) return false;
+  const own = planFor(seq, entered(seq, s, s.idx), stepOf(seq, s));
+  return JSON.stringify(s.plan.slice(lead)) === JSON.stringify(own);
+}
+
 /** "Lanjut" in the ready phase: the next caption part, the rest of the
  *  plan, or the next step. */
 function proceed(seq: AutoplaySequence, s: AutoplayState): AutoplayState {
@@ -1150,6 +1169,11 @@ function reduce(seq: AutoplaySequence, s: AutoplayState, e: AutoplayEvent): Auto
       // "Lanjut" (a held caption, no `jump`): the next caption — and so on any step without frames.
       if (s.phase === "ready" && (!e.jump || !hasFrames(step))) return proceed(seq, s);
       const play = s.phase !== "paused";
+      // On the line said before a step's own first line ("Mari kita mulai…", "Kita lanjutkan…"):
+      // that first line, not the next step — the opening line only leads into the step. Operator
+      // 2026-10-25: Berikutnya on "Mari kita mulai" skipped "Ayat pertama Surah Al-Fatihah…" and
+      // went on to "Sekarang dengarkan imam…".
+      if (beforeOwnPlan(seq, s)) return enter(seq, s, s.idx, { run: play, skipDone: false });
       // A step with frames: the frame after this one, from its first line; its last frame goes
       // on to the next step.
       const on = frameHop(seq, s, 1);
