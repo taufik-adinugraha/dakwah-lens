@@ -259,7 +259,8 @@ describe("the screen stays on while a lesson runs, and across the hand-off (oper
           }
         }
         // The last step's "Berikutnya ›" while paused also hands off (the lesson goes on there).
-        const last = reduceAutoplay(seq, reduceAutoplay(seq, createAutoplayState(seq), { type: "start", reason: "restore", from: seq.steps.length - 1 }), { type: "pause" });
+        // On the step itself, past "Kita lanjutkan…" (from that line Berikutnya opens the step).
+        const last = reduceAutoplay(seq, reduceAutoplay(seq, createAutoplayState(seq), { type: "start", reason: "continue", from: seq.steps.length - 1 }), { type: "pause" });
         expect(screenAwake(last), where).toBe("off");
         expect(screenAwake(reduceAutoplay(seq, last, { type: "next" })), where).toBe(ayah < fatihah.length ? "hand-off" : "off");
         // The browser refusing sound, or the imam's recording failing, pauses the lesson: off.
@@ -1116,7 +1117,9 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
         // "Has a file" as the list itself counts it (an exercise two steps on is listed with
         // what it says by itself, its introduction and first prompt — not with its other prompts).
         const further = (st: AutoplayState) => lookaheadAudio(seq, st, { steps: LOOKAHEAD_STEPS }).length > lookaheadAudio(seq, st, { steps: 1 }).length;
-        let onPrimer = reduceAutoplay(seq, first, { type: "next" });
+        // From "Mari kita mulai…" Berikutnya opens the first step itself (operator 2026-10-25); the
+        // next one leaves it.
+        let onPrimer = reduceAutoplay(seq, reduceAutoplay(seq, first, { type: "next" }), { type: "next" });
         for (let k = 0; k < seq.steps.length && !further(onPrimer); k++) onPrimer = reduceAutoplay(seq, onPrimer, { type: "next" });
         const at = onPrimer.idx;
         expect(at).toBeGreaterThan(0);

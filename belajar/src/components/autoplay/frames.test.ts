@@ -172,7 +172,13 @@ function frameNavProblems(
         // `next` is the same event.
         const nextE: AutoplayEvent = s.phase === "ready" ? { type: "next", jump: true } : { type: "next" };
         const next = reduce(seq, s, nextE);
-        if (k < runs.length - 1) landed(k + 1, next, "Berikutnya");
+        // On the line said before the step's plan has begun ("Kita lanjutkan…" over a step paused
+        // at its start, as "Mari kita mulai…" before the first step): that plan from its first
+        // line, the first frame (operator 2026-10-25) — the opening line only leads into it.
+        const lead = s.plan.length - plan.length;
+        const opening = lead > 0 && s.at < lead && JSON.stringify(s.plan.slice(lead)) === JSON.stringify(plan);
+        if (opening) landed(0, next, "Berikutnya on the opening line");
+        else if (k < runs.length - 1) landed(k + 1, next, "Berikutnya");
         else if (s.phase === "ready") {
           // A held caption on the last frame: on to the next step, playing (as Lanjut gets there).
           hops++;

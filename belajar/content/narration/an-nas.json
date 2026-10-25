@@ -5421,14 +5421,14 @@
       ]
     },
     "an-nas:1:map:total": {
-      "text": "Dengan itu, sudah dua puluh hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, اِسْم مَوْصُول, فِعْل مَاضٍ, عَطْف, serta فِعْل أَمْر.",
+      "text": "Dengan itu, sudah dua puluh hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, isim maushul, fi'il madhi, عَطْف, serta فِعْل أَمْر.",
       "display": "Dengan itu, sudah dua puluh hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), manshub (مَنْصُوب), isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), ‘athaf (عَطْف), serta fi’il amr (فِعْل أَمْر).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/36f11e9e4ade0cdb.mp3",
-        "ms": 31556,
-        "sha256": "f4d1cca923a8b86445ab62567c2a03683498b493f72c834314f1edfebfc9b002"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/859dd92506212823.mp3",
+        "ms": 35004,
+        "sha256": "63cefc63726c93e6144c036c0caddd97dfb5f59bf3ec2fc37f3d6fb8b3645fc3"
       },
       "tokens": [
         {
@@ -5448,17 +5448,17 @@
         },
         {
           "t": "dua",
-          "s": 1.16,
-          "e": 1.28
+          "s": 1.18,
+          "e": 1.36
         },
         {
           "t": "puluh",
-          "s": 1.34,
-          "e": 1.6
+          "s": 1.42,
+          "e": 1.8
         },
         {
           "t": "hal",
-          "s": 1.7,
+          "s": 1.85,
           "e": 2.0
         },
         {
@@ -5474,162 +5474,162 @@
         {
           "t": "pelajari,",
           "s": 2.44,
-          "e": 3.04
+          "e": 3.52
         },
         {
           "t": "yaitu",
-          "s": 3.24,
-          "e": 3.84
+          "s": 3.56,
+          "e": 3.92
         },
         {
           "t": "harakat,",
-          "s": 3.96,
-          "e": 4.72
-        },
-        {
-          "t": "tiga",
-          "s": 4.84,
+          "s": 3.98,
           "e": 5.2
         },
         {
+          "t": "tiga",
+          "s": 5.24,
+          "e": 5.44
+        },
+        {
           "t": "jenis",
-          "s": 5.267,
-          "e": 5.6
+          "s": 5.493,
+          "e": 5.76
         },
         {
           "t": "kata,",
-          "s": 5.68,
+          "s": 5.84,
           "e": 6.24
         },
         {
           "t": "yaitu",
-          "s": 6.28,
-          "e": 6.64
+          "s": 6.36,
+          "e": 6.8
         },
         {
           "t": "isim (اِسْم),",
-          "s": 6.72,
-          "e": 7.36
+          "s": 6.88,
+          "e": 7.68
         },
         {
           "t": "fi’il (فِعْل),",
-          "s": 7.44,
-          "e": 8.08
+          "s": 7.76,
+          "e": 8.48
         },
         {
           "t": "dan",
-          "s": 8.12,
-          "e": 8.24
+          "s": 8.54,
+          "e": 8.72
         },
         {
           "t": "huruf (حَرْف),",
-          "s": 8.32,
-          "e": 9.2
-        },
-        {
-          "t": "majrur (مَجْرُور),",
-          "s": 9.24,
+          "s": 8.76,
           "e": 9.84
         },
         {
+          "t": "majrur (مَجْرُور),",
+          "s": 9.88,
+          "e": 10.88
+        },
+        {
           "t": "huruf jar (حَرْف جَرّ),",
-          "s": 9.96,
-          "e": 10.8
+          "s": 10.92,
+          "e": 12.32
         },
         {
           "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 11.04,
-          "e": 12.24
+          "s": 12.4,
+          "e": 13.84
         },
         {
           "t": "marfu’ (مَرْفُوع),",
-          "s": 12.44,
-          "e": 13.28
+          "s": 13.88,
+          "e": 14.96
         },
         {
           "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
-          "s": 13.48,
-          "e": 15.4
+          "s": 15.04,
+          "e": 17.28
         },
         {
           "t": "alif lam (ال),",
-          "s": 15.493,
-          "e": 16.72
+          "s": 17.36,
+          "e": 18.56
         },
         {
           "t": "na’t (نَعْت),",
-          "s": 16.76,
-          "e": 17.36
+          "s": 18.64,
+          "e": 19.2
         },
         {
           "t": "idhafah (إِضَافَة),",
-          "s": 17.493,
-          "e": 18.32
+          "s": 19.387,
+          "e": 20.32
         },
         {
           "t": "dhamir (ضَمِير),",
-          "s": 18.48,
-          "e": 19.28
+          "s": 20.533,
+          "e": 21.72
         },
         {
           "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 19.467,
-          "e": 21.04
+          "s": 21.84,
+          "e": 22.96
         },
         {
           "t": "mu’rab (مُعْرَب)",
-          "s": 21.08,
-          "e": 21.6
-        },
-        {
-          "t": "dan",
-          "s": 21.66,
-          "e": 21.84
-        },
-        {
-          "t": "mabni (مَبْنِيّ),",
-          "s": 21.88,
-          "e": 22.8
-        },
-        {
-          "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
-          "s": 22.84,
+          "s": 23.24,
           "e": 24.0
         },
         {
+          "t": "dan",
+          "s": 24.08,
+          "e": 24.32
+        },
+        {
+          "t": "mabni (مَبْنِيّ),",
+          "s": 24.36,
+          "e": 25.44
+        },
+        {
+          "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
+          "s": 25.48,
+          "e": 26.64
+        },
+        {
           "t": "maf’ul bih (مَفْعُول بِه),",
-          "s": 24.12,
-          "e": 25.12
+          "s": 26.92,
+          "e": 28.24
         },
         {
           "t": "manshub (مَنْصُوب),",
-          "s": 25.32,
-          "e": 26.4
+          "s": 28.4,
+          "e": 29.12
         },
         {
           "t": "isim maushul (اِسْم مَوْصُول),",
-          "s": 26.52,
-          "e": 27.68
-        },
-        {
-          "t": "fi’il madhi (فِعْل مَاضٍ),",
-          "s": 27.84,
-          "e": 29.2
-        },
-        {
-          "t": "‘athaf (عَطْف),",
-          "s": 29.32,
-          "e": 29.92
-        },
-        {
-          "t": "serta",
-          "s": 30.04,
+          "s": 29.28,
           "e": 30.64
         },
         {
+          "t": "fi’il madhi (فِعْل مَاضٍ),",
+          "s": 30.88,
+          "e": 32.08
+        },
+        {
+          "t": "‘athaf (عَطْف),",
+          "s": 32.36,
+          "e": 33.44
+        },
+        {
+          "t": "serta",
+          "s": 33.507,
+          "e": 33.84
+        },
+        {
           "t": "fi’il amr (فِعْل أَمْر).",
-          "s": 30.76,
-          "e": 31.52
+          "s": 33.96,
+          "e": 34.96
         }
       ]
     },
@@ -9473,225 +9473,225 @@
       ]
     },
     "an-nas:2:map:total": {
-      "text": "Dengan itu, sudah dua puluh satu hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, اِسْم مَوْصُول, فِعْل مَاضٍ, عَطْف, فِعْل أَمْر, serta بَدَل.",
+      "text": "Dengan itu, sudah dua puluh satu hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, isim maushul, fi'il madhi, عَطْف, فِعْل أَمْر, serta بَدَل.",
       "display": "Dengan itu, sudah dua puluh satu hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), manshub (مَنْصُوب), isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), ‘athaf (عَطْف), fi’il amr (فِعْل أَمْر), serta badal (بَدَل).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/ceaa8f913037d46e.mp3",
-        "ms": 36754,
-        "sha256": "fdf717a6afbfc592da7719ce584a9522ea70e21656eaa858a40f5f8d0f18e197"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/33b0542e3e2dd790.mp3",
+        "ms": 36989,
+        "sha256": "1e9cb4f6ac966a0b4079f7c167754c150e45313b60b7ccef3a45e94e3e7a0e53"
       },
       "tokens": [
         {
           "t": "Dengan",
           "s": 0.0,
-          "e": 0.24
+          "e": 0.32
         },
         {
           "t": "itu,",
-          "s": 0.36,
-          "e": 0.8
+          "s": 0.42,
+          "e": 1.0
         },
         {
           "t": "sudah",
-          "s": 0.893,
-          "e": 1.36
+          "s": 1.047,
+          "e": 1.28
         },
         {
           "t": "dua",
-          "s": 1.42,
-          "e": 1.6
+          "s": 1.34,
+          "e": 1.52
         },
         {
           "t": "puluh",
-          "s": 1.64,
-          "e": 1.92
+          "s": 1.56,
+          "e": 1.84
         },
         {
           "t": "satu",
-          "s": 1.952,
-          "e": 2.08
+          "s": 1.872,
+          "e": 2.0
         },
         {
           "t": "hal",
-          "s": 2.18,
-          "e": 2.48
+          "s": 2.08,
+          "e": 2.32
         },
         {
           "t": "yang",
-          "s": 2.512,
-          "e": 2.64
+          "s": 2.352,
+          "e": 2.48
         },
         {
           "t": "kita",
-          "s": 2.688,
-          "e": 2.88
+          "s": 2.528,
+          "e": 2.72
         },
         {
           "t": "pelajari,",
-          "s": 2.94,
-          "e": 4.08
+          "s": 2.76,
+          "e": 3.84
         },
         {
           "t": "yaitu",
-          "s": 4.12,
-          "e": 4.72
+          "s": 3.88,
+          "e": 4.24
         },
         {
           "t": "harakat,",
-          "s": 4.82,
-          "e": 6.0
+          "s": 4.3,
+          "e": 5.36
         },
         {
           "t": "tiga",
-          "s": 6.04,
-          "e": 6.32
+          "s": 5.4,
+          "e": 5.68
         },
         {
           "t": "jenis",
-          "s": 6.373,
-          "e": 6.64
+          "s": 5.733,
+          "e": 6.0
         },
         {
           "t": "kata,",
-          "s": 6.736,
-          "e": 7.44
+          "s": 6.08,
+          "e": 6.56
         },
         {
           "t": "yaitu",
-          "s": 7.48,
-          "e": 8.0
+          "s": 6.6,
+          "e": 6.96
         },
         {
           "t": "isim (اِسْم),",
-          "s": 8.16,
-          "e": 9.0
+          "s": 7.04,
+          "e": 7.84
         },
         {
           "t": "fi’il (فِعْل),",
-          "s": 9.14,
-          "e": 9.68
+          "s": 7.92,
+          "e": 8.4
         },
         {
           "t": "dan",
-          "s": 9.78,
-          "e": 10.08
+          "s": 8.52,
+          "e": 8.88
         },
         {
           "t": "huruf (حَرْف),",
-          "s": 10.16,
-          "e": 10.64
+          "s": 8.96,
+          "e": 9.44
         },
         {
           "t": "majrur (مَجْرُور),",
-          "s": 10.92,
-          "e": 12.04
+          "s": 9.72,
+          "e": 10.88
         },
         {
           "t": "huruf jar (حَرْف جَرّ),",
-          "s": 12.18,
-          "e": 13.12
+          "s": 11.04,
+          "e": 12.0
         },
         {
           "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 13.4,
-          "e": 14.84
+          "s": 12.28,
+          "e": 13.68
         },
         {
           "t": "marfu’ (مَرْفُوع),",
-          "s": 14.98,
-          "e": 16.16
+          "s": 13.88,
+          "e": 14.72
         },
         {
           "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
-          "s": 16.24,
-          "e": 17.76
+          "s": 15.0,
+          "e": 17.32
         },
         {
           "t": "alif lam (ال),",
-          "s": 17.947,
-          "e": 18.88
+          "s": 17.44,
+          "e": 18.32
         },
         {
           "t": "na’t (نَعْت),",
-          "s": 19.2,
-          "e": 20.0
+          "s": 18.64,
+          "e": 19.68
         },
         {
           "t": "idhafah (إِضَافَة),",
-          "s": 20.187,
-          "e": 21.6
+          "s": 19.787,
+          "e": 20.84
         },
         {
           "t": "dhamir (ضَمِير),",
-          "s": 21.68,
-          "e": 22.32
+          "s": 20.96,
+          "e": 21.96
         },
         {
           "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 22.48,
-          "e": 23.76
+          "s": 22.08,
+          "e": 23.28
         },
         {
           "t": "mu’rab (مُعْرَب)",
-          "s": 24.04,
-          "e": 24.8
+          "s": 23.56,
+          "e": 24.32
         },
         {
           "t": "dan",
-          "s": 24.86,
-          "e": 25.04
+          "s": 24.44,
+          "e": 24.8
         },
         {
           "t": "mabni (مَبْنِيّ),",
-          "s": 25.08,
-          "e": 26.08
+          "s": 24.84,
+          "e": 25.36
         },
         {
           "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
-          "s": 26.16,
-          "e": 27.36
+          "s": 25.68,
+          "e": 27.2
         },
         {
           "t": "maf’ul bih (مَفْعُول بِه),",
-          "s": 27.6,
+          "s": 27.48,
           "e": 28.64
         },
         {
           "t": "manshub (مَنْصُوب),",
-          "s": 28.88,
-          "e": 30.24
+          "s": 28.96,
+          "e": 30.32
         },
         {
           "t": "isim maushul (اِسْم مَوْصُول),",
-          "s": 30.28,
-          "e": 31.6
+          "s": 30.4,
+          "e": 31.44
         },
         {
           "t": "fi’il madhi (فِعْل مَاضٍ),",
-          "s": 31.8,
-          "e": 33.32
+          "s": 31.653,
+          "e": 33.28
         },
         {
           "t": "‘athaf (عَطْف),",
-          "s": 33.5,
-          "e": 34.48
+          "s": 33.36,
+          "e": 34.24
         },
         {
           "t": "fi’il amr (فِعْل أَمْر),",
-          "s": 34.56,
-          "e": 35.64
+          "s": 34.4,
+          "e": 35.36
         },
         {
           "t": "serta",
-          "s": 35.7,
-          "e": 36.0
+          "s": 35.507,
+          "e": 36.24
         },
         {
           "t": "badal (بَدَل).",
-          "s": 36.16,
-          "e": 36.72
+          "s": 36.36,
+          "e": 36.96
         }
       ]
     },
@@ -13642,14 +13642,14 @@
       ]
     },
     "an-nas:3:map:total": {
-      "text": "Sampai ayat ini, sudah dua puluh satu hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, اِسْم مَوْصُول, فِعْل مَاضٍ, عَطْف, فِعْل أَمْر, serta بَدَل.",
+      "text": "Sampai ayat ini, sudah dua puluh satu hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, isim maushul, fi'il madhi, عَطْف, فِعْل أَمْر, serta بَدَل.",
       "display": "Sampai ayat ini, sudah dua puluh satu hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), manshub (مَنْصُوب), isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), ‘athaf (عَطْف), fi’il amr (فِعْل أَمْر), serta badal (بَدَل).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/f1f1dfb0c2b75ade.mp3",
-        "ms": 37146,
-        "sha256": "f78ed037800cb1dd9db9b1aa080c1f3a7b23b5368e0de64d21a1aee7d7f8d5b3"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/febd7ff2b6a9fc57.mp3",
+        "ms": 41718,
+        "sha256": "69c7e0bff94041952f153ade31e06019604b02bdb290fb79955cc04b348c7e36"
       },
       "tokens": [
         {
@@ -13669,203 +13669,203 @@
         },
         {
           "t": "sudah",
-          "s": 1.133,
-          "e": 1.6
+          "s": 1.107,
+          "e": 1.44
         },
         {
           "t": "dua",
-          "s": 1.66,
-          "e": 1.84
+          "s": 1.48,
+          "e": 1.6
         },
         {
           "t": "puluh",
-          "s": 1.88,
-          "e": 2.16
+          "s": 1.66,
+          "e": 2.04
         },
         {
           "t": "satu",
-          "s": 2.192,
-          "e": 2.32
+          "s": 2.08,
+          "e": 2.24
         },
         {
           "t": "hal",
-          "s": 2.42,
-          "e": 2.72
+          "s": 2.34,
+          "e": 2.64
         },
         {
           "t": "yang",
-          "s": 2.752,
-          "e": 2.88
+          "s": 2.672,
+          "e": 2.8
         },
         {
           "t": "kita",
-          "s": 2.928,
-          "e": 3.12
+          "s": 2.848,
+          "e": 3.04
         },
         {
           "t": "pelajari,",
-          "s": 3.16,
-          "e": 4.24
+          "s": 3.08,
+          "e": 3.84
         },
         {
           "t": "yaitu",
-          "s": 4.28,
-          "e": 4.64
+          "s": 4.08,
+          "e": 4.8
         },
         {
           "t": "harakat,",
-          "s": 4.7,
-          "e": 5.76
-        },
-        {
-          "t": "tiga",
-          "s": 5.8,
+          "s": 4.96,
           "e": 6.0
         },
         {
+          "t": "tiga",
+          "s": 6.28,
+          "e": 6.8
+        },
+        {
           "t": "jenis",
-          "s": 6.067,
-          "e": 6.4
+          "s": 6.867,
+          "e": 7.2
         },
         {
           "t": "kata,",
-          "s": 6.496,
-          "e": 7.04
+          "s": 7.28,
+          "e": 7.76
         },
         {
           "t": "yaitu",
-          "s": 7.08,
-          "e": 7.44
+          "s": 7.96,
+          "e": 8.64
         },
         {
           "t": "isim (اِسْم),",
-          "s": 7.52,
-          "e": 8.0
-        },
-        {
-          "t": "fi’il (فِعْل),",
-          "s": 8.28,
+          "s": 8.76,
           "e": 9.28
         },
         {
+          "t": "fi’il (فِعْل),",
+          "s": 9.64,
+          "e": 10.56
+        },
+        {
           "t": "dan",
-          "s": 9.32,
-          "e": 9.44
+          "s": 10.7,
+          "e": 11.12
         },
         {
           "t": "huruf (حَرْف),",
-          "s": 9.52,
-          "e": 10.64
+          "s": 11.2,
+          "e": 11.68
         },
         {
           "t": "majrur (مَجْرُور),",
-          "s": 10.68,
-          "e": 11.52
-        },
-        {
-          "t": "huruf jar (حَرْف جَرّ),",
-          "s": 11.64,
+          "s": 12.0,
           "e": 13.04
         },
         {
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 13.36,
+          "e": 14.48
+        },
+        {
           "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 13.08,
-          "e": 14.24
+          "s": 14.8,
+          "e": 16.32
         },
         {
           "t": "marfu’ (مَرْفُوع),",
-          "s": 14.48,
-          "e": 15.64
+          "s": 16.6,
+          "e": 17.6
         },
         {
           "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
-          "s": 15.78,
-          "e": 17.52
+          "s": 17.92,
+          "e": 20.08
         },
         {
           "t": "alif lam (ال),",
-          "s": 17.68,
-          "e": 18.88
+          "s": 20.32,
+          "e": 21.44
         },
         {
           "t": "na’t (نَعْت),",
-          "s": 19.04,
-          "e": 19.681
+          "s": 21.84,
+          "e": 22.72
         },
         {
           "t": "idhafah (إِضَافَة),",
-          "s": 19.893,
-          "e": 20.88
+          "s": 22.96,
+          "e": 24.0
         },
         {
           "t": "dhamir (ضَمِير),",
-          "s": 21.093,
-          "e": 21.92
+          "s": 24.267,
+          "e": 25.44
         },
         {
           "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 22.16,
-          "e": 23.52
+          "s": 25.627,
+          "e": 26.96
         },
         {
           "t": "mu’rab (مُعْرَب)",
-          "s": 23.84,
-          "e": 24.64
+          "s": 27.36,
+          "e": 28.24
         },
         {
           "t": "dan",
-          "s": 24.68,
-          "e": 24.8
+          "s": 28.3,
+          "e": 28.48
         },
         {
           "t": "mabni (مَبْنِيّ),",
-          "s": 24.84,
-          "e": 25.84
+          "s": 28.52,
+          "e": 29.12
         },
         {
           "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
-          "s": 25.92,
-          "e": 27.2
+          "s": 29.48,
+          "e": 30.96
         },
         {
           "t": "maf’ul bih (مَفْعُول بِه),",
-          "s": 27.44,
-          "e": 28.64
+          "s": 31.28,
+          "e": 32.64
         },
         {
           "t": "manshub (مَنْصُوب),",
-          "s": 28.92,
-          "e": 29.92
+          "s": 33.0,
+          "e": 34.0
         },
         {
           "t": "isim maushul (اِسْم مَوْصُول),",
-          "s": 30.2,
-          "e": 31.52
+          "s": 34.208,
+          "e": 35.76
         },
         {
           "t": "fi’il madhi (فِعْل مَاضٍ),",
-          "s": 31.8,
-          "e": 33.2
+          "s": 35.973,
+          "e": 37.28
         },
         {
           "t": "‘athaf (عَطْف),",
-          "s": 33.48,
-          "e": 34.48
+          "s": 37.64,
+          "e": 38.48
         },
         {
           "t": "fi’il amr (فِعْل أَمْر),",
-          "s": 34.64,
-          "e": 36.0
+          "s": 38.8,
+          "e": 40.4
         },
         {
           "t": "serta",
-          "s": 36.067,
-          "e": 36.4
+          "s": 40.493,
+          "e": 40.96
         },
         {
           "t": "badal (بَدَل).",
-          "s": 36.56,
-          "e": 37.12
+          "s": 41.12,
+          "e": 41.68
         }
       ]
     },
@@ -19241,14 +19241,14 @@
       ]
     },
     "an-nas:4:map:total": {
-      "text": "Sampai ayat ini, sudah dua puluh satu hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, اِسْم مَوْصُول, فِعْل مَاضٍ, عَطْف, فِعْل أَمْر, serta بَدَل.",
+      "text": "Sampai ayat ini, sudah dua puluh satu hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, isim maushul, fi'il madhi, عَطْف, فِعْل أَمْر, serta بَدَل.",
       "display": "Sampai ayat ini, sudah dua puluh satu hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), manshub (مَنْصُوب), isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), ‘athaf (عَطْف), fi’il amr (فِعْل أَمْر), serta badal (بَدَل).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/f1f1dfb0c2b75ade.mp3",
-        "ms": 37146,
-        "sha256": "f78ed037800cb1dd9db9b1aa080c1f3a7b23b5368e0de64d21a1aee7d7f8d5b3"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/febd7ff2b6a9fc57.mp3",
+        "ms": 41718,
+        "sha256": "69c7e0bff94041952f153ade31e06019604b02bdb290fb79955cc04b348c7e36"
       },
       "tokens": [
         {
@@ -19268,203 +19268,203 @@
         },
         {
           "t": "sudah",
-          "s": 1.133,
-          "e": 1.6
+          "s": 1.107,
+          "e": 1.44
         },
         {
           "t": "dua",
-          "s": 1.66,
-          "e": 1.84
+          "s": 1.48,
+          "e": 1.6
         },
         {
           "t": "puluh",
-          "s": 1.88,
-          "e": 2.16
+          "s": 1.66,
+          "e": 2.04
         },
         {
           "t": "satu",
-          "s": 2.192,
-          "e": 2.32
+          "s": 2.08,
+          "e": 2.24
         },
         {
           "t": "hal",
-          "s": 2.42,
-          "e": 2.72
+          "s": 2.34,
+          "e": 2.64
         },
         {
           "t": "yang",
-          "s": 2.752,
-          "e": 2.88
+          "s": 2.672,
+          "e": 2.8
         },
         {
           "t": "kita",
-          "s": 2.928,
-          "e": 3.12
+          "s": 2.848,
+          "e": 3.04
         },
         {
           "t": "pelajari,",
-          "s": 3.16,
-          "e": 4.24
+          "s": 3.08,
+          "e": 3.84
         },
         {
           "t": "yaitu",
-          "s": 4.28,
-          "e": 4.64
+          "s": 4.08,
+          "e": 4.8
         },
         {
           "t": "harakat,",
-          "s": 4.7,
-          "e": 5.76
-        },
-        {
-          "t": "tiga",
-          "s": 5.8,
+          "s": 4.96,
           "e": 6.0
         },
         {
+          "t": "tiga",
+          "s": 6.28,
+          "e": 6.8
+        },
+        {
           "t": "jenis",
-          "s": 6.067,
-          "e": 6.4
+          "s": 6.867,
+          "e": 7.2
         },
         {
           "t": "kata,",
-          "s": 6.496,
-          "e": 7.04
+          "s": 7.28,
+          "e": 7.76
         },
         {
           "t": "yaitu",
-          "s": 7.08,
-          "e": 7.44
+          "s": 7.96,
+          "e": 8.64
         },
         {
           "t": "isim (اِسْم),",
-          "s": 7.52,
-          "e": 8.0
-        },
-        {
-          "t": "fi’il (فِعْل),",
-          "s": 8.28,
+          "s": 8.76,
           "e": 9.28
         },
         {
+          "t": "fi’il (فِعْل),",
+          "s": 9.64,
+          "e": 10.56
+        },
+        {
           "t": "dan",
-          "s": 9.32,
-          "e": 9.44
+          "s": 10.7,
+          "e": 11.12
         },
         {
           "t": "huruf (حَرْف),",
-          "s": 9.52,
-          "e": 10.64
+          "s": 11.2,
+          "e": 11.68
         },
         {
           "t": "majrur (مَجْرُور),",
-          "s": 10.68,
-          "e": 11.52
-        },
-        {
-          "t": "huruf jar (حَرْف جَرّ),",
-          "s": 11.64,
+          "s": 12.0,
           "e": 13.04
         },
         {
+          "t": "huruf jar (حَرْف جَرّ),",
+          "s": 13.36,
+          "e": 14.48
+        },
+        {
           "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 13.08,
-          "e": 14.24
+          "s": 14.8,
+          "e": 16.32
         },
         {
           "t": "marfu’ (مَرْفُوع),",
-          "s": 14.48,
-          "e": 15.64
+          "s": 16.6,
+          "e": 17.6
         },
         {
           "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
-          "s": 15.78,
-          "e": 17.52
+          "s": 17.92,
+          "e": 20.08
         },
         {
           "t": "alif lam (ال),",
-          "s": 17.68,
-          "e": 18.88
+          "s": 20.32,
+          "e": 21.44
         },
         {
           "t": "na’t (نَعْت),",
-          "s": 19.04,
-          "e": 19.681
+          "s": 21.84,
+          "e": 22.72
         },
         {
           "t": "idhafah (إِضَافَة),",
-          "s": 19.893,
-          "e": 20.88
+          "s": 22.96,
+          "e": 24.0
         },
         {
           "t": "dhamir (ضَمِير),",
-          "s": 21.093,
-          "e": 21.92
+          "s": 24.267,
+          "e": 25.44
         },
         {
           "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 22.16,
-          "e": 23.52
+          "s": 25.627,
+          "e": 26.96
         },
         {
           "t": "mu’rab (مُعْرَب)",
-          "s": 23.84,
-          "e": 24.64
+          "s": 27.36,
+          "e": 28.24
         },
         {
           "t": "dan",
-          "s": 24.68,
-          "e": 24.8
+          "s": 28.3,
+          "e": 28.48
         },
         {
           "t": "mabni (مَبْنِيّ),",
-          "s": 24.84,
-          "e": 25.84
+          "s": 28.52,
+          "e": 29.12
         },
         {
           "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
-          "s": 25.92,
-          "e": 27.2
+          "s": 29.48,
+          "e": 30.96
         },
         {
           "t": "maf’ul bih (مَفْعُول بِه),",
-          "s": 27.44,
-          "e": 28.64
+          "s": 31.28,
+          "e": 32.64
         },
         {
           "t": "manshub (مَنْصُوب),",
-          "s": 28.92,
-          "e": 29.92
+          "s": 33.0,
+          "e": 34.0
         },
         {
           "t": "isim maushul (اِسْم مَوْصُول),",
-          "s": 30.2,
-          "e": 31.52
+          "s": 34.208,
+          "e": 35.76
         },
         {
           "t": "fi’il madhi (فِعْل مَاضٍ),",
-          "s": 31.8,
-          "e": 33.2
+          "s": 35.973,
+          "e": 37.28
         },
         {
           "t": "‘athaf (عَطْف),",
-          "s": 33.48,
-          "e": 34.48
+          "s": 37.64,
+          "e": 38.48
         },
         {
           "t": "fi’il amr (فِعْل أَمْر),",
-          "s": 34.64,
-          "e": 36.0
+          "s": 38.8,
+          "e": 40.4
         },
         {
           "t": "serta",
-          "s": 36.067,
-          "e": 36.4
+          "s": 40.493,
+          "e": 40.96
         },
         {
           "t": "badal (بَدَل).",
-          "s": 36.56,
-          "e": 37.12
+          "s": 41.12,
+          "e": 41.68
         }
       ]
     },
@@ -19825,49 +19825,49 @@
       ]
     },
     "an-nas:5:map:again": {
-      "text": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, مَرْفُوع, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, serta اِسْم مَوْصُول.",
+      "text": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, مَرْفُوع, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, serta isim maushul.",
       "display": "Dari yang sudah kita pelajari, yang kita temui lagi di ayat ini adalah harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), majrur (مَجْرُور), huruf jar (حَرْف جَرّ), marfu’ (مَرْفُوع), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), serta isim maushul (اِسْم مَوْصُول).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/eb09586185de5569.mp3",
-        "ms": 23171,
-        "sha256": "c7df86d76a5f9b77f900e3bffd489b605a8cb1cbb80dbd0dd0973c3e99e75aa9"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/e7d1c9ee9256fcfe.mp3",
+        "ms": 24189,
+        "sha256": "5180731e737b4c41d046e28009f359f988a581d32e0463ae3c805cbff1ba9ac9"
       },
       "tokens": [
         {
           "t": "Dari",
           "s": 0.0,
-          "e": 0.16
+          "e": 0.24
         },
         {
           "t": "yang",
-          "s": 0.192,
+          "s": 0.256,
           "e": 0.32
         },
         {
           "t": "sudah",
-          "s": 0.36,
-          "e": 0.56
+          "s": 0.373,
+          "e": 0.64
         },
         {
           "t": "kita",
-          "s": 0.608,
-          "e": 0.8
+          "s": 0.688,
+          "e": 0.88
         },
         {
           "t": "pelajari,",
-          "s": 0.84,
-          "e": 1.68
+          "s": 0.92,
+          "e": 1.76
         },
         {
           "t": "yang",
-          "s": 1.712,
-          "e": 1.84
+          "s": 1.792,
+          "e": 1.92
         },
         {
           "t": "kita",
-          "s": 1.888,
+          "s": 1.952,
           "e": 2.08
         },
         {
@@ -19897,22 +19897,22 @@
         },
         {
           "t": "adalah",
-          "s": 3.76,
-          "e": 4.24
+          "s": 3.737,
+          "e": 4.08
         },
         {
           "t": "harakat,",
-          "s": 4.3,
-          "e": 5.28
+          "s": 4.12,
+          "e": 5.2
         },
         {
           "t": "tiga",
-          "s": 5.32,
-          "e": 5.6
+          "s": 5.24,
+          "e": 5.52
         },
         {
           "t": "jenis",
-          "s": 5.653,
+          "s": 5.587,
           "e": 5.92
         },
         {
@@ -19927,88 +19927,88 @@
         },
         {
           "t": "isim (اِسْم),",
-          "s": 7.28,
-          "e": 8.16
+          "s": 7.24,
+          "e": 7.76
         },
         {
           "t": "fi’il (فِعْل),",
-          "s": 8.24,
-          "e": 8.8
+          "s": 8.04,
+          "e": 8.72
         },
         {
           "t": "dan",
-          "s": 8.9,
-          "e": 9.2
+          "s": 8.86,
+          "e": 9.28
         },
         {
           "t": "huruf (حَرْف),",
-          "s": 9.28,
-          "e": 10.16
+          "s": 9.36,
+          "e": 9.84
         },
         {
           "t": "majrur (مَجْرُور),",
-          "s": 10.2,
-          "e": 11.2
+          "s": 10.12,
+          "e": 10.96
         },
         {
           "t": "huruf jar (حَرْف جَرّ),",
-          "s": 11.24,
-          "e": 12.08
+          "s": 11.28,
+          "e": 12.32
         },
         {
           "t": "marfu’ (مَرْفُوع),",
-          "s": 12.28,
-          "e": 13.12
+          "s": 12.64,
+          "e": 14.0
         },
         {
           "t": "alif lam (ال),",
-          "s": 13.307,
-          "e": 14.24
-        },
-        {
-          "t": "na’t (نَعْت),",
-          "s": 14.56,
+          "s": 14.053,
           "e": 15.28
         },
         {
+          "t": "na’t (نَعْت),",
+          "s": 15.36,
+          "e": 16.0
+        },
+        {
           "t": "idhafah (إِضَافَة),",
-          "s": 15.493,
-          "e": 16.4
+          "s": 16.187,
+          "e": 17.04
         },
         {
           "t": "dhamir (ضَمِير),",
-          "s": 16.613,
-          "e": 17.44
+          "s": 17.253,
+          "e": 18.16
         },
         {
           "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 17.653,
-          "e": 19.12
+          "s": 18.347,
+          "e": 19.68
         },
         {
           "t": "mu’rab (مُعْرَب)",
-          "s": 19.32,
-          "e": 20.0
+          "s": 20.0,
+          "e": 20.88
         },
         {
           "t": "dan",
-          "s": 20.14,
-          "e": 20.56
+          "s": 21.0,
+          "e": 21.36
         },
         {
           "t": "mabni (مَبْنِيّ),",
-          "s": 20.64,
-          "e": 21.52
-        },
-        {
-          "t": "serta",
-          "s": 21.6,
+          "s": 21.4,
           "e": 22.0
         },
         {
+          "t": "serta",
+          "s": 22.147,
+          "e": 22.88
+        },
+        {
           "t": "isim maushul (اِسْم مَوْصُول).",
-          "s": 22.12,
-          "e": 23.12
+          "s": 22.992,
+          "e": 24.16
         }
       ]
     },
@@ -20744,7 +20744,7 @@
       ]
     },
     "an-nas:5:w1:compose:1": {
-      "text": "Kata ini adalah اِسْم مَوْصُول, yaitu kata penghubung: maknanya baru lengkap dengan kalimat sesudahnya.",
+      "text": "Kata ini adalah isim maushul, yaitu kata penghubung: maknanya baru lengkap dengan kalimat sesudahnya.",
       "display": "Kata ini adalah isim maushul (اِسْم مَوْصُول), yaitu kata penghubung: maknanya baru lengkap dengan kalimat sesudahnya.",
       "highlight": [
         1
@@ -20752,9 +20752,9 @@
       "focus": "114:5:1",
       "frame": 1,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/eaebfa349bd79c60.mp3",
-        "ms": 7079,
-        "sha256": "9c4a0af876629564eeb655b03168cd2de5f3c700a7fed62445759bbec91ad12d"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/acbf627f0885d3ae.mp3",
+        "ms": 7236,
+        "sha256": "e495a45e1b6a57cb7021522fb9413a57a525b2665f9f1d4abdce69379a4ef9f1"
       },
       "tokens": [
         {
@@ -20774,53 +20774,53 @@
         },
         {
           "t": "isim maushul (اِسْم مَوْصُول),",
-          "s": 0.96,
+          "s": 0.976,
           "e": 2.16
         },
         {
           "t": "yaitu",
-          "s": 2.36,
-          "e": 2.88
+          "s": 2.4,
+          "e": 2.96
         },
         {
           "t": "kata",
-          "s": 2.96,
+          "s": 3.024,
           "e": 3.28
         },
         {
           "t": "penghubung:",
           "s": 3.328,
-          "e": 3.92
+          "e": 4.0
         },
         {
           "t": "maknanya",
-          "s": 4.1,
-          "e": 4.96
+          "s": 4.18,
+          "e": 5.04
         },
         {
           "t": "baru",
-          "s": 5.008,
-          "e": 5.2
+          "s": 5.088,
+          "e": 5.28
         },
         {
           "t": "lengkap",
-          "s": 5.248,
-          "e": 5.6
+          "s": 5.328,
+          "e": 5.76
         },
         {
           "t": "dengan",
-          "s": 5.646,
-          "e": 5.92
+          "s": 5.794,
+          "e": 6.0
         },
         {
           "t": "kalimat",
-          "s": 5.96,
-          "e": 6.32
+          "s": 6.06,
+          "e": 6.48
         },
         {
           "t": "sesudahnya.",
-          "s": 6.38,
-          "e": 7.04
+          "s": 6.54,
+          "e": 7.2
         }
       ]
     },
@@ -20891,7 +20891,7 @@
       ]
     },
     "an-nas:5:w1:compose:3": {
-      "text": "Akhirnya tetap, karena اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون.",
+      "text": "Akhirnya tetap, karena isim maushul ini مَبْنِيّ di atas سُكُون.",
       "display": "Akhirnya tetap, karena isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون).",
       "highlight": [
         1
@@ -20899,55 +20899,55 @@
       "focus": "114:5:1",
       "frame": 1,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/ab445d55f8ee3af7.mp3",
-        "ms": 4519,
-        "sha256": "ae14c8345be6d07ca543d492c233b93d602f89df412b2d9d7ec9481c24fe1069"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/29c0c91a8d40bbc6.mp3",
+        "ms": 4598,
+        "sha256": "8b1c00d903ab3d631f357f7a20fa4b6e9b5129b9314ef54bf3e41b9c437bb7cd"
       },
       "tokens": [
         {
           "t": "Akhirnya",
           "s": 0.0,
-          "e": 0.24
+          "e": 0.4
         },
         {
           "t": "tetap,",
-          "s": 0.3,
-          "e": 1.04
+          "s": 0.46,
+          "e": 1.2
         },
         {
           "t": "karena",
-          "s": 1.086,
-          "e": 1.36
+          "s": 1.269,
+          "e": 1.68
         },
         {
           "t": "isim maushul (اِسْم مَوْصُول)",
-          "s": 1.4,
-          "e": 2.08
+          "s": 1.776,
+          "e": 2.64
         },
         {
           "t": "ini",
-          "s": 2.16,
-          "e": 2.4
+          "s": 2.74,
+          "e": 3.04
         },
         {
           "t": "mabni (مَبْنِيّ)",
-          "s": 2.52,
-          "e": 3.16
+          "s": 3.12,
+          "e": 3.6
         },
         {
           "t": "di",
-          "s": 3.2,
-          "e": 3.28
-        },
-        {
-          "t": "atas",
-          "s": 3.36,
+          "s": 3.627,
           "e": 3.68
         },
         {
+          "t": "atas",
+          "s": 3.744,
+          "e": 4.0
+        },
+        {
           "t": "sukun (سُكُون).",
-          "s": 3.8,
-          "e": 4.48
+          "s": 4.04,
+          "e": 4.56
         }
       ]
     },
@@ -24170,170 +24170,170 @@
       ]
     },
     "an-nas:5:ex:why-harakat:1:why": {
-      "text": "اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata al-waswasi yang artinya pembisik, setan, di ayat keempat, yang مَجْرُور sebagai mudhof ilaih; kalimat sesudahnya menjadi صِلَةnya.",
+      "text": "Isim maushul ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata al-waswasi yang artinya pembisik, setan, di ayat keempat, yang مَجْرُور sebagai mudhof ilaih; kalimat sesudahnya menjadi صِلَةnya.",
       "display": "Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai sifat, atau na’t (نَعْت), bagi kata ٱلْوَسْوَاسِ (al-waswāsi) yang artinya “pembisik (setan)” di ayat keempat, yang majrur (مَجْرُور) sebagai mudhaf ilaih (مُضَاف إِلَيْه); kalimat sesudahnya menjadi shilah-nya (صِلَة).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/a72a6150b15b1631.mp3",
-        "ms": 20271,
-        "sha256": "521ffb3f9f3b95f0534a3803ff369e0efae2b144bd811dc3fe6f9f78d458123d"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/3e4c973099a5b248.mp3",
+        "ms": 18207,
+        "sha256": "b3a6aef722d82309511919173ee45f7180d88f158646aaa455a882675062ee4e"
       },
       "tokens": [
         {
           "t": "Isim maushul (اِسْم مَوْصُول)",
           "s": 0.0,
-          "e": 0.72
+          "e": 0.64
         },
         {
           "t": "ini",
-          "s": 0.84,
-          "e": 1.2
+          "s": 0.7,
+          "e": 0.88
         },
         {
           "t": "mabni (مَبْنِيّ)",
-          "s": 1.44,
-          "e": 2.16
+          "s": 0.92,
+          "e": 1.36
         },
         {
           "t": "di",
-          "s": 2.187,
-          "e": 2.24
+          "s": 1.387,
+          "e": 1.44
         },
         {
           "t": "atas",
-          "s": 2.304,
-          "e": 2.56
+          "s": 1.504,
+          "e": 1.76
         },
         {
           "t": "sukun (سُكُون)",
-          "s": 2.6,
-          "e": 3.12
+          "s": 1.8,
+          "e": 2.4
         },
         {
           "t": "dan",
-          "s": 3.3,
-          "e": 3.84
+          "s": 2.48,
+          "e": 2.72
         },
         {
           "t": "berkedudukan",
-          "s": 3.9,
-          "e": 4.64
+          "s": 2.8,
+          "e": 3.52
         },
         {
           "t": "jar (جَرّ)",
-          "s": 4.72,
-          "e": 5.04
+          "s": 3.6,
+          "e": 4.12
         },
         {
           "t": "sebagai",
-          "s": 5.12,
-          "e": 5.68
+          "s": 4.155,
+          "e": 4.4
         },
         {
           "t": "sifat,",
-          "s": 5.72,
-          "e": 6.56
+          "s": 4.44,
+          "e": 4.88
         },
         {
           "t": "atau",
-          "s": 6.608,
-          "e": 6.8
+          "s": 5.008,
+          "e": 5.52
         },
         {
           "t": "na’t (نَعْت),",
-          "s": 6.88,
-          "e": 7.44
+          "s": 5.6,
+          "e": 6.4
         },
         {
           "t": "bagi",
-          "s": 7.552,
-          "e": 8.0
+          "s": 6.48,
+          "e": 6.8
         },
         {
           "t": "kata",
-          "s": 8.096,
-          "e": 8.48
+          "s": 6.88,
+          "e": 7.2
         },
         {
           "t": "ٱلْوَسْوَاسِ (al-waswāsi)",
-          "s": 8.613,
-          "e": 9.76
+          "s": 7.307,
+          "e": 8.4
         },
         {
           "t": "yang",
-          "s": 9.856,
-          "e": 10.24
+          "s": 8.496,
+          "e": 8.88
         },
         {
           "t": "artinya",
-          "s": 10.3,
-          "e": 10.8
+          "s": 8.92,
+          "e": 9.36
         },
         {
           "t": "pembisik,",
-          "s": 10.88,
-          "e": 12.0
+          "s": 9.456,
+          "e": 10.24
         },
         {
           "t": "setan,",
-          "s": 12.08,
-          "e": 12.64
+          "s": 10.4,
+          "e": 11.12
         },
         {
           "t": "di",
-          "s": 12.773,
-          "e": 13.04
+          "s": 11.253,
+          "e": 11.52
         },
         {
           "t": "ayat",
-          "s": 13.067,
-          "e": 13.2
+          "s": 11.573,
+          "e": 11.76
         },
         {
           "t": "keempat,",
-          "s": 13.253,
-          "e": 13.76
+          "s": 11.813,
+          "e": 12.24
         },
         {
           "t": "yang",
-          "s": 13.92,
-          "e": 14.56
+          "s": 12.368,
+          "e": 12.88
         },
         {
           "t": "majrur (مَجْرُور)",
-          "s": 14.6,
-          "e": 15.12
+          "s": 12.92,
+          "e": 13.44
         },
         {
           "t": "sebagai",
-          "s": 15.2,
-          "e": 15.76
+          "s": 13.51,
+          "e": 14.0
         },
         {
           "t": "mudhaf ilaih (مُضَاف إِلَيْه);",
-          "s": 15.82,
-          "e": 16.72
+          "s": 14.08,
+          "e": 14.88
         },
         {
           "t": "kalimat",
-          "s": 16.9,
-          "e": 17.68
+          "s": 15.06,
+          "e": 15.84
         },
         {
           "t": "sesudahnya",
-          "s": 17.74,
-          "e": 18.48
+          "s": 15.88,
+          "e": 16.48
         },
         {
           "t": "menjadi",
-          "s": 18.58,
-          "e": 19.28
+          "s": 16.56,
+          "e": 17.12
         },
         {
           "t": "shilah-nya (صِلَة).",
-          "s": 19.4,
-          "e": 20.24
+          "s": 17.28,
+          "e": 18.16
         }
       ]
     },
@@ -24790,170 +24790,170 @@
       ]
     },
     "an-nas:5:ex:sort-case:1:why": {
-      "text": "اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata al-waswasi yang artinya pembisik, setan, di ayat keempat, yang مَجْرُور sebagai mudhof ilaih; kalimat sesudahnya menjadi صِلَةnya.",
+      "text": "Isim maushul ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata al-waswasi yang artinya pembisik, setan, di ayat keempat, yang مَجْرُور sebagai mudhof ilaih; kalimat sesudahnya menjadi صِلَةnya.",
       "display": "Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai sifat, atau na’t (نَعْت), bagi kata ٱلْوَسْوَاسِ (al-waswāsi) yang artinya “pembisik (setan)” di ayat keempat, yang majrur (مَجْرُور) sebagai mudhaf ilaih (مُضَاف إِلَيْه); kalimat sesudahnya menjadi shilah-nya (صِلَة).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/a72a6150b15b1631.mp3",
-        "ms": 20271,
-        "sha256": "521ffb3f9f3b95f0534a3803ff369e0efae2b144bd811dc3fe6f9f78d458123d"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/3e4c973099a5b248.mp3",
+        "ms": 18207,
+        "sha256": "b3a6aef722d82309511919173ee45f7180d88f158646aaa455a882675062ee4e"
       },
       "tokens": [
         {
           "t": "Isim maushul (اِسْم مَوْصُول)",
           "s": 0.0,
-          "e": 0.72
+          "e": 0.64
         },
         {
           "t": "ini",
-          "s": 0.84,
-          "e": 1.2
+          "s": 0.7,
+          "e": 0.88
         },
         {
           "t": "mabni (مَبْنِيّ)",
-          "s": 1.44,
-          "e": 2.16
+          "s": 0.92,
+          "e": 1.36
         },
         {
           "t": "di",
-          "s": 2.187,
-          "e": 2.24
+          "s": 1.387,
+          "e": 1.44
         },
         {
           "t": "atas",
-          "s": 2.304,
-          "e": 2.56
+          "s": 1.504,
+          "e": 1.76
         },
         {
           "t": "sukun (سُكُون)",
-          "s": 2.6,
-          "e": 3.12
+          "s": 1.8,
+          "e": 2.4
         },
         {
           "t": "dan",
-          "s": 3.3,
-          "e": 3.84
+          "s": 2.48,
+          "e": 2.72
         },
         {
           "t": "berkedudukan",
-          "s": 3.9,
-          "e": 4.64
+          "s": 2.8,
+          "e": 3.52
         },
         {
           "t": "jar (جَرّ)",
-          "s": 4.72,
-          "e": 5.04
+          "s": 3.6,
+          "e": 4.12
         },
         {
           "t": "sebagai",
-          "s": 5.12,
-          "e": 5.68
+          "s": 4.155,
+          "e": 4.4
         },
         {
           "t": "sifat,",
-          "s": 5.72,
-          "e": 6.56
+          "s": 4.44,
+          "e": 4.88
         },
         {
           "t": "atau",
-          "s": 6.608,
-          "e": 6.8
+          "s": 5.008,
+          "e": 5.52
         },
         {
           "t": "na’t (نَعْت),",
-          "s": 6.88,
-          "e": 7.44
+          "s": 5.6,
+          "e": 6.4
         },
         {
           "t": "bagi",
-          "s": 7.552,
-          "e": 8.0
+          "s": 6.48,
+          "e": 6.8
         },
         {
           "t": "kata",
-          "s": 8.096,
-          "e": 8.48
+          "s": 6.88,
+          "e": 7.2
         },
         {
           "t": "ٱلْوَسْوَاسِ (al-waswāsi)",
-          "s": 8.613,
-          "e": 9.76
+          "s": 7.307,
+          "e": 8.4
         },
         {
           "t": "yang",
-          "s": 9.856,
-          "e": 10.24
+          "s": 8.496,
+          "e": 8.88
         },
         {
           "t": "artinya",
-          "s": 10.3,
-          "e": 10.8
+          "s": 8.92,
+          "e": 9.36
         },
         {
           "t": "pembisik,",
-          "s": 10.88,
-          "e": 12.0
+          "s": 9.456,
+          "e": 10.24
         },
         {
           "t": "setan,",
-          "s": 12.08,
-          "e": 12.64
+          "s": 10.4,
+          "e": 11.12
         },
         {
           "t": "di",
-          "s": 12.773,
-          "e": 13.04
+          "s": 11.253,
+          "e": 11.52
         },
         {
           "t": "ayat",
-          "s": 13.067,
-          "e": 13.2
+          "s": 11.573,
+          "e": 11.76
         },
         {
           "t": "keempat,",
-          "s": 13.253,
-          "e": 13.76
+          "s": 11.813,
+          "e": 12.24
         },
         {
           "t": "yang",
-          "s": 13.92,
-          "e": 14.56
+          "s": 12.368,
+          "e": 12.88
         },
         {
           "t": "majrur (مَجْرُور)",
-          "s": 14.6,
-          "e": 15.12
+          "s": 12.92,
+          "e": 13.44
         },
         {
           "t": "sebagai",
-          "s": 15.2,
-          "e": 15.76
+          "s": 13.51,
+          "e": 14.0
         },
         {
           "t": "mudhaf ilaih (مُضَاف إِلَيْه);",
-          "s": 15.82,
-          "e": 16.72
+          "s": 14.08,
+          "e": 14.88
         },
         {
           "t": "kalimat",
-          "s": 16.9,
-          "e": 17.68
+          "s": 15.06,
+          "e": 15.84
         },
         {
           "t": "sesudahnya",
-          "s": 17.74,
-          "e": 18.48
+          "s": 15.88,
+          "e": 16.48
         },
         {
           "t": "menjadi",
-          "s": 18.58,
-          "e": 19.28
+          "s": 16.56,
+          "e": 17.12
         },
         {
           "t": "shilah-nya (صِلَة).",
-          "s": 19.4,
-          "e": 20.24
+          "s": 17.28,
+          "e": 18.16
         }
       ]
     },
@@ -25380,180 +25380,180 @@
       ]
     },
     "an-nas:5:ex:label-role:1:why": {
-      "text": "Perannya: اِسْم مَوْصُول. اِسْم مَوْصُول ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata al-waswasi yang artinya pembisik, setan, di ayat keempat, yang مَجْرُور sebagai mudhof ilaih; kalimat sesudahnya menjadi صِلَةnya.",
+      "text": "Perannya: isim maushul. Isim maushul ini مَبْنِيّ di atas سُكُون dan berkedudukan جَرّ sebagai sifat, atau نَعْت, bagi kata al-waswasi yang artinya pembisik, setan, di ayat keempat, yang مَجْرُور sebagai mudhof ilaih; kalimat sesudahnya menjadi صِلَةnya.",
       "display": "Perannya: isim maushul (اِسْم مَوْصُول). Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai sifat, atau na’t (نَعْت), bagi kata ٱلْوَسْوَاسِ (al-waswāsi) yang artinya “pembisik (setan)” di ayat keempat, yang majrur (مَجْرُور) sebagai mudhaf ilaih (مُضَاف إِلَيْه); kalimat sesudahnya menjadi shilah-nya (صِلَة).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/d1d762afb5c69b15.mp3",
-        "ms": 21238,
-        "sha256": "a57018a957487335b71ce011a853d1132036c7fee68b7e8c0d5d6857412a6596"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/90227d148673dbfd.mp3",
+        "ms": 22204,
+        "sha256": "865c253f149e5a4167139b4f9fac09b4b641387ec332622ae85a9af772c3ad1e"
       },
       "tokens": [
         {
           "t": "Perannya:",
           "s": 0.0,
-          "e": 0.76
+          "e": 0.64
         },
         {
           "t": "isim maushul (اِسْم مَوْصُول).",
-          "s": 0.86,
-          "e": 2.08
+          "s": 0.752,
+          "e": 1.92
         },
         {
           "t": "Isim maushul (اِسْم مَوْصُول)",
-          "s": 2.48,
-          "e": 3.6
+          "s": 2.187,
+          "e": 3.28
         },
         {
           "t": "ini",
-          "s": 3.7,
-          "e": 4.0
+          "s": 3.4,
+          "e": 3.76
         },
         {
           "t": "mabni (مَبْنِيّ)",
-          "s": 4.12,
-          "e": 4.64
+          "s": 3.84,
+          "e": 4.4
         },
         {
           "t": "di",
-          "s": 4.667,
-          "e": 4.72
+          "s": 4.427,
+          "e": 4.48
         },
         {
           "t": "atas",
-          "s": 4.784,
-          "e": 5.04
+          "s": 4.544,
+          "e": 4.8
         },
         {
           "t": "sukun (سُكُون)",
-          "s": 5.08,
-          "e": 5.68
+          "s": 4.84,
+          "e": 5.36
         },
         {
           "t": "dan",
-          "s": 5.78,
-          "e": 6.08
+          "s": 5.46,
+          "e": 5.76
         },
         {
           "t": "berkedudukan",
-          "s": 6.16,
-          "e": 6.88
+          "s": 5.82,
+          "e": 6.64
         },
         {
           "t": "jar (جَرّ)",
-          "s": 7.0,
-          "e": 7.56
+          "s": 6.72,
+          "e": 7.04
         },
         {
           "t": "sebagai",
-          "s": 7.595,
-          "e": 7.84
+          "s": 7.1,
+          "e": 7.52
         },
         {
           "t": "sifat,",
-          "s": 7.92,
-          "e": 8.4
+          "s": 7.56,
+          "e": 8.32
         },
         {
           "t": "atau",
-          "s": 8.496,
-          "e": 8.88
+          "s": 8.416,
+          "e": 8.8
         },
         {
           "t": "na’t (نَعْت),",
           "s": 8.96,
-          "e": 9.36
+          "e": 9.52
         },
         {
           "t": "bagi",
-          "s": 9.472,
-          "e": 9.92
+          "s": 9.648,
+          "e": 10.16
         },
         {
           "t": "kata",
-          "s": 10.0,
-          "e": 10.32
+          "s": 10.24,
+          "e": 10.56
         },
         {
           "t": "ٱلْوَسْوَاسِ (al-waswāsi)",
-          "s": 10.453,
-          "e": 11.52
-        },
-        {
-          "t": "yang",
-          "s": 11.616,
+          "s": 10.72,
           "e": 12.0
         },
         {
+          "t": "yang",
+          "s": 12.112,
+          "e": 12.56
+        },
+        {
           "t": "artinya",
-          "s": 12.06,
-          "e": 12.48
+          "s": 12.62,
+          "e": 13.12
         },
         {
           "t": "pembisik,",
-          "s": 12.56,
-          "e": 13.52
+          "s": 13.2,
+          "e": 14.24
         },
         {
           "t": "setan,",
-          "s": 13.62,
-          "e": 14.16
+          "s": 14.34,
+          "e": 14.88
         },
         {
           "t": "di",
-          "s": 14.267,
-          "e": 14.48
+          "s": 15.067,
+          "e": 15.44
         },
         {
           "t": "ayat",
-          "s": 14.533,
-          "e": 14.8
+          "s": 15.493,
+          "e": 15.76
         },
         {
           "t": "keempat,",
-          "s": 14.853,
-          "e": 15.36
+          "s": 15.813,
+          "e": 16.32
         },
         {
           "t": "yang",
-          "s": 15.488,
-          "e": 16.0
+          "s": 16.464,
+          "e": 17.04
         },
         {
           "t": "majrur (مَجْرُور)",
-          "s": 16.08,
-          "e": 16.64
+          "s": 17.08,
+          "e": 17.6
         },
         {
           "t": "sebagai",
-          "s": 16.7,
-          "e": 17.12
+          "s": 17.65,
+          "e": 18.0
         },
         {
           "t": "mudhaf ilaih (مُضَاف إِلَيْه);",
-          "s": 17.2,
-          "e": 18.08
+          "s": 18.06,
+          "e": 19.04
         },
         {
           "t": "kalimat",
-          "s": 18.22,
-          "e": 18.88
+          "s": 19.18,
+          "e": 19.84
         },
         {
           "t": "sesudahnya",
-          "s": 18.94,
-          "e": 19.6
+          "s": 19.9,
+          "e": 20.56
         },
         {
           "t": "menjadi",
-          "s": 19.67,
-          "e": 20.16
+          "s": 20.63,
+          "e": 21.12
         },
         {
           "t": "shilah-nya (صِلَة).",
-          "s": 20.36,
-          "e": 21.2
+          "s": 21.28,
+          "e": 22.16
         }
       ]
     },
@@ -26083,14 +26083,14 @@
       ]
     },
     "an-nas:5:map:total": {
-      "text": "Dengan itu, sudah dua puluh dua hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, اِسْم مَوْصُول, فِعْل مَاضٍ, عَطْف, فِعْل أَمْر, بَدَل, serta جَمْع تَكْسِير.",
+      "text": "Dengan itu, sudah dua puluh dua hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, isim maushul, fi'il madhi, عَطْف, فِعْل أَمْر, بَدَل, serta جَمْع تَكْسِير.",
       "display": "Dengan itu, sudah dua puluh dua hal yang kita pelajari, yaitu harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), manshub (مَنْصُوب), isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), ‘athaf (عَطْف), fi’il amr (فِعْل أَمْر), badal (بَدَل), serta jamak taksir (جَمْع تَكْسِير).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/f045cc4141f56fd6.mp3",
-        "ms": 38687,
-        "sha256": "f38e2f84ccdbe81e1d07e82ca97048864c2af3f0b5a172cf3beb08d8f77493b5"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/e4c2a36810ef6dee.mp3",
+        "ms": 39314,
+        "sha256": "137ff7202dee42e2234ea7017ce54a63458113e3431dbb0b612a820610a38de0"
       },
       "tokens": [
         {
@@ -26100,213 +26100,213 @@
         },
         {
           "t": "itu,",
-          "s": 0.32,
-          "e": 0.76
+          "s": 0.34,
+          "e": 0.72
         },
         {
           "t": "sudah",
-          "s": 0.793,
-          "e": 0.96
-        },
-        {
-          "t": "dua",
-          "s": 1.0,
+          "s": 0.787,
           "e": 1.12
         },
         {
-          "t": "puluh",
+          "t": "dua",
           "s": 1.18,
-          "e": 1.48
+          "e": 1.36
+        },
+        {
+          "t": "puluh",
+          "s": 1.42,
+          "e": 1.68
         },
         {
           "t": "dua",
-          "s": 1.51,
-          "e": 1.6
-        },
-        {
-          "t": "hal",
-          "s": 1.7,
+          "s": 1.76,
           "e": 2.0
         },
         {
-          "t": "yang",
-          "s": 2.032,
-          "e": 2.16
-        },
-        {
-          "t": "kita",
-          "s": 2.208,
+          "t": "hal",
+          "s": 2.1,
           "e": 2.4
         },
         {
+          "t": "yang",
+          "s": 2.432,
+          "e": 2.56
+        },
+        {
+          "t": "kita",
+          "s": 2.624,
+          "e": 2.88
+        },
+        {
           "t": "pelajari,",
-          "s": 2.44,
-          "e": 3.52
+          "s": 2.92,
+          "e": 4.08
         },
         {
           "t": "yaitu",
-          "s": 3.56,
-          "e": 4.16
+          "s": 4.12,
+          "e": 4.4
         },
         {
           "t": "harakat,",
-          "s": 4.26,
-          "e": 5.04
+          "s": 4.46,
+          "e": 5.6
         },
         {
           "t": "tiga",
-          "s": 5.28,
-          "e": 5.68
+          "s": 5.64,
+          "e": 5.84
         },
         {
           "t": "jenis",
-          "s": 5.733,
-          "e": 6.0
+          "s": 5.907,
+          "e": 6.24
         },
         {
           "t": "kata,",
-          "s": 6.08,
-          "e": 6.64
+          "s": 6.32,
+          "e": 6.88
         },
         {
           "t": "yaitu",
-          "s": 6.68,
+          "s": 6.92,
           "e": 7.28
         },
         {
           "t": "isim (اِسْم),",
-          "s": 7.44,
-          "e": 8.0
+          "s": 7.36,
+          "e": 8.16
         },
         {
           "t": "fi’il (فِعْل),",
-          "s": 8.32,
-          "e": 9.36
+          "s": 8.24,
+          "e": 8.64
         },
         {
           "t": "dan",
-          "s": 9.42,
-          "e": 9.6
+          "s": 8.74,
+          "e": 9.04
         },
         {
           "t": "huruf (حَرْف),",
-          "s": 9.68,
-          "e": 10.72
+          "s": 9.12,
+          "e": 9.56
         },
         {
           "t": "majrur (مَجْرُور),",
-          "s": 10.76,
-          "e": 11.76
+          "s": 9.58,
+          "e": 10.08
         },
         {
           "t": "huruf jar (حَرْف جَرّ),",
-          "s": 11.8,
-          "e": 13.12
+          "s": 10.44,
+          "e": 11.6
         },
         {
           "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 13.16,
-          "e": 14.32
+          "s": 11.88,
+          "e": 13.28
         },
         {
           "t": "marfu’ (مَرْفُوع),",
-          "s": 14.6,
-          "e": 15.44
+          "s": 13.52,
+          "e": 14.4
         },
         {
           "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
-          "s": 15.72,
-          "e": 17.52
+          "s": 14.76,
+          "e": 16.64
         },
         {
           "t": "alif lam (ال),",
-          "s": 17.707,
-          "e": 18.64
+          "s": 16.853,
+          "e": 17.92
         },
         {
           "t": "na’t (نَعْت),",
-          "s": 19.0,
-          "e": 19.84
+          "s": 18.28,
+          "e": 19.12
         },
         {
           "t": "idhafah (إِضَافَة),",
-          "s": 20.053,
-          "e": 21.52
+          "s": 19.333,
+          "e": 20.32
         },
         {
           "t": "dhamir (ضَمِير),",
-          "s": 21.6,
-          "e": 22.64
+          "s": 20.533,
+          "e": 21.36
         },
         {
           "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 22.693,
-          "e": 23.68
+          "s": 21.627,
+          "e": 23.04
         },
         {
           "t": "mu’rab (مُعْرَب)",
-          "s": 24.0,
-          "e": 24.8
+          "s": 23.4,
+          "e": 24.24
         },
         {
           "t": "dan",
-          "s": 24.86,
-          "e": 25.04
+          "s": 24.3,
+          "e": 24.48
         },
         {
           "t": "mabni (مَبْنِيّ),",
-          "s": 25.08,
-          "e": 26.16
+          "s": 24.52,
+          "e": 25.76
         },
         {
           "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
-          "s": 26.2,
-          "e": 27.36
+          "s": 25.8,
+          "e": 27.04
         },
         {
           "t": "maf’ul bih (مَفْعُول بِه),",
-          "s": 27.56,
-          "e": 28.64
+          "s": 27.36,
+          "e": 28.48
         },
         {
           "t": "manshub (مَنْصُوب),",
-          "s": 28.92,
-          "e": 30.32
+          "s": 28.84,
+          "e": 30.28
         },
         {
           "t": "isim maushul (اِسْم مَوْصُول),",
-          "s": 30.36,
-          "e": 31.52
+          "s": 30.384,
+          "e": 31.44
         },
         {
           "t": "fi’il madhi (فِعْل مَاضٍ),",
-          "s": 31.8,
-          "e": 33.28
+          "s": 31.707,
+          "e": 33.6
         },
         {
           "t": "‘athaf (عَطْف),",
-          "s": 33.44,
-          "e": 34.08
+          "s": 33.68,
+          "e": 34.8
         },
         {
           "t": "fi’il amr (فِعْل أَمْر),",
-          "s": 34.32,
-          "e": 35.6
+          "s": 34.88,
+          "e": 35.76
         },
         {
           "t": "badal (بَدَل),",
-          "s": 35.76,
-          "e": 36.4
+          "s": 36.12,
+          "e": 37.44
         },
         {
           "t": "serta",
-          "s": 36.533,
-          "e": 37.2
+          "s": 37.52,
+          "e": 37.92
         },
         {
           "t": "jamak taksir (جَمْع تَكْسِير).",
-          "s": 37.36,
-          "e": 38.64
+          "s": 38.08,
+          "e": 39.28
         }
       ]
     },
@@ -31351,14 +31351,14 @@
       ]
     },
     "an-nas:6:map:total:1": {
-      "text": "Dari pelajaran pengantar dan Surah Al-Fatihah ada sembilan belas hal, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, اِسْم مَوْصُول, فِعْل مَاضٍ, serta عَطْف.",
+      "text": "Dari pelajaran pengantar dan Surah Al-Fatihah ada sembilan belas hal, yaitu harakat, tiga jenis kata, yaitu اِسْم, فِعْل, dan حَرْف, مَجْرُور, حَرْف جَرّ, جُمْلَة اِسْمِيَّة, مَرْفُوع, جَمْع مُذَكَّر سَالِم, alif lam, نَعْت, idhofah, dhomir, fi'il mudhori', مُعْرَب dan مَبْنِيّ, جُمْلَة فِعْلِيَّة, مَفْعُول بِه, مَنْصُوب, isim maushul, fi'il madhi, serta عَطْف.",
       "display": "Dari pelajaran pengantar dan Surah Al-Fatihah ada sembilan belas hal, yaitu harakat, tiga jenis kata, yaitu isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف), majrur (مَجْرُور), huruf jar (حَرْف جَرّ), jumlah ismiyyah (جُمْلَة اِسْمِيَّة), marfu’ (مَرْفُوع), jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم), alif lam (ال), na’t (نَعْت), idhafah (إِضَافَة), dhamir (ضَمِير), fi’il mudhari’ (فِعْل مُضَارِع), mu’rab (مُعْرَب) dan mabni (مَبْنِيّ), jumlah fi’liyyah (جُمْلَة فِعْلِيَّة), maf’ul bih (مَفْعُول بِه), manshub (مَنْصُوب), isim maushul (اِسْم مَوْصُول), fi’il madhi (فِعْل مَاضٍ), serta ‘athaf (عَطْف).",
       "highlight": [],
       "focus": null,
       "audio": {
-        "url": "/belajar/media/narration/kang-nandar/an-nas/0930b61986ae0ad8.mp3",
-        "ms": 38922,
-        "sha256": "cb3383276ec536d4a8b79e4b04d0f392ad636cc0ff1f0c858b698b14840f519a"
+        "url": "/belajar/media/narration/kang-nandar/an-nas/c0dd8d89ab6bdeb6.mp3",
+        "ms": 38034,
+        "sha256": "3a5bc85c85e0558b4a12f59411e48375dbfb5c05135546ad65ebee33f87bffc4"
       },
       "tokens": [
         {
@@ -31369,11 +31369,11 @@
         {
           "t": "pelajaran",
           "s": 0.28,
-          "e": 0.8
+          "e": 0.72
         },
         {
           "t": "pengantar",
-          "s": 0.832,
+          "s": 0.768,
           "e": 1.44
         },
         {
@@ -31389,177 +31389,177 @@
         {
           "t": "Al-Fatihah",
           "s": 2.053,
-          "e": 2.88
+          "e": 2.8
         },
         {
           "t": "ada",
-          "s": 2.96,
-          "e": 3.2
+          "s": 2.94,
+          "e": 3.36
         },
         {
           "t": "sembilan",
-          "s": 3.26,
-          "e": 3.6
+          "s": 3.42,
+          "e": 3.76
         },
         {
           "t": "belas",
-          "s": 3.64,
-          "e": 3.96
+          "s": 3.8,
+          "e": 4.0
         },
         {
           "t": "hal,",
-          "s": 4.01,
-          "e": 4.24
+          "s": 4.1,
+          "e": 5.04
         },
         {
           "t": "yaitu",
-          "s": 4.56,
-          "e": 5.28
+          "s": 5.08,
+          "e": 5.44
         },
         {
           "t": "harakat,",
-          "s": 5.38,
-          "e": 6.72
+          "s": 5.48,
+          "e": 6.48
         },
         {
           "t": "tiga",
-          "s": 6.76,
-          "e": 6.96
+          "s": 6.52,
+          "e": 6.72
         },
         {
           "t": "jenis",
-          "s": 7.027,
-          "e": 7.36
+          "s": 6.787,
+          "e": 7.12
         },
         {
           "t": "kata,",
-          "s": 7.456,
-          "e": 7.96
+          "s": 7.216,
+          "e": 7.76
         },
         {
           "t": "yaitu",
-          "s": 8.02,
-          "e": 8.48
+          "s": 7.84,
+          "e": 8.24
         },
         {
           "t": "isim (اِسْم),",
-          "s": 8.6,
-          "e": 9.2
+          "s": 8.28,
+          "e": 9.04
         },
         {
           "t": "fi’il (فِعْل),",
-          "s": 9.4,
+          "s": 9.12,
+          "e": 9.76
+        },
+        {
+          "t": "dan",
+          "s": 9.8,
           "e": 9.92
         },
         {
-          "t": "dan",
-          "s": 10.02,
-          "e": 10.32
-        },
-        {
           "t": "huruf (حَرْف),",
-          "s": 10.4,
-          "e": 10.88
+          "s": 10.0,
+          "e": 11.2
         },
         {
           "t": "majrur (مَجْرُور),",
-          "s": 11.28,
-          "e": 12.32
+          "s": 11.24,
+          "e": 11.92
         },
         {
           "t": "huruf jar (حَرْف جَرّ),",
-          "s": 12.6,
-          "e": 13.96
+          "s": 12.2,
+          "e": 13.6
         },
         {
           "t": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة),",
-          "s": 14.18,
-          "e": 15.52
+          "s": 13.8,
+          "e": 15.04
         },
         {
           "t": "marfu’ (مَرْفُوع),",
-          "s": 15.92,
-          "e": 16.96
+          "s": 15.32,
+          "e": 16.24
         },
         {
           "t": "jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم),",
-          "s": 17.36,
-          "e": 19.36
+          "s": 16.64,
+          "e": 18.72
         },
         {
           "t": "alif lam (ال),",
-          "s": 19.627,
-          "e": 21.16
+          "s": 18.96,
+          "e": 20.44
         },
         {
           "t": "na’t (نَعْت),",
-          "s": 21.38,
-          "e": 22.08
+          "s": 20.66,
+          "e": 21.28
         },
         {
           "t": "idhafah (إِضَافَة),",
-          "s": 22.32,
-          "e": 23.36
+          "s": 21.547,
+          "e": 22.72
         },
         {
           "t": "dhamir (ضَمِير),",
-          "s": 23.653,
-          "e": 24.8
+          "s": 22.96,
+          "e": 23.84
         },
         {
           "t": "fi’il mudhari’ (فِعْل مُضَارِع),",
-          "s": 25.013,
-          "e": 26.4
+          "s": 24.133,
+          "e": 25.6
         },
         {
           "t": "mu’rab (مُعْرَب)",
-          "s": 26.76,
-          "e": 27.68
+          "s": 26.0,
+          "e": 26.88
         },
         {
           "t": "dan",
-          "s": 27.74,
-          "e": 27.92
+          "s": 26.94,
+          "e": 27.12
         },
         {
           "t": "mabni (مَبْنِيّ),",
-          "s": 27.96,
-          "e": 28.56
+          "s": 27.16,
+          "e": 27.76
         },
         {
           "t": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة),",
-          "s": 28.96,
-          "e": 30.4
+          "s": 28.2,
+          "e": 29.76
         },
         {
           "t": "maf’ul bih (مَفْعُول بِه),",
-          "s": 30.76,
-          "e": 32.0
+          "s": 30.2,
+          "e": 31.44
         },
         {
           "t": "manshub (مَنْصُوب),",
-          "s": 32.4,
-          "e": 33.52
+          "s": 31.84,
+          "e": 32.88
         },
         {
           "t": "isim maushul (اِسْم مَوْصُول),",
-          "s": 33.88,
-          "e": 35.28
+          "s": 33.088,
+          "e": 34.56
         },
         {
           "t": "fi’il madhi (فِعْل مَاضٍ),",
-          "s": 35.68,
-          "e": 37.52
+          "s": 34.827,
+          "e": 36.64
         },
         {
           "t": "serta",
-          "s": 37.6,
-          "e": 38.0
+          "s": 36.733,
+          "e": 37.2
         },
         {
           "t": "‘athaf (عَطْف).",
-          "s": 38.24,
-          "e": 38.88
+          "s": 37.4,
+          "e": 38.0
         }
       ]
     },
