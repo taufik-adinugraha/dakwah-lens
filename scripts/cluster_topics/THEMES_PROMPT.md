@@ -206,6 +206,26 @@ sample of the corpus. Write `<RUN>/themes.json`:
 - Fold a single-event story into the domain magnet instead of minting a theme for it
   (KMP Batumandi fire, the police-shoots-police case, the PSS supporters' crash went into
   the disaster and law magnets this week; none became a reservoir).
+- **A crime-type word in a label makes the theme the law group's reservoir.** 2026-10-29:
+  "Pembunuhan Ibu dan Anak di Madiun" (146 posts, 0.59) took every assault, corpse find and
+  gang fight; "…Pabrik Sabu Aceh" (0.47) took every ganja/sabu arrest; "Penindakan KPK" with a
+  bare `kpk` (0.36) took every arrest and trial. A theme named for a single arrest ("Penahanan
+  Mantan Bupati Gowa…", 0.31) took every detention and trial of the week. Fixes that worked:
+  name the distinctive event ("Kasus Madiun: Jasad Dibakar dan Digiling…"), keep `kpk`, `jaksa`-
+  type and drug-arrest words in the law magnet, floor 0.42, and fold the ~25-post arrest story
+  into the magnet. Concrete-only purity 0.714 after two rounds (first inject: three themes
+  under 0.45).
+- **A small calendar event is not a theme.** "Hari Santri 2026" (35 posts) collected 23
+  Lainnya agenda posts (Hindu holidays, expos) at 0.43; its tokens belong in the religious
+  magnet. Same for housing programmes, Pilkades and Nataru prices: put them in the
+  governance magnet.
+- The governance magnet needs local-government vocabulary (`reses`, `ranperda`, `otsus`,
+  `santunan`, `pangan murah`, `inspektur`, `satpol pp`, `retribusi`, `pemda`) or its orphans
+  fall onto whichever concrete theme is nearest. `perda`, `camat`, `pemko`, `jaksa`, `ganja`,
+  `bandar`, `gizi` are substrings of other words and fail the gate; use phrases.
+- Do not paste the survey agents' tokens unchecked: 13 of ~190 failed `check_keywords.py`
+  (`kortas`, `mendagri`, `antam`, `menkes`, `tabrakan`, `zelensky`, `guru besar` at 25%
+  cohesion). The agents' own self-check counts the 7,000-post sample, the gate counts the cache.
 - Reports from the survey agents arrive inside the hand-back message. Copy them to
   `shards/report_NN.md` mechanically (the text is in the agent's transcript, in its
   `SubagentHandback` call) rather than retyping ten 10 KB reports; `verify_reports.py`
