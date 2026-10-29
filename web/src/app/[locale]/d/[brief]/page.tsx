@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 
 import { BriefDetailContent } from "../../briefings/[id]/BriefDetailContent";
 import { getBriefingBySlug } from "@/lib/briefing-data";
+import { isBriefingListed } from "@/lib/briefing-listing";
 import { localeAwareFormat } from "@/lib/date-id";
 import { localeAlternates } from "@/lib/seo";
 
@@ -68,6 +69,8 @@ export async function generateMetadata({
   return {
     title,
     description,
+    // Unlisted after BRIEFING_LISTED_DAYS: still reachable, not indexed.
+    robots: isBriefingListed(row) ? undefined : { index: false, follow: true },
     // Self-canonical: this IS the canonical hub that /briefings/{id} points at.
     alternates: localeAlternates({
       locale,

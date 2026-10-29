@@ -14,6 +14,7 @@
 import { and, count, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
 
 import { db, schema } from "@/db";
+import { briefingListedSql } from "@/lib/briefing-listing";
 import { currentWeekStartUtc } from "@/lib/user-flyer/quota";
 
 /* ─────────────────────────────────────────────────────────────
@@ -1052,6 +1053,7 @@ export async function getOverallViewKits(): Promise<OverallViewKits | null> {
     FROM briefings
     WHERE theme_group IS NULL
       AND summary_md IS NOT NULL
+      AND ${briefingListedSql()}
     ORDER BY generated_at DESC
     LIMIT 1
   `)) as unknown as Array<{
@@ -1140,6 +1142,7 @@ export async function getSegmentBriefingChoices(): Promise<
       generated_at,
       COALESCE((headline_stats->'totals'->>'posts_7d')::int, 0) AS posts_7d
     FROM briefings
+    WHERE ${briefingListedSql()}
     ORDER BY COALESCE(theme_group, 'all'), generated_at DESC
   `)) as unknown as Array<{
     segment: string;
@@ -1530,6 +1533,7 @@ export async function getKitSegments(): Promise<KitSegmentData[]> {
     WHERE summary_md IS NOT NULL
       AND theme_group IS NOT NULL
       AND theme_group NOT IN ('spiritual', 'family', 'youth', 'justice')
+      AND ${briefingListedSql()}
     ORDER BY theme_group, generated_at DESC
   `)) as unknown as Array<{
     segment: string;

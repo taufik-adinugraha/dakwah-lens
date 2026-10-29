@@ -30,6 +30,7 @@ import {
   extractDeliverableSection,
   getBriefingBySlug,
 } from "@/lib/briefing-data";
+import { isBriefingListed } from "@/lib/briefing-listing";
 import { Article } from "../../../m/[id]/Article";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
 import { ShareButton } from "./ShareButton";
@@ -104,6 +105,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
+    // Unlisted after BRIEFING_LISTED_DAYS: still reachable, not indexed.
+    robots: isBriefingListed(row) ? undefined : { index: false, follow: true },
     alternates: localeAlternates({
       locale,
       canonicalPath: `/d/${brief}/${deliverable}`,

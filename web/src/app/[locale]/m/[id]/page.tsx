@@ -5,6 +5,7 @@ import { ArrowLeft, MessageSquareQuote } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { getBriefingBySlug } from "@/lib/briefing-data";
+import { isBriefingListed } from "@/lib/briefing-listing";
 import { localeAwareFormat } from "@/lib/date-id";
 import { localeAlternates, SITE_URL } from "@/lib/seo";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
@@ -97,6 +98,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
+    // Unlisted after BRIEFING_LISTED_DAYS: still reachable, not indexed.
+    robots: isBriefingListed(brief) ? undefined : { index: false, follow: true },
     alternates: localeAlternates({
       locale,
       canonicalPath: `/m/${id}`,
