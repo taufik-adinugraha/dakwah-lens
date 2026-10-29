@@ -6,6 +6,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { MonthPickerPager } from "@/components/MonthPickerPager";
 import { db, schema } from "@/db";
+import { briefingListedSql } from "@/lib/briefing-listing";
 import { Link } from "@/i18n/navigation";
 import { briefingSlug, FIQH_GROUP, TAFSIR_GROUP } from "@/lib/briefing-data";
 import {
@@ -111,6 +112,7 @@ export default async function PublicFlyersPage({
         EXTRACT(YEAR FROM (generated_at AT TIME ZONE 'Asia/Jakarta'))::int AS year,
         EXTRACT(MONTH FROM (generated_at AT TIME ZONE 'Asia/Jakarta'))::int AS month
       FROM briefings
+      WHERE ${briefingListedSql()}
       UNION
       SELECT DISTINCT
         EXTRACT(YEAR FROM (created_at AT TIME ZONE 'Asia/Jakarta'))::int AS year,
@@ -146,6 +148,7 @@ export default async function PublicFlyersPage({
       FROM briefings
       WHERE generated_at >= ${startUtc.toISOString()}
         AND generated_at <  ${endUtc.toISOString()}
+        AND ${briefingListedSql()}
       ORDER BY generated_at DESC, theme_group NULLS FIRST
     `)) as unknown as Array<{
       id: string;
@@ -157,6 +160,7 @@ export default async function PublicFlyersPage({
     briefingRows = (await db.execute(sql`
       SELECT DISTINCT ON (theme_group) id, generated_at, theme_group AS segment, occasion_slug
       FROM briefings
+      WHERE ${briefingListedSql()}
       ORDER BY theme_group NULLS FIRST, generated_at DESC
     `)) as unknown as Array<{
       id: string;

@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 
 import { db, schema } from "@/db";
 import { briefingSlug } from "@/lib/briefing-data";
+import { briefingListedSql } from "@/lib/briefing-listing";
 import { SITE_URL } from "@/lib/seo";
 import { TOPICS } from "@/lib/doa";
 
@@ -93,7 +94,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  // 2) Every briefing hub + its deliverable pages.
+  // 2) Every LISTED briefing hub + its deliverable pages.
   try {
     const rows = await db
       .select({
@@ -102,7 +103,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         occasionSlug: schema.briefings.occasionSlug,
         hasEn: sql<boolean>`${schema.briefings.summaryMdEn} is not null`,
       })
-      .from(schema.briefings);
+      .from(schema.briefings)
+      // Unlisted briefings (older than BRIEFING_LISTED_DAYS) stay
+      // reachable but are noindexed, so they leave the sitemap too.
+      .where(briefingListedSql());
 
     for (const r of rows) {
       const slug = briefingSlug(r.generatedAt, r.themeGroup, r.occasionSlug);

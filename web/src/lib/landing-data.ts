@@ -3,6 +3,7 @@ import "server-only";
 import { sql } from "drizzle-orm";
 
 import { db } from "@/db";
+import { briefingListedSql } from "@/lib/briefing-listing";
 
 /** Lightweight rows for the landing "live Insights preview" — the
  *  redesign's proof that the product is real: latest briefing per
@@ -44,6 +45,7 @@ export async function getLandingInsights(): Promise<LandingInsights> {
           id, theme_group, generated_at
         FROM briefings
         WHERE theme_group IS NOT NULL AND occasion_slug IS NULL
+          AND ${briefingListedSql()}
         ORDER BY theme_group, generated_at DESC
       ) latest
       LEFT JOIN (

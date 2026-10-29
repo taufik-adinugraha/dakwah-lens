@@ -19,6 +19,7 @@ import {
 } from "@/lib/dashboard-metrics";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
 import { occasionWeeks, weekRangeUtc, wibWeekOf } from "@/lib/week-filter";
+import { briefingListedSql } from "@/lib/briefing-listing";
 
 /**
  * Strip word-count annotations the LLM echoes back from the prompt's
@@ -488,7 +489,7 @@ export async function getLatestBriefing(
       occasionSlug: schema.briefings.occasionSlug,
     })
     .from(schema.briefings)
-    .where(eq(schema.briefings.themeGroup, group))
+    .where(and(eq(schema.briefings.themeGroup, group), briefingListedSql()))
     .orderBy(desc(schema.briefings.generatedAt))
     .limit(1);
   if (!row) return null;
@@ -863,7 +864,7 @@ export async function getOtherMahasiswaRooms(
            || '-' || ${slugifySql}
     WHERE to_char(i.generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
             || '-' || ${slugifySql} <> ${currentSlug}
-      AND i.generated_at >= now() - interval '90 days'
+      AND ${briefingListedSql("i")}
     GROUP BY i.summary_md, i.theme_group, i.generated_at
     ORDER BY i.generated_at DESC
     LIMIT ${limit * 4}
@@ -1004,7 +1005,7 @@ export async function getLatestOccasionBriefing(): Promise<
       occasionSlug: schema.briefings.occasionSlug,
     })
     .from(schema.briefings)
-    .where(sql`occasion_slug IS NOT NULL AND theme_group = 'Acara Kalender Islam'`)
+    .where(sql`occasion_slug IS NOT NULL AND theme_group = 'Acara Kalender Islam' AND ${briefingListedSql()}`)
     .orderBy(desc(schema.briefings.generatedAt))
     .limit(1);
   if (!row) return null;
@@ -1056,7 +1057,7 @@ export async function getLatestNationalBriefing(): Promise<
       occasionSlug: schema.briefings.occasionSlug,
     })
     .from(schema.briefings)
-    .where(sql`theme_group = ${NATIONAL_GROUP} AND occasion_slug IS NOT NULL`)
+    .where(sql`theme_group = ${NATIONAL_GROUP} AND occasion_slug IS NOT NULL AND ${briefingListedSql()}`)
     .orderBy(desc(schema.briefings.generatedAt))
     .limit(1);
   if (!row) return null;
@@ -1183,6 +1184,7 @@ export async function getKhutbahKultumWeeks(): Promise<string[]> {
         to_char(date_trunc('week', generated_at AT TIME ZONE 'Asia/Jakarta'), 'YYYY-MM-DD') AS wk
       FROM briefings
       WHERE theme_group IN (${sqlList(BRIEFING_GROUPS)})
+        AND ${briefingListedSql()}
       ORDER BY wk DESC
       LIMIT 260
     `) as unknown as Promise<Array<{ wk: string }>>,
@@ -1191,6 +1193,7 @@ export async function getKhutbahKultumWeeks(): Promise<string[]> {
       FROM briefings
       WHERE theme_group IN (${sqlList(KHUTBAH_KULTUM_OCCASION_GROUPS)})
         AND occasion_slug IS NOT NULL
+        AND ${briefingListedSql()}
     `) as unknown as Promise<
       Array<{ generated_at: Date | string; event_date: string | null }>
     >,
@@ -1249,6 +1252,7 @@ export async function getKhutbahKultumBriefings(
       WHERE theme_group IN (${sqlList(BRIEFING_GROUPS)})
         AND generated_at >= ${startUtc.toISOString()}
         AND generated_at <  ${endUtc.toISOString()}
+        AND ${briefingListedSql()}
       ORDER BY theme_group, generated_at DESC
     `) as unknown as Promise<KhutbahKultumRow[]>,
     db.execute(sql`
@@ -1258,6 +1262,7 @@ export async function getKhutbahKultumBriefings(
       FROM briefings
       WHERE theme_group IN (${sqlList(KHUTBAH_KULTUM_OCCASION_GROUPS)})
         AND occasion_slug IS NOT NULL
+        AND ${briefingListedSql()}
       ORDER BY theme_group, occasion_slug, generated_at DESC
     `) as unknown as Promise<KhutbahKultumRow[]>,
   ]);
@@ -1379,6 +1384,7 @@ export async function getBriefingNavigation(
     WHERE (generated_at AT TIME ZONE 'Asia/Jakarta')::date
         = (${currentGeneratedAt.toISOString()}::timestamptz AT TIME ZONE 'Asia/Jakarta')::date
       AND theme_group IS NOT NULL
+      AND ${briefingListedSql()}
     ORDER BY theme_group, generated_at DESC
   `)) as unknown as Array<{ generatedAt: Date; themeGroup: string | null }>;
 
@@ -1417,7 +1423,7 @@ export async function getBriefingNavigation(
     })
     .from(schema.briefings)
     .where(
-      sql`generated_at < ${currentTs}::timestamptz AND ${segmentClause} AND ${differentDay}`,
+      sql`generated_at < ${currentTs}::timestamptz AND ${segmentClause} AND ${differentDay} AND ${briefingListedSql()}`,
     )
     .orderBy(desc(schema.briefings.generatedAt))
     .limit(1);
@@ -1431,7 +1437,7 @@ export async function getBriefingNavigation(
       })
       .from(schema.briefings)
       .where(
-        sql`generated_at > ${currentTs}::timestamptz AND ${segmentClause} AND ${differentDay}`,
+        sql`generated_at > ${currentTs}::timestamptz AND ${segmentClause} AND ${differentDay} AND ${briefingListedSql()}`,
       )
       .orderBy(schema.briefings.generatedAt)
       .limit(1)

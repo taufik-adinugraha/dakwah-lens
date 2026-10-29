@@ -3,6 +3,7 @@ import "server-only";
 import { sql } from "drizzle-orm";
 
 import { db } from "@/db";
+import { briefingListedSql } from "@/lib/briefing-listing";
 import { extractPosterQuestion } from "@/lib/flyer/content";
 
 /**
@@ -45,7 +46,8 @@ export const ACTIVE_THRESHOLD_DAYS = 7;
 
 /**
  * Public-safe roll-up of every discussion room published in the last
- * `windowDays` (default 90). One row per logical room — a briefing
+ * `windowDays` (default 90) whose briefing is still listed (see
+ * briefing-listing.ts — 10 days). One row per logical room — a briefing
  * regenerated 5× still shows as one card thanks to the DISTINCT ON.
  *
  * No auth. Single SQL round-trip so /discussions stays cheap to load.
@@ -92,6 +94,7 @@ export async function listPublicRoomOverviews(
         summary_md
       FROM briefings
       WHERE generated_at >= now() - (${windowDays} || ' days')::interval
+        AND ${briefingListedSql()}
       ORDER BY briefing_slug, generated_at DESC
     )
     SELECT
