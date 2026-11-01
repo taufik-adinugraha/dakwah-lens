@@ -24,7 +24,7 @@ celery_app = Celery(
     "dakwah_lens",
     broker=settings.redis_url,
     backend=settings.redis_url,
-    include=["api.workers.ingest"],
+    include=["api.workers.ingest", "api.workers.claude_jobs"],
 )
 
 celery_app.conf.update(
@@ -220,6 +220,28 @@ celery_app.conf.update(
         #     "task": "api.workers.ingest.recluster_all",
         #     "schedule": crontab(minute=0, hour=4),
         # },
+        # Claude theme + sentiment labels and the weekly Claude recluster
+        # (operator decision 2026-11-01; workers/claude_jobs.py). The batch
+        # is submitted at 00:00 WIB and applied by the poll once it ends
+        # (most batches end within the hour). The poll starts Thursday's
+        # recluster as soon as that day's batch is applied; the 06:00 WIB
+        # entry is the fallback if it has not run by then (the task runs
+        # at most once per day). Costs ride on the promotional Claude
+        # credit (ANTHROPIC_LABELING_API_KEY), not the IDR budget.
+        "claude-label-daily": {
+            "task": "api.workers.claude_jobs.label_daily_submit",
+            "schedule": crontab(minute=0, hour=0),
+        },
+        "claude-label-poll": {
+            "task": "api.workers.claude_jobs.label_batch_poll",
+            "schedule": crontab(minute="*/10"),
+        },
+        "claude-recluster-weekly": {
+            "task": "api.workers.claude_jobs.recluster_weekly",
+            # day_of_week=4 = Thursday in Celery's crontab (Sun=0).
+            "schedule": crontab(minute=0, hour=6, day_of_week=4),
+            "kwargs": {"fallback": True},
+        },
         # Insights briefing generation — PAUSED 2026-05-23 for cost.
         #
         # Scheduled day moved Sunday → Thursday 2026-05-24 so the

@@ -155,6 +155,9 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      # Claude label batch + weekly recluster (workers/claude_jobs.py).
+      # Separate org key; unset = both jobs log and skip.
+      ANTHROPIC_LABELING_API_KEY: ${ANTHROPIC_LABELING_API_KEY:-}
       APIFY_TOKEN: ${APIFY_TOKEN}
       YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-large}
@@ -203,6 +206,9 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      # Claude label batch + weekly recluster (workers/claude_jobs.py).
+      # Separate org key; unset = both jobs log and skip.
+      ANTHROPIC_LABELING_API_KEY: ${ANTHROPIC_LABELING_API_KEY:-}
       APIFY_TOKEN: ${APIFY_TOKEN}
       YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-large}

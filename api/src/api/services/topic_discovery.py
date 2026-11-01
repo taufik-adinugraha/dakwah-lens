@@ -42,6 +42,7 @@ from google.genai import types
 from openai import OpenAI
 
 from api.config import settings
+from api.services.keyword_gate import ELASTIC_HARD_BAN
 
 log = structlog.get_logger()
 
@@ -1269,23 +1270,11 @@ def discover_topics(
     # bucket instead — which is what we want, because those posts are
     # genuinely off-topic from any clean cluster the LLM should mint.
     #
-    # The set below mirrors the prompt's FORBIDDEN label substrings.
+    # The set (keyword_gate.ELASTIC_HARD_BAN — one copy, shared with the
+    # keyword gate) mirrors the prompt's FORBIDDEN label substrings.
     # Keep both in sync. Words like "tragis" / "viral" / "polemik" /
     # "kontroversi" / "heboh" / "geger" / "gempar" / "fenomena" never
     # produced clean clusters either — promoting them to the hard ban.
-    ELASTIC_HARD_BAN = {
-        "misterius",
-        "horor",
-        "aneh",
-        "tragis",
-        "viral",
-        "polemik",
-        "kontroversi",
-        "heboh",
-        "geger",
-        "gempar",
-        "fenomena",
-    }
     elastic_rejected: list[str] = []
     kept_after_elastic: list[dict[str, Any]] = []
     for theme in themes:
