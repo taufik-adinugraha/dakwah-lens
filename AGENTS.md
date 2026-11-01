@@ -8,14 +8,15 @@ Read the PRD (`Dakwah-Lens_PRD_v0.4.pdf`) for full product context. Owner: Sukse
 - `api/` — FastAPI + Celery backend. See `api/` files; uv-managed Python 3.12 in `src/api/`.
 - `docker-compose.yml` — local Postgres, Qdrant, Redis.
 
-## Locked decisions (current as of 2026-05-25)
+## Locked decisions (current as of 2026-11-01)
 
 | Decision | Value |
 |---|---|
 | Languages | Indonesian (primary) + English via next-intl |
 | Embedding model | `text-embedding-3-large` (OpenAI) |
-| Sentiment (all platforms) | Gemini Flash-Lite (`services/sentiment.py`) — single classifier across mainstream + social since 2026-05-25; IndoBERT removed after a manual eval showed ~14% accuracy on X positives |
-| Da'wah classifier / opportunity / topic discovery / rerank | Gemini 2.5 Flash-Lite |
+| Sentiment + `theme_group` (all platforms) | Claude Sonnet 5.5 via the Message Batches API, daily 00:00 WIB (`services/claude_labels.py`) since 2026-11-01 — labels every arrival plus every post still NULL; overwrites the ingest-time Gemini Flash-Lite label (`services/sentiment.py`), which has failed since 2026-10-29 on a depleted prepay |
+| Topic clustering | Claude Sonnet 5.5, weekly on Thursday after that day's label batch (`services/claude_recluster.py`, fallback 06:00 WIB) since 2026-11-01 — the automated twin of `scripts/cluster_topics/` |
+| Da'wah classifier / opportunity / rerank | Gemini 2.5 Flash-Lite |
 | Brief synthesis | Gemini 2.5 Pro (fallback: Claude Sonnet 4.6) |
 | Vector store | Self-hosted Qdrant in docker compose |
 | Hosting | IDCloudHost VPS (Indonesia residency per UU PDP §27/2022) |
@@ -34,6 +35,7 @@ Read the PRD (`Dakwah-Lens_PRD_v0.4.pdf`) for full product context. Owner: Sukse
 ## Cost discipline (per PRD §13)
 
 - Budget cap: IDR ~1.5-2M/month (~IDR 1M LLM + ~IDR 500K VPS).
+- The Claude label batch and weekly recluster run on `ANTHROPIC_LABELING_API_KEY`, an org funded by a $200/month promotional Claude credit, not on this cap. Estimated ~$25–35/month together; each run's cost is on its `ingest_runs` row and in api-costs (`label_batch`, `recluster`).
 - Tiered LLM routing — Gemini Flash-Lite by default for classify/topic/rerank; Gemini 2.5 Pro reserved for brief synthesis; Claude Sonnet 4.6 only as a Pro fallback.
 - Aggressive caching: never re-embed an unchanged kitab chunk; cache topic classifications.
 - Batch classification calls whenever the API supports it.
@@ -160,6 +162,8 @@ Memory: `feedback_fact_check_news_paraphrase`. Live enforcement: briefing.py SYS
 | theme classification / audit | `bash scripts/theme_audit/run.sh [days]` |
 | sentiment relabel | `bash scripts/sent_relabel/run.sh [days]` then `ingest.sh <run>` |
 | topic clustering (manual) | `bash scripts/cluster_topics/run.sh` then `inject.sh <run>` |
+
+Since 2026-11-01 sentiment, `theme_group` and topic clustering also run automatically (`workers/claude_jobs.py`); the manual entry points remain for audits and for a recluster outside Thursday. The automated and manual paths share one copy of each rule: the sentiment rubric (`api/src/api/prompts/sentiment_rubric.md`), the clustering guide (`api/src/api/prompts/cluster_themes_guide.md`) and the keyword gate (`api/src/api/services/keyword_gate.py`). The `scripts/` paths are symlinks to them. Edit the shared file, never a copy (`project_manual_auto_parity`).
 
 Why: every miss these pipelines produced came from a hand-made run. The per-run scripts were cloned by sed from the previous run and drifted (`m21_ingest.sh` shipped printing "M14B LEDGER" over m21's numbers); run dirs lived in `/tmp` and were reaped nightly; the batch prompt was retyped each time; and the null-coverage check depended on the operator remembering it. Each is now a default rather than discipline, and each run dir is durable under `~/.dakwah/`. Batch agents must pass `verify_batch.py` before reporting — a subagent's self-report is not evidence, measured repeatedly (batch n017 reported success having written no file; three more in the 4d theme run died with zero bytes). All three are pure-Claude — never Gemini. Memory: `feedback_manual_pipelines_one_entry_point`.
 

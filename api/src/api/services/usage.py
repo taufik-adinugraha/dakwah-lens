@@ -55,6 +55,11 @@ PRICES: dict[str, dict[str, float]] = {
         "claude-sonnet-4-5_out": 15.00,
         "claude-sonnet-4-6_in": 3.00,
         "claude-sonnet-4-6_out": 15.00,
+        # Standard rates. The label batch and recluster record their own
+        # cost_usd (batch -50%, cache writes 1.25x, cache reads 0.1x) — see
+        # claude_labels.cost_usd(); these rows are the fallback estimate.
+        "claude-sonnet-5-5_in": 2.00,
+        "claude-sonnet-5-5_out": 10.00,
     },
     # YouTube Data API — $0 inside free quota (10K units/day), $0 outside
     # (Google doesn't sell extra quota). We still log unit usage so we can

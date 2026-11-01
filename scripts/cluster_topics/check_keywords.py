@@ -88,34 +88,20 @@ ship a token that matches inside other words.
 Exit 1 if any keyword is inflated or incoherent past its threshold, so it can
 gate.
 """
-import ast
 import json
-import re
+import os
 import sys
-from pathlib import Path
 
-INFLATION_LIMIT = 0.15  # >15% of matches coming from inside other words
-COHESION_LIMIT = 0.30   # <30% of matches sharing ANY other keyword of its theme
-COHESION_MIN_N = 40     # below this the fraction is too noisy to judge
-
-
-def elastic_ban() -> set[str]:
-    """The label words topic_discovery silently rejects, read from its source.
-
-    inject drops a theme whose label contains one of these and only logs a
-    warning (2026-10-22: "Polemik Ijazah..." vanished into Lainnya and the
-    only trace was one log line). The set is a local variable inside the
-    pipeline function, so it cannot be imported; parsing it out of the file
-    keeps ONE copy instead of a second list that drifts
-    (project_manual_auto_parity).
-    """
-    src = Path(__file__).resolve().parents[2] / "api/src/api/services/topic_discovery.py"
-    for node in ast.walk(ast.parse(src.read_text(encoding="utf-8"))):
-        if isinstance(node, ast.Assign) and any(
-            isinstance(t, ast.Name) and t.id == "ELASTIC_HARD_BAN" for t in node.targets
-        ):
-            return {str(x).lower() for x in ast.literal_eval(node.value)}
-    raise SystemExit("ELASTIC_HARD_BAN not found in topic_discovery.py — update elastic_ban()")
+# One copy of the gate, shared with the weekly automated recluster and with
+# topic_discovery (project_manual_auto_parity): measurements, thresholds and
+# the banned label words all live in api/src/api/services/keyword_gate.py.
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(REPO, "api", "src"))
+from api.services.keyword_gate import (  # noqa: E402
+    INFLATION_LIMIT,
+    banned_label_words,
+    check_themes,
+)
 
 
 def main() -> int:
@@ -128,63 +114,46 @@ def main() -> int:
     ]
     raw = json.load(open(f"{run}/themes.json", encoding="utf-8"))
     themes = raw.get("themes") if isinstance(raw, dict) else raw
-
-    ban = elastic_ban()
-    banned = [(t["label"], w) for t in themes for w in sorted(ban) if w in t["label"].lower()]
+    banned = banned_label_words(themes)
     for label, w in banned:
         print(f"  BANNED LABEL WORD {w!r} in {label!r}")
     if banned:
         print("FAIL: inject would silently drop these themes (their posts fall to Lainnya)")
         return 1
 
-    def word_re(k: str):
-        return re.compile(rf"(?<![a-z]){re.escape(k.lower())}(?![a-z])")
+    rep = check_themes(themes, texts, inflation_limit=thresh)
+    for r in rep.rows:
+        flag = (
+            f"  <-- INFLATED, {r.substring - r.word} of {r.substring} matches are inside other words"
+            if r.inflated
+            else ""
+        )
+        print(f"  {r.label[:28]:30s} {r.keyword:18s} substr={r.substring:5d} word={r.word:5d}{flag}")
 
-    bad = []
-    for t in themes:
-        for kw in t.get("keywords", []):
-            k = kw.lower()
-            sub = sum(1 for x in texts if k in x)
-            wb = sum(1 for x in texts if word_re(k).search(x))
-            infl = sub - wb
-            flag = ""
-            if sub and infl / sub > thresh:
-                flag = f"  <-- INFLATED, {infl} of {sub} matches are inside other words"
-                bad.append((t["label"], kw, sub, wb))
-            print(f"  {t['label'][:28]:30s} {kw:18s} substr={sub:5d} word={wb:5d}{flag}")
-
-    # Second pass: semantic cohesion. A keyword that names the same story as its
-    # theme-mates co-occurs with at least one of them; a generic one does not.
-    # Only meaningful for a theme with something to co-occur WITH, and only
-    # stable once the keyword has enough matches to make the fraction real.
-    incoherent = []
     print()
+    skipped = dict(rep.cohesion_skipped)
+    incoherent_by_label: dict[str, list] = {}
+    for item in rep.incoherent:
+        incoherent_by_label.setdefault(item[0], []).append(item)
     for t in themes:
-        kws = [k.lower() for k in t.get("keywords", [])]
-        if len(kws) < 3:
+        if len([k for k in t.get("keywords", [])]) < 3:
             continue
-        if t.get("magnet"):
+        kind = skipped.get(t["label"])
+        if kind == "magnet":
             print(f"  {t['label'][:28]:30s} (domain magnet — cohesion not applicable)")
             continue
-        if t.get("synonyms"):
+        if kind == "synonyms":
             print(f"  {t['label'][:28]:30s} (synonym set — cohesion not applicable)")
             continue
-        pats = {k: word_re(k) for k in kws}
-        for k in kws:
-            hits = [x for x in texts if pats[k].search(x)]
-            if len(hits) < COHESION_MIN_N:
-                continue
-            others = [pats[o] for o in kws if o != k]
-            co = sum(1 for x in hits if any(p.search(x) for p in others))
-            frac = co / len(hits)
-            if frac < COHESION_LIMIT:
-                print(
-                    f"  {t['label'][:28]:30s} {k:18s} cohesion={frac:4.0%} "
-                    f"of {len(hits):4d}  <-- INCOHERENT"
-                )
-                incoherent.append((t["label"], k, len(hits), frac))
+        for _lab, k, n, frac in incoherent_by_label.get(t["label"], []):
+            print(
+                f"  {t['label'][:28]:30s} {k:18s} cohesion={frac:4.0%} "
+                f"of {n:4d}  <-- INCOHERENT"
+            )
 
     print()
+    bad = rep.inflated
+    incoherent = rep.incoherent
     if bad:
         print(f"FAIL: {len(bad)} keyword(s) match mostly inside other words:")
         for lab, kw, sub, wb in bad:

@@ -49,6 +49,13 @@ class Settings(BaseSettings):
     # 4.6 as fallback when Gemini errors or returns malformed output.
     brief_model: str = "gemini-2.5-pro"
     brief_fallback_model: str = "claude-sonnet-4-6"
+    # Claude jobs: the daily theme+sentiment label batch and the weekly
+    # topic recluster (services/claude_labels.py, claude_recluster.py).
+    # A key from the org holding the promotional Claude credit — kept
+    # separate from `anthropic_api_key` (the briefing fallback) so the two
+    # spends never mix. Unset = both jobs log and skip.
+    anthropic_labeling_api_key: str | None = None
+    labeling_model: str = "claude-sonnet-5-5"
 
     # ─── Scrapers ────────────────────────────────────────
     apify_token: str | None = None
