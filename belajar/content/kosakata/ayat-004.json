@@ -1219,6 +1219,16 @@
    }
   },
   {
+   "loc": "4:150",
+   "ar": "إِنَّ ٱلَّذِينَ يَكْفُرُونَ بِٱللَّهِ وَرُسُلِهِۦ وَيُرِيدُونَ أَن يُفَرِّقُوا۟ بَيْنَ ٱللَّهِ وَرُسُلِهِۦ وَيَقُولُونَ نُؤْمِنُ بِبَعْضٍ وَنَكْفُرُ بِبَعْضٍ وَيُرِيدُونَ أَن يَتَّخِذُوا۟ بَيْنَ ذَٰلِكَ سَبِيلًا",
+   "translation": {
+    "text": "Sesungguhnya orang-orang yang ingkar kepada Allah dan Rasul-rasul-Nya, dan bermaksud membeda-bedakan[239] antara (keimanan kepada) Allah dan Rasul-rasul-Nya, dengan mengatakan, \"Kami beriman kepada sebagian dan kami mengingkari sebagian (yang lain),\" serta bermaksud mengambil jalan tengah (iman atau kafir),",
+    "footnotes": [
+     "[239] Beriman kepada Allah, tidak beriman kepada Rasul-rasul-Nya."
+    ]
+   }
+  },
+  {
    "loc": "4:152",
    "ar": "وَٱلَّذِينَ ءَامَنُوا۟ بِٱللَّهِ وَرُسُلِهِۦ وَلَمْ يُفَرِّقُوا۟ بَيْنَ أَحَدٍ مِّنْهُمْ أُو۟لَٰٓئِكَ سَوْفَ يُؤْتِيهِمْ أُجُورَهُمْ وَكَانَ ٱللَّهُ غَفُورًا رَّحِيمًا",
    "translation": {

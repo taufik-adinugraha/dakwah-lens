@@ -89,7 +89,7 @@ def alafasy_upstream(s: int, a: int) -> str:
 def content_texts(content: Path = CONTENT) -> dict[str, str]:
     """Every content file the app reads, as text (the lessons, the library, the compositions, the
     word voices; the narration manifests carry no recording of these sets)."""
-    files = sorted(content.glob("*.json")) + sorted((content / "compose").glob("*.json")) + sorted((content / "kosakata").glob("words-*.json"))
+    files = sorted(content.glob("*.json")) + sorted((content / "compose").glob("*.json")) + sorted((content / "kosakata").glob("words-*.json")) + sorted((content / "kosakata").glob("path.json"))
     return {f.relative_to(content).as_posix(): f.read_text(encoding="utf-8") for f in files}
 
 
@@ -131,7 +131,8 @@ def sources_pins() -> dict:
 def kosakata_pins() -> dict[str, dict]:
     """{path under narration/: its pin} of the Kosakata list's recordings."""
     out = {}
-    for p in KV.load_pins()["words"].values():
+    pins = KV.load_pins()
+    for p in [*pins["words"].values(), *(pins.get("parts") or {}).values()]:
         rel = KV.url_of(p["loc"])[len(NARRATION_PREFIX):]
         out[rel] = {"upstream": KV.upstream_of(p["loc"]), "sha256": p["sha256"], "ms": p["ms"], "bytes": p["bytes"]}
     return out

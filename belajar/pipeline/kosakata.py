@@ -16,6 +16,7 @@ page needs one word at a time. The app reads these files per request and never b
     content/kosakata/index.json       every word's row, for the list and the search
     content/kosakata/words-NNN.json   100 words each, by rank
     content/kosakata/ayat-SSS.json    the cited ayat of one surah, for the ayah popup
+    content/kosakata/path.json        the learning path's levels and batches, and Level 0 (kosakata_path.py)
 """
 from __future__ import annotations
 
@@ -27,6 +28,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import ayat as AY
+import kosakata_path as P
 import kosakata_voice as V
 from common import (
     AUTHORED_DIR,
@@ -239,6 +241,7 @@ def lemma_table(segs: list, T: Tanzil) -> list[dict]:
                 "root": root_letters(roots.most_common(1)[0][0]) if roots else [],
                 "forms": [f for f, _ in forms.most_common(TOP_FORMS)],
                 "_places": {f"{g.s}:{g.a}" for g in gs},
+                "_tags": Counter(g.tag for g in gs),
             }
         )
     return table
@@ -282,6 +285,23 @@ def expected_versions(src: dict, files: dict[str, dict], authored_sha: str) -> d
     }
 
 
+def example_of(word: dict, positions: dict[str, list[int]], corpus: AY.Corpus, tokens: dict) -> dict | None:
+    """The ayah a learner sees the word in: the shortest cited ayah of its earliest sense that has one,
+    with no footnote where possible. `hi` is where the word stands in it, from QAC. None for a word
+    every citation of which falls in an ayah Tanzil and QAC count differently."""
+    for sense in word["senses"]:
+        usable = []
+        for loc in sense["ayat"]:
+            s, a = AY.parse_loc(loc)
+            if (s, a) in tokens and positions.get(loc):
+                row = corpus.rows[s][a]
+                usable.append((bool(AY.split_footnotes(row.get("footnotes"))), len(lesson_ayah(corpus.T, s, a)[0]), AY.parse_loc(loc), loc))
+        if usable:
+            loc = min(usable)[3]
+            return {"loc": loc, "hi": positions[loc]}
+    return None
+
+
 def build(authored: dict, authored_sha: str, corpus: AY.Corpus, segs: list, lexemes: dict[str, str]) -> dict[str, dict]:
     """All the files, by name. ValueError on any gap: a lemma without meanings, a citation that is
     not an ayah where the lemma occurs, a QuranEnc row whose footnotes do not match."""
@@ -299,6 +319,12 @@ def build(authored: dict, authored_sha: str, corpus: AY.Corpus, segs: list, lexe
     running = 0
     rows, shards = [], defaultdict(list)
     cited: set[str] = set()
+    tokens, word_count = V.counted_alike(corpus.T, segs)
+    positions: dict[str, dict[str, list[int]]] = defaultdict(lambda: defaultdict(list))
+    for g in segs:
+        lem = g.feat.get("LEM")
+        if lem and g.w - 1 not in positions[lem][f"{g.s}:{g.a}"]:
+            positions[lem][f"{g.s}:{g.a}"].append(g.w - 1)
     for e in table:
         a = lemmas[e["lemma"]]
         for sense in a["senses"]:
@@ -318,12 +344,17 @@ def build(authored: dict, authored_sha: str, corpus: AY.Corpus, segs: list, lexe
                 "cum": round(running * 10000 / total),
                 "s": fold(" ".join([e["ar"], e["translit"]] + [s[k] for s in a["senses"] for k in ("id", "en")])),
                 "v": V.row_voice(pins[e["lemma"]]),
+                "k": P.kind_of(e["_tags"]),
             }
         )
         word = {k: v for k, v in e.items() if not k.startswith("_")}
         word["senses"] = a["senses"]
         word["review"] = a["review"]
         word["voice"] = V.word_voice(pins[e["lemma"]])
+        word["kind"] = rows[-1]["k"]
+        example = example_of(word, positions[e["lemma"]], corpus, tokens)
+        if example:
+            word["example"] = example
         if e["lemma"] in lexemes:
             word["lexeme"] = lexemes[e["lemma"]]
         shards[file_for_rank(e["rank"])].append(word)
@@ -352,6 +383,14 @@ def build(authored: dict, authored_sha: str, corpus: AY.Corpus, segs: list, lexe
     files: dict[str, dict] = {"index.json": index}
     for name, words in shards.items():
         files[name] = {"words": words}
+    parts = P.load_parts()
+    files["path.json"] = P.path_file(
+        [w for name in sorted(shards) for w in shards[name]],
+        rows,
+        parts,
+        P.part_table(parts, segs, tokens, word_count, lemmas, V.load_pins()),
+        P.attached_share(segs),
+    )
     for s, entries in by_sura.items():
         files[file_for_sura(s)] = {"sura": s, "ayat": entries}
     index["data_versions"] = expected_versions(corpus.src, files, authored_sha)
@@ -402,6 +441,10 @@ def authored_problems(authored: dict) -> list[str]:
             for loc in s.get("ayat", []):
                 if AY.parse_loc(loc) is None:
                     out.append(f"{lem}: {loc!r} is not a location")
+    for lem, a in authored.get("lemmas", {}).items():
+        for sense in a.get("senses") or []:
+            if ";" in sense.get("id", "") or ";" in sense.get("en", ""):
+                out.append(f"{lem}: {sense.get('id')!r} / {sense.get('en')!r} has a semicolon, which separates senses in the list")
     for lem, (gid, gen) in PINNED_SENSES.items():
         have = [(s.get("id"), s.get("en")) for s in authored.get("lemmas", {}).get(lem, {}).get("senses", [])]
         if (gid, gen) not in have:
@@ -469,8 +512,24 @@ def problems(files: dict[str, dict], authored: dict, authored_sha: str, src: dic
                 out.append(f"rank {w['rank']}: the recording differs from pipeline/kosakata_voice.json")
             if r.get("v") != V.row_voice(pin):
                 out.append(f"rank {w['rank']}: the index plays another recording than the word file")
+        ex = w.get("example")
+        if ex and (ex["loc"] not in {loc for s in w["senses"] for loc in s["ayat"]} or ex["loc"] not in ayat):
+            out.append(f"rank {w['rank']}: its example {ex['loc']} is not an ayah it cites")
+        elif ex and any(i >= len(ayat[ex["loc"]]["ar"].split(" ")) for i in ex["hi"]):
+            out.append(f"rank {w['rank']}: its example marks a word {ex['loc']} does not have")
+        if w.get("kind") not in {"verb", "noun", "particle", "name"} or r.get("k") != w.get("kind"):
+            out.append(f"rank {w['rank']}: kind {w.get('kind')!r} / {r.get('k')!r}")
         for s in w["senses"]:
             cited.update(s["ayat"])
+    out += P.path_problems(files.get("path.json"), words)
+    for part in P.load_parts():
+        have = (files.get("path.json") or {}).get("parts", {}).get(part["key"])
+        for loc in (part["card"], part["test"]):
+            pin = pins.get("parts", {}).get(loc)
+            if pin is None:
+                out.append(f"part {part['key']}: no recording pinned for {loc}")
+            elif have and V.word_voice(pin) not in [e["voice"] for e in have.get("examples", [])]:
+                out.append(f"part {part['key']}: its recording of {loc} differs from pipeline/kosakata_voice.json")
     for loc in sorted(cited - set(ayat)):
         out.append(f"{loc} is cited but has no entry in its ayat file")
     for loc in sorted(set(ayat) - cited):

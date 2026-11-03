@@ -484,6 +484,14 @@
    }
   },
   {
+   "loc": "56:74",
+   "ar": "فَسَبِّحْ بِٱسْمِ رَبِّكَ ٱلْعَظِيمِ",
+   "translation": {
+    "text": "Maka bertasbihlah dengan (menyebut) nama Tuhanmu Yang Mahabesar.",
+    "footnotes": []
+   }
+  },
+  {
    "loc": "56:75",
    "ar": "فَلَآ أُقْسِمُ بِمَوَٰقِعِ ٱلنُّجُومِ",
    "translation": {
@@ -532,14 +540,6 @@
    }
   },
   {
-   "loc": "56:84",
-   "ar": "وَأَنتُمْ حِينَئِذٍ تَنظُرُونَ",
-   "translation": {
-    "text": "dan kamu ketika itu melihat,",
-    "footnotes": []
-   }
-  },
-  {
    "loc": "56:86",
    "ar": "فَلَوْلَآ إِن كُنتُمْ غَيْرَ مَدِينِينَ",
    "translation": {
@@ -560,6 +560,14 @@
    "ar": "فَرَوْحٌ وَرَيْحَانٌ وَجَنَّتُ نَعِيمٍ",
    "translation": {
     "text": "maka dia memperoleh ketenteraman dan rezeki serta surga (yang penuh) kenikmatan.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "56:90",
+   "ar": "وَأَمَّآ إِن كَانَ مِنْ أَصْحَٰبِ ٱلْيَمِينِ",
+   "translation": {
+    "text": "Dan jika dia termasuk golongan kanan,",
     "footnotes": []
    }
   },

@@ -1,0 +1,22 @@
+{
+  "_about": "Level 0 of the Kosakata learning path (operator 2026-11-03): the parts attached to words, which the list cannot hold because QAC gives a lemma only to a stem. Written by hand. `feats` are QAC's feature names, counted by kosakata_path.py; `form_starts` / `form_not_starts` keep a pronoun apart from a verb's subject ending, which QAC tags the same way. `letters` is how many letters of the word the part is. `card` and `test` are real places in the Qur'an, each checked against QAC: the word is this part and one stem, inside an ayah.",
+  "parts": [
+    {"key": "wa", "side": "prefix", "letters": 1, "translit": "wa-", "id": "dan", "en": "and", "feats": ["w:CONJ+", "w:REM+", "w:CIRC+", "w:SUP+", "w:COM+", "w:P+"], "card": "1:7:8", "test": "2:8:9", "concept": "athaf"},
+    {"key": "al", "side": "prefix", "letters": 2, "translit": "al-", "id": "penanda kata tertentu", "en": "the", "feats": ["Al+"], "card": "2:11:7", "test": "2:8:2"},
+    {"key": "fa", "side": "prefix", "letters": 1, "translit": "fa-", "id": "maka, lalu", "en": "so, then", "feats": ["f:REM+", "f:CONJ+", "f:RSLT+", "f:SUP+", "f:CAUS+"], "card": "2:22:18", "test": "2:16:6"},
+    {"key": "li", "side": "prefix", "letters": 1, "translit": "li-", "id": "bagi, untuk", "en": "for", "feats": ["l:P+", "l:PRP+", "l:IMPV+"], "card": "1:2:2", "test": "2:154:3", "concept": "huruf-jar"},
+    {"key": "bi", "side": "prefix", "letters": 1, "translit": "bi-", "id": "dengan", "en": "with", "feats": ["bi+"], "card": "2:10:10", "test": "2:8:6", "concept": "huruf-jar"},
+    {"key": "la", "side": "prefix", "letters": 1, "translit": "la-", "id": "sungguh (penegas)", "en": "indeed (emphasis)", "feats": ["l:EMPH+"], "card": "2:176:12", "test": "2:130:17"},
+    {"key": "a", "side": "prefix", "letters": 1, "translit": "a-", "id": "apakah (tanya)", "en": "is it? (question)", "feats": ["A:INTG+", "A:EQ+"], "card": "2:33:9", "test": "9:13:1"},
+    {"key": "ya", "side": "prefix", "letters": 1, "translit": "yā-", "id": "wahai", "en": "O", "feats": ["ya+"], "card": "2:55:3", "test": "2:21:1"},
+    {"key": "ka", "side": "prefix", "letters": 1, "translit": "ka-", "id": "seperti", "en": "like", "feats": ["ka+"], "card": "2:73:4", "test": "2:108:6", "concept": "huruf-jar"},
+    {"key": "sa", "side": "prefix", "letters": 1, "translit": "sa-", "id": "akan", "en": "will", "feats": ["sa+"], "card": "2:142:1", "test": "19:96:6"},
+    {"key": "hum", "side": "suffix", "letters": 2, "translit": "-hum, -him", "id": "mereka", "en": "them, their", "feats": ["PRON:3MP"], "form_starts": "h", "card": "2:46:5", "test": "1:7:4", "concept": "dhamir"},
+    {"key": "hu", "side": "suffix", "letters": 1, "translit": "-hu, -hi", "id": "dia, -nya", "en": "him, his, it", "feats": ["PRON:3MS"], "card": "2:112:11", "test": "2:37:7", "concept": "dhamir"},
+    {"key": "na", "side": "suffix", "letters": 2, "translit": "-nā", "id": "kami", "en": "us, our", "feats": ["PRON:1P"], "card": "2:127:8", "test": "2:70:12", "concept": "dhamir"},
+    {"key": "kum", "side": "suffix", "letters": 2, "translit": "-kum", "id": "kalian", "en": "you, your (many)", "feats": ["PRON:2MP"], "form_starts": "k", "card": "2:76:21", "test": "2:40:7", "concept": "dhamir"},
+    {"key": "ha", "side": "suffix", "letters": 2, "translit": "-hā", "id": "-nya (perempuan atau benda)", "en": "her, its", "feats": ["PRON:3FS"], "card": "14:25:6", "test": "2:142:11", "concept": "dhamir"},
+    {"key": "kaa", "side": "suffix", "letters": 1, "translit": "-ka", "id": "kamu, -mu", "en": "you, your (one person)", "feats": ["PRON:2MS"], "form_starts": "k", "card": "6:115:3", "test": "2:252:5", "concept": "dhamir"},
+    {"key": "i", "side": "suffix", "letters": 1, "translit": "-ī", "id": "aku, -ku", "en": "me, my", "feats": ["PRON:1S"], "form_not_starts": "t", "card": "3:51:3", "test": "2:260:16", "concept": "dhamir"}
+  ]
+}

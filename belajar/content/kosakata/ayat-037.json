@@ -288,14 +288,6 @@
    }
   },
   {
-   "loc": "37:50",
-   "ar": "فَأَقْبَلَ بَعْضُهُمْ عَلَىٰ بَعْضٍ يَتَسَآءَلُونَ",
-   "translation": {
-    "text": "Lalu mereka berhadap-hadapan satu sama lain sambil bercakap-cakap.",
-    "footnotes": []
-   }
-  },
-  {
    "loc": "37:51",
    "ar": "قَالَ قَآئِلٌ مِّنْهُمْ إِنِّى كَانَ لِى قَرِينٌ",
    "translation": {
@@ -670,6 +662,14 @@
    }
   },
   {
+   "loc": "37:126",
+   "ar": "ٱللَّهَ رَبَّكُمْ وَرَبَّ ءَابَآئِكُمُ ٱلْأَوَّلِينَ",
+   "translation": {
+    "text": "(yaitu) Allah Tuhanmu dan Tuhan nenek moyangmu yang terdahulu?\"",
+    "footnotes": []
+   }
+  },
+  {
    "loc": "37:130",
    "ar": "سَلَٰمٌ عَلَىٰٓ إِلْ يَاسِينَ",
    "translation": {
@@ -802,14 +802,6 @@
    "ar": "أَمْ لَكُمْ سُلْطَٰنٌ مُّبِينٌ",
    "translation": {
     "text": "Ataukah kamu mempunyai bukti yang jelas?",
-    "footnotes": []
-   }
-  },
-  {
-   "loc": "37:157",
-   "ar": "فَأْتُوا۟ بِكِتَٰبِكُمْ إِن كُنتُمْ صَٰدِقِينَ",
-   "translation": {
-    "text": "(Kalau begitu) maka bawalah kitabmu jika kamu orang yang benar.",
     "footnotes": []
    }
   },

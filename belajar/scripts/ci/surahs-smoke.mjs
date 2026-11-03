@@ -385,9 +385,30 @@ async function frequencyList() {
   const loc = words[0].senses[0].ayat[0];
   const ayah = await fetch(`${BASE}/belajar/api/ayah?loc=${loc}`);
   if (ayah.status !== 200) fail(`/api/ayah?loc=${loc}`, `status ${ayah.status}, expected 200`);
-  const en = await get("/belajar/en/kosakata");
-  if (!visibleText(en.html).includes(index.rows[0].en.split(";")[0])) fail("/en/kosakata", "the English meaning is not shown");
-  console.log("kosakata list: pages, search, a word, its play buttons and the ayah popup answer");
+  // English is hidden for now (lib/features.ts BELAJAR_KOSAKATA_EN): the list's pages answer 404 and the
+  // hub has no card, while a lesson word's own English entry, a different page, stays.
+  for (const path of ["/belajar/en/kosakata", `/belajar/en/kosakata/kata/${words[0].rank}`]) {
+    if ((await get(path)).status !== 404) fail(path, "the English list is hidden: expected 404");
+  }
+  if (/href="[^"]*\/en\/kosakata"/.test((await get("/belajar/en")).html)) fail("/belajar/en", "the English hub links to the hidden list");
+  if ((await get("/belajar/en/kosakata/rahim")).status !== 200) fail("/belajar/en/kosakata/rahim", "a lesson word's English entry must stay");
+  // The learning path answers at its address, and the list does not link to it until it is listed.
+  for (const path of ["/belajar/id/kosakata/bertahap", "/belajar/id/kosakata/bertahap/0/1", "/belajar/id/kosakata/bertahap/1/1", "/belajar/id/kosakata/bertahap/1/1/tes", "/belajar/id/kosakata/bertahap/5/tes"]) {
+    const page = await get(path);
+    if (page.status !== 200) fail(path, `status ${page.status}, expected 200`);
+  }
+  for (const path of ["/belajar/id/kosakata/bertahap/9/1", "/belajar/id/kosakata/bertahap/1/99", "/belajar/id/kosakata/bertahap/1/99/tes", "/belajar/id/kosakata/bertahap/x/tes", "/belajar/en/kosakata/bertahap"]) {
+    if ((await get(path)).status !== 404) fail(path, "expected 404");
+  }
+  if (list.html.includes("data-kosakata-tabs")) fail("/kosakata", "the list links to the learning path before it is listed");
+  const count = (body) => fetch(`${BASE}/belajar/api/kosakata/hasil`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  // The route answers 204 whatever the database says, so the row itself is read back in the image job
+  // (deploy-belajar.yml): one passed and one failed, the second through the upsert's conflict path.
+  if ((await count({ test: "1-3", passed: true })).status !== 204) fail("/api/kosakata/hasil", "a finished test is not counted");
+  if ((await count({ test: "1-3", passed: false })).status !== 204) fail("/api/kosakata/hasil", "a second result for a test is not counted");
+  if ((await count({ test: "9-9", passed: true })).status !== 400) fail("/api/kosakata/hasil", "a test that does not exist must be refused");
+  if ((await count({ test: "1-3" })).status !== 400) fail("/api/kosakata/hasil", "a malformed count must be refused");
+  console.log("kosakata list: pages, search, a word, its play buttons and the ayah popup answer; the path answers at its address");
 }
 
 async function checkHidden() {

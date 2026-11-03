@@ -16,6 +16,7 @@ import unittest
 
 import host_media as H
 import kosakata as K
+import kosakata_path as P
 import kosakata_voice as V
 from common import load_sources
 
@@ -121,6 +122,62 @@ class PlantedFaults(unittest.TestCase):
     def test_a_list_row_that_plays_another_place(self):
         self.f["index.json"]["rows"][2]["v"] = "1:1:1 0 500"
         self.assertCaught("the index plays another recording")
+
+    def path(self):
+        return self.f["path.json"]
+
+    def test_a_word_missing_from_a_level(self):
+        self.path()["levels"][1]["batches"][0].pop()
+        self.assertCaught("does not hold each of words 1 to 100 once")
+
+    def test_a_word_in_two_batches(self):
+        b = self.path()["levels"][1]["batches"]
+        b[0][0] = b[1][0]
+        self.assertCaught("does not hold each of words 1 to 100 once")
+
+    def test_a_batch_of_the_wrong_size(self):
+        b = self.path()["levels"][1]["batches"]
+        b[1].append(b[0].pop())
+        self.assertCaught("holds 9 words")
+
+    def test_two_words_that_clash_in_one_batch(self):
+        b = self.path()["levels"][1]["batches"]
+        x, y = next((x, y) for x in b[0] for y in b[1] if P.clash(self.word_by_rank(x), self.word_by_rank(y)))
+        z = next(r for r in b[0] if r != x)
+        b[0][b[0].index(z)], b[1][b[1].index(y)] = y, z
+        self.assertCaught("clash")
+
+    def word_by_rank(self, rank):
+        return self.f[K.file_for_rank(rank)]["words"][(rank - 1) % K.WORDS_PER_FILE]
+
+    def test_a_level_0_part_with_no_batch(self):
+        self.path()["levels"][0]["batches"][0].pop()
+        self.assertCaught("Level 0's batches and its parts differ")
+
+    def test_a_part_whose_example_is_not_its_word(self):
+        self.path()["parts"]["wa"]["examples"][0]["word"][2] = "x"
+        self.assertCaught("does not join back")
+
+    def test_a_part_with_another_recording(self):
+        self.path()["parts"]["wa"]["examples"][0]["voice"]["sha256"] = "b" * 64
+        self.assertCaught("differs from pipeline/kosakata_voice.json")
+
+    def test_a_word_of_another_kind_in_the_index(self):
+        self.f["index.json"]["rows"][2]["k"] = "name" if self.word(3)["kind"] != "name" else "verb"
+        self.assertCaught("kind")
+
+    def test_an_example_the_word_does_not_cite(self):
+        self.word(3)["example"]["loc"] = "112:1"
+        self.assertCaught("is not an ayah it cites")
+
+    def test_a_mark_past_the_end_of_the_ayah(self):
+        self.word(3)["example"]["hi"] = [999]
+        self.assertCaught("marks a word")
+
+    def test_a_semicolon_inside_a_gloss(self):
+        lem = next(iter(self.a["lemmas"]))
+        self.a["lemmas"][lem]["senses"][0]["id"] = "dari; ke"
+        self.assertCaught("has a semicolon")
 
     def test_too_many_senses(self):
         lem = next(iter(self.a["lemmas"]))
@@ -254,6 +311,58 @@ class PlaceRule(unittest.TestCase):
     def test_no_ayah_that_tanzil_and_qac_count_differently(self):
         for lem, p in self.places.items():
             self.assertNotIn(":".join(p["loc"].split(":")[:2]), {"2:181", "8:6", "13:37", "37:130"}, lem)
+
+
+class Path(unittest.TestCase):
+    def test_the_most_frequent_tag_decides_the_kind(self):
+        self.assertEqual(P.kind_of({"V": 5, "N": 1}), "verb")
+        self.assertEqual(P.kind_of({"N": 5, "V": 1}), "noun")
+        self.assertEqual(P.kind_of({"PN": 3}), "name")
+        self.assertEqual(P.kind_of({"P": 3}), "particle")
+
+    def test_look_alikes_and_synonyms_clash(self):
+        word = lambda ar, gloss: {"ar": ar, "senses": [{"id": gloss, "en": gloss, "ayat": []}]}
+        self.assertTrue(P.clash(word("مِن", "dari"), word("مَن", "orang yang")))
+        self.assertTrue(P.clash(word("مِن", "dari"), word("عَن", "dari")))
+        self.assertTrue(P.clash(word("قَد", "sungguh (penegasan)"), word("إِنّ", "sungguh (penegas)")))
+        self.assertFalse(P.clash(word("يَوْم", "hari"), word("أَرْض", "bumi")))
+
+    def test_a_batch_holds_no_clash_when_there_is_room(self):
+        word = lambda r, g: {"rank": r, "ar": f"ا{chr(0x0628 + r)}", "senses": [{"id": g, "en": g, "ayat": []}]}
+        words = [word(i, f"g{i}") for i in range(1, 21)]
+        words[5]["senses"][0]["id"] = "g1"
+        out = P.batches(words)
+        self.assertEqual([len(b) for b in out], [10, 10])
+        self.assertEqual(sorted(w["rank"] for b in out for w in b), list(range(1, 21)))
+        self.assertNotIn(words[5], out[0])
+
+    def test_a_part_splits_on_letters_with_their_marks(self):
+        self.assertEqual(P.split_part("وَلَا", "prefix", 1), ["", "وَ", "لَا"])
+        self.assertEqual(P.split_part("رَبِّهِمْ", "suffix", 2), ["رَبِّ", "هِمْ", ""])
+        self.assertEqual(P.split_part("رَبِّهِۦ", "suffix", 1), ["رَبِّ", "هِۦ", ""])
+
+    def test_the_real_parts_are_well_formed(self):
+        parts = P.load_parts()
+        self.assertEqual(len(parts), 17)
+        self.assertEqual({p["side"] for p in parts}, {"prefix", "suffix"})
+        for p in parts:
+            self.assertNotEqual(p["card"], p["test"], p["key"])
+
+    @unittest.skipIf(NO_CORPUS, "needs pipeline/cache")
+    def test_a_part_at_the_end_of_an_ayah_is_refused(self):
+        corpus, segs = K.load_corpus_and_qac()
+        tokens, count = V.counted_alike(corpus.T, segs)
+        part = {**P.load_parts()[0], "card": "1:7:9"}
+        with self.assertRaises(ValueError):
+            P.part_table([part], segs, tokens, count, AUTHORED["lemmas"], V.load_pins())
+
+    @unittest.skipIf(NO_CORPUS, "needs pipeline/cache")
+    def test_a_part_the_word_does_not_have_is_refused(self):
+        corpus, segs = K.load_corpus_and_qac()
+        tokens, count = V.counted_alike(corpus.T, segs)
+        part = {**P.load_parts()[0], "card": "2:10:10"}  # bi-, not wa-
+        with self.assertRaises(ValueError):
+            P.part_table([part], segs, tokens, count, AUTHORED["lemmas"], V.load_pins())
 
 
 class Rules(unittest.TestCase):

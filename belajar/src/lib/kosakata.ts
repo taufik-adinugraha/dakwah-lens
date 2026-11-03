@@ -9,7 +9,7 @@ import "server-only";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { KosakataAyatFile, KosakataIndex, KosakataWord, KosakataWordsFile } from "@/content/kosakata-schema";
+import type { KosakataAyatFile, KosakataIndex, KosakataPath, KosakataWord, KosakataWordsFile } from "@/content/kosakata-schema";
 
 import { parseAyahLoc, type AyahPayload } from "./ayah";
 import { IS_PUBLIC } from "./flags";
@@ -30,6 +30,14 @@ export function kosakataIndex(): KosakataIndex {
     index = loaded;
   }
   return index;
+}
+
+let path: KosakataPath | null = null;
+
+/** The learning path: its levels, its batches and Level 0. Small, so it stays in memory with the index. */
+export function kosakataPath(): KosakataPath {
+  if (!path) path = read<KosakataPath>("path.json");
+  return path;
 }
 
 /** One word in full, by rank. */

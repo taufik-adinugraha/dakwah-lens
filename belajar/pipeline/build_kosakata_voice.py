@@ -25,6 +25,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import kosakata as K
+import kosakata_path as P
 import kosakata_voice as V
 from build_wordvoice import QC_CACHE, UA, word_span
 
@@ -114,13 +115,40 @@ def fetch(max_rank: int | None) -> int:
                 pins["words"][lem] = pin
             if done % 500 == 0:
                 print(f"  {done} of {len(scope)}", flush=True)
+    # Level 0 plays other places: each word's part, which no lemma's rule would choose.
+    tokens, _ = V.counted_alike(corpus.T, segs)
+    places = P.part_places(P.load_parts())
+    for ch in sorted({int(loc.split(":")[0]) for loc in places}):
+        words.update(chapter_words(ch))
+
+    def one_part(loc: str) -> tuple[str, dict | None, str | None]:
+        s, a, n = (int(x) for x in loc.split(":"))
+        listed = words.get(f"{s}:{a}") or []
+        if (s, a) not in tokens or n > len(listed):
+            return loc, None, f"{loc}: not a word both Tanzil and Quran.com have"
+        f = QC_CACHE / V.upstream_of(loc).rsplit("/", 1)[1]
+        if not f.exists():
+            f.write_bytes(get(V.upstream_of(loc)))
+        body = f.read_bytes()
+        ms, start, end = word_span(f)
+        return loc, {"loc": loc, "form": tokens[(s, a)][n - 1], "qc_text": listed[n - 1], "sha256": hashlib.sha256(body).hexdigest(),
+                     "bytes": len(body), "ms": ms, "start": start, "end": end}, None
+
+    pins.setdefault("parts", {})
+    with ThreadPoolExecutor(THREADS) as pool:
+        for loc, pin, err in pool.map(one_part, places):
+            if err:
+                errs.append(err)
+            else:
+                pins["parts"][loc] = pin
     pins["_comment"] = ("Written by pipeline/build_kosakata_voice.py --fetch: for each word of the Kosakata list, the one place whose Quran.com "
                         "recording it plays (the rule is in kosakata_voice.py), what Quran.com calls that word, and the file's sha256 and length. Never edited by hand.")
     pins["words"] = dict(sorted(pins["words"].items()))
+    pins["parts"] = dict(sorted(pins["parts"].items()))
     V.PINS.write_text(json.dumps(pins, ensure_ascii=False, indent=0) + "\n", encoding="utf-8")
     problems = V.pin_problems(pins)
-    size = sum(p["bytes"] for p in pins["words"].values())
-    print(f"pinned {len(pins['words'])} words, {size / 1e6:.1f} MB; {len(errs)} failed, {len(problems)} pin problems", flush=True)
+    size = sum(p["bytes"] for p in [*pins["words"].values(), *pins["parts"].values()])
+    print(f"pinned {len(pins['words'])} words and {len(pins['parts'])} places of Level 0, {size / 1e6:.1f} MB; {len(errs)} failed, {len(problems)} pin problems", flush=True)
     for line in (errs + problems)[:40]:
         print("  " + line, file=sys.stderr)
     return 1 if errs or problems else 0
@@ -131,7 +159,8 @@ def upload_list() -> int:
     local copy is its pin byte for byte. The copies are uploaded from here rather than through
     host_media.py --deliver, which also wants the imam's ayah files on this machine and copies 289 MB
     a second time. Prints the upload; never runs it."""
-    words = V.load_pins()["words"]
+    pins = V.load_pins()
+    words = {**pins["words"], **{f"part at {k}": v for k, v in (pins.get("parts") or {}).items()}}
     root = QC_CACHE.parents[1]
     bad, listed = [], []
     for lem, p in sorted(words.items(), key=lambda kv: kv[1]["loc"]):
@@ -142,7 +171,8 @@ def upload_list() -> int:
         elif hashlib.sha256(f.read_bytes()).hexdigest() != p["sha256"]:
             bad.append(f"{lem}: {f} is not its pin")
         else:
-            listed.append(f"quran-com/wbw/{name}")
+            if f"quran-com/wbw/{name}" not in listed:
+                listed.append(f"quran-com/wbw/{name}")
     if bad:
         print(f"{len(bad)} problem(s):\n  " + "\n  ".join(bad[:30]), file=sys.stderr)
         return 1

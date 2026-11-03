@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 
 import { routing } from "@/i18n/routing";
-import { reachableSurahs, warisSwitchOn } from "@/lib/features";
+import { kosakataEnglishOn, reachableSurahs, warisSwitchOn } from "@/lib/features";
 import { SURAH_SLUGS } from "@/lib/routes";
 
 // Locale routing, plus the runtime switches of what is hidden. The module has
@@ -15,6 +15,11 @@ const LOCALE = `(${routing.locales.join("|")})`;
 const WARIS = new RegExp(`^/${LOCALE}/waris(?:/|$)`);
 /** /{locale}/quran/{slug} and every path under it; not the track page /{locale}/quran itself. */
 const SURAH = new RegExp(`^/${LOCALE}/quran/([^/]+)(?:/|$)`);
+/**
+ * The Kosakata list's own pages in English: /en/kosakata, and /kata and /bertahap under it. Not
+ * /en/kosakata/{id}, a lesson word's full entry, which the English lessons link to.
+ */
+const KOSAKATA_EN = /^\/(en)\/kosakata(?:\/?$|\/(?:kata|bertahap)(?:\/|$))/;
 /** The surahs that have a lesson (an unknown slug is left to the lesson routes' own 404). */
 const LESSONS: ReadonlySet<string> = new Set(SURAH_SLUGS);
 
@@ -31,6 +36,7 @@ const NOT_FOUND = "/_tersembunyi";
  * (lib/features.ts), all of it gated by the one check below:
  *   - Ilmu Waris, unless BELAJAR_WARIS=on (operator, 2026-10-10): every
  *     /{locale}/waris… URL;
+ *   - the Kosakata list in English, unless BELAJAR_KOSAKATA_EN=on (operator, 2026-11-03);
  *   - every surah that is neither published (BELAJAR_SURAHS; operator, 2026-10-10:
  *     Al-Fatihah first, the others "segera hadir") nor unlisted (BELAJAR_UNLISTED:
  *     answers at its address, linked from nowhere; operator, 2026-10-20): its
@@ -66,10 +72,10 @@ export default function proxy(request: NextRequest) {
 }
 
 /** What is hidden on this request (both switches are read per request). */
-type Hidden = { waris: boolean; published: ReadonlySet<string> };
+type Hidden = { waris: boolean; kosakataEn: boolean; published: ReadonlySet<string> };
 
 function hiddenNow(): Hidden {
-  return { waris: !warisSwitchOn(), published: new Set(reachableSurahs()) };
+  return { waris: !warisSwitchOn(), kosakataEn: !kosakataEnglishOn(), published: new Set(reachableSurahs()) };
 }
 
 /**
@@ -89,12 +95,15 @@ function hiddenLocale(pathname: string, hidden: Hidden): string | null {
 }
 
 /**
- * `path`'s locale when it is under the waris track while that is hidden, or
- * under the lesson of a surah that is not published; null for any other path.
+ * `path`'s locale when it is under the waris track while that is hidden, on the
+ * Kosakata list's English pages while those are, or under the lesson of a surah
+ * that is not published; null for any other path.
  */
 function hiddenIn(path: string, hidden: Hidden): string | null {
   const waris = hidden.waris ? WARIS.exec(path) : null;
   if (waris) return waris[1];
+  const kosakata = hidden.kosakataEn ? KOSAKATA_EN.exec(path) : null;
+  if (kosakata) return kosakata[1];
   const surah = SURAH.exec(path);
   if (surah && LESSONS.has(surah[2]) && !hidden.published.has(surah[2])) return surah[1];
   return null;

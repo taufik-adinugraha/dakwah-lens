@@ -54,6 +54,13 @@
     "end": 1070,
     "sha256": "954500fb074468c49393158d7212992ddf5334487fb6b7003cac889d079b05ba"
    },
+   "kind": "particle",
+   "example": {
+    "loc": "74:51",
+    "hi": [
+     1
+    ]
+   },
    "lexeme": "min"
   },
   {
@@ -96,6 +103,13 @@
     "start": 373,
     "end": 1357,
     "sha256": "5a088cd81ee055ce1246a5b891aa414fd8930114c09fac37073dd48891ba0daa"
+   },
+   "kind": "name",
+   "example": {
+    "loc": "1:2",
+    "hi": [
+     1
+    ]
    },
    "lexeme": "allah"
   },
@@ -152,6 +166,13 @@
     "end": 1294,
     "sha256": "484eb64d8afd9cbdec89d96f293985129b5cef8d4c7c21df0eb5b7d486f3cc24"
    },
+   "kind": "particle",
+   "example": {
+    "loc": "51:5",
+    "hi": [
+     0
+    ]
+   },
    "lexeme": "ma"
   },
   {
@@ -194,16 +215,9 @@
       "26:101",
       "56:44"
      ]
-    },
-    {
-     "id": "pastilah (penegas)",
-     "en": "assuredly",
-     "ayat": [
-      "16:109"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "لَا",
     "loc": "2:2:3",
@@ -212,6 +226,13 @@
     "start": 411,
     "end": 1199,
     "sha256": "5762ef1cdf1fa9fe7e3c1191228d6082137e658c21391f26e603af24fd9f70ef"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "2:18",
+    "hi": [
+     4
+    ]
    },
    "lexeme": "la"
   },
@@ -260,6 +281,13 @@
     "end": 1292,
     "sha256": "8312ff8742a41d2a8eb2f114c7664676ea02ade33d2ba415f0843c7492547643"
    },
+   "kind": "particle",
+   "example": {
+    "loc": "26:147",
+    "hi": [
+     0
+    ]
+   },
    "lexeme": "fi"
   },
   {
@@ -298,6 +326,13 @@
     "start": 259,
     "end": 1487,
     "sha256": "0d45b4fd989f907a9e38d8c7043f171c707fc3bba4785c6b66cefed7566405be"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "52:7",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -341,6 +376,13 @@
     "end": 760,
     "sha256": "8b4ed4dfd5f189bade8449a3a40e3fc4a91367fb5e6453a0b321c3f479907a8e"
    },
+   "kind": "verb",
+   "example": {
+    "loc": "26:96",
+    "hi": [
+     0
+    ]
+   },
    "lexeme": "qala"
   },
   {
@@ -379,6 +421,13 @@
     "start": 335,
     "end": 1508,
     "sha256": "f7c79317ba324a124bd734b65ddeb04c9b5ca2e7548b8d4be334508ca8d5297b"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "26:79",
+    "hi": [
+     0
+    ]
    },
    "lexeme": "alladhi"
   },
@@ -443,6 +492,13 @@
     "end": 1462,
     "sha256": "b933cb194c2feeaee2c5b74cb9a47055e4e6b6388962f1432bd35cd0b7c59501"
    },
+   "kind": "particle",
+   "example": {
+    "loc": "55:26",
+    "hi": [
+     2
+    ]
+   },
    "lexeme": "ala"
   },
   {
@@ -502,6 +558,13 @@
     "end": 723,
     "sha256": "0f3da8d50f6e59074520155b199b097a6b38a0bbdc68edc4f818ae52e47e6546"
    },
+   "kind": "verb",
+   "example": {
+    "loc": "20:35",
+    "hi": [
+     1
+    ]
+   },
    "lexeme": "kana"
   },
   {
@@ -544,6 +607,13 @@
     "start": 284,
     "end": 1227,
     "sha256": "98fd89036e474f355f32078b3a4b2180ddc7e95156feeae7ce9cbe240deba574"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "1:2",
+    "hi": [
+     2
+    ]
    },
    "lexeme": "rabb"
   },
@@ -599,6 +669,13 @@
     "start": 326,
     "end": 1060,
     "sha256": "afd9cef0610ad0f7973ea24a698bad5bd70bfc800d08f61adb7405dcf954d904"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "26:65",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -645,6 +722,13 @@
     "start": 341,
     "end": 1174,
     "sha256": "497a792c27bf4ef1557a8b729b43ebb27d1aeea9d9b182cec3bcaad41d2181d8"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "20:24",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -690,6 +774,13 @@
     "start": 297,
     "end": 1070,
     "sha256": "1693d7c90ee0cdf1f5106fb193b9c9f497521ff7e47bc16019e03e7942d1bc4d"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "2:192",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -735,6 +826,13 @@
     "start": 342,
     "end": 1529,
     "sha256": "b8d0274d48c6e6d5dd673064e3ce160b68be3e38d588cd28fc77f27d33bb0b2e"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "37:163",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -755,8 +853,8 @@
    ],
    "senses": [
     {
-     "id": "untuk; agar",
-     "en": "to; that",
+     "id": "untuk, agar",
+     "en": "to, that",
      "ayat": [
       "5:37",
       "7:110",
@@ -788,6 +886,13 @@
     "start": 396,
     "end": 983,
     "sha256": "45a3710b2f92a7abb040f4fc61b7b2bf84ce9dafcbe22973cc961a42e53c4012"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "7:110",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -830,6 +935,13 @@
     "start": 336,
     "end": 1507,
     "sha256": "a79faf8ef04060994a8e5d512190852562a68072d044bfa0899d1247e00a5936"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "7:121",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -868,6 +980,13 @@
     "start": 446,
     "end": 1635,
     "sha256": "7089e8adafeb3a1852374ed6b0b865fb7469308fbdc28ac97b6b1697d4c37434"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "14:20",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -914,6 +1033,13 @@
     "start": 19,
     "end": 829,
     "sha256": "e041d8729bf15e92c5ec8535230d5d08b100f4824ecee2e7806079761d09656a"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "69:29",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -963,6 +1089,13 @@
     "start": 0,
     "end": 855,
     "sha256": "395e83498489772dea51051ffd51145e67daad3b9b68f28b833f3fc4028a41d9"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "26:152",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -1011,6 +1144,13 @@
     "end": 794,
     "sha256": "d7d953b09a0388b28526f76cfe18085a43f1f855d3032b575b8613550b16f748"
    },
+   "kind": "particle",
+   "example": {
+    "loc": "56:1",
+    "hi": [
+     0
+    ]
+   },
    "lexeme": "idha"
   },
   {
@@ -1049,6 +1189,13 @@
     "start": 32,
     "end": 513,
     "sha256": "3cf1e1f4407772287da6536a1eaa3648e2610aa40eb71a9862c3bdeb0db444b5"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "23:1",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -1092,6 +1239,13 @@
     "end": 902,
     "sha256": "30fbee51a637c60197614d9dd4f7e4dd08b24fa3cc9675cfa7238e6aa167a287"
    },
+   "kind": "noun",
+   "example": {
+    "loc": "26:88",
+    "hi": [
+     0
+    ]
+   },
    "lexeme": "yawm"
   },
   {
@@ -1134,6 +1288,13 @@
     "start": 0,
     "end": 1019,
     "sha256": "9172c9cc4c276a515e40963204c9a0b19212abb51ce56d23e7f0f07d5726ea5f"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "26:105",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -1176,6 +1337,13 @@
     "start": 59,
     "end": 914,
     "sha256": "44ba5e83fc32804e4ff69bf385a6c855d859ef92a2cfc9675ef5ec2bb5df6d73"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "16:19",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -1227,6 +1395,13 @@
     "start": 0,
     "end": 1505,
     "sha256": "9627d4633de5501a56a60b18ec768f89a0338d74a5ada5f127605badae7dddb8"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "20:23",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1265,6 +1440,13 @@
     "start": 297,
     "end": 1455,
     "sha256": "e3418ad8615052b2a57dc257e222725dd1147341fcf6a5a3c76ffe320bce4e38"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "4:138",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1316,6 +1498,13 @@
     "start": 406,
     "end": 1348,
     "sha256": "88de9e408f59a9966675c1e5f6f1aa2b3cb48fe01e29db18ce8781260350773a"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "15:30",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1354,6 +1543,13 @@
     "start": 392,
     "end": 1327,
     "sha256": "430a3a2a1c5db48962386ba569465be660090be09db89890a5aaad984e182605"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "74:44",
+    "hi": [
+     0
+    ]
    },
    "lexeme": "lam"
   },
@@ -1405,6 +1601,13 @@
     "start": 343,
     "end": 1273,
     "sha256": "df1ac35aef2ca566dd68f8e974148db55e66bb0b5681030d7976b95118ec5f18"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "26:85",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -1440,6 +1643,13 @@
     "start": 426,
     "end": 1719,
     "sha256": "be7f7df89752cff270cdade5e2126e30912b82816d9674c7d82ba42da90423a0"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "26:172",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -1482,6 +1692,13 @@
     "start": 84,
     "end": 1216,
     "sha256": "c07747cc7cd129cebaf70ed6a58ab7aa4903df96abfeed6f2b58a2a8158b92a3"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "3:132",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1524,6 +1741,13 @@
     "start": 276,
     "end": 1696,
     "sha256": "305d915fc8d94938b94b8c7acee355e578f0b2aad18beee68bc6b1ceaa438084"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "52:7",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -1562,6 +1786,13 @@
     "start": 313,
     "end": 1486,
     "sha256": "613c17b42ef479ac8b1f41ee812d8ef2a4a1c31115e50bae862df74cd5193131"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "37:60",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -1604,6 +1835,13 @@
     "start": 5,
     "end": 1907,
     "sha256": "787b5de5f6920dc2f86a9d255a8c5a7aeea202d4d6ed903a3891832452f03191"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "37:6",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1662,6 +1900,13 @@
     "start": 1,
     "end": 1213,
     "sha256": "0ee66a7fd096ec6110502916abdda26016482871dfd7fa111b35aa10af75b386"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "11:21",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -1704,6 +1949,13 @@
     "start": 0,
     "end": 810,
     "sha256": "ac462271a29e7280458395788789926871e4fd0493ad27a3f3f362953cb796eb"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "19:77",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1746,6 +1998,13 @@
     "start": 399,
     "end": 1592,
     "sha256": "d780fe05fc76921b7c65548b452deedd5841fe500c0ebccc47b30b86da9536cc"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "54:49",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1782,6 +2041,13 @@
     "start": 360,
     "end": 953,
     "sha256": "7b8998e02d41b0b6c9cfde0a10f77dd3e4378d9f2b035688005f9e54674cd7ea"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "3:158",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1832,6 +2098,13 @@
     "start": 0,
     "end": 1907,
     "sha256": "e257bebc1a509dffcb12b585b4a4d2b156ceba9d58573029615ab35e3e2a5144"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "15:61",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -1874,6 +2147,13 @@
     "start": 0,
     "end": 956,
     "sha256": "00c70d0c21b0270d9ce8e9180c5e264ca58e9426b33824e58f160b36615b1c77"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "99:7",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -1916,6 +2196,13 @@
     "start": 44,
     "end": 1398,
     "sha256": "0d7ae1b0cc18a03146d75e8008cf1396d42956dff5d1e54c6a4cf29dcc1357ad"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "20:36",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1955,16 +2242,9 @@
       "7:60",
       "96:7"
      ]
-    },
-    {
-     "id": "pernahkah kamu perhatikan",
-     "en": "have you considered",
-     "ayat": [
-      "56:63"
-     ]
     }
    ],
-   "review": "disputed",
+   "review": "corrected",
    "voice": {
     "form": "رَءَا",
     "loc": "6:76:5",
@@ -1973,6 +2253,13 @@
     "start": 11,
     "end": 977,
     "sha256": "be13ab9bb62d18b1b4c742a9cc10ea57e6ea2c41567213b0d84e67abd880a0ab"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "37:14",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -2004,13 +2291,6 @@
       "22:69",
       "38:66"
      ]
-    },
-    {
-     "id": "sebelum",
-     "en": "before",
-     "ayat": [
-      "3:3"
-     ]
     }
    ],
    "review": "corrected",
@@ -2022,6 +2302,13 @@
     "start": 0,
     "end": 992,
     "sha256": "6af70faec03575714b7e1e0ebf5c6dd5003692f5d20e5de590c3985599f796a6"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "38:66",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -2055,19 +2342,11 @@
      ]
     },
     {
-     "id": "membawa",
-     "en": "bring",
-     "ayat": [
-      "7:112",
-      "10:79",
-      "37:157"
-     ]
-    },
-    {
      "id": "mendatangi",
-     "en": "approach",
+     "en": "come to",
      "ayat": [
-      "26:165"
+      "26:165",
+      "26:89"
      ]
     }
    ],
@@ -2080,6 +2359,13 @@
     "start": 0,
     "end": 862,
     "sha256": "2534b1f6bef47b9a5da4fa9dbbad5562480248c9bce6154b55a5ebc41db37023"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "20:9",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -2104,12 +2390,21 @@
    ],
    "senses": [
     {
+     "id": "kitab",
+     "en": "book",
+     "ayat": [
+      "2:2",
+      "12:1",
+      "52:2"
+     ]
+    },
+    {
      "id": "kitab suci",
      "en": "scripture",
      "ayat": [
-      "2:2",
       "3:98",
-      "37:117"
+      "37:117",
+      "4:159"
      ]
     },
     {
@@ -2129,6 +2424,13 @@
     "start": 67,
     "end": 1379,
     "sha256": "0b23ecec0a8e1e4eedd13c58a6b9cb38ff32f00f637d65d79175a78dcf8aa6b6"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "52:2",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -2187,6 +2489,13 @@
     "start": 0,
     "end": 1305,
     "sha256": "40e49d09b97be6e02d2dcf481ff7b434f7bdebf4bcb10fbbf7f242c8f7545fcc"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "15:64",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -2229,6 +2538,13 @@
     "start": 361,
     "end": 1252,
     "sha256": "87f05efff3e71d359cef3c96d8790cbf163fc937f80ad2e3ce6965fb88d800e2"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "28:52",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -2272,6 +2588,13 @@
     "end": 2088,
     "sha256": "b96f5dfc5ee5caea7571a893592aed5d89315dd12b34f58b01088de2e2fed12f"
    },
+   "kind": "noun",
+   "example": {
+    "loc": "114:2",
+    "hi": [
+     1
+    ]
+   },
    "lexeme": "nas"
   },
   {
@@ -2310,6 +2633,13 @@
     "start": 45,
     "end": 569,
     "sha256": "7cf220fa5e03d965dbcd6c65c35358c6da21c74a68ab60a45120d4ce9e88620e"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "2:131",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -2352,6 +2682,13 @@
     "start": 412,
     "end": 2793,
     "sha256": "8510133fab0fe95f5329ee4cb84dc1cc2a0353b2381c0357c870fca1a5750f14"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "39:34",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -2388,6 +2725,13 @@
     "start": 385,
     "end": 2905,
     "sha256": "dccf2e76e4430c7df5e4d4d570f7fe108d6e5750db394aa19b9999ef835749be"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "23:10",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -2430,6 +2774,13 @@
     "start": 0,
     "end": 1332,
     "sha256": "db33b58e2a0a0d2c7023dcba6e2a4f5546315142524068909e17ce63dfd590c0"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "23:1",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -2464,13 +2815,6 @@
      "ayat": [
       "12:103"
      ]
-    },
-    {
-     "id": "mengapa tidak",
-     "en": "why not",
-     "ayat": [
-      "15:7"
-     ]
     }
    ],
    "review": "corrected",
@@ -2482,6 +2826,13 @@
     "start": 34,
     "end": 820,
     "sha256": "7be7809bae742106e3eadc4e7aba1f389b0dc74ee57d2e979b29697eb1b4c0ee"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "26:198",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -2524,6 +2875,13 @@
     "start": 298,
     "end": 1326,
     "sha256": "a9f52fcdbb05822782c4e2ea6346ff6921545aff0556da85aa9872f55312726d"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:52",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -2583,6 +2941,13 @@
     "start": 37,
     "end": 1474,
     "sha256": "97bac891bc7209eed3e4b92e95bec17e88dc2c6f7845686e8900b7878a994483"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "6:127",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -2625,6 +2990,13 @@
     "start": 204,
     "end": 1070,
     "sha256": "80df53494ede266877fb7908fa1ec068a79373e34a902aa2b60d4d9f0e5c5766"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "55:3",
+    "hi": [
+     0
+    ]
    },
    "lexeme": "khalaqa"
   },
@@ -2675,6 +3047,13 @@
     "start": 364,
     "end": 1948,
     "sha256": "b322f6cd357ea7e4182949491bdd7888aee25cbefeb938019afb982f2d040d01"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "56:69",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -2734,6 +3113,13 @@
     "start": 0,
     "end": 1272,
     "sha256": "7838bd11001ddaf85f1fcde72f15ba74c9c4162a19d91f9d022fcd9648409af8"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "97:3",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -2776,6 +3162,13 @@
     "start": 0,
     "end": 1373,
     "sha256": "defed2efb5ec70fde9cdc6e968b4263525769942d1d77724cab4c8f56706fb3d"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "26:105",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -2825,6 +3218,13 @@
     "start": 0,
     "end": 1017,
     "sha256": "deb991bdba4c85bcbb08eedec7355a7d3ba439f243d02c3b359255fad13ecf54"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "15:76",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -2890,6 +3290,13 @@
     "start": 0,
     "end": 1174,
     "sha256": "18031ba0fb3d0dec0d5e464a47c3a7573ed0f5a137edf33a77271d67ac87463e"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "7:197",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -2915,11 +3322,11 @@
    "senses": [
     {
      "id": "bertakwa",
-     "en": "fear Allah",
+     "en": "be God-conscious",
      "ayat": [
       "2:278",
       "9:119",
-      "26:126"
+      "10:63"
      ]
     },
     {
@@ -2930,7 +3337,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "ٱتَّقَىٰ",
     "loc": "2:189:19",
@@ -2939,6 +3346,13 @@
     "start": 31,
     "end": 1261,
     "sha256": "9f26ba1b0ea57b422127cb867b49f06c49cbe0f85a6853e27783ce286cbe35ee"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "10:63",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -2998,6 +3412,13 @@
     "start": 0,
     "end": 940,
     "sha256": "04c1eb5235a5a0d357cc0cd78eb7aa3c99aa55c90c33a845c155995a43a3b885"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "26:151",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -3022,7 +3443,7 @@
    ],
    "senses": [
     {
-     "id": "maha mengetahui",
+     "id": "Maha Mengetahui",
      "en": "all-knowing",
      "ayat": [
       "2:244",
@@ -3045,7 +3466,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "عَلِيمٌ",
     "loc": "4:12:87",
@@ -3054,6 +3475,13 @@
     "start": 3,
     "end": 1176,
     "sha256": "b47f5a0fee5e73155744f6cd4791f22150df307bf135a4562b83a2a13b0615ce"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "15:86",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -3092,6 +3520,13 @@
     "start": 77,
     "end": 869,
     "sha256": "30f30aac98ef35ce3379788fece9571fc5afae0172c36a9913518fc6bce42579"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "18:67",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -3123,18 +3558,9 @@
       "12:10",
       "23:113"
      ]
-    },
-    {
-     "id": "satu sama lain",
-     "en": "one another",
-     "ayat": [
-      "7:24",
-      "37:50",
-      "43:67"
-     ]
     }
    ],
-   "review": "disputed",
+   "review": "corrected",
    "voice": {
     "form": "بَعْضٍ",
     "loc": "2:76:11",
@@ -3143,6 +3569,13 @@
     "start": 37,
     "end": 1393,
     "sha256": "e2e74e9d1d05491f3df6f6c04240273897b57e8127b157027230bc310aeff5ab"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "23:113",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -3195,6 +3628,13 @@
     "start": 0,
     "end": 1853,
     "sha256": "d8262760fb40924003b8b3b977b657201a6735caea25544e90a7838e3351ad01"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "15:61",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -3219,6 +3659,13 @@
    ],
    "senses": [
     {
+     "id": "terakhir",
+     "en": "last",
+     "ayat": [
+      "2:8"
+     ]
+    },
+    {
      "id": "akhirat",
      "en": "the Hereafter",
      "ayat": [
@@ -3228,14 +3675,7 @@
      ]
     },
     {
-     "id": "akhir",
-     "en": "last",
-     "ayat": [
-      "2:8"
-     ]
-    },
-    {
-     "id": "orang yang kemudian",
+     "id": "generasi kemudian",
      "en": "later generations",
      "ayat": [
       "26:84",
@@ -3243,7 +3683,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "ٱلْـَٔاخِرِ",
     "loc": "2:8:8",
@@ -3252,6 +3692,13 @@
     "start": 391,
     "end": 1976,
     "sha256": "764da8e92a7469c7d986ea55dac6881ceabbb2740684ed3421e90d873f730d10"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:8",
+    "hi": [
+     7
+    ]
    }
   },
   {
@@ -3290,6 +3737,13 @@
     "start": 38,
     "end": 1043,
     "sha256": "25655d213844de0a9ff4ad34144fe52581a511569a68bb65b6b84870dcc0b8ff"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "8:64",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -3323,15 +3777,6 @@
      ]
     },
     {
-     "id": "tanpa",
-     "en": "without",
-     "ayat": [
-      "6:140",
-      "22:3",
-      "38:39"
-     ]
-    },
-    {
      "id": "bukan / tidak",
      "en": "not",
      "ayat": [
@@ -3341,7 +3786,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "غَيْرَ",
     "loc": "2:59:5",
@@ -3350,6 +3795,13 @@
     "start": 19,
     "end": 987,
     "sha256": "d315de265c6ddbca661782ce46b685bb10f760fb7e7abf4019d1757af133fa00"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "26:29",
+    "hi": [
+     4
+    ]
    },
    "lexeme": "ghayr"
   },
@@ -3384,11 +3836,12 @@
      ]
     },
     {
-     "id": "kebun",
+     "id": "kebun, taman",
      "en": "garden",
      "ayat": [
       "26:134",
-      "26:147"
+      "26:147",
+      "69:22"
      ]
     }
    ],
@@ -3401,6 +3854,13 @@
     "start": 0,
     "end": 1817,
     "sha256": "594d917ecb3590834cf1d2f94a2b42ea7bc10db5d1a0aa97362e97436c95c382"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "26:90",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -3444,6 +3904,13 @@
     "end": 998,
     "sha256": "78abe783fdd405ad50f55d2339b67d79bc6d8e4a8be10d834f598335fd0d840a"
    },
+   "kind": "noun",
+   "example": {
+    "loc": "19:81",
+    "hi": [
+     4
+    ]
+   },
    "lexeme": "ilah"
   },
   {
@@ -3468,15 +3935,6 @@
    ],
    "senses": [
     {
-     "id": "neraka",
-     "en": "the Fire (Hell)",
-     "ayat": [
-      "2:39",
-      "3:131",
-      "5:37"
-     ]
-    },
-    {
      "id": "api",
      "en": "fire",
      "ayat": [
@@ -3484,9 +3942,18 @@
       "21:69",
       "36:80"
      ]
+    },
+    {
+     "id": "neraka",
+     "en": "the Fire (Hell)",
+     "ayat": [
+      "2:39",
+      "3:131",
+      "5:37"
+     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "نَارٌ",
     "loc": "2:266:27",
@@ -3495,6 +3962,13 @@
     "start": 0,
     "end": 1354,
     "sha256": "bbfbff9d87e6d5fe6e446eb7c53dfba19a6e3c0c5f82ac9c5d4e2bef9d4f37d7"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "15:27",
+    "hi": [
+     5
+    ]
    }
   },
   {
@@ -3537,6 +4011,13 @@
     "start": 50,
     "end": 807,
     "sha256": "0269e388f5f756f8cf8f121f0af10cbd3018c7426ad5918538924e10c032007c"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "16:104",
+    "hi": [
+     7
+    ]
    },
    "lexeme": "hada"
   },
@@ -3587,6 +4068,13 @@
     "start": 268,
     "end": 1227,
     "sha256": "93e7df580b1e21bc247d03782e989519e122e60b288b5ec4047d87a025a8b1e1"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "21:67",
+    "hi": [
+     5
+    ]
    }
   },
   {
@@ -3622,6 +4110,13 @@
     "start": 26,
     "end": 1246,
     "sha256": "0209ab943941fcce722d5c6f12ca2dca29e7fca590052c3e01472882d15b650e"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "97:5",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -3647,7 +4142,7 @@
    "senses": [
     {
      "id": "menghendaki",
-     "en": "to want",
+     "en": "want",
      "ayat": [
       "4:28",
       "4:134",
@@ -3664,6 +4159,13 @@
     "start": 386,
     "end": 1484,
     "sha256": "f38dc3977e4c96d3119b7d5361a97460862ad60bacd629e105cf25479d07a92a"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "16:40",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -3711,6 +4213,13 @@
     "start": 425,
     "end": 1135,
     "sha256": "7a0b1c8351675f4fe991cabef8f97f0d6a2a910cb716fbeb1df1267767eb1180"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "56:59",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -3749,6 +4258,13 @@
     "start": 41,
     "end": 1057,
     "sha256": "13270425c6e5e8fa47c1351118bdbb5e42272e21586f074210b1d8d8802b1d97"
+   },
+   "kind": "name",
+   "example": {
+    "loc": "20:9",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -3791,6 +4307,13 @@
     "start": 0,
     "end": 1220,
     "sha256": "470a0305a5aca03ad45cc461c8d39b374c6f0f017972cd813d44d0789726024a"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "6:155",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -3833,6 +4356,13 @@
     "start": 29,
     "end": 703,
     "sha256": "02bb8be60617839ab0a09f50c56f44633b8acea142697f1b5f261cb3a3e9444a"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "26:89",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -3875,6 +4405,13 @@
     "start": 0,
     "end": 940,
     "sha256": "2e73cf261c80b63fb269b70d16fac885d7f332adae80a597b456cb4a976e71c9"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "6:18",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -3899,20 +4436,21 @@
    ],
    "senses": [
     {
+     "id": "mengirim",
+     "en": "send",
+     "ayat": [
+      "51:33",
+      "12:45",
+      "7:6"
+     ]
+    },
+    {
      "id": "mengutus",
      "en": "send as messenger",
      "ayat": [
       "6:48",
       "11:96",
       "21:107"
-     ]
-    },
-    {
-     "id": "mengirim",
-     "en": "send",
-     "ayat": [
-      "12:45",
-      "51:33"
      ]
     },
     {
@@ -3932,6 +4470,13 @@
     "start": 10,
     "end": 836,
     "sha256": "b806e74f266201297b506ce96ff37b801bf72dd57edc7d6b9efa008774dabf41"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "51:33",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -3975,6 +4520,13 @@
     "end": 1985,
     "sha256": "2e8a8eb05f62ae565d779f69d8af367c8a4ee11f2454a7acf15906a6ffc5aed5",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "41:7",
+    "hi": [
+     7
+    ]
    }
   },
   {
@@ -4024,6 +4576,13 @@
     "start": 0,
     "end": 1436,
     "sha256": "2c18791d3a4e8d1f5404548881064a592ea0273a20b8ef53eddadceb529b3fa7"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "21:14",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -4048,12 +4607,11 @@
    ],
    "senses": [
     {
-     "id": "menimpa, menyiksa",
-     "en": "seize with punishment",
+     "id": "mengambil",
+     "en": "take",
      "ayat": [
-      "3:11",
-      "7:78",
-      "11:67"
+      "4:71",
+      "7:199"
      ]
     },
     {
@@ -4065,15 +4623,16 @@
      ]
     },
     {
-     "id": "mengambil",
-     "en": "take",
+     "id": "menimpa, menyiksa",
+     "en": "seize with punishment",
      "ayat": [
-      "4:71",
-      "7:199"
+      "3:11",
+      "7:78",
+      "11:67"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "أَخَذَ",
     "loc": "3:81:2",
@@ -4082,6 +4641,13 @@
     "start": 0,
     "end": 1044,
     "sha256": "223f4be3135c3913dece8313f2b62614dcbc6cae6e7ee040fc7591f70a2805a9"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "7:199",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -4127,6 +4693,13 @@
     "start": 51,
     "end": 710,
     "sha256": "07ab00e23c5b0d82db51cdc9518e69399a42dad217d0aad324b7fac2f6287589"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "38:2",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -4187,6 +4760,13 @@
     "start": 117,
     "end": 947,
     "sha256": "2e66be22a6eb62036523e846fb1f704be2a49f9b23899ee7b614c4a3b9738b2e"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "26:170",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -4245,6 +4825,13 @@
     "start": 33,
     "end": 1094,
     "sha256": "d895436d0edaed0886a7a568b4ad10a829a81aabe67da8c09bc86677d4d1e5b1"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "36:74",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -4290,6 +4877,13 @@
     "start": 0,
     "end": 888,
     "sha256": "531d34b591a44de3087d21cb59544b43fee87ddc6b0a01d425c645141718fb74"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "3:132",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -4333,6 +4927,13 @@
     "end": 1149,
     "sha256": "44003761545ad8411a2b8cf0e22bd139e160bc6b0824172a91cdd1af5ac5b69b"
    },
+   "kind": "verb",
+   "example": {
+    "loc": "1:5",
+    "hi": [
+     1
+    ]
+   },
    "lexeme": "abada"
   },
   {
@@ -4366,14 +4967,14 @@
      ]
     },
     {
-     "id": "tulang belulang",
-     "en": "bones",
+     "id": "Maha Agung",
+     "en": "Most Great",
      "ayat": [
-      "23:82"
+      "56:74"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "عَظِيمٌ",
     "loc": "2:7:12",
@@ -4383,6 +4984,13 @@
     "end": 1840,
     "sha256": "1ac7731c8d9d4ea5e6b5a2d4e476111f4d596ddeba60ed451efe5391cbe0e6c5",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "37:60",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -4412,15 +5020,7 @@
      "ayat": [
       "5:28",
       "7:108",
-      "30:41"
-     ]
-    },
-    {
-     "id": "sebelum, di hadapan",
-     "en": "before, in front",
-     "ayat": [
-      "3:3",
-      "49:1"
+      "20:22"
      ]
     }
    ],
@@ -4433,6 +5033,13 @@
     "start": 0,
     "end": 784,
     "sha256": "ddc29baa443a7713efa9a579436ac1f68d0155f784a35aa499ffbf17c6a0c4c6"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "7:108",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -4476,6 +5083,13 @@
     "end": 1489,
     "sha256": "7725f3a6474f2fc93ba5dc81b4244a6f1f2c1c10e5d5391a9e3ca46df3ca073a",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "12:1",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -4518,6 +5132,13 @@
     "start": 0,
     "end": 1301,
     "sha256": "d8d94c9f7242e5d98a5ea7740dd495b0d68a66a0f19d9392324b2718d64c5101"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "1:3",
+    "hi": [
+     1
+    ]
    },
    "lexeme": "rahim"
   },
@@ -4574,6 +5195,13 @@
     "start": 95,
     "end": 1706,
     "sha256": "30ba3bf323d4ebbe79344df17433badcf336328bcf90bd3792a978e5ebdd36b6"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "16:122",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -4616,6 +5244,13 @@
     "start": 0,
     "end": 1348,
     "sha256": "9d2831a74490317639337e381a96fcdf4b15efef3066498992a60f23a9618398"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "21:107",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -4673,6 +5308,13 @@
     "start": 30,
     "end": 918,
     "sha256": "b68e3ea5e1d67bd892e3354fd7019fc3467ec0c125552ee78eb2823fbc87765c"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "43:76",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -4711,6 +5353,13 @@
     "start": 60,
     "end": 740,
     "sha256": "bd4a1a7193308bf0bfb7c9597d5101e1ff89dc38699567f78b2e50133d1cedd0"
+   },
+   "kind": "particle",
+   "example": {
+    "loc": "18:67",
+    "hi": [
+     2
+    ]
    }
   }
  ]

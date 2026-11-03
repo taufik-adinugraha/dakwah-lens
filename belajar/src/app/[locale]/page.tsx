@@ -10,7 +10,7 @@ import { NoteRow, type PillTone } from "@/components/StatusPill";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
 import { comingUnits } from "@/lib/comingUnits";
-import { visibleSurahs, warisVisible } from "@/lib/features";
+import { kosakataEnglishOn, visibleSurahs, warisVisible } from "@/lib/features";
 import { kosakataIndex } from "@/lib/kosakata";
 import { LIBRARY } from "@/lib/library";
 import { conceptIndexHref, kosakataHref, quranHref, warisHref } from "@/lib/routes";
@@ -99,15 +99,20 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
       body: t("concepts_body"),
       notes: [{ tone: "ok", items: [t("concepts_available", { n: LIBRARY.concepts.length })] }],
     },
-    {
+  ];
+  // The list in English is hidden for now (lib/features.ts BELAJAR_KOSAKATA_EN); awaited first, so this
+  // reads the switch at request time like the card below.
+  const visible = await warisVisible();
+  if (locale !== "en" || kosakataEnglishOn()) {
+    tracks.push({
       href: kosakataHref(),
       Icon: BookText,
       title: t("kosakata_title"),
       body: t("kosakata_body"),
       notes: [{ tone: "ok", items: [t("kosakata_available", { n: kosakataIndex().rows.length })] }],
-    },
-  ];
-  if (await warisVisible()) {
+    });
+  }
+  if (visible) {
     const tw = await getTranslations("Track");
     tracks.push({
       // Ilmu Waris (Faraidh): what exists today is the calculator (docs/waris-plan.md §9.1, M2.13).

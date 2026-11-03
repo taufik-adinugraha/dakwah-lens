@@ -124,6 +124,10 @@ export const lexemeHref = (id: string) => `/kosakata/${id}`;
 /** The Qur'an vocabulary list, ranked by frequency: /kosakata, and one word by its rank. */
 export const kosakataHref = () => "/kosakata";
 export const kosakataWordHref = (rank: number) => `/kosakata/kata/${rank}`;
+export const kosakataPathHref = () => "/kosakata/bertahap";
+export const kosakataBatchHref = (level: number, batch: number) => `/kosakata/bertahap/${level}/${batch}`;
+export const kosakataBatchTestHref = (level: number, batch: number) => `/kosakata/bertahap/${level}/${batch}/tes`;
+export const kosakataLevelTestHref = (level: number) => `/kosakata/bertahap/${level}/tes`;
 
 /** Sources & licences. */
 export const creditsHref = () => "/kredit";

@@ -3,9 +3,11 @@ import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
+import { KosakataTabs } from "@/components/kosakata/KosakataTabs";
 import { ClipButton, ClipPageStatus, ClipPlayerProvider } from "@/components/library/ClipButton";
 import { MixedText } from "@/components/library/MixedText";
 import { Link } from "@/i18n/navigation";
+import { kosakataPathListed } from "@/lib/features";
 import { kosakataIndex } from "@/lib/kosakata";
 import { MILESTONES, pageCount, pageOfRank, pageRows, parsePage, percent, rowVoice, searchRows } from "@/lib/kosakata-core";
 import { kosakataHref, kosakataWordHref } from "@/lib/routes";
@@ -42,6 +44,7 @@ export default async function KosakataPage({ params, searchParams }: PageProps<"
     <div className="relative isolate">
       <ForestGlow />
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+        {kosakataPathListed() ? <KosakataTabs current="all" /> : null}
         <h1 className="text-balance font-display text-3xl font-medium tracking-[-0.015em] sm:text-4xl">
           <MixedText text={t("title")} />
         </h1>

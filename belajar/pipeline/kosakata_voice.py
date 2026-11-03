@@ -142,7 +142,7 @@ def pin_problems(pins: dict, wanted: dict[str, dict] | None = None) -> list[str]
     """The pins alone (CI), and against the rule's places when they are given (local, with the corpus)."""
     out = []
     words = pins.get("words") or {}
-    for lem, p in words.items():
+    for lem, p in [*words.items(), *((f"part at {k}", v) for k, v in (pins.get("parts") or {}).items())]:
         loc = str(p.get("loc"))
         if not _LOC.fullmatch(loc):
             out.append(f"{lem}: {loc!r} is not a word's place")
