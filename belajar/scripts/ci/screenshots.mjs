@@ -1171,7 +1171,8 @@ async function kosakataVoiceChecks(page, vp) {
   const button = (w) => `main button[data-clip="${w.voice.loc}"]`;
   await page.route(isNarration, handler);
   try {
-    await page.goto(`${BASE}/belajar/id/kosakata`, { waitUntil: "networkidle" });
+    // Its first page by name: while the path is listed, the bare address opens the path (src/proxy.ts).
+    await page.goto(`${BASE}/belajar/id/kosakata?hal=1`, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(400);
     await page.screenshot({ path: `shots/${vp}-kosakata-list.png`, fullPage: false });
@@ -1325,6 +1326,35 @@ async function kosakataPathChecks(page, vp) {
     if (widths.length !== 5 || !(widths[0] > widths[1] && widths[1] > widths[2])) fail(`the band's levels are ${widths.join(", ")}px wide: not to scale`);
     await sideways("the map");
     await page.screenshot({ path: `shots/${vp}-kosakata-path-map.png`, fullPage: true });
+
+    // The two tabs (operator 2026-11-03: "people easily overlook them"): large, in the first screen, the
+    // path first and filled on its own page, the list outlined, and the list's tab reaching the list.
+    // The mouse off them first: an earlier step's click may have left it over a tab, which tints it.
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: `shots/${vp}-kosakata-tabs.png`, fullPage: false });
+    const tabs = await page.locator("[data-kosakata-tabs] a").evaluateAll((els) =>
+      els.map((e) => {
+        const r = e.getBoundingClientRect();
+        const s = getComputedStyle(e);
+        return { href: e.getAttribute("href"), current: e.getAttribute("aria-current"), top: r.top, bottom: r.bottom, height: r.height, width: r.width, bg: s.backgroundColor, border: s.borderTopWidth };
+      }),
+    );
+    if (tabs.length !== 2) fail(`the map has ${tabs.length} tabs`);
+    if (!tabs[0].href.endsWith("/kosakata/bertahap") || tabs[0].current !== "page") fail(`the first tab is ${JSON.stringify(tabs[0])}, not the path on its own page`);
+    if (!tabs[1].href.endsWith("/kosakata?hal=1") || tabs[1].current !== null) fail(`the second tab is ${JSON.stringify(tabs[1])}, not the list`);
+    const viewportHeight = page.viewportSize().height;
+    for (const t of tabs) {
+      if (t.height < 56 || t.width < 120) fail(`a tab is ${t.width}x${t.height}px: too small to notice`);
+      if (t.bottom > viewportHeight) fail(`a tab ends ${t.bottom}px down, below the first screen`);
+    }
+    if (tabs[0].top !== tabs[1].top || tabs[0].height !== tabs[1].height) fail("the two tabs are not one even row");
+    if (tabs[0].bg !== "rgb(14, 90, 60)" || tabs[1].bg !== "rgb(255, 255, 255)") fail(`the tabs' fills are ${tabs[0].bg} and ${tabs[1].bg}: on its page a tab is filled, the other outlined`);
+    await page.locator('[data-kosakata-tabs] a[href$="?hal=1"]').click();
+    await page.waitForSelector("main button[data-clip]", { timeout: 8000 });
+    if (!page.url().endsWith("/kosakata?hal=1")) fail(`the list's tab went to ${page.url()}`);
+    await go(MAP);
+
     await go(`${MAP}/1/1`);
     await page.waitForSelector("[data-path-locked]", { timeout: 8000 });
 

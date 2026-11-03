@@ -10,10 +10,10 @@ import { NoteRow, type PillTone } from "@/components/StatusPill";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
 import { comingUnits } from "@/lib/comingUnits";
-import { kosakataEnglishOn, visibleSurahs, warisVisible } from "@/lib/features";
+import { kosakataEnglishOn, kosakataPathListed, visibleSurahs, warisVisible } from "@/lib/features";
 import { kosakataIndex } from "@/lib/kosakata";
 import { LIBRARY } from "@/lib/library";
-import { conceptIndexHref, kosakataHref, quranHref, warisHref } from "@/lib/routes";
+import { conceptIndexHref, kosakataHref, kosakataPathHref, quranHref, warisHref } from "@/lib/routes";
 import { shareMetadata } from "@/lib/share";
 
 export async function generateMetadata({
@@ -105,7 +105,8 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
   const visible = await warisVisible();
   if (locale !== "en" || kosakataEnglishOn()) {
     tracks.push({
-      href: kosakataHref(),
+      // While the learning path is listed the section opens on it (src/proxy.ts), so the card goes there directly.
+      href: kosakataPathListed() ? kosakataPathHref() : kosakataHref(),
       Icon: BookText,
       title: t("kosakata_title"),
       body: t("kosakata_body"),

@@ -147,6 +147,51 @@ describe("proxy: the Kosakata list hidden in English unless BELAJAR_KOSAKATA_EN=
   });
 });
 
+describe("proxy: Kosakata opens on the learning path while it is listed (operator, 2026-11-03)", () => {
+  const saved = { path: process.env.BELAJAR_KOSAKATA_BERTAHAP, en: process.env.BELAJAR_KOSAKATA_EN };
+  const restore = (name: string, value: string | undefined) => {
+    if (value === undefined) delete process.env[name];
+    else process.env[name] = value;
+  };
+  beforeEach(() => {
+    process.env.BELAJAR_KOSAKATA_BERTAHAP = "on";
+    delete process.env.BELAJAR_KOSAKATA_EN;
+  });
+  afterEach(() => {
+    restore("BELAJAR_KOSAKATA_BERTAHAP", saved.path);
+    restore("BELAJAR_KOSAKATA_EN", saved.en);
+  });
+
+  it("sends the section's own address to the path, for a while and not for good", () => {
+    expect(landing("/belajar/id/kosakata")).toBe("307 /belajar/id/kosakata/bertahap");
+  });
+
+  it("keeps anything else the address carries", () => {
+    const res = proxy(new NextRequest("http://127.0.0.1:3200/belajar/id/kosakata?utm=wa", { nextConfig: { basePath: "/belajar" } }));
+    expect(new URL(res.headers.get("location") ?? "/", "http://127.0.0.1:3200").search).toBe("?utm=wa");
+  });
+
+  it("leaves the list's pages, a search, the path and the words alone", () => {
+    for (const path of ["/belajar/id/kosakata?hal=1", "/belajar/id/kosakata?hal=3", "/belajar/id/kosakata?q=tangan", "/belajar/id/kosakata?q="]) {
+      expect(landing(path), path).toBe("/belajar/id/kosakata");
+    }
+    for (const path of ["/belajar/id/kosakata/bertahap", "/belajar/id/kosakata/bertahap/1/3", "/belajar/id/kosakata/kata/1", "/belajar/id/kosakata/rahim"]) {
+      expect(landing(path), path).toBe(path);
+    }
+  });
+
+  it("keeps the English list hidden, and follows the same rule when it is shown", () => {
+    expect(landing("/belajar/en/kosakata")).toMatch(HIDDEN_404);
+    process.env.BELAJAR_KOSAKATA_EN = "on";
+    expect(landing("/belajar/en/kosakata")).toBe("307 /belajar/en/kosakata/bertahap");
+  });
+
+  it("is the list again with the switch off", () => {
+    delete process.env.BELAJAR_KOSAKATA_BERTAHAP;
+    expect(landing("/belajar/id/kosakata")).toBe("/belajar/id/kosakata");
+  });
+});
+
 describe("proxy: only the surahs BELAJAR_SURAHS publishes (unset: Al-Fatihah only)", () => {
   beforeEach(() => setUnlisted(""));
 

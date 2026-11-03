@@ -25,6 +25,8 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata
  * 4,832 rows reaches the browser but the ones shown. Each row plays its word (operator 2026-11-03:
  * "we should also provide the audio of each word so user can listen how it's read"); nothing is
  * fetched ahead here, because a page holds a hundred words and a press loads one small file.
+ * While the learning path is listed, the bare address opens the path (src/proxy.ts), so links to this
+ * list always name a page (`?hal=1`) or a search.
  */
 export default async function KosakataPage({ params, searchParams }: PageProps<"/[locale]/kosakata">) {
   const { locale } = await params;
@@ -44,10 +46,10 @@ export default async function KosakataPage({ params, searchParams }: PageProps<"
     <div className="relative isolate">
       <ForestGlow />
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        {kosakataPathListed() ? <KosakataTabs current="all" /> : null}
         <h1 className="text-balance font-display text-3xl font-medium tracking-[-0.015em] sm:text-4xl">
           <MixedText text={t("title")} />
         </h1>
+        {kosakataPathListed() ? <KosakataTabs current="all" /> : null}
         <p className="mt-3 max-w-prose text-pretty text-lg text-ink-muted">
           <MixedText text={t("intro", { total })} />
         </p>
@@ -112,7 +114,7 @@ export default async function KosakataPage({ params, searchParams }: PageProps<"
           </p>
           {found ? (
             <p className="mt-1 text-sm">
-              <Link href={kosakataHref()} className="font-semibold text-forest underline underline-offset-2">
+              <Link href={`${kosakataHref()}?hal=1`} className="font-semibold text-forest underline underline-offset-2">
                 {t("search_clear")}
               </Link>
             </p>

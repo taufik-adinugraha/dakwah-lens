@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 
 import { routing } from "@/i18n/routing";
-import { kosakataEnglishOn, reachableSurahs, warisSwitchOn } from "@/lib/features";
-import { SURAH_SLUGS } from "@/lib/routes";
+import { kosakataEnglishOn, kosakataPathListed, reachableSurahs, warisSwitchOn } from "@/lib/features";
+import { kosakataPathHref, SURAH_SLUGS } from "@/lib/routes";
 
 // Locale routing, plus the runtime switches of what is hidden. The module has
 // no protected routes and no sign-in (plan L16, §7.3): progress stays in the
@@ -20,6 +20,8 @@ const SURAH = new RegExp(`^/${LOCALE}/quran/([^/]+)(?:/|$)`);
  * /en/kosakata/{id}, a lesson word's full entry, which the English lessons link to.
  */
 const KOSAKATA_EN = /^\/(en)\/kosakata(?:\/?$|\/(?:kata|bertahap)(?:\/|$))/;
+/** The Kosakata section's own address (Next has already answered a trailing "/" with its own 308). */
+const KOSAKATA_HOME = new RegExp(`^/${LOCALE}/kosakata$`);
 /** The surahs that have a lesson (an unknown slug is left to the lesson routes' own 404). */
 const LESSONS: ReadonlySet<string> = new Set(SURAH_SLUGS);
 
@@ -65,10 +67,26 @@ export default function proxy(request: NextRequest) {
   const locale =
     hiddenLocale(request.nextUrl.pathname, hidden) ??
     hiddenLocale(rewrittenPathname(request, response), hidden);
-  if (!locale) return response;
+  if (!locale) return kosakataOpening(request) ?? response;
   const url = request.nextUrl.clone();
   url.pathname = `/${locale}${NOT_FOUND}`;
   return NextResponse.rewrite(url);
+}
+
+/**
+ * While the learning path is listed (BELAJAR_KOSAKATA_BERTAHAP=on), the Kosakata section opens on it
+ * (operator 2026-11-03: "set belajar bertahap as first/default tab"): /{locale}/kosakata, with neither
+ * a page nor a search, goes to the path. The list stays at ?hal= and ?q=, so its pager, a search and
+ * a link to either keep working. A temporary redirect, because the switch can go back. Checked after
+ * the gate above, so the English list stays hidden. Null for any other request.
+ */
+function kosakataOpening(request: NextRequest): NextResponse | null {
+  const { pathname, searchParams } = request.nextUrl;
+  const home = KOSAKATA_HOME.exec(pathname);
+  if (!home || !kosakataPathListed() || searchParams.has("hal") || searchParams.has("q")) return null;
+  const url = request.nextUrl.clone();
+  url.pathname = `/${home[1]}${kosakataPathHref()}`;
+  return NextResponse.redirect(url);
 }
 
 /** What is hidden on this request (both switches are read per request). */

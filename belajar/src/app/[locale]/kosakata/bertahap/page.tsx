@@ -25,15 +25,17 @@ export default async function KosakataPathPage({ params }: PageProps<"/[locale]/
   setRequestLocale(locale);
   await connection();
   const t = await getTranslations("KosakataPath");
+  const tk = await getTranslations("Kosakata");
   const path = kosakataPath();
   return (
     <div className="relative isolate">
       <ForestGlow />
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        <KosakataTabs current="path" />
+        {/* The section's name, as on the list: this is where the section opens, and the tab below names this page. */}
         <h1 className="text-balance font-display text-3xl font-medium tracking-[-0.015em] sm:text-4xl">
-          <MixedText text={t("title")} />
+          <MixedText text={tk("title")} />
         </h1>
+        <KosakataTabs current="path" />
         <p className="mt-3 max-w-prose text-pretty text-lg text-ink-muted">
           <MixedText text={t("intro")} />
         </p>
