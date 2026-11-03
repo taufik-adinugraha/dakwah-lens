@@ -1,0 +1,29 @@
+{
+ "sura": 103,
+ "ayat": [
+  {
+   "loc": "103:1",
+   "ar": "وَٱلْعَصْرِ",
+   "translation": {
+    "text": "Demi masa.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "103:2",
+   "ar": "إِنَّ ٱلْإِنسَٰنَ لَفِى خُسْرٍ",
+   "translation": {
+    "text": "Sungguh, manusia berada dalam kerugian,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "103:3",
+   "ar": "إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّٰلِحَٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ",
+   "translation": {
+    "text": "kecuali orang-orang yang beriman dan mengerjakan kebajikan serta saling menasihati untuk kebenaran dan saling menasihati untuk kesabaran.",
+    "footnotes": []
+   }
+  }
+ ]
+}

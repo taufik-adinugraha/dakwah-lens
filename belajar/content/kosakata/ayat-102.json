@@ -1,0 +1,31 @@
+{
+ "sura": 102,
+ "ayat": [
+  {
+   "loc": "102:1",
+   "ar": "أَلْهَىٰكُمُ ٱلتَّكَاثُرُ",
+   "translation": {
+    "text": "Bermegah-megahan telah melalaikan kamu,[923]",
+    "footnotes": [
+     "[923] Bermegah-megahan dalam soal banyak anak, harta, pengikut, kemuliaan dan sebagainya, telah melalaikan kamu dari ketaatan kepada Allah."
+    ]
+   }
+  },
+  {
+   "loc": "102:2",
+   "ar": "حَتَّىٰ زُرْتُمُ ٱلْمَقَابِرَ",
+   "translation": {
+    "text": "sampai kamu masuk ke dalam kubur.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "102:5",
+   "ar": "كَلَّا لَوْ تَعْلَمُونَ عِلْمَ ٱلْيَقِينِ",
+   "translation": {
+    "text": "Sekali-kali tidak! Sekiranya kamu mengetahui dengan pasti,",
+    "footnotes": []
+   }
+  }
+ ]
+}

@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { ayahPayload } from "@/lib/ayat";
+import { kosakataAyah } from "@/lib/kosakata";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +15,12 @@ export const dynamic = "force-dynamic";
  * a page needs one at a time, on a click. Same origin, as the CSP requires (connect-src 'self').
  * Not gated by BELAJAR_SURAHS: it serves Qur'an text only, and a surah shown later finds its
  * facts' ayat here (the proxy skips /api). The answer only changes with a deploy, so the browser
- * may keep it a day; the dialog also keeps what it fetched for the visit.
+ * may keep it a day; the dialog also keeps what it fetched for the visit. An ayah no fact locates may
+ * still be cited by the vocabulary list: those live in small per-surah files (lib/kosakata.ts).
  */
 export async function GET(request: NextRequest) {
-  const payload = ayahPayload(request.nextUrl.searchParams.get("loc"));
+  const loc = request.nextUrl.searchParams.get("loc");
+  const payload = ayahPayload(loc) ?? kosakataAyah(loc);
   if (!payload) {
     return NextResponse.json({ error: "not_found" }, { status: 404, headers: { "cache-control": "no-store" } });
   }

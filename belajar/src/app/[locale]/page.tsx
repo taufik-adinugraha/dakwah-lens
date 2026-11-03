@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowRight, BookOpen, Library, Scale } from "lucide-react";
+import { ArrowRight, BookOpen, BookText, Library, Scale } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
@@ -11,8 +11,9 @@ import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
 import { comingUnits } from "@/lib/comingUnits";
 import { visibleSurahs, warisVisible } from "@/lib/features";
+import { kosakataIndex } from "@/lib/kosakata";
 import { LIBRARY } from "@/lib/library";
-import { conceptIndexHref, quranHref, warisHref } from "@/lib/routes";
+import { conceptIndexHref, kosakataHref, quranHref, warisHref } from "@/lib/routes";
 import { shareMetadata } from "@/lib/share";
 
 export async function generateMetadata({
@@ -97,6 +98,13 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
       title: t("concepts_title"),
       body: t("concepts_body"),
       notes: [{ tone: "ok", items: [t("concepts_available", { n: LIBRARY.concepts.length })] }],
+    },
+    {
+      href: kosakataHref(),
+      Icon: BookText,
+      title: t("kosakata_title"),
+      body: t("kosakata_body"),
+      notes: [{ tone: "ok", items: [t("kosakata_available", { n: kosakataIndex().rows.length })] }],
     },
   ];
   if (await warisVisible()) {

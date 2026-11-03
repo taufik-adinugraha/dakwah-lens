@@ -170,8 +170,24 @@ describe("GET /belajar/api/ayah", () => {
     expect((await (await get("?loc=2%3A282")).json()).loc).toBe("2:282");
   });
 
+  it("answers an ayah only the vocabulary list cites, from its surah's file", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { words } = JSON.parse(readFileSync("content/kosakata/words-001.json", "utf8")) as {
+      words: { senses: { ayat: string[] }[] }[];
+    };
+    const loc = words[0].senses[0].ayat[0];
+    const res = await get(`?loc=${loc}`);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { loc: string; ar: string; name: string; translation: { text: string; source_label: string } };
+    expect(body.loc).toBe(loc);
+    expect(body.ar.length).toBeGreaterThan(0);
+    expect(body.translation.text.length).toBeGreaterThan(0);
+    expect(body.translation.source_label.length).toBeGreaterThan(0);
+    expect(body.name.length).toBeGreaterThan(0);
+  });
+
   it("answers 404 for a location the file has no entry for, or none at all", async () => {
-    for (const q of ["?loc=2:999", "?loc=103:1", "?loc=abc", "?loc=", ""]) {
+    for (const q of ["?loc=2:999", "?loc=114:999", "?loc=abc", "?loc=", ""]) {
       const res = await get(q);
       expect(res.status, q).toBe(404);
       expect(res.headers.get("cache-control"), q).toBe("no-store");

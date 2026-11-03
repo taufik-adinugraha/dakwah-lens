@@ -1,0 +1,69 @@
+{
+ "sura": 100,
+ "ayat": [
+  {
+   "loc": "100:1",
+   "ar": "وَٱلْعَٰدِيَٰتِ ضَبْحًا",
+   "translation": {
+    "text": "Demi kuda perang yang berlari kencang terengah-engah,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "100:2",
+   "ar": "فَٱلْمُورِيَٰتِ قَدْحًا",
+   "translation": {
+    "text": "dan kuda yang memercikkan bunga api (dengan pukulan kuku kakinya),",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "100:3",
+   "ar": "فَٱلْمُغِيرَٰتِ صُبْحًا",
+   "translation": {
+    "text": "dan kuda yang menyerang (dengan tiba-tiba) pada waktu pagi,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "100:4",
+   "ar": "فَأَثَرْنَ بِهِۦ نَقْعًا",
+   "translation": {
+    "text": "sehingga menerbangkan debu,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "100:5",
+   "ar": "فَوَسَطْنَ بِهِۦ جَمْعًا",
+   "translation": {
+    "text": "lalu menyerbu ke tengah-tengah kumpulan musuh,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "100:6",
+   "ar": "إِنَّ ٱلْإِنسَٰنَ لِرَبِّهِۦ لَكَنُودٌ",
+   "translation": {
+    "text": "sungguh, manusia itu sangat ingkar, (tidak bersyukur) kepada Tuhannya,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "100:9",
+   "ar": "أَفَلَا يَعْلَمُ إِذَا بُعْثِرَ مَا فِى ٱلْقُبُورِ",
+   "translation": {
+    "text": "Maka tidakkah dia mengetahui apabila apa yang di dalam kubur dikeluarkan,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "100:10",
+   "ar": "وَحُصِّلَ مَا فِى ٱلصُّدُورِ",
+   "translation": {
+    "text": "dan apa yang tersimpan di dalam dada dikeluarkan?",
+    "footnotes": []
+   }
+  }
+ ]
+}

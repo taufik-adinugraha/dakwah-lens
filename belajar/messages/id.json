@@ -20,7 +20,10 @@
     "surah_ayat": "{name} ({ayat} ayat)",
     "concepts_title": "Konsep tata bahasa",
     "concepts_body": "Pustaka nahwu dan sharaf: setiap konsep dijelaskan sekali, lalu dipakai ulang di setiap pelajaran yang memuatnya.",
-    "concepts_available": "{n} konsep nahwu dan sharaf"
+    "concepts_available": "{n} konsep nahwu dan sharaf",
+    "kosakata_title": "Kosakata Al-Qur'an",
+    "kosakata_body": "Semua kata dalam Al-Qur'an, dari yang paling sering muncul, lengkap dengan arti dan ayatnya.",
+    "kosakata_available": "{n, number} kata"
   },
   "Quran": {
     "title": "Bahasa Arab Al-Qur'an",
@@ -158,7 +161,9 @@
     "data_versions_body": "Untuk pemeriksaan teknis: versi dan sidik berkas (sha256) setiap data yang dipakai halaman pelajaran, persis seperti yang dicatat saat materi disusun.",
     "data_versions_summary": "Lihat versi data (untuk pemeriksaan teknis)",
     "data_versions_library": "Pustaka Konsep, Kosakata, dan Akar",
-    "data_versions_ayat": "Ayat yang dibuka dari kartu “Tahukah Anda?”"
+    "data_versions_ayat": "Ayat yang dibuka dari kartu “Tahukah Anda?”",
+    "kosakata_heading": "Kosakata Al-Qur'an",
+    "kosakata_body": "Peringkat, jumlah, akar, dan bentuk kata dihitung dari Quranic Arabic Corpus 0.4 dan teks Tanzil. Terjemahan ayat dari QuranEnc. Arti kata ditulis dengan bantuan AI (Claude) dari ayat-ayat yang dikutip, dengan terjemahan QuranEnc dan Saheeh International, lalu diperiksa AI. Arti ini belum merujuk ke kitab."
   },
   "NotFound": {
     "title": "Halaman tidak ditemukan",
@@ -380,7 +385,7 @@
     "loading_narration": "Memuat suara narator…",
     "loading_word": "Memuat suara kata…",
     "loading_recitation": "Memuat bacaan imam…",
-    "loading_slow": "Masih memuat. Koneksi mungkin sedang lambat; tunggu sebentar, atau klik ↺\u00a0Ulangi.",
+    "loading_slow": "Masih memuat. Koneksi mungkin sedang lambat; tunggu sebentar, atau klik ↺ Ulangi.",
     "pause": "Jeda",
     "resume": "Lanjutkan",
     "next_wait": "Lanjut",
@@ -477,5 +482,42 @@
     "panel_title": "Ukuran huruf",
     "panel_body": "Semua tulisan ikut membesar, termasuk huruf Arab. Pilihan Anda disimpan di perangkat ini.",
     "close": "Tutup"
+  },
+  "Kosakata": {
+    "title": "Kosakata Al-Qur'an",
+    "intro": "Semua kata dalam Al-Qur'an, {total, number} kata dasar, diurutkan dari yang paling sering muncul. Mulailah dari atas: sedikit kata saja sudah mencakup banyak bacaan.",
+    "reach_heading": "Seberapa jauh daftar ini membawa Anda",
+    "reach_words": "{n, number} kata pertama",
+    "reach_percent": "{pct}%",
+    "reach_note": "Persentase kata dalam Al-Qur'an, dihitung dari Quranic Arabic Corpus 0.4 atas {tokens, number} bagian kata yang punya bentuk dasar. Kata yang berulang dihitung setiap kali muncul.",
+    "search_label": "Cari kata atau arti",
+    "search_placeholder": "Contoh: tangan, rahim, يد",
+    "search_button": "Cari",
+    "search_clear": "Tampilkan semua kata",
+    "search_results": "{count, number} kata cocok dengan “{q}”",
+    "search_capped": "{shown, number} teratas dari {count, number} kata yang cocok dengan “{q}”",
+    "search_none": "Tidak ada kata yang cocok dengan “{q}”. Coba ejaan lain, atau cari artinya.",
+    "list_status": "Kata ke-{from, number} sampai ke-{to, number} dari {total, number}",
+    "row_count": "{count, number} kali",
+    "pager_label": "Halaman daftar kata",
+    "pager_status": "Halaman {page, number} dari {pages, number}",
+    "prev": "Sebelumnya",
+    "next": "Berikutnya",
+    "back": "Semua kosakata",
+    "word_eyebrow": "Kata ke-{rank} dari {total}",
+    "lemma_caption": "Bentuk dasar menurut Quranic Arabic Corpus",
+    "meanings": "Arti",
+    "meanings_hint": "Klik ayat untuk membaca dan mendengarkannya.",
+    "chip": "QS {loc}",
+    "occurrences": "Kemunculan",
+    "occurrences_value": "{count, number} kali dalam {ayat, number} ayat, di {surahs, number} surah",
+    "root": "Akar kata",
+    "no_root": "Tidak berakar",
+    "forms": "Bentuk yang paling sering muncul",
+    "full_entry": "Baca penjelasan lengkap kata ini",
+    "word_pager_label": "Kata lain",
+    "prev_word": "Kata sebelumnya",
+    "next_word": "Kata berikutnya",
+    "source_note": "Arti pada daftar ini ditulis dengan bantuan AI dari ayat-ayat yang dikutip, dengan terjemahan QuranEnc dan Saheeh International, lalu diperiksa AI. Berbeda dengan Kosakata di pelajaran, arti di sini belum merujuk ke kitab. Dibantu AI, bukan fatwa."
   }
 }

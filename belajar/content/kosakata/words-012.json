@@ -1,0 +1,3480 @@
+{
+ "words": [
+  {
+   "rank": 1101,
+   "lemma": "jamiyl",
+   "ar": "جَمِيل",
+   "translit": "jamīl",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 5,
+   "root": [
+    "ج",
+    "م",
+    "ل"
+   ],
+   "forms": [
+    "جَمِيلًا",
+    "جَمِيلٌ",
+    "ٱلْجَمِيلَ"
+   ],
+   "senses": [
+    {
+     "id": "baik",
+     "en": "gracious",
+     "ayat": [
+      "15:85",
+      "33:28",
+      "70:5"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1102,
+   "lemma": "haAd",
+   "ar": "هَاد",
+   "translit": "hād",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 5,
+   "root": [
+    "ه",
+    "د",
+    "ي"
+   ],
+   "forms": [
+    "هَادٍ",
+    "لَهَادِ",
+    "بِهَٰدِ"
+   ],
+   "senses": [
+    {
+     "id": "pemberi petunjuk",
+     "en": "guide",
+     "ayat": [
+      "13:7",
+      "13:33",
+      "39:23"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1103,
+   "lemma": "Ead~a",
+   "ar": "عَدَّ",
+   "translit": "‘adda",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 6,
+   "root": [
+    "ع",
+    "د",
+    "د"
+   ],
+   "forms": [
+    "تَعُدُّوا۟",
+    "تَعُدُّونَ",
+    "نَعُدُّ",
+    "وَعَدَّهُمْ",
+    "نَعُدُّهُم"
+   ],
+   "senses": [
+    {
+     "id": "menghitung",
+     "en": "count",
+     "ayat": [
+      "14:34",
+      "16:18",
+      "22:47"
+     ]
+    },
+    {
+     "id": "menganggap",
+     "en": "count as",
+     "ayat": [
+      "38:62"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1104,
+   "lemma": "waAd",
+   "ar": "وَاد",
+   "translit": "wād",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 7,
+   "root": [
+    "و",
+    "د",
+    "ي"
+   ],
+   "forms": [
+    "بِٱلْوَادِ",
+    "بِوَادٍ",
+    "وَادٍ",
+    "وَادِ",
+    "ٱلْوَادِ"
+   ],
+   "senses": [
+    {
+     "id": "lembah",
+     "en": "valley",
+     "ayat": [
+      "14:37",
+      "20:12",
+      "27:18"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1105,
+   "lemma": "jaA^n~",
+   "ar": "جَآنّ",
+   "translit": "jānn",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 4,
+   "root": [
+    "ج",
+    "ن",
+    "ن"
+   ],
+   "forms": [
+    "جَآنٌّ",
+    "وَٱلْجَآنَّ",
+    "ٱلْجَآنَّ"
+   ],
+   "senses": [
+    {
+     "id": "jin",
+     "en": "jinn",
+     "ayat": [
+      "15:27",
+      "55:15",
+      "55:39"
+     ]
+    },
+    {
+     "id": "ular",
+     "en": "snake",
+     "ayat": [
+      "27:10",
+      "28:31"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1106,
+   "lemma": "$ajar",
+   "ar": "شَجَر",
+   "translit": "syajar",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 6,
+   "root": [
+    "ش",
+    "ج",
+    "ر"
+   ],
+   "forms": [
+    "ٱلشَّجَرِ",
+    "وَٱلشَّجَرُ",
+    "شَجَرٌ",
+    "شَجَرَهَآ",
+    "شَجَرٍ"
+   ],
+   "senses": [
+    {
+     "id": "pohon",
+     "en": "tree",
+     "ayat": [
+      "16:68",
+      "22:18",
+      "55:6"
+     ]
+    },
+    {
+     "id": "tumbuhan",
+     "en": "vegetation",
+     "ayat": [
+      "16:10"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1107,
+   "lemma": "mutakab~ir",
+   "ar": "مُتَكَبِّر",
+   "translit": "mutakabbir",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 4,
+   "root": [
+    "ك",
+    "ب",
+    "ر"
+   ],
+   "forms": [
+    "ٱلْمُتَكَبِّرِينَ",
+    "مُتَكَبِّرٍ",
+    "لِّلْمُتَكَبِّرِينَ",
+    "ٱلْمُتَكَبِّرُ"
+   ],
+   "senses": [
+    {
+     "id": "orang sombong",
+     "en": "arrogant one",
+     "ayat": [
+      "16:29",
+      "40:27",
+      "40:35"
+     ]
+    },
+    {
+     "id": "Yang Mahaagung",
+     "en": "the Superior",
+     "ayat": [
+      "59:23"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1108,
+   "lemma": "Saf~",
+   "ar": "صَفّ",
+   "translit": "ṣaff",
+   "count": 7,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ص",
+    "ف",
+    "ف"
+   ],
+   "forms": [
+    "صَفًّا"
+   ],
+   "senses": [
+    {
+     "id": "barisan, saf",
+     "en": "row, rank",
+     "ayat": [
+      "18:48",
+      "61:4",
+      "78:38"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1109,
+   "lemma": "bukorap",
+   "ar": "بُكْرَة",
+   "translit": "bukrah",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 6,
+   "root": [
+    "ب",
+    "ك",
+    "ر"
+   ],
+   "forms": [
+    "بُكْرَةً"
+   ],
+   "senses": [
+    {
+     "id": "pagi",
+     "en": "morning",
+     "ayat": [
+      "19:11",
+      "33:42",
+      "76:25"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1110,
+   "lemma": "tanaz~alato",
+   "ar": "تَنَزَّلَتْ",
+   "translit": "tanazzalat",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 5,
+   "root": [
+    "ن",
+    "ز",
+    "ل"
+   ],
+   "forms": [
+    "تَنَزَّلُ",
+    "نَتَنَزَّلُ",
+    "تَنَزَّلَتْ",
+    "تَتَنَزَّلُ",
+    "يَتَنَزَّلُ"
+   ],
+   "senses": [
+    {
+     "id": "turun",
+     "en": "descend",
+     "ayat": [
+      "19:64",
+      "26:222",
+      "97:4"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1111,
+   "lemma": "kuboraY`",
+   "ar": "كُبْرَىٰ",
+   "translit": "kubrā",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 6,
+   "root": [
+    "ك",
+    "ب",
+    "ر"
+   ],
+   "forms": [
+    "ٱلْكُبْرَىٰ",
+    "ٱلْكُبْرَىٰٓ",
+    "ٱلْكُبْرَى",
+    "ٱلْكُبَرِ"
+   ],
+   "senses": [
+    {
+     "id": "terbesar",
+     "en": "greatest",
+     "ayat": [
+      "53:18",
+      "79:34",
+      "87:12"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1112,
+   "lemma": ">aboqaY`^",
+   "ar": "أَبْقَىٰٓ",
+   "translit": "abqā",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 4,
+   "root": [
+    "ب",
+    "ق",
+    "ي"
+   ],
+   "forms": [
+    "وَأَبْقَىٰٓ",
+    "وَأَبْقَىٰ"
+   ],
+   "senses": [
+    {
+     "id": "lebih kekal",
+     "en": "more enduring",
+     "ayat": [
+      "20:127",
+      "28:60",
+      "87:17"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1113,
+   "lemma": "{ntaSara",
+   "ar": "ٱنتَصَرَ",
+   "translit": "intaṣara",
+   "count": 7,
+   "ayat": 7,
+   "surahs": 5,
+   "root": [
+    "ن",
+    "ص",
+    "ر"
+   ],
+   "forms": [
+    "يَنتَصِرُونَ",
+    "وَٱنتَصَرُوا۟",
+    "ٱنتَصَرَ",
+    "لَٱنتَصَرَ",
+    "فَٱنتَصِرْ"
+   ],
+   "senses": [
+    {
+     "id": "membela diri",
+     "en": "defend oneself",
+     "ayat": [
+      "42:39",
+      "42:41",
+      "26:93"
+     ]
+    },
+    {
+     "id": "menolong",
+     "en": "help",
+     "ayat": [
+      "54:10"
+     ]
+    },
+    {
+     "id": "membalas",
+     "en": "take vengeance",
+     "ayat": [
+      "47:4"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1114,
+   "lemma": ">abokam",
+   "ar": "أَبْكَم",
+   "translit": "abkam",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ب",
+    "ك",
+    "م"
+   ],
+   "forms": [
+    "بُكْمٌ",
+    "وَبُكْمٌ",
+    "ٱلْبُكْمُ",
+    "أَبْكَمُ",
+    "وَبُكْمًا"
+   ],
+   "senses": [
+    {
+     "id": "bisu",
+     "en": "dumb",
+     "ayat": [
+      "2:18",
+      "16:76",
+      "17:97"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1115,
+   "lemma": ">andaAd",
+   "ar": "أَندَاد",
+   "translit": "andād",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ن",
+    "د",
+    "د"
+   ],
+   "forms": [
+    "أَندَادًا"
+   ],
+   "senses": [
+    {
+     "id": "tandingan",
+     "en": "equals",
+     "ayat": [
+      "2:22",
+      "14:30",
+      "41:9"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1116,
+   "lemma": "muta$a`bih",
+   "ar": "مُتَشَٰبِه",
+   "translit": "mutasyābih",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 4,
+   "root": [
+    "ش",
+    "ب",
+    "ه"
+   ],
+   "forms": [
+    "مُتَشَٰبِهًا",
+    "مُتَشَٰبِهٍ",
+    "مُتَشَٰبِهَٰتٌ",
+    "مُّتَشَٰبِهًا"
+   ],
+   "senses": [
+    {
+     "id": "serupa",
+     "en": "similar",
+     "ayat": [
+      "2:25",
+      "6:141",
+      "39:23"
+     ]
+    },
+    {
+     "id": "samar maknanya",
+     "en": "unclear in meaning",
+     "ayat": [
+      "3:7"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1117,
+   "lemma": "naqaDato",
+   "ar": "نَقَضَتْ",
+   "translit": "naqaḍat",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "ن",
+    "ق",
+    "ض"
+   ],
+   "forms": [
+    "يَنقُضُونَ",
+    "تَنقُضُوا۟",
+    "نَقَضَتْ"
+   ],
+   "senses": [
+    {
+     "id": "melanggar (janji)",
+     "en": "break (a pledge)",
+     "ayat": [
+      "2:27",
+      "8:56",
+      "13:20"
+     ]
+    },
+    {
+     "id": "menguraikan",
+     "en": "untwist",
+     "ayat": [
+      "16:92"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1118,
+   "lemma": "jaAEil",
+   "ar": "جَاعِل",
+   "translit": "jā‘il",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ج",
+    "ع",
+    "ل"
+   ],
+   "forms": [
+    "جَاعِلٌ",
+    "جَاعِلُكَ",
+    "وَجَاعِلُ",
+    "لَجَٰعِلُونَ",
+    "وَجَاعِلُوهُ"
+   ],
+   "senses": [
+    {
+     "id": "menjadikan",
+     "en": "make",
+     "ayat": [
+      "2:124",
+      "18:8",
+      "35:1"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1119,
+   "lemma": "balaA^'",
+   "ar": "بَلَآء",
+   "translit": "balā’",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ب",
+    "ل",
+    "و"
+   ],
+   "forms": [
+    "بَلَآءٌ",
+    "بَلَآءً",
+    "ٱلْبَلَٰٓؤُا۟",
+    "بَلَٰٓؤٌا۟"
+   ],
+   "senses": [
+    {
+     "id": "cobaan",
+     "en": "trial",
+     "ayat": [
+      "2:49",
+      "37:106",
+      "44:33"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1120,
+   "lemma": "man~",
+   "ar": "مَنّ",
+   "translit": "mann",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "م",
+    "ن",
+    "ن"
+   ],
+   "forms": [
+    "ٱلْمَنَّ",
+    "مَنًّا",
+    "بِٱلْمَنِّ",
+    "مَنًّۢا"
+   ],
+   "senses": [
+    {
+     "id": "manna",
+     "en": "manna",
+     "ayat": [
+      "2:57",
+      "7:160",
+      "20:80"
+     ]
+    },
+    {
+     "id": "menyebut-nyebut pemberian",
+     "en": "reminders of generosity",
+     "ayat": [
+      "2:262",
+      "2:264"
+     ]
+    },
+    {
+     "id": "pembebasan tanpa tebusan",
+     "en": "favor of release",
+     "ayat": [
+      "47:4"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1121,
+   "lemma": "baA^'a",
+   "ar": "بَآءَ",
+   "translit": "bā’a",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "ب",
+    "و",
+    "أ"
+   ],
+   "forms": [
+    "وَبَآءُو",
+    "بَآءَ",
+    "فَبَآءُو",
+    "تَبُوٓأَ"
+   ],
+   "senses": [
+    {
+     "id": "kembali menanggung",
+     "en": "return bearing, incur",
+     "ayat": [
+      "2:61",
+      "3:162",
+      "5:29"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1122,
+   "lemma": "s~abot",
+   "ar": "سَبْت",
+   "translit": "sabt",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 4,
+   "root": [
+    "س",
+    "ب",
+    "ت"
+   ],
+   "forms": [
+    "ٱلسَّبْتِ",
+    "سَبْتِهِمْ",
+    "ٱلسَّبْتُ"
+   ],
+   "senses": [
+    {
+     "id": "hari Sabat",
+     "en": "sabbath",
+     "ayat": [
+      "2:65",
+      "7:163",
+      "16:124"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1123,
+   "lemma": ">um~iY~",
+   "ar": "أُمِّىّ",
+   "translit": "ummīī",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "أ",
+    "م",
+    "م"
+   ],
+   "forms": [
+    "ٱلْأُمِّيِّـۧنَ",
+    "أُمِّيُّونَ",
+    "وَٱلْأُمِّيِّـۧنَ",
+    "ٱلْأُمِّىَّ",
+    "ٱلْأُمِّىِّ"
+   ],
+   "senses": [
+    {
+     "id": "buta huruf",
+     "en": "unlettered",
+     "ayat": [
+      "2:78",
+      "7:157",
+      "62:2"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1124,
+   "lemma": ">umoniy~at",
+   "ar": "أُمْنِيَّت",
+   "translit": "umniyyat",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 4,
+   "root": [
+    "م",
+    "ن",
+    "ي"
+   ],
+   "forms": [
+    "أَمَانِىَّ",
+    "أَمَانِيُّهُمْ",
+    "بِأَمَانِيِّكُمْ",
+    "أَمَانِىِّ",
+    "أُمْنِيَّتِهِۦ"
+   ],
+   "senses": [
+    {
+     "id": "angan-angan",
+     "en": "wishful thinking",
+     "ayat": [
+      "2:78",
+      "2:111",
+      "4:123"
+     ]
+    },
+    {
+     "id": "keinginan",
+     "en": "desire",
+     "ayat": [
+      "22:52"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1125,
+   "lemma": "m~aEoduwdap",
+   "ar": "مَعْدُودَة",
+   "translit": "ma‘dūdah",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "ع",
+    "د",
+    "د"
+   ],
+   "forms": [
+    "مَّعْدُودَٰتٍ",
+    "مَّعْدُودَةً",
+    "مَّعْدُودَةٍ",
+    "مَعْدُودَةٍ"
+   ],
+   "senses": [
+    {
+     "id": "terhitung, terbatas",
+     "en": "counted, limited",
+     "ayat": [
+      "2:80",
+      "2:203",
+      "12:20"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1126,
+   "lemma": "<ixoraAj",
+   "ar": "إِخْرَاج",
+   "translit": "ikhrāj",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "خ",
+    "ر",
+    "ج"
+   ],
+   "forms": [
+    "إِخْرَاجُهُمْ",
+    "وَإِخْرَاجُ",
+    "إِخْرَاجٍ",
+    "بِإِخْرَاجِ",
+    "إِخْرَاجِكُمْ"
+   ],
+   "senses": [
+    {
+     "id": "pengusiran",
+     "en": "expulsion",
+     "ayat": [
+      "2:85",
+      "2:240",
+      "9:13"
+     ]
+    },
+    {
+     "id": "pengeluaran",
+     "en": "bringing out",
+     "ayat": [
+      "71:18"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1127,
+   "lemma": "yataman~a",
+   "ar": "يَتَمَنَّ",
+   "translit": "yatamanna",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "م",
+    "ن",
+    "ي"
+   ],
+   "forms": [
+    "فَتَمَنَّوُا۟",
+    "يَتَمَنَّوْهُ",
+    "تَمَنَّوْنَ",
+    "تَتَمَنَّوْا۟",
+    "يَتَمَنَّوْنَهُۥٓ"
+   ],
+   "senses": [
+    {
+     "id": "mengharapkan",
+     "en": "wish for",
+     "ayat": [
+      "2:94",
+      "3:143",
+      "4:32"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1128,
+   "lemma": "xala`q",
+   "ar": "خَلَٰق",
+   "translit": "khalāq",
+   "count": 6,
+   "ayat": 4,
+   "surahs": 3,
+   "root": [
+    "خ",
+    "ل",
+    "ق"
+   ],
+   "forms": [
+    "خَلَٰقٍ",
+    "بِخَلَٰقِهِمْ",
+    "خَلَٰقَ",
+    "بِخَلَٰقِكُمْ"
+   ],
+   "senses": [
+    {
+     "id": "bagian",
+     "en": "share",
+     "ayat": [
+      "2:200",
+      "3:77",
+      "9:69"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1129,
+   "lemma": "yaSofaHu",
+   "ar": "يَصْفَحُ",
+   "translit": "yaṣfaḥu",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ص",
+    "ف",
+    "ح"
+   ],
+   "forms": [
+    "وَٱصْفَحُوا۟",
+    "وَٱصْفَحْ",
+    "فَٱصْفَحِ",
+    "وَلْيَصْفَحُوٓا۟",
+    "فَٱصْفَحْ"
+   ],
+   "senses": [
+    {
+     "id": "membiarkan kesalahan",
+     "en": "overlook wrongs",
+     "ayat": [
+      "2:109",
+      "5:13",
+      "64:14"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1130,
+   "lemma": "Eahida",
+   "ar": "عَهِدَ",
+   "translit": "‘ahida",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ع",
+    "ه",
+    "د"
+   ],
+   "forms": [
+    "عَهِدَ",
+    "وَعَهِدْنَآ",
+    "عَهِدْنَآ",
+    "أَعْهَدْ"
+   ],
+   "senses": [
+    {
+     "id": "memerintahkan",
+     "en": "enjoin, charge",
+     "ayat": [
+      "2:125",
+      "36:60",
+      "20:115"
+     ]
+    },
+    {
+     "id": "berjanji",
+     "en": "promise",
+     "ayat": [
+      "7:134",
+      "43:49"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1131,
+   "lemma": "s~ujuwd",
+   "ar": "سُجُود",
+   "translit": "sujūd",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "س",
+    "ج",
+    "د"
+   ],
+   "forms": [
+    "ٱلسُّجُودِ"
+   ],
+   "senses": [
+    {
+     "id": "sujud",
+     "en": "prostration",
+     "ayat": [
+      "50:40",
+      "68:42",
+      "68:43"
+     ]
+    },
+    {
+     "id": "orang yang sujud",
+     "en": "those who prostrate",
+     "ayat": [
+      "2:125",
+      "22:26"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1132,
+   "lemma": "'aAmin",
+   "ar": "ءَامِن",
+   "translit": "āmin",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "أ",
+    "م",
+    "ن"
+   ],
+   "forms": [
+    "ءَامِنًا"
+   ],
+   "senses": [
+    {
+     "id": "aman",
+     "en": "safe",
+     "ayat": [
+      "2:126",
+      "3:97",
+      "41:40"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1133,
+   "lemma": "kar~ap",
+   "ar": "كَرَّة",
+   "translit": "karrah",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ك",
+    "ر",
+    "ر"
+   ],
+   "forms": [
+    "كَرَّةً",
+    "ٱلْكَرَّةَ",
+    "كَرَّتَيْنِ",
+    "كَرَّةٌ"
+   ],
+   "senses": [
+    {
+     "id": "kembali",
+     "en": "return",
+     "ayat": [
+      "26:102",
+      "39:58",
+      "79:12"
+     ]
+    },
+    {
+     "id": "giliran menang",
+     "en": "turn to prevail",
+     "ayat": [
+      "17:6"
+     ]
+    },
+    {
+     "id": "kali",
+     "en": "time (repetition)",
+     "ayat": [
+      "67:4"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1134,
+   "lemma": "Hala`l",
+   "ar": "حَلَٰل",
+   "translit": "ḥalāl",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ح",
+    "ل",
+    "ل"
+   ],
+   "forms": [
+    "حَلَٰلًا",
+    "وَحَلَٰلًا",
+    "حَلَٰلٌ"
+   ],
+   "senses": [
+    {
+     "id": "halal",
+     "en": "lawful",
+     "ayat": [
+      "2:168",
+      "10:59",
+      "16:116"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1135,
+   "lemma": "mayotap",
+   "ar": "مَيْتَة",
+   "translit": "maitah",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "م",
+    "و",
+    "ت"
+   ],
+   "forms": [
+    "ٱلْمَيْتَةَ",
+    "ٱلْمَيْتَةُ",
+    "مَّيْتَةً",
+    "مَيْتَةً"
+   ],
+   "senses": [
+    {
+     "id": "bangkai",
+     "en": "dead animal",
+     "ayat": [
+      "2:173",
+      "5:3",
+      "16:115"
+     ]
+    },
+    {
+     "id": "mati",
+     "en": "dead",
+     "ayat": [
+      "36:33",
+      "6:139"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1136,
+   "lemma": "EaAd",
+   "ar": "عَاد",
+   "translit": "‘ād",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ع",
+    "د",
+    "و"
+   ],
+   "forms": [
+    "عَادٍ",
+    "ٱلْعَادُونَ",
+    "عَادُونَ"
+   ],
+   "senses": [
+    {
+     "id": "melampaui batas",
+     "en": "transgressor",
+     "ayat": [
+      "2:173",
+      "23:7",
+      "26:166"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1137,
+   "lemma": "daEowap",
+   "ar": "دَعْوَة",
+   "translit": "da‘wah",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "د",
+    "ع",
+    "و"
+   ],
+   "forms": [
+    "دَعْوَةَ",
+    "دَّعْوَتُكُمَا",
+    "دَعْوَةُ",
+    "دَعْوَتَكَ",
+    "دَعْوَةً"
+   ],
+   "senses": [
+    {
+     "id": "doa",
+     "en": "supplication",
+     "ayat": [
+      "2:186",
+      "10:89",
+      "13:14"
+     ]
+    },
+    {
+     "id": "seruan",
+     "en": "call",
+     "ayat": [
+      "14:44",
+      "30:25",
+      "40:43"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1138,
+   "lemma": "fajor",
+   "ar": "فَجْر",
+   "translit": "fajr",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 5,
+   "root": [
+    "ف",
+    "ج",
+    "ر"
+   ],
+   "forms": [
+    "ٱلْفَجْرِ",
+    "وَٱلْفَجْرِ"
+   ],
+   "senses": [
+    {
+     "id": "fajar",
+     "en": "dawn",
+     "ayat": [
+      "2:187",
+      "89:1",
+      "97:5"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1139,
+   "lemma": "muEotadiyn",
+   "ar": "مُعْتَدِين",
+   "translit": "mu‘tadīn",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ع",
+    "د",
+    "و"
+   ],
+   "forms": [
+    "ٱلْمُعْتَدِينَ",
+    "بِٱلْمُعْتَدِينَ",
+    "ٱلْمُعْتَدُونَ"
+   ],
+   "senses": [
+    {
+     "id": "orang yang melampaui batas",
+     "en": "transgressors",
+     "ayat": [
+      "2:190",
+      "5:87",
+      "7:55"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1140,
+   "lemma": "vuqifu",
+   "ar": "ثُقِفُ",
+   "translit": "ṡuqifu",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ث",
+    "ق",
+    "ف"
+   ],
+   "forms": [
+    "ثَقِفْتُمُوهُمْ",
+    "ثُقِفُوٓا۟",
+    "تَثْقَفَنَّهُمْ",
+    "يَثْقَفُوكُمْ"
+   ],
+   "senses": [
+    {
+     "id": "mendapati, menangkap",
+     "en": "come upon, catch",
+     "ayat": [
+      "2:191",
+      "8:57",
+      "60:2"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1141,
+   "lemma": "Zul~ap",
+   "ar": "ظُلَّة",
+   "translit": "ẓullah",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 5,
+   "root": [
+    "ظ",
+    "ل",
+    "ل"
+   ],
+   "forms": [
+    "ظُلَلٌ",
+    "ظُلَلٍ",
+    "ظُلَّةٌ",
+    "ٱلظُّلَّةِ",
+    "كَٱلظُّلَلِ"
+   ],
+   "senses": [
+    {
+     "id": "naungan",
+     "en": "canopy",
+     "ayat": [
+      "7:171",
+      "26:189",
+      "39:16"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1142,
+   "lemma": "xamor",
+   "ar": "خَمْر",
+   "translit": "khamr",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "خ",
+    "م",
+    "ر"
+   ],
+   "forms": [
+    "ٱلْخَمْرِ",
+    "خَمْرًا",
+    "ٱلْخَمْرُ",
+    "خَمْرٍ"
+   ],
+   "senses": [
+    {
+     "id": "khamar",
+     "en": "wine",
+     "ayat": [
+      "2:219",
+      "5:90",
+      "12:41"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1143,
+   "lemma": "m~u&ominap",
+   "ar": "مُؤْمِنَة",
+   "translit": "mu’minah",
+   "count": 6,
+   "ayat": 4,
+   "surahs": 3,
+   "root": [
+    "أ",
+    "م",
+    "ن"
+   ],
+   "forms": [
+    "مُّؤْمِنَةٍ",
+    "مُّؤْمِنَةٌ",
+    "مُؤْمِنَةٍ",
+    "مُّؤْمِنَةً"
+   ],
+   "senses": [
+    {
+     "id": "yang beriman",
+     "en": "believing",
+     "ayat": [
+      "2:221",
+      "4:92",
+      "33:50"
+     ]
+    },
+    {
+     "id": "perempuan mukmin",
+     "en": "believing woman",
+     "ayat": [
+      "33:36"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1144,
+   "lemma": "baEol",
+   "ar": "بَعْل",
+   "translit": "ba‘l",
+   "count": 6,
+   "ayat": 4,
+   "surahs": 4,
+   "root": [
+    "ب",
+    "ع",
+    "ل"
+   ],
+   "forms": [
+    "بُعُولَتِهِنَّ",
+    "وَبُعُولَتُهُنَّ",
+    "بَعْلِهَا",
+    "بَعْلِى",
+    "لِبُعُولَتِهِنَّ"
+   ],
+   "senses": [
+    {
+     "id": "suami",
+     "en": "husband",
+     "ayat": [
+      "2:228",
+      "4:128",
+      "11:72"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1145,
+   "lemma": "sal~ama",
+   "ar": "سَلَّمَ",
+   "translit": "sallama",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "س",
+    "ل",
+    "م"
+   ],
+   "forms": [
+    "سَلَّمْتُم",
+    "وَيُسَلِّمُوا۟",
+    "سَلَّمَ",
+    "وَتُسَلِّمُوا۟",
+    "فَسَلِّمُوا۟"
+   ],
+   "senses": [
+    {
+     "id": "memberi salam",
+     "en": "greet with peace",
+     "ayat": [
+      "24:27",
+      "24:61",
+      "33:56"
+     ]
+    },
+    {
+     "id": "menerima sepenuhnya",
+     "en": "submit",
+     "ayat": [
+      "4:65"
+     ]
+    },
+    {
+     "id": "menyelamatkan",
+     "en": "save",
+     "ayat": [
+      "8:43"
+     ]
+    },
+    {
+     "id": "menyerahkan",
+     "en": "hand over",
+     "ayat": [
+      "2:233"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1146,
+   "lemma": "fariyDap",
+   "ar": "فَرِيضَة",
+   "translit": "farīḍah",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 3,
+   "root": [
+    "ف",
+    "ر",
+    "ض"
+   ],
+   "forms": [
+    "فَرِيضَةً",
+    "ٱلْفَرِيضَةِ"
+   ],
+   "senses": [
+    {
+     "id": "kewajiban",
+     "en": "obligation",
+     "ayat": [
+      "4:11",
+      "9:60",
+      "4:24"
+     ]
+    },
+    {
+     "id": "mahar yang ditentukan",
+     "en": "specified bridal gift",
+     "ayat": [
+      "2:236",
+      "2:237"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1147,
+   "lemma": ">aqoraDu",
+   "ar": "أَقْرَضُ",
+   "translit": "aqraḍu",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ق",
+    "ر",
+    "ض"
+   ],
+   "forms": [
+    "يُقْرِضُ",
+    "وَأَقْرَضْتُمُ",
+    "وَأَقْرَضُوا۟",
+    "تُقْرِضُوا۟",
+    "وَأَقْرِضُوا۟"
+   ],
+   "senses": [
+    {
+     "id": "meminjamkan",
+     "en": "to loan",
+     "ayat": [
+      "2:245",
+      "57:11",
+      "64:17"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1148,
+   "lemma": "qaroD",
+   "ar": "قَرْض",
+   "translit": "qarḍ",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ق",
+    "ر",
+    "ض"
+   ],
+   "forms": [
+    "قَرْضًا"
+   ],
+   "senses": [
+    {
+     "id": "pinjaman",
+     "en": "loan",
+     "ayat": [
+      "2:245",
+      "57:11",
+      "64:17"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1149,
+   "lemma": "saEap",
+   "ar": "سَعَة",
+   "translit": "sa‘ah",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 4,
+   "root": [
+    "و",
+    "س",
+    "ع"
+   ],
+   "forms": [
+    "سَعَتِهِۦ",
+    "سَعَةً",
+    "وَسَعَةً",
+    "وَٱلسَّعَةِ",
+    "سَعَةٍ"
+   ],
+   "senses": [
+    {
+     "id": "keluasan, kelapangan",
+     "en": "ampleness, abundance",
+     "ayat": [
+      "2:247",
+      "4:130",
+      "65:7"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1150,
+   "lemma": "sakiynap",
+   "ar": "سَكِينَة",
+   "translit": "sakīnah",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 3,
+   "root": [
+    "س",
+    "ك",
+    "ن"
+   ],
+   "forms": [
+    "سَكِينَتَهُۥ",
+    "ٱلسَّكِينَةَ",
+    "سَكِينَةٌ"
+   ],
+   "senses": [
+    {
+     "id": "ketenangan",
+     "en": "tranquillity",
+     "ayat": [
+      "48:4",
+      "9:26",
+      "2:248"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1151,
+   "lemma": "wasiEa",
+   "ar": "وَسِعَ",
+   "translit": "wasi‘a",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "و",
+    "س",
+    "ع"
+   ],
+   "forms": [
+    "وَسِعَ",
+    "وَسِعَتْ",
+    "وَسِعْتَ"
+   ],
+   "senses": [
+    {
+     "id": "meliputi",
+     "en": "encompass",
+     "ayat": [
+      "6:80",
+      "7:156",
+      "40:7"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1152,
+   "lemma": "ru$od",
+   "ar": "رُشْد",
+   "translit": "rusyd",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ر",
+    "ش",
+    "د"
+   ],
+   "forms": [
+    "رُشْدًا",
+    "ٱلرُّشْدِ",
+    "ٱلرُّشْدُ",
+    "رُشْدَهُۥ"
+   ],
+   "senses": [
+    {
+     "id": "jalan yang benar",
+     "en": "right course",
+     "ayat": [
+      "2:256",
+      "7:146",
+      "72:2"
+     ]
+    },
+    {
+     "id": "kematangan pikiran",
+     "en": "sound judgement",
+     "ayat": [
+      "4:6",
+      "18:66",
+      "21:51"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1153,
+   "lemma": "kibar",
+   "ar": "كِبَر",
+   "translit": "kibar",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ك",
+    "ب",
+    "ر"
+   ],
+   "forms": [
+    "ٱلْكِبَرُ",
+    "ٱلْكِبَرِ",
+    "ٱلْكِبَرَ"
+   ],
+   "senses": [
+    {
+     "id": "usia tua",
+     "en": "old age",
+     "ayat": [
+      "2:266",
+      "3:40",
+      "17:23"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1154,
+   "lemma": "siyma`",
+   "ar": "سِيمَٰ",
+   "translit": "sīmā",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "س",
+    "و",
+    "م"
+   ],
+   "forms": [
+    "بِسِيمَٰهُمْ",
+    "بِسِيمَىٰهُمْ",
+    "سِيمَاهُمْ"
+   ],
+   "senses": [
+    {
+     "id": "tanda",
+     "en": "mark",
+     "ayat": [
+      "2:273",
+      "7:46",
+      "48:29"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1155,
+   "lemma": "taSad~aqa",
+   "ar": "تَصَدَّقَ",
+   "translit": "taṣaddaqa",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ص",
+    "د",
+    "ق"
+   ],
+   "forms": [
+    "تَصَدَّقُوا۟",
+    "يَصَّدَّقُوا۟",
+    "تَصَدَّقَ",
+    "لَنَصَّدَّقَنَّ",
+    "وَتَصَدَّقْ"
+   ],
+   "senses": [
+    {
+     "id": "bersedekah",
+     "en": "give charity",
+     "ayat": [
+      "9:75",
+      "12:88",
+      "63:10"
+     ]
+    },
+    {
+     "id": "melepaskan hak",
+     "en": "forgo as charity",
+     "ayat": [
+      "2:280",
+      "4:92",
+      "5:45"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1156,
+   "lemma": "kaAtib",
+   "ar": "كَاتِب",
+   "translit": "kātib",
+   "count": 6,
+   "ayat": 4,
+   "surahs": 3,
+   "root": [
+    "ك",
+    "ت",
+    "ب"
+   ],
+   "forms": [
+    "كَاتِبٌ",
+    "كَاتِبٌۢ",
+    "كَاتِبًا",
+    "كَٰتِبُونَ",
+    "كَٰتِبِينَ"
+   ],
+   "senses": [
+    {
+     "id": "penulis",
+     "en": "scribe",
+     "ayat": [
+      "2:282",
+      "2:283"
+     ]
+    },
+    {
+     "id": "pencatat",
+     "en": "recorder",
+     "ayat": [
+      "21:94",
+      "82:11"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1157,
+   "lemma": "yaxofaY`",
+   "ar": "يَخْفَىٰ",
+   "translit": "yakhfā",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "خ",
+    "ف",
+    "ي"
+   ],
+   "forms": [
+    "يَخْفَىٰ",
+    "يَخْفَوْنَ",
+    "تَخْفَىٰ"
+   ],
+   "senses": [
+    {
+     "id": "tersembunyi",
+     "en": "be hidden",
+     "ayat": [
+      "3:5",
+      "14:38",
+      "40:16"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1158,
+   "lemma": "m~iyEaAd",
+   "ar": "مِيعَاد",
+   "translit": "mī‘ād",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "و",
+    "ع",
+    "د"
+   ],
+   "forms": [
+    "ٱلْمِيعَادَ",
+    "ٱلْمِيعَٰدِ",
+    "مِّيعَادُ"
+   ],
+   "senses": [
+    {
+     "id": "janji",
+     "en": "promise",
+     "ayat": [
+      "3:9",
+      "3:194",
+      "39:20"
+     ]
+    },
+    {
+     "id": "waktu yang ditetapkan",
+     "en": "appointment",
+     "ayat": [
+      "8:42",
+      "34:30"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1159,
+   "lemma": "Eiborap",
+   "ar": "عِبْرَة",
+   "translit": "‘ibrah",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ع",
+    "ب",
+    "ر"
+   ],
+   "forms": [
+    "لَعِبْرَةً",
+    "عِبْرَةٌ"
+   ],
+   "senses": [
+    {
+     "id": "pelajaran",
+     "en": "lesson",
+     "ayat": [
+      "12:111",
+      "16:66",
+      "24:44"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1160,
+   "lemma": "fiD~ap",
+   "ar": "فِضَّة",
+   "translit": "fiḍḍah",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "ف",
+    "ض",
+    "ض"
+   ],
+   "forms": [
+    "فِضَّةٍ",
+    "وَٱلْفِضَّةِ",
+    "وَٱلْفِضَّةَ"
+   ],
+   "senses": [
+    {
+     "id": "perak",
+     "en": "silver",
+     "ayat": [
+      "3:14",
+      "9:34",
+      "76:15"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1161,
+   "lemma": "rajiym",
+   "ar": "رَجِيم",
+   "translit": "rajīm",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ر",
+    "ج",
+    "م"
+   ],
+   "forms": [
+    "ٱلرَّجِيمِ",
+    "رَّجِيمٍ",
+    "رَجِيمٌ"
+   ],
+   "senses": [
+    {
+     "id": "terkutuk, terusir",
+     "en": "accursed, expelled",
+     "ayat": [
+      "3:36",
+      "15:34",
+      "81:25"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1162,
+   "lemma": "qaSaS",
+   "ar": "قَصَص",
+   "translit": "qaṣaṣ",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ق",
+    "ص",
+    "ص"
+   ],
+   "forms": [
+    "ٱلْقَصَصَ",
+    "ٱلْقَصَصُ",
+    "ٱلْقَصَصِ",
+    "قَصَصِهِمْ",
+    "قَصَصًا"
+   ],
+   "senses": [
+    {
+     "id": "kisah",
+     "en": "story",
+     "ayat": [
+      "3:62",
+      "12:3",
+      "28:25"
+     ]
+    },
+    {
+     "id": "mengikuti jejak",
+     "en": "following tracks",
+     "ayat": [
+      "18:64"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1163,
+   "lemma": "gayoZ",
+   "ar": "غَيْظ",
+   "translit": "gaiẓ",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 4,
+   "root": [
+    "غ",
+    "ي",
+    "ظ"
+   ],
+   "forms": [
+    "ٱلْغَيْظِ",
+    "بِغَيْظِكُمْ",
+    "ٱلْغَيْظَ",
+    "غَيْظَ",
+    "بِغَيْظِهِمْ"
+   ],
+   "senses": [
+    {
+     "id": "amarah",
+     "en": "rage",
+     "ayat": [
+      "3:119",
+      "3:134",
+      "9:15"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1164,
+   "lemma": "baw~a>a",
+   "ar": "بَوَّأَ",
+   "translit": "bawwa’a",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ب",
+    "و",
+    "أ"
+   ],
+   "forms": [
+    "بَوَّأْنَا",
+    "تُبَوِّئُ",
+    "وَبَوَّأَكُمْ",
+    "لَنُبَوِّئَنَّهُمْ",
+    "لَنُبَوِّئَنَّهُم"
+   ],
+   "senses": [
+    {
+     "id": "menempatkan",
+     "en": "settle in place",
+     "ayat": [
+      "7:74",
+      "29:58",
+      "3:121"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1165,
+   "lemma": "gam~",
+   "ar": "غَمّ",
+   "translit": "gamm",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 4,
+   "root": [
+    "غ",
+    "م",
+    "م"
+   ],
+   "forms": [
+    "ٱلْغَمِّ",
+    "غَمًّۢا",
+    "بِغَمٍّ",
+    "غَمٍّ"
+   ],
+   "senses": [
+    {
+     "id": "kesusahan",
+     "en": "distress",
+     "ayat": [
+      "3:153",
+      "21:88",
+      "22:22"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1166,
+   "lemma": "fariH",
+   "ar": "فَرِح",
+   "translit": "fariḥ",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ف",
+    "ر",
+    "ح"
+   ],
+   "forms": [
+    "فَرِحُونَ",
+    "فَرِحِينَ",
+    "لَفَرِحٌ",
+    "ٱلْفَرِحِينَ"
+   ],
+   "senses": [
+    {
+     "id": "bergembira",
+     "en": "rejoicing",
+     "ayat": [
+      "3:170",
+      "9:50"
+     ]
+    },
+    {
+     "id": "bangga",
+     "en": "exultant",
+     "ayat": [
+      "11:10",
+      "28:76",
+      "23:53"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1167,
+   "lemma": "m~uniyr",
+   "ar": "مُنِير",
+   "translit": "munīr",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ن",
+    "و",
+    "ر"
+   ],
+   "forms": [
+    "ٱلْمُنِيرِ",
+    "مُّنِيرٍ",
+    "مُّنِيرًا"
+   ],
+   "senses": [
+    {
+     "id": "menerangi",
+     "en": "illuminating",
+     "ayat": [
+      "33:46",
+      "25:61",
+      "22:8"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1168,
+   "lemma": ">unvayayon",
+   "ar": "أُنثَيَيْن",
+   "translit": "unṡayain",
+   "count": 6,
+   "ayat": 4,
+   "surahs": 2,
+   "root": [
+    "أ",
+    "ن",
+    "ث"
+   ],
+   "forms": [
+    "ٱلْأُنثَيَيْنِ"
+   ],
+   "senses": [
+    {
+     "id": "dua perempuan/betina",
+     "en": "two females",
+     "ayat": [
+      "4:11",
+      "4:176",
+      "6:143"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1169,
+   "lemma": "v~uluv",
+   "ar": "ثُلُث",
+   "translit": "ṡuluṡ",
+   "count": 6,
+   "ayat": 4,
+   "surahs": 2,
+   "root": [
+    "ث",
+    "ل",
+    "ث"
+   ],
+   "forms": [
+    "ثُلُثَا",
+    "ٱلثُّلُثُ",
+    "ٱلثُّلُثِ",
+    "ٱلثُّلُثَانِ",
+    "ثُلُثَىِ"
+   ],
+   "senses": [
+    {
+     "id": "sepertiga",
+     "en": "a third",
+     "ayat": [
+      "4:12",
+      "4:11",
+      "73:20"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1170,
+   "lemma": "buhota`n",
+   "ar": "بُهْتَٰن",
+   "translit": "buhtān",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "ب",
+    "ه",
+    "ت"
+   ],
+   "forms": [
+    "بُهْتَٰنًا",
+    "بُهْتَٰنٌ",
+    "بِبُهْتَٰنٍ"
+   ],
+   "senses": [
+    {
+     "id": "tuduhan dusta",
+     "en": "slander",
+     "ayat": [
+      "4:112",
+      "4:156",
+      "24:16"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1171,
+   "lemma": "maqot",
+   "ar": "مَقْت",
+   "translit": "maqt",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 4,
+   "root": [
+    "م",
+    "ق",
+    "ت"
+   ],
+   "forms": [
+    "مَقْتًا",
+    "وَمَقْتًا",
+    "لَمَقْتُ",
+    "مَّقْتِكُمْ"
+   ],
+   "senses": [
+    {
+     "id": "kebencian yang sangat",
+     "en": "intense hatred",
+     "ayat": [
+      "40:10",
+      "35:39",
+      "61:3"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1172,
+   "lemma": "{sotamotaEa",
+   "ar": "ٱسْتَمْتَعَ",
+   "translit": "istamta‘a",
+   "count": 6,
+   "ayat": 4,
+   "surahs": 4,
+   "root": [
+    "م",
+    "ت",
+    "ع"
+   ],
+   "forms": [
+    "ٱسْتَمْتَعَ",
+    "ٱسْتَمْتَعْتُم",
+    "فَٱسْتَمْتَعُوا۟",
+    "فَٱسْتَمْتَعْتُم",
+    "وَٱسْتَمْتَعْتُم"
+   ],
+   "senses": [
+    {
+     "id": "menikmati",
+     "en": "enjoy",
+     "ayat": [
+      "9:69",
+      "6:128",
+      "4:24"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1173,
+   "lemma": "*ar~ap",
+   "ar": "ذَرَّة",
+   "translit": "żarrah",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "ذ",
+    "ر",
+    "ر"
+   ],
+   "forms": [
+    "ذَرَّةٍ"
+   ],
+   "senses": [
+    {
+     "id": "zarah (benda sangat kecil)",
+     "en": "atom; tiny particle",
+     "ayat": [
+      "4:40",
+      "10:61",
+      "99:7"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1174,
+   "lemma": ">adoraka",
+   "ar": "أَدْرَكَ",
+   "translit": "adraka",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 4,
+   "root": [
+    "د",
+    "ر",
+    "ك"
+   ],
+   "forms": [
+    "يُدْرِككُّمُ",
+    "يُدْرِكْهُ",
+    "تُدْرِكُهُ",
+    "يُدْرِكُ",
+    "أَدْرَكَهُ"
+   ],
+   "senses": [
+    {
+     "id": "menimpa",
+     "en": "overtake",
+     "ayat": [
+      "4:78",
+      "4:100",
+      "10:90"
+     ]
+    },
+    {
+     "id": "mencapai",
+     "en": "reach",
+     "ayat": [
+      "36:40",
+      "6:103"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1175,
+   "lemma": "taHiy~ap",
+   "ar": "تَحِيَّة",
+   "translit": "taḥiyyah",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ح",
+    "ي",
+    "ي"
+   ],
+   "forms": [
+    "تَحِيَّتُهُمْ",
+    "تَحِيَّةً",
+    "بِتَحِيَّةٍ",
+    "وَتَحِيَّتُهُمْ"
+   ],
+   "senses": [
+    {
+     "id": "salam penghormatan",
+     "en": "greeting",
+     "ayat": [
+      "4:86",
+      "10:10",
+      "14:23"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1176,
+   "lemma": "gaDiba",
+   "ar": "غَضِبَ",
+   "translit": "gaḍiba",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "غ",
+    "ض",
+    "ب"
+   ],
+   "forms": [
+    "وَغَضِبَ",
+    "غَضِبَ",
+    "غَضِبُوا۟"
+   ],
+   "senses": [
+    {
+     "id": "marah, murka",
+     "en": "be angry",
+     "ayat": [
+      "4:93",
+      "42:37",
+      "60:13"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1177,
+   "lemma": "EaraD",
+   "ar": "عَرَض",
+   "translit": "‘araḍ",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 5,
+   "root": [
+    "ع",
+    "ر",
+    "ض"
+   ],
+   "forms": [
+    "عَرَضَ",
+    "عَرَضٌ",
+    "عَرَضًا"
+   ],
+   "senses": [
+    {
+     "id": "harta duniawi",
+     "en": "worldly goods",
+     "ayat": [
+      "4:94",
+      "8:67",
+      "9:42"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1178,
+   "lemma": "yasotafotu",
+   "ar": "يَسْتَفْتُ",
+   "translit": "yastaftu",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 4,
+   "root": [
+    "ف",
+    "ت",
+    "ي"
+   ],
+   "forms": [
+    "فَٱسْتَفْتِهِمْ",
+    "وَيَسْتَفْتُونَكَ",
+    "يَسْتَفْتُونَكَ",
+    "تَسْتَفْتِيَانِ",
+    "تَسْتَفْتِ"
+   ],
+   "senses": [
+    {
+     "id": "meminta fatwa",
+     "en": "request a ruling",
+     "ayat": [
+      "4:127",
+      "4:176"
+     ]
+    },
+    {
+     "id": "menanyakan",
+     "en": "inquire",
+     "ayat": [
+      "37:11",
+      "37:149",
+      "18:22"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1179,
+   "lemma": ">asofal",
+   "ar": "أَسْفَل",
+   "translit": "asfal",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "س",
+    "ف",
+    "ل"
+   ],
+   "forms": [
+    "أَسْفَلَ",
+    "ٱلْأَسْفَلِينَ",
+    "ٱلْأَسْفَلِ"
+   ],
+   "senses": [
+    {
+     "id": "paling bawah",
+     "en": "lowest",
+     "ayat": [
+      "4:145",
+      "41:29",
+      "95:5"
+     ]
+    },
+    {
+     "id": "bawah",
+     "en": "below",
+     "ayat": [
+      "8:42",
+      "33:10"
+     ]
+    },
+    {
+     "id": "paling hina",
+     "en": "most debased",
+     "ayat": [
+      "37:98"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1180,
+   "lemma": ">axo*",
+   "ar": "أَخْذ",
+   "translit": "akhż",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 5,
+   "root": [
+    "أ",
+    "خ",
+    "ذ"
+   ],
+   "forms": [
+    "وَأَخْذِهِمُ",
+    "أَخْذُ",
+    "أَخْذَهُۥٓ",
+    "أَخْذَ",
+    "أَخْذَةً"
+   ],
+   "senses": [
+    {
+     "id": "cengkeraman azab",
+     "en": "seizure (punishment)",
+     "ayat": [
+      "11:102",
+      "54:42",
+      "69:10"
+     ]
+    },
+    {
+     "id": "mengambil",
+     "en": "taking",
+     "ayat": [
+      "4:161"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1181,
+   "lemma": "Eada`wap",
+   "ar": "عَدَٰوَة",
+   "translit": "‘adāwah",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 3,
+   "root": [
+    "ع",
+    "د",
+    "و"
+   ],
+   "forms": [
+    "ٱلْعَدَٰوَةَ",
+    "ٱلْعَدَاوَةَ",
+    "عَدَٰوَةً",
+    "عَدَٰوَةٌ",
+    "ٱلْعَدَٰوَةُ"
+   ],
+   "senses": [
+    {
+     "id": "permusuhan",
+     "en": "animosity",
+     "ayat": [
+      "5:14",
+      "5:82",
+      "41:34"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1182,
+   "lemma": "xila`f",
+   "ar": "خِلَٰف",
+   "translit": "khilāf",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "خ",
+    "ل",
+    "ف"
+   ],
+   "forms": [
+    "خِلَٰفٍ",
+    "خِلَٰفَ",
+    "خِلَٰفَكَ"
+   ],
+   "senses": [
+    {
+     "id": "bersilang",
+     "en": "opposite sides",
+     "ayat": [
+      "5:33",
+      "7:124",
+      "20:71"
+     ]
+    },
+    {
+     "id": "sepeninggal",
+     "en": "after (one's departure)",
+     "ayat": [
+      "9:81",
+      "17:76"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1183,
+   "lemma": "bal~ago",
+   "ar": "بَلَّغْ",
+   "translit": "ballag",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 4,
+   "root": [
+    "ب",
+    "ل",
+    "غ"
+   ],
+   "forms": [
+    "أُبَلِّغُكُمْ",
+    "بَلِّغْ",
+    "بَلَّغْتَ",
+    "يُبَلِّغُونَ",
+    "وَأُبَلِّغُكُم"
+   ],
+   "senses": [
+    {
+     "id": "menyampaikan",
+     "en": "convey",
+     "ayat": [
+      "5:67",
+      "7:62",
+      "33:39"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1184,
+   "lemma": "ba`lig",
+   "ar": "بَٰلِغ",
+   "translit": "bālig",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ب",
+    "ل",
+    "غ"
+   ],
+   "forms": [
+    "بَٰلِغَ",
+    "بَٰلِغُوهُ",
+    "بِبَٰلِغِهِۦ",
+    "بَٰلِغِيهِ",
+    "بِبَٰلِغِيهِ"
+   ],
+   "senses": [
+    {
+     "id": "sampai, mencapai",
+     "en": "reaching",
+     "ayat": [
+      "5:95",
+      "7:135",
+      "16:7"
+     ]
+    },
+    {
+     "id": "melaksanakan",
+     "en": "accomplishing",
+     "ayat": [
+      "65:3"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1185,
+   "lemma": "{ntaqamo",
+   "ar": "ٱنتَقَمْ",
+   "translit": "intaqam",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ن",
+    "ق",
+    "م"
+   ],
+   "forms": [
+    "فَٱنتَقَمْنَا",
+    "فَيَنتَقِمُ",
+    "ٱنتَقَمْنَا"
+   ],
+   "senses": [
+    {
+     "id": "membalas dengan hukuman",
+     "en": "take retribution",
+     "ayat": [
+      "7:136",
+      "30:47",
+      "43:55"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1186,
+   "lemma": "r~a`ziqiyn",
+   "ar": "رَٰزِقِين",
+   "translit": "rāziqīn",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ر",
+    "ز",
+    "ق"
+   ],
+   "forms": [
+    "ٱلرَّٰزِقِينَ",
+    "بِرَٰزِقِينَ"
+   ],
+   "senses": [
+    {
+     "id": "pemberi rezeki",
+     "en": "provider",
+     "ayat": [
+      "5:114",
+      "22:58",
+      "34:39"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1187,
+   "lemma": "faATir",
+   "ar": "فَاطِر",
+   "translit": "fāṭir",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ف",
+    "ط",
+    "ر"
+   ],
+   "forms": [
+    "فَاطِرِ",
+    "فَاطِرَ",
+    "فَاطِرُ"
+   ],
+   "senses": [
+    {
+     "id": "pencipta",
+     "en": "creator",
+     "ayat": [
+      "6:14",
+      "35:1",
+      "42:11"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1188,
+   "lemma": "waqor",
+   "ar": "وَقْر",
+   "translit": "waqr",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "و",
+    "ق",
+    "ر"
+   ],
+   "forms": [
+    "وَقْرًا",
+    "وَقْرٌ"
+   ],
+   "senses": [
+    {
+     "id": "sumbatan (tuli)",
+     "en": "deafness",
+     "ayat": [
+      "6:25",
+      "31:7",
+      "41:44"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1189,
+   "lemma": "qal~abu",
+   "ar": "قَلَّبُ",
+   "translit": "qallabu",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ق",
+    "ل",
+    "ب"
+   ],
+   "forms": [
+    "يُقَلِّبُ",
+    "وَنُقَلِّبُ",
+    "وَقَلَّبُوا۟",
+    "وَنُقَلِّبُهُمْ",
+    "تُقَلَّبُ"
+   ],
+   "senses": [
+    {
+     "id": "membolak-balikkan",
+     "en": "turn about",
+     "ayat": [
+      "18:18",
+      "18:42",
+      "6:110"
+     ]
+    },
+    {
+     "id": "mempergantikan",
+     "en": "alternate",
+     "ayat": [
+      "24:44"
+     ]
+    },
+    {
+     "id": "memutarbalikkan urusan",
+     "en": "upset matters",
+     "ayat": [
+      "9:48"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1190,
+   "lemma": "*ara>a",
+   "ar": "ذَرَأَ",
+   "translit": "żara’a",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "ذ",
+    "ر",
+    "أ"
+   ],
+   "forms": [
+    "ذَرَأَ",
+    "ذَرَأَكُمْ",
+    "ذَرَأْنَا",
+    "يَذْرَؤُكُمْ"
+   ],
+   "senses": [
+    {
+     "id": "menciptakan, mengembangbiakkan",
+     "en": "create, multiply",
+     "ayat": [
+      "6:136",
+      "23:79",
+      "42:11"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1191,
+   "lemma": ">asorafa",
+   "ar": "أَسْرَفَ",
+   "translit": "asrafa",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "س",
+    "ر",
+    "ف"
+   ],
+   "forms": [
+    "تُسْرِفُوٓا۟",
+    "يُسْرِف",
+    "أَسْرَفَ",
+    "يُسْرِفُوا۟",
+    "أَسْرَفُوا۟"
+   ],
+   "senses": [
+    {
+     "id": "melampaui batas",
+     "en": "exceed limits",
+     "ayat": [
+      "7:31",
+      "17:33",
+      "39:53"
+     ]
+    }
+   ],
+   "review": "corrected"
+  },
+  {
+   "rank": 1192,
+   "lemma": "muntaZiruwn",
+   "ar": "مُنتَظِرُون",
+   "translit": "muntaẓirūn",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ن",
+    "ظ",
+    "ر"
+   ],
+   "forms": [
+    "ٱلْمُنتَظِرِينَ",
+    "مُنتَظِرُونَ",
+    "مُّنتَظِرُونَ"
+   ],
+   "senses": [
+    {
+     "id": "menunggu",
+     "en": "waiting",
+     "ayat": [
+      "6:158",
+      "10:20",
+      "32:30"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1193,
+   "lemma": "munZaruwn",
+   "ar": "مُنظَرُون",
+   "translit": "munẓarūn",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ن",
+    "ظ",
+    "ر"
+   ],
+   "forms": [
+    "ٱلْمُنظَرِينَ",
+    "مُّنظَرِينَ",
+    "مُنظَرُونَ",
+    "مُنظَرِينَ"
+   ],
+   "senses": [
+    {
+     "id": "diberi penangguhan",
+     "en": "reprieved",
+     "ayat": [
+      "7:15",
+      "15:8",
+      "26:203"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1194,
+   "lemma": "muli}ato",
+   "ar": "مُلِئَتْ",
+   "translit": "muli’at",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "م",
+    "ل",
+    "أ"
+   ],
+   "forms": [
+    "لَأَمْلَأَنَّ",
+    "وَلَمُلِئْتَ",
+    "مُلِئَتْ"
+   ],
+   "senses": [
+    {
+     "id": "memenuhi",
+     "en": "fill",
+     "ayat": [
+      "7:18",
+      "11:119",
+      "38:85"
+     ]
+    },
+    {
+     "id": "dipenuhi",
+     "en": "be filled",
+     "ayat": [
+      "18:18",
+      "72:8"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1195,
+   "lemma": "naASiH",
+   "ar": "نَاصِح",
+   "translit": "nāṣiḥ",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 3,
+   "root": [
+    "ن",
+    "ص",
+    "ح"
+   ],
+   "forms": [
+    "ٱلنَّٰصِحِينَ",
+    "نَاصِحٌ",
+    "لَنَٰصِحُونَ",
+    "نَٰصِحُونَ"
+   ],
+   "senses": [
+    {
+     "id": "penasihat tulus",
+     "en": "sincere adviser",
+     "ayat": [
+      "7:68",
+      "7:79",
+      "28:20"
+     ]
+    },
+    {
+     "id": "berniat baik",
+     "en": "well-meaning",
+     "ayat": [
+      "12:11",
+      "28:12"
+     ]
+    }
+   ],
+   "review": "disputed"
+  },
+  {
+   "rank": 1196,
+   "lemma": "yasota>oxiru",
+   "ar": "يَسْتَأْخِرُ",
+   "translit": "yasta’khiru",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 6,
+   "root": [
+    "أ",
+    "خ",
+    "ر"
+   ],
+   "forms": [
+    "يَسْتَـْٔخِرُونَ",
+    "يَسْتَأْخِرُونَ",
+    "تَسْتَـْٔخِرُونَ"
+   ],
+   "senses": [
+    {
+     "id": "tertunda",
+     "en": "remain behind",
+     "ayat": [
+      "7:34",
+      "10:49",
+      "34:30"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1197,
+   "lemma": "risa`la`t",
+   "ar": "رِسَٰلَٰت",
+   "translit": "risālāt",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 3,
+   "root": [
+    "ر",
+    "س",
+    "ل"
+   ],
+   "forms": [
+    "رِسَٰلَٰتِ",
+    "وَرِسَٰلَٰتِهِۦ"
+   ],
+   "senses": [
+    {
+     "id": "risalah",
+     "en": "messages",
+     "ayat": [
+      "7:62",
+      "33:39",
+      "72:28"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1198,
+   "lemma": "waHod",
+   "ar": "وَحْد",
+   "translit": "waḥd",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "و",
+    "ح",
+    "د"
+   ],
+   "forms": [
+    "وَحْدَهُۥ",
+    "وَحْدَهُ",
+    "وَحْدَهُۥٓ"
+   ],
+   "senses": [
+    {
+     "id": "saja",
+     "en": "alone",
+     "ayat": [
+      "7:70",
+      "40:84",
+      "60:4"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1199,
+   "lemma": "DuHFY",
+   "ar": "ضُحًى",
+   "translit": "ḍuḥanā",
+   "count": 6,
+   "ayat": 6,
+   "surahs": 5,
+   "root": [
+    "ض",
+    "ح",
+    "و"
+   ],
+   "forms": [
+    "ضُحًى",
+    "ضُحَىٰهَا",
+    "وَضُحَىٰهَا",
+    "وَٱلضُّحَىٰ"
+   ],
+   "senses": [
+    {
+     "id": "pagi hari",
+     "en": "morning",
+     "ayat": [
+      "7:98",
+      "20:59",
+      "79:46"
+     ]
+    },
+    {
+     "id": "sinar pagi",
+     "en": "morning brightness",
+     "ayat": [
+      "79:29",
+      "91:1",
+      "93:1"
+     ]
+    }
+   ],
+   "review": "passed"
+  },
+  {
+   "rank": 1200,
+   "lemma": "n~akava",
+   "ar": "نَكَثَ",
+   "translit": "nakaṡa",
+   "count": 6,
+   "ayat": 5,
+   "surahs": 4,
+   "root": [
+    "ن",
+    "ك",
+    "ث"
+   ],
+   "forms": [
+    "يَنكُثُونَ",
+    "نَّكَثُوٓا۟",
+    "نَّكَثَ",
+    "يَنكُثُ"
+   ],
+   "senses": [
+    {
+     "id": "melanggar janji",
+     "en": "break one's word",
+     "ayat": [
+      "7:135",
+      "9:12",
+      "48:10"
+     ]
+    }
+   ],
+   "review": "passed"
+  }
+ ]
+}

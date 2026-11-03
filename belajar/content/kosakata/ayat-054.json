@@ -1,0 +1,365 @@
+{
+ "sura": 54,
+ "ayat": [
+  {
+   "loc": "54:1",
+   "ar": "ٱقْتَرَبَتِ ٱلسَّاعَةُ وَٱنشَقَّ ٱلْقَمَرُ",
+   "translation": {
+    "text": "Saat (hari Kiamat) semakin dekat, bulan pun terbelah.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:2",
+   "ar": "وَإِن يَرَوْا۟ ءَايَةً يُعْرِضُوا۟ وَيَقُولُوا۟ سِحْرٌ مُّسْتَمِرٌّ",
+   "translation": {
+    "text": "Dan jika mereka (orang-orang musyrikin) melihat suatu tanda (mukjizat), mereka berpaling dan berkata, \"(Ini adalah) sihir yang terus menerus.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:3",
+   "ar": "وَكَذَّبُوا۟ وَٱتَّبَعُوٓا۟ أَهْوَآءَهُمْ وَكُلُّ أَمْرٍ مُّسْتَقِرٌّ",
+   "translation": {
+    "text": "Dan mereka mendustakan (Muhammad) dan mengikuti nafsu mereka, padahal setiap urusan telah ada ketetapannya.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:4",
+   "ar": "وَلَقَدْ جَآءَهُم مِّنَ ٱلْأَنۢبَآءِ مَا فِيهِ مُزْدَجَرٌ",
+   "translation": {
+    "text": "Dan sungguh, telah datang kepada mereka beberapa kisah yang di dalamnya terdapat ancaman (terhadap kekafiran),",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:5",
+   "ar": "حِكْمَةٌۢ بَٰلِغَةٌ فَمَا تُغْنِ ٱلنُّذُرُ",
+   "translation": {
+    "text": "(itulah) suatu hikmah yang sempurna, tetapi peringatan-peringatan itu tidak berguna (bagi mereka),",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:6",
+   "ar": "فَتَوَلَّ عَنْهُمْ يَوْمَ يَدْعُ ٱلدَّاعِ إِلَىٰ شَىْءٍ نُّكُرٍ",
+   "translation": {
+    "text": "maka berpalinglah engkau (Muhammad) dari mereka pada hari (ketika) penyeru (malaikat) mengajak (mereka) kepada sesuatu yang tidak menyenangkan (hari pembalasan),",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:7",
+   "ar": "خُشَّعًا أَبْصَٰرُهُمْ يَخْرُجُونَ مِنَ ٱلْأَجْدَاثِ كَأَنَّهُمْ جَرَادٌ مُّنتَشِرٌ",
+   "translation": {
+    "text": "pandangan mereka tertunduk, ketika mereka keluar dari kuburan, seakan-akan mereka belalang yang beterbangan,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:8",
+   "ar": "مُّهْطِعِينَ إِلَى ٱلدَّاعِ يَقُولُ ٱلْكَٰفِرُونَ هَٰذَا يَوْمٌ عَسِرٌ",
+   "translation": {
+    "text": "dengan patuh mereka segera datang kepada penyeru itu. Orang-orang kafir berkata, \"Ini adalah hari yang sulit.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:9",
+   "ar": "كَذَّبَتْ قَبْلَهُمْ قَوْمُ نُوحٍ فَكَذَّبُوا۟ عَبْدَنَا وَقَالُوا۟ مَجْنُونٌ وَٱزْدُجِرَ",
+   "translation": {
+    "text": "Sebelum mereka, kaum Nuh juga telah mendustakan (rasul), maka mereka mendustakan hamba Kami (Nuh) dan mengatakan, \"Dia orang gila!\" Lalu diusirnya dengan ancaman.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:10",
+   "ar": "فَدَعَا رَبَّهُۥٓ أَنِّى مَغْلُوبٌ فَٱنتَصِرْ",
+   "translation": {
+    "text": "Maka dia (Nuh) mengadu kepada Tuhannya, \"Sesungguhnya aku telah dikalahkan, maka tolonglah (aku).\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:11",
+   "ar": "فَفَتَحْنَآ أَبْوَٰبَ ٱلسَّمَآءِ بِمَآءٍ مُّنْهَمِرٍ",
+   "translation": {
+    "text": "Lalu Kami bukakan pintu-pintu langit dengan (menurunkan) air yang tercurah,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:12",
+   "ar": "وَفَجَّرْنَا ٱلْأَرْضَ عُيُونًا فَٱلْتَقَى ٱلْمَآءُ عَلَىٰٓ أَمْرٍ قَدْ قُدِرَ",
+   "translation": {
+    "text": "dan Kami jadikan bumi menyemburkan mata-mata air maka bertemulah (air-air) itu sehinggga (meluap menimbulkan) keadaaan (bencana) yang telah ditetapkan.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:13",
+   "ar": "وَحَمَلْنَٰهُ عَلَىٰ ذَاتِ أَلْوَٰحٍ وَدُسُرٍ",
+   "translation": {
+    "text": "Dan Kami angkut dia (Nuh) ke atas (kapal) yang terbuat dari papan dan pasak,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:14",
+   "ar": "تَجْرِى بِأَعْيُنِنَا جَزَآءً لِّمَن كَانَ كُفِرَ",
+   "translation": {
+    "text": "yang berlayar dengan pemeliharaan (pengawasan) Kami sebagai balasan bagi orang yang telah diingkari (kaumnya).",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:15",
+   "ar": "وَلَقَد تَّرَكْنَٰهَآ ءَايَةً فَهَلْ مِن مُّدَّكِرٍ",
+   "translation": {
+    "text": "Dan sungguh, kapal itu telah Kami jadikan sebagai tanda (pelajaran). Maka adakah orang yang mau mengambil pelajaran?",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:16",
+   "ar": "فَكَيْفَ كَانَ عَذَابِى وَنُذُرِ",
+   "translation": {
+    "text": "Maka betapa dahsyatnya azab-Ku dan peringatan-Ku!",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:17",
+   "ar": "وَلَقَدْ يَسَّرْنَا ٱلْقُرْءَانَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ",
+   "translation": {
+    "text": "Dan sungguh, telah Kami mudahkan Al-Qur`an untuk peringatan, maka adakah orang yang mau mengambil pelajaran?",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:19",
+   "ar": "إِنَّآ أَرْسَلْنَا عَلَيْهِمْ رِيحًا صَرْصَرًا فِى يَوْمِ نَحْسٍ مُّسْتَمِرٍّ",
+   "translation": {
+    "text": "Sesungguhnya Kami telah menghembuskan angin yang sangat kencang kepada mereka pada hari nahas yang terus menerus,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:20",
+   "ar": "تَنزِعُ ٱلنَّاسَ كَأَنَّهُمْ أَعْجَازُ نَخْلٍ مُّنقَعِرٍ",
+   "translation": {
+    "text": "yang membuat manusia bergelimpangan, mereka bagaikan pohon-pohon kurma yang tumbang dengan akar-akarnya.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:23",
+   "ar": "كَذَّبَتْ ثَمُودُ بِٱلنُّذُرِ",
+   "translation": {
+    "text": "Kaum Samud pun telah mendustakan peringatan itu.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:24",
+   "ar": "فَقَالُوٓا۟ أَبَشَرًا مِّنَّا وَٰحِدًا نَّتَّبِعُهُۥٓ إِنَّآ إِذًا لَّفِى ضَلَٰلٍ وَسُعُرٍ",
+   "translation": {
+    "text": "Maka mereka berkata, \"Bagaimana kita akan mengikuti seorang manusia (biasa) di antara kita? Sungguh, kalau begitu kita benar-benar telah sesat dan gila.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:25",
+   "ar": "أَءُلْقِىَ ٱلذِّكْرُ عَلَيْهِ مِنۢ بَيْنِنَا بَلْ هُوَ كَذَّابٌ أَشِرٌ",
+   "translation": {
+    "text": "Apakah wahyu itu diturunkan kepadanya di antara kita? Pastilah dia (Saleh) seorang yang sangat pendusta (dan) sombong.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:26",
+   "ar": "سَيَعْلَمُونَ غَدًا مَّنِ ٱلْكَذَّابُ ٱلْأَشِرُ",
+   "translation": {
+    "text": "Kelak mereka akan mengetahui siapa yang sebenarnya sangat pendusta (dan) sombong itu.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:27",
+   "ar": "إِنَّا مُرْسِلُوا۟ ٱلنَّاقَةِ فِتْنَةً لَّهُمْ فَٱرْتَقِبْهُمْ وَٱصْطَبِرْ",
+   "translation": {
+    "text": "Sesungguhnya Kami akan mengirimkan unta betina sebagai cobaan bagi mereka, maka tunggulah mereka dan bersabarlah (Saleh).",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:28",
+   "ar": "وَنَبِّئْهُمْ أَنَّ ٱلْمَآءَ قِسْمَةٌۢ بَيْنَهُمْ كُلُّ شِرْبٍ مُّحْتَضَرٌ",
+   "translation": {
+    "text": "Dan beritahukanlah kepada mereka bahwa air itu dibagi di antara mereka (dengan unta betina itu); setiap orang berhak mendapat giliran minum.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:29",
+   "ar": "فَنَادَوْا۟ صَاحِبَهُمْ فَتَعَاطَىٰ فَعَقَرَ",
+   "translation": {
+    "text": "Maka mereka memanggil kawannya, lalu dia menangkap (unta itu) dan memotongnya.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:31",
+   "ar": "إِنَّآ أَرْسَلْنَا عَلَيْهِمْ صَيْحَةً وَٰحِدَةً فَكَانُوا۟ كَهَشِيمِ ٱلْمُحْتَظِرِ",
+   "translation": {
+    "text": "Kami kirimkan atas mereka satu suara yang keras mengguntur, maka jadilah mereka seperti batang-batang kering yang lapuk.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:33",
+   "ar": "كَذَّبَتْ قَوْمُ لُوطٍۭ بِٱلنُّذُرِ",
+   "translation": {
+    "text": "Kaum Luṭ pun telah mendustakan peringatan itu.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:34",
+   "ar": "إِنَّآ أَرْسَلْنَا عَلَيْهِمْ حَاصِبًا إِلَّآ ءَالَ لُوطٍ نَّجَّيْنَٰهُم بِسَحَرٍ",
+   "translation": {
+    "text": "Sesungguhnya Kami kirimkan kepada mereka badai yang membawa batu-batu (yang menimpa mereka), kecuali keluarga Luṭ. Kami selamatkan mereka sebelum fajar menyingsing,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:36",
+   "ar": "وَلَقَدْ أَنذَرَهُم بَطْشَتَنَا فَتَمَارَوْا۟ بِٱلنُّذُرِ",
+   "translation": {
+    "text": "Dan sungguh, dia (Luṭ) telah memperingatkan mereka akan hukuman Kami, tetapi mereka mendustakan peringatan-Ku.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:37",
+   "ar": "وَلَقَدْ رَٰوَدُوهُ عَن ضَيْفِهِۦ فَطَمَسْنَآ أَعْيُنَهُمْ فَذُوقُوا۟ عَذَابِى وَنُذُرِ",
+   "translation": {
+    "text": "Dan sungguh, mereka telah membujuknya (agar menyerahkan) tamunya (kepada mereka), lalu Kami butakan mata mereka, maka rasakanlah azab-Ku dan peringatan-Ku!",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:38",
+   "ar": "وَلَقَدْ صَبَّحَهُم بُكْرَةً عَذَابٌ مُّسْتَقِرٌّ",
+   "translation": {
+    "text": "Dan sungguh, pada esok harinya mereka benar-benar ditimpa azab yang tetap.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:42",
+   "ar": "كَذَّبُوا۟ بِـَٔايَٰتِنَا كُلِّهَا فَأَخَذْنَٰهُمْ أَخْذَ عَزِيزٍ مُّقْتَدِرٍ",
+   "translation": {
+    "text": "Mereka mendustakan mukjizat-mukjizat Kami semuanya, maka Kami azab mereka dengan azab dari Żat Yang Mahaperkasa, Mahakuasa.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:43",
+   "ar": "أَكُفَّارُكُمْ خَيْرٌ مِّنْ أُو۟لَٰٓئِكُمْ أَمْ لَكُم بَرَآءَةٌ فِى ٱلزُّبُرِ",
+   "translation": {
+    "text": "Apakah orang-orang kafir di lingkunganmu (kaum musyrikin) lebih baik dari mereka, ataukah kamu telah mempunyai jaminan kebebasan (dari azab) dalam kitab-kitab terdahulu?",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:44",
+   "ar": "أَمْ يَقُولُونَ نَحْنُ جَمِيعٌ مُّنتَصِرٌ",
+   "translation": {
+    "text": "Atau mereka mengatakan, \"Kami ini golongan yang bersatu yang pasti menang.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:45",
+   "ar": "سَيُهْزَمُ ٱلْجَمْعُ وَيُوَلُّونَ ٱلدُّبُرَ",
+   "translation": {
+    "text": "Golongan itu pasti akan dikalahkan dan mereka akan mundur ke belakang.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:46",
+   "ar": "بَلِ ٱلسَّاعَةُ مَوْعِدُهُمْ وَٱلسَّاعَةُ أَدْهَىٰ وَأَمَرُّ",
+   "translation": {
+    "text": "Bahkan hari Kiamat itulah hari yang dijanjikan kepada mereka dan hari Kiamat itu lebih dahsyat dan lebih pahit.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:47",
+   "ar": "إِنَّ ٱلْمُجْرِمِينَ فِى ضَلَٰلٍ وَسُعُرٍ",
+   "translation": {
+    "text": "Sungguh, orang-orang yang berdosa berada dalam kesesatan (di dunia) dan akan berada dalam neraka (di akhirat).",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:48",
+   "ar": "يَوْمَ يُسْحَبُونَ فِى ٱلنَّارِ عَلَىٰ وُجُوهِهِمْ ذُوقُوا۟ مَسَّ سَقَرَ",
+   "translation": {
+    "text": "Pada hari mereka diseret ke neraka pada wajahnya. (Dikatakan kepada mereka), \"Rasakanlah sentuhan api neraka.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:49",
+   "ar": "إِنَّا كُلَّ شَىْءٍ خَلَقْنَٰهُ بِقَدَرٍ",
+   "translation": {
+    "text": "Sungguh, Kami menciptakan segala sesuatu menurut ukuran.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:50",
+   "ar": "وَمَآ أَمْرُنَآ إِلَّا وَٰحِدَةٌ كَلَمْحٍۭ بِٱلْبَصَرِ",
+   "translation": {
+    "text": "Dan perintah Kami hanyalah (dengan) satu perkataan seperti kejapan mata.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:51",
+   "ar": "وَلَقَدْ أَهْلَكْنَآ أَشْيَاعَكُمْ فَهَلْ مِن مُّدَّكِرٍ",
+   "translation": {
+    "text": "Dan sungguh, telah Kami binasakan orang yang serupa dengan kamu (kekafirannya). Maka adakah orang yang mau mengambil pelajaran?",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:52",
+   "ar": "وَكُلُّ شَىْءٍ فَعَلُوهُ فِى ٱلزُّبُرِ",
+   "translation": {
+    "text": "Dan segala sesuatu yang telah mereka perbuat tercatat dalam buku-buku catatan.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:53",
+   "ar": "وَكُلُّ صَغِيرٍ وَكَبِيرٍ مُّسْتَطَرٌ",
+   "translation": {
+    "text": "Dan segala (sesuatu) yang kecil maupun yang besar (semuanya) tertulis.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "54:55",
+   "ar": "فِى مَقْعَدِ صِدْقٍ عِندَ مَلِيكٍ مُّقْتَدِرٍۭ",
+   "translation": {
+    "text": "di tempat yang disenangi di sisi Tuhan Yang Mahakuasa.",
+    "footnotes": []
+   }
+  }
+ ]
+}

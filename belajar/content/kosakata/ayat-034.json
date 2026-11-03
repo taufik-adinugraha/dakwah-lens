@@ -1,0 +1,352 @@
+{
+ "sura": 34,
+ "ayat": [
+  {
+   "loc": "34:1",
+   "ar": "ٱلْحَمْدُ لِلَّهِ ٱلَّذِى لَهُۥ مَا فِى ٱلسَّمَٰوَٰتِ وَمَا فِى ٱلْأَرْضِ وَلَهُ ٱلْحَمْدُ فِى ٱلْـَٔاخِرَةِ وَهُوَ ٱلْحَكِيمُ ٱلْخَبِيرُ",
+   "translation": {
+    "text": "Segala puji bagi Allah yang memiliki apa yang ada di langit dan apa yang ada di bumi, dan segala puji di akhirat bagi Allah. Dan Dialah Yang Mahabijaksana, Mahateliti.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:2",
+   "ar": "يَعْلَمُ مَا يَلِجُ فِى ٱلْأَرْضِ وَمَا يَخْرُجُ مِنْهَا وَمَا يَنزِلُ مِنَ ٱلسَّمَآءِ وَمَا يَعْرُجُ فِيهَا وَهُوَ ٱلرَّحِيمُ ٱلْغَفُورُ",
+   "translation": {
+    "text": "Dia mengetahui apa yang masuk ke dalam bumi, apa yang keluar darinya, apa yang turun dari langit dan apa yang naik kepadanya. Dan Dialah Yang Maha Penyayang, Maha Pengampun.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:3",
+   "ar": "وَقَالَ ٱلَّذِينَ كَفَرُوا۟ لَا تَأْتِينَا ٱلسَّاعَةُ قُلْ بَلَىٰ وَرَبِّى لَتَأْتِيَنَّكُمْ عَٰلِمِ ٱلْغَيْبِ لَا يَعْزُبُ عَنْهُ مِثْقَالُ ذَرَّةٍ فِى ٱلسَّمَٰوَٰتِ وَلَا فِى ٱلْأَرْضِ وَلَآ أَصْغَرُ مِن ذَٰلِكَ وَلَآ أَكْبَرُ إِلَّا فِى كِتَٰبٍ مُّبِينٍ",
+   "translation": {
+    "text": "Dan orang-orang yang kafir berkata, \"Hari Kiamat itu tidak akan datang kepada kami.\" Katakanlah, \"Pasti datang, demi Tuhanku Yang mengetahui yang gaib, Kiamat itu pasti akan datang kepadamu. Tidak ada yang tersembunyi bagi-Nya sekalipun seberat zarah[691]baik yang di langit maupun yang di bumi, yang lebih kecil dari itu atau yang lebih besar, semuanya (tertulis) dalam Kitab yang jelas (Lauḥ Maḥfūẓ),\"",
+    "footnotes": [
+     "[691] Zarah adalah jenis yang terkecil dari semut. Orang Arab mengungkapkan sesuatu yang paling kecil dengan sebutan zarah."
+    ]
+   }
+  },
+  {
+   "loc": "34:5",
+   "ar": "وَٱلَّذِينَ سَعَوْ فِىٓ ءَايَٰتِنَا مُعَٰجِزِينَ أُو۟لَٰٓئِكَ لَهُمْ عَذَابٌ مِّن رِّجْزٍ أَلِيمٌ",
+   "translation": {
+    "text": "Dan orang-orang yang berusaha untuk (menentang) ayat-ayat Kami dengan anggapan mereka dapat melemahkan (menggagalkan azab Kami), mereka itu akan memperoleh azab, yaitu azab yang sangat pedih.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:7",
+   "ar": "وَقَالَ ٱلَّذِينَ كَفَرُوا۟ هَلْ نَدُلُّكُمْ عَلَىٰ رَجُلٍ يُنَبِّئُكُمْ إِذَا مُزِّقْتُمْ كُلَّ مُمَزَّقٍ إِنَّكُمْ لَفِى خَلْقٍ جَدِيدٍ",
+   "translation": {
+    "text": "Dan orang-orang kafir berkata (kepada teman-temannya), \"Maukah kami tunjukkan kepadamu seorang laki-laki[692] yang memberitakan kepadamu bahwa apabila badanmu telah hancur sehancur-hancurnya, kamu pasti (akan dibangkitkan kembali) dalam ciptaan yang baru.",
+    "footnotes": [
+     "[692] Nabi Muhammad -ṣallallāhu 'alaihi wa sallam- sebagai penghinaan mereka terhadapnya."
+    ]
+   }
+  },
+  {
+   "loc": "34:8",
+   "ar": "أَفْتَرَىٰ عَلَى ٱللَّهِ كَذِبًا أَم بِهِۦ جِنَّةٌۢ بَلِ ٱلَّذِينَ لَا يُؤْمِنُونَ بِٱلْـَٔاخِرَةِ فِى ٱلْعَذَابِ وَٱلضَّلَٰلِ ٱلْبَعِيدِ",
+   "translation": {
+    "text": "Apakah dia mengada-adakan kebohongan terhadap Allah atau sakit gila?\" (Tidak), tetapi orang-orang yang tidak beriman kepada akhirat itu berada dalam siksaan dan kesesatan yang jauh.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:9",
+   "ar": "أَفَلَمْ يَرَوْا۟ إِلَىٰ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُم مِّنَ ٱلسَّمَآءِ وَٱلْأَرْضِ إِن نَّشَأْ نَخْسِفْ بِهِمُ ٱلْأَرْضَ أَوْ نُسْقِطْ عَلَيْهِمْ كِسَفًا مِّنَ ٱلسَّمَآءِ إِنَّ فِى ذَٰلِكَ لَـَٔايَةً لِّكُلِّ عَبْدٍ مُّنِيبٍ",
+   "translation": {
+    "text": "Maka apakah mereka tidak memperhatikan langit dan bumi yang ada di hadapan dan di belakang mereka? Jika Kami menghendaki, niscaya Kami benamkan mereka di bumi atau Kami jatuhkan kepada mereka kepingan-kepingan dari langit. Sungguh, pada yang demikian itu benar-benar terdapat tanda (kekuasaan Allah) bagi setiap hamba yang kembali (kepada-Nya).",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:10",
+   "ar": "وَلَقَدْ ءَاتَيْنَا دَاوُۥدَ مِنَّا فَضْلًا يَٰجِبَالُ أَوِّبِى مَعَهُۥ وَٱلطَّيْرَ وَأَلَنَّا لَهُ ٱلْحَدِيدَ",
+   "translation": {
+    "text": "Dan sungguh, telah Kami berikan kepada Dawud karunia dari Kami. (Kami berfirman), \"Wahai gunung-gunung dan burung-burung! Bertasbihlah berulang-ulang bersama Dawud,\" dan Kami telah melunakkan besi untuknya,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:11",
+   "ar": "أَنِ ٱعْمَلْ سَٰبِغَٰتٍ وَقَدِّرْ فِى ٱلسَّرْدِ وَٱعْمَلُوا۟ صَٰلِحًا إِنِّى بِمَا تَعْمَلُونَ بَصِيرٌ",
+   "translation": {
+    "text": "(yaitu) buatlah baju besi yang besar-besar dan ukurlah anyamannya; dan kerjakanlah kebajikan. Sungguh, Aku Maha Melihat apa yang kamu kerjakan.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:12",
+   "ar": "وَلِسُلَيْمَٰنَ ٱلرِّيحَ غُدُوُّهَا شَهْرٌ وَرَوَاحُهَا شَهْرٌ وَأَسَلْنَا لَهُۥ عَيْنَ ٱلْقِطْرِ وَمِنَ ٱلْجِنِّ مَن يَعْمَلُ بَيْنَ يَدَيْهِ بِإِذْنِ رَبِّهِۦ وَمَن يَزِغْ مِنْهُمْ عَنْ أَمْرِنَا نُذِقْهُ مِنْ عَذَابِ ٱلسَّعِيرِ",
+   "translation": {
+    "text": "Dan Kami (tundukkan) angin bagi Sulaiman, yang perjalanannya pada waktu pagi sama dengan perjalanan sebulan dan perjalanannya pada waktu sore sama dengan perjalanan sebulan (pula)[693] dan Kami alirkan cairan tembaga baginya. Dan sebagian dari jin ada yang bekerja di hadapannya (di bawah kekuasaannya) dengan izin Tuhannya. Dan siapa yang menyimpang di antara mereka dari perintah Kami, Kami rasakan kepadanya azab neraka yang apinya menyala-nyala.",
+    "footnotes": [
+     "[693] Bila Nabi Sulaiman -'alaihissalām- mengadakan perjalanan dari pagi sampai tengah hari, maka jarak yang ditempuhnya sama dengan jarak perjalanan unta yang cepat dalam sebulan. Begitu pula apabila dia mengadakan perjalanan dari tengah hari sampai sore, maka kecepatannya sama dengan perjalanan sebulan."
+    ]
+   }
+  },
+  {
+   "loc": "34:13",
+   "ar": "يَعْمَلُونَ لَهُۥ مَا يَشَآءُ مِن مَّحَٰرِيبَ وَتَمَٰثِيلَ وَجِفَانٍ كَٱلْجَوَابِ وَقُدُورٍ رَّاسِيَٰتٍ ٱعْمَلُوٓا۟ ءَالَ دَاوُۥدَ شُكْرًا وَقَلِيلٌ مِّنْ عِبَادِىَ ٱلشَّكُورُ",
+   "translation": {
+    "text": "Mereka (para jin itu) bekerja untuk Sulaiman sesuai dengan apa yang dikehendakinya, di antaranya (membuat) gedung-gedung yang tinggi, patung-patung, piring-piring yang (besarnya) seperti kolam dan periuk-periuk yang tetap (berada di atas tungku). Bekerjalah wahai keluarga Dawud untuk bersyukur (kepada Allah). Dan sedikit sekali dari hamba-hamba-Ku yang bersyukur.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:14",
+   "ar": "فَلَمَّا قَضَيْنَا عَلَيْهِ ٱلْمَوْتَ مَا دَلَّهُمْ عَلَىٰ مَوْتِهِۦٓ إِلَّا دَآبَّةُ ٱلْأَرْضِ تَأْكُلُ مِنسَأَتَهُۥ فَلَمَّا خَرَّ تَبَيَّنَتِ ٱلْجِنُّ أَن لَّوْ كَانُوا۟ يَعْلَمُونَ ٱلْغَيْبَ مَا لَبِثُوا۟ فِى ٱلْعَذَابِ ٱلْمُهِينِ",
+   "translation": {
+    "text": "Maka ketika Kami telah menetapkan kematian atasnya (Sulaiman), tidak ada yang menunjukkan kepada mereka kematiannya itu kecuali rayap yang memakan tongkatnya. Maka ketika dia telah tersungkur, tahulah jin itu bahwa sekiranya mereka mengetahui hal yang gaib tentu mereka tidak menetap dalam siksa yang menghinakan.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:15",
+   "ar": "لَقَدْ كَانَ لِسَبَإٍ فِى مَسْكَنِهِمْ ءَايَةٌ جَنَّتَانِ عَن يَمِينٍ وَشِمَالٍ كُلُوا۟ مِن رِّزْقِ رَبِّكُمْ وَٱشْكُرُوا۟ لَهُۥ بَلْدَةٌ طَيِّبَةٌ وَرَبٌّ غَفُورٌ",
+   "translation": {
+    "text": "Sungguh, bagi kaum Saba` ada tanda (kebesaran Tuhan) di tempat kediaman mereka yaitu dua buah kebun di sebelah kanan dan di sebeleh kiri, (kepada mereka dikatakan), \"Makanlah olehmu dari rezeki yang (dianugerahkan) Tuhanmu dan bersyukurlah kepada-Nya. (Negerimu) adalah negeri yang baik (nyaman) sedang (Tuhanmu) adalah Tuhan Yang Maha Pengampun.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:16",
+   "ar": "فَأَعْرَضُوا۟ فَأَرْسَلْنَا عَلَيْهِمْ سَيْلَ ٱلْعَرِمِ وَبَدَّلْنَٰهُم بِجَنَّتَيْهِمْ جَنَّتَيْنِ ذَوَاتَىْ أُكُلٍ خَمْطٍ وَأَثْلٍ وَشَىْءٍ مِّن سِدْرٍ قَلِيلٍ",
+   "translation": {
+    "text": "Tetapi mereka berpaling, maka Kami kirim kepada mereka banjir yang besar[694] dan Kami ganti kedua kebun mereka dengan dua kebun yang ditumbuhi (pohon-pohon) yang berbuah pahit, pohon Aṡl dan sedikit pohon Sidr.[695]",
+    "footnotes": [
+     "[694] Banjir besar yang disebabkan runtuhnya bendungan Ma`rib.",
+     "[695] Pohon Aṡl ialah sejenis pohon cemara, pohon Sidr ialah sejenis pohon bidara."
+    ]
+   }
+  },
+  {
+   "loc": "34:17",
+   "ar": "ذَٰلِكَ جَزَيْنَٰهُم بِمَا كَفَرُوا۟ وَهَلْ نُجَٰزِىٓ إِلَّا ٱلْكَفُورَ",
+   "translation": {
+    "text": "Demikianlah Kami memberi balasan kepada mereka karena kekafiran mereka. Dan Kami tidak menjatuhkan azab (yang demikian itu), melainkan hanya kepada orang-orang yang sangat kafir.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:18",
+   "ar": "وَجَعَلْنَا بَيْنَهُمْ وَبَيْنَ ٱلْقُرَى ٱلَّتِى بَٰرَكْنَا فِيهَا قُرًى ظَٰهِرَةً وَقَدَّرْنَا فِيهَا ٱلسَّيْرَ سِيرُوا۟ فِيهَا لَيَالِىَ وَأَيَّامًا ءَامِنِينَ",
+   "translation": {
+    "text": "Dan Kami jadikan antara mereka (penduduk Saba`) dan negeri-negeri yang Kami berkahi (Syam), beberapa negeri yang berdekatan dan Kami tetapkan antara negeri-negeri itu (jarak-jarak) perjalanan. Berjalanlah kamu di negeri-negeri itu pada malam dan siang hari dengan aman.[696]",
+    "footnotes": [
+     "[696] Negeri yang berada di Syam, karena kesuburannya, dan negeri-negeri yang berdekatan ialah negeri-negeri antara Yaman dan Syam, sehingga orang-orang dapat berjalan dengan aman pada siang dan malam tanpa terpaksa berhenti di padang pasir dan tanpa mendapat kesulitan."
+    ]
+   }
+  },
+  {
+   "loc": "34:19",
+   "ar": "فَقَالُوا۟ رَبَّنَا بَٰعِدْ بَيْنَ أَسْفَارِنَا وَظَلَمُوٓا۟ أَنفُسَهُمْ فَجَعَلْنَٰهُمْ أَحَادِيثَ وَمَزَّقْنَٰهُمْ كُلَّ مُمَزَّقٍ إِنَّ فِى ذَٰلِكَ لَـَٔايَٰتٍ لِّكُلِّ صَبَّارٍ شَكُورٍ",
+   "translation": {
+    "text": "Maka mereka berkata, \"Ya Tuhan kami, jauhkanlah jarak perjalanan kami,\"[697] dan (berarti mereka) menzalimi diri mereka sendiri; maka Kami jadikan mereka bahan pembicaraan dan Kami hancurkan mereka sehancur-hancurnya. Sungguh, pada yang demikian itu benar-benar terdapat tanda-tanda (kekuasaan Allah) bagi setiap orang yang sabar dan bersyukur.",
+    "footnotes": [
+     "[697] Agar kota-kota yang berdekatan itu dihapuskan, agar perjalanan menjadi panjang dan mereka dapat melakukan monopoli dalam perdagangan itu, sehingga keuntungan lebih besar."
+    ]
+   }
+  },
+  {
+   "loc": "34:20",
+   "ar": "وَلَقَدْ صَدَّقَ عَلَيْهِمْ إِبْلِيسُ ظَنَّهُۥ فَٱتَّبَعُوهُ إِلَّا فَرِيقًا مِّنَ ٱلْمُؤْمِنِينَ",
+   "translation": {
+    "text": "Dan sungguh, Iblis telah dapat meyakinkan terhadap mereka kebenaran sangkaannya, lalu mereka mengikutinya, kecuali sebagian dari orang-orang mukmin.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:22",
+   "ar": "قُلِ ٱدْعُوا۟ ٱلَّذِينَ زَعَمْتُم مِّن دُونِ ٱللَّهِ لَا يَمْلِكُونَ مِثْقَالَ ذَرَّةٍ فِى ٱلسَّمَٰوَٰتِ وَلَا فِى ٱلْأَرْضِ وَمَا لَهُمْ فِيهِمَا مِن شِرْكٍ وَمَا لَهُۥ مِنْهُم مِّن ظَهِيرٍ",
+   "translation": {
+    "text": "Katakanlah (Muhammad), \"Serulah mereka yang kamu anggap (sebagai tuhan) selain Allah! Mereka tidak memiliki (kekuasaan) seberat zarah pun di langit dan di bumi, dan mereka sama sekali tidak mempunyai peran serta dalam (penciptaan) langit dan bumi, dan tidak ada di antara mereka yang menjadi pembantu bagi-Nya.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:23",
+   "ar": "وَلَا تَنفَعُ ٱلشَّفَٰعَةُ عِندَهُۥٓ إِلَّا لِمَنْ أَذِنَ لَهُۥ حَتَّىٰٓ إِذَا فُزِّعَ عَن قُلُوبِهِمْ قَالُوا۟ مَاذَا قَالَ رَبُّكُمْ قَالُوا۟ ٱلْحَقَّ وَهُوَ ٱلْعَلِىُّ ٱلْكَبِيرُ",
+   "translation": {
+    "text": "Dan syafaat (pertolongan) di sisi-Nya hanya berguna bagi orang yang telah diizinkan-Nya (memperoleh syafaat itu). Sehingga apabila telah dihilangkan ketakutan dari hati mereka, mereka berkata, \"Apakah yang telah difirmankan oleh Tuhanmu?\" Mereka menjawab, \"(Perkataan) yang benar,\" dan Dialah Yang Mahatinggi, Mahabesar.[698]",
+    "footnotes": [
+     "[698] Ayat ini menerangkan bahwa pemberian syafaat (pertolongan) hanya dapat berlaku dengan izin Allah. Orang-orang yang akan diberi izin memberi syafaat dan orang-orang yang akan mendapat syafaat merasa takut dan harap-harap cemas atas izin Allah."
+    ]
+   }
+  },
+  {
+   "loc": "34:25",
+   "ar": "قُل لَّا تُسْـَٔلُونَ عَمَّآ أَجْرَمْنَا وَلَا نُسْـَٔلُ عَمَّا تَعْمَلُونَ",
+   "translation": {
+    "text": "Katakanlah, \"Kamu tidak akan dimintai tanggung jawab atas apa yang kami kerjakan dan kami juga tidak akan dimintai tanggung jawab atas apa yang kamu kerjakan.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:26",
+   "ar": "قُلْ يَجْمَعُ بَيْنَنَا رَبُّنَا ثُمَّ يَفْتَحُ بَيْنَنَا بِٱلْحَقِّ وَهُوَ ٱلْفَتَّاحُ ٱلْعَلِيمُ",
+   "translation": {
+    "text": "Katakanlah, \"Tuhan kita akan mengumpulkan kita semua, kemudian Dia memberi keputusan antara kita dengan benar. Dan Dia Yang Maha Pemberi keputusan, Maha Mengetahui.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:27",
+   "ar": "قُلْ أَرُونِىَ ٱلَّذِينَ أَلْحَقْتُم بِهِۦ شُرَكَآءَ كَلَّا بَلْ هُوَ ٱللَّهُ ٱلْعَزِيزُ ٱلْحَكِيمُ",
+   "translation": {
+    "text": "Katakanlah, \"Perlihatkanlah kepadaku sembahan-sembahan yang kamu hubungkan dengan Dia sebagai sekutu-sekutu(-Nya), tidak mungkin! Sebenarnya Dialah Allah Yang Mahaperkasa, Mahabijaksana.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:28",
+   "ar": "وَمَآ أَرْسَلْنَٰكَ إِلَّا كَآفَّةً لِّلنَّاسِ بَشِيرًا وَنَذِيرًا وَلَٰكِنَّ أَكْثَرَ ٱلنَّاسِ لَا يَعْلَمُونَ",
+   "translation": {
+    "text": "Dan Kami tidak mengutus engkau (Muhammad), melainkan kepada semua umat manusia sebagai pembawa berita gembira dan sebagai pemberi peringatan, tetapi kebanyakan manusia tidak mengetahui.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:30",
+   "ar": "قُل لَّكُم مِّيعَادُ يَوْمٍ لَّا تَسْتَـْٔخِرُونَ عَنْهُ سَاعَةً وَلَا تَسْتَقْدِمُونَ",
+   "translation": {
+    "text": "Katakanlah, \"Bagimu ada hari yang telah dijanjikan (hari Kiamat), kamu tidak dapat meminta penundaan atau percepatannya sesaat pun.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:31",
+   "ar": "وَقَالَ ٱلَّذِينَ كَفَرُوا۟ لَن نُّؤْمِنَ بِهَٰذَا ٱلْقُرْءَانِ وَلَا بِٱلَّذِى بَيْنَ يَدَيْهِ وَلَوْ تَرَىٰٓ إِذِ ٱلظَّٰلِمُونَ مَوْقُوفُونَ عِندَ رَبِّهِمْ يَرْجِعُ بَعْضُهُمْ إِلَىٰ بَعْضٍ ٱلْقَوْلَ يَقُولُ ٱلَّذِينَ ٱسْتُضْعِفُوا۟ لِلَّذِينَ ٱسْتَكْبَرُوا۟ لَوْلَآ أَنتُمْ لَكُنَّا مُؤْمِنِينَ",
+   "translation": {
+    "text": "Dan orang-orang kafir berkata, \"Kami tidak akan beriman kepada Al-Qur`an ini dan tidak (pula) kepada kitab yang sebelumnya.\" Dan (alangkah mengerikan) kalau kamu melihat ketika orang-orang yang zalim itu dihadapkan kepada Tuhannya, sebagian mereka mengembalikan perkataan kepada sebagian yang lain; orang-orang yang dianggap lemah berkata kepada orang-orang yang menyombongkan diri, \"Kalau tidaklah karena kamu tentulah kami menjadi orang-orang mukmin.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:32",
+   "ar": "قَالَ ٱلَّذِينَ ٱسْتَكْبَرُوا۟ لِلَّذِينَ ٱسْتُضْعِفُوٓا۟ أَنَحْنُ صَدَدْنَٰكُمْ عَنِ ٱلْهُدَىٰ بَعْدَ إِذْ جَآءَكُم بَلْ كُنتُم مُّجْرِمِينَ",
+   "translation": {
+    "text": "Orang-orang yang menyombongkan diri berkata kepada orang-orang yang dianggap lemah, \"Kamikah yang telah menghalangimu untuk memperoleh petunjuk setelah petunjuk itu datang kepadamu? (Tidak!) Sebenarnya kamu sendirilah orang-orang yang berbuat dosa.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:33",
+   "ar": "وَقَالَ ٱلَّذِينَ ٱسْتُضْعِفُوا۟ لِلَّذِينَ ٱسْتَكْبَرُوا۟ بَلْ مَكْرُ ٱلَّيْلِ وَٱلنَّهَارِ إِذْ تَأْمُرُونَنَآ أَن نَّكْفُرَ بِٱللَّهِ وَنَجْعَلَ لَهُۥٓ أَندَادًا وَأَسَرُّوا۟ ٱلنَّدَامَةَ لَمَّا رَأَوُا۟ ٱلْعَذَابَ وَجَعَلْنَا ٱلْأَغْلَٰلَ فِىٓ أَعْنَاقِ ٱلَّذِينَ كَفَرُوا۟ هَلْ يُجْزَوْنَ إِلَّا مَا كَانُوا۟ يَعْمَلُونَ",
+   "translation": {
+    "text": "Dan orang-orang yang dianggap lemah berkata kepada orang-orang yang menyombongkan diri, \"(Tidak!) Sebenarnya tipu daya(mu) pada waktu malam dan siang (yang menghalangi kami), ketika kamu menyeru kami agar kami kafir kepada Allah dan menjadikan sekutu-sekutu bagi-Nya.\" Mereka menyatakan penyesalan ketika mereka melihat azab. Dan Kami pasangkan belenggu di leher orang-orang yang kafir. Mereka tidak dibalas melainkan sesuai dengan apa yang telah mereka kerjakan.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:35",
+   "ar": "وَقَالُوا۟ نَحْنُ أَكْثَرُ أَمْوَٰلًا وَأَوْلَٰدًا وَمَا نَحْنُ بِمُعَذَّبِينَ",
+   "translation": {
+    "text": "Dan mereka berkata, \"Kami memiliki lebih banyak harta dan anak-anak (daripada kamu) dan kami tidak akan diazab.\"[699]",
+    "footnotes": [
+     "[699] Oleh karena orang-orang kafir itu mendapat nikmat yang besar di dunia, maka mereka merasa bahwa mereka dikasihi Allah dan tidak akan diazab di akhirat."
+    ]
+   }
+  },
+  {
+   "loc": "34:36",
+   "ar": "قُلْ إِنَّ رَبِّى يَبْسُطُ ٱلرِّزْقَ لِمَن يَشَآءُ وَيَقْدِرُ وَلَٰكِنَّ أَكْثَرَ ٱلنَّاسِ لَا يَعْلَمُونَ",
+   "translation": {
+    "text": "Katakanlah, \"Sungguh, Tuhanku melapangkan rezeki bagi siapa yang Dia kehendaki dan membatasinya (bagi siapa yang Dia kehendaki), tetapi kebanyakan manusia tidak mengetahui.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:37",
+   "ar": "وَمَآ أَمْوَٰلُكُمْ وَلَآ أَوْلَٰدُكُم بِٱلَّتِى تُقَرِّبُكُمْ عِندَنَا زُلْفَىٰٓ إِلَّا مَنْ ءَامَنَ وَعَمِلَ صَٰلِحًا فَأُو۟لَٰٓئِكَ لَهُمْ جَزَآءُ ٱلضِّعْفِ بِمَا عَمِلُوا۟ وَهُمْ فِى ٱلْغُرُفَٰتِ ءَامِنُونَ",
+   "translation": {
+    "text": "Dan bukanlah harta dan anak-anakmu yang mendekatkan kamu kepada Kami; melainkan orang-orang yang beriman dan mengerjakan kebajikan, mereka itulah yang memperoleh balasan yang berlipat ganda atas apa yang telah mereka kerjakan; dan mereka aman sentosa di tempat-tempat yang tinggi (dalam surga).",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:38",
+   "ar": "وَٱلَّذِينَ يَسْعَوْنَ فِىٓ ءَايَٰتِنَا مُعَٰجِزِينَ أُو۟لَٰٓئِكَ فِى ٱلْعَذَابِ مُحْضَرُونَ",
+   "translation": {
+    "text": "Dan orang-orang yang berusaha menentang ayat-ayat Kami melemahkan (menggagalkan azab Kami), mereka itu dimasukkan ke dalam azab.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:39",
+   "ar": "قُلْ إِنَّ رَبِّى يَبْسُطُ ٱلرِّزْقَ لِمَن يَشَآءُ مِنْ عِبَادِهِۦ وَيَقْدِرُ لَهُۥ وَمَآ أَنفَقْتُم مِّن شَىْءٍ فَهُوَ يُخْلِفُهُۥ وَهُوَ خَيْرُ ٱلرَّٰزِقِينَ",
+   "translation": {
+    "text": "Katakanlah, \"Sungguh, Tuhanku melapangkan rezeki dan membatasinya bagi siapa yang Dia kehendaki di antara hamba-hamba-Nya.\" Dan apa saja yang kamu infakkan, Allah akan menggantinya dan Dialah pemberi rezeki yang terbaik.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:43",
+   "ar": "وَإِذَا تُتْلَىٰ عَلَيْهِمْ ءَايَٰتُنَا بَيِّنَٰتٍ قَالُوا۟ مَا هَٰذَآ إِلَّا رَجُلٌ يُرِيدُ أَن يَصُدَّكُمْ عَمَّا كَانَ يَعْبُدُ ءَابَآؤُكُمْ وَقَالُوا۟ مَا هَٰذَآ إِلَّآ إِفْكٌ مُّفْتَرًى وَقَالَ ٱلَّذِينَ كَفَرُوا۟ لِلْحَقِّ لَمَّا جَآءَهُمْ إِنْ هَٰذَآ إِلَّا سِحْرٌ مُّبِينٌ",
+   "translation": {
+    "text": "Dan apabila dibacakan kepada mereka ayat-ayat Kami yang terang, mereka berkata, \"Orang ini tidak lain hanya ingin menghalang-halangi kamu dari apa yang disembah oleh nenek moyangmu,\" dan mereka berkata, \"(Al-Qur`an) ini tidak lain hanyalah kebohongan yang diada-adakan saja.\" Dan orang-orang kafir berkata terhadap kebenaran ketika kebenaran (Al-Qur`an) itu datang kepada mereka, \"Ini tidak lain hanyalah sihir yang nyata.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:45",
+   "ar": "وَكَذَّبَ ٱلَّذِينَ مِن قَبْلِهِمْ وَمَا بَلَغُوا۟ مِعْشَارَ مَآ ءَاتَيْنَٰهُمْ فَكَذَّبُوا۟ رُسُلِى فَكَيْفَ كَانَ نَكِيرِ",
+   "translation": {
+    "text": "Dan orang-orang yang sebelum mereka telah mendustakan (para rasul) sedang orang-orang (kafir Mekkah) itu belum sampai menerima sepersepuluh dari apa[701] yang telah Kami berikan kepada orang-orang terdahulu, namun mereka mendustakan para rasul-Ku. Maka (lihatlah) bagaimana dahsyatnya akibat kemurkaan-Ku.",
+    "footnotes": [
+     "[701] Pemberian Allah tentang kepandaian ilmu pengetahuan, umur panjang, kekuatan jasmani, kekayaan harta benda dan lain sebagainya."
+    ]
+   }
+  },
+  {
+   "loc": "34:46",
+   "ar": "قُلْ إِنَّمَآ أَعِظُكُم بِوَٰحِدَةٍ أَن تَقُومُوا۟ لِلَّهِ مَثْنَىٰ وَفُرَٰدَىٰ ثُمَّ تَتَفَكَّرُوا۟ مَا بِصَاحِبِكُم مِّن جِنَّةٍ إِنْ هُوَ إِلَّا نَذِيرٌ لَّكُم بَيْنَ يَدَىْ عَذَابٍ شَدِيدٍ",
+   "translation": {
+    "text": "Katakanlah, \"Aku hendak memperingatkan kepadamu satu hal saja, yaitu agar kamu menghadap Allah (dengan ikhlas) berdua-dua atau sendiri-sendiri;[702] kemudian agar kamu pikirkan (tentang Muhammad). Kawanmu itu tidak gila sedikit pun. Dia tidak lain hanyalah seorang pemberi peringatan bagi kamu sebelum (menghadapi) azab yang keras.\"",
+    "footnotes": [
+     "[702] “Berdua-dua atau sendiri-sendiri” maksudnya ialah bahwa dalam menghadap kepada Allah, kemudian merenungkan keadaan Nabi Muhammad -ṣallallāhu 'alaihi wa sallam- sebaiknya dilakukan dalam keadaan suasana tenang, dan ini tidak dapat dilakukan dalam keadaan beramai-ramai."
+    ]
+   }
+  },
+  {
+   "loc": "34:49",
+   "ar": "قُلْ جَآءَ ٱلْحَقُّ وَمَا يُبْدِئُ ٱلْبَٰطِلُ وَمَا يُعِيدُ",
+   "translation": {
+    "text": "Katakanlah, \"Kebenaran telah datang dan yang batil itu tidak akan memulai dan tidak (pula) akan mengulangi.\"[704]",
+    "footnotes": [
+     "[704] Apabila kebenaran sudah datang maka kebatilan akan hancur binasa dan tidak dapat berbuat sesuatu untuk melawan dan meruntuhkan kebenaran."
+    ]
+   }
+  },
+  {
+   "loc": "34:51",
+   "ar": "وَلَوْ تَرَىٰٓ إِذْ فَزِعُوا۟ فَلَا فَوْتَ وَأُخِذُوا۟ مِن مَّكَانٍ قَرِيبٍ",
+   "translation": {
+    "text": "Dan (alangkah mengerikan) sekiranya engkau melihat mereka (orang-orang kafir) ketika terperanjat ketakutan (pada hari Kiamat); lalu mereka tidak dapat melepaskan diri, dan mereka ditangkap dari tempat yang dekat (untuk dibawa ke neraka).",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "34:52",
+   "ar": "وَقَالُوٓا۟ ءَامَنَّا بِهِۦ وَأَنَّىٰ لَهُمُ ٱلتَّنَاوُشُ مِن مَّكَانٍۭ بَعِيدٍ",
+   "translation": {
+    "text": "Dan (ketika) mereka berkata, \"Kami beriman kepada-Nya.\" Namun bagaimana mereka dapat mencapai (keimanan) dari tempat yang jauh?[705]",
+    "footnotes": [
+     "[705] Setelah mereka melihat bagaimana dahsyatnya azab pada hari Kiamat, maka mereka baru mau beriman kepada Allah dan Rasul-Nya padahal tempat beriman itu sudah jauh yaitu di dunia."
+    ]
+   }
+  },
+  {
+   "loc": "34:54",
+   "ar": "وَحِيلَ بَيْنَهُمْ وَبَيْنَ مَا يَشْتَهُونَ كَمَا فُعِلَ بِأَشْيَاعِهِم مِّن قَبْلُ إِنَّهُمْ كَانُوا۟ فِى شَكٍّ مُّرِيبٍۭ",
+   "translation": {
+    "text": "Dan diberi penghalang antara mereka dengan apa yang mereka inginkan[706] sebagaimana yang dilakukan terhadap orang-orang yang sepaham dengan mereka yang terdahulu. Sesungguhnya mereka dahulu (di dunia) dalam keraguan yang mendalam.",
+    "footnotes": [
+     "[706] Yang mereka inginkan itu ialah beriman kepada Allah atau kembali ke dunia untuk bertobat."
+    ]
+   }
+  }
+ ]
+}
