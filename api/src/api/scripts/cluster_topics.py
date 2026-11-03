@@ -94,6 +94,45 @@ DAY_TZ = "Asia/Jakarta"
 # don't accidentally exclude content that just hasn't been re-classified.
 MIN_OPPORTUNITY_FOR_DISCOVERY = 0.4
 
+# Whether the score decides what enters the corpus (the 0.4 floor above, and
+# ranking each day by score × engagement). OFF since 2026-11-03: the score came
+# back through the Claude batch, but from August until then nearly every post
+# had none, so the floor let everything through and each day was simply its
+# newest PER_DAY_CAP posts. Every manual recluster since was tuned on that
+# corpus, and briefings read their headlines from it. On July's scores the floor
+# would keep 22% of Teknologi & AI and 29% of Ekonomi & Bisnis, which thins
+# those briefings' topic headlines. Turning this on is an operator decision.
+# While off, only a score of exactly 0 is kept out: as before, those posts must
+# not reach a topic, where DESC NULLS LAST would rank them over unscored posts.
+OPPORTUNITY_SHAPES_CORPUS = False
+
+
+def _corpus_floor(apply_opportunity_floor: bool) -> Any | None:
+    """The WHERE clause keeping low-score posts out of the corpus, if any."""
+    if not apply_opportunity_floor:
+        return None
+    floor = (
+        SocialPost.dawah_opportunity >= MIN_OPPORTUNITY_FOR_DISCOVERY
+        if OPPORTUNITY_SHAPES_CORPUS
+        else SocialPost.dawah_opportunity > 0
+    )
+    return sql_or(SocialPost.dawah_opportunity.is_(None), floor)
+
+
+def _corpus_day_order() -> tuple[Any, ...]:
+    """How posts are ranked inside a WIB day before PER_DAY_CAP cuts them."""
+    if not OPPORTUNITY_SHAPES_CORPUS:
+        return (SocialPost.posted_at.desc(),)
+    # Composite ranking: dawah_opportunity × engagement_score. For mainstream
+    # RSS rows (no engagement metrics), engagement_score is NULL → fallback to
+    # 1.0 so opportunity alone drives the sort. For YouTube rows both factors
+    # multiply: high-relevance content that's actually being watched floats to
+    # the top.
+    composite = func.coalesce(SocialPost.dawah_opportunity, 0.0) * func.coalesce(
+        SocialPost.engagement_score, 1.0
+    )
+    return (composite.desc(), SocialPost.posted_at.desc())
+
 # Sentinel platform for the unified topic set. All discovered topics are
 # stored under this value; the per-platform breakdown is derived from
 # each post's own `social_posts.platform` downstream.
@@ -134,18 +173,6 @@ async def _fetch_recent_posts() -> list[dict[str, Any]]:
         day_bucket = func.date_trunc(
             "day", func.timezone(DAY_TZ, SocialPost.posted_at)
         )
-        # Composite ranking: dawah_opportunity × engagement_score.
-        # For mainstream RSS rows (no engagement metrics), engagement_score
-        # is NULL → fallback to 1.0 so opportunity alone drives the sort.
-        # For YouTube rows, both factors multiply: high-relevance content
-        # that's actually being watched floats to the top. The score is
-        # used ONLY for sample selection inside the day partition; the
-        # 0.4 opportunity floor still gates entry into the pool.
-        composite_score = (
-            func.coalesce(SocialPost.dawah_opportunity, 0.0)
-            * func.coalesce(SocialPost.engagement_score, 1.0)
-        )
-
         async def _sample(apply_opportunity_floor: bool) -> list[dict[str, Any]]:
             ranked_q = select(
                 SocialPost.id,
@@ -155,18 +182,13 @@ async def _fetch_recent_posts() -> list[dict[str, Any]]:
                 func.row_number()
                 .over(
                     partition_by=day_bucket,
-                    order_by=(composite_score.desc(), SocialPost.posted_at.desc()),
+                    order_by=_corpus_day_order(),
                 )
                 .label("rn"),
             ).where(SocialPost.posted_at >= window_start)
-            if apply_opportunity_floor:
-                ranked_q = ranked_q.where(
-                    sql_or(
-                        SocialPost.dawah_opportunity.is_(None),
-                        SocialPost.dawah_opportunity
-                        >= MIN_OPPORTUNITY_FOR_DISCOVERY,
-                    )
-                )
+            floor = _corpus_floor(apply_opportunity_floor)
+            if floor is not None:
+                ranked_q = ranked_q.where(floor)
             ranked = ranked_q.subquery()
 
             res = await session.execute(

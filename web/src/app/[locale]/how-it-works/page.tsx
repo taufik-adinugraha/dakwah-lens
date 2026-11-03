@@ -417,7 +417,7 @@ function IngestionPipeline({ t }: { t: T }) {
     },
     {
       title: t("ingest_stage_3_title"),
-      module: "services/sentiment.py · relevance.py",
+      module: "services/claude_labels.py",
       body: t("ingest_stage_3_body"),
     },
     {
@@ -427,7 +427,7 @@ function IngestionPipeline({ t }: { t: T }) {
     },
     {
       title: t("ingest_stage_5_title"),
-      module: "scripts/cluster_topics.py → topics",
+      module: "services/claude_recluster.py → topics",
       body: t("ingest_stage_5_body"),
     },
   ];
@@ -866,6 +866,13 @@ function BriefingAnatomy({ t }: { t: T }) {
 
 function ModelsTable({ t }: { t: T }) {
   const rows = [
+    {
+      name: "Claude Sonnet 5.5",
+      id: "claude-sonnet-5-5",
+      role: t("models_sonnet55_role"),
+      why: t("models_sonnet55_why"),
+      where: t("models_sonnet55_where"),
+    },
     {
       name: "Gemini 2.5 Flash-Lite",
       id: "gemini-2.5-flash-lite",

@@ -203,11 +203,11 @@ export default async function QueriesPage({
           <strong>~58 keywords × 18.5 runs/week ≈ 1,073 scrapes/week.</strong>
         </p>
         <p>
-          The downstream Gemini relevance classifier filters every scraped
-          post into the 9 PRD da&apos;wah categories before anything reaches the
-          dashboard. Broad societal queries (<code>pinjol</code>,{" "}
-          <code>burnout</code>) surface real ummah concerns, then the
-          classifier picks the religiously-relevant subset.
+          The nightly Claude batch labels every scraped post with a theme
+          group, sentiment and da&apos;wah-opportunity score. Broad societal
+          queries (<code>pinjol</code>, <code>burnout</code>) surface real
+          ummah concerns, then the score ranks the religiously-relevant subset
+          higher.
         </p>
         <p>
           <strong>Disable rather than delete</strong> when in doubt — disabled

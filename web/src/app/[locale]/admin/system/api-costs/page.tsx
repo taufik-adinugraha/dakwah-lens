@@ -179,8 +179,8 @@ export default async function ApiCostsPage() {
         </p>
         <p>
           <strong>Providers tracked:</strong> OpenAI (Qur&apos;an embeddings),
-          Gemini (relevance classifier + brief synthesis), Anthropic (brief
-          synthesis fallback), Apify (X / Instagram / TikTok), YouTube Data
+          Gemini (brief synthesis + daleel rerank), Anthropic (nightly labels,
+          weekly topics + brief synthesis fallback), Apify (X / Instagram / TikTok), YouTube Data
           API (quota units), RSS (free — volume tracking only), and{" "}
           Resend (transactional email — verification + password reset).
           Resend&apos;s free tier covers 3,000 emails/month, so cost rows show
