@@ -17,7 +17,11 @@ import {
   parsePage,
   parseRank,
   percent,
+  placeOf,
+  rowVoice,
   searchRows,
+  voiceUrl,
+  wordClip,
   wordsFileName,
 } from "./kosakata-core";
 
@@ -40,6 +44,13 @@ describe("the data files", () => {
       const { words } = KosakataWordsFile.parse(read(wordsFileName((page - 1) * 100 + 1)));
       for (const w of words) {
         expect(wordsFileName(w.rank)).toBe(wordsFileName((page - 1) * 100 + 1));
+        // The list and the word page play the same recording, the file the build names.
+        const row = rowVoice(index.rows[w.rank - 1].v);
+        expect(row.loc, w.lemma).toBe(w.voice.loc);
+        expect(row.clip, w.lemma).toEqual(wordClip(w.voice));
+        expect(voiceUrl(w.voice.loc), w.lemma).toBe(w.voice.url);
+        expect(w.voice.end, w.lemma).toBeLessThanOrEqual(w.voice.ms);
+        expect(index.names[placeOf(w.voice.loc).surah], w.lemma).toBeTruthy();
         for (const s of w.senses) {
           for (const loc of s.ayat) {
             const r = parseAyahLoc(loc);
@@ -51,6 +62,17 @@ describe("the data files", () => {
       }
     }
   }, 60_000);
+
+  it("builds a word's address the way the pipeline does", () => {
+    expect(voiceUrl("2:30:2")).toBe("/belajar/media/narration/quran-com/wbw/002_030_002.mp3");
+    expect(voiceUrl("114:6:3")).toBe("/belajar/media/narration/quran-com/wbw/114_006_003.mp3");
+    expect(rowVoice("2:30:2 29 760").clip).toEqual({
+      url: "/belajar/media/narration/quran-com/wbw/002_030_002.mp3",
+      start: 29,
+      end: 760,
+      source: "quran.com",
+    });
+  });
 
   it("names every surah, and the operator's reading of nasiya is there", () => {
     expect(Object.keys(index.names)).toHaveLength(114);

@@ -369,21 +369,25 @@ async function frequencyList() {
   const list = await get("/belajar/id/kosakata");
   if (list.status !== 200) fail("/kosakata", `status ${list.status}, expected 200`);
   else if (!visibleText(list.html).includes(index.rows[0].translit)) fail("/kosakata", "the first word is not listed");
+  if (!list.html.includes(`data-clip="${index.rows[0].v.split(" ")[0]}"`)) fail("/kosakata", "the first word has no play button");
   const second = await get("/belajar/id/kosakata?hal=2");
   if (!visibleText(second.html).includes(index.rows[100].translit)) fail("/kosakata?hal=2", "page 2 does not start at word 101");
   const found = await get(`/belajar/id/kosakata?q=${encodeURIComponent("tangan")}`);
   if (!/href="[^"]*\/kosakata\/kata\/\d+"/.test(found.html)) fail("/kosakata?q=", "the search found nothing for 'tangan'");
+  if (!/data-clip="\d+:\d+:\d+"/.test(found.html)) fail("/kosakata?q=", "the search results have no play button");
   const words = JSON.parse(await readFile(new URL("words-001.json", DIR), "utf8")).words;
   const word = await get(`/belajar/id/kosakata/kata/${words[0].rank}`);
   if (word.status !== 200) fail("/kosakata/kata/1", `status ${word.status}, expected 200`);
   if (!word.html.includes(`data-ayah-chip="${words[0].senses[0].ayat[0]}"`)) fail("/kosakata/kata/1", "no ayah chip for its first sense");
+  if (!word.html.includes(`data-clip="${words[0].voice.loc}"`)) fail("/kosakata/kata/1", "no play button");
+  if (!visibleText(word.html).includes(words[0].voice.form)) fail("/kosakata/kata/1", "it does not say which form is heard");
   if ((await get("/belajar/id/kosakata/kata/999999")).status !== 404) fail("/kosakata/kata/999999", "an unknown rank must answer 404");
   const loc = words[0].senses[0].ayat[0];
   const ayah = await fetch(`${BASE}/belajar/api/ayah?loc=${loc}`);
   if (ayah.status !== 200) fail(`/api/ayah?loc=${loc}`, `status ${ayah.status}, expected 200`);
   const en = await get("/belajar/en/kosakata");
   if (!visibleText(en.html).includes(index.rows[0].en.split(";")[0])) fail("/en/kosakata", "the English meaning is not shown");
-  console.log("kosakata list: pages, search, a word and the ayah popup answer");
+  console.log("kosakata list: pages, search, a word, its play buttons and the ayah popup answer");
 }
 
 async function checkHidden() {

@@ -50,6 +50,7 @@ python3 test_validate_compose.py   # plants 78 faults in copies of the compositi
 python3 build_kosakata.py           # ../content/kosakata/: the Qur'an vocabulary list, from QAC, Tanzil, QuranEnc and authored/kosakata_meanings.json
 python3 validate_kosakata.py        # the list against the meanings, the pins and a fresh build (CI: --no-corpus); exit 1 on any problem
 python3 test_validate_kosakata.py   # plants faults in copies of the list and the meanings (a typed headword, an edited meaning, a citation where the word does not occur, …)
+python3 build_kosakata_voice.py --check  # each Kosakata word's recording is the place the rule chooses, Quran.com's text of it agrees, and its pin is sound (kosakata_voice.py; validate_kosakata.py checks the pins in CI); --fetch pins new ones, --upload-list prepares the upload
 python3 validate_terms.py          # Konsep terms in Arabic script + inline markup (CI: --no-corpus); see "Konsep"
 python3 test_validate_terms.py     # plants 54 faults (retyped term, unmarked term, wrong word bytes, a ref whose Latin names other bytes, ketuk, a gloss variant whose ref does not resolve, Arabic typed by hand, a marked lesson or Kosakata twin that drifted, …)
 python3 validate_clips.py          # the imam's voice of every Konsep example: library.json `clips` (CI: --no-corpus); see "Suara contoh"

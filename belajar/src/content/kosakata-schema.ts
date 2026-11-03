@@ -16,6 +16,26 @@ export const KosakataSense = z.object({
   ayat: Locations,
 });
 
+/**
+ * The word's recording: our unaltered copy of Quran.com's recording of one real place in the Qur'an
+ * (pipeline/kosakata_voice.py chooses it, kosakata_voice.json pins it). A lemma has no recording of
+ * its own, so the page says which form is heard and where.
+ */
+export const KosakataVoice = z.object({
+  /** The word as written at that place, verbatim from Tanzil: what is heard. */
+  form: z.string().min(1),
+  loc: z.string().regex(/^[1-9]\d{0,2}:[1-9]\d{0,2}:[1-9]\d{0,2}$/),
+  url: z.string().regex(/^\/belajar\/media\/narration\/quran-com\/wbw\/\d{3}_\d{3}_\d{3}\.mp3$/),
+  ms: z.number().int().positive(),
+  /** The word inside its file, in milliseconds. */
+  start: z.number().int().nonnegative(),
+  end: z.number().int().positive(),
+  sha256: z.string().regex(/^[0-9a-f]{64}$/),
+  /** true (never false) when that place ends its ayah, so the word is read in its stop form. */
+  final: z.literal(true).optional(),
+});
+export type KosakataVoice = z.infer<typeof KosakataVoice>;
+
 export const KosakataWord = z.object({
   rank: z.number().int().positive(),
   /** QAC's lemma, in Buckwalter: the word's key. */
@@ -31,6 +51,7 @@ export const KosakataWord = z.object({
   review: z.enum(["passed", "corrected", "disputed"]),
   /** The lesson Kosakata entry that explains this word in full, when there is one. */
   lexeme: z.string().optional(),
+  voice: KosakataVoice,
 });
 export type KosakataWord = z.infer<typeof KosakataWord>;
 
@@ -49,6 +70,8 @@ export const KosakataRow = z.object({
   cum: z.number().int().min(0).max(10000),
   /** Folded search text: headword, transliteration and every gloss. */
   s: z.string().min(1),
+  /** The word's recording, as "<loc> <start> <end>": one short string, because the index stays in the container's memory. */
+  v: z.string().regex(/^[1-9]\d{0,2}:[1-9]\d{0,2}:[1-9]\d{0,2} \d+ \d+$/),
 });
 export type KosakataRow = z.infer<typeof KosakataRow>;
 

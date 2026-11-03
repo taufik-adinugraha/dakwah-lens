@@ -3,10 +3,11 @@ import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
+import { ClipButton, ClipPageStatus, ClipPlayerProvider } from "@/components/library/ClipButton";
 import { MixedText } from "@/components/library/MixedText";
 import { Link } from "@/i18n/navigation";
 import { kosakataIndex } from "@/lib/kosakata";
-import { MILESTONES, pageCount, pageOfRank, pageRows, parsePage, percent, searchRows } from "@/lib/kosakata-core";
+import { MILESTONES, pageCount, pageOfRank, pageRows, parsePage, percent, rowVoice, searchRows } from "@/lib/kosakata-core";
 import { kosakataHref, kosakataWordHref } from "@/lib/routes";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata">): Promise<Metadata> {
@@ -18,8 +19,10 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata
 /**
  * The Qur'an vocabulary list (operator 2026-11-03: every word of the Qur'an, ranked by frequency
  * only, meanings in Indonesian and English). A page of 100 words at a time (`?hal=`) or the search
- * (`?q=`), both answered on the server from the light index, with a plain GET form: no script, and
- * nothing of the 4,832 rows reaches the browser but the ones shown.
+ * (`?q=`), both answered on the server from the light index, with a plain GET form: nothing of the
+ * 4,832 rows reaches the browser but the ones shown. Each row plays its word (operator 2026-11-03:
+ * "we should also provide the audio of each word so user can listen how it's read"); nothing is
+ * fetched ahead here, because a page holds a hundred words and a press loads one small file.
  */
 export default async function KosakataPage({ params, searchParams }: PageProps<"/[locale]/kosakata">) {
   const { locale } = await params;
@@ -113,26 +116,33 @@ export default async function KosakataPage({ params, searchParams }: PageProps<"
           ) : null}
 
           {shown.length > 0 ? (
-            <ol className="mt-3 divide-y divide-hairline rounded-2xl border border-hairline bg-white">
-              {shown.map((r) => (
-                <li key={r.rank}>
-                  <Link
-                    href={kosakataWordHref(r.rank)}
-                    className="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 transition-colors hover:bg-paper-deep"
-                  >
-                    <span className="text-sm text-ink-soft tabular-nums">{nf.format(r.rank)}</span>
-                    <span className="min-w-0">
-                      <span className="block text-base font-semibold text-ink">{r.translit}</span>
-                      <span className="block text-base text-forest">{locale === "en" ? r.en : r.id}</span>
-                      <span className="block text-sm text-ink-soft">{t("row_count", { count: r.count })}</span>
-                    </span>
-                    <span lang="ar" dir="rtl" className="arabic-inline text-ar-md text-ink">
-                      {r.ar}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ol>
+            <ClipPlayerProvider>
+              <ol className="mt-3 divide-y divide-hairline rounded-2xl border border-hairline bg-white">
+                {shown.map((r) => {
+                  const voice = rowVoice(r.v);
+                  return (
+                    <li key={r.rank} className="grid grid-cols-[minmax(0,1fr)_auto] items-center pe-3 transition-colors hover:bg-paper-deep">
+                      <Link
+                        href={kosakataWordHref(r.rank)}
+                        className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)_auto] items-center gap-2 py-2 ps-3 pe-2 sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:gap-3 sm:ps-4"
+                      >
+                        <span className="text-sm text-ink-soft tabular-nums">{nf.format(r.rank)}</span>
+                        <span className="min-w-0">
+                          <span className="block text-base font-semibold text-ink">{r.translit}</span>
+                          <span className="block text-base text-forest">{locale === "en" ? r.en : r.id}</span>
+                          <span className="block text-sm text-ink-soft">{t("row_count", { count: r.count })}</span>
+                        </span>
+                        <span lang="ar" dir="rtl" className="arabic-inline text-ar-md text-ink">
+                          {r.ar}
+                        </span>
+                      </Link>
+                      <ClipButton compact loc={voice.loc} clip={voice.clip} word={r.translit} />
+                    </li>
+                  );
+                })}
+              </ol>
+              <ClipPageStatus />
+            </ClipPlayerProvider>
           ) : null}
         </section>
 

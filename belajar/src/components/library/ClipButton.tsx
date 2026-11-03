@@ -62,6 +62,9 @@ function LoadingMark({ className }: { className?: string }) {
  *   two as they sound ("tabārakasmu"). `noteId`: the id of the line that says what is heard when
  *   it is not what is written (ClipNote: the imam's stop at an ayah's end, a hamzat washal); the
  *   button is described by it, so a screen reader says it after the button's name.
+ * - `compact`: the icon alone, still 48px and still named in full for a screen reader, for a list with
+ *   one button per row, where the word "Dengarkan" a hundred times is noise. The load and a failure
+ *   are said once, by the page's ClipPageStatus; the button shows only the turning mark.
  * - Without a ClipPlayerProvider above it, nothing is drawn.
  */
 export function ClipButton({
@@ -70,12 +73,14 @@ export function ClipButton({
   word,
   noteId,
   className,
+  compact = false,
 }: {
   loc: string;
   clip: Clip;
   word: string;
   noteId?: string;
   className?: string;
+  compact?: boolean;
 }) {
   const player = useContext(ClipPlayerContext);
   const t = useTranslations("Clip");
@@ -103,6 +108,23 @@ export function ClipButton({
         ? [t(qc ? "retry_label_qc" : "retry_label", { word }), ta("retry")]
         : [t(qc ? "play_label_qc" : "play_label", { word }), t("play")];
   const Icon = view.mode === "stop" ? Square : view.mode === "retry" ? RotateCcw : Play;
+  const state = view.mode === "stop" ? "playing" : view.mode === "retry" ? "failed" : "idle";
+  if (compact) {
+    return (
+      <button
+        type="button"
+        data-clip={loc}
+        data-source={clip.source ?? "imam"}
+        title={qc ? t("source_qc") : clip.source === "elevenlabs" ? t("source_ai") : undefined}
+        data-state={state}
+        aria-label={label}
+        onClick={() => player.press(id, clip)}
+        className={clsx("btn-listen px-0!", className)}
+      >
+        {view.line === "loading" || view.line === "slow" ? <LoadingMark /> : <Icon aria-hidden className="h-5 w-5 shrink-0" />}
+      </button>
+    );
+  }
   return (
     <span className={clsx("inline-flex max-w-full flex-wrap items-center gap-y-1", className)}>
       <button
@@ -110,7 +132,7 @@ export function ClipButton({
         data-clip={loc}
         data-source={clip.source ?? "imam"}
         title={qc ? t("source_qc") : clip.source === "elevenlabs" ? t("source_ai") : undefined}
-        data-state={view.mode === "stop" ? "playing" : view.mode === "retry" ? "failed" : "idle"}
+        data-state={state}
         aria-label={label}
         aria-describedby={[noteId, line ? statusId : null].filter(Boolean).join(" ") || undefined}
         onClick={() => player.press(id, clip)}
@@ -128,5 +150,30 @@ export function ClipButton({
         ) : null}
       </span>
     </span>
+  );
+}
+
+/**
+ * What the compact buttons do not say themselves: that the word is loading, what to do when that is
+ * slow, and that it failed (the module's rule: never a silent wait). One line for the whole page, in
+ * the same place wherever the row is, and a polite live region that is always present.
+ */
+export function ClipPageStatus() {
+  const player = useContext(ClipPlayerContext);
+  const t = useTranslations("Clip");
+  const ta = useTranslations("Ayah");
+  const tg = useTranslations("Guided");
+  if (!player) return null;
+  const { line } = clipView(player.state, player.state.key ?? "", player.notice);
+  const text = line === "failed" ? t("failed") : line === "slow" ? ta("loading_slow") : line === "loading" ? tg("loading_word") : null;
+  return (
+    <div role="status" aria-live="polite" data-clip-status="" className="pointer-events-none fixed inset-x-4 bottom-4 z-20 flex justify-center">
+      {text ? (
+        <p className="flex max-w-md items-start gap-2 rounded-2xl border border-hairline bg-white px-4 py-3 text-base text-ink shadow-md">
+          {line !== "failed" && <LoadingMark className="mt-0.5 text-forest" />}
+          <span className="min-w-0 text-pretty">{text}</span>
+        </p>
+      ) : null}
+    </div>
   );
 }

@@ -10,7 +10,9 @@ trim — a word is played as [start, end] of its file, as the imam's clips alway
              → /belajar/media/narration/alafasy/<SSS><AAA>.mp3
              every ayah a lesson recites, and every ayah a Konsep / composition example clip is
              cut from (the quran-align word timings stay: they time the same file).
-  quran-com  Quran.com's word-by-word recording of a word (content/wordvoice.json, wordvoice.py)
+  quran-com  Quran.com's word-by-word recording of a word: the lessons' and Konsep's
+             (content/wordvoice.json, wordvoice.py) and each word of the Kosakata list's
+             (kosakata_voice.json, kosakata_voice.py)
              (https://audio.qurancdn.com/wbw/<SSS>_<AAA>_<WWW>.mp3)
              → /belajar/media/narration/quran-com/wbw/<SSS>_<AAA>_<WWW>.mp3
 
@@ -54,6 +56,7 @@ import sys
 import urllib.request
 from pathlib import Path
 
+import kosakata_voice as KV
 import wordvoice as W
 
 PIPELINE = Path(__file__).resolve().parent
@@ -86,7 +89,7 @@ def alafasy_upstream(s: int, a: int) -> str:
 def content_texts(content: Path = CONTENT) -> dict[str, str]:
     """Every content file the app reads, as text (the lessons, the library, the compositions, the
     word voices; the narration manifests carry no recording of these sets)."""
-    files = sorted(content.glob("*.json")) + sorted((content / "compose").glob("*.json"))
+    files = sorted(content.glob("*.json")) + sorted((content / "compose").glob("*.json")) + sorted((content / "kosakata").glob("words-*.json"))
     return {f.relative_to(content).as_posix(): f.read_text(encoding="utf-8") for f in files}
 
 
@@ -125,11 +128,25 @@ def sources_pins() -> dict:
     return (inputs.get("everyayah_alafasy") or {}).get("files") or {}
 
 
+def kosakata_pins() -> dict[str, dict]:
+    """{path under narration/: its pin} of the Kosakata list's recordings."""
+    out = {}
+    for p in KV.load_pins()["words"].values():
+        rel = KV.url_of(p["loc"])[len(NARRATION_PREFIX):]
+        out[rel] = {"upstream": KV.upstream_of(p["loc"]), "sha256": p["sha256"], "ms": p["ms"], "bytes": p["bytes"]}
+    return out
+
+
+_KOSAKATA = kosakata_pins()
+
+
 def pin_of(rel: str, pins: dict, manifest: dict | None) -> dict | None:
     """{upstream, sha256} (+ bytes, ms) of a hosted file: hosted.json for the imam's, the word-voice
-    manifest for Quran.com's."""
+    manifest and kosakata_voice.json for Quran.com's."""
     if rel.startswith("alafasy/"):
         return (pins.get("alafasy") or {}).get(rel.split("/", 1)[1])
+    if rel in _KOSAKATA:
+        return _KOSAKATA[rel]
     for e in ((manifest or {}).get("words") or {}).values():
         a = e.get("audio") or {}
         if e.get("source") == "quran.com" and a.get("url") == NARRATION_PREFIX + rel:
@@ -152,6 +169,11 @@ def local_copy(rel: str) -> Path | None:
 def problems(pins: dict, manifest: dict | None, content: Path = CONTENT, local: bool = True) -> list[str]:
     refs, out = referenced(content)
     ala = pins.get("alafasy") or {}
+    for e in ((manifest or {}).get("words") or {}).values():
+        a = e.get("audio") or {}
+        rel = str(a.get("url", ""))[len(NARRATION_PREFIX):]
+        if e.get("source") == "quran.com" and rel in _KOSAKATA and _KOSAKATA[rel]["sha256"] != a.get("sha256"):
+            out.append(f"{rel}: pinned twice with different bytes (content/wordvoice.json and kosakata_voice.json)")
     src = sources_pins()
     for rel in sorted(refs):
         p = pin_of(rel, pins, manifest)
