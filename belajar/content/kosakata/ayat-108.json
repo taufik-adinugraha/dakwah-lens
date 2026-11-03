@@ -1,0 +1,29 @@
+{
+ "sura": 108,
+ "ayat": [
+  {
+   "loc": "108:1",
+   "ar": "إِنَّآ أَعْطَيْنَٰكَ ٱلْكَوْثَرَ",
+   "translation": {
+    "text": "Sungguh, Kami telah memberimu (Muhammad) nikmat yang banyak.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "108:2",
+   "ar": "فَصَلِّ لِرَبِّكَ وَٱنْحَرْ",
+   "translation": {
+    "text": "Maka laksanakanlah salat karena Tuhanmu, dan berkurbanlah (sebagai ibadah dan mendekatkan diri kepada Allah).",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "108:3",
+   "ar": "إِنَّ شَانِئَكَ هُوَ ٱلْأَبْتَرُ",
+   "translation": {
+    "text": "Sungguh, orang-orang yang membencimu dialah yang terputus (dari rahmat Allah).",
+    "footnotes": []
+   }
+  }
+ ]
+}

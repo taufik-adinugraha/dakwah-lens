@@ -121,5 +121,9 @@ export const conceptIndexHref = () => "/konsep";
 export const conceptHref = (id: string) => `/konsep/${id}`;
 export const lexemeHref = (id: string) => `/kosakata/${id}`;
 
+/** The Qur'an vocabulary list, ranked by frequency: /kosakata, and one word by its rank. */
+export const kosakataHref = () => "/kosakata";
+export const kosakataWordHref = (rank: number) => `/kosakata/kata/${rank}`;
+
 /** Sources & licences. */
 export const creditsHref = () => "/kredit";

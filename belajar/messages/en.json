@@ -20,7 +20,10 @@
     "surah_ayat": "{name} ({ayat} ayat)",
     "concepts_title": "Grammar concepts",
     "concepts_body": "A nahwu and sharaf library: each concept is explained once, then reused in every lesson that contains it.",
-    "concepts_available": "{n, plural, one {# nahwu or sharaf concept} other {# nahwu and sharaf concepts}}"
+    "concepts_available": "{n, plural, one {# nahwu or sharaf concept} other {# nahwu and sharaf concepts}}",
+    "kosakata_title": "Qur'an vocabulary",
+    "kosakata_body": "Every word of the Qur'an, most frequent first, with its meanings and the ayat that show them.",
+    "kosakata_available": "{n, number} words"
   },
   "Quran": {
     "title": "Qur'anic Arabic",
@@ -158,7 +161,9 @@
     "data_versions_body": "For technical checks: the version and file fingerprint (sha256) of every dataset the lesson pages use, exactly as recorded when the lessons were built.",
     "data_versions_summary": "Show data versions (for technical checks)",
     "data_versions_library": "Concept, vocabulary and root library",
-    "data_versions_ayat": "Ayat opened from the “Did you know?” cards"
+    "data_versions_ayat": "Ayat opened from the “Did you know?” cards",
+    "kosakata_heading": "Qur'an vocabulary",
+    "kosakata_body": "Rank, counts, roots and word forms are computed from the Quranic Arabic Corpus 0.4 and the Tanzil text. Ayah translations are from QuranEnc. Word meanings were written with AI (Claude) from the cited ayat, using the QuranEnc and Saheeh International translations, then checked by AI. These meanings do not yet cite a kitab."
   },
   "NotFound": {
     "title": "Page not found",
@@ -380,7 +385,7 @@
     "loading_narration": "Loading the narrator's voice…",
     "loading_word": "Loading the word's recording…",
     "loading_recitation": "Loading the imam's recitation…",
-    "loading_slow": "Still loading. The connection may be slow; wait a moment, or click ↺\u00a0Replay.",
+    "loading_slow": "Still loading. The connection may be slow; wait a moment, or click ↺ Replay.",
     "pause": "Pause",
     "resume": "Resume",
     "next_wait": "Continue",
@@ -477,5 +482,42 @@
     "panel_title": "Text size",
     "panel_body": "All text grows, Arabic included. Your choice is saved on this device.",
     "close": "Close"
+  },
+  "Kosakata": {
+    "title": "Qur'an vocabulary",
+    "intro": "Every word of the Qur'an, {total, number} base words, most frequent first. Start at the top: a few words already cover much of what you read.",
+    "reach_heading": "How far this list takes you",
+    "reach_words": "First {n, number} words",
+    "reach_percent": "{pct}%",
+    "reach_note": "Share of the words in the Qur'an, counted from the Quranic Arabic Corpus 0.4 over {tokens, number} word parts that have a base form. A repeated word counts each time it occurs.",
+    "search_label": "Search a word or meaning",
+    "search_placeholder": "For example: hand, rahim, يد",
+    "search_button": "Search",
+    "search_clear": "Show all words",
+    "search_results": "{count, number} words match “{q}”",
+    "search_capped": "Top {shown, number} of {count, number} words matching “{q}”",
+    "search_none": "No word matches “{q}”. Try another spelling, or search for its meaning.",
+    "list_status": "Words {from, number} to {to, number} of {total, number}",
+    "row_count": "{count, number} times",
+    "pager_label": "Pages of the word list",
+    "pager_status": "Page {page, number} of {pages, number}",
+    "prev": "Previous",
+    "next": "Next",
+    "back": "All vocabulary",
+    "word_eyebrow": "Word {rank} of {total}",
+    "lemma_caption": "Base form, per the Quranic Arabic Corpus",
+    "meanings": "Meanings",
+    "meanings_hint": "Click an ayah to read and hear it.",
+    "chip": "QS {loc}",
+    "occurrences": "Occurrences",
+    "occurrences_value": "{count, number} times in {ayat, number} ayat, across {surahs, number} surahs",
+    "root": "Root",
+    "no_root": "No root",
+    "forms": "Most frequent forms",
+    "full_entry": "Read the full explanation of this word",
+    "word_pager_label": "Other words",
+    "prev_word": "Previous word",
+    "next_word": "Next word",
+    "source_note": "The meanings in this list were written with AI from the cited ayat, using the QuranEnc and Saheeh International translations, then checked by AI. Unlike the Kosakata in the lessons, they do not yet cite a kitab. AI-assisted, not a fatwa."
   }
 }

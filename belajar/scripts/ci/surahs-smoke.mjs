@@ -358,6 +358,34 @@ async function api(expected) {
 // --hidden (production: BELAJAR_SURAHS unset, Al-Fatihah only; the default unlisted surahs answer
 // at their address and are linked from nowhere).
 // ---------------------------------------------------------------------------------------------
+// The Qur'an vocabulary list (/kosakata), on the REAL image: the Dockerfile must have copied
+// content/kosakata beside the server (the app reads it per request, so the build cannot trace it),
+// the list pages and searches, a word opens, and the ayah popup answers an ayah only the list cites.
+async function frequencyList() {
+  const DIR = new URL("../../content/kosakata/", import.meta.url);
+  const index = JSON.parse(await readFile(new URL("index.json", DIR), "utf8"));
+  const hub = await get("/belajar/id");
+  if (!/href="[^"]*\/kosakata"/.test(hub.html)) fail("/belajar/id", "the hub has no card for the vocabulary list");
+  const list = await get("/belajar/id/kosakata");
+  if (list.status !== 200) fail("/kosakata", `status ${list.status}, expected 200`);
+  else if (!visibleText(list.html).includes(index.rows[0].translit)) fail("/kosakata", "the first word is not listed");
+  const second = await get("/belajar/id/kosakata?hal=2");
+  if (!visibleText(second.html).includes(index.rows[100].translit)) fail("/kosakata?hal=2", "page 2 does not start at word 101");
+  const found = await get(`/belajar/id/kosakata?q=${encodeURIComponent("tangan")}`);
+  if (!/href="[^"]*\/kosakata\/kata\/\d+"/.test(found.html)) fail("/kosakata?q=", "the search found nothing for 'tangan'");
+  const words = JSON.parse(await readFile(new URL("words-001.json", DIR), "utf8")).words;
+  const word = await get(`/belajar/id/kosakata/kata/${words[0].rank}`);
+  if (word.status !== 200) fail("/kosakata/kata/1", `status ${word.status}, expected 200`);
+  if (!word.html.includes(`data-ayah-chip="${words[0].senses[0].ayat[0]}"`)) fail("/kosakata/kata/1", "no ayah chip for its first sense");
+  if ((await get("/belajar/id/kosakata/kata/999999")).status !== 404) fail("/kosakata/kata/999999", "an unknown rank must answer 404");
+  const loc = words[0].senses[0].ayat[0];
+  const ayah = await fetch(`${BASE}/belajar/api/ayah?loc=${loc}`);
+  if (ayah.status !== 200) fail(`/api/ayah?loc=${loc}`, `status ${ayah.status}, expected 200`);
+  const en = await get("/belajar/en/kosakata");
+  if (!visibleText(en.html).includes(index.rows[0].en.split(";")[0])) fail("/en/kosakata", "the English meaning is not shown");
+  console.log("kosakata list: pages, search, a word and the ayah popup answer");
+}
+
 async function checkHidden() {
   await api(DEFAULT);
   // `hidden`: not published, so a "Segera hadir" card and no link into it anywhere. `gone`: not even
@@ -554,6 +582,7 @@ async function checkHidden() {
   }
   console.log(`kosakata: ${LIBRARY.lexicon.length} page(s), ${plainPlaces} place(s) in a hidden surah shown as plain text`);
   if (plainPlaces === 0) fail("kosakata", "no word place in a hidden surah was found as plain text");
+  await frequencyList();
   let chipped = 0;
   let imam = 0;
   for (const path of [...DEFAULT.flatMap((s) => lessonPaths("id", s)), "/belajar/id/konsep", "/belajar/id/kredit", "/belajar/en/kredit"]) {

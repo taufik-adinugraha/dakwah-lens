@@ -1,0 +1,47 @@
+{
+ "sura": 99,
+ "ayat": [
+  {
+   "loc": "99:1",
+   "ar": "إِذَا زُلْزِلَتِ ٱلْأَرْضُ زِلْزَالَهَا",
+   "translation": {
+    "text": "Apabila bumi diguncangkan dengan guncangan yang dahsyat,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "99:2",
+   "ar": "وَأَخْرَجَتِ ٱلْأَرْضُ أَثْقَالَهَا",
+   "translation": {
+    "text": "dan bumi telah mengeluarkan beban-beban berat (yang dikandung)nya,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "99:4",
+   "ar": "يَوْمَئِذٍ تُحَدِّثُ أَخْبَارَهَا",
+   "translation": {
+    "text": "Pada hari itu bumi menyampaikan beritanya,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "99:6",
+   "ar": "يَوْمَئِذٍ يَصْدُرُ ٱلنَّاسُ أَشْتَاتًا لِّيُرَوْا۟ أَعْمَٰلَهُمْ",
+   "translation": {
+    "text": "Pada hari itu manusia keluar dari kuburnya dalam keadaan berkelompok-kelompok,[922] untuk diperlihatkan kepada mereka (balasan) semua amal perbuatannya.",
+    "footnotes": [
+     "[922] Ada yang beruntung dan ada yang celaka."
+    ]
+   }
+  },
+  {
+   "loc": "99:7",
+   "ar": "فَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُۥ",
+   "translation": {
+    "text": "Maka barangsiapa mengerjakan kebaikan seberat zarah, niscaya dia akan melihat (balasan)nya.",
+    "footnotes": []
+   }
+  }
+ ]
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ChevronDown } from "lucide-react";
+import { MixedText } from "@/components/library/MixedText";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { AYAT_DATA_VERSIONS } from "@/lib/ayat";
@@ -86,6 +87,15 @@ export default async function CreditsPage({
         <a href="https://quran.com" className="link-text inline-flex min-h-11 items-center text-sm" rel="noopener">
           {t("words_link")}
         </a>
+      </section>
+      {/* The vocabulary list: what is computed, what is AI, and that it cites no kitab. */}
+      <section className="mt-8" aria-labelledby="kosakata-list">
+        <h2 id="kosakata-list" className="text-lg font-semibold text-ink">
+          <MixedText text={t("kosakata_heading")} />
+        </h2>
+        <p className="mt-1 max-w-prose text-base text-ink-muted">
+          <MixedText text={t("kosakata_body")} />
+        </p>
       </section>
       {/* The narrator's voice of the explanations and of what has no word recording
           (src/lib/wordvoice.ts): AI, and said so. */}

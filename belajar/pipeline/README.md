@@ -47,6 +47,9 @@ python3 test_validate_ayat.py      # plants 28 faults (a missing or extra entry,
 python3 build_compose.py           # word compositions + harakat primer + the imam's voice of each bentuk dasar ../content/compose/*.json, and fixtures/compose_examples.json (see "Komposisi kata"); after build_library.py, whose library.json it reads
 python3 validate_compose.py        # composition checks against the corpus, the example voices included (CI: --no-corpus); exit 1 on any failure
 python3 test_validate_compose.py   # plants 78 faults in copies of the compositions and of the examples' fixture (a base frame without its voice, a hamzat-washal form played alone, a clip shifted to the next word, a word that ends its ayah, an untrue reason, a change into a mark that is neither a vowel nor the sukun of jazm, a second file's stale pin, …), each must fail (83; CI: --no-corpus, 77 of them)
+python3 build_kosakata.py           # ../content/kosakata/: the Qur'an vocabulary list, from QAC, Tanzil, QuranEnc and authored/kosakata_meanings.json
+python3 validate_kosakata.py        # the list against the meanings, the pins and a fresh build (CI: --no-corpus); exit 1 on any problem
+python3 test_validate_kosakata.py   # plants faults in copies of the list and the meanings (a typed headword, an edited meaning, a citation where the word does not occur, …)
 python3 validate_terms.py          # Konsep terms in Arabic script + inline markup (CI: --no-corpus); see "Konsep"
 python3 test_validate_terms.py     # plants 54 faults (retyped term, unmarked term, wrong word bytes, a ref whose Latin names other bytes, ketuk, a gloss variant whose ref does not resolve, Arabic typed by hand, a marked lesson or Kosakata twin that drifted, …)
 python3 validate_clips.py          # the imam's voice of every Konsep example: library.json `clips` (CI: --no-corpus); see "Suara contoh"

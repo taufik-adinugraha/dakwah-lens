@@ -1,0 +1,424 @@
+{
+ "sura": 39,
+ "ayat": [
+  {
+   "loc": "39:1",
+   "ar": "تَنزِيلُ ٱلْكِتَٰبِ مِنَ ٱللَّهِ ٱلْعَزِيزِ ٱلْحَكِيمِ",
+   "translation": {
+    "text": "Kitab (Al-Qur`an) ini diturunkan oleh Allah Yang Mahamulia, Mahabijaksana.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:2",
+   "ar": "إِنَّآ أَنزَلْنَآ إِلَيْكَ ٱلْكِتَٰبَ بِٱلْحَقِّ فَٱعْبُدِ ٱللَّهَ مُخْلِصًا لَّهُ ٱلدِّينَ",
+   "translation": {
+    "text": "Sesungguhnya Kami menurunkan Kitab (Al-Qur`an) kepadamu (Muhammad) dengan (membawa) kebenaran. Maka sembahlah Allah dengan tulus ikhlas beragama kepada-Nya.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:3",
+   "ar": "أَلَا لِلَّهِ ٱلدِّينُ ٱلْخَالِصُ وَٱلَّذِينَ ٱتَّخَذُوا۟ مِن دُونِهِۦٓ أَوْلِيَآءَ مَا نَعْبُدُهُمْ إِلَّا لِيُقَرِّبُونَآ إِلَى ٱللَّهِ زُلْفَىٰٓ إِنَّ ٱللَّهَ يَحْكُمُ بَيْنَهُمْ فِى مَا هُمْ فِيهِ يَخْتَلِفُونَ إِنَّ ٱللَّهَ لَا يَهْدِى مَنْ هُوَ كَٰذِبٌ كَفَّارٌ",
+   "translation": {
+    "text": "Ingatlah! Hanya milik Allah agama yang murni (dari syirik). Dan orang-orang yang mengambil pelindung selain Dia (berkata), \"Kami tidak menyembah mereka melainkan (berharap) agar mereka mendekatkan kami kepada Allah dengan sedekat-dekatnya.\" Sungguh, Allah akan memberi putusan di antara mereka tentang apa yang mereka perselisihkan. Sungguh, Allah tidak memberi petunjuk kepada pendusta dan orang yang sangat ingkar.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:5",
+   "ar": "خَلَقَ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضَ بِٱلْحَقِّ يُكَوِّرُ ٱلَّيْلَ عَلَى ٱلنَّهَارِ وَيُكَوِّرُ ٱلنَّهَارَ عَلَى ٱلَّيْلِ وَسَخَّرَ ٱلشَّمْسَ وَٱلْقَمَرَ كُلٌّ يَجْرِى لِأَجَلٍ مُّسَمًّى أَلَا هُوَ ٱلْعَزِيزُ ٱلْغَفَّٰرُ",
+   "translation": {
+    "text": "Dia menciptakan langit dan bumi dengan (tujuan) yang benar; Dia memasukkan malam atas siang dan memasukkan siang atas malam dan menundukkan matahari dan bulan, masing-masing berjalan menurut waktu yang ditentukan. Ingatlah! Dialah Yang Mahamulia, Maha Pengampun.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:6",
+   "ar": "خَلَقَكُم مِّن نَّفْسٍ وَٰحِدَةٍ ثُمَّ جَعَلَ مِنْهَا زَوْجَهَا وَأَنزَلَ لَكُم مِّنَ ٱلْأَنْعَٰمِ ثَمَٰنِيَةَ أَزْوَٰجٍ يَخْلُقُكُمْ فِى بُطُونِ أُمَّهَٰتِكُمْ خَلْقًا مِّنۢ بَعْدِ خَلْقٍ فِى ظُلُمَٰتٍ ثَلَٰثٍ ذَٰلِكُمُ ٱللَّهُ رَبُّكُمْ لَهُ ٱلْمُلْكُ لَآ إِلَٰهَ إِلَّا هُوَ فَأَنَّىٰ تُصْرَفُونَ",
+   "translation": {
+    "text": "Dia menciptakan kamu dari diri yang satu (Adam), kemudian darinya Dia jadikan pasangannya. Dan Dia menurunkan delapan pasang hewan ternak untukmu. Dia menjadikan kamu dalam perut ibumu kejadian demi kejadian dalam tiga kegelapan.[757] Yang (berbuat) demikian itu adalah Allah, Tuhan kamu, Tuhan Yang memiliki kerajaan. Tidak ada tuhan selain Dia; maka mengapa kamu dapat dipalingkan?",
+    "footnotes": [
+     "[757] Tiga kegelapan itu ialah kegelapan dalam perut, kegelapan dalam rahim dan kegelapan dalam selaput yang menutup anak dalam rahim."
+    ]
+   }
+  },
+  {
+   "loc": "39:7",
+   "ar": "إِن تَكْفُرُوا۟ فَإِنَّ ٱللَّهَ غَنِىٌّ عَنكُمْ وَلَا يَرْضَىٰ لِعِبَادِهِ ٱلْكُفْرَ وَإِن تَشْكُرُوا۟ يَرْضَهُ لَكُمْ وَلَا تَزِرُ وَازِرَةٌ وِزْرَ أُخْرَىٰ ثُمَّ إِلَىٰ رَبِّكُم مَّرْجِعُكُمْ فَيُنَبِّئُكُم بِمَا كُنتُمْ تَعْمَلُونَ إِنَّهُۥ عَلِيمٌۢ بِذَاتِ ٱلصُّدُورِ",
+   "translation": {
+    "text": "Jika kamu kafir, maka (ketahuilah) sesungguhnya Allah tidak memerlukanmu[758] dan Dia tidak meridai kekafiran hamba-hamba-Nya. Jika kamu bersyukur, Dia meridai kesyukuranmu itu. Seseorang yang berdosa tidak memikul dosa orang lain.[759] Kemudian kepada Tuhanmulah kembalimu lalu Dia beritakan kepadamu apa yang telah kamu kerjakan. Sungguh, Dia Maha Mengetahui apa yang tersimpan dalam dada(mu).",
+    "footnotes": [
+     "[758] Manusia beriman atau tidak, hal itu tidak merugikan Allah sedikit pun.",
+     "[759] Masing-masing memikul dosanya sendiri-sendiri."
+    ]
+   }
+  },
+  {
+   "loc": "39:8",
+   "ar": "وَإِذَا مَسَّ ٱلْإِنسَٰنَ ضُرٌّ دَعَا رَبَّهُۥ مُنِيبًا إِلَيْهِ ثُمَّ إِذَا خَوَّلَهُۥ نِعْمَةً مِّنْهُ نَسِىَ مَا كَانَ يَدْعُوٓا۟ إِلَيْهِ مِن قَبْلُ وَجَعَلَ لِلَّهِ أَندَادًا لِّيُضِلَّ عَن سَبِيلِهِۦ قُلْ تَمَتَّعْ بِكُفْرِكَ قَلِيلًا إِنَّكَ مِنْ أَصْحَٰبِ ٱلنَّارِ",
+   "translation": {
+    "text": "Dan apabila manusia ditimpa bencana, dia memohon (pertolongan) kepada Tuhannya dengan kembali (taat) kepada-Nya; tetapi apabila Dia memberikan nikmat kepadanya dia lupa (akan bencana) yang pernah dia berdoa kepada Allah sebelum itu, dan di mengadakan sekutu-sekutu bagi Allah untuk menyesatkan (manusia) dari jalan-Nya. Katakanlah, \"Bersenang-senanglah kamu dengan kekafiranmu itu untuk sementara waktu. Sungguh, kamu termasuk penghuni neraka.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:9",
+   "ar": "أَمَّنْ هُوَ قَٰنِتٌ ءَانَآءَ ٱلَّيْلِ سَاجِدًا وَقَآئِمًا يَحْذَرُ ٱلْـَٔاخِرَةَ وَيَرْجُوا۟ رَحْمَةَ رَبِّهِۦ قُلْ هَلْ يَسْتَوِى ٱلَّذِينَ يَعْلَمُونَ وَٱلَّذِينَ لَا يَعْلَمُونَ إِنَّمَا يَتَذَكَّرُ أُو۟لُوا۟ ٱلْأَلْبَٰبِ",
+   "translation": {
+    "text": "(Apakah kamu orang musyrik yang lebih beruntung) ataukah orang yang beribadah pada waktu malam dengan sujud dan berdiri, karena takut kepada (azab) akhirat dan mengharapkan rahmat Tuhannya? Katakanlah, \"Apakah sama orang-orang yang mengetahui dengan orang-orang yang tidak mengetahui?\" Sebenarnya hanya orang yang berakal sehat yang dapat menerima pelajaran.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:15",
+   "ar": "فَٱعْبُدُوا۟ مَا شِئْتُم مِّن دُونِهِۦ قُلْ إِنَّ ٱلْخَٰسِرِينَ ٱلَّذِينَ خَسِرُوٓا۟ أَنفُسَهُمْ وَأَهْلِيهِمْ يَوْمَ ٱلْقِيَٰمَةِ أَلَا ذَٰلِكَ هُوَ ٱلْخُسْرَانُ ٱلْمُبِينُ",
+   "translation": {
+    "text": "Maka sembahlah selain Dia sesukamu! (wahai orang-orang musyrik).[760] Katakanlah, \"Sesungguhnya orang-orang yang rugi ialah orang-orang yang merugikan diri mereka sendiri dan keluarganya pada hari Kiamat.\" Ingatlah! Yang demikian itu adalah kerugian yang nyata.",
+    "footnotes": [
+     "[760] Perintah ini bukanlah menurut arti yang sebenarnya, tetapi sebagai pernyataan kemurkaan Allah terhadap kaum musyrikin yang telah berkali-kali diajak kepada Tauhid tetapi mereka selalu ingkar."
+    ]
+   }
+  },
+  {
+   "loc": "39:16",
+   "ar": "لَهُم مِّن فَوْقِهِمْ ظُلَلٌ مِّنَ ٱلنَّارِ وَمِن تَحْتِهِمْ ظُلَلٌ ذَٰلِكَ يُخَوِّفُ ٱللَّهُ بِهِۦ عِبَادَهُۥ يَٰعِبَادِ فَٱتَّقُونِ",
+   "translation": {
+    "text": "Di atas mereka ada lapisan-lapisan dari api dan di bawahnya juga ada lapisan-lapisan yang disediakan bagi mereka. Demikianlah Allah mengancam hamba-hamba-Nya (dengan azab itu). \"Wahai hamba-hamba-Ku, maka bertakwalah kepada-Ku.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:17",
+   "ar": "وَٱلَّذِينَ ٱجْتَنَبُوا۟ ٱلطَّٰغُوتَ أَن يَعْبُدُوهَا وَأَنَابُوٓا۟ إِلَى ٱللَّهِ لَهُمُ ٱلْبُشْرَىٰ فَبَشِّرْ عِبَادِ",
+   "translation": {
+    "text": "Dan orang-orang yang menjauhi Tagut (yaitu) tidak menyembahnya[761] dan kembali kepada Allah, mereka pantas mendapat berita gembira; sebab itu sampaikanlah kabar gembira itu kepada hamba-hamba-Ku,",
+    "footnotes": [
+     "[761] Tagut ialah setan dan apa saja yang disembah selain Allah -Subḥānahu wata'ālā-."
+    ]
+   }
+  },
+  {
+   "loc": "39:18",
+   "ar": "ٱلَّذِينَ يَسْتَمِعُونَ ٱلْقَوْلَ فَيَتَّبِعُونَ أَحْسَنَهُۥٓ أُو۟لَٰٓئِكَ ٱلَّذِينَ هَدَىٰهُمُ ٱللَّهُ وَأُو۟لَٰٓئِكَ هُمْ أُو۟لُوا۟ ٱلْأَلْبَٰبِ",
+   "translation": {
+    "text": "(yaitu) mereka yang mendengarkan perkataan lalu mengikuti apa yang paling baik di antaranya.[762] Mereka itulah orang-orang yang telah diberi petunjuk oleh Allah dan mereka itulah orang-orang yang mempunyai akal sehat.",
+    "footnotes": [
+     "[762] Mereka yang mendengarkan ajaran-ajaran Al-Qur`an dan ajaran-ajaran yang lain, tetapi yang diikutinya ialah ajaran-ajaran Al-Qur`an karena ia adalah yang paling baik."
+    ]
+   }
+  },
+  {
+   "loc": "39:20",
+   "ar": "لَٰكِنِ ٱلَّذِينَ ٱتَّقَوْا۟ رَبَّهُمْ لَهُمْ غُرَفٌ مِّن فَوْقِهَا غُرَفٌ مَّبْنِيَّةٌ تَجْرِى مِن تَحْتِهَا ٱلْأَنْهَٰرُ وَعْدَ ٱللَّهِ لَا يُخْلِفُ ٱللَّهُ ٱلْمِيعَادَ",
+   "translation": {
+    "text": "Tetapi orang-orang yang bertakwa kepada Tuhannya, mereka mendapat kamar-kamar (di surga), di atasnya terdapat pula kamar-kamar yang dibangun (bertingkat-tingkat), yang mengalir di bawahnya sungai-sungai. (Itulah) janji Allah. Allah tidak akan memungkiri janji(-Nya).",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:21",
+   "ar": "أَلَمْ تَرَ أَنَّ ٱللَّهَ أَنزَلَ مِنَ ٱلسَّمَآءِ مَآءً فَسَلَكَهُۥ يَنَٰبِيعَ فِى ٱلْأَرْضِ ثُمَّ يُخْرِجُ بِهِۦ زَرْعًا مُّخْتَلِفًا أَلْوَٰنُهُۥ ثُمَّ يَهِيجُ فَتَرَىٰهُ مُصْفَرًّا ثُمَّ يَجْعَلُهُۥ حُطَٰمًا إِنَّ فِى ذَٰلِكَ لَذِكْرَىٰ لِأُو۟لِى ٱلْأَلْبَٰبِ",
+   "translation": {
+    "text": "Apakah engkau tidak memperhatikan, bahwa Allah menurunkan air dari langit, lalu diaturnya menjadi sumber-sumber air di bumi, kemudian dengan air itu ditumbuhkan-Nya tanam-tanaman yang bermacam-macam warnanya, kemudian menjadi kering, lalu engkau melihatnya kekuning-kuningan, kemudian dijadikan-Nya hancur berkeping-keping. Sungguh, pada yang demikian itu terdapat pelajaran bagi orang-orang yang mempunyai akal sehat.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:22",
+   "ar": "أَفَمَن شَرَحَ ٱللَّهُ صَدْرَهُۥ لِلْإِسْلَٰمِ فَهُوَ عَلَىٰ نُورٍ مِّن رَّبِّهِۦ فَوَيْلٌ لِّلْقَٰسِيَةِ قُلُوبُهُم مِّن ذِكْرِ ٱللَّهِ أُو۟لَٰٓئِكَ فِى ضَلَٰلٍ مُّبِينٍ",
+   "translation": {
+    "text": "Maka apakah orang-orang yang dibukakan hatinya oleh Allah untuk (menerima) agama Islam lalu dia mendapat cahaya dari Tuhannya (sama dengan orang yang hatinya membatu)? Maka celakalah mereka yang hatinya telah membatu untuk mengingat Allah. Mereka itu dalam kesesatan yang nyata.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:23",
+   "ar": "ٱللَّهُ نَزَّلَ أَحْسَنَ ٱلْحَدِيثِ كِتَٰبًا مُّتَشَٰبِهًا مَّثَانِىَ تَقْشَعِرُّ مِنْهُ جُلُودُ ٱلَّذِينَ يَخْشَوْنَ رَبَّهُمْ ثُمَّ تَلِينُ جُلُودُهُمْ وَقُلُوبُهُمْ إِلَىٰ ذِكْرِ ٱللَّهِ ذَٰلِكَ هُدَى ٱللَّهِ يَهْدِى بِهِۦ مَن يَشَآءُ وَمَن يُضْلِلِ ٱللَّهُ فَمَا لَهُۥ مِنْ هَادٍ",
+   "translation": {
+    "text": "Allah telah menurunkan perkataan yang paling baik (yaitu) Al-Qur`an yang serupa (ayat-ayatnya) lagi berulang-ulang,[763] gemetar karenanya kulit orang-orang yang takut kepada Tuhannya, kemudian menjadi tenang kulit dan hati mereka ketika mengingat Allah. Itulah petunjuk Allah, dengan Kitab itu Dia memberi petunjuk kepada siapa yang Dia kehendaki. Dan barang siapa disesatkan oleh Allah, maka tidak seorang pun yang dapat memberi petunjuk.",
+    "footnotes": [
+     "[763] Hukum-hukum, pelajaran dan kisah-kisah itu diulang-ulang menyebutnya dalam Al-Qur`an agar lebih kuat pengaruhnya dan lebih meresap. Sebagian mufasir mengatakan bahwa maksudnya itu ialah bahwa ayat-ayat Al-Qur`an itu diulang-ulang membacanya seperti tersebut dalam mukadimah surah Al-Fātiḥah."
+    ]
+   }
+  },
+  {
+   "loc": "39:27",
+   "ar": "وَلَقَدْ ضَرَبْنَا لِلنَّاسِ فِى هَٰذَا ٱلْقُرْءَانِ مِن كُلِّ مَثَلٍ لَّعَلَّهُمْ يَتَذَكَّرُونَ",
+   "translation": {
+    "text": "Dan sungguh, telah Kami buatkan dalam Al-Qur`an ini segala macam perumpamaan bagi manusia agar mereka dapat pelajaran.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:29",
+   "ar": "ضَرَبَ ٱللَّهُ مَثَلًا رَّجُلًا فِيهِ شُرَكَآءُ مُتَشَٰكِسُونَ وَرَجُلًا سَلَمًا لِّرَجُلٍ هَلْ يَسْتَوِيَانِ مَثَلًا ٱلْحَمْدُ لِلَّهِ بَلْ أَكْثَرُهُمْ لَا يَعْلَمُونَ",
+   "translation": {
+    "text": "Allah membuat perumpamaan (yaitu) seorang laki-laki (hamba sahaya) yang dimiliki oleh beberapa orang berserikat yang dalam perselisihan, dan seorang hamba sahaya yang menjadi milik penuh dari seorang (saja). Adakah kedua hamba sahaya itu sama keadaannya? Segala puji bagi Allah, tetapi kebanyakan mereka tidak mengetahui.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:31",
+   "ar": "ثُمَّ إِنَّكُمْ يَوْمَ ٱلْقِيَٰمَةِ عِندَ رَبِّكُمْ تَخْتَصِمُونَ",
+   "translation": {
+    "text": "Kemudian sesungguhnya kamu pada hari Kiamat akan berbantah-bantahan di hadapan Tuhanmu.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:32",
+   "ar": "فَمَنْ أَظْلَمُ مِمَّن كَذَبَ عَلَى ٱللَّهِ وَكَذَّبَ بِٱلصِّدْقِ إِذْ جَآءَهُۥٓ أَلَيْسَ فِى جَهَنَّمَ مَثْوًى لِّلْكَٰفِرِينَ",
+   "translation": {
+    "text": "Maka siapakah yang lebih zalim daripada orang yang membuat-buat kebohongan terhadap Allah dan mendustakan kebenaran yang datang kepadanya? Bukankah di neraka Jahanam tempat tinggal bagi orang-orang kafir?",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:33",
+   "ar": "وَٱلَّذِى جَآءَ بِٱلصِّدْقِ وَصَدَّقَ بِهِۦٓ أُو۟لَٰٓئِكَ هُمُ ٱلْمُتَّقُونَ",
+   "translation": {
+    "text": "Dan orang yang membawa kebenaran (Muhammad) dan orang yang membenarkannya, mereka itulah orang yang bertakwa.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:34",
+   "ar": "لَهُم مَّا يَشَآءُونَ عِندَ رَبِّهِمْ ذَٰلِكَ جَزَآءُ ٱلْمُحْسِنِينَ",
+   "translation": {
+    "text": "Mereka memperoleh apa yang mereka kehendaki di sisi Tuhannya. Demikianlah balasan bagi orang-orang yang berbuat baik,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:35",
+   "ar": "لِيُكَفِّرَ ٱللَّهُ عَنْهُمْ أَسْوَأَ ٱلَّذِى عَمِلُوا۟ وَيَجْزِيَهُمْ أَجْرَهُم بِأَحْسَنِ ٱلَّذِى كَانُوا۟ يَعْمَلُونَ",
+   "translation": {
+    "text": "agar Allah menghapus perbuatan mereka yang paling buruk yang pernah mereka lakukan dan memberi pahala kepada mereka dengan yang lebih baik daripada apa yang mereka kerjakan.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:36",
+   "ar": "أَلَيْسَ ٱللَّهُ بِكَافٍ عَبْدَهُۥ وَيُخَوِّفُونَكَ بِٱلَّذِينَ مِن دُونِهِۦ وَمَن يُضْلِلِ ٱللَّهُ فَمَا لَهُۥ مِنْ هَادٍ",
+   "translation": {
+    "text": "Bukankah Allah yang mencukupi hamba-Nya? Mereka menakut-nakutimu dengan sesembahan selain Dia. Barangsiapa disesatkan oleh Allah maka tidak seorang pun yang dapat memberi petunjuk kepadanya.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:37",
+   "ar": "وَمَن يَهْدِ ٱللَّهُ فَمَا لَهُۥ مِن مُّضِلٍّ أَلَيْسَ ٱللَّهُ بِعَزِيزٍ ذِى ٱنتِقَامٍ",
+   "translation": {
+    "text": "Dan barangsiapa diberi petunjuk oleh Allah, maka tidak seorang pun yang dapat menyesatkannya. Bukankah Allah Mahaperkasa dan mempunyai (kekuasaan untuk) menghukum?",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:38",
+   "ar": "وَلَئِن سَأَلْتَهُم مَّنْ خَلَقَ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضَ لَيَقُولُنَّ ٱللَّهُ قُلْ أَفَرَءَيْتُم مَّا تَدْعُونَ مِن دُونِ ٱللَّهِ إِنْ أَرَادَنِىَ ٱللَّهُ بِضُرٍّ هَلْ هُنَّ كَٰشِفَٰتُ ضُرِّهِۦٓ أَوْ أَرَادَنِى بِرَحْمَةٍ هَلْ هُنَّ مُمْسِكَٰتُ رَحْمَتِهِۦ قُلْ حَسْبِىَ ٱللَّهُ عَلَيْهِ يَتَوَكَّلُ ٱلْمُتَوَكِّلُونَ",
+   "translation": {
+    "text": "Dan sungguh, jika engkau tanyakan kepada mereka, \"Siapakah yang menciptakan langit dan bumi?\" Niscaya mereka menjawab, \"Allah.\" Katakanlah, \"Kalau begitu tahukah kamu tentang apa yang kamu sembah selain Allah, jika Allah hendak mendatangkan bencana kepadaku, apakah mereka mampu menghilangkan bencana itu, atau jika Allah hendak memberi rahmat kepadaku, apakah mereka dapat mencegah rahmat-Nya?\" Katakanlah, \"Cukuplah Allah bagiku. Kepada-Nyalah orang-orang yang bertawakal berserah diri.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:39",
+   "ar": "قُلْ يَٰقَوْمِ ٱعْمَلُوا۟ عَلَىٰ مَكَانَتِكُمْ إِنِّى عَٰمِلٌ فَسَوْفَ تَعْلَمُونَ",
+   "translation": {
+    "text": "Katakanlah (Muhammad), \"Wahai kaumku! Berbuatlah menurut kedudukanmu, aku pun berbuat (demikian). Kelak kamu akan mengetahui,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:40",
+   "ar": "مَن يَأْتِيهِ عَذَابٌ يُخْزِيهِ وَيَحِلُّ عَلَيْهِ عَذَابٌ مُّقِيمٌ",
+   "translation": {
+    "text": "siapa yang mendapat siksa yang menghinakan dan kepadanya ditimpakan azab yang kekal.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:42",
+   "ar": "ٱللَّهُ يَتَوَفَّى ٱلْأَنفُسَ حِينَ مَوْتِهَا وَٱلَّتِى لَمْ تَمُتْ فِى مَنَامِهَا فَيُمْسِكُ ٱلَّتِى قَضَىٰ عَلَيْهَا ٱلْمَوْتَ وَيُرْسِلُ ٱلْأُخْرَىٰٓ إِلَىٰٓ أَجَلٍ مُّسَمًّى إِنَّ فِى ذَٰلِكَ لَـَٔايَٰتٍ لِّقَوْمٍ يَتَفَكَّرُونَ",
+   "translation": {
+    "text": "Allah memegang nyawa (seseorang) pada saat kematiannya dan nyawa (seseorang) yang belum mati ketika dia tidur; maka Dia tahan nyawa (orang) yang telah Dia tetapkan kematiannya dan Dia lepaskan nyawa yang lain sampai waktu yang ditentukan.[764] Sungguh, pada yang demikian itu terdapat tanda-tanda (kebesaran) Allah bagi kaum yang berpikir.",
+    "footnotes": [
+     "[764] Orang-orang yang mati itu rohnya ditahan Allah sehingga tidak dapat kembali kepada tubuhnya; dan orang-orang yang tidak mati, hanya tidur saja, rohnya dilepaskan sehingga dapat kembali kepadanya lagi."
+    ]
+   }
+  },
+  {
+   "loc": "39:45",
+   "ar": "وَإِذَا ذُكِرَ ٱللَّهُ وَحْدَهُ ٱشْمَأَزَّتْ قُلُوبُ ٱلَّذِينَ لَا يُؤْمِنُونَ بِٱلْـَٔاخِرَةِ وَإِذَا ذُكِرَ ٱلَّذِينَ مِن دُونِهِۦٓ إِذَا هُمْ يَسْتَبْشِرُونَ",
+   "translation": {
+    "text": "Dan apabila yang disebut hanya nama Allah, kesal sekali hati orang-orang yang tidak beriman kepada akhirat. Namun apabila nama-nama sembahan selain Allah yang disebut, tiba-tiba mereka menjadi bergembira.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:46",
+   "ar": "قُلِ ٱللَّهُمَّ فَاطِرَ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضِ عَٰلِمَ ٱلْغَيْبِ وَٱلشَّهَٰدَةِ أَنتَ تَحْكُمُ بَيْنَ عِبَادِكَ فِى مَا كَانُوا۟ فِيهِ يَخْتَلِفُونَ",
+   "translation": {
+    "text": "Katakanlah, \"Ya Allah, Pencipta langit dan bumi, yang mengetahui segala yang gaib dan yang nyata, Engkaulah yang memutuskan di antara hamba-hamba-Mu tentang apa yang selalu mereka perselisihkan.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:47",
+   "ar": "وَلَوْ أَنَّ لِلَّذِينَ ظَلَمُوا۟ مَا فِى ٱلْأَرْضِ جَمِيعًا وَمِثْلَهُۥ مَعَهُۥ لَٱفْتَدَوْا۟ بِهِۦ مِن سُوٓءِ ٱلْعَذَابِ يَوْمَ ٱلْقِيَٰمَةِ وَبَدَا لَهُم مِّنَ ٱللَّهِ مَا لَمْ يَكُونُوا۟ يَحْتَسِبُونَ",
+   "translation": {
+    "text": "Dan sekiranya orang-orang yang zalim mempunyai segala apa yang ada di bumi dan ditambah lagi sebanyak itu, niscaya mereka akan menebus dirinya dengan itu dari azab yang buruk pada hari Kiamat. Dan jelaslah bagi mereka azab dari Allah yang dahulu tidak pernah mereka perkirakan.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:48",
+   "ar": "وَبَدَا لَهُمْ سَيِّـَٔاتُ مَا كَسَبُوا۟ وَحَاقَ بِهِم مَّا كَانُوا۟ بِهِۦ يَسْتَهْزِءُونَ",
+   "translation": {
+    "text": "Dan jelaslah bagi mereka kejahatan apa yang telah mereka kerjakan, dan mereka diliputi oleh apa yang dahulu mereka selalu memperolok-olokkannya.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:49",
+   "ar": "فَإِذَا مَسَّ ٱلْإِنسَٰنَ ضُرٌّ دَعَانَا ثُمَّ إِذَا خَوَّلْنَٰهُ نِعْمَةً مِّنَّا قَالَ إِنَّمَآ أُوتِيتُهُۥ عَلَىٰ عِلْمٍۭ بَلْ هِىَ فِتْنَةٌ وَلَٰكِنَّ أَكْثَرَهُمْ لَا يَعْلَمُونَ",
+   "translation": {
+    "text": "Maka apabila manusia ditimpa bencana dia menyeru Kami, kemudian apabila Kami berikan nikmat Kami kepadanya, dia berkata, \"Sesungguhnya aku diberi nikmat ini hanyalah karena kepintaranku.\" Sebenarnya, itu adalah ujian, tetapi kebanyakan mereka tidak mengetahui.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:53",
+   "ar": "قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا۟ عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا۟ مِن رَّحْمَةِ ٱللَّهِ إِنَّ ٱللَّهَ يَغْفِرُ ٱلذُّنُوبَ جَمِيعًا إِنَّهُۥ هُوَ ٱلْغَفُورُ ٱلرَّحِيمُ",
+   "translation": {
+    "text": "Katakanlah, \"Wahai hamba-hamba-Ku yang melampaui batas terhadap diri mereka sendiri! Janganlah kamu berputus asa dari rahmat Allah. Sesungguhnya Allah mengampuni dosa-dosa[765] semuanya. Sungguh, Dialah Yang Maha Pengampun, Maha Penyayang.",
+    "footnotes": [
+     "[765]Lihat surah An-Nisā` (4) : 48, kecuali dosa syirik."
+    ]
+   }
+  },
+  {
+   "loc": "39:54",
+   "ar": "وَأَنِيبُوٓا۟ إِلَىٰ رَبِّكُمْ وَأَسْلِمُوا۟ لَهُۥ مِن قَبْلِ أَن يَأْتِيَكُمُ ٱلْعَذَابُ ثُمَّ لَا تُنصَرُونَ",
+   "translation": {
+    "text": "Dan kembalilah kamu kepada Tuhanmu, dan berserah dirilah kepada-Nya sebelum datang azab kepadamu, kemudian kamu tidak dapat ditolong.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:56",
+   "ar": "أَن تَقُولَ نَفْسٌ يَٰحَسْرَتَىٰ عَلَىٰ مَا فَرَّطتُ فِى جَنۢبِ ٱللَّهِ وَإِن كُنتُ لَمِنَ ٱلسَّٰخِرِينَ",
+   "translation": {
+    "text": "agar jangan ada orang yang mengatakan, \"Alangkah besar penyesalanku atas kelalaianku dalam (menunaikan kewajiban) terhadap Allah, dan sesungguhnya aku termasuk orang-orang yang memperolok-olokkan (agama Allah)\",",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:58",
+   "ar": "أَوْ تَقُولَ حِينَ تَرَى ٱلْعَذَابَ لَوْ أَنَّ لِى كَرَّةً فَأَكُونَ مِنَ ٱلْمُحْسِنِينَ",
+   "translation": {
+    "text": "atau (agar jangan) ada yang berkata ketika melihat azab, \"Sekiranya aku dapat kembali (ke dunia), tentu aku termasuk orang-orang yang berbuat baik.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:60",
+   "ar": "وَيَوْمَ ٱلْقِيَٰمَةِ تَرَى ٱلَّذِينَ كَذَبُوا۟ عَلَى ٱللَّهِ وُجُوهُهُم مُّسْوَدَّةٌ أَلَيْسَ فِى جَهَنَّمَ مَثْوًى لِّلْمُتَكَبِّرِينَ",
+   "translation": {
+    "text": "Dan pada hari Kiamat engkau akan melihat orang-orang yang berbuat dusta terhadap Allah, wajahnya menghitam. Bukankah neraka Jahanam itu tempat tinggal bagi orang yang menyombongkan diri?",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:61",
+   "ar": "وَيُنَجِّى ٱللَّهُ ٱلَّذِينَ ٱتَّقَوْا۟ بِمَفَازَتِهِمْ لَا يَمَسُّهُمُ ٱلسُّوٓءُ وَلَا هُمْ يَحْزَنُونَ",
+   "translation": {
+    "text": "Dan Allah menyelamatkan orang-orang yang bertakwa karena kemenangan mereka. Mereka tidak disentuh oleh azab dan tidak bersedih hati.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:63",
+   "ar": "لَّهُۥ مَقَالِيدُ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضِ وَٱلَّذِينَ كَفَرُوا۟ بِـَٔايَٰتِ ٱللَّهِ أُو۟لَٰٓئِكَ هُمُ ٱلْخَٰسِرُونَ",
+   "translation": {
+    "text": "Milik-Nyalah kunci-kunci (perbendaharaan) langit dan bumi. Dan orang-orang yang kafir terhadap ayat-ayat Allah, mereka itulah orang yang rugi.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:64",
+   "ar": "قُلْ أَفَغَيْرَ ٱللَّهِ تَأْمُرُوٓنِّىٓ أَعْبُدُ أَيُّهَا ٱلْجَٰهِلُونَ",
+   "translation": {
+    "text": "Katakanlah (Muhammad), \"Apakah kamu menyuruh aku menyembah selain Allah, wahai orang-orang yang bodoh?\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:67",
+   "ar": "وَمَا قَدَرُوا۟ ٱللَّهَ حَقَّ قَدْرِهِۦ وَٱلْأَرْضُ جَمِيعًا قَبْضَتُهُۥ يَوْمَ ٱلْقِيَٰمَةِ وَٱلسَّمَٰوَٰتُ مَطْوِيَّٰتٌۢ بِيَمِينِهِۦ سُبْحَٰنَهُۥ وَتَعَٰلَىٰ عَمَّا يُشْرِكُونَ",
+   "translation": {
+    "text": "Dan mereka tidak mengagungkan Allah sebagaimana mestinya padahal bumi seluruhnya dalam genggaman-Nya pada hari Kiamat dan langit digulung dengan tangan kanan-Nya.[766] Mahasuci Dia dan Mahatinggi Dia dari apa yang mereka persekutukan.",
+    "footnotes": [
+     "[766] Ayat ini menggambarkan kebesaran dan kekuasaan Allah dan hanya Dialah yang berkuasa pada hari Kiamat."
+    ]
+   }
+  },
+  {
+   "loc": "39:68",
+   "ar": "وَنُفِخَ فِى ٱلصُّورِ فَصَعِقَ مَن فِى ٱلسَّمَٰوَٰتِ وَمَن فِى ٱلْأَرْضِ إِلَّا مَن شَآءَ ٱللَّهُ ثُمَّ نُفِخَ فِيهِ أُخْرَىٰ فَإِذَا هُمْ قِيَامٌ يَنظُرُونَ",
+   "translation": {
+    "text": "Dan sangkakala pun ditiup, maka matilah semua (makhluk) yang di langit dan di bumi kecuali mereka yang dikehendaki Allah. Kemudian ditiup sekali lagi (sangkakala itu) maka seketika itu mereka bangun (dari kuburnya) menunggu (keputusan Allah).",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:69",
+   "ar": "وَأَشْرَقَتِ ٱلْأَرْضُ بِنُورِ رَبِّهَا وَوُضِعَ ٱلْكِتَٰبُ وَجِا۟ىٓءَ بِٱلنَّبِيِّـۧنَ وَٱلشُّهَدَآءِ وَقُضِىَ بَيْنَهُم بِٱلْحَقِّ وَهُمْ لَا يُظْلَمُونَ",
+   "translation": {
+    "text": "Dan bumi (padang Mahsyar) menjadi terang benderang dengan cahaya (keadilan) Tuhannya; dan buku-buku (perhitungan perbuatan mereka) diberikan (kepada masing-masing), nabi-nabi dan saksi-saksi pun dihadirkan, lalu diberikan keputusan di antara mereka secara adil, sedang mereka tidak dirugikan.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:70",
+   "ar": "وَوُفِّيَتْ كُلُّ نَفْسٍ مَّا عَمِلَتْ وَهُوَ أَعْلَمُ بِمَا يَفْعَلُونَ",
+   "translation": {
+    "text": "Dan kepada setiap jiwa diberi balasan dengan sempurna sesuai dengan apa yang telah dikerjakannya dan Dia lebih mengetahui apa yang mereka kerjakan.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:71",
+   "ar": "وَسِيقَ ٱلَّذِينَ كَفَرُوٓا۟ إِلَىٰ جَهَنَّمَ زُمَرًا حَتَّىٰٓ إِذَا جَآءُوهَا فُتِحَتْ أَبْوَٰبُهَا وَقَالَ لَهُمْ خَزَنَتُهَآ أَلَمْ يَأْتِكُمْ رُسُلٌ مِّنكُمْ يَتْلُونَ عَلَيْكُمْ ءَايَٰتِ رَبِّكُمْ وَيُنذِرُونَكُمْ لِقَآءَ يَوْمِكُمْ هَٰذَا قَالُوا۟ بَلَىٰ وَلَٰكِنْ حَقَّتْ كَلِمَةُ ٱلْعَذَابِ عَلَى ٱلْكَٰفِرِينَ",
+   "translation": {
+    "text": "Orang-orang yang kafir digiring ke neraka Jahanam secara berombongan. Sehingga apabila mereka sampai kepadanya (neraka) pintu-pintunya dibukakan dan penjaga-penjaga berkata kepada mereka, \"Bukankah telah datang kepadamu rasul-rasul dari kalangan kamu yang membacakan ayat-ayat Tuhanmu dan memperingatkan kepadamu akan pertemuan (dengan) harimu ini?\" Mereka menjawab, \"Benar, ada,\" tetapi ketetapan azab pasti berlaku terhadap orang-orang kafir.",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:72",
+   "ar": "قِيلَ ٱدْخُلُوٓا۟ أَبْوَٰبَ جَهَنَّمَ خَٰلِدِينَ فِيهَا فَبِئْسَ مَثْوَى ٱلْمُتَكَبِّرِينَ",
+   "translation": {
+    "text": "Dikatakan (kepada mereka), \"Masukilah pintu-pintu neraka Jahanam itu, (kamu) kekal di dalamnya.\" Maka (neraka Jahanam) itulah seburuk-buruk tempat tinggal bagi orang-orang yang menyombongkan diri.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:73",
+   "ar": "وَسِيقَ ٱلَّذِينَ ٱتَّقَوْا۟ رَبَّهُمْ إِلَى ٱلْجَنَّةِ زُمَرًا حَتَّىٰٓ إِذَا جَآءُوهَا وَفُتِحَتْ أَبْوَٰبُهَا وَقَالَ لَهُمْ خَزَنَتُهَا سَلَٰمٌ عَلَيْكُمْ طِبْتُمْ فَٱدْخُلُوهَا خَٰلِدِينَ",
+   "translation": {
+    "text": "Dan orang-orang yang bertakwa kepada Tuhannya diantar ke dalam surga secara berombongan. Sehingga apabila mereka sampai kepadanya (surga) dan pintu-pintunya telah dibukakan, penjaga-penjaganya berkata kepada mereka, \"Kesejahteraan (dilimpahkan) atasmu, berbahagialah kamu! Maka masuklah, kamu kekal di dalamnya.\"",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "39:75",
+   "ar": "وَتَرَى ٱلْمَلَٰٓئِكَةَ حَآفِّينَ مِنْ حَوْلِ ٱلْعَرْشِ يُسَبِّحُونَ بِحَمْدِ رَبِّهِمْ وَقُضِىَ بَيْنَهُم بِٱلْحَقِّ وَقِيلَ ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ",
+   "translation": {
+    "text": "Dan engkau (Muhammad) akan melihat malaikat-malaikat melingkar di sekeliling Arasy, bertasbih sambil memuji Tuhannya; lalu diberikan keputusan di antara mereka (hamba-hamba Allah) secara adil dan dikatakan, \"Segala puji bagi Allah, Tuhan seluruh alam.\"",
+    "footnotes": []
+   }
+  }
+ ]
+}

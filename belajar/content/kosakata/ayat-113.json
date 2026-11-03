@@ -1,0 +1,37 @@
+{
+ "sura": 113,
+ "ayat": [
+  {
+   "loc": "113:1",
+   "ar": "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ",
+   "translation": {
+    "text": "Katakanlah, \"Aku berlindung kepada Tuhan yang menguasai subuh (fajar),",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "113:3",
+   "ar": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
+   "translation": {
+    "text": "dan dari kejahatan malam apabila telah gelap gulita,",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "113:4",
+   "ar": "وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِى ٱلْعُقَدِ",
+   "translation": {
+    "text": "dan dari kejahatan (perempuan-perempuan) penyihir yang meniup pada buhul-buhul (talinya),",
+    "footnotes": []
+   }
+  },
+  {
+   "loc": "113:5",
+   "ar": "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+   "translation": {
+    "text": "dan dari kejahatan orang yang dengki apabila dia dengki.\"",
+    "footnotes": []
+   }
+  }
+ ]
+}

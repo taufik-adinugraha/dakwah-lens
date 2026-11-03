@@ -207,6 +207,17 @@ jobs:
       # there (content/compose `primer.lesson` "0"): its line and its map are derived like an
       # ayah's. Before the quizzes, the lesson map and the narration, which read it. Stdlib only,
       # no network.
+      # The Qur'an vocabulary list (content/kosakata/): the files match the meanings and the sources'
+      # pins, and every rule holds. pipeline/cache is git-ignored, so CI runs the corpus-free half; a
+      # fresh build from the corpus (which also proves each citation is an ayah where QAC has the
+      # word) runs locally with plain `python3 pipeline/validate_kosakata.py`.
+      - name: Kosakata list — up to date
+        run: python3 pipeline/build_kosakata.py --check --no-corpus
+      - name: Kosakata list — validate
+        run: python3 pipeline/validate_kosakata.py --no-corpus
+      - name: Kosakata list — planted-fault tests
+        run: python3 pipeline/test_validate_kosakata.py --no-corpus
+
       - name: Curriculum — up to date
         run: python3 pipeline/build_curriculum.py --check
       - name: Curriculum — validate
