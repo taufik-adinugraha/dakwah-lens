@@ -665,19 +665,21 @@
    ],
    "senses": [
     {
-     "id": "senang (hati)",
-     "en": "be content",
+     "id": "tenang, menetap",
+     "en": "settle, be at rest",
+     "ayat": [
+      "33:33",
+      "20:40",
+      "28:13"
+     ]
+    },
+    {
+     "id": "menjadi sejuk (mata)",
+     "en": "be cooled (eye)",
      "ayat": [
       "19:26",
       "20:40",
       "33:51"
-     ]
-    },
-    {
-     "id": "tetap tinggal",
-     "en": "remain, abide",
-     "ayat": [
-      "33:33"
      ]
     }
    ],
@@ -1248,24 +1250,24 @@
    ],
    "senses": [
     {
-     "id": "menikahkan",
-     "en": "marry (to)",
-     "ayat": [
-      "33:37",
-      "44:54",
-      "52:20"
-     ]
-    },
-    {
      "id": "memasangkan",
      "en": "pair",
      "ayat": [
       "81:7",
-      "42:50"
+      "42:50",
+      "52:20"
+     ]
+    },
+    {
+     "id": "menikahkan",
+     "en": "marry (to)",
+     "ayat": [
+      "33:37",
+      "44:54"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "زُوِّجَتْ",
     "loc": "81:7:3",
@@ -2968,23 +2970,16 @@
    ],
    "senses": [
     {
-     "id": "akad",
-     "en": "contract",
+     "id": "buhul, ikatan",
+     "en": "knot, tie",
      "ayat": [
-      "2:235",
-      "2:237"
-     ]
-    },
-    {
-     "id": "buhul",
-     "en": "knot",
-     "ayat": [
+      "113:4",
       "20:27",
-      "113:4"
+      "2:235"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "عُقْدَةَ",
     "loc": "2:235:29",
@@ -3230,13 +3225,6 @@
       "3:35",
       "19:26"
      ]
-    },
-    {
-     "id": "diberi peringatan",
-     "en": "be warned",
-     "ayat": [
-      "21:45"
-     ]
     }
    ],
    "review": "corrected",
@@ -3429,7 +3417,7 @@
    "senses": [
     {
      "id": "membentuk",
-     "en": "to form",
+     "en": "form",
      "ayat": [
       "3:6",
       "7:11",

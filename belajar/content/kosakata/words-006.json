@@ -199,7 +199,7 @@
    ],
    "senses": [
     {
-     "id": "mahatinggi",
+     "id": "Mahatinggi",
      "en": "exalted, high above",
      "ayat": [
       "6:100",
@@ -489,7 +489,7 @@
    "senses": [
     {
      "id": "membahayakan",
-     "en": "to harm",
+     "en": "harm",
      "ayat": [
       "3:111",
       "3:176",
@@ -1993,12 +1993,21 @@
    ],
    "senses": [
     {
-     "id": "yang mengetahui",
-     "en": "one who knows",
+     "id": "Yang Maha Mengetahui",
+     "en": "the Knower",
      "ayat": [
       "6:73",
-      "21:81",
-      "29:43"
+      "9:94",
+      "21:81"
+     ]
+    },
+    {
+     "id": "orang yang berilmu",
+     "en": "one of knowledge",
+     "ayat": [
+      "29:43",
+      "30:22",
+      "12:44"
      ]
     }
    ],
@@ -2077,15 +2086,6 @@
    ],
    "senses": [
     {
-     "id": "mengulangi (penciptaan)",
-     "en": "repeat creation",
-     "ayat": [
-      "10:4",
-      "21:104",
-      "30:11"
-     ]
-    },
-    {
      "id": "mengembalikan",
      "en": "return",
      "ayat": [
@@ -2093,9 +2093,18 @@
       "22:22",
       "18:20"
      ]
+    },
+    {
+     "id": "mengulangi",
+     "en": "repeat",
+     "ayat": [
+      "10:4",
+      "21:104",
+      "30:11"
+     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "أُعِيدُوا۟",
     "loc": "22:22:8",
@@ -2347,21 +2356,21 @@
    ],
    "senses": [
     {
-     "id": "mengetahui sepenuhnya",
-     "en": "know fully",
-     "ayat": [
-      "27:22",
-      "18:91",
-      "2:255"
-     ]
-    },
-    {
      "id": "meliputi, mengepung",
      "en": "encompass, surround",
      "ayat": [
       "10:22",
       "18:29",
       "17:60"
+     ]
+    },
+    {
+     "id": "mengetahui sepenuhnya",
+     "en": "know fully",
+     "ayat": [
+      "27:22",
+      "18:91",
+      "2:255"
      ]
     },
     {
@@ -2955,14 +2964,6 @@
      "ayat": [
       "13:33",
       "3:75"
-     ]
-    },
-    {
-     "id": "pokok penopang",
-     "en": "means of support",
-     "ayat": [
-      "4:5",
-      "5:97"
      ]
     }
    ],

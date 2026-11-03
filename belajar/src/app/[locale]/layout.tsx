@@ -22,14 +22,17 @@ const amiri = Amiri({
   subsets: ["arabic"],
   display: "swap",
 });
+// latin-ext: the transliteration's ā, ī, ū, ḥ, ṣ, ḍ, ṭ, ẓ, ṡ and ż. Without it these fall back to another
+// font, and the display face drew qāla as "qaɫa" in a word page's heading (CI screenshot, 2026-11-03). The
+// browser fetches this subset only for a page that uses those letters.
 const fraunces = Fraunces({
   variable: "--font-fraunces",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   display: "swap",
 });
 const inter = Inter({
   variable: "--font-inter",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   display: "swap",
 });
 

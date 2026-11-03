@@ -5,9 +5,9 @@
   "qac": "morphology-0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
   "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512)",
   "sura_names": "QuranEnc Indonesian sura list, extracted text sha256:1cb44693cd863238093e21b6711eabfcdf78a9de58851b351c3a6f105d352eca",
-  "meanings": "pipeline/authored/kosakata_meanings.json sha256:553d18bdd93e0ecdcc29bd40a83662ff36aa6402d35f9b19ced87e04e9d79d04",
+  "meanings": "pipeline/authored/kosakata_meanings.json sha256:caa5363aa10c8be006df07df5a3b098163ca87129a3eb0353714e54562a4de47",
   "voice": "pipeline/kosakata_voice.json sha256:0370986393d3da6d6e4f021e45739d29f61afa5163cef44125846aa0cef90fa3",
-  "entries": "sha256:2c50abf84edcc8133f456c14788a53dafc69f3bb4255f4f0bb6daff5fa5f9741",
+  "entries": "sha256:7848853733f6101f7b80a5d958fe5c4cecfc524f09ab5d2f1037747a39023b16",
   "pipeline": "belajar/pipeline/build_kosakata.py (stdlib only, no LLM)"
  },
  "total_tokens": 74608,
@@ -173,7 +173,7 @@
    "id": "tidak (penafian); jangan (larangan)",
    "en": "not (negation); do not (prohibition)",
    "cum": 1371,
-   "s": "لا la tidak (penafian) not (negation) jangan (larangan) do not (prohibition) tidak pula nor, neither pastilah (penegas) assuredly",
+   "s": "لا la tidak (penafian) not (negation) jangan (larangan) do not (prohibition) tidak pula nor, neither",
    "v": "2:2:3 411 1199"
   },
   {
@@ -602,7 +602,7 @@
    "id": "melihat; menganggap",
    "en": "see; consider (to be)",
    "cum": 4516,
-   "s": "را raa melihat see menganggap consider (to be) pernahkah kamu perhatikan have you considered",
+   "s": "را raa melihat see menganggap consider (to be)",
    "v": "6:76:5 11 977"
   },
   {
@@ -610,10 +610,10 @@
    "ar": "بَيْن",
    "translit": "bain",
    "count": 266,
-   "id": "antara; sebelum",
-   "en": "between; before",
+   "id": "antara",
+   "en": "between",
    "cum": 4552,
-   "s": "بين bain antara between sebelum before",
+   "s": "بين bain antara between",
    "v": "2:66:4 0 992"
   },
   {
@@ -621,10 +621,10 @@
    "ar": "أَتَى",
    "translit": "atā",
    "count": 264,
-   "id": "datang; membawa",
-   "en": "come; bring",
+   "id": "datang; mendatangi",
+   "en": "come; come to",
    "cum": 4587,
-   "s": "اتي ata datang come membawa bring mendatangi approach",
+   "s": "اتي ata datang come mendatangi come to",
    "v": "26:89:3 0 862"
   },
   {
@@ -632,10 +632,10 @@
    "ar": "كِتَٰب",
    "translit": "kitāb",
    "count": 260,
-   "id": "kitab suci; tulisan",
-   "en": "scripture; writing",
+   "id": "kitab; kitab suci",
+   "en": "book; scripture",
    "cum": 4622,
-   "s": "كتب kitab kitab suci scripture tulisan writing",
+   "s": "كتب kitab kitab book kitab suci scripture tulisan writing",
    "v": "2:89:3 67 1379"
   },
   {
@@ -723,7 +723,7 @@
    "id": "sekiranya (pengandaian); walaupun",
    "en": "if (hypothetical); even if",
    "cum": 4865,
-   "s": "لو lau sekiranya (pengandaian) if (hypothetical) walaupun even if mengapa tidak why not",
+   "s": "لو lau sekiranya (pengandaian) if (hypothetical) walaupun even if",
    "v": "2:96:11 34 820"
   },
   {
@@ -820,9 +820,9 @@
    "translit": "ittaqā",
    "count": 166,
    "id": "bertakwa; menjaga diri dari",
-   "en": "fear Allah; guard against",
+   "en": "be God-conscious; guard against",
    "cum": 5084,
-   "s": "اتقي ittaqa bertakwa fear allah menjaga diri dari guard against",
+   "s": "اتقي ittaqa bertakwa be god-conscious menjaga diri dari guard against",
    "v": "2:189:19 31 1261"
   },
   {
@@ -841,7 +841,7 @@
    "ar": "عَلِيم",
    "translit": "‘alīm",
    "count": 163,
-   "id": "maha mengetahui; pandai",
+   "id": "Maha Mengetahui; pandai",
    "en": "all-knowing; learned",
    "cum": 5128,
    "s": "عليم alim maha mengetahui all-knowing pandai learned ulama scholars",
@@ -863,10 +863,10 @@
    "ar": "بَعْض",
    "translit": "ba‘ḍ",
    "count": 157,
-   "id": "sebagian; satu sama lain",
-   "en": "some, part; one another",
+   "id": "sebagian",
+   "en": "some, part",
    "cum": 5170,
-   "s": "بعض bad sebagian some, part satu sama lain one another",
+   "s": "بعض bad sebagian some, part",
    "v": "2:76:11 37 1393"
   },
   {
@@ -885,10 +885,10 @@
    "ar": "آخِر",
    "translit": "ākhir",
    "count": 155,
-   "id": "akhirat; akhir",
-   "en": "the Hereafter; last",
+   "id": "terakhir; akhirat",
+   "en": "last; the Hereafter",
    "cum": 5212,
-   "s": "اخر akhir akhirat the hereafter akhir last orang yang kemudian later generations",
+   "s": "اخر akhir terakhir last akhirat the hereafter generasi kemudian later generations",
    "v": "2:8:8 391 1976"
   },
   {
@@ -907,10 +907,10 @@
    "ar": "غَيْر",
    "translit": "gair",
    "count": 147,
-   "id": "selain; tanpa",
-   "en": "other than; without",
+   "id": "selain; bukan / tidak",
+   "en": "other than; not",
    "cum": 5252,
-   "s": "غير gair selain other than tanpa without bukan / tidak not",
+   "s": "غير gair selain other than bukan / tidak not",
    "v": "2:59:5 19 987"
   },
   {
@@ -918,10 +918,10 @@
    "ar": "جَنَّة",
    "translit": "jannah",
    "count": 147,
-   "id": "surga; kebun",
+   "id": "surga; kebun, taman",
    "en": "Paradise; garden",
    "cum": 5272,
-   "s": "جنه jannah surga paradise kebun garden",
+   "s": "جنه jannah surga paradise kebun, taman garden",
    "v": "2:266:6 0 1817"
   },
   {
@@ -940,10 +940,10 @@
    "ar": "نَار",
    "translit": "nār",
    "count": 145,
-   "id": "neraka; api",
-   "en": "the Fire (Hell); fire",
+   "id": "api; neraka",
+   "en": "fire; the Fire (Hell)",
    "cum": 5311,
-   "s": "نار nar neraka the fire (hell) api fire",
+   "s": "نار nar api fire neraka the fire (hell)",
    "v": "2:266:27 0 1354"
   },
   {
@@ -985,9 +985,9 @@
    "translit": "arāda",
    "count": 139,
    "id": "menghendaki",
-   "en": "to want",
+   "en": "want",
    "cum": 5387,
-   "s": "اراد arada menghendaki to want",
+   "s": "اراد arada menghendaki want",
    "v": "2:26:25 386 1484"
   },
   {
@@ -1050,10 +1050,10 @@
    "ar": "أَرْسَلَ",
    "translit": "arsala",
    "count": 130,
-   "id": "mengutus; mengirim",
-   "en": "send as messenger; send",
+   "id": "mengirim; mengutus",
+   "en": "send; send as messenger",
    "cum": 5494,
-   "s": "ارسل arsala mengutus send as messenger mengirim send melepaskan let go",
+   "s": "ارسل arsala mengirim send mengutus send as messenger melepaskan let go",
    "v": "9:33:3 10 836"
   },
   {
@@ -1083,10 +1083,10 @@
    "ar": "أَخَذَ",
    "translit": "akhaża",
    "count": 127,
-   "id": "menimpa, menyiksa; memegang",
-   "en": "seize with punishment; seize, grasp",
+   "id": "mengambil; memegang",
+   "en": "take; seize, grasp",
    "cum": 5546,
-   "s": "اخذ akhaza menimpa, menyiksa seize with punishment memegang seize, grasp mengambil take",
+   "s": "اخذ akhaza mengambil take memegang seize, grasp menimpa, menyiksa seize with punishment",
    "v": "3:81:2 0 1044"
   },
   {
@@ -1149,10 +1149,10 @@
    "ar": "عَظِيم",
    "translit": "‘aẓīm",
    "count": 120,
-   "id": "besar, agung; tulang belulang",
-   "en": "great, mighty; bones",
+   "id": "besar, agung; Maha Agung",
+   "en": "great, mighty; Most Great",
    "cum": 5646,
-   "s": "عظيم azim besar, agung great, mighty tulang belulang bones",
+   "s": "عظيم azim besar, agung great, mighty maha agung most great",
    "v": "2:7:12 303 1840"
   },
   {
@@ -1160,10 +1160,10 @@
    "ar": "يَد",
    "translit": "yad",
    "count": 120,
-   "id": "tangan; sebelum, di hadapan",
-   "en": "hand; before, in front",
+   "id": "tangan",
+   "en": "hand",
    "cum": 5662,
-   "s": "يد yad tangan hand sebelum, di hadapan before, in front",
+   "s": "يد yad tangan hand",
    "v": "5:64:3 0 784"
   },
   {
@@ -1281,7 +1281,7 @@
    "ar": "عَزِيز",
    "translit": "‘azīz",
    "count": 101,
-   "id": "mahaperkasa; sukar",
+   "id": "Mahaperkasa; sukar",
    "en": "exalted in might; difficult",
    "cum": 5823,
    "s": "عزيز aziz mahaperkasa exalted in might sukar difficult",
@@ -1435,10 +1435,10 @@
    "ar": "نَظَرَ",
    "translit": "naẓara",
    "count": 87,
-   "id": "memperhatikan; melihat",
-   "en": "observe; look",
+   "id": "melihat; memperhatikan",
+   "en": "look; observe",
    "cum": 5994,
-   "s": "نظر nazara memperhatikan observe melihat look",
+   "s": "نظر nazara melihat look memperhatikan observe",
    "v": "9:127:5 0 1044"
   },
   {
@@ -1545,10 +1545,10 @@
    "ar": "خَافَ",
    "translit": "khāfa",
    "count": 83,
-   "id": "takut; khawatir terhadap",
-   "en": "fear; fear for",
+   "id": "takut; khawatir",
+   "en": "fear; be apprehensive",
    "cum": 6107,
-   "s": "خاف khafa takut fear khawatir terhadap fear for",
+   "s": "خاف khafa takut fear khawatir be apprehensive",
    "v": "2:182:2 46 801"
   },
   {
@@ -1589,10 +1589,10 @@
    "ar": "رَجَعَ",
    "translit": "raja‘a",
    "count": 79,
-   "id": "dikembalikan; kembali",
-   "en": "be returned; return",
+   "id": "kembali; dikembalikan",
+   "en": "return; be returned",
    "cum": 6150,
-   "s": "رجع rajaa dikembalikan be returned kembali return mengembalikan bring back",
+   "s": "رجع rajaa kembali return dikembalikan be returned mengembalikan bring back",
    "v": "7:150:2 0 967"
   },
   {
@@ -1600,10 +1600,10 @@
    "ar": "أَصْحَٰب",
    "translit": "aṣḥāb",
    "count": 78,
-   "id": "golongan, penghuni",
-   "en": "people, inhabitants",
+   "id": "sahabat, golongan; penghuni",
+   "en": "companions, people; inhabitants",
    "cum": 6160,
-   "s": "اصحب ashab golongan, penghuni people, inhabitants",
+   "s": "اصحب ashab sahabat, golongan companions, people penghuni inhabitants",
    "v": "2:39:6 6 1206"
   },
   {
@@ -1985,10 +1985,10 @@
    "ar": "أَنفَقَ",
    "translit": "anfaqa",
    "count": 68,
-   "id": "menginfakkan",
-   "en": "spend",
+   "id": "membelanjakan, menafkahkan; menginfakkan",
+   "en": "spend; spend in charity",
    "cum": 6503,
-   "s": "انفق anfaqa menginfakkan spend",
+   "s": "انفق anfaqa membelanjakan, menafkahkan spend menginfakkan spend in charity",
    "v": "18:42:8 0 1495"
   },
   {
@@ -2029,10 +2029,10 @@
    "ar": "يَمِين",
    "translit": "yamīn",
    "count": 65,
-   "id": "sumpah; tangan kanan",
-   "en": "oath; right hand",
+   "id": "tangan kanan; kanan",
+   "en": "right hand; right side",
    "cum": 6538,
-   "s": "يمين yamin sumpah oath tangan kanan right hand kanan right side",
+   "s": "يمين yamin tangan kanan right hand kanan right side sumpah oath",
    "v": "34:15:9 0 993"
   },
   {
@@ -2062,10 +2062,10 @@
    "ar": "آبَاء",
    "translit": "ābā’",
    "count": 64,
-   "id": "nenek moyang",
-   "en": "forefathers",
+   "id": "bapak-bapak; nenek moyang",
+   "en": "fathers; forefathers",
    "cum": 6564,
-   "s": "ابا aba nenek moyang forefathers",
+   "s": "ابا aba bapak-bapak fathers nenek moyang forefathers",
    "v": "24:31:27 4 2120"
   },
   {
@@ -2074,9 +2074,9 @@
    "translit": "aṣāba",
    "count": 64,
    "id": "menimpa; menghendaki",
-   "en": "to befall, strike; to intend",
+   "en": "befall, strike; intend",
    "cum": 6572,
-   "s": "اصاب asaba menimpa to befall, strike menghendaki to intend",
+   "s": "اصاب asaba menimpa befall, strike menghendaki intend",
    "v": "11:89:9 0 1279"
   },
   {
@@ -2128,10 +2128,10 @@
    "ar": "ٱبْن",
    "translit": "ibn",
    "count": 63,
-   "id": "putra; musafir",
-   "en": "son; traveler",
+   "id": "putra",
+   "en": "son",
    "cum": 6614,
-   "s": "ابن ibn putra son musafir traveler",
+   "s": "ابن ibn putra son",
    "v": "3:45:13 0 1145"
   },
   {
@@ -2417,7 +2417,7 @@
    "id": "menegakkan (salat); menjalankan",
    "en": "establish (prayer); keep (limits)",
    "cum": 6816,
-   "s": "اقام aqama menegakkan (salat) establish (prayer) menjalankan keep (limits) menghadapkan direct (the face)",
+   "s": "اقام aqama menegakkan (salat) establish (prayer) menjalankan keep (limits)",
    "v": "2:177:32 43 1219"
   },
   {
@@ -2436,10 +2436,10 @@
    "ar": "قَٰتَلَ",
    "translit": "qātala",
    "count": 54,
-   "id": "berperang, memerangi; melaknat",
-   "en": "fight; curse",
+   "id": "berperang, memerangi",
+   "en": "fight",
    "cum": 6831,
-   "s": "قتل qatala berperang, memerangi fight melaknat curse",
+   "s": "قتل qatala berperang, memerangi fight",
    "v": "3:146:4 0 1019"
   },
   {
@@ -2678,10 +2678,10 @@
    "ar": "كَتَبَ",
    "translit": "kataba",
    "count": 49,
-   "id": "diwajibkan; menetapkan",
-   "en": "prescribed; decree",
+   "id": "menulis; mencatat",
+   "en": "write; record",
    "cum": 6980,
-   "s": "كتب kataba diwajibkan prescribed menetapkan decree menulis write mencatat record",
+   "s": "كتب kataba menulis write mencatat record menetapkan decree diwajibkan prescribed",
    "v": "2:178:4 67 838"
   },
   {
@@ -2766,7 +2766,7 @@
    "ar": "سَمِيع",
    "translit": "samī‘",
    "count": 47,
-   "id": "maha mendengar",
+   "id": "Maha Mendengar",
    "en": "All-Hearing",
    "cum": 7032,
    "s": "سميع sami maha mendengar all-hearing",
@@ -2821,7 +2821,7 @@
    "ar": "قَدِير",
    "translit": "qadīr",
    "count": 45,
-   "id": "mahakuasa",
+   "id": "Mahakuasa",
    "en": "all-powerful",
    "cum": 7062,
    "s": "قدير qadir mahakuasa all-powerful",
@@ -3096,7 +3096,7 @@
    "ar": "سُبْحَٰن",
    "translit": "subḥān",
    "count": 41,
-   "id": "mahasuci",
+   "id": "Mahasuci",
    "en": "exalted is He",
    "cum": 7207,
    "s": "سبحن subhan mahasuci exalted is he",
@@ -3130,9 +3130,9 @@
    "translit": "‘ażżaba",
    "count": 41,
    "id": "mengazab",
-   "en": "to punish",
+   "en": "punish",
    "cum": 7224,
-   "s": "عذب azzaba mengazab to punish",
+   "s": "عذب azzaba mengazab punish",
    "v": "5:40:9 0 1326"
   },
   {
@@ -3140,10 +3140,10 @@
    "ar": "تَرَكَ",
    "translit": "taraka",
    "count": 40,
-   "id": "membiarkan; meninggalkan",
-   "en": "leave, let be; leave behind",
+   "id": "meninggalkan; membiarkan",
+   "en": "leave (behind); let be",
    "cum": 7229,
-   "s": "ترك taraka membiarkan leave, let be meninggalkan leave behind",
+   "s": "ترك taraka meninggalkan leave (behind) membiarkan let be",
    "v": "2:180:8 73 924"
   },
   {
@@ -3372,9 +3372,9 @@
    "translit": "mayyit",
    "count": 38,
    "id": "mati; akan mati",
-   "en": "dead; to die",
+   "en": "dead; die",
    "cum": 7340,
-   "s": "ميت mayyit mati dead akan mati to die",
+   "s": "ميت mayyit mati dead akan mati die",
    "v": "39:30:2 0 1092"
   },
   {
@@ -3976,10 +3976,10 @@
    "ar": "وَلَّىٰ",
    "translit": "wallā",
    "count": 30,
-   "id": "berpaling pergi; menghadap",
-   "en": "turn away; turn toward",
+   "id": "menghadapkan; berbalik pergi",
+   "en": "turn toward; turn away",
    "cum": 7593,
-   "s": "ولي walla berpaling pergi turn away menghadap turn toward menjadikan teman make allies",
+   "s": "ولي walla menghadapkan turn toward berbalik pergi turn away menjadikan teman make allies",
    "v": "27:10:8 0 940"
   },
   {
@@ -3987,10 +3987,10 @@
    "ar": "عَسَى",
    "translit": "‘asā",
    "count": 30,
-   "id": "boleh jadi",
-   "en": "perhaps",
+   "id": "mudah-mudahan; boleh jadi",
+   "en": "it is hoped; perhaps",
    "cum": 7597,
-   "s": "عسي asa boleh jadi perhaps",
+   "s": "عسي asa mudah-mudahan it is hoped boleh jadi perhaps",
    "v": "4:84:11 0 985"
   },
   {
@@ -4218,10 +4218,10 @@
    "ar": "أَصْلَحَ",
    "translit": "aṣlaḥa",
    "count": 28,
-   "id": "memperbaiki diri; memperbaiki",
-   "en": "reform oneself; set right, amend",
+   "id": "memperbaiki; memperbaiki diri",
+   "en": "set right, amend; reform oneself",
    "cum": 7679,
-   "s": "اصلح aslaha memperbaiki diri reform oneself memperbaiki set right, amend",
+   "s": "اصلح aslaha memperbaiki set right, amend memperbaiki diri reform oneself",
    "v": "5:39:6 0 1437"
   },
   {
@@ -4273,10 +4273,10 @@
    "ar": "رِجَال",
    "translit": "rijāl",
    "count": 28,
-   "id": "laki-laki; berjalan kaki",
-   "en": "men; on foot",
+   "id": "laki-laki",
+   "en": "men",
    "cum": 7698,
-   "s": "رجال rijal laki-laki men berjalan kaki on foot",
+   "s": "رجال rijal laki-laki men",
    "v": "7:46:5 0 1045"
   },
   {
@@ -4834,7 +4834,7 @@
    "ar": "غَنِىّ",
    "translit": "ganiyy",
    "count": 24,
-   "id": "mahakaya; kaya",
+   "id": "Mahakaya; kaya",
    "en": "free of need; rich",
    "cum": 7875,
    "s": "غني ganiyy mahakaya free of need kaya rich",
@@ -4978,9 +4978,9 @@
    "translit": "la‘ana",
    "count": 23,
    "id": "melaknat",
-   "en": "to curse",
+   "en": "curse",
    "cum": 7915,
-   "s": "لعن laana melaknat to curse",
+   "s": "لعن laana melaknat curse",
    "v": "5:78:1 0 862"
   },
   {
@@ -5033,9 +5033,9 @@
    "translit": "fatanu",
    "count": 23,
    "id": "menguji; memalingkan",
-   "en": "to test; to tempt away",
+   "en": "test; tempt away",
    "cum": 7931,
-   "s": "فتن fatanu menguji to test memalingkan to tempt away menyiksa to persecute",
+   "s": "فتن fatanu menguji test memalingkan tempt away menyiksa persecute",
    "v": "16:110:9 67 1097"
   },
   {
@@ -5109,10 +5109,10 @@
    "ar": "سَيِّئَة",
    "translit": "sayyi’ah",
    "count": 22,
-   "id": "perbuatan buruk; musibah",
-   "en": "evil deed; misfortune",
+   "id": "keburukan; perbuatan buruk",
+   "en": "evil; evil deed",
    "cum": 7952,
-   "s": "سييه sayyiah perbuatan buruk evil deed musibah misfortune",
+   "s": "سييه sayyiah keburukan evil perbuatan buruk evil deed musibah misfortune",
    "v": "3:120:7 0 1484"
   },
   {
@@ -5362,10 +5362,10 @@
    "ar": "رُوح",
    "translit": "rūḥ",
    "count": 21,
-   "id": "Jibril (Roh); roh",
-   "en": "the Spirit (Gabriel); soul, spirit",
+   "id": "roh; Jibril (Roh)",
+   "en": "spirit, soul; the Spirit (Gabriel)",
    "cum": 8018,
-   "s": "روح ruh jibril (roh) the spirit (gabriel) roh soul, spirit wahyu inspiration",
+   "s": "روح ruh roh spirit, soul jibril (roh) the spirit (gabriel) wahyu inspiration",
    "v": "16:102:3 154 1030"
   },
   {
@@ -5439,10 +5439,10 @@
    "ar": "وَضَعَ",
    "translit": "waḍa‘a",
    "count": 21,
-   "id": "melahirkan; meletakkan",
-   "en": "give birth; put down, place",
+   "id": "meletakkan; melahirkan",
+   "en": "put down, place; give birth",
    "cum": 8038,
-   "s": "وضع wadaa melahirkan give birth meletakkan put down, place membebaskan relieve of",
+   "s": "وضع wadaa meletakkan put down, place melahirkan give birth membebaskan relieve of",
    "v": "3:96:4 0 1437"
   },
   {
@@ -5549,10 +5549,10 @@
    "ar": "بَلَوْ",
    "translit": "balau",
    "count": 20,
-   "id": "menguji; menjadi usang",
-   "en": "test; wear out",
+   "id": "menguji",
+   "en": "test",
    "cum": 8065,
-   "s": "بلو balau menguji test menjadi usang wear out",
+   "s": "بلو balau menguji test",
    "v": "68:17:4 0 1123"
   },
   {
@@ -5681,7 +5681,7 @@
    "ar": "تَعَٰلَىٰ",
    "translit": "ta‘ālā",
    "count": 20,
-   "id": "mahatinggi; menyombongkan diri",
+   "id": "Mahatinggi; menyombongkan diri",
    "en": "exalted, high above; be haughty",
    "cum": 8097,
    "s": "تعلي taala mahatinggi exalted, high above menyombongkan diri be haughty menguasai overcome, take over",
@@ -5748,9 +5748,9 @@
    "translit": "yaḍurra",
    "count": 19,
    "id": "membahayakan",
-   "en": "to harm",
+   "en": "harm",
    "cum": 8113,
-   "s": "يضر yadurra membahayakan to harm",
+   "s": "يضر yadurra membahayakan harm",
    "v": "3:144:22 0 1019"
   },
   {
@@ -6110,10 +6110,10 @@
    "ar": "عَٰلِم",
    "translit": "‘ālim",
    "count": 18,
-   "id": "yang mengetahui",
-   "en": "one who knows",
+   "id": "Yang Maha Mengetahui; orang yang berilmu",
+   "en": "the Knower; one of knowledge",
    "cum": 8194,
-   "s": "علم alim yang mengetahui one who knows",
+   "s": "علم alim yang maha mengetahui the knower orang yang berilmu one of knowledge",
    "v": "6:73:19 0 1295"
   },
   {
@@ -6132,10 +6132,10 @@
    "ar": "أُعِيدُ",
    "translit": "u‘īdu",
    "count": 18,
-   "id": "mengulangi (penciptaan); mengembalikan",
-   "en": "repeat creation; return",
+   "id": "mengembalikan; mengulangi",
+   "en": "return; repeat",
    "cum": 8199,
-   "s": "اعيد uidu mengulangi (penciptaan) repeat creation mengembalikan return",
+   "s": "اعيد uidu mengembalikan return mengulangi repeat",
    "v": "22:22:8 45 1254"
   },
   {
@@ -6198,10 +6198,10 @@
    "ar": "أَحَاطَ",
    "translit": "aḥāṭa",
    "count": 17,
-   "id": "mengetahui sepenuhnya; meliputi, mengepung",
-   "en": "know fully; encompass, surround",
+   "id": "meliputi, mengepung; mengetahui sepenuhnya",
+   "en": "encompass, surround; know fully",
    "cum": 8213,
-   "s": "احاط ahata mengetahui sepenuhnya know fully meliputi, mengepung encompass, surround dibinasakan be destroyed",
+   "s": "احاط ahata meliputi, mengepung encompass, surround mengetahui sepenuhnya know fully dibinasakan be destroyed",
    "v": "17:60:6 0 1084"
   },
   {
@@ -6344,7 +6344,7 @@
    "id": "berdiri; menegakkan",
    "en": "standing; upholding",
    "cum": 8242,
-   "s": "قايم qaim berdiri standing menegakkan upholding mengawasi watching over pokok penopang means of support",
+   "s": "قايم qaim berdiri standing menegakkan upholding mengawasi watching over",
    "v": "3:39:4 0 2453"
   },
   {
@@ -6858,10 +6858,10 @@
    "ar": "حَلِيم",
    "translit": "ḥalīm",
    "count": 15,
-   "id": "penyantun",
-   "en": "forbearing",
+   "id": "Maha Penyantun; penyantun",
+   "en": "Most Forbearing; forbearing",
    "cum": 8342,
-   "s": "حليم halim penyantun forbearing",
+   "s": "حليم halim maha penyantun most forbearing penyantun forbearing",
    "v": "2:225:14 47 1527"
   },
   {
@@ -6968,10 +6968,10 @@
    "ar": "حَرَج",
    "translit": "ḥaraj",
    "count": 15,
-   "id": "keberatan hati; kesukaran",
-   "en": "inner distress; difficulty",
+   "id": "kesukaran; keberatan hati",
+   "en": "difficulty; inner distress",
    "cum": 8362,
-   "s": "حرج haraj keberatan hati inner distress kesukaran difficulty celaan blame sempit constricted",
+   "s": "حرج haraj kesukaran difficulty keberatan hati inner distress celaan blame sempit constricted",
    "v": "7:2:8 0 1202"
   },
   {
@@ -7177,10 +7177,10 @@
    "ar": "مَقَام",
    "translit": "maqām",
    "count": 14,
-   "id": "tempat berdiri; kedudukan",
-   "en": "standing place; position, station",
+   "id": "tempat; kedudukan",
+   "en": "place; position, station",
    "cum": 8399,
-   "s": "مقام maqam tempat berdiri standing place kedudukan position, station tempat, kediaman place, abode berdiri, tinggal standing, staying",
+   "s": "مقام maqam tempat place kedudukan position, station tempat berdiri standing place tinggal (bersama) staying (among)",
    "v": "55:46:3 194 1358"
   },
   {
@@ -7430,10 +7430,10 @@
    "ar": "مَدَّ",
    "translit": "madda",
    "count": 13,
-   "id": "menghamparkan; memanjangkan",
-   "en": "spread out; extend",
+   "id": "memanjangkan; menghamparkan",
+   "en": "extend; spread out",
    "cum": 8441,
-   "s": "مد madda menghamparkan spread out memanjangkan extend menambah increase, replenish merentangkan stretch out",
+   "s": "مد madda memanjangkan extend menghamparkan spread out menambah increase, replenish merentangkan stretch out",
    "v": "13:3:3 0 1036"
   },
   {
@@ -7573,10 +7573,10 @@
    "ar": "غَشِيَ",
    "translit": "gasyiya",
    "count": 13,
-   "id": "meliputi, menutupi; pingsan",
-   "en": "envelop, cover; faint",
+   "id": "meliputi, menutupi",
+   "en": "envelop, cover",
    "cum": 8464,
-   "s": "غشي gasyiya meliputi, menutupi envelop, cover pingsan faint",
+   "s": "غشي gasyiya meliputi, menutupi envelop, cover",
    "v": "44:11:1 101 1280"
   },
   {
@@ -7629,9 +7629,9 @@
    "translit": "za‘ama",
    "count": 13,
    "id": "mengaku, mengklaim",
-   "en": "to claim",
+   "en": "claim",
    "cum": 8473,
-   "s": "زعم zaama mengaku, mengklaim to claim",
+   "s": "زعم zaama mengaku, mengklaim claim",
    "v": "64:7:1 71 1019"
   },
   {
@@ -7763,7 +7763,7 @@
    "id": "memotong; memutuskan",
    "en": "cut; sever",
    "cum": 8493,
-   "s": "قطع qutia memotong cut memutuskan sever membinasakan eliminate melintasi cross",
+   "s": "قطع qutia memotong cut memutuskan sever melintasi cross",
    "v": "6:45:1 17 1218"
   },
   {
@@ -8079,10 +8079,10 @@
    "ar": "وَقَعَ",
    "translit": "waqa‘a",
    "count": 12,
-   "id": "menimpa; terjadi",
-   "en": "befall; occur",
+   "id": "terjadi; menimpa",
+   "en": "occur; befall",
    "cum": 8540,
-   "s": "وقع waqaa menimpa befall terjadi occur jatuh fall ditetapkan become established",
+   "s": "وقع waqaa terjadi occur menimpa befall jatuh fall ditetapkan become established",
    "v": "4:100:24 0 1202"
   },
   {
@@ -8123,10 +8123,10 @@
    "ar": "وِزْر",
    "translit": "wizr",
    "count": 12,
-   "id": "beban dosa; beban",
-   "en": "burden of sin; load",
+   "id": "beban; beban dosa",
+   "en": "burden; burden of sin",
    "cum": 8546,
-   "s": "وزر wizr beban dosa burden of sin beban load",
+   "s": "وزر wizr beban burden beban dosa burden of sin",
    "v": "6:164:19 0 1123"
   },
   {
@@ -8299,10 +8299,10 @@
    "ar": "عَرَضَ",
    "translit": "‘araḍa",
    "count": 11,
-   "id": "dihadapkan; memperlihatkan",
-   "en": "be presented; show, display",
+   "id": "menghadapkan, memperlihatkan; dihadapkan",
+   "en": "present, show; be presented",
    "cum": 8572,
-   "s": "عرض arada dihadapkan be presented memperlihatkan show, display menawarkan offer",
+   "s": "عرض arada menghadapkan, memperlihatkan present, show dihadapkan be presented menawarkan offer",
    "v": "38:31:2 21 829"
   },
   {
@@ -8387,10 +8387,10 @@
    "ar": "بَغْي",
    "translit": "bagy",
    "count": 11,
-   "id": "kedengkian; kezaliman",
-   "en": "jealous animosity; oppression",
+   "id": "kezaliman; kedengkian",
+   "en": "oppression; jealous animosity",
    "cum": 8584,
-   "s": "بغي bagy kedengkian jealous animosity kezaliman oppression",
+   "s": "بغي bagy kezaliman oppression kedengkian jealous animosity",
    "v": "42:39:4 0 1332"
   },
   {
@@ -8464,10 +8464,10 @@
    "ar": "رَءُوف",
    "translit": "ra’ūf",
    "count": 11,
-   "id": "penyantun",
-   "en": "kind",
+   "id": "Maha Penyantun; penyantun",
+   "en": "Most Kind; kind",
    "cum": 8594,
-   "s": "روف rauf penyantun kind",
+   "s": "روف rauf maha penyantun most kind penyantun kind",
    "v": "9:117:26 0 1396"
   },
   {
@@ -8498,9 +8498,9 @@
    "translit": "a‘jaba",
    "count": 11,
    "id": "membuat kagum, menyenangkan",
-   "en": "to impress, please",
+   "en": "impress, please",
    "cum": 8598,
-   "s": "اعجب ajaba membuat kagum, menyenangkan to impress, please",
+   "s": "اعجب ajaba membuat kagum, menyenangkan impress, please",
    "v": "57:20:16 0 1045"
   },
   {
@@ -8673,10 +8673,10 @@
    "ar": "أَوْلَىٰ",
    "translit": "aulā",
    "count": 11,
-   "id": "lebih berhak; celakalah",
-   "en": "more entitled; woe to",
+   "id": "lebih berhak",
+   "en": "more entitled",
    "cum": 8622,
-   "s": "اولي aula lebih berhak more entitled celakalah woe to",
+   "s": "اولي aula lebih berhak more entitled",
    "v": "4:135:21 0 1045"
   },
   {
@@ -8772,7 +8772,7 @@
    "ar": "قَوِىّ",
    "translit": "qawiyy",
    "count": 11,
-   "id": "mahakuat; kuat",
+   "id": "Mahakuat; kuat",
    "en": "powerful; strong",
    "cum": 8635,
    "s": "قوي qawiyy mahakuat powerful kuat strong",
@@ -8827,10 +8827,10 @@
    "ar": "مَعْلُوم",
    "translit": "ma‘lūm",
    "count": 11,
-   "id": "tertentu",
+   "id": "diketahui, tertentu",
    "en": "known, appointed",
    "cum": 8643,
-   "s": "معلوم malum tertentu known, appointed",
+   "s": "معلوم malum diketahui, tertentu known, appointed",
    "v": "15:21:11 91 1971"
   },
   {
@@ -9498,7 +9498,7 @@
    "ar": "شَكُور",
    "translit": "syakūr",
    "count": 10,
-   "id": "banyak bersyukur; maha mensyukuri",
+   "id": "banyak bersyukur; Maha Mensyukuri",
    "en": "grateful; appreciative",
    "cum": 8725,
    "s": "شكور syakur banyak bersyukur grateful maha mensyukuri appreciative",
@@ -9674,10 +9674,10 @@
    "ar": "فَرَّقُ",
    "translit": "farraqu",
    "count": 9,
-   "id": "membeda-bedakan; memecah belah",
-   "en": "make distinction; divide",
+   "id": "memisahkan; membeda-bedakan",
+   "en": "separate; make distinction",
    "cum": 8744,
-   "s": "فرق farraqu membeda-bedakan make distinction memecah belah divide memisahkan cause separation",
+   "s": "فرق farraqu memisahkan separate membeda-bedakan make distinction memecah belah divide",
    "v": "2:136:25 42 1338"
   },
   {
@@ -9861,10 +9861,10 @@
    "ar": "لَغْو",
    "translit": "lagw",
    "count": 9,
-   "id": "perkataan sia-sia; yang tak disengaja",
-   "en": "idle speech; what is unintended",
+   "id": "perkataan sia-sia; hal sia-sia",
+   "en": "idle speech; vain matters",
    "cum": 8765,
-   "s": "لغو lagw perkataan sia-sia idle speech yang tak disengaja what is unintended",
+   "s": "لغو lagw perkataan sia-sia idle speech hal sia-sia vain matters",
    "v": "52:23:5 39 1306"
   },
   {
@@ -10070,10 +10070,10 @@
    "ar": "رَمَىٰ",
    "translit": "ramā",
    "count": 9,
-   "id": "menuduh; melempar",
-   "en": "accuse; throw",
+   "id": "melempar; menuduh",
+   "en": "throw; accuse",
    "cum": 8788,
-   "s": "رمي rama menuduh accuse melempar throw",
+   "s": "رمي rama melempar throw menuduh accuse",
    "v": "8:17:12 16 886"
   },
   {
@@ -10158,10 +10158,10 @@
    "ar": "غِلّ",
    "translit": "gill",
    "count": 9,
-   "id": "belenggu; dendam",
-   "en": "shackles; resentment",
+   "id": "dendam",
+   "en": "resentment",
    "cum": 8797,
-   "s": "غل gill belenggu shackles dendam resentment",
+   "s": "غل gill dendam resentment",
    "v": "7:43:6 5 1149"
   },
   {
@@ -10544,9 +10544,9 @@
    "translit": "ibtalā",
    "count": 8,
    "id": "menguji",
-   "en": "to test",
+   "en": "test",
    "cum": 8838,
-   "s": "ابتلي ibtala menguji to test",
+   "s": "ابتلي ibtala menguji test",
    "v": "2:124:2 82 1270"
   },
   {
@@ -10609,10 +10609,10 @@
    "ar": "زَالَت",
    "translit": "zālat",
    "count": 8,
-   "id": "senantiasa",
-   "en": "continue to",
+   "id": "berhenti",
+   "en": "cease",
    "cum": 8844,
-   "s": "زالت zalat senantiasa continue to",
+   "s": "زالت zalat berhenti cease",
    "v": "21:15:2 0 1081"
   },
   {
@@ -10709,9 +10709,9 @@
    "translit": "sammā",
    "count": 8,
    "id": "menamai",
-   "en": "to name",
+   "en": "name",
    "cum": 8854,
-   "s": "سمي samma menamai to name",
+   "s": "سمي samma menamai name",
    "v": "22:78:19 6 2011"
   },
   {
@@ -10786,9 +10786,9 @@
    "translit": "hamma",
    "count": 8,
    "id": "bermaksud",
-   "en": "to intend",
+   "en": "intend",
    "cum": 8861,
-   "s": "هم hamma bermaksud to intend",
+   "s": "هم hamma bermaksud intend",
    "v": "5:11:9 0 1097"
   },
   {
@@ -10796,10 +10796,10 @@
    "ar": "جَنب",
    "translit": "janb",
    "count": 8,
-   "id": "lambung; di samping",
-   "en": "side of the body; beside",
+   "id": "lambung; sisi",
+   "en": "side of the body; side",
    "cum": 8862,
-   "s": "جنب janb lambung side of the body di samping beside dalam hal in regard to",
+   "s": "جنب janb lambung side of the body sisi side",
    "v": "39:56:9 40 1071"
   },
   {
@@ -10818,10 +10818,10 @@
    "ar": "كَبُرَ",
    "translit": "kabura",
    "count": 8,
-   "id": "terasa berat; sangat besar",
-   "en": "be burdensome; be great",
+   "id": "sangat besar; terasa berat",
+   "en": "be great; be burdensome",
    "cum": 8864,
-   "s": "كبر kabura terasa berat be burdensome sangat besar be great menjadi dewasa grow up",
+   "s": "كبر kabura sangat besar be great terasa berat be burdensome menjadi dewasa grow up",
    "v": "6:35:3 0 871"
   },
   {
@@ -11082,10 +11082,10 @@
    "ar": "أَظْهَرَ",
    "translit": "aẓhara",
    "count": 8,
-   "id": "memenangkan; memperlihatkan",
-   "en": "make prevail; disclose",
+   "id": "menampakkan; memenangkan",
+   "en": "make manifest; make prevail",
    "cum": 8890,
-   "s": "اظهر azhara memenangkan make prevail memperlihatkan disclose menimbulkan cause to appear",
+   "s": "اظهر azhara menampakkan make manifest memenangkan make prevail memasuki waktu zuhur enter noon",
    "v": "40:26:15 0 989"
   },
   {
@@ -11115,10 +11115,10 @@
    "ar": "رَٰوَدُ",
    "translit": "rāwadu",
    "count": 8,
-   "id": "menggoda; membujuk",
-   "en": "seek to seduce; persuade",
+   "id": "membujuk",
+   "en": "try to persuade",
    "cum": 8893,
-   "s": "رود rawadu menggoda seek to seduce membujuk persuade",
+   "s": "رود rawadu membujuk try to persuade",
    "v": "12:30:7 69 1208"
   },
   {
@@ -11225,10 +11225,10 @@
    "ar": "صُحُف",
    "translit": "ṣuḥuf",
    "count": 8,
-   "id": "kitab-kitab; lembaran-lembaran",
-   "en": "scriptures; sheets",
+   "id": "lembaran-lembaran; kitab-kitab",
+   "en": "sheets; scriptures",
    "cum": 8904,
-   "s": "صحف suhuf kitab-kitab scriptures lembaran-lembaran sheets",
+   "s": "صحف suhuf lembaran-lembaran sheets kitab-kitab scriptures",
    "v": "53:36:6 36 1176"
   },
   {
@@ -11247,10 +11247,10 @@
    "ar": "طَافَ",
    "translit": "ṭāfa",
    "count": 8,
-   "id": "diedarkan; berkeliling",
-   "en": "be circulated; go around",
+   "id": "berkeliling; diedarkan",
+   "en": "go around; be circulated",
    "cum": 8906,
-   "s": "طاف tafa diedarkan be circulated berkeliling go around menimpa come upon",
+   "s": "طاف tafa berkeliling go around diedarkan be circulated menimpa come upon",
    "v": "37:45:1 0 940"
   },
   {
@@ -11280,10 +11280,10 @@
    "ar": "كَبِيرَة",
    "translit": "kabīrah",
    "count": 7,
-   "id": "yang besar-besar; berat",
-   "en": "major ones; difficult",
+   "id": "besar; yang besar-besar",
+   "en": "great, large; major ones",
    "cum": 8909,
-   "s": "كبيره kabirah yang besar-besar major ones berat difficult besar great, large",
+   "s": "كبيره kabirah besar great, large yang besar-besar major ones berat difficult",
    "v": "9:121:6 1 1432"
   },
   {
@@ -11291,10 +11291,10 @@
    "ar": "أَرْبَع",
    "translit": "arba‘",
    "count": 7,
-   "id": "empat puluh; empat",
-   "en": "forty; four",
+   "id": "empat; empat puluh",
+   "en": "four; forty",
    "cum": 8910,
-   "s": "اربع arba empat puluh forty empat four",
+   "s": "اربع arba empat four empat puluh forty",
    "v": "24:6:12 0 961"
   },
   {
@@ -11357,10 +11357,10 @@
    "ar": "عَاكِف",
    "translit": "‘ākif",
    "count": 7,
-   "id": "tekun menyembah; beriktikaf",
-   "en": "devoted (to worship); staying for worship",
+   "id": "tekun berdiam; beriktikaf",
+   "en": "staying devotedly; staying for worship",
    "cum": 8916,
-   "s": "عاكف akif tekun menyembah devoted (to worship) beriktikaf staying for worship penetap resident",
+   "s": "عاكف akif tekun berdiam staying devotedly beriktikaf staying for worship tekun (pada) devoted (to) penetap resident",
    "v": "22:25:14 0 1357"
   },
   {
@@ -11456,10 +11456,10 @@
    "ar": "سَآئِل",
    "translit": "sā’il",
    "count": 7,
-   "id": "peminta-minta; penanya",
-   "en": "one who asks for help; one who asks",
+   "id": "orang yang meminta; penanya",
+   "en": "one who asks; questioner",
    "cum": 8924,
-   "s": "سايل sail peminta-minta one who asks for help penanya one who asks",
+   "s": "سايل sail orang yang meminta one who asks penanya questioner",
    "v": "70:1:2 24 2011"
   },
   {
@@ -11567,9 +11567,9 @@
    "translit": "yukallifu",
    "count": 7,
    "id": "membebani",
-   "en": "to burden, charge",
+   "en": "burden, charge",
    "cum": 8933,
-   "s": "يكلف yukallifu membebani to burden, charge",
+   "s": "يكلف yukallifu membebani burden, charge",
    "v": "2:286:2 1 1430"
   },
   {
@@ -11712,7 +11712,7 @@
    "id": "tali; perjanjian",
    "en": "rope; covenant",
    "cum": 8946,
-   "s": "حبل habl tali rope perjanjian covenant urat vein",
+   "s": "حبل habl tali rope perjanjian covenant",
    "v": "50:16:13 0 1149"
   },
   {
@@ -11767,7 +11767,7 @@
    "id": "kitab-kitab; catatan tertulis",
    "en": "scriptures; written records",
    "cum": 8950,
-   "s": "زبر zubur kitab-kitab scriptures catatan tertulis written records golongan sects",
+   "s": "زبر zubur kitab-kitab scriptures catatan tertulis written records",
    "v": "26:196:3 0 1045"
   },
   {
@@ -11841,10 +11841,10 @@
    "ar": "قَاعِد",
    "translit": "qā‘id",
    "count": 7,
-   "id": "yang tinggal; duduk",
-   "en": "one who stays behind; sitting",
+   "id": "yang duduk; yang tinggal",
+   "en": "one who sits; one who stays behind",
    "cum": 8957,
-   "s": "قاعد qaid yang tinggal one who stays behind duduk sitting",
+   "s": "قاعد qaid yang duduk one who sits yang tinggal one who stays behind",
    "v": "10:12:8 0 1271"
   },
   {
@@ -11984,10 +11984,10 @@
    "ar": "دَلَّ",
    "translit": "dalla",
    "count": 7,
-   "id": "menunjukkan; membujuk",
-   "en": "direct to; lure",
+   "id": "menunjukkan",
+   "en": "direct to",
    "cum": 8969,
-   "s": "دل dalla menunjukkan direct to membujuk lure",
+   "s": "دل dalla menunjukkan direct to",
    "v": "34:14:6 0 1097"
   },
   {
@@ -11996,9 +11996,9 @@
    "translit": "ḥayya",
    "count": 7,
    "id": "hidup",
-   "en": "to live",
+   "en": "live",
    "cum": 8970,
-   "s": "حي hayya hidup to live",
+   "s": "حي hayya hidup live",
    "v": "8:42:29 0 803"
   },
   {
@@ -12127,10 +12127,10 @@
    "ar": "ضَاقَ",
    "translit": "ḍāqa",
    "count": 7,
-   "id": "menjadi sempit; merasa susah hati",
-   "en": "become narrow; feel distressed",
+   "id": "menjadi sempit",
+   "en": "become narrow",
    "cum": 8981,
-   "s": "ضاق daqa menjadi sempit become narrow merasa susah hati feel distressed",
+   "s": "ضاق daqa menjadi sempit become narrow",
    "v": "11:77:7 0 1262"
   },
   {
@@ -12633,10 +12633,10 @@
    "ar": "دَعْوَة",
    "translit": "da‘wah",
    "count": 6,
-   "id": "doa; seruan",
-   "en": "supplication; call",
+   "id": "seruan; doa",
+   "en": "call; supplication",
    "cum": 9021,
-   "s": "دعوه dawah doa supplication seruan call",
+   "s": "دعوه dawah seruan call doa supplication",
    "v": "2:186:8 19 1096"
   },
   {
@@ -12744,9 +12744,9 @@
    "translit": "aqraḍu",
    "count": 6,
    "id": "meminjamkan",
-   "en": "to loan",
+   "en": "loan",
    "cum": 9029,
-   "s": "اقرض aqradu meminjamkan to loan",
+   "s": "اقرض aqradu meminjamkan loan",
    "v": "2:245:4 75 1176"
   },
   {
@@ -13040,10 +13040,10 @@
    "ar": "أَدْرَكَ",
    "translit": "adraka",
    "count": 6,
-   "id": "menimpa; mencapai",
-   "en": "overtake; reach",
+   "id": "menyusul, mencapai; menangkap (penglihatan)",
+   "en": "overtake, reach; perceive (by sight)",
    "cum": 9051,
-   "s": "ادرك adraka menimpa overtake mencapai reach",
+   "s": "ادرك adraka menyusul, mencapai overtake, reach menangkap (penglihatan) perceive (by sight)",
    "v": "6:103:5 55 1165"
   },
   {
@@ -13084,10 +13084,10 @@
    "ar": "يَسْتَفْتُ",
    "translit": "yastaftu",
    "count": 6,
-   "id": "meminta fatwa; menanyakan",
-   "en": "request a ruling; inquire",
+   "id": "menanyakan; meminta fatwa",
+   "en": "inquire; request a ruling",
    "cum": 9054,
-   "s": "يستفت yastaftu meminta fatwa request a ruling menanyakan inquire",
+   "s": "يستفت yastaftu menanyakan inquire meminta fatwa request a ruling",
    "v": "18:22:30 26 1329"
   },
   {
@@ -13106,10 +13106,10 @@
    "ar": "أَخْذ",
    "translit": "akhż",
    "count": 6,
-   "id": "cengkeraman azab; mengambil",
-   "en": "seizure (punishment); taking",
+   "id": "pengambilan, cengkeraman; siksaan",
+   "en": "taking, seizure; punishment",
    "cum": 9056,
-   "s": "اخذ akhz cengkeraman azab seizure (punishment) mengambil taking",
+   "s": "اخذ akhz pengambilan, cengkeraman taking, seizure siksaan punishment",
    "v": "11:102:2 2 978"
   },
   {
@@ -13546,7 +13546,7 @@
    "ar": "قَهَّار",
    "translit": "qahhār",
    "count": 6,
-   "id": "mahaperkasa",
+   "id": "Mahaperkasa",
    "en": "the prevailing",
    "cum": 9088,
    "s": "قهار qahhar mahaperkasa the prevailing",
@@ -13558,9 +13558,9 @@
    "translit": "ḥulum",
    "count": 6,
    "id": "mimpi; usia balig",
-   "en": "dreams; puberty",
+   "en": "dream; puberty",
    "cum": 9089,
-   "s": "حلم hulum mimpi dreams usia balig puberty akal minds",
+   "s": "حلم hulum mimpi dream usia balig puberty",
    "v": "24:58:11 0 1223"
   },
   {
@@ -13887,10 +13887,10 @@
    "ar": "فَرَقْ",
    "translit": "faraq",
    "count": 5,
-   "id": "membelah; memisahkan, membedakan",
-   "en": "part, split; separate, make distinct",
+   "id": "memisahkan; membedakan, memperjelas",
+   "en": "separate, part; make distinct",
    "cum": 9112,
-   "s": "فرق faraq membelah part, split memisahkan, membedakan separate, make distinct takut be afraid",
+   "s": "فرق faraq memisahkan separate, part membedakan, memperjelas make distinct",
    "v": "2:50:2 0 1272"
   },
   {
@@ -14239,10 +14239,10 @@
    "ar": "خَاوِيَة",
    "translit": "khāwiyah",
    "count": 5,
-   "id": "runtuh; kosong",
-   "en": "fallen in ruin; hollow",
+   "id": "kosong, sunyi; runtuh",
+   "en": "empty, desolate; fallen in ruin",
    "cum": 9133,
-   "s": "خاويه khawiyah runtuh fallen in ruin kosong hollow",
+   "s": "خاويه khawiyah kosong, sunyi empty, desolate runtuh fallen in ruin",
    "v": "2:259:7 46 1688"
   },
   {
@@ -14503,10 +14503,10 @@
    "ar": "وَهَنَ",
    "translit": "wahana",
    "count": 5,
-   "id": "lemah semangat; melemah",
-   "en": "lose heart; become weak",
+   "id": "melemah; lemah semangat",
+   "en": "become weak; lose heart",
    "cum": 9150,
-   "s": "وهن wahana lemah semangat lose heart melemah become weak",
+   "s": "وهن wahana melemah become weak lemah semangat lose heart",
    "v": "19:4:4 0 993"
   },
   {
@@ -14580,10 +14580,10 @@
    "ar": "رَقِيب",
    "translit": "raqīb",
    "count": 5,
-   "id": "pengawas; penunggu",
-   "en": "observer; one who waits",
+   "id": "Maha Mengawasi; pengawas",
+   "en": "All-Watchful; observer",
    "cum": 9154,
-   "s": "رقيب raqib pengawas observer penunggu one who waits",
+   "s": "رقيب raqib maha mengawasi all-watchful pengawas observer penunggu one who waits",
    "v": "50:18:7 0 1332"
   },
   {
@@ -14723,10 +14723,10 @@
    "ar": "يُفْتِي",
    "translit": "yuftī",
    "count": 5,
-   "id": "memberi fatwa; menerangkan",
-   "en": "give a ruling; explain",
+   "id": "menerangkan; memberi fatwa",
+   "en": "explain; give a ruling",
    "cum": 9163,
-   "s": "يفتي yufti memberi fatwa give a ruling menerangkan explain memberi pertimbangan advise",
+   "s": "يفتي yufti menerangkan explain memberi fatwa give a ruling memberi pertimbangan advise",
    "v": "4:127:6 36 1358"
   },
   {
@@ -14745,10 +14745,10 @@
    "ar": "هَلَكَ",
    "translit": "halaka",
    "count": 5,
-   "id": "mati; binasa",
-   "en": "die; perish",
+   "id": "binasa; mati",
+   "en": "perish; die",
    "cum": 9164,
-   "s": "هلك halaka mati die binasa perish hilang be gone",
+   "s": "هلك halaka binasa perish mati die hilang be gone",
    "v": "4:176:9 0 908"
   },
   {
@@ -15340,9 +15340,9 @@
    "translit": "ukriha",
    "count": 5,
    "id": "memaksa",
-   "en": "to compel",
+   "en": "compel",
    "cum": 9200,
-   "s": "اكره ukriha memaksa to compel",
+   "s": "اكره ukriha memaksa compel",
    "v": "16:106:9 59 1143"
   },
   {
@@ -15406,9 +15406,9 @@
    "translit": "rajam",
    "count": 5,
    "id": "merajam",
-   "en": "to stone",
+   "en": "stone",
    "cum": 9205,
-   "s": "رجم rajam merajam to stone",
+   "s": "رجم rajam merajam stone",
    "v": "11:91:14 0 1979"
   },
   {
@@ -15702,10 +15702,10 @@
    "ar": "تَقَرَّ",
    "translit": "taqarra",
    "count": 5,
-   "id": "senang (hati); tetap tinggal",
-   "en": "be content; remain, abide",
+   "id": "tenang, menetap; menjadi sejuk (mata)",
+   "en": "settle, be at rest; be cooled (eye)",
    "cum": 9223,
-   "s": "تقر taqarra senang (hati) be content tetap tinggal remain, abide",
+   "s": "تقر taqarra tenang, menetap settle, be at rest menjadi sejuk (mata) be cooled (eye)",
    "v": "20:40:14 12 1071"
   },
   {
@@ -15845,10 +15845,10 @@
    "ar": "زُوِّجَتْ",
    "translit": "zuwwijat",
    "count": 5,
-   "id": "menikahkan; memasangkan",
-   "en": "marry (to); pair",
+   "id": "memasangkan; menikahkan",
+   "en": "pair; marry (to)",
    "cum": 9231,
-   "s": "زوجت zuwwijat menikahkan marry (to) memasangkan pair",
+   "s": "زوجت zuwwijat memasangkan pair menikahkan marry (to)",
    "v": "81:7:3 0 1855"
   },
   {
@@ -16296,10 +16296,10 @@
    "ar": "عُقْدَة",
    "translit": "‘uqdah",
    "count": 4,
-   "id": "akad; buhul",
-   "en": "contract; knot",
+   "id": "buhul, ikatan",
+   "en": "knot, tie",
    "cum": 9254,
-   "s": "عقده uqdah akad contract buhul knot",
+   "s": "عقده uqdah buhul, ikatan knot, tie",
    "v": "2:235:29 66 1190"
   },
   {
@@ -16362,10 +16362,10 @@
    "ar": "نَذَرْ",
    "translit": "nażar",
    "count": 4,
-   "id": "bernazar; diberi peringatan",
-   "en": "vow; be warned",
+   "id": "bernazar",
+   "en": "vow",
    "cum": 9257,
-   "s": "نذر nazar bernazar vow diberi peringatan be warned",
+   "s": "نذر nazar bernazar vow",
    "v": "3:35:7 0 1376"
   },
   {
@@ -16418,9 +16418,9 @@
    "translit": "ṣawwara",
    "count": 4,
    "id": "membentuk",
-   "en": "to form",
+   "en": "form",
    "cum": 9259,
-   "s": "صور sawwara membentuk to form",
+   "s": "صور sawwara membentuk form",
    "v": "40:64:9 0 1358"
   },
   {
@@ -16780,10 +16780,10 @@
    "ar": "كِفْل",
    "translit": "kifl",
    "count": 4,
-   "id": "bagian; Zulkifli",
-   "en": "portion; Dhul-Kifl",
+   "id": "bagian; (dalam nama) Zulkifli",
+   "en": "portion; (in name) Dhul-Kifl",
    "cum": 9277,
-   "s": "كفل kifl bagian portion zulkifli dhul-kifl",
+   "s": "كفل kifl bagian portion (dalam nama) zulkifli (in name) dhul-kifl",
    "v": "4:85:15 40 1097"
   },
   {
@@ -17055,7 +17055,7 @@
    "ar": "عَلَّٰم",
    "translit": "‘allām",
    "count": 4,
-   "id": "maha mengetahui",
+   "id": "Maha Mengetahui",
    "en": "all-knowing",
    "cum": 9291,
    "s": "علم allam maha mengetahui all-knowing",
@@ -17220,10 +17220,10 @@
    "ar": "تَمَّ",
    "translit": "tamma",
    "count": 4,
-   "id": "terpenuhi; genap",
-   "en": "be fulfilled; be completed",
+   "id": "sempurna; terpenuhi",
+   "en": "be complete; be fulfilled",
    "cum": 9299,
-   "s": "تم tamma terpenuhi be fulfilled genap be completed",
+   "s": "تم tamma sempurna be complete terpenuhi be fulfilled",
    "v": "7:142:7 0 1384"
   },
   {
@@ -18089,10 +18089,10 @@
    "ar": "عُلُوّ",
    "translit": "‘uluww",
    "count": 4,
-   "id": "kesombongan; ketinggian",
-   "en": "haughtiness; sublimity",
+   "id": "ketinggian; kesombongan",
+   "en": "exaltation; haughtiness",
    "cum": 9341,
-   "s": "علو uluww kesombongan haughtiness ketinggian sublimity",
+   "s": "علو uluww ketinggian exaltation kesombongan haughtiness",
    "v": "17:4:12 14 1195"
   },
   {
@@ -18166,7 +18166,7 @@
    "ar": "مُقْتَدِر",
    "translit": "muqtadir",
    "count": 4,
-   "id": "mahakuasa",
+   "id": "Mahakuasa",
    "en": "perfect in ability",
    "cum": 9345,
    "s": "مقتدر muqtadir mahakuasa perfect in ability",
@@ -18243,10 +18243,10 @@
    "ar": "رَبَتْ",
    "translit": "rabat",
    "count": 4,
-   "id": "mengembang; bertambah",
-   "en": "swell; increase",
+   "id": "bertambah; mengembang",
+   "en": "increase; swell",
    "cum": 9348,
-   "s": "ربت rabat mengembang swell bertambah increase",
+   "s": "ربت rabat bertambah increase mengembang swell",
    "v": "22:5:64 0 1142"
   },
   {
@@ -18353,10 +18353,10 @@
    "ar": "سُوق",
    "translit": "sūq",
    "count": 4,
-   "id": "pasar; batang",
-   "en": "markets; stalk",
+   "id": "pasar",
+   "en": "market",
    "cum": 9354,
-   "s": "سوق suq pasar markets batang stalk kaki legs",
+   "s": "سوق suq pasar market",
    "v": "48:29:39 0 1332"
   },
   {
@@ -18430,10 +18430,10 @@
    "ar": "مُرْسِل",
    "translit": "mursil",
    "count": 4,
-   "id": "pengutus; pelepas",
+   "id": "pengirim; pelepas",
    "en": "sender; one who releases",
    "cum": 9358,
-   "s": "مرسل mursil pengutus sender pelepas one who releases",
+   "s": "مرسل mursil pengirim sender pelepas one who releases",
    "v": "35:2:13 0 1019"
   },
   {
@@ -18628,10 +18628,10 @@
    "ar": "ٱسْتَغْنَىٰ",
    "translit": "istagnā",
    "count": 4,
-   "id": "merasa serba cukup; tidak memerlukan",
-   "en": "consider oneself self-sufficient; be free of need",
+   "id": "tidak memerlukan; merasa serba cukup",
+   "en": "be free of need; consider oneself self-sufficient",
    "cum": 9367,
-   "s": "استغني istagna merasa serba cukup consider oneself self-sufficient tidak memerlukan be free of need",
+   "s": "استغني istagna tidak memerlukan be free of need merasa serba cukup consider oneself self-sufficient",
    "v": "80:5:3 0 1646"
   },
   {
@@ -18926,9 +18926,9 @@
    "translit": "tuḥaddiṡu",
    "count": 3,
    "id": "menceritakan",
-   "en": "to report",
+   "en": "report",
    "cum": 9378,
-   "s": "تحدث tuhaddisu menceritakan to report",
+   "s": "تحدث tuhaddisu menceritakan report",
    "v": "99:4:2 0 1121"
   },
   {
@@ -18991,10 +18991,10 @@
    "ar": "قَوَاعِد",
    "translit": "qawā‘id",
    "count": 3,
-   "id": "pondasi; perempuan tua",
-   "en": "foundations; women past childbearing",
+   "id": "pondasi",
+   "en": "foundations",
    "cum": 9381,
-   "s": "قواعد qawaid pondasi foundations perempuan tua women past childbearing",
+   "s": "قواعد qawaid pondasi foundations",
    "v": "2:127:4 36 1424"
   },
   {
@@ -19355,9 +19355,9 @@
    "translit": "ri’ā’",
    "count": 3,
    "id": "pamer",
-   "en": "to be seen",
+   "en": "be seen",
    "cum": 9394,
-   "s": "ريا ria pamer to be seen",
+   "s": "ريا ria pamer be seen",
    "v": "2:264:12 0 2803"
   },
   {
@@ -19486,7 +19486,7 @@
    "ar": "وَهَّاب",
    "translit": "wahhāb",
    "count": 3,
-   "id": "maha pemberi",
+   "id": "Maha Pemberi",
    "en": "the bestower",
    "cum": 9399,
    "s": "وهاب wahhab maha pemberi the bestower",
@@ -20479,7 +20479,7 @@
    "id": "gugur; terjerumus",
    "en": "fall; fall into",
    "cum": 9435,
-   "s": "سقط suqita gugur fall terjerumus fall into menyesal regret overcame",
+   "s": "سقط suqita gugur fall terjerumus fall into",
    "v": "7:149:2 0 914"
   },
   {
@@ -20829,9 +20829,9 @@
    "translit": "turjī",
    "count": 3,
    "id": "menangguhkan",
-   "en": "to postpone",
+   "en": "postpone",
    "cum": 9448,
-   "s": "ترجي turji menangguhkan to postpone",
+   "s": "ترجي turji menangguhkan postpone",
    "v": "33:51:1 59 1097"
   },
   {
@@ -21136,10 +21136,10 @@
    "ar": "زَهَقَ",
    "translit": "zahaqa",
    "count": 3,
-   "id": "melayang (nyawa); lenyap",
-   "en": "depart (of souls); vanish",
+   "id": "lenyap; melayang (nyawa)",
+   "en": "vanish; depart (of souls)",
    "cum": 9459,
-   "s": "زهق zahaqa melayang (nyawa) depart (of souls) lenyap vanish",
+   "s": "زهق zahaqa lenyap vanish melayang (nyawa) depart (of souls)",
    "v": "17:81:4 0 1195"
   },
   {
@@ -21169,10 +21169,10 @@
    "ar": "رَاغِب",
    "translit": "rāgib",
    "count": 3,
-   "id": "berharap; berpaling dari",
-   "en": "hoping; turning away from",
+   "id": "berharap",
+   "en": "hoping",
    "cum": 9461,
-   "s": "راغب ragib berharap hoping berpaling dari turning away from",
+   "s": "راغب ragib berharap hoping",
    "v": "19:46:2 0 1593"
   },
   {
@@ -21280,9 +21280,9 @@
    "translit": "yagīẓu",
    "count": 3,
    "id": "membuat marah",
-   "en": "to enrage",
+   "en": "enrage",
    "cum": 9465,
-   "s": "يغيظ yagizu membuat marah to enrage",
+   "s": "يغيظ yagizu membuat marah enrage",
    "v": "9:120:34 5 1227"
   },
   {
@@ -21312,10 +21312,10 @@
    "ar": "رَآدّ",
    "translit": "rādd",
    "count": 3,
-   "id": "penolak; pengembali",
-   "en": "repeller; one who returns",
+   "id": "pengembali; penolak",
+   "en": "one who returns; repeller",
    "cum": 9466,
-   "s": "راد radd penolak repeller pengembali one who returns",
+   "s": "راد radd pengembali one who returns penolak repeller",
    "v": "10:107:14 18 3664"
   },
   {
@@ -21576,10 +21576,10 @@
    "ar": "مُنكِرُون",
    "translit": "munkirūn",
    "count": 3,
-   "id": "tidak mengenal; mengingkari",
-   "en": "not recognizing; denying",
+   "id": "mengingkari; tidak mengenal",
+   "en": "denying; not recognizing",
    "cum": 9475,
-   "s": "منكرون munkirun tidak mengenal not recognizing mengingkari denying",
+   "s": "منكرون munkirun mengingkari denying tidak mengenal not recognizing",
    "v": "12:58:9 0 2632"
   },
   {
@@ -24569,9 +24569,9 @@
    "translit": "yubliya",
    "count": 2,
    "id": "menguji",
-   "en": "to test",
+   "en": "test",
    "cum": 9568,
-   "s": "يبلي yubliya menguji to test",
+   "s": "يبلي yubliya menguji test",
    "v": "8:17:13 46 1463"
   },
   {
@@ -26768,7 +26768,7 @@
    "ar": "وَدُود",
    "translit": "wadūd",
    "count": 2,
-   "id": "maha pengasih",
+   "id": "Maha Pengasih",
    "en": "affectionate",
    "cum": 9621,
    "s": "ودود wadud maha pengasih affectionate",
@@ -26823,7 +26823,7 @@
    "ar": "فَعَّال",
    "translit": "fa‘‘āl",
    "count": 2,
-   "id": "maha pelaksana",
+   "id": "Maha Pelaksana",
    "en": "effecter",
    "cum": 9623,
    "s": "فعال faal maha pelaksana effecter",
@@ -26955,7 +26955,7 @@
    "ar": "حَٰش",
    "translit": "ḥāsy",
    "count": 2,
-   "id": "mahasempurna (seruan)",
+   "id": "Mahasempurna (seruan)",
    "en": "perfect is (exclamation)",
    "cum": 9626,
    "s": "حش hasy mahasempurna (seruan) perfect is (exclamation)",
@@ -30871,7 +30871,7 @@
    "ar": "قُدُّوس",
    "translit": "quddūs",
    "count": 2,
-   "id": "mahasuci",
+   "id": "Mahasuci",
    "en": "the pure",
    "cum": 9721,
    "s": "قدوس quddus mahasuci the pure",
@@ -33731,7 +33731,7 @@
    "ar": "مُقِيت",
    "translit": "muqīt",
    "count": 1,
-   "id": "mahakuasa, pemelihara",
+   "id": "Mahakuasa, Pemelihara",
    "en": "all-powerful, keeper",
    "cum": 9762,
    "s": "مقيت muqit mahakuasa, pemelihara all-powerful, keeper",
@@ -37713,7 +37713,7 @@
    "ar": "مُتَعَال",
    "translit": "muta‘āl",
    "count": 1,
-   "id": "mahatinggi",
+   "id": "Mahatinggi",
    "en": "the exalted",
    "cum": 9810,
    "s": "متعال mutaal mahatinggi the exalted",
@@ -41806,9 +41806,9 @@
    "translit": "talfaḥu",
    "count": 1,
    "id": "membakar",
-   "en": "to sear",
+   "en": "sear",
    "cum": 9860,
-   "s": "تلفح talfahu membakar to sear",
+   "s": "تلفح talfahu membakar sear",
    "v": "23:104:1 46 1123"
   },
   {
@@ -45721,7 +45721,7 @@
    "ar": "رَفِيع",
    "translit": "rafī‘",
    "count": 1,
-   "id": "mahatinggi",
+   "id": "Mahatinggi",
    "en": "exalted",
    "cum": 9908,
    "s": "رفيع rafi mahatinggi exalted",
@@ -49099,9 +49099,9 @@
    "translit": "tuḍayyiqu",
    "count": 1,
    "id": "menyempitkan",
-   "en": "to straiten",
+   "en": "straiten",
    "cum": 9949,
-   "s": "تضيق tudayyiqu menyempitkan to straiten",
+   "s": "تضيق tudayyiqu menyempitkan straiten",
    "v": "65:6:9 132 1829"
   },
   {

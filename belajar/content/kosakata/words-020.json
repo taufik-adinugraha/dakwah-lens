@@ -375,22 +375,22 @@
    ],
    "senses": [
     {
+     "id": "lenyap",
+     "en": "vanish",
+     "ayat": [
+      "17:81"
+     ]
+    },
+    {
      "id": "melayang (nyawa)",
      "en": "depart (of souls)",
      "ayat": [
       "9:55",
       "9:85"
      ]
-    },
-    {
-     "id": "lenyap",
-     "en": "vanish",
-     "ayat": [
-      "17:81"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "وَزَهَقَ",
     "loc": "17:81:4",
@@ -505,13 +505,6 @@
      "ayat": [
       "9:59",
       "68:32"
-     ]
-    },
-    {
-     "id": "berpaling dari",
-     "en": "turning away from",
-     "ayat": [
-      "19:46"
      ]
     }
    ],
@@ -914,7 +907,7 @@
    "senses": [
     {
      "id": "membuat marah",
-     "en": "to enrage",
+     "en": "enrage",
      "ayat": [
       "9:120",
       "22:15",
@@ -1032,22 +1025,22 @@
    ],
    "senses": [
     {
-     "id": "penolak",
-     "en": "repeller",
-     "ayat": [
-      "10:107"
-     ]
-    },
-    {
      "id": "pengembali",
      "en": "one who returns",
      "ayat": [
       "28:7",
       "28:85"
      ]
+    },
+    {
+     "id": "penolak",
+     "en": "repeller",
+     "ayat": [
+      "10:107"
+     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "رَآدَّ",
     "loc": "10:107:14",
@@ -2033,22 +2026,22 @@
    ],
    "senses": [
     {
-     "id": "tidak mengenal",
-     "en": "not recognizing",
-     "ayat": [
-      "12:58"
-     ]
-    },
-    {
      "id": "mengingkari",
      "en": "denying",
      "ayat": [
       "21:50",
       "23:69"
      ]
+    },
+    {
+     "id": "tidak mengenal",
+     "en": "not recognizing",
+     "ayat": [
+      "12:58"
+     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "مُنكِرُونَ",
     "loc": "12:58:9",

@@ -216,7 +216,7 @@
    ],
    "senses": [
     {
-     "id": "mahaperkasa",
+     "id": "Mahaperkasa",
      "en": "exalted in might",
      "ayat": [
       "2:209",
@@ -905,21 +905,21 @@
    ],
    "senses": [
     {
-     "id": "memperhatikan",
-     "en": "observe",
-     "ayat": [
-      "6:11",
-      "27:69",
-      "10:14"
-     ]
-    },
-    {
      "id": "melihat",
      "en": "look",
      "ayat": [
       "37:88",
       "51:44",
-      "56:84"
+      "10:14"
+     ]
+    },
+    {
+     "id": "memperhatikan",
+     "en": "observe",
+     "ayat": [
+      "6:11",
+      "27:69",
+      "7:84"
      ]
     }
    ],
@@ -1394,16 +1394,16 @@
      "ayat": [
       "3:175",
       "5:28",
-      "8:58"
+      "6:15"
      ]
     },
     {
-     "id": "khawatir terhadap",
-     "en": "fear for",
+     "id": "khawatir",
+     "en": "be apprehensive",
      "ayat": [
-      "11:26",
-      "26:135",
-      "40:32"
+      "8:58",
+      "4:101",
+      "11:26"
      ]
     }
    ],
@@ -1593,21 +1593,21 @@
    ],
    "senses": [
     {
-     "id": "dikembalikan",
-     "en": "be returned",
-     "ayat": [
-      "10:56",
-      "29:57",
-      "3:109"
-     ]
-    },
-    {
      "id": "kembali",
      "en": "return",
      "ayat": [
       "2:18",
       "36:50",
       "21:64"
+     ]
+    },
+    {
+     "id": "dikembalikan",
+     "en": "be returned",
+     "ayat": [
+      "10:56",
+      "29:57",
+      "3:109"
      ]
     },
     {
@@ -1618,7 +1618,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "رَجَعَ",
     "loc": "7:150:2",
@@ -1651,12 +1651,21 @@
    ],
    "senses": [
     {
-     "id": "golongan, penghuni",
-     "en": "people, inhabitants",
+     "id": "sahabat, golongan",
+     "en": "companions, people",
+     "ayat": [
+      "15:78",
+      "56:38",
+      "56:90"
+     ]
+    },
+    {
+     "id": "penghuni",
+     "en": "inhabitants",
      "ayat": [
       "2:82",
-      "15:78",
-      "56:38"
+      "7:36",
+      "46:14"
      ]
     }
    ],
@@ -3288,16 +3297,25 @@
    ],
    "senses": [
     {
-     "id": "menginfakkan",
+     "id": "membelanjakan, menafkahkan",
      "en": "spend",
+     "ayat": [
+      "25:67",
+      "2:270",
+      "9:98"
+     ]
+    },
+    {
+     "id": "menginfakkan",
+     "en": "spend in charity",
      "ayat": [
       "2:3",
       "2:261",
-      "25:67"
+      "57:10"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "أَنفَقَ",
     "loc": "18:42:8",
@@ -3474,15 +3492,6 @@
    ],
    "senses": [
     {
-     "id": "sumpah",
-     "en": "oath",
-     "ayat": [
-      "2:225",
-      "5:53",
-      "5:108"
-     ]
-    },
-    {
      "id": "tangan kanan",
      "en": "right hand",
      "ayat": [
@@ -3499,9 +3508,18 @@
       "16:48",
       "37:28"
      ]
+    },
+    {
+     "id": "sumpah",
+     "en": "oath",
+     "ayat": [
+      "2:225",
+      "5:53",
+      "5:108"
+     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "يَمِينٍ",
     "loc": "34:15:9",
@@ -3633,16 +3651,25 @@
    ],
    "senses": [
     {
+     "id": "bapak-bapak",
+     "en": "fathers",
+     "ayat": [
+      "2:170",
+      "13:23",
+      "21:54"
+     ]
+    },
+    {
      "id": "nenek moyang",
      "en": "forefathers",
      "ayat": [
-      "2:170",
-      "7:70",
-      "21:53"
+      "26:76",
+      "37:126",
+      "36:6"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "ءَابَآءِ",
     "loc": "24:31:27",
@@ -3676,7 +3703,7 @@
    "senses": [
     {
      "id": "menimpa",
-     "en": "to befall, strike",
+     "en": "befall, strike",
      "ayat": [
       "2:156",
       "3:120",
@@ -3685,7 +3712,7 @@
     },
     {
      "id": "menghendaki",
-     "en": "to intend",
+     "en": "intend",
      "ayat": [
       "38:36"
      ]
@@ -3907,14 +3934,6 @@
       "3:45",
       "11:45",
       "2:146"
-     ]
-    },
-    {
-     "id": "musafir",
-     "en": "traveler",
-     "ayat": [
-      "4:36",
-      "30:38"
      ]
     }
    ],

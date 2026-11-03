@@ -351,7 +351,7 @@
    "senses": [
     {
      "id": "menceritakan",
-     "en": "to report",
+     "en": "report",
      "ayat": [
       "99:4",
       "93:11",
@@ -589,16 +589,9 @@
       "2:127",
       "16:26"
      ]
-    },
-    {
-     "id": "perempuan tua",
-     "en": "women past childbearing",
-     "ayat": [
-      "24:60"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "ٱلْقَوَاعِدَ",
     "loc": "2:127:4",
@@ -1921,7 +1914,7 @@
    "senses": [
     {
      "id": "pamer",
-     "en": "to be seen",
+     "en": "be seen",
      "ayat": [
       "2:264",
       "4:38",
@@ -2416,7 +2409,7 @@
    ],
    "senses": [
     {
-     "id": "maha pemberi",
+     "id": "Maha Pemberi",
      "en": "the bestower",
      "ayat": [
       "3:8",

@@ -194,16 +194,9 @@
       "26:101",
       "56:44"
      ]
-    },
-    {
-     "id": "pastilah (penegas)",
-     "en": "assuredly",
-     "ayat": [
-      "16:109"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "لَا",
     "loc": "2:2:3",
@@ -1955,16 +1948,9 @@
       "7:60",
       "96:7"
      ]
-    },
-    {
-     "id": "pernahkah kamu perhatikan",
-     "en": "have you considered",
-     "ayat": [
-      "56:63"
-     ]
     }
    ],
-   "review": "disputed",
+   "review": "corrected",
    "voice": {
     "form": "رَءَا",
     "loc": "6:76:5",
@@ -2003,13 +1989,6 @@
       "4:73",
       "22:69",
       "38:66"
-     ]
-    },
-    {
-     "id": "sebelum",
-     "en": "before",
-     "ayat": [
-      "3:3"
      ]
     }
    ],
@@ -2055,19 +2034,11 @@
      ]
     },
     {
-     "id": "membawa",
-     "en": "bring",
-     "ayat": [
-      "7:112",
-      "10:79",
-      "37:157"
-     ]
-    },
-    {
      "id": "mendatangi",
-     "en": "approach",
+     "en": "come to",
      "ayat": [
-      "26:165"
+      "26:165",
+      "26:89"
      ]
     }
    ],
@@ -2104,12 +2075,21 @@
    ],
    "senses": [
     {
+     "id": "kitab",
+     "en": "book",
+     "ayat": [
+      "2:2",
+      "12:1",
+      "52:2"
+     ]
+    },
+    {
      "id": "kitab suci",
      "en": "scripture",
      "ayat": [
-      "2:2",
       "3:98",
-      "37:117"
+      "37:117",
+      "4:159"
      ]
     },
     {
@@ -2463,13 +2443,6 @@
      "en": "even if",
      "ayat": [
       "12:103"
-     ]
-    },
-    {
-     "id": "mengapa tidak",
-     "en": "why not",
-     "ayat": [
-      "15:7"
      ]
     }
    ],
@@ -2915,11 +2888,11 @@
    "senses": [
     {
      "id": "bertakwa",
-     "en": "fear Allah",
+     "en": "be God-conscious",
      "ayat": [
       "2:278",
       "9:119",
-      "26:126"
+      "10:63"
      ]
     },
     {
@@ -2930,7 +2903,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "ٱتَّقَىٰ",
     "loc": "2:189:19",
@@ -3022,7 +2995,7 @@
    ],
    "senses": [
     {
-     "id": "maha mengetahui",
+     "id": "Maha Mengetahui",
      "en": "all-knowing",
      "ayat": [
       "2:244",
@@ -3045,7 +3018,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "عَلِيمٌ",
     "loc": "4:12:87",
@@ -3123,18 +3096,9 @@
       "12:10",
       "23:113"
      ]
-    },
-    {
-     "id": "satu sama lain",
-     "en": "one another",
-     "ayat": [
-      "7:24",
-      "37:50",
-      "43:67"
-     ]
     }
    ],
-   "review": "disputed",
+   "review": "corrected",
    "voice": {
     "form": "بَعْضٍ",
     "loc": "2:76:11",
@@ -3219,6 +3183,13 @@
    ],
    "senses": [
     {
+     "id": "terakhir",
+     "en": "last",
+     "ayat": [
+      "2:8"
+     ]
+    },
+    {
      "id": "akhirat",
      "en": "the Hereafter",
      "ayat": [
@@ -3228,14 +3199,7 @@
      ]
     },
     {
-     "id": "akhir",
-     "en": "last",
-     "ayat": [
-      "2:8"
-     ]
-    },
-    {
-     "id": "orang yang kemudian",
+     "id": "generasi kemudian",
      "en": "later generations",
      "ayat": [
       "26:84",
@@ -3243,7 +3207,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "ٱلْـَٔاخِرِ",
     "loc": "2:8:8",
@@ -3323,15 +3287,6 @@
      ]
     },
     {
-     "id": "tanpa",
-     "en": "without",
-     "ayat": [
-      "6:140",
-      "22:3",
-      "38:39"
-     ]
-    },
-    {
      "id": "bukan / tidak",
      "en": "not",
      "ayat": [
@@ -3341,7 +3296,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "غَيْرَ",
     "loc": "2:59:5",
@@ -3384,11 +3339,12 @@
      ]
     },
     {
-     "id": "kebun",
+     "id": "kebun, taman",
      "en": "garden",
      "ayat": [
       "26:134",
-      "26:147"
+      "26:147",
+      "69:22"
      ]
     }
    ],
@@ -3468,15 +3424,6 @@
    ],
    "senses": [
     {
-     "id": "neraka",
-     "en": "the Fire (Hell)",
-     "ayat": [
-      "2:39",
-      "3:131",
-      "5:37"
-     ]
-    },
-    {
      "id": "api",
      "en": "fire",
      "ayat": [
@@ -3484,9 +3431,18 @@
       "21:69",
       "36:80"
      ]
+    },
+    {
+     "id": "neraka",
+     "en": "the Fire (Hell)",
+     "ayat": [
+      "2:39",
+      "3:131",
+      "5:37"
+     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "نَارٌ",
     "loc": "2:266:27",
@@ -3647,7 +3603,7 @@
    "senses": [
     {
      "id": "menghendaki",
-     "en": "to want",
+     "en": "want",
      "ayat": [
       "4:28",
       "4:134",
@@ -3899,20 +3855,21 @@
    ],
    "senses": [
     {
+     "id": "mengirim",
+     "en": "send",
+     "ayat": [
+      "51:33",
+      "12:45",
+      "7:6"
+     ]
+    },
+    {
      "id": "mengutus",
      "en": "send as messenger",
      "ayat": [
       "6:48",
       "11:96",
       "21:107"
-     ]
-    },
-    {
-     "id": "mengirim",
-     "en": "send",
-     "ayat": [
-      "12:45",
-      "51:33"
      ]
     },
     {
@@ -4048,12 +4005,11 @@
    ],
    "senses": [
     {
-     "id": "menimpa, menyiksa",
-     "en": "seize with punishment",
+     "id": "mengambil",
+     "en": "take",
      "ayat": [
-      "3:11",
-      "7:78",
-      "11:67"
+      "4:71",
+      "7:199"
      ]
     },
     {
@@ -4065,15 +4021,16 @@
      ]
     },
     {
-     "id": "mengambil",
-     "en": "take",
+     "id": "menimpa, menyiksa",
+     "en": "seize with punishment",
      "ayat": [
-      "4:71",
-      "7:199"
+      "3:11",
+      "7:78",
+      "11:67"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "أَخَذَ",
     "loc": "3:81:2",
@@ -4366,14 +4323,14 @@
      ]
     },
     {
-     "id": "tulang belulang",
-     "en": "bones",
+     "id": "Maha Agung",
+     "en": "Most Great",
      "ayat": [
-      "23:82"
+      "56:74"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "عَظِيمٌ",
     "loc": "2:7:12",
@@ -4412,15 +4369,7 @@
      "ayat": [
       "5:28",
       "7:108",
-      "30:41"
-     ]
-    },
-    {
-     "id": "sebelum, di hadapan",
-     "en": "before, in front",
-     "ayat": [
-      "3:3",
-      "49:1"
+      "20:22"
      ]
     }
    ],

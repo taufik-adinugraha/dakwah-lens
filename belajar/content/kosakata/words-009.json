@@ -2373,7 +2373,7 @@
      ]
     },
     {
-     "id": "maha mensyukuri",
+     "id": "Maha Mensyukuri",
      "en": "appreciative",
      "ayat": [
       "35:30",
@@ -3071,6 +3071,14 @@
    ],
    "senses": [
     {
+     "id": "memisahkan",
+     "en": "separate",
+     "ayat": [
+      "2:102",
+      "4:150"
+     ]
+    },
+    {
      "id": "membeda-bedakan",
      "en": "make distinction",
      "ayat": [
@@ -3087,16 +3095,9 @@
       "30:32",
       "20:94"
      ]
-    },
-    {
-     "id": "memisahkan",
-     "en": "cause separation",
-     "ayat": [
-      "2:102"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "نُفَرِّقُ",
     "loc": "2:136:25",
@@ -3836,15 +3837,16 @@
      "en": "idle speech",
      "ayat": [
       "19:62",
-      "23:3",
+      "56:25",
       "78:35"
      ]
     },
     {
-     "id": "yang tak disengaja",
-     "en": "what is unintended",
+     "id": "hal sia-sia",
+     "en": "vain matters",
      "ayat": [
-      "2:225",
+      "23:3",
+      "25:72",
       "5:89"
      ]
     }

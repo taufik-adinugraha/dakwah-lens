@@ -570,15 +570,15 @@
      ]
     },
     {
-     "id": "Zulkifli",
-     "en": "Dhul-Kifl",
+     "id": "(dalam nama) Zulkifli",
+     "en": "(in name) Dhul-Kifl",
      "ayat": [
       "21:85",
       "38:48"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "كِفْلٌ",
     "loc": "4:85:15",
@@ -1565,7 +1565,7 @@
    ],
    "senses": [
     {
-     "id": "maha mengetahui",
+     "id": "Maha Mengetahui",
      "en": "all-knowing",
      "ayat": [
       "5:109",
@@ -2182,19 +2182,19 @@
    ],
    "senses": [
     {
-     "id": "terpenuhi",
-     "en": "be fulfilled",
+     "id": "sempurna",
+     "en": "be complete",
      "ayat": [
-      "6:115",
-      "7:137",
-      "11:119"
+      "7:142",
+      "6:115"
      ]
     },
     {
-     "id": "genap",
-     "en": "be completed",
+     "id": "terpenuhi",
+     "en": "be fulfilled",
      "ayat": [
-      "7:142"
+      "7:137",
+      "11:119"
      ]
     }
    ],

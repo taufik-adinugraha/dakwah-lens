@@ -1,0 +1,140 @@
+{
+ "_about": "Decisions from reading the third check (operator asked for it 2026-11-03: 'do it'). A check finds, a person decides.",
+ "reject": {
+  "196": "jarai stays 'mengalir' first: right in most places (the rivers of Paradise), and 'sungai berjalan' reads wrong in Indonesian.",
+  "348": "wahid stays 'satu' first: right everywhere including of Allah, where 'Yang Maha Esa' would mislead in 'nafsin wahidah'.",
+  "447": "qarn keeps '(dalam nama) Zulkarnain': already labelled as a name, and removing it stops the search finding him.",
+  "1126": "ikhraj stays 'pengusiran' first: fits 5 of 6 occurrences, and 'pengeluaran' also means an expense in Indonesian."
+ },
+ "from_first_run": [
+  "69"
+ ],
+ "replace": {
+  "350": [
+   {
+    "gloss_id": "menghadapkan",
+    "gloss_en": "turn toward",
+    "ayat": [
+     "2:144",
+     "2:149",
+     "2:115"
+    ]
+   },
+   {
+    "gloss_id": "berbalik pergi",
+    "gloss_en": "turn away",
+    "ayat": [
+     "17:46",
+     "21:57",
+     "27:80"
+    ]
+   },
+   {
+    "gloss_id": "menjadikan teman",
+    "gloss_en": "make allies",
+    "ayat": [
+     "6:129"
+    ]
+   }
+  ],
+  "1514": [
+   {
+    "gloss_id": "bagian",
+    "gloss_en": "portion",
+    "ayat": [
+     "4:85",
+     "57:28"
+    ]
+   },
+   {
+    "gloss_id": "(dalam nama) Zulkifli",
+    "gloss_en": "(in name) Dhul-Kifl",
+    "ayat": [
+     "21:85",
+     "38:48"
+    ]
+   }
+  ],
+  "93": [
+   {
+    "gloss_id": "besar, agung",
+    "gloss_en": "great, mighty",
+    "ayat": [
+     "4:67",
+     "23:86",
+     "37:60"
+    ]
+   },
+   {
+    "gloss_id": "Maha Agung",
+    "gloss_en": "Most Great",
+    "ayat": [
+     "56:74"
+    ]
+   }
+  ],
+  "63": [
+   {
+    "gloss_id": "bertakwa",
+    "gloss_en": "be God-conscious",
+    "ayat": [
+     "2:278",
+     "9:119",
+     "10:63"
+    ]
+   },
+   {
+    "gloss_id": "menjaga diri dari",
+    "gloss_en": "guard against",
+    "ayat": [
+     "3:131"
+    ]
+   }
+  ],
+  "65": [
+   {
+    "gloss_id": "Maha Mengetahui",
+    "gloss_en": "all-knowing",
+    "ayat": [
+     "2:244",
+     "15:86",
+     "33:54"
+    ]
+   },
+   {
+    "gloss_id": "pandai",
+    "gloss_en": "learned",
+    "ayat": [
+     "7:112"
+    ]
+   },
+   {
+    "gloss_id": "ulama",
+    "gloss_en": "scholars",
+    "ayat": [
+     "26:197"
+    ]
+   }
+  ],
+  "72": [
+   {
+    "gloss_id": "surga",
+    "gloss_en": "Paradise",
+    "ayat": [
+     "2:82",
+     "26:90",
+     "15:45"
+    ]
+   },
+   {
+    "gloss_id": "kebun, taman",
+    "gloss_en": "garden",
+    "ayat": [
+     "26:134",
+     "26:147",
+     "69:22"
+    ]
+   }
+  ]
+ }
+}

@@ -852,7 +852,7 @@
    ],
    "senses": [
     {
-     "id": "mahaperkasa",
+     "id": "Mahaperkasa",
      "en": "the prevailing",
      "ayat": [
       "12:39",
@@ -896,7 +896,7 @@
    "senses": [
     {
      "id": "mimpi",
-     "en": "dreams",
+     "en": "dream",
      "ayat": [
       "12:44",
       "21:5"
@@ -909,16 +909,9 @@
       "24:58",
       "24:59"
      ]
-    },
-    {
-     "id": "akal",
-     "en": "minds",
-     "ayat": [
-      "52:32"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "ٱلْحُلُمَ",
     "loc": "24:58:11",
@@ -2179,26 +2172,19 @@
    ],
    "senses": [
     {
-     "id": "membelah",
-     "en": "part, split",
-     "ayat": [
-      "2:50"
-     ]
-    },
-    {
-     "id": "memisahkan, membedakan",
-     "en": "separate, make distinct",
+     "id": "memisahkan",
+     "en": "separate, part",
      "ayat": [
       "5:25",
-      "17:106",
-      "44:4"
+      "2:50",
+      "17:106"
      ]
     },
     {
-     "id": "takut",
-     "en": "be afraid",
+     "id": "membedakan, memperjelas",
+     "en": "make distinct",
      "ayat": [
-      "9:56"
+      "44:4"
      ]
     }
    ],
@@ -3588,23 +3574,24 @@
    ],
    "senses": [
     {
-     "id": "runtuh",
-     "en": "fallen in ruin",
+     "id": "kosong, sunyi",
+     "en": "empty, desolate",
      "ayat": [
-      "2:259",
-      "18:42",
+      "27:52",
+      "69:7",
       "22:45"
      ]
     },
     {
-     "id": "kosong",
-     "en": "hollow",
+     "id": "runtuh",
+     "en": "fallen in ruin",
      "ayat": [
-      "69:7"
+      "2:259",
+      "18:42"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "خَاوِيَةٌ",
     "loc": "2:259:7",

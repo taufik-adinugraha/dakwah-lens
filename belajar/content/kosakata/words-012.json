@@ -1611,15 +1611,6 @@
    ],
    "senses": [
     {
-     "id": "doa",
-     "en": "supplication",
-     "ayat": [
-      "2:186",
-      "10:89",
-      "13:14"
-     ]
-    },
-    {
      "id": "seruan",
      "en": "call",
      "ayat": [
@@ -1627,9 +1618,18 @@
       "30:25",
       "40:43"
      ]
+    },
+    {
+     "id": "doa",
+     "en": "supplication",
+     "ayat": [
+      "2:186",
+      "10:89",
+      "13:14"
+     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "دَعْوَةَ",
     "loc": "2:186:8",
@@ -2067,7 +2067,7 @@
    "senses": [
     {
      "id": "meminjamkan",
-     "en": "to loan",
+     "en": "loan",
      "ayat": [
       "2:245",
       "57:11",
@@ -3211,24 +3211,23 @@
    ],
    "senses": [
     {
-     "id": "menimpa",
-     "en": "overtake",
+     "id": "menyusul, mencapai",
+     "en": "overtake, reach",
      "ayat": [
       "4:78",
-      "4:100",
-      "10:90"
+      "10:90",
+      "36:40"
      ]
     },
     {
-     "id": "mencapai",
-     "en": "reach",
+     "id": "menangkap (penglihatan)",
+     "en": "perceive (by sight)",
      "ayat": [
-      "36:40",
       "6:103"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "يُدْرِكُ",
     "loc": "6:103:5",
@@ -3382,24 +3381,24 @@
    ],
    "senses": [
     {
+     "id": "menanyakan",
+     "en": "inquire",
+     "ayat": [
+      "37:11",
+      "37:149",
+      "12:41"
+     ]
+    },
+    {
      "id": "meminta fatwa",
      "en": "request a ruling",
      "ayat": [
       "4:127",
       "4:176"
      ]
-    },
-    {
-     "id": "menanyakan",
-     "en": "inquire",
-     "ayat": [
-      "37:11",
-      "37:149",
-      "18:22"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "تَسْتَفْتِ",
     "loc": "18:22:30",
@@ -3487,23 +3486,24 @@
    ],
    "senses": [
     {
-     "id": "cengkeraman azab",
-     "en": "seizure (punishment)",
+     "id": "pengambilan, cengkeraman",
+     "en": "taking, seizure",
      "ayat": [
+      "4:161",
       "11:102",
-      "54:42",
-      "69:10"
+      "54:42"
      ]
     },
     {
-     "id": "mengambil",
-     "en": "taking",
+     "id": "siksaan",
+     "en": "punishment",
      "ayat": [
-      "4:161"
+      "69:10",
+      "73:16"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "أَخْذُ",
     "loc": "11:102:2",

@@ -1303,7 +1303,7 @@
    ],
    "senses": [
     {
-     "id": "mahakaya",
+     "id": "Mahakaya",
      "en": "free of need",
      "ayat": [
       "2:263",
@@ -1913,7 +1913,7 @@
    "senses": [
     {
      "id": "melaknat",
-     "en": "to curse",
+     "en": "curse",
      "ayat": [
       "2:88",
       "4:52",
@@ -2143,7 +2143,7 @@
    "senses": [
     {
      "id": "menguji",
-     "en": "to test",
+     "en": "test",
      "ayat": [
       "6:53",
       "20:85",
@@ -2152,7 +2152,7 @@
     },
     {
      "id": "memalingkan",
-     "en": "to tempt away",
+     "en": "tempt away",
      "ayat": [
       "5:49",
       "17:73",
@@ -2161,7 +2161,7 @@
     },
     {
      "id": "menyiksa",
-     "en": "to persecute",
+     "en": "persecute",
      "ayat": [
       "10:83",
       "16:110",
@@ -2507,6 +2507,15 @@
     "سَيِّئَةٍ"
    ],
    "senses": [
+    {
+     "id": "keburukan",
+     "en": "evil",
+     "ayat": [
+      "4:78",
+      "27:46",
+      "13:6"
+     ]
+    },
     {
      "id": "perbuatan buruk",
      "en": "evil deed",
@@ -3538,21 +3547,21 @@
    ],
    "senses": [
     {
-     "id": "Jibril (Roh)",
-     "en": "the Spirit (Gabriel)",
-     "ayat": [
-      "2:87",
-      "16:102",
-      "26:193"
-     ]
-    },
-    {
      "id": "roh",
-     "en": "soul, spirit",
+     "en": "spirit, soul",
      "ayat": [
       "15:29",
       "32:9",
       "17:85"
+     ]
+    },
+    {
+     "id": "Jibril (Roh)",
+     "en": "the Spirit (Gabriel)",
+     "ayat": [
+      "19:17",
+      "26:193",
+      "16:102"
      ]
     },
     {
@@ -3563,7 +3572,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "رُوحُ",
     "loc": "16:102:3",
@@ -3863,21 +3872,21 @@
    ],
    "senses": [
     {
+     "id": "meletakkan",
+     "en": "put down, place",
+     "ayat": [
+      "4:102",
+      "18:49",
+      "21:47"
+     ]
+    },
+    {
      "id": "melahirkan",
      "en": "give birth",
      "ayat": [
       "3:36",
       "35:11",
       "41:47"
-     ]
-    },
-    {
-     "id": "meletakkan",
-     "en": "put down, place",
-     "ayat": [
-      "4:102",
-      "21:47",
-      "18:49"
      ]
     },
     {
@@ -4324,13 +4333,6 @@
       "2:155",
       "5:94",
       "21:35"
-     ]
-    },
-    {
-     "id": "menjadi usang",
-     "en": "wear out",
-     "ayat": [
-      "20:120"
      ]
     }
    ],

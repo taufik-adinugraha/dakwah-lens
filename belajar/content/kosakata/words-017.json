@@ -1343,23 +1343,23 @@
    ],
    "senses": [
     {
-     "id": "kesombongan",
-     "en": "haughtiness",
+     "id": "ketinggian",
+     "en": "exaltation",
      "ayat": [
-      "17:4",
-      "27:14",
+      "17:43",
       "28:83"
      ]
     },
     {
-     "id": "ketinggian",
-     "en": "sublimity",
+     "id": "kesombongan",
+     "en": "haughtiness",
      "ayat": [
-      "17:43"
+      "17:4",
+      "27:14"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "عُلُوًّا",
     "loc": "17:4:12",
@@ -1630,7 +1630,7 @@
    ],
    "senses": [
     {
-     "id": "mahakuasa",
+     "id": "Mahakuasa",
      "en": "perfect in ability",
      "ayat": [
       "18:45",
@@ -1914,18 +1914,18 @@
    ],
    "senses": [
     {
+     "id": "bertambah",
+     "en": "increase",
+     "ayat": [
+      "30:39"
+     ]
+    },
+    {
      "id": "mengembang",
      "en": "swell",
      "ayat": [
       "22:5",
       "41:39"
-     ]
-    },
-    {
-     "id": "bertambah",
-     "en": "increase",
-     "ayat": [
-      "30:39"
      ]
     }
    ],
@@ -2352,28 +2352,14 @@
    "senses": [
     {
      "id": "pasar",
-     "en": "markets",
+     "en": "market",
      "ayat": [
       "25:7",
       "25:20"
      ]
-    },
-    {
-     "id": "batang",
-     "en": "stalk",
-     "ayat": [
-      "48:29"
-     ]
-    },
-    {
-     "id": "kaki",
-     "en": "legs",
-     "ayat": [
-      "38:33"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "سُوقِهِۦ",
     "loc": "48:29:39",
@@ -2650,7 +2636,7 @@
    ],
    "senses": [
     {
-     "id": "pengutus",
+     "id": "pengirim",
      "en": "sender",
      "ayat": [
       "28:45",
@@ -2666,7 +2652,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "مُرْسِلَ",
     "loc": "35:2:13",
@@ -3372,19 +3358,19 @@
    ],
    "senses": [
     {
-     "id": "merasa serba cukup",
-     "en": "consider oneself self-sufficient",
-     "ayat": [
-      "80:5",
-      "92:8"
-     ]
-    },
-    {
      "id": "tidak memerlukan",
      "en": "be free of need",
      "ayat": [
       "64:6",
       "96:7"
+     ]
+    },
+    {
+     "id": "merasa serba cukup",
+     "en": "consider oneself self-sufficient",
+     "ayat": [
+      "80:5",
+      "92:8"
      ]
     }
    ],

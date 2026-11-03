@@ -2314,21 +2314,21 @@
    ],
    "senses": [
     {
-     "id": "berpaling pergi",
-     "en": "turn away",
-     "ayat": [
-      "17:46",
-      "27:80",
-      "8:15"
-     ]
-    },
-    {
-     "id": "menghadap",
+     "id": "menghadapkan",
      "en": "turn toward",
      "ayat": [
       "2:144",
       "2:149",
       "2:115"
+     ]
+    },
+    {
+     "id": "berbalik pergi",
+     "en": "turn away",
+     "ayat": [
+      "17:46",
+      "21:57",
+      "27:80"
      ]
     },
     {
@@ -2372,11 +2372,20 @@
    ],
    "senses": [
     {
+     "id": "mudah-mudahan",
+     "en": "it is hoped",
+     "ayat": [
+      "4:99",
+      "9:102",
+      "17:79"
+     ]
+    },
+    {
      "id": "boleh jadi",
      "en": "perhaps",
      "ayat": [
       "2:216",
-      "7:129",
+      "4:19",
       "27:72"
      ]
     }
@@ -3331,21 +3340,21 @@
    ],
    "senses": [
     {
-     "id": "memperbaiki diri",
-     "en": "reform oneself",
-     "ayat": [
-      "3:89",
-      "5:39",
-      "7:35"
-     ]
-    },
-    {
      "id": "memperbaiki",
      "en": "set right, amend",
      "ayat": [
       "8:1",
       "33:71",
-      "47:2"
+      "26:152"
+     ]
+    },
+    {
+     "id": "memperbaiki diri",
+     "en": "reform oneself",
+     "ayat": [
+      "3:89",
+      "5:39",
+      "4:16"
      ]
     }
    ],
@@ -3594,17 +3603,9 @@
       "4:7",
       "24:37"
      ]
-    },
-    {
-     "id": "berjalan kaki",
-     "en": "on foot",
-     "ayat": [
-      "2:239",
-      "22:27"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "رِجَالٌ",
     "loc": "7:46:5",

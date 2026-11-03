@@ -34,6 +34,18 @@ export async function warisVisible(): Promise<boolean> {
 }
 
 /**
+ * BELAJAR_KOSAKATA_EN — the Kosakata list in English is hidden for now (operator, 2026-11-03: "at the
+ * moment, hide the english version"; docs/belajar-plan.md L37). Only the list's own pages: /en/kosakata
+ * and what is under /kata and /bertahap. /en/kosakata/{id} is another page, a lesson word's full entry,
+ * which the lessons in English link to, so it stays. src/proxy.ts answers the hidden ones with the
+ * module's 404, and the English hub shows no card. `BELAJAR_KOSAKATA_EN=on` shows them again with no
+ * rebuild, the same way as BELAJAR_WARIS above.
+ */
+export function kosakataEnglishOn(): boolean {
+  return process.env.BELAJAR_KOSAKATA_EN === "on";
+}
+
+/**
  * BELAJAR_SURAHS — the surahs of the Qur'an track visitors can reach (operator, 2026-10-10:
  * "let's focus on alfatihah first, show cards for other surah as 'segera hadir', but not
  * clickable"; docs/belajar-plan.md L14). A comma-separated list of lesson slugs

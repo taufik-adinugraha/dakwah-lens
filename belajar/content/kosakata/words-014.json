@@ -292,19 +292,20 @@
    ],
    "senses": [
     {
-     "id": "lemah semangat",
-     "en": "lose heart",
-     "ayat": [
-      "3:139",
-      "3:146",
-      "4:104"
-     ]
-    },
-    {
      "id": "melemah",
      "en": "become weak",
      "ayat": [
-      "19:4"
+      "19:4",
+      "3:139",
+      "47:35"
+     ]
+    },
+    {
+     "id": "lemah semangat",
+     "en": "lose heart",
+     "ayat": [
+      "3:146",
+      "4:104"
      ]
     }
    ],
@@ -599,11 +600,18 @@
    ],
    "senses": [
     {
-     "id": "pengawas",
-     "en": "observer",
+     "id": "Maha Mengawasi",
+     "en": "All-Watchful",
      "ayat": [
       "4:1",
       "5:117",
+      "33:52"
+     ]
+    },
+    {
+     "id": "pengawas",
+     "en": "observer",
+     "ayat": [
       "50:18"
      ]
     },
@@ -1185,19 +1193,19 @@
    ],
    "senses": [
     {
-     "id": "memberi fatwa",
-     "en": "give a ruling",
-     "ayat": [
-      "4:127",
-      "4:176"
-     ]
-    },
-    {
      "id": "menerangkan",
      "en": "explain",
      "ayat": [
       "12:43",
       "12:46"
+     ]
+    },
+    {
+     "id": "memberi fatwa",
+     "en": "give a ruling",
+     "ayat": [
+      "4:127",
+      "4:176"
      ]
     },
     {
@@ -1208,7 +1216,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "يُفْتِيكُمْ",
     "loc": "4:127:6",
@@ -1285,18 +1293,18 @@
    ],
    "senses": [
     {
+     "id": "binasa",
+     "en": "perish",
+     "ayat": [
+      "8:42"
+     ]
+    },
+    {
      "id": "mati",
      "en": "die",
      "ayat": [
       "4:176",
       "40:34"
-     ]
-    },
-    {
-     "id": "binasa",
-     "en": "perish",
-     "ayat": [
-      "8:42"
      ]
     },
     {
@@ -1307,7 +1315,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "هَلَكَ",
     "loc": "4:176:9",
@@ -3610,7 +3618,7 @@
    "senses": [
     {
      "id": "memaksa",
-     "en": "to compel",
+     "en": "compel",
      "ayat": [
       "10:99",
       "16:106",
@@ -3851,7 +3859,7 @@
    "senses": [
     {
      "id": "merajam",
-     "en": "to stone",
+     "en": "stone",
      "ayat": [
       "11:91",
       "19:46",

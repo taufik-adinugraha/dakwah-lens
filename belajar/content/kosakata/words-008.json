@@ -1086,21 +1086,21 @@
    ],
    "senses": [
     {
+     "id": "terjadi",
+     "en": "occur",
+     "ayat": [
+      "56:1",
+      "69:15",
+      "10:51"
+     ]
+    },
+    {
      "id": "menimpa",
      "en": "befall",
      "ayat": [
       "7:71",
       "7:134",
       "27:82"
-     ]
-    },
-    {
-     "id": "terjadi",
-     "en": "occur",
-     "ayat": [
-      "10:51",
-      "56:1",
-      "69:15"
      ]
     },
     {
@@ -1121,7 +1121,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "وَقَعَ",
     "loc": "4:100:24",
@@ -1310,21 +1310,21 @@
    ],
    "senses": [
     {
+     "id": "beban",
+     "en": "burden",
+     "ayat": [
+      "20:87",
+      "47:4",
+      "94:2"
+     ]
+    },
+    {
      "id": "beban dosa",
      "en": "burden of sin",
      "ayat": [
       "6:164",
       "16:25",
       "20:100"
-     ]
-    },
-    {
-     "id": "beban",
-     "en": "load",
-     "ayat": [
-      "20:87",
-      "47:4",
-      "94:2"
      ]
     }
    ],
@@ -2041,21 +2041,21 @@
    ],
    "senses": [
     {
+     "id": "menghadapkan, memperlihatkan",
+     "en": "present, show",
+     "ayat": [
+      "2:31",
+      "18:100",
+      "38:31"
+     ]
+    },
+    {
      "id": "dihadapkan",
      "en": "be presented",
      "ayat": [
       "11:18",
       "46:20",
       "69:18"
-     ]
-    },
-    {
-     "id": "memperlihatkan",
-     "en": "show, display",
-     "ayat": [
-      "2:31",
-      "18:100",
-      "38:31"
      ]
     },
     {
@@ -2394,6 +2394,15 @@
    ],
    "senses": [
     {
+     "id": "kezaliman",
+     "en": "oppression",
+     "ayat": [
+      "7:33",
+      "10:23",
+      "42:39"
+     ]
+    },
+    {
      "id": "kedengkian",
      "en": "jealous animosity",
      "ayat": [
@@ -2401,18 +2410,9 @@
       "3:19",
       "42:14"
      ]
-    },
-    {
-     "id": "kezaliman",
-     "en": "oppression",
-     "ayat": [
-      "10:23",
-      "7:33",
-      "42:39"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "ٱلْبَغْىُ",
     "loc": "42:39:4",
@@ -2725,16 +2725,23 @@
    ],
    "senses": [
     {
+     "id": "Maha Penyantun",
+     "en": "Most Kind",
+     "ayat": [
+      "2:207",
+      "24:20",
+      "57:9"
+     ]
+    },
+    {
      "id": "penyantun",
      "en": "kind",
      "ayat": [
-      "2:207",
-      "9:128",
-      "57:9"
+      "9:128"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "رَءُوفٌ",
     "loc": "9:117:26",
@@ -2868,7 +2875,7 @@
    "senses": [
     {
      "id": "membuat kagum, menyenangkan",
-     "en": "to impress, please",
+     "en": "impress, please",
      "ayat": [
       "2:204",
       "9:25",
@@ -3591,16 +3598,8 @@
      "en": "more entitled",
      "ayat": [
       "3:68",
-      "4:135",
+      "8:75",
       "33:6"
-     ]
-    },
-    {
-     "id": "celakalah",
-     "en": "woe to",
-     "ayat": [
-      "75:34",
-      "75:35"
      ]
     }
    ],
@@ -4005,7 +4004,7 @@
    ],
    "senses": [
     {
-     "id": "mahakuat",
+     "id": "Mahakuat",
      "en": "powerful",
      "ayat": [
       "11:66",
@@ -4220,16 +4219,16 @@
    ],
    "senses": [
     {
-     "id": "tertentu",
+     "id": "diketahui, tertentu",
      "en": "known, appointed",
      "ayat": [
-      "15:4",
-      "26:38",
-      "37:164"
+      "56:50",
+      "15:21",
+      "70:24"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "مَّعْلُومٍ",
     "loc": "15:21:11",

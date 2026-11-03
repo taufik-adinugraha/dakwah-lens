@@ -357,25 +357,25 @@
    ],
    "senses": [
     {
+     "id": "lembaran-lembaran",
+     "en": "sheets",
+     "ayat": [
+      "81:10",
+      "74:52",
+      "80:13"
+     ]
+    },
+    {
      "id": "kitab-kitab",
      "en": "scriptures",
      "ayat": [
       "20:133",
       "53:36",
-      "87:18"
-     ]
-    },
-    {
-     "id": "lembaran-lembaran",
-     "en": "sheets",
-     "ayat": [
-      "80:13",
-      "81:10",
-      "74:52"
+      "87:19"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "صُحُفِ",
     "loc": "53:36:6",
@@ -457,21 +457,21 @@
    ],
    "senses": [
     {
-     "id": "diedarkan",
-     "en": "be circulated",
-     "ayat": [
-      "37:45",
-      "43:71",
-      "76:15"
-     ]
-    },
-    {
      "id": "berkeliling",
      "en": "go around",
      "ayat": [
       "52:24",
       "56:17",
       "55:44"
+     ]
+    },
+    {
+     "id": "diedarkan",
+     "en": "be circulated",
+     "ayat": [
+      "37:45",
+      "43:71",
+      "76:15"
      ]
     },
     {
@@ -482,7 +482,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "يُطَافُ",
     "loc": "37:45:1",
@@ -603,6 +603,14 @@
    ],
    "senses": [
     {
+     "id": "besar",
+     "en": "great, large",
+     "ayat": [
+      "9:121",
+      "18:49"
+     ]
+    },
+    {
      "id": "yang besar-besar",
      "en": "major ones",
      "ayat": [
@@ -617,14 +625,6 @@
      "ayat": [
       "2:45",
       "2:143"
-     ]
-    },
-    {
-     "id": "besar",
-     "en": "great, large",
-     "ayat": [
-      "9:121",
-      "18:49"
      ]
     }
    ],
@@ -660,6 +660,15 @@
    ],
    "senses": [
     {
+     "id": "empat",
+     "en": "four",
+     "ayat": [
+      "24:6",
+      "24:8",
+      "24:45"
+     ]
+    },
+    {
      "id": "empat puluh",
      "en": "forty",
      "ayat": [
@@ -667,17 +676,9 @@
       "5:26",
       "46:15"
      ]
-    },
-    {
-     "id": "empat",
-     "en": "four",
-     "ayat": [
-      "24:6",
-      "24:45"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "أَرْبَعُ",
     "loc": "24:6:12",
@@ -930,12 +931,12 @@
    ],
    "senses": [
     {
-     "id": "tekun menyembah",
-     "en": "devoted (to worship)",
+     "id": "tekun berdiam",
+     "en": "staying devotedly",
      "ayat": [
+      "2:187",
       "20:91",
-      "21:52",
-      "26:71"
+      "20:97"
      ]
     },
     {
@@ -947,6 +948,14 @@
      ]
     },
     {
+     "id": "tekun (pada)",
+     "en": "devoted (to)",
+     "ayat": [
+      "21:52",
+      "26:71"
+     ]
+    },
+    {
      "id": "penetap",
      "en": "resident",
      "ayat": [
@@ -954,7 +963,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "ٱلْعَٰكِفُ",
     "loc": "22:25:14",
@@ -1341,25 +1350,24 @@
    ],
    "senses": [
     {
-     "id": "peminta-minta",
-     "en": "one who asks for help",
+     "id": "orang yang meminta",
+     "en": "one who asks",
      "ayat": [
-      "2:177",
+      "93:10",
       "51:19",
-      "93:10"
+      "70:1"
      ]
     },
     {
      "id": "penanya",
-     "en": "one who asks",
+     "en": "questioner",
      "ayat": [
       "12:7",
-      "41:10",
-      "70:1"
+      "41:10"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "سَآئِلٌۢ",
     "loc": "70:1:2",
@@ -1802,7 +1810,7 @@
    "senses": [
     {
      "id": "membebani",
-     "en": "to burden, charge",
+     "en": "burden, charge",
      "ayat": [
       "2:286",
       "6:152",
@@ -2349,16 +2357,9 @@
      "ayat": [
       "3:112"
      ]
-    },
-    {
-     "id": "urat",
-     "en": "vein",
-     "ayat": [
-      "50:16"
-     ]
     }
    ],
-   "review": "disputed",
+   "review": "corrected",
    "voice": {
     "form": "حَبْلِ",
     "loc": "50:16:13",
@@ -2577,16 +2578,9 @@
      "ayat": [
       "54:52"
      ]
-    },
-    {
-     "id": "golongan",
-     "en": "sects",
-     "ayat": [
-      "23:53"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "زُبُرِ",
     "loc": "26:196:3",
@@ -2882,23 +2876,24 @@
    ],
    "senses": [
     {
-     "id": "yang tinggal",
-     "en": "one who stays behind",
+     "id": "yang duduk",
+     "en": "one who sits",
      "ayat": [
+      "10:12",
       "4:95",
-      "9:46",
       "9:86"
      ]
     },
     {
-     "id": "duduk",
-     "en": "sitting",
+     "id": "yang tinggal",
+     "en": "one who stays behind",
      "ayat": [
-      "10:12"
+      "9:46",
+      "5:24"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "قَاعِدًا",
     "loc": "10:12:8",
@@ -3509,16 +3504,9 @@
       "28:12",
       "61:10"
      ]
-    },
-    {
-     "id": "membujuk",
-     "en": "lure",
-     "ayat": [
-      "7:22"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "دَلَّهُمْ",
     "loc": "34:14:6",
@@ -3552,7 +3540,7 @@
    "senses": [
     {
      "id": "hidup",
-     "en": "to live",
+     "en": "live",
      "ayat": [
       "7:25",
       "23:37",
@@ -4047,14 +4035,6 @@
       "9:25",
       "15:97",
       "26:13"
-     ]
-    },
-    {
-     "id": "merasa susah hati",
-     "en": "feel distressed",
-     "ayat": [
-      "11:77",
-      "29:33"
      ]
     }
    ],

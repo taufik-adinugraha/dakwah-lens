@@ -1,5 +1,5 @@
 {
- "_about": "Meanings of every QAC lemma, written with Claude outside this pipeline (belajar/authoring/kosakata_generate.py): Sonnet 5.5 wrote each from a sample of up to 12 ayat with QuranEnc and Saheeh International, Opus 5.5 checked and corrected, every correction was re-checked, then a second full check. Dibantu AI, bukan fatwa. review: passed, corrected, or disputed (still questioned after the checks, read by Claude Opus 5.5 in session). Edit here, then run build_kosakata.py.",
+ "_about": "Meanings of every QAC lemma, written with Claude outside this pipeline (belajar/authoring/kosakata_generate.py): Sonnet 5.5 wrote each from a sample of up to 12 ayat with QuranEnc and Saheeh International, Opus 5.5 checked and corrected, every correction was re-checked, then a second full check, then a third check of ranks 1 to 2,000 for what a learner memorises, with every correction read and decided by a person (authoring/kosakata_rulings_levels.json). Dibantu AI, bukan fatwa. review: passed, corrected, or disputed (still questioned after the checks, read by Claude Opus 5.5 in session). Edit here, then run build_kosakata.py.",
  "lemmas": {
   "min": {
    "review": "corrected",
@@ -77,7 +77,7 @@
    ]
   },
   "laA": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "tidak (penafian)",
@@ -101,13 +101,6 @@
      "ayat": [
       "26:101",
       "56:44"
-     ]
-    },
-    {
-     "id": "pastilah (penegas)",
-     "en": "assuredly",
-     "ayat": [
-      "16:109"
      ]
     }
    ]
@@ -822,7 +815,7 @@
    ]
   },
   "ra'aA": {
-   "review": "disputed",
+   "review": "corrected",
    "senses": [
     {
      "id": "melihat",
@@ -840,13 +833,6 @@
       "7:60",
       "96:7"
      ]
-    },
-    {
-     "id": "pernahkah kamu perhatikan",
-     "en": "have you considered",
-     "ayat": [
-      "56:63"
-     ]
     }
    ]
   },
@@ -860,13 +846,6 @@
       "4:73",
       "22:69",
       "38:66"
-     ]
-    },
-    {
-     "id": "sebelum",
-     "en": "before",
-     "ayat": [
-      "3:3"
      ]
     }
    ]
@@ -884,19 +863,11 @@
      ]
     },
     {
-     "id": "membawa",
-     "en": "bring",
-     "ayat": [
-      "7:112",
-      "10:79",
-      "37:157"
-     ]
-    },
-    {
      "id": "mendatangi",
-     "en": "approach",
+     "en": "come to",
      "ayat": [
-      "26:165"
+      "26:165",
+      "26:89"
      ]
     }
    ]
@@ -905,12 +876,21 @@
    "review": "corrected",
    "senses": [
     {
+     "id": "kitab",
+     "en": "book",
+     "ayat": [
+      "2:2",
+      "12:1",
+      "52:2"
+     ]
+    },
+    {
      "id": "kitab suci",
      "en": "scripture",
      "ayat": [
-      "2:2",
       "3:98",
-      "37:117"
+      "37:117",
+      "4:159"
      ]
     },
     {
@@ -1053,13 +1033,6 @@
      "en": "even if",
      "ayat": [
       "12:103"
-     ]
-    },
-    {
-     "id": "mengapa tidak",
-     "en": "why not",
-     "ayat": [
-      "15:7"
      ]
     }
    ]
@@ -1248,15 +1221,15 @@
    ]
   },
   "{t~aqaY`": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "bertakwa",
-     "en": "fear Allah",
+     "en": "be God-conscious",
      "ayat": [
       "2:278",
       "9:119",
-      "26:126"
+      "10:63"
      ]
     },
     {
@@ -1300,10 +1273,10 @@
    ]
   },
   "Ealiym": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "maha mengetahui",
+     "id": "Maha Mengetahui",
      "en": "all-knowing",
      "ayat": [
       "2:244",
@@ -1342,7 +1315,7 @@
    ]
   },
   "baEoD": {
-   "review": "disputed",
+   "review": "corrected",
    "senses": [
     {
      "id": "sebagian",
@@ -1351,15 +1324,6 @@
       "2:73",
       "12:10",
       "23:113"
-     ]
-    },
-    {
-     "id": "satu sama lain",
-     "en": "one another",
-     "ayat": [
-      "7:24",
-      "37:50",
-      "43:67"
      ]
     }
    ]
@@ -1393,8 +1357,15 @@
    ]
   },
   "A^xir": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "terakhir",
+     "en": "last",
+     "ayat": [
+      "2:8"
+     ]
+    },
     {
      "id": "akhirat",
      "en": "the Hereafter",
@@ -1405,14 +1376,7 @@
      ]
     },
     {
-     "id": "akhir",
-     "en": "last",
-     "ayat": [
-      "2:8"
-     ]
-    },
-    {
-     "id": "orang yang kemudian",
+     "id": "generasi kemudian",
      "en": "later generations",
      "ayat": [
       "26:84",
@@ -1436,7 +1400,7 @@
    ]
   },
   "gayor": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "selain",
@@ -1445,15 +1409,6 @@
       "3:85",
       "6:40",
       "26:29"
-     ]
-    },
-    {
-     "id": "tanpa",
-     "en": "without",
-     "ayat": [
-      "6:140",
-      "22:3",
-      "38:39"
      ]
     },
     {
@@ -1480,11 +1435,12 @@
      ]
     },
     {
-     "id": "kebun",
+     "id": "kebun, taman",
      "en": "garden",
      "ayat": [
       "26:134",
-      "26:147"
+      "26:147",
+      "69:22"
      ]
     }
    ]
@@ -1504,17 +1460,8 @@
    ]
   },
   "naAr": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "neraka",
-     "en": "the Fire (Hell)",
-     "ayat": [
-      "2:39",
-      "3:131",
-      "5:37"
-     ]
-    },
     {
      "id": "api",
      "en": "fire",
@@ -1522,6 +1469,15 @@
       "15:27",
       "21:69",
       "36:80"
+     ]
+    },
+    {
+     "id": "neraka",
+     "en": "the Fire (Hell)",
+     "ayat": [
+      "2:39",
+      "3:131",
+      "5:37"
      ]
     }
    ]
@@ -1580,7 +1536,7 @@
    "senses": [
     {
      "id": "menghendaki",
-     "en": "to want",
+     "en": "want",
      "ayat": [
       "4:28",
       "4:134",
@@ -1672,20 +1628,21 @@
    "review": "corrected",
    "senses": [
     {
+     "id": "mengirim",
+     "en": "send",
+     "ayat": [
+      "51:33",
+      "12:45",
+      "7:6"
+     ]
+    },
+    {
      "id": "mengutus",
      "en": "send as messenger",
      "ayat": [
       "6:48",
       "11:96",
       "21:107"
-     ]
-    },
-    {
-     "id": "mengirim",
-     "en": "send",
-     "ayat": [
-      "12:45",
-      "51:33"
      ]
     },
     {
@@ -1733,15 +1690,14 @@
    ]
   },
   ">axa*a": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "menimpa, menyiksa",
-     "en": "seize with punishment",
+     "id": "mengambil",
+     "en": "take",
      "ayat": [
-      "3:11",
-      "7:78",
-      "11:67"
+      "4:71",
+      "7:199"
      ]
     },
     {
@@ -1753,11 +1709,12 @@
      ]
     },
     {
-     "id": "mengambil",
-     "en": "take",
+     "id": "menimpa, menyiksa",
+     "en": "seize with punishment",
      "ayat": [
-      "4:71",
-      "7:199"
+      "3:11",
+      "7:78",
+      "11:67"
      ]
     }
    ]
@@ -1883,7 +1840,7 @@
    ]
   },
   "EaZiym": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "besar, agung",
@@ -1895,10 +1852,10 @@
      ]
     },
     {
-     "id": "tulang belulang",
-     "en": "bones",
+     "id": "Maha Agung",
+     "en": "Most Great",
      "ayat": [
-      "23:82"
+      "56:74"
      ]
     }
    ]
@@ -1912,15 +1869,7 @@
      "ayat": [
       "5:28",
       "7:108",
-      "30:41"
-     ]
-    },
-    {
-     "id": "sebelum, di hadapan",
-     "en": "before, in front",
-     "ayat": [
-      "3:3",
-      "49:1"
+      "20:22"
      ]
     }
    ]
@@ -2126,7 +2075,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahaperkasa",
+     "id": "Mahaperkasa",
      "en": "exalted in might",
      "ayat": [
       "2:209",
@@ -2430,21 +2379,21 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "memperhatikan",
-     "en": "observe",
-     "ayat": [
-      "6:11",
-      "27:69",
-      "10:14"
-     ]
-    },
-    {
      "id": "melihat",
      "en": "look",
      "ayat": [
       "37:88",
       "51:44",
-      "56:84"
+      "10:14"
+     ]
+    },
+    {
+     "id": "memperhatikan",
+     "en": "observe",
+     "ayat": [
+      "6:11",
+      "27:69",
+      "7:84"
      ]
     }
    ]
@@ -2641,16 +2590,16 @@
      "ayat": [
       "3:175",
       "5:28",
-      "8:58"
+      "6:15"
      ]
     },
     {
-     "id": "khawatir terhadap",
-     "en": "fear for",
+     "id": "khawatir",
+     "en": "be apprehensive",
      "ayat": [
-      "11:26",
-      "26:135",
-      "40:32"
+      "8:58",
+      "4:101",
+      "11:26"
      ]
     }
    ]
@@ -2725,17 +2674,8 @@
    ]
   },
   "rajaEa": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "dikembalikan",
-     "en": "be returned",
-     "ayat": [
-      "10:56",
-      "29:57",
-      "3:109"
-     ]
-    },
     {
      "id": "kembali",
      "en": "return",
@@ -2743,6 +2683,15 @@
       "2:18",
       "36:50",
       "21:64"
+     ]
+    },
+    {
+     "id": "dikembalikan",
+     "en": "be returned",
+     "ayat": [
+      "10:56",
+      "29:57",
+      "3:109"
      ]
     },
     {
@@ -2758,12 +2707,21 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "golongan, penghuni",
-     "en": "people, inhabitants",
+     "id": "sahabat, golongan",
+     "en": "companions, people",
+     "ayat": [
+      "15:78",
+      "56:38",
+      "56:90"
+     ]
+    },
+    {
+     "id": "penghuni",
+     "en": "inhabitants",
      "ayat": [
       "2:82",
-      "15:78",
-      "56:38"
+      "7:36",
+      "46:14"
      ]
     }
    ]
@@ -3440,15 +3398,24 @@
    ]
   },
   ">anfaqa": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "menginfakkan",
+     "id": "membelanjakan, menafkahkan",
      "en": "spend",
+     "ayat": [
+      "25:67",
+      "2:270",
+      "9:98"
+     ]
+    },
+    {
+     "id": "menginfakkan",
+     "en": "spend in charity",
      "ayat": [
       "2:3",
       "2:261",
-      "25:67"
+      "57:10"
      ]
     }
    ]
@@ -3514,17 +3481,8 @@
    ]
   },
   "yamiyn": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "sumpah",
-     "en": "oath",
-     "ayat": [
-      "2:225",
-      "5:53",
-      "5:108"
-     ]
-    },
     {
      "id": "tangan kanan",
      "en": "right hand",
@@ -3541,6 +3499,15 @@
       "7:17",
       "16:48",
       "37:28"
+     ]
+    },
+    {
+     "id": "sumpah",
+     "en": "oath",
+     "ayat": [
+      "2:225",
+      "5:53",
+      "5:108"
      ]
     }
    ]
@@ -3589,15 +3556,24 @@
    ]
   },
   "A^baA'": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "bapak-bapak",
+     "en": "fathers",
+     "ayat": [
+      "2:170",
+      "13:23",
+      "21:54"
+     ]
+    },
     {
      "id": "nenek moyang",
      "en": "forefathers",
      "ayat": [
-      "2:170",
-      "7:70",
-      "21:53"
+      "26:76",
+      "37:126",
+      "36:6"
      ]
     }
    ]
@@ -3607,7 +3583,7 @@
    "senses": [
     {
      "id": "menimpa",
-     "en": "to befall, strike",
+     "en": "befall, strike",
      "ayat": [
       "2:156",
       "3:120",
@@ -3616,7 +3592,7 @@
     },
     {
      "id": "menghendaki",
-     "en": "to intend",
+     "en": "intend",
      "ayat": [
       "38:36"
      ]
@@ -3698,14 +3674,6 @@
       "3:45",
       "11:45",
       "2:146"
-     ]
-    },
-    {
-     "id": "musafir",
-     "en": "traveler",
-     "ayat": [
-      "4:36",
-      "30:38"
      ]
     }
    ]
@@ -4182,7 +4150,7 @@
    ]
   },
   ">aqaAma": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "menegakkan (salat)",
@@ -4198,13 +4166,6 @@
      "en": "keep (limits)",
      "ayat": [
       "2:230"
-     ]
-    },
-    {
-     "id": "menghadapkan",
-     "en": "direct (the face)",
-     "ayat": [
-      "10:105"
      ]
     }
    ]
@@ -4233,13 +4194,6 @@
       "2:190",
       "4:76",
       "22:39"
-     ]
-    },
-    {
-     "id": "melaknat",
-     "en": "curse",
-     "ayat": [
-      "9:30"
      ]
     }
    ]
@@ -4659,26 +4613,8 @@
    ]
   },
   "kataba": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "diwajibkan",
-     "en": "prescribed",
-     "ayat": [
-      "2:180",
-      "2:183",
-      "2:246"
-     ]
-    },
-    {
-     "id": "menetapkan",
-     "en": "decree",
-     "ayat": [
-      "5:21",
-      "9:51",
-      "58:21"
-     ]
-    },
     {
      "id": "menulis",
      "en": "write",
@@ -4694,6 +4630,24 @@
       "4:81",
       "19:79",
       "3:53"
+     ]
+    },
+    {
+     "id": "menetapkan",
+     "en": "decree",
+     "ayat": [
+      "5:21",
+      "9:51",
+      "58:21"
+     ]
+    },
+    {
+     "id": "diwajibkan",
+     "en": "prescribed",
+     "ayat": [
+      "2:180",
+      "2:183",
+      "2:246"
      ]
     }
    ]
@@ -4826,7 +4780,7 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "maha mendengar",
+     "id": "Maha Mendengar",
      "en": "All-Hearing",
      "ayat": [
       "2:244",
@@ -4896,7 +4850,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahakuasa",
+     "id": "Mahakuasa",
      "en": "all-powerful",
      "ayat": [
       "2:106",
@@ -5334,7 +5288,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahasuci",
+     "id": "Mahasuci",
      "en": "exalted is He",
      "ayat": [
       "2:116",
@@ -5393,7 +5347,7 @@
    "senses": [
     {
      "id": "mengazab",
-     "en": "to punish",
+     "en": "punish",
      "ayat": [
       "3:129",
       "9:55",
@@ -5403,24 +5357,24 @@
    ]
   },
   "taraka": {
-   "review": "disputed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "membiarkan",
-     "en": "leave, let be",
-     "ayat": [
-      "2:17",
-      "18:99",
-      "26:146"
-     ]
-    },
-    {
      "id": "meninggalkan",
-     "en": "leave behind",
+     "en": "leave (behind)",
      "ayat": [
       "4:7",
       "12:17",
       "44:25"
+     ]
+    },
+    {
+     "id": "membiarkan",
+     "en": "let be",
+     "ayat": [
+      "2:17",
+      "18:99",
+      "26:146"
      ]
     }
    ]
@@ -5759,7 +5713,7 @@
     },
     {
      "id": "akan mati",
-     "en": "to die",
+     "en": "die",
      "ayat": [
       "23:15",
       "37:58",
@@ -6815,21 +6769,21 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "berpaling pergi",
-     "en": "turn away",
-     "ayat": [
-      "17:46",
-      "27:80",
-      "8:15"
-     ]
-    },
-    {
-     "id": "menghadap",
+     "id": "menghadapkan",
      "en": "turn toward",
      "ayat": [
       "2:144",
       "2:149",
       "2:115"
+     ]
+    },
+    {
+     "id": "berbalik pergi",
+     "en": "turn away",
+     "ayat": [
+      "17:46",
+      "21:57",
+      "27:80"
      ]
     },
     {
@@ -6845,11 +6799,20 @@
    "review": "corrected",
    "senses": [
     {
+     "id": "mudah-mudahan",
+     "en": "it is hoped",
+     "ayat": [
+      "4:99",
+      "9:102",
+      "17:79"
+     ]
+    },
+    {
      "id": "boleh jadi",
      "en": "perhaps",
      "ayat": [
       "2:216",
-      "7:129",
+      "4:19",
       "27:72"
      ]
     }
@@ -7225,21 +7188,21 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "memperbaiki diri",
-     "en": "reform oneself",
-     "ayat": [
-      "3:89",
-      "5:39",
-      "7:35"
-     ]
-    },
-    {
      "id": "memperbaiki",
      "en": "set right, amend",
      "ayat": [
       "8:1",
       "33:71",
-      "47:2"
+      "26:152"
+     ]
+    },
+    {
+     "id": "memperbaiki diri",
+     "en": "reform oneself",
+     "ayat": [
+      "3:89",
+      "5:39",
+      "4:16"
      ]
     }
    ]
@@ -7340,7 +7303,7 @@
    ]
   },
   "rijaAl": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "laki-laki",
@@ -7349,14 +7312,6 @@
       "4:1",
       "4:7",
       "24:37"
-     ]
-    },
-    {
-     "id": "berjalan kaki",
-     "en": "on foot",
-     "ayat": [
-      "2:239",
-      "22:27"
      ]
     }
    ]
@@ -8364,7 +8319,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahakaya",
+     "id": "Mahakaya",
      "en": "free of need",
      "ayat": [
       "2:263",
@@ -8614,7 +8569,7 @@
    "senses": [
     {
      "id": "melaknat",
-     "en": "to curse",
+     "en": "curse",
      "ayat": [
       "2:88",
       "4:52",
@@ -8709,7 +8664,7 @@
    "senses": [
     {
      "id": "menguji",
-     "en": "to test",
+     "en": "test",
      "ayat": [
       "6:53",
       "20:85",
@@ -8718,7 +8673,7 @@
     },
     {
      "id": "memalingkan",
-     "en": "to tempt away",
+     "en": "tempt away",
      "ayat": [
       "5:49",
       "17:73",
@@ -8727,7 +8682,7 @@
     },
     {
      "id": "menyiksa",
-     "en": "to persecute",
+     "en": "persecute",
      "ayat": [
       "10:83",
       "16:110",
@@ -8884,6 +8839,15 @@
   "say~i}ap": {
    "review": "corrected",
    "senses": [
+    {
+     "id": "keburukan",
+     "en": "evil",
+     "ayat": [
+      "4:78",
+      "27:46",
+      "13:6"
+     ]
+    },
     {
      "id": "perbuatan buruk",
      "en": "evil deed",
@@ -9268,24 +9232,24 @@
    ]
   },
   "ruwH": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "Jibril (Roh)",
-     "en": "the Spirit (Gabriel)",
-     "ayat": [
-      "2:87",
-      "16:102",
-      "26:193"
-     ]
-    },
-    {
      "id": "roh",
-     "en": "soul, spirit",
+     "en": "spirit, soul",
      "ayat": [
       "15:29",
       "32:9",
       "17:85"
+     ]
+    },
+    {
+     "id": "Jibril (Roh)",
+     "en": "the Spirit (Gabriel)",
+     "ayat": [
+      "19:17",
+      "26:193",
+      "16:102"
      ]
     },
     {
@@ -9410,21 +9374,21 @@
    "review": "corrected",
    "senses": [
     {
+     "id": "meletakkan",
+     "en": "put down, place",
+     "ayat": [
+      "4:102",
+      "18:49",
+      "21:47"
+     ]
+    },
+    {
      "id": "melahirkan",
      "en": "give birth",
      "ayat": [
       "3:36",
       "35:11",
       "41:47"
-     ]
-    },
-    {
-     "id": "meletakkan",
-     "en": "put down, place",
-     "ayat": [
-      "4:102",
-      "21:47",
-      "18:49"
      ]
     },
     {
@@ -9590,13 +9554,6 @@
       "2:155",
       "5:94",
       "21:35"
-     ]
-    },
-    {
-     "id": "menjadi usang",
-     "en": "wear out",
-     "ayat": [
-      "20:120"
      ]
     }
    ]
@@ -9801,7 +9758,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahatinggi",
+     "id": "Mahatinggi",
      "en": "exalted, high above",
      "ayat": [
       "6:100",
@@ -9924,7 +9881,7 @@
    "senses": [
     {
      "id": "membahayakan",
-     "en": "to harm",
+     "en": "harm",
      "ayat": [
       "3:111",
       "3:176",
@@ -10517,12 +10474,21 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "yang mengetahui",
-     "en": "one who knows",
+     "id": "Yang Maha Mengetahui",
+     "en": "the Knower",
      "ayat": [
       "6:73",
-      "21:81",
-      "29:43"
+      "9:94",
+      "21:81"
+     ]
+    },
+    {
+     "id": "orang yang berilmu",
+     "en": "one of knowledge",
+     "ayat": [
+      "29:43",
+      "30:22",
+      "12:44"
      ]
     }
    ]
@@ -10542,17 +10508,8 @@
    ]
   },
   ">uEiydu": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "mengulangi (penciptaan)",
-     "en": "repeat creation",
-     "ayat": [
-      "10:4",
-      "21:104",
-      "30:11"
-     ]
-    },
     {
      "id": "mengembalikan",
      "en": "return",
@@ -10560,6 +10517,15 @@
       "20:55",
       "22:22",
       "18:20"
+     ]
+    },
+    {
+     "id": "mengulangi",
+     "en": "repeat",
+     "ayat": [
+      "10:4",
+      "21:104",
+      "30:11"
      ]
     }
    ]
@@ -10645,21 +10611,21 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "mengetahui sepenuhnya",
-     "en": "know fully",
-     "ayat": [
-      "27:22",
-      "18:91",
-      "2:255"
-     ]
-    },
-    {
      "id": "meliputi, mengepung",
      "en": "encompass, surround",
      "ayat": [
       "10:22",
       "18:29",
       "17:60"
+     ]
+    },
+    {
+     "id": "mengetahui sepenuhnya",
+     "en": "know fully",
+     "ayat": [
+      "27:22",
+      "18:91",
+      "2:255"
      ]
     },
     {
@@ -10899,14 +10865,6 @@
      "ayat": [
       "13:33",
       "3:75"
-     ]
-    },
-    {
-     "id": "pokok penopang",
-     "en": "means of support",
-     "ayat": [
-      "4:5",
-      "5:97"
      ]
     }
    ]
@@ -11727,11 +11685,20 @@
    "review": "corrected",
    "senses": [
     {
+     "id": "Maha Penyantun",
+     "en": "Most Forbearing",
+     "ayat": [
+      "2:225",
+      "2:263",
+      "3:155"
+     ]
+    },
+    {
      "id": "penyantun",
      "en": "forbearing",
      "ayat": [
-      "2:225",
       "11:75",
+      "9:114",
       "37:101"
      ]
     }
@@ -11934,21 +11901,20 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "keberatan hati",
-     "en": "inner distress",
-     "ayat": [
-      "4:65",
-      "7:2",
-      "33:37"
-     ]
-    },
-    {
      "id": "kesukaran",
      "en": "difficulty",
      "ayat": [
       "5:6",
       "22:78",
-      "33:50"
+      "33:37"
+     ]
+    },
+    {
+     "id": "keberatan hati",
+     "en": "inner distress",
+     "ayat": [
+      "4:65",
+      "7:2"
      ]
     },
     {
@@ -12336,14 +12302,15 @@
    ]
   },
   "maqaAm": {
-   "review": "disputed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "tempat berdiri",
-     "en": "standing place",
+     "id": "tempat",
+     "en": "place",
      "ayat": [
-      "2:125",
-      "3:97"
+      "27:39",
+      "44:51",
+      "44:26"
      ]
     },
     {
@@ -12356,20 +12323,18 @@
      ]
     },
     {
-     "id": "tempat, kediaman",
-     "en": "place, abode",
+     "id": "tempat berdiri",
+     "en": "standing place",
      "ayat": [
-      "27:39",
-      "44:26",
-      "44:51"
+      "2:125",
+      "3:97"
      ]
     },
     {
-     "id": "berdiri, tinggal",
-     "en": "standing, staying",
+     "id": "tinggal (bersama)",
+     "en": "staying (among)",
      "ayat": [
-      "10:71",
-      "14:14"
+      "10:71"
      ]
     }
    ]
@@ -12833,21 +12798,21 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "menghamparkan",
-     "en": "spread out",
-     "ayat": [
-      "13:3",
-      "15:19",
-      "50:7"
-     ]
-    },
-    {
      "id": "memanjangkan",
      "en": "extend",
      "ayat": [
       "25:45",
       "19:75",
       "19:79"
+     ]
+    },
+    {
+     "id": "menghamparkan",
+     "en": "spread out",
+     "ayat": [
+      "13:3",
+      "15:19",
+      "50:7"
      ]
     },
     {
@@ -13079,13 +13044,6 @@
       "20:78",
       "91:4"
      ]
-    },
-    {
-     "id": "pingsan",
-     "en": "faint",
-     "ayat": [
-      "33:19"
-     ]
     }
    ]
   },
@@ -13167,7 +13125,7 @@
    "senses": [
     {
      "id": "mengaku, mengklaim",
-     "en": "to claim",
+     "en": "claim",
      "ayat": [
       "4:60",
       "6:22",
@@ -13347,7 +13305,7 @@
    ]
   },
   "quTiEa": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "memotong",
@@ -13364,15 +13322,6 @@
      "ayat": [
       "2:27",
       "13:25"
-     ]
-    },
-    {
-     "id": "membinasakan",
-     "en": "eliminate",
-     "ayat": [
-      "6:45",
-      "7:72",
-      "8:7"
      ]
     },
     {
@@ -13970,8 +13919,17 @@
    ]
   },
   "waqaEa": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "terjadi",
+     "en": "occur",
+     "ayat": [
+      "56:1",
+      "69:15",
+      "10:51"
+     ]
+    },
     {
      "id": "menimpa",
      "en": "befall",
@@ -13979,15 +13937,6 @@
       "7:71",
       "7:134",
       "27:82"
-     ]
-    },
-    {
-     "id": "terjadi",
-     "en": "occur",
-     "ayat": [
-      "10:51",
-      "56:1",
-      "69:15"
      ]
     },
     {
@@ -14086,21 +14035,21 @@
    "review": "corrected",
    "senses": [
     {
+     "id": "beban",
+     "en": "burden",
+     "ayat": [
+      "20:87",
+      "47:4",
+      "94:2"
+     ]
+    },
+    {
      "id": "beban dosa",
      "en": "burden of sin",
      "ayat": [
       "6:164",
       "16:25",
       "20:100"
-     ]
-    },
-    {
-     "id": "beban",
-     "en": "load",
-     "ayat": [
-      "20:87",
-      "47:4",
-      "94:2"
      ]
     }
    ]
@@ -14373,21 +14322,21 @@
    "review": "corrected",
    "senses": [
     {
+     "id": "menghadapkan, memperlihatkan",
+     "en": "present, show",
+     "ayat": [
+      "2:31",
+      "18:100",
+      "38:31"
+     ]
+    },
+    {
      "id": "dihadapkan",
      "en": "be presented",
      "ayat": [
       "11:18",
       "46:20",
       "69:18"
-     ]
-    },
-    {
-     "id": "memperlihatkan",
-     "en": "show, display",
-     "ayat": [
-      "2:31",
-      "18:100",
-      "38:31"
      ]
     },
     {
@@ -14514,8 +14463,17 @@
    ]
   },
   "bagoy": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "kezaliman",
+     "en": "oppression",
+     "ayat": [
+      "7:33",
+      "10:23",
+      "42:39"
+     ]
+    },
     {
      "id": "kedengkian",
      "en": "jealous animosity",
@@ -14523,15 +14481,6 @@
       "2:213",
       "3:19",
       "42:14"
-     ]
-    },
-    {
-     "id": "kezaliman",
-     "en": "oppression",
-     "ayat": [
-      "10:23",
-      "7:33",
-      "42:39"
      ]
     }
    ]
@@ -14653,15 +14602,22 @@
    ]
   },
   "ra'uwf": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "Maha Penyantun",
+     "en": "Most Kind",
+     "ayat": [
+      "2:207",
+      "24:20",
+      "57:9"
+     ]
+    },
     {
      "id": "penyantun",
      "en": "kind",
      "ayat": [
-      "2:207",
-      "9:128",
-      "57:9"
+      "9:128"
      ]
     }
    ]
@@ -14715,7 +14671,7 @@
    "senses": [
     {
      "id": "membuat kagum, menyenangkan",
-     "en": "to impress, please",
+     "en": "impress, please",
      "ayat": [
       "2:204",
       "9:25",
@@ -15000,16 +14956,8 @@
      "en": "more entitled",
      "ayat": [
       "3:68",
-      "4:135",
+      "8:75",
       "33:6"
-     ]
-    },
-    {
-     "id": "celakalah",
-     "en": "woe to",
-     "ayat": [
-      "75:34",
-      "75:35"
      ]
     }
    ]
@@ -15169,7 +15117,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahakuat",
+     "id": "Mahakuat",
      "en": "powerful",
      "ayat": [
       "11:66",
@@ -15251,15 +15199,15 @@
    ]
   },
   "m~aEoluwm": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "tertentu",
+     "id": "diketahui, tertentu",
      "en": "known, appointed",
      "ayat": [
-      "15:4",
-      "26:38",
-      "37:164"
+      "56:50",
+      "15:21",
+      "70:24"
      ]
     }
    ]
@@ -16385,7 +16333,7 @@
      ]
     },
     {
-     "id": "maha mensyukuri",
+     "id": "Maha Mensyukuri",
      "en": "appreciative",
      "ayat": [
       "35:30",
@@ -16637,8 +16585,16 @@
    ]
   },
   "far~aqu": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "memisahkan",
+     "en": "separate",
+     "ayat": [
+      "2:102",
+      "4:150"
+     ]
+    },
     {
      "id": "membeda-bedakan",
      "en": "make distinction",
@@ -16655,13 +16611,6 @@
       "6:159",
       "30:32",
       "20:94"
-     ]
-    },
-    {
-     "id": "memisahkan",
-     "en": "cause separation",
-     "ayat": [
-      "2:102"
      ]
     }
    ]
@@ -16951,15 +16900,16 @@
      "en": "idle speech",
      "ayat": [
       "19:62",
-      "23:3",
+      "56:25",
       "78:35"
      ]
     },
     {
-     "id": "yang tak disengaja",
-     "en": "what is unintended",
+     "id": "hal sia-sia",
+     "en": "vain matters",
      "ayat": [
-      "2:225",
+      "23:3",
+      "25:72",
       "5:89"
      ]
     }
@@ -17295,17 +17245,8 @@
    ]
   },
   "ramaY`": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "menuduh",
-     "en": "accuse",
-     "ayat": [
-      "24:4",
-      "24:6",
-      "4:112"
-     ]
-    },
     {
      "id": "melempar",
      "en": "throw",
@@ -17313,6 +17254,15 @@
       "8:17",
       "105:4",
       "77:32"
+     ]
+    },
+    {
+     "id": "menuduh",
+     "en": "accuse",
+     "ayat": [
+      "24:4",
+      "24:6",
+      "4:112"
      ]
     }
    ]
@@ -17416,17 +17366,8 @@
    ]
   },
   "gil~": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "belenggu",
-     "en": "shackles",
-     "ayat": [
-      "13:5",
-      "36:8",
-      "76:4"
-     ]
-    },
     {
      "id": "dendam",
      "en": "resentment",
@@ -18051,7 +17992,7 @@
    "senses": [
     {
      "id": "menguji",
-     "en": "to test",
+     "en": "test",
      "ayat": [
       "2:124",
       "4:6",
@@ -18145,13 +18086,13 @@
    ]
   },
   "zaAlat": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "senantiasa",
-     "en": "continue to",
+     "id": "berhenti",
+     "en": "cease",
      "ayat": [
-      "2:217",
+      "21:15",
       "11:118",
       "22:55"
      ]
@@ -18307,7 +18248,7 @@
    "senses": [
     {
      "id": "menamai",
-     "en": "to name",
+     "en": "name",
      "ayat": [
       "3:36",
       "22:78",
@@ -18414,7 +18355,7 @@
    "senses": [
     {
      "id": "bermaksud",
-     "en": "to intend",
+     "en": "intend",
      "ayat": [
       "5:11",
       "9:13",
@@ -18424,7 +18365,7 @@
    ]
   },
   "janb": {
-   "review": "disputed",
+   "review": "corrected",
    "senses": [
     {
      "id": "lambung",
@@ -18436,17 +18377,10 @@
      ]
     },
     {
-     "id": "di samping",
-     "en": "beside",
+     "id": "sisi",
+     "en": "side",
      "ayat": [
       "4:36"
-     ]
-    },
-    {
-     "id": "dalam hal",
-     "en": "in regard to",
-     "ayat": [
-      "39:56"
      ]
     }
    ]
@@ -18469,21 +18403,21 @@
    "review": "corrected",
    "senses": [
     {
+     "id": "sangat besar",
+     "en": "be great",
+     "ayat": [
+      "18:5",
+      "61:3",
+      "40:35"
+     ]
+    },
+    {
      "id": "terasa berat",
      "en": "be burdensome",
      "ayat": [
       "6:35",
       "10:71",
       "42:13"
-     ]
-    },
-    {
-     "id": "sangat besar",
-     "en": "be great",
-     "ayat": [
-      "18:5",
-      "61:3",
-      "17:51"
      ]
     },
     {
@@ -18892,8 +18826,17 @@
    ]
   },
   ">aZohara": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "menampakkan",
+     "en": "make manifest",
+     "ayat": [
+      "40:26",
+      "66:3",
+      "72:26"
+     ]
+    },
     {
      "id": "memenangkan",
      "en": "make prevail",
@@ -18904,18 +18847,10 @@
      ]
     },
     {
-     "id": "memperlihatkan",
-     "en": "disclose",
+     "id": "memasuki waktu zuhur",
+     "en": "enter noon",
      "ayat": [
-      "66:3",
-      "72:26"
-     ]
-    },
-    {
-     "id": "menimbulkan",
-     "en": "cause to appear",
-     "ayat": [
-      "40:26"
+      "30:18"
      ]
     }
    ]
@@ -18956,23 +18891,15 @@
    ]
   },
   "ra`wadu": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "menggoda",
-     "en": "seek to seduce",
-     "ayat": [
-      "12:23",
-      "12:26",
-      "12:51"
-     ]
-    },
-    {
      "id": "membujuk",
-     "en": "persuade",
+     "en": "try to persuade",
      "ayat": [
       "12:61",
-      "54:37"
+      "54:37",
+      "12:23"
      ]
     }
    ]
@@ -19111,24 +19038,24 @@
    ]
   },
   "SuHuf": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "lembaran-lembaran",
+     "en": "sheets",
+     "ayat": [
+      "81:10",
+      "74:52",
+      "80:13"
+     ]
+    },
     {
      "id": "kitab-kitab",
      "en": "scriptures",
      "ayat": [
       "20:133",
       "53:36",
-      "87:18"
-     ]
-    },
-    {
-     "id": "lembaran-lembaran",
-     "en": "sheets",
-     "ayat": [
-      "80:13",
-      "81:10",
-      "74:52"
+      "87:19"
      ]
     }
    ]
@@ -19155,17 +19082,8 @@
    ]
   },
   "TaAfa": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "diedarkan",
-     "en": "be circulated",
-     "ayat": [
-      "37:45",
-      "43:71",
-      "76:15"
-     ]
-    },
     {
      "id": "berkeliling",
      "en": "go around",
@@ -19173,6 +19091,15 @@
       "52:24",
       "56:17",
       "55:44"
+     ]
+    },
+    {
+     "id": "diedarkan",
+     "en": "be circulated",
+     "ayat": [
+      "37:45",
+      "43:71",
+      "76:15"
      ]
     },
     {
@@ -19224,6 +19151,14 @@
    "review": "corrected",
    "senses": [
     {
+     "id": "besar",
+     "en": "great, large",
+     "ayat": [
+      "9:121",
+      "18:49"
+     ]
+    },
+    {
      "id": "yang besar-besar",
      "en": "major ones",
      "ayat": [
@@ -19239,20 +19174,21 @@
       "2:45",
       "2:143"
      ]
-    },
-    {
-     "id": "besar",
-     "en": "great, large",
-     "ayat": [
-      "9:121",
-      "18:49"
-     ]
     }
    ]
   },
   ">arobaE": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "empat",
+     "en": "four",
+     "ayat": [
+      "24:6",
+      "24:8",
+      "24:45"
+     ]
+    },
     {
      "id": "empat puluh",
      "en": "forty",
@@ -19260,14 +19196,6 @@
       "2:51",
       "5:26",
       "46:15"
-     ]
-    },
-    {
-     "id": "empat",
-     "en": "four",
-     "ayat": [
-      "24:6",
-      "24:45"
      ]
     }
    ]
@@ -19360,15 +19288,15 @@
    ]
   },
   "EaAkif": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "tekun menyembah",
-     "en": "devoted (to worship)",
+     "id": "tekun berdiam",
+     "en": "staying devotedly",
      "ayat": [
+      "2:187",
       "20:91",
-      "21:52",
-      "26:71"
+      "20:97"
      ]
     },
     {
@@ -19377,6 +19305,14 @@
      "ayat": [
       "2:125",
       "2:187"
+     ]
+    },
+    {
+     "id": "tekun (pada)",
+     "en": "devoted (to)",
+     "ayat": [
+      "21:52",
+      "26:71"
      ]
     },
     {
@@ -19523,24 +19459,23 @@
    ]
   },
   "saA^}il": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "peminta-minta",
-     "en": "one who asks for help",
+     "id": "orang yang meminta",
+     "en": "one who asks",
      "ayat": [
-      "2:177",
+      "93:10",
       "51:19",
-      "93:10"
+      "70:1"
      ]
     },
     {
      "id": "penanya",
-     "en": "one who asks",
+     "en": "questioner",
      "ayat": [
       "12:7",
-      "41:10",
-      "70:1"
+      "41:10"
      ]
     }
    ]
@@ -19716,7 +19651,7 @@
    "senses": [
     {
      "id": "membebani",
-     "en": "to burden, charge",
+     "en": "burden, charge",
      "ayat": [
       "2:286",
       "6:152",
@@ -19894,7 +19829,7 @@
    ]
   },
   "Habol": {
-   "review": "disputed",
+   "review": "corrected",
    "senses": [
     {
      "id": "tali",
@@ -19910,13 +19845,6 @@
      "en": "covenant",
      "ayat": [
       "3:112"
-     ]
-    },
-    {
-     "id": "urat",
-     "en": "vein",
-     "ayat": [
-      "50:16"
      ]
     }
    ]
@@ -19993,7 +19921,7 @@
    ]
   },
   "zubur": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "kitab-kitab",
@@ -20009,13 +19937,6 @@
      "en": "written records",
      "ayat": [
       "54:52"
-     ]
-    },
-    {
-     "id": "golongan",
-     "en": "sects",
-     "ayat": [
-      "23:53"
      ]
     }
    ]
@@ -20121,22 +20042,23 @@
    ]
   },
   "qaAEid": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "yang tinggal",
-     "en": "one who stays behind",
+     "id": "yang duduk",
+     "en": "one who sits",
      "ayat": [
+      "10:12",
       "4:95",
-      "9:46",
       "9:86"
      ]
     },
     {
-     "id": "duduk",
-     "en": "sitting",
+     "id": "yang tinggal",
+     "en": "one who stays behind",
      "ayat": [
-      "10:12"
+      "9:46",
+      "5:24"
      ]
     }
    ]
@@ -20385,7 +20307,7 @@
    ]
   },
   "dal~a": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "menunjukkan",
@@ -20395,13 +20317,6 @@
       "28:12",
       "61:10"
      ]
-    },
-    {
-     "id": "membujuk",
-     "en": "lure",
-     "ayat": [
-      "7:22"
-     ]
     }
    ]
   },
@@ -20410,7 +20325,7 @@
    "senses": [
     {
      "id": "hidup",
-     "en": "to live",
+     "en": "live",
      "ayat": [
       "7:25",
       "23:37",
@@ -20583,14 +20498,6 @@
       "9:25",
       "15:97",
       "26:13"
-     ]
-    },
-    {
-     "id": "merasa susah hati",
-     "en": "feel distressed",
-     "ayat": [
-      "11:77",
-      "29:33"
      ]
     }
    ]
@@ -21380,17 +21287,8 @@
    ]
   },
   "daEowap": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "doa",
-     "en": "supplication",
-     "ayat": [
-      "2:186",
-      "10:89",
-      "13:14"
-     ]
-    },
     {
      "id": "seruan",
      "en": "call",
@@ -21398,6 +21296,15 @@
       "14:44",
       "30:25",
       "40:43"
+     ]
+    },
+    {
+     "id": "doa",
+     "en": "supplication",
+     "ayat": [
+      "2:186",
+      "10:89",
+      "13:14"
      ]
     }
    ]
@@ -21569,7 +21476,7 @@
    "senses": [
     {
      "id": "meminjamkan",
-     "en": "to loan",
+     "en": "loan",
      "ayat": [
       "2:245",
       "57:11",
@@ -21991,22 +21898,21 @@
    ]
   },
   ">adoraka": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "menimpa",
-     "en": "overtake",
+     "id": "menyusul, mencapai",
+     "en": "overtake, reach",
      "ayat": [
       "4:78",
-      "4:100",
-      "10:90"
+      "10:90",
+      "36:40"
      ]
     },
     {
-     "id": "mencapai",
-     "en": "reach",
+     "id": "menangkap (penglihatan)",
+     "en": "perceive (by sight)",
      "ayat": [
-      "36:40",
       "6:103"
      ]
     }
@@ -22055,23 +21961,23 @@
    ]
   },
   "yasotafotu": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "meminta fatwa",
-     "en": "request a ruling",
-     "ayat": [
-      "4:127",
-      "4:176"
-     ]
-    },
     {
      "id": "menanyakan",
      "en": "inquire",
      "ayat": [
       "37:11",
       "37:149",
-      "18:22"
+      "12:41"
+     ]
+    },
+    {
+     "id": "meminta fatwa",
+     "en": "request a ruling",
+     "ayat": [
+      "4:127",
+      "4:176"
      ]
     }
    ]
@@ -22106,22 +22012,23 @@
    ]
   },
   ">axo*": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "cengkeraman azab",
-     "en": "seizure (punishment)",
+     "id": "pengambilan, cengkeraman",
+     "en": "taking, seizure",
      "ayat": [
+      "4:161",
       "11:102",
-      "54:42",
-      "69:10"
+      "54:42"
      ]
     },
     {
-     "id": "mengambil",
-     "en": "taking",
+     "id": "siksaan",
+     "en": "punishment",
      "ayat": [
-      "4:161"
+      "69:10",
+      "73:16"
      ]
     }
    ]
@@ -22791,7 +22698,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahaperkasa",
+     "id": "Mahaperkasa",
      "en": "the prevailing",
      "ayat": [
       "12:39",
@@ -22802,11 +22709,11 @@
    ]
   },
   "Hulum": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "mimpi",
-     "en": "dreams",
+     "en": "dream",
      "ayat": [
       "12:44",
       "21:5"
@@ -22818,13 +22725,6 @@
      "ayat": [
       "24:58",
       "24:59"
-     ]
-    },
-    {
-     "id": "akal",
-     "en": "minds",
-     "ayat": [
-      "52:32"
      ]
     }
    ]
@@ -23297,26 +23197,19 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "membelah",
-     "en": "part, split",
-     "ayat": [
-      "2:50"
-     ]
-    },
-    {
-     "id": "memisahkan, membedakan",
-     "en": "separate, make distinct",
+     "id": "memisahkan",
+     "en": "separate, part",
      "ayat": [
       "5:25",
-      "17:106",
-      "44:4"
+      "2:50",
+      "17:106"
      ]
     },
     {
-     "id": "takut",
-     "en": "be afraid",
+     "id": "membedakan, memperjelas",
+     "en": "make distinct",
      "ayat": [
-      "9:56"
+      "44:4"
      ]
     }
    ]
@@ -23857,22 +23750,23 @@
    ]
   },
   "xaAwiyap": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "kosong, sunyi",
+     "en": "empty, desolate",
+     "ayat": [
+      "27:52",
+      "69:7",
+      "22:45"
+     ]
+    },
     {
      "id": "runtuh",
      "en": "fallen in ruin",
      "ayat": [
       "2:259",
-      "18:42",
-      "22:45"
-     ]
-    },
-    {
-     "id": "kosong",
-     "en": "hollow",
-     "ayat": [
-      "69:7"
+      "18:42"
      ]
     }
    ]
@@ -24247,19 +24141,20 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "lemah semangat",
-     "en": "lose heart",
-     "ayat": [
-      "3:139",
-      "3:146",
-      "4:104"
-     ]
-    },
-    {
      "id": "melemah",
      "en": "become weak",
      "ayat": [
-      "19:4"
+      "19:4",
+      "3:139",
+      "47:35"
+     ]
+    },
+    {
+     "id": "lemah semangat",
+     "en": "lose heart",
+     "ayat": [
+      "3:146",
+      "4:104"
      ]
     }
    ]
@@ -24371,11 +24266,18 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "pengawas",
-     "en": "observer",
+     "id": "Maha Mengawasi",
+     "en": "All-Watchful",
      "ayat": [
       "4:1",
       "5:117",
+      "33:52"
+     ]
+    },
+    {
+     "id": "pengawas",
+     "en": "observer",
+     "ayat": [
       "50:18"
      ]
     },
@@ -24605,22 +24507,22 @@
    ]
   },
   "yufotiy": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "memberi fatwa",
-     "en": "give a ruling",
-     "ayat": [
-      "4:127",
-      "4:176"
-     ]
-    },
     {
      "id": "menerangkan",
      "en": "explain",
      "ayat": [
       "12:43",
       "12:46"
+     ]
+    },
+    {
+     "id": "memberi fatwa",
+     "en": "give a ruling",
+     "ayat": [
+      "4:127",
+      "4:176"
      ]
     },
     {
@@ -24654,21 +24556,21 @@
    ]
   },
   "halaka": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "binasa",
+     "en": "perish",
+     "ayat": [
+      "8:42"
+     ]
+    },
     {
      "id": "mati",
      "en": "die",
      "ayat": [
       "4:176",
       "40:34"
-     ]
-    },
-    {
-     "id": "binasa",
-     "en": "perish",
-     "ayat": [
-      "8:42"
      ]
     },
     {
@@ -25542,7 +25444,7 @@
    "senses": [
     {
      "id": "memaksa",
-     "en": "to compel",
+     "en": "compel",
      "ayat": [
       "10:99",
       "16:106",
@@ -25626,7 +25528,7 @@
    "senses": [
     {
      "id": "merajam",
-     "en": "to stone",
+     "en": "stone",
      "ayat": [
       "11:91",
       "19:46",
@@ -26060,19 +25962,21 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "senang (hati)",
-     "en": "be content",
+     "id": "tenang, menetap",
+     "en": "settle, be at rest",
+     "ayat": [
+      "33:33",
+      "20:40",
+      "28:13"
+     ]
+    },
+    {
+     "id": "menjadi sejuk (mata)",
+     "en": "be cooled (eye)",
      "ayat": [
       "19:26",
       "20:40",
       "33:51"
-     ]
-    },
-    {
-     "id": "tetap tinggal",
-     "en": "remain, abide",
-     "ayat": [
-      "33:33"
      ]
     }
    ]
@@ -26297,23 +26201,23 @@
    ]
   },
   "zuw~ijato": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "menikahkan",
-     "en": "marry (to)",
-     "ayat": [
-      "33:37",
-      "44:54",
-      "52:20"
-     ]
-    },
     {
      "id": "memasangkan",
      "en": "pair",
      "ayat": [
       "81:7",
-      "42:50"
+      "42:50",
+      "52:20"
+     ]
+    },
+    {
+     "id": "menikahkan",
+     "en": "marry (to)",
+     "ayat": [
+      "33:37",
+      "44:54"
      ]
     }
    ]
@@ -26960,22 +26864,15 @@
    ]
   },
   "Euqodap": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "akad",
-     "en": "contract",
+     "id": "buhul, ikatan",
+     "en": "knot, tie",
      "ayat": [
-      "2:235",
-      "2:237"
-     ]
-    },
-    {
-     "id": "buhul",
-     "en": "knot",
-     "ayat": [
+      "113:4",
       "20:27",
-      "113:4"
+      "2:235"
      ]
     }
    ]
@@ -27068,13 +26965,6 @@
       "3:35",
       "19:26"
      ]
-    },
-    {
-     "id": "diberi peringatan",
-     "en": "be warned",
-     "ayat": [
-      "21:45"
-     ]
     }
    ]
   },
@@ -27139,7 +27029,7 @@
    "senses": [
     {
      "id": "membentuk",
-     "en": "to form",
+     "en": "form",
      "ayat": [
       "3:6",
       "7:11",
@@ -27677,7 +27567,7 @@
    ]
   },
   "kifol": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "bagian",
@@ -27688,8 +27578,8 @@
      ]
     },
     {
-     "id": "Zulkifli",
-     "en": "Dhul-Kifl",
+     "id": "(dalam nama) Zulkifli",
+     "en": "(in name) Dhul-Kifl",
      "ayat": [
       "21:85",
       "38:48"
@@ -28047,7 +27937,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "maha mengetahui",
+     "id": "Maha Mengetahui",
      "en": "all-knowing",
      "ayat": [
       "5:109",
@@ -28277,19 +28167,19 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "terpenuhi",
-     "en": "be fulfilled",
+     "id": "sempurna",
+     "en": "be complete",
      "ayat": [
-      "6:115",
-      "7:137",
-      "11:119"
+      "7:142",
+      "6:115"
      ]
     },
     {
-     "id": "genap",
-     "en": "be completed",
+     "id": "terpenuhi",
+     "en": "be fulfilled",
      "ayat": [
-      "7:142"
+      "7:137",
+      "11:119"
      ]
     }
    ]
@@ -29482,22 +29372,22 @@
    ]
   },
   "Euluw~": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "ketinggian",
+     "en": "exaltation",
+     "ayat": [
+      "17:43",
+      "28:83"
+     ]
+    },
     {
      "id": "kesombongan",
      "en": "haughtiness",
      "ayat": [
       "17:4",
-      "27:14",
-      "28:83"
-     ]
-    },
-    {
-     "id": "ketinggian",
-     "en": "sublimity",
-     "ayat": [
-      "17:43"
+      "27:14"
      ]
     }
    ]
@@ -29597,7 +29487,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahakuasa",
+     "id": "Mahakuasa",
      "en": "perfect in ability",
      "ayat": [
       "18:45",
@@ -29701,18 +29591,18 @@
    "review": "corrected",
    "senses": [
     {
+     "id": "bertambah",
+     "en": "increase",
+     "ayat": [
+      "30:39"
+     ]
+    },
+    {
      "id": "mengembang",
      "en": "swell",
      "ayat": [
       "22:5",
       "41:39"
-     ]
-    },
-    {
-     "id": "bertambah",
-     "en": "increase",
-     "ayat": [
-      "30:39"
      ]
     }
    ]
@@ -29870,28 +29760,14 @@
    ]
   },
   "s~uwq": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "pasar",
-     "en": "markets",
+     "en": "market",
      "ayat": [
       "25:7",
       "25:20"
-     ]
-    },
-    {
-     "id": "batang",
-     "en": "stalk",
-     "ayat": [
-      "48:29"
-     ]
-    },
-    {
-     "id": "kaki",
-     "en": "legs",
-     "ayat": [
-      "38:33"
      ]
     }
    ]
@@ -29987,10 +29863,10 @@
    ]
   },
   "murosil": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
-     "id": "pengutus",
+     "id": "pengirim",
      "en": "sender",
      "ayat": [
       "28:45",
@@ -30254,19 +30130,19 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "merasa serba cukup",
-     "en": "consider oneself self-sufficient",
-     "ayat": [
-      "80:5",
-      "92:8"
-     ]
-    },
-    {
      "id": "tidak memerlukan",
      "en": "be free of need",
      "ayat": [
       "64:6",
       "96:7"
+     ]
+    },
+    {
+     "id": "merasa serba cukup",
+     "en": "consider oneself self-sufficient",
+     "ayat": [
+      "80:5",
+      "92:8"
      ]
     }
    ]
@@ -30687,7 +30563,7 @@
    "senses": [
     {
      "id": "menceritakan",
-     "en": "to report",
+     "en": "report",
      "ayat": [
       "99:4",
       "93:11",
@@ -30767,7 +30643,7 @@
    ]
   },
   "qawaAEid": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "pondasi",
@@ -30775,13 +30651,6 @@
      "ayat": [
       "2:127",
       "16:26"
-     ]
-    },
-    {
-     "id": "perempuan tua",
-     "en": "women past childbearing",
-     "ayat": [
-      "24:60"
      ]
     }
    ]
@@ -31282,7 +31151,7 @@
    "senses": [
     {
      "id": "pamer",
-     "en": "to be seen",
+     "en": "be seen",
      "ayat": [
       "2:264",
       "4:38",
@@ -31470,7 +31339,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "maha pemberi",
+     "id": "Maha Pemberi",
      "en": "the bestower",
      "ayat": [
       "3:8",
@@ -32804,7 +32673,7 @@
    ]
   },
   "suqiTa": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
     {
      "id": "gugur",
@@ -32818,13 +32687,6 @@
      "en": "fall into",
      "ayat": [
       "9:49"
-     ]
-    },
-    {
-     "id": "menyesal",
-     "en": "regret overcame",
-     "ayat": [
-      "7:149"
      ]
     }
    ]
@@ -33322,7 +33184,7 @@
    "senses": [
     {
      "id": "menangguhkan",
-     "en": "to postpone",
+     "en": "postpone",
      "ayat": [
       "7:111",
       "26:36",
@@ -33730,21 +33592,21 @@
    ]
   },
   "zahaqa": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
+    {
+     "id": "lenyap",
+     "en": "vanish",
+     "ayat": [
+      "17:81"
+     ]
+    },
     {
      "id": "melayang (nyawa)",
      "en": "depart (of souls)",
      "ayat": [
       "9:55",
       "9:85"
-     ]
-    },
-    {
-     "id": "lenyap",
-     "en": "vanish",
-     "ayat": [
-      "17:81"
      ]
     }
    ]
@@ -33786,13 +33648,6 @@
      "ayat": [
       "9:59",
       "68:32"
-     ]
-    },
-    {
-     "id": "berpaling dari",
-     "en": "turning away from",
-     "ayat": [
-      "19:46"
      ]
     }
    ]
@@ -33938,7 +33793,7 @@
    "senses": [
     {
      "id": "membuat marah",
-     "en": "to enrage",
+     "en": "enrage",
      "ayat": [
       "9:120",
       "22:15",
@@ -33976,21 +33831,21 @@
    ]
   },
   "raA^d~": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "penolak",
-     "en": "repeller",
-     "ayat": [
-      "10:107"
-     ]
-    },
     {
      "id": "pengembali",
      "en": "one who returns",
      "ayat": [
       "28:7",
       "28:85"
+     ]
+    },
+    {
+     "id": "penolak",
+     "en": "repeller",
+     "ayat": [
+      "10:107"
      ]
     }
    ]
@@ -34365,21 +34220,21 @@
    ]
   },
   "munkiruwn": {
-   "review": "passed",
+   "review": "corrected",
    "senses": [
-    {
-     "id": "tidak mengenal",
-     "en": "not recognizing",
-     "ayat": [
-      "12:58"
-     ]
-    },
     {
      "id": "mengingkari",
      "en": "denying",
      "ayat": [
       "21:50",
       "23:69"
+     ]
+    },
+    {
+     "id": "tidak mengenal",
+     "en": "not recognizing",
+     "ayat": [
+      "12:58"
      ]
     }
    ]
@@ -38232,7 +38087,7 @@
    "senses": [
     {
      "id": "menguji",
-     "en": "to test",
+     "en": "test",
      "ayat": [
       "3:186",
       "8:17"
@@ -40958,7 +40813,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "maha pengasih",
+     "id": "Maha Pengasih",
      "en": "affectionate",
      "ayat": [
       "11:90",
@@ -41035,7 +40890,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "maha pelaksana",
+     "id": "Maha Pelaksana",
      "en": "effecter",
      "ayat": [
       "11:107",
@@ -41203,7 +41058,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahasempurna (seruan)",
+     "id": "Mahasempurna (seruan)",
      "en": "perfect is (exclamation)",
      "ayat": [
       "12:31",
@@ -45962,7 +45817,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahasuci",
+     "id": "Mahasuci",
      "en": "the pure",
      "ayat": [
       "59:23",
@@ -49172,7 +49027,7 @@
    "review": "corrected",
    "senses": [
     {
-     "id": "mahakuasa, pemelihara",
+     "id": "Mahakuasa, Pemelihara",
      "en": "all-powerful, keeper",
      "ayat": [
       "4:85"
@@ -53516,7 +53371,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahatinggi",
+     "id": "Mahatinggi",
      "en": "the exalted",
      "ayat": [
       "13:9"
@@ -57981,7 +57836,7 @@
    "senses": [
     {
      "id": "membakar",
-     "en": "to sear",
+     "en": "sear",
      "ayat": [
       "23:104"
      ]
@@ -62252,7 +62107,7 @@
    "review": "passed",
    "senses": [
     {
-     "id": "mahatinggi",
+     "id": "Mahatinggi",
      "en": "exalted",
      "ayat": [
       "40:15"
@@ -65944,7 +65799,7 @@
    "senses": [
     {
      "id": "menyempitkan",
-     "en": "to straiten",
+     "en": "straiten",
      "ayat": [
       "65:6"
      ]

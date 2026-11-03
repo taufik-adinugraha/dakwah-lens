@@ -385,8 +385,13 @@ async function frequencyList() {
   const loc = words[0].senses[0].ayat[0];
   const ayah = await fetch(`${BASE}/belajar/api/ayah?loc=${loc}`);
   if (ayah.status !== 200) fail(`/api/ayah?loc=${loc}`, `status ${ayah.status}, expected 200`);
-  const en = await get("/belajar/en/kosakata");
-  if (!visibleText(en.html).includes(index.rows[0].en.split(";")[0])) fail("/en/kosakata", "the English meaning is not shown");
+  // English is hidden for now (lib/features.ts BELAJAR_KOSAKATA_EN): the list's pages answer 404 and the
+  // hub has no card, while a lesson word's own English entry, a different page, stays.
+  for (const path of ["/belajar/en/kosakata", `/belajar/en/kosakata/kata/${words[0].rank}`]) {
+    if ((await get(path)).status !== 404) fail(path, "the English list is hidden: expected 404");
+  }
+  if (/href="[^"]*\/en\/kosakata"/.test((await get("/belajar/en")).html)) fail("/belajar/en", "the English hub links to the hidden list");
+  if ((await get("/belajar/en/kosakata/rahim")).status !== 200) fail("/belajar/en/kosakata/rahim", "a lesson word's English entry must stay");
   console.log("kosakata list: pages, search, a word, its play buttons and the ayah popup answer");
 }
 

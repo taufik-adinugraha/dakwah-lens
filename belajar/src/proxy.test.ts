@@ -109,6 +109,44 @@ const MUAWWIDZAT = [
   "/belajar/id/quran/an-nas/6",
 ];
 
+describe("proxy: the Kosakata list hidden in English unless BELAJAR_KOSAKATA_EN=on (operator, 2026-11-03)", () => {
+  const before = process.env.BELAJAR_KOSAKATA_EN;
+  afterEach(() => {
+    if (before === undefined) delete process.env.BELAJAR_KOSAKATA_EN;
+    else process.env.BELAJAR_KOSAKATA_EN = before;
+  });
+
+  it("answers the list's English pages with the module's 404, however they are spelled", () => {
+    delete process.env.BELAJAR_KOSAKATA_EN;
+    for (const path of [
+      "/belajar/en/kosakata",
+      "/belajar/en/kosakata/",
+      "/belajar/en/kosakata/kata/1",
+      "/belajar/en/kosakata/bertahap",
+      "/belajar/en/kosakata/bertahap/1/3",
+      "/belajar/en/kos%61kata",
+      "/belajar/en/kosa%09kata",
+      "/belajar/en/kosakata%2Fkata%2F1",
+    ]) {
+      expect(landing(path), path).toMatch(HIDDEN_404);
+    }
+  });
+
+  it("leaves the Indonesian list and a lesson word's English entry alone", () => {
+    delete process.env.BELAJAR_KOSAKATA_EN;
+    expect(landing("/belajar/id/kosakata")).toBe("/belajar/id/kosakata");
+    expect(landing("/belajar/id/kosakata/kata/1")).toBe("/belajar/id/kosakata/kata/1");
+    expect(landing("/belajar/en/kosakata/rahim")).toBe("/belajar/en/kosakata/rahim");
+    expect(landing("/belajar/en/kosakata/katala")).toBe("/belajar/en/kosakata/katala");
+  });
+
+  it("serves the English list with the switch on", () => {
+    process.env.BELAJAR_KOSAKATA_EN = "on";
+    expect(landing("/belajar/en/kosakata")).toBe("/belajar/en/kosakata");
+    expect(landing("/belajar/en/kosakata/kata/1")).toBe("/belajar/en/kosakata/kata/1");
+  });
+});
+
 describe("proxy: only the surahs BELAJAR_SURAHS publishes (unset: Al-Fatihah only)", () => {
   beforeEach(() => setUnlisted(""));
 

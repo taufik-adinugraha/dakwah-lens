@@ -1984,16 +1984,9 @@
      "ayat": [
       "9:49"
      ]
-    },
-    {
-     "id": "menyesal",
-     "en": "regret overcame",
-     "ayat": [
-      "7:149"
-     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "سُقِطَ",
     "loc": "7:149:2",
@@ -3293,7 +3286,7 @@
    "senses": [
     {
      "id": "menangguhkan",
-     "en": "to postpone",
+     "en": "postpone",
      "ayat": [
       "7:111",
       "26:36",

@@ -530,11 +530,20 @@
    ],
    "senses": [
     {
+     "id": "Maha Penyantun",
+     "en": "Most Forbearing",
+     "ayat": [
+      "2:225",
+      "2:263",
+      "3:155"
+     ]
+    },
+    {
      "id": "penyantun",
      "en": "forbearing",
      "ayat": [
-      "2:225",
       "11:75",
+      "9:114",
       "37:101"
      ]
     }
@@ -1012,21 +1021,20 @@
    ],
    "senses": [
     {
-     "id": "keberatan hati",
-     "en": "inner distress",
-     "ayat": [
-      "4:65",
-      "7:2",
-      "33:37"
-     ]
-    },
-    {
      "id": "kesukaran",
      "en": "difficulty",
      "ayat": [
       "5:6",
       "22:78",
-      "33:50"
+      "33:37"
+     ]
+    },
+    {
+     "id": "keberatan hati",
+     "en": "inner distress",
+     "ayat": [
+      "4:65",
+      "7:2"
      ]
     },
     {
@@ -1946,11 +1954,12 @@
    ],
    "senses": [
     {
-     "id": "tempat berdiri",
-     "en": "standing place",
+     "id": "tempat",
+     "en": "place",
      "ayat": [
-      "2:125",
-      "3:97"
+      "27:39",
+      "44:51",
+      "44:26"
      ]
     },
     {
@@ -1963,24 +1972,22 @@
      ]
     },
     {
-     "id": "tempat, kediaman",
-     "en": "place, abode",
+     "id": "tempat berdiri",
+     "en": "standing place",
      "ayat": [
-      "27:39",
-      "44:26",
-      "44:51"
+      "2:125",
+      "3:97"
      ]
     },
     {
-     "id": "berdiri, tinggal",
-     "en": "standing, staying",
+     "id": "tinggal (bersama)",
+     "en": "staying (among)",
      "ayat": [
-      "10:71",
-      "14:14"
+      "10:71"
      ]
     }
    ],
-   "review": "disputed",
+   "review": "corrected",
    "voice": {
     "form": "مَقَامَ",
     "loc": "55:46:3",
@@ -3063,21 +3070,21 @@
    ],
    "senses": [
     {
-     "id": "menghamparkan",
-     "en": "spread out",
-     "ayat": [
-      "13:3",
-      "15:19",
-      "50:7"
-     ]
-    },
-    {
      "id": "memanjangkan",
      "en": "extend",
      "ayat": [
       "25:45",
       "19:75",
       "19:79"
+     ]
+    },
+    {
+     "id": "menghamparkan",
+     "en": "spread out",
+     "ayat": [
+      "13:3",
+      "15:19",
+      "50:7"
      ]
     },
     {
@@ -3673,13 +3680,6 @@
       "20:78",
       "91:4"
      ]
-    },
-    {
-     "id": "pingsan",
-     "en": "faint",
-     "ayat": [
-      "33:19"
-     ]
     }
    ],
    "review": "corrected",
@@ -3901,7 +3901,7 @@
    "senses": [
     {
      "id": "mengaku, mengklaim",
-     "en": "to claim",
+     "en": "claim",
      "ayat": [
       "4:60",
       "6:22",
@@ -4429,15 +4429,6 @@
      ]
     },
     {
-     "id": "membinasakan",
-     "en": "eliminate",
-     "ayat": [
-      "6:45",
-      "7:72",
-      "8:7"
-     ]
-    },
-    {
      "id": "melintasi",
      "en": "cross",
      "ayat": [
@@ -4445,7 +4436,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "فَقُطِعَ",
     "loc": "6:45:1",

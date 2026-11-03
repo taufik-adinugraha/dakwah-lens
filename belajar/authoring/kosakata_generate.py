@@ -1,5 +1,5 @@
 """Writes the meanings of the Qur'an vocabulary list with Claude: the one LLM step, kept out of
-belajar/pipeline, whose rule is no LLM and no paid API (pipeline/README.md). Run once, 2026-11-03;
+belajar/pipeline, whose rule is no LLM and no paid API (pipeline/README.md). Run 2026-11-03;
 kept to show how the meanings were made and to rerun them. Not part of any build or CI step.
 
 Code supplies everything countable or verbatim. Claude Sonnet 5.5 writes the meanings from up to 12
@@ -10,7 +10,9 @@ so a restart resumes it instead of paying twice. Paid from ANTHROPIC_API_KEY.
     cd api && uv run --env-file ../.env python ../belajar/authoring/kosakata_generate.py build <dir> all
     cd api && uv run --env-file ../.env python ../belajar/authoring/kosakata_generate.py run <dir> all
     cd api && uv run --env-file ../.env python ../belajar/authoring/kosakata_generate.py second <dir>
-    python3 belajar/authoring/kosakata_export.py <dir> final2.json belajar/pipeline/authored/kosakata_meanings.json
+    cd api && uv run --env-file ../.env python ../belajar/authoring/kosakata_generate.py levelcheck <dir> 1 2000
+    python3 belajar/authoring/kosakata_generate.py levelapply <dir>   (after reading the file levelcheck writes)
+    python3 belajar/authoring/kosakata_export.py <dir> final3.json belajar/pipeline/authored/kosakata_meanings.json
     cd belajar/pipeline && python3 build_kosakata.py && python3 validate_kosakata.py
 """
 import hashlib
@@ -283,6 +285,21 @@ Severity: "error" means a learner would be misled (a wrong meaning, a citation t
 
 If you find any error, set verdict to "needs_fix" and give a corrected entry using only locations from the sample and the same rules: 1 to 4 senses, glosses of 1 to 4 words with the same meaning in both languages, 1 to 3 locations per sense, no Arabic script. If there are only minor issues or none, set verdict to "ok" and corrected to null."""
 
+LEARNER_SYSTEM = """You check entries in a Qur'anic vocabulary list on dakwah-lens.id. Adult learners in Indonesia will now memorise these entries in batches of ten and be tested on them. The test asks for the first sense only; the other senses appear on the word's card. Two earlier checks asked whether each sense can be shown in the ayat it cites. This check asks something narrower: what will a learner carry away from this entry, and will it mislead them when they meet the word elsewhere in the Qur'an?
+
+You receive one lemma, a sample of ayat where it occurs (the word marked ⟦like this⟧, with an Indonesian and an English translation), and the entry. Use your knowledge of Arabic and of the Qur'an to judge what the word means in general. A sample can be unrepresentative, so a sense can be common in the sample and still not be what the word mainly means.
+
+Look for these problems:
+1. The first sense is not the meaning a learner should carry. It should be right in most of the places the word occurs and should not mislead in the rest. A narrower meaning that comes from a recurring context, or from what usually happens to the verb's object, must not stand first when a plainer meaning is right everywhere. Move the plainer meaning first. If it is missing, add it with a sampled ayah that shows it. The reverse also holds: where one meaning is right in most places and Indonesian readers already know the word by it, it stays first even if the root's older meaning is broader. Religious terms are the usual case: salat, zakat, takwa and surga stay ahead of "doa", "penyucian", "menjaga diri" and "kebun".
+2. A sense belongs to a different word. The corpus sometimes groups another word under this lemma, such as a plural whose singular is a different word with an unrelated meaning. Remove that sense.
+3. A sense is the meaning of a phrase that contains this word, not the word's own meaning. A word does not mean what its phrase means, even when the phrase is a fixed idiom. Remove that sense, unless the word carries the meaning without its neighbour.
+4. A gloss is wrong for the word, or a gloss_id and gloss_en do not mean the same thing.
+5. A word used of Allah is interpreted, compared with creatures, or tied to a theological dispute; or anything contradicts established aqidah or takes a sectarian side. Keep to the plain wording. Keep the established rendering of Allah's names and attributes ("Maha ...") first when that is how the word is mostly used, even where the same word is also used of creatures: that use belongs in a later sense. Never put first a gloss that would attribute doubt, ignorance or limitation to Allah in the ayat where He is the speaker or the subject. This covers particles too: where the established translation of a particle in Allah's speech is a word of purpose, a word of doubt must not stand ahead of it.
+
+Severity: "error" means a learner who memorised this entry would be misled. "minor" means style or a slightly better word, with the meaning still right. These entries have been checked twice already, so do not rewrite what is right: a synonym you prefer, a different order of two meanings that are both common, capital letters and the wording of a parenthesis are all minor.
+
+If you find any error, set verdict to "needs_fix" and give a corrected entry using only locations from the sample and the same rules: 1 to 4 senses, glosses of 1 to 4 words with the same meaning in both languages, 1 to 3 locations per sense, no Arabic script. Every sense must cite a sampled ayah where the marked word carries it. If the core meaning is missing and no sampled ayah shows it, report that as an error and set corrected to null. If there are only minor issues or none, set verdict to "ok" and corrected to null."""
+
 SENSE = {
     "type": "object",
     "properties": {
@@ -522,6 +539,123 @@ def second() -> None:
     print("mechanical failures:", [(by[k]["translit"], mech(by[k], x["entry"])) for k, x in out.items() if mech(by[k], x["entry"])][:10])
 
 
+def learner_params(e: dict, entry: dict) -> dict:
+    user = lemma_block(e) + "\n\nEntry to check:\n" + json.dumps(entry, ensure_ascii=False, indent=1)
+    return params(VERIFIER, LEARNER_SYSTEM, user, VERDICT, "medium")
+
+
+def levelcheck() -> None:
+    """A third check, of what a learner memorises, over the ranks the learning path tests (operator
+    2026-11-03): levelcheck <dir> <first rank> <last rank> [tag]. Corrections are re-checked once, as before.
+    It writes a file to read and changes no entry: what is applied is decided by reading that file
+    (levelapply), because a check finds and a person decides."""
+    import kosakata as K
+
+    lo, hi = int(sys.argv[3]), int(sys.argv[4])
+    tag = f"_{sys.argv[5]}" if len(sys.argv) > 5 else ""
+    ev = json.loads((HERE / "evidence.json").read_text(encoding="utf-8"))
+    for e in ev:  # the transliteration rule was corrected after evidence.json was built
+        e["translit"] = K.translit(e["lemma_bw"], set(e["tags"]))
+    by = {e["id"]: e for e in ev}
+    final = load("final2.json")
+    scope = [e for e in ev if lo <= e["rank"] <= hi and e["lemma_bw"] not in K.PINNED_SENSES]
+    name = f"level_{lo}_{hi}{tag}"
+    c = client()
+    if (HERE / f"{name}.json").exists():
+        checked = load(f"{name}.json")
+    else:
+        checked = collect(c, name, [{"custom_id": e["id"], "params": learner_params(e, final[e["id"]]["entry"])} for e in scope], "check")
+        save(f"{name}.json", checked)
+    if (HERE / f"{name}_recheck.json").exists():
+        rechecked = load(f"{name}_recheck.json")
+    else:
+        reqs = [
+            {"custom_id": k, "params": learner_params(by[k], v["check"]["corrected"])}
+            for k, v in checked.items()
+            if v.get("check", {}).get("verdict") == "needs_fix" and v["check"].get("corrected")
+        ]
+        rechecked = collect(c, f"{name}_recheck", reqs, "check") if reqs else {}
+        save(f"{name}_recheck.json", rechecked)
+    spend = sum(cost(VERIFIER, r["usage"]) for d in (checked, rechecked) for r in d.values() if "usage" in r)
+    results = Counter(x.get("type") for x in checked.values())
+    verdicts = Counter((x.get("check") or {}).get("verdict") for x in checked.values())
+    print(f"{name}: {len(scope)} entries, results {dict(results)}, verdicts {dict(verdicts)}, re-check {dict(Counter((x.get('check') or {}).get('verdict') for x in rechecked.values()))}, cost ${spend:.2f}", flush=True)
+    show = lambda entry: "; ".join(f"{s['gloss_id']} / {s['gloss_en']} {s['ayat']}" for s in entry["senses"])
+    lines = []
+    for e in scope:
+        chk = checked.get(e["id"], {}).get("check")
+        if not chk:
+            lines.append(f"\n#{e['rank']} {e['headword']} {e['translit']}: NO RESULT {checked.get(e['id'], {}).get('type')}")
+            continue
+        if chk["verdict"] == "ok":
+            continue
+        again = rechecked.get(e["id"], {}).get("check")
+        lines.append(f"\n#{e['rank']} {e['headword']} {e['translit']} {e['count']}x  re-check: {again['verdict'] if again else 'none'}")
+        lines.append(f"  was: {show(final[e['id']]['entry'])}")
+        lines += [f"  ERR: {i['problem']}" for i in chk["issues"] if i["severity"] == "error"]
+        if chk.get("corrected"):
+            lines.append(f"  now: {show(chk['corrected'])}")
+        if again and again["verdict"] != "ok":
+            lines += [f"  RE-ERR: {i['problem']}" for i in again["issues"] if i["severity"] == "error"]
+            if again.get("corrected"):
+                lines.append(f"  re-now: {show(again['corrected'])}")
+    (HERE / f"{name}.txt").write_text("\n".join(lines), encoding="utf-8")
+    print("wrote", HERE / f"{name}.txt", flush=True)
+
+
+def levelapply() -> None:
+    """Writes final3.json: the third check as decided by reading it. Every correction was read; a
+    check finds and a person decides. rulings_levels.json in the run directory holds the decisions:
+    `reject` (rank: why the entry stays as it was), `replace` (rank: senses a person wrote or chose),
+    `from_first_run` (ranks taken from the first Level 1 pass). Everything else the check corrected
+    and re-checked is taken. Then two mechanical fixes across the whole list: Allah's attributes are
+    capitalised ("Maha Mengetahui"), and English verbs lose a leading "to", which would mark the right
+    answer in a test."""
+    ev = json.loads((HERE / "evidence.json").read_text(encoding="utf-8"))
+    by_rank = {e["rank"]: e for e in ev}
+    final = load("final2.json")
+    rulings = load("rulings_levels.json")
+    v1 = load("level_1_100.json")
+    level1 = load("level_1_100_v2.json")
+    rest = load("level_101_2000.json")
+    reject = {int(k) for k in rulings["reject"]}
+    out = {k: dict(x) for k, x in final.items()}
+    changed: dict[str, str] = {}
+    for checked in (level1, rest):
+        for k, x in checked.items():
+            chk = x.get("check") or {}
+            if chk.get("verdict") == "needs_fix" and chk.get("corrected") and by_rank_of(ev, k) not in reject:
+                out[k] = {"status": "corrected", "entry": chk["corrected"]}
+                changed[k] = "check"
+    for rank in rulings["from_first_run"]:
+        k = by_rank[int(rank)]["id"]
+        out[k] = {"status": "corrected", "entry": v1[k]["check"]["corrected"]}
+        changed[k] = "first run"
+    for rank, senses in rulings["replace"].items():
+        k = by_rank[int(rank)]["id"]
+        out[k] = {"status": "corrected", "entry": {"senses": senses}}
+        changed[k] = "person"
+    style = 0
+    for x in out.values():
+        for s in x["entry"]["senses"]:
+            if s["gloss_id"].lower().startswith("maha") and not s["gloss_id"].lower().startswith("mahar"):  # mahar: a dowry
+                fixed = " ".join(w[:1].upper() + w[1:] for w in s["gloss_id"].split(" "))
+                style += fixed != s["gloss_id"]
+                s["gloss_id"] = fixed
+            if s["gloss_en"].lower().startswith("to "):
+                s["gloss_en"] = s["gloss_en"][3:]
+                style += 1
+    save("final3.json", out)
+    problems = [(by_rank_of(ev, k), mech(next(e for e in ev if e["id"] == k), x["entry"])) for k, x in out.items() if k in changed]
+    print("changed entries:", len(changed), dict(Counter(changed.values())), "| style fixes:", style)
+    print("status:", dict(Counter(x["status"] for x in out.values())))
+    print("mechanical failures in changed entries:", [p for p in problems if p[1]])
+
+
+def by_rank_of(ev: list[dict], key: str) -> int:
+    return next(e["rank"] for e in ev if e["id"] == key)
+
+
 def audit_report() -> None:
     ev = {e["id"]: e for e in json.loads((HERE / "evidence.json").read_text(encoding="utf-8"))}
     final, audit = load("final.json"), load("audit.json")
@@ -656,4 +790,4 @@ def report() -> None:
 
 
 if __name__ == "__main__":
-    {"build": build, "probe": probe, "run": run, "report": report, "second": second}[sys.argv[1]]()
+    {"build": build, "probe": probe, "run": run, "report": report, "second": second, "levelcheck": levelcheck, "levelapply": levelapply}[sys.argv[1]]()

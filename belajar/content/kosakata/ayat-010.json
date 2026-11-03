@@ -458,6 +458,14 @@
    }
   },
   {
+   "loc": "10:63",
+   "ar": "ٱلَّذِينَ ءَامَنُوا۟ وَكَانُوا۟ يَتَّقُونَ",
+   "translation": {
+    "text": "(Yaitu) orang-orang yang beriman dan senantiasa bertakwa.",
+    "footnotes": []
+   }
+  },
+  {
    "loc": "10:64",
    "ar": "لَهُمُ ٱلْبُشْرَىٰ فِى ٱلْحَيَوٰةِ ٱلدُّنْيَا وَفِى ٱلْـَٔاخِرَةِ لَا تَبْدِيلَ لِكَلِمَٰتِ ٱللَّهِ ذَٰلِكَ هُوَ ٱلْفَوْزُ ٱلْعَظِيمُ",
    "translation": {
@@ -696,14 +704,6 @@
    "ar": "ثُمَّ نُنَجِّى رُسُلَنَا وَٱلَّذِينَ ءَامَنُوا۟ كَذَٰلِكَ حَقًّا عَلَيْنَا نُنجِ ٱلْمُؤْمِنِينَ",
    "translation": {
     "text": "Kemudian Kami selamatkan rasul-rasul Kami dan orang-orang yang beriman, demikianlah menjadi kewajiban Kami menyelamatkan orang yang beriman.",
-    "footnotes": []
-   }
-  },
-  {
-   "loc": "10:105",
-   "ar": "وَأَنْ أَقِمْ وَجْهَكَ لِلدِّينِ حَنِيفًا وَلَا تَكُونَنَّ مِنَ ٱلْمُشْرِكِينَ",
-   "translation": {
-    "text": "dan (aku telah diperintah), \"Hadapkanlah wajahmu kepada agama dengan tulus dan ikhlas, dan jangan sekali-kali engkau termasuk orang yang musyrik.",
     "footnotes": []
    }
   },

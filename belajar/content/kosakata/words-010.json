@@ -154,15 +154,6 @@
    ],
    "senses": [
     {
-     "id": "menuduh",
-     "en": "accuse",
-     "ayat": [
-      "24:4",
-      "24:6",
-      "4:112"
-     ]
-    },
-    {
      "id": "melempar",
      "en": "throw",
      "ayat": [
@@ -170,9 +161,18 @@
       "105:4",
       "77:32"
      ]
+    },
+    {
+     "id": "menuduh",
+     "en": "accuse",
+     "ayat": [
+      "24:4",
+      "24:6",
+      "4:112"
+     ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "رَمَىٰ",
     "loc": "8:17:12",
@@ -489,15 +489,6 @@
    ],
    "senses": [
     {
-     "id": "belenggu",
-     "en": "shackles",
-     "ayat": [
-      "13:5",
-      "36:8",
-      "76:4"
-     ]
-    },
-    {
      "id": "dendam",
      "en": "resentment",
      "ayat": [
@@ -507,7 +498,7 @@
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "غِلٍّ",
     "loc": "7:43:6",
@@ -2078,7 +2069,7 @@
    "senses": [
     {
      "id": "menguji",
-     "en": "to test",
+     "en": "test",
      "ayat": [
       "2:124",
       "4:6",
@@ -2340,16 +2331,16 @@
    ],
    "senses": [
     {
-     "id": "senantiasa",
-     "en": "continue to",
+     "id": "berhenti",
+     "en": "cease",
      "ayat": [
-      "2:217",
+      "21:15",
       "11:118",
       "22:55"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "زَالَت",
     "loc": "21:15:2",
@@ -2746,7 +2737,7 @@
    "senses": [
     {
      "id": "menamai",
-     "en": "to name",
+     "en": "name",
      "ayat": [
       "3:36",
       "22:78",
@@ -3043,7 +3034,7 @@
    "senses": [
     {
      "id": "bermaksud",
-     "en": "to intend",
+     "en": "intend",
      "ayat": [
       "5:11",
       "9:13",
@@ -3093,21 +3084,14 @@
      ]
     },
     {
-     "id": "di samping",
-     "en": "beside",
+     "id": "sisi",
+     "en": "side",
      "ayat": [
       "4:36"
      ]
-    },
-    {
-     "id": "dalam hal",
-     "en": "in regard to",
-     "ayat": [
-      "39:56"
-     ]
     }
    ],
-   "review": "disputed",
+   "review": "corrected",
    "voice": {
     "form": "جَنۢبِ",
     "loc": "39:56:9",
@@ -3181,21 +3165,21 @@
    ],
    "senses": [
     {
+     "id": "sangat besar",
+     "en": "be great",
+     "ayat": [
+      "18:5",
+      "61:3",
+      "40:35"
+     ]
+    },
+    {
      "id": "terasa berat",
      "en": "be burdensome",
      "ayat": [
       "6:35",
       "10:71",
       "42:13"
-     ]
-    },
-    {
-     "id": "sangat besar",
-     "en": "be great",
-     "ayat": [
-      "18:5",
-      "61:3",
-      "17:51"
      ]
     },
     {
@@ -4267,6 +4251,15 @@
    ],
    "senses": [
     {
+     "id": "menampakkan",
+     "en": "make manifest",
+     "ayat": [
+      "40:26",
+      "66:3",
+      "72:26"
+     ]
+    },
+    {
      "id": "memenangkan",
      "en": "make prevail",
      "ayat": [
@@ -4276,22 +4269,14 @@
      ]
     },
     {
-     "id": "memperlihatkan",
-     "en": "disclose",
+     "id": "memasuki waktu zuhur",
+     "en": "enter noon",
      "ayat": [
-      "66:3",
-      "72:26"
-     ]
-    },
-    {
-     "id": "menimbulkan",
-     "en": "cause to appear",
-     "ayat": [
-      "40:26"
+      "30:18"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "يُظْهِرَ",
     "loc": "40:26:15",
@@ -4415,24 +4400,16 @@
    ],
    "senses": [
     {
-     "id": "menggoda",
-     "en": "seek to seduce",
-     "ayat": [
-      "12:23",
-      "12:26",
-      "12:51"
-     ]
-    },
-    {
      "id": "membujuk",
-     "en": "persuade",
+     "en": "try to persuade",
      "ayat": [
       "12:61",
-      "54:37"
+      "54:37",
+      "12:23"
      ]
     }
    ],
-   "review": "passed",
+   "review": "corrected",
    "voice": {
     "form": "تُرَٰوِدُ",
     "loc": "12:30:7",
