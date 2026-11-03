@@ -1151,6 +1151,101 @@ async function endCardShots(page, vp, surahsOn) {
 }
 
 /**
+ * The word voices of the Kosakata list (operator 2026-11-03: "we should also provide the audio of each
+ * word so user can listen how it's read"), in a real browser. The files live on the media store, so
+ * they are answered here with silent stand-ins of the same length (narrationRoute). Checks that a row's
+ * button asks for that word's file and for nothing before a press, stops at the word's end marker, that
+ * a second press takes over from the first, that a file that fails says so in the page's one status
+ * line, and that a word page says what is heard. Its screenshots are the only look CI has at these pages.
+ */
+async function kosakataVoiceChecks(page, vp) {
+  const read = async (name) => JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "kosakata", name), "utf8"));
+  const { words } = await read("words-001.json");
+  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8"));
+  const fail = (m) => {
+    throw new Error(`${vp} kosakata voices: ${m}`);
+  };
+  const index = new Map(words.map((w) => [w.voice.url, w.voice.ms]));
+  const served = [];
+  const handler = narrationRoute(index, served, { failMediaFetch: true });
+  const button = (w) => `main button[data-clip="${w.voice.loc}"]`;
+  await page.route(isNarration, handler);
+  try {
+    await page.goto(`${BASE}/belajar/id/kosakata`, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(400);
+    await page.screenshot({ path: `shots/${vp}-kosakata-list.png`, fullPage: false });
+    const count = await page.locator("main button[data-clip]").count();
+    if (count !== words.length) fail(`the list shows ${count} play buttons for ${words.length} words`);
+    if (served.length) fail(`the list fetched recordings before any press: ${served.slice(0, 3).join("; ")}`);
+    const wide = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    if (wide > 0) fail(`the list scrolls sideways by ${wide}px`);
+
+    const [a, b, broken] = [words[6], words[10], words[20]];
+    const box = await page.locator(button(a)).boundingBox();
+    if (!box || box.height < 44 || box.width < 44) fail(`a play button is ${box?.width}x${box?.height}px, smaller than a finger`);
+    const label = (await page.locator(button(a)).getAttribute("aria-label")) ?? "";
+    if (!label.includes(a.translit)) fail(`the button's label ${JSON.stringify(label)} does not name ${a.translit}`);
+
+    // A press plays that word's file, and stops at its end marker, not at the end of the file.
+    await page.evaluate(() => {
+      const calls = [];
+      window.__clipPauses = calls;
+      const pause = HTMLMediaElement.prototype.pause;
+      HTMLMediaElement.prototype.pause = function (...args) {
+        calls.push({ src: this.currentSrc || this.getAttribute("src") || "", t: this.currentTime, wasPaused: this.paused });
+        return pause.apply(this, args);
+      };
+    });
+    await page.locator(button(a)).click();
+    await page.waitForSelector(`${button(a)}[data-state="playing"]`, { timeout: 8000 });
+    await page.waitForSelector(`${button(a)}[data-state="idle"]`, { timeout: 8000 });
+    if (!served.some((l) => l.startsWith(a.voice.url))) fail(`pressing ${a.translit} did not ask for ${a.voice.url}: ${served.join("; ")}`);
+    const stops = await page.evaluate(() => window.__clipPauses.filter((c) => !c.wasPaused));
+    const stop = stops.at(-1);
+    if (!stop || !stop.src.includes(a.voice.url) || Math.abs(stop.t * 1000 - a.voice.end) > 300) {
+      fail(`${a.translit} should stop near ${a.voice.end} ms of its file, stopped at ${JSON.stringify(stop)}`);
+    }
+
+    // A second press takes over from the first: one word at a time.
+    await page.locator(button(a)).click();
+    await page.waitForSelector(`${button(a)}[data-state="playing"]`, { timeout: 8000 });
+    await page.locator(button(b)).click();
+    await page.waitForSelector(`${button(b)}[data-state="playing"]`, { timeout: 8000 });
+    if ((await page.locator(button(a)).getAttribute("data-state")) !== "idle") fail("two words play at once");
+    await page.waitForSelector(`${button(b)}[data-state="idle"]`, { timeout: 8000 });
+
+    // A file that cannot be had: the button offers a retry and the page says what to do.
+    index.delete(broken.voice.url);
+    await page.locator(button(broken)).click();
+    await page.waitForSelector(`${button(broken)}[data-state="failed"]`, { timeout: 8000 });
+    const said = await page.locator("[data-clip-status]").last().innerText();
+    if (!said.includes(msgs.Clip.failed.slice(0, 20))) fail(`a failed word says ${JSON.stringify(said)}`);
+
+    // The search answers the same way.
+    await page.goto(`${BASE}/belajar/id/kosakata?q=tangan`, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    if ((await page.locator("main button[data-clip]").count()) < 1) fail("the search results have no play button");
+    await page.screenshot({ path: `shots/${vp}-kosakata-search.png`, fullPage: true });
+
+    // A word page says which form is heard and where; the place's stop form is said when it ends an ayah.
+    await page.goto(`${BASE}/belajar/id/kosakata/kata/${a.rank}`, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    if ((await page.locator(button(a)).count()) !== 1) fail(`the page of ${a.translit} has no play button`);
+    if (!(await page.locator("main").innerText()).includes(a.voice.form)) fail(`the page of ${a.translit} does not show ${a.voice.form}`);
+    if ((await page.locator("[data-clip-note]").count()) !== 0) fail(`${a.translit} is not ayah-final, yet its page has a stop note`);
+    await page.screenshot({ path: `shots/${vp}-kosakata-word.png`, fullPage: true });
+    const atEnd = words.find((w) => w.voice.final);
+    if (!atEnd) fail("no word on the first page has an ayah-final place: this check needs one");
+    await page.goto(`${BASE}/belajar/id/kosakata/kata/${atEnd.rank}`, { waitUntil: "networkidle" });
+    if ((await page.locator('[data-clip-note="waqf"]').count()) !== 1) fail(`${atEnd.translit} is heard in its stop form, and its page does not say so`);
+    console.log(`${vp} kosakata voices: ${count} buttons, a press plays its file and stops at its end, one at a time, a failure is said, a word page says what is heard`);
+  } finally {
+    await page.unroute(isNarration, handler);
+  }
+}
+
+/**
  * The Konsep pages show grammar terms in Arabic script, measured in the real browser (operator
  * 2026-10-10: "mention the arabic word like majrur in arabic letter"; narration rule 15: a
  * transliteration and its Arabic never split across lines). On the index and on three concept
@@ -4347,6 +4442,7 @@ try {
     }
     await konsepChecks(page, vp);
     await clipChecks(page, vp, narration);
+    await kosakataVoiceChecks(page, vp);
     await menuShots(page, vp);
     await headerShots(page, vp);
     await footerCheck(page, vp);

@@ -34,7 +34,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "خَاسِئًا",
+    "loc": "67:4:8",
+    "url": "/belajar/media/narration/quran-com/wbw/067_004_008.mp3",
+    "ms": 1176,
+    "start": 0,
+    "end": 1176,
+    "sha256": "d88646999ce610af74cb04aa4513e0693f39e4db621e2ea5ed99b0489295c47a"
+   }
   },
   {
    "rank": 1702,
@@ -64,7 +73,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "نَكَالَ",
+    "loc": "79:25:3",
+    "url": "/belajar/media/narration/quran-com/wbw/079_025_003.mp3",
+    "ms": 1254,
+    "start": 0,
+    "end": 1254,
+    "sha256": "dff38eb439750452968aed933051ac4a9b5e7c22d81e3aa001afcdd0b0943478"
+   }
   },
   {
    "rank": 1703,
@@ -101,7 +119,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "بِكْرٌ",
+    "loc": "2:68:17",
+    "url": "/belajar/media/narration/quran-com/wbw/002_068_017.mp3",
+    "ms": 1409,
+    "start": 211,
+    "end": 1406,
+    "sha256": "92c67c729c7368829992b40782732d97feaaca2e2e104ff8905a6e29c96df240"
+   }
   },
   {
    "rank": 1704,
@@ -131,7 +158,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱلْبَقَرِ",
+    "loc": "6:144:5",
+    "url": "/belajar/media/narration/quran-com/wbw/006_144_005.mp3",
+    "ms": 1202,
+    "start": 0,
+    "end": 1197,
+    "sha256": "14596fb21c741cfa9e7b7e5325e80e536343fd7a4ded965a6d0f9db8dc063535"
+   }
   },
   {
    "rank": 1705,
@@ -166,7 +202,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "مُسَلَّمَةٌ",
+    "loc": "2:71:13",
+    "url": "/belajar/media/narration/quran-com/wbw/002_071_013.mp3",
+    "ms": 1749,
+    "start": 29,
+    "end": 1749,
+    "sha256": "c62f727e52c6d5a9cc62e327963e6fe5853e8781cc2a7dc46455fed8920557cc"
+   }
   },
   {
    "rank": 1706,
@@ -196,7 +241,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "مُخْرِجٌ",
+    "loc": "2:72:7",
+    "url": "/belajar/media/narration/quran-com/wbw/002_072_007.mp3",
+    "ms": 1383,
+    "start": 43,
+    "end": 1373,
+    "sha256": "1e5c83632a6e7dd40eb9f48ff92d1745d701db0fae3d15e3bd6bc391227d2dfb"
+   }
   },
   {
    "rank": 1707,
@@ -226,7 +280,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "قَسَتْ",
+    "loc": "2:74:2",
+    "url": "/belajar/media/narration/quran-com/wbw/002_074_002.mp3",
+    "ms": 887,
+    "start": 61,
+    "end": 878,
+    "sha256": "5fdc6e8298b6f4da7ba98c1d7e9722d4d4f75b3ec8752941f4773c063190e1ec"
+   }
   },
   {
    "rank": 1708,
@@ -256,7 +319,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "يَشَّقَّقُ",
+    "loc": "2:74:22",
+    "url": "/belajar/media/narration/quran-com/wbw/002_074_022.mp3",
+    "ms": 1827,
+    "start": 0,
+    "end": 1827,
+    "sha256": "4b5ab37b5db3648b1200d84e63cc86c4c4293adc785c1f99e7c1ba90b3a20f22"
+   }
   },
   {
    "rank": 1709,
@@ -287,7 +359,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "تُحَدِّثُ",
+    "loc": "99:4:2",
+    "url": "/belajar/media/narration/quran-com/wbw/099_004_002.mp3",
+    "ms": 1123,
+    "start": 0,
+    "end": 1121,
+    "sha256": "c53368593555aa10d169643186b274ee418a10ba9d1505e11b2f3ed87f568f0e"
+   }
   },
   {
    "rank": 1710,
@@ -318,7 +399,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "وَٱسْتَفْتَحُوا۟",
+    "loc": "14:15:1",
+    "url": "/belajar/media/narration/quran-com/wbw/014_015_001.mp3",
+    "ms": 1904,
+    "start": 84,
+    "end": 1861,
+    "sha256": "8b2e9893da538140e22bca2df2065596ecd7b82fb69472135c579f1de85c1d2a"
+   }
   },
   {
    "rank": 1711,
@@ -345,7 +435,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "وَجِبْرِيلَ",
+    "loc": "2:98:7",
+    "url": "/belajar/media/narration/quran-com/wbw/002_098_007.mp3",
+    "ms": 1253,
+    "start": 74,
+    "end": 1243,
+    "sha256": "2ea8b40553b66a7b914a6d31537e79b2f4dba76e1d786c182e549a9cfbc0d4c0"
+   }
   },
   {
    "rank": 1712,
@@ -376,7 +475,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "يَتَبَدَّلِ",
+    "loc": "2:108:12",
+    "url": "/belajar/media/narration/quran-com/wbw/002_108_012.mp3",
+    "ms": 1646,
+    "start": 113,
+    "end": 1523,
+    "sha256": "aa02b73ad00acb8379e377427830c3ce87268488b7935a2cb98b2f549ccb5bcb"
+   }
   },
   {
    "rank": 1713,
@@ -405,7 +513,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "هُودًا",
+    "loc": "2:111:8",
+    "url": "/belajar/media/narration/quran-com/wbw/002_111_008.mp3",
+    "ms": 1123,
+    "start": 0,
+    "end": 1086,
+    "sha256": "f03ff13b1a94f69b4b0abfea775d0f151de48798cba6bd9adbafc09fec7b2e81"
+   }
   },
   {
    "rank": 1714,
@@ -435,7 +552,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "خَآئِفًا",
+    "loc": "28:18:4",
+    "url": "/belajar/media/narration/quran-com/wbw/028_018_004.mp3",
+    "ms": 2273,
+    "start": 0,
+    "end": 2270,
+    "sha256": "3288e235637fa52aaa0c4a52d1615f2fb61cc17cd9d21428a6f7d7f8d206cd16"
+   }
   },
   {
    "rank": 1715,
@@ -472,7 +598,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱلْقَوَاعِدَ",
+    "loc": "2:127:4",
+    "url": "/belajar/media/narration/quran-com/wbw/002_127_004.mp3",
+    "ms": 1436,
+    "start": 36,
+    "end": 1424,
+    "sha256": "d4c3b76baf4190e0bc384abc61f0d690e2003c765c23574ad541f0653c7b62e0"
+   }
   },
   {
    "rank": 1716,
@@ -507,7 +642,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "بِتَابِعٍ",
+    "loc": "2:145:13",
+    "url": "/belajar/media/narration/quran-com/wbw/002_145_013.mp3",
+    "ms": 1437,
+    "start": 35,
+    "end": 1422,
+    "sha256": "c4a32ba9765fefbbccaf1d2adfa80ee91c62e400a0394d57a60636581d0e3086"
+   }
   },
   {
    "rank": 1717,
@@ -537,7 +681,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "بِخَارِجٍ",
+    "loc": "6:122:17",
+    "url": "/belajar/media/narration/quran-com/wbw/006_122_017.mp3",
+    "ms": 1567,
+    "start": 0,
+    "end": 1561,
+    "sha256": "562cd3c071b9479e25f7bb54a11d76b313612fc3aed03805311c9ab8b06feb63"
+   }
   },
   {
    "rank": 1718,
@@ -568,7 +721,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "أَلْفَوْا۟",
+    "loc": "37:69:2",
+    "url": "/belajar/media/narration/quran-com/wbw/037_069_002.mp3",
+    "ms": 862,
+    "start": 7,
+    "end": 862,
+    "sha256": "00f2afc279bd16927e78111a106dbf538ade17b40c4c39ed43f1460e8a19861b"
+   }
   },
   {
    "rank": 1719,
@@ -597,7 +759,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "بَاغٍ",
+    "loc": "2:173:16",
+    "url": "/belajar/media/narration/quran-com/wbw/002_173_016.mp3",
+    "ms": 1044,
+    "start": 29,
+    "end": 1044,
+    "sha256": "ca315ac128321c1344bc34c691ce5acbbb042ca5c21af9402d4469ab7933f9bf"
+   }
   },
   {
    "rank": 1720,
@@ -627,7 +798,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "فِدْيَةٌ",
+    "loc": "2:184:17",
+    "url": "/belajar/media/narration/quran-com/wbw/002_184_017.mp3",
+    "ms": 1253,
+    "start": 33,
+    "end": 1253,
+    "sha256": "c3036e82920c8f2539f9e4a6054af49c066e22d067247a34f27918bfe2526d2c"
+   }
   },
   {
    "rank": 1721,
@@ -662,7 +842,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱلدَّاعِ",
+    "loc": "2:186:9",
+    "url": "/belajar/media/narration/quran-com/wbw/002_186_009.mp3",
+    "ms": 1227,
+    "start": 29,
+    "end": 1220,
+    "sha256": "9c109dd9a10c72bfb81db0adad77b4dc21b9921f6c5419491ddacb35b3c6785f"
+   }
   },
   {
    "rank": 1722,
@@ -692,7 +881,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "مَحِلَّهُۥ",
+    "loc": "2:196:17",
+    "url": "/belajar/media/narration/quran-com/wbw/002_196_017.mp3",
+    "ms": 1096,
+    "start": 0,
+    "end": 1076,
+    "sha256": "11c2c7c45e5e3ec649f23730c7b594db15ae7af1d41bceef32dadb23cfb27bc0"
+   }
   },
   {
    "rank": 1723,
@@ -734,7 +932,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "تَأَخَّرَ",
+    "loc": "2:203:14",
+    "url": "/belajar/media/narration/quran-com/wbw/002_203_014.mp3",
+    "ms": 1070,
+    "start": 26,
+    "end": 1062,
+    "sha256": "9574452e8bb3f6cf664021db37e9764dbb672af80c75bbb2edb6d435adcc7859"
+   }
   },
   {
    "rank": 1724,
@@ -767,7 +974,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "لَمَّا",
+    "loc": "43:35:5",
+    "url": "/belajar/media/narration/quran-com/wbw/043_035_005.mp3",
+    "ms": 1724,
+    "start": 0,
+    "end": 1724,
+    "sha256": "654dcffadbed004d0b34fd02d797347edc09ef15bfb5350eb2bb5804f4c953a8"
+   }
   },
   {
    "rank": 1725,
@@ -798,7 +1014,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "زُلْزِلَتِ",
+    "loc": "99:1:2",
+    "url": "/belajar/media/narration/quran-com/wbw/099_001_002.mp3",
+    "ms": 1280,
+    "start": 0,
+    "end": 1280,
+    "sha256": "71ecc3da3ef0c100af6ec9dc1dcb1ff9da7b8b286d3986dab5aafba96e250394"
+   }
   },
   {
    "rank": 1726,
@@ -833,7 +1058,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "كُرْهٌ",
+    "loc": "2:216:5",
+    "url": "/belajar/media/narration/quran-com/wbw/002_216_005.mp3",
+    "ms": 1123,
+    "start": 74,
+    "end": 1049,
+    "sha256": "3677ea646201ad43aaa2fb6003f7aad7d4e1b3ab79271ffacbac3f478f894724"
+   }
   },
   {
    "rank": 1727,
@@ -863,7 +1097,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "وَٱلْمَيْسِرِ",
+    "loc": "2:219:4",
+    "url": "/belajar/media/narration/quran-com/wbw/002_219_004.mp3",
+    "ms": 1541,
+    "start": 60,
+    "end": 1475,
+    "sha256": "82bbc3c6ce1a93b6bc15eb0e3227302d7cad1e10dacafae9c294c4da08ac14e4"
+   }
   },
   {
    "rank": 1728,
@@ -893,7 +1136,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱلْمُشْرِكَٰتِ",
+    "loc": "2:221:3",
+    "url": "/belajar/media/narration/quran-com/wbw/002_221_003.mp3",
+    "ms": 1750,
+    "start": 0,
+    "end": 1665,
+    "sha256": "9c557c2524355ace0afe499d7f0efc90545621b62599c3a1a2edc800536492de"
+   }
   },
   {
    "rank": 1729,
@@ -924,7 +1176,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "تُنكِحُوا۟",
+    "loc": "2:221:14",
+    "url": "/belajar/media/narration/quran-com/wbw/002_221_014.mp3",
+    "ms": 1959,
+    "start": 196,
+    "end": 1773,
+    "sha256": "fe32e7e8f7a9665ced5330d130a42696c384f204a8f847f22b99c975fc0d8434"
+   }
   },
   {
    "rank": 1730,
@@ -952,7 +1213,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱلْمَحِيضِ",
+    "loc": "2:222:3",
+    "url": "/belajar/media/narration/quran-com/wbw/002_222_003.mp3",
+    "ms": 1488,
+    "start": 42,
+    "end": 1477,
+    "sha256": "7ebfea6a8877e5ebfc14f72c6190d8b6ce723bfd2c24c677bd95c2558a95c834"
+   }
   },
   {
    "rank": 1731,
@@ -982,7 +1252,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "فَآءُو",
+    "loc": "2:226:9",
+    "url": "/belajar/media/narration/quran-com/wbw/002_226_009.mp3",
+    "ms": 2584,
+    "start": 0,
+    "end": 2572,
+    "sha256": "10e86757e08ceea903ee03eeb4c147fc16ec67ebaab8613c447aa2a9c37eed92"
+   }
   },
   {
    "rank": 1732,
@@ -1012,7 +1291,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "يَتَعَدَّ",
+    "loc": "2:229:41",
+    "url": "/belajar/media/narration/quran-com/wbw/002_229_041.mp3",
+    "ms": 1384,
+    "start": 93,
+    "end": 1272,
+    "sha256": "567db119fc702431d1c6acb31192af1b6f4b8530ba1b4a23b591ec699b56e2df"
+   }
   },
   {
    "rank": 1733,
@@ -1043,7 +1331,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "سَرِّحُوهُنَّ",
+    "loc": "2:231:9",
+    "url": "/belajar/media/narration/quran-com/wbw/002_231_009.mp3",
+    "ms": 2926,
+    "start": 106,
+    "end": 2784,
+    "sha256": "d64df41269c8f22182ef655f349d555200b8f52a50b467208911f281d107d2ae"
+   }
   },
   {
    "rank": 1734,
@@ -1072,7 +1369,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "مَوْلُودٌ",
+    "loc": "2:233:27",
+    "url": "/belajar/media/narration/quran-com/wbw/002_233_027.mp3",
+    "ms": 1698,
+    "start": 231,
+    "end": 1566,
+    "sha256": "3aaa193d1009d9f8c7bb3bd92bea031b763d6f0ec4116ddd0740815c8a1e4ce9"
+   }
   },
   {
    "rank": 1735,
@@ -1103,7 +1409,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "يُضَآرَّ",
+    "loc": "2:282:112",
+    "url": "/belajar/media/narration/quran-com/wbw/002_282_112.mp3",
+    "ms": 4150,
+    "start": 0,
+    "end": 4135,
+    "sha256": "6023bd113a9e6c808ddfa5647155b44e0fc5f81edb490954c7eab5ff4c282d3a"
+   }
   },
   {
    "rank": 1736,
@@ -1133,7 +1448,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "فِصَالًا",
+    "loc": "2:233:36",
+    "url": "/belajar/media/narration/quran-com/wbw/002_233_036.mp3",
+    "ms": 1515,
+    "start": 34,
+    "end": 1349,
+    "sha256": "eb644f363dd988509c7061b5676cd53c401fcfccac0465d4d39b2349fdd0adca"
+   }
   },
   {
    "rank": 1737,
@@ -1163,7 +1487,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "أَكْنَنتُمْ",
+    "loc": "2:235:11",
+    "url": "/belajar/media/narration/quran-com/wbw/002_235_011.mp3",
+    "ms": 2116,
+    "start": 81,
+    "end": 2075,
+    "sha256": "4e61136aee7785f5d5a4eac9376ff3b9cb66de2afca383c05dde040609181831"
+   }
   },
   {
    "rank": 1738,
@@ -1200,7 +1533,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "بَقِيَّتُ",
+    "loc": "11:86:1",
+    "url": "/belajar/media/narration/quran-com/wbw/011_086_001.mp3",
+    "ms": 1540,
+    "start": 0,
+    "end": 1540,
+    "sha256": "bc1871218f09c1ec80080dd707c2fd0bc0ddfea9880d25d472461bbada40ee37"
+   }
   },
   {
    "rank": 1739,
@@ -1227,7 +1569,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "جَالُوتَ",
+    "loc": "2:251:6",
+    "url": "/belajar/media/narration/quran-com/wbw/002_251_006.mp3",
+    "ms": 1489,
+    "start": 0,
+    "end": 1489,
+    "sha256": "fbc1591a6964496e3e60c189c2bec6d7375c3da388e94d32d484ccb4e49af168"
+   }
   },
   {
    "rank": 1740,
@@ -1257,7 +1608,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "أَفْرِغْ",
+    "loc": "2:250:7",
+    "url": "/belajar/media/narration/quran-com/wbw/002_250_007.mp3",
+    "ms": 1228,
+    "start": 66,
+    "end": 1226,
+    "sha256": "7c856f22b0b2a05a5ce4545f6e8d6d00b1ee307aa7a555f211bf7d82fd34cc44"
+   }
   },
   {
    "rank": 1741,
@@ -1288,7 +1648,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "لَفَسَدَتِ",
+    "loc": "23:71:5",
+    "url": "/belajar/media/narration/quran-com/wbw/023_071_005.mp3",
+    "ms": 1411,
+    "start": 62,
+    "end": 1411,
+    "sha256": "66cafe8c8bb41ab642ad86d0e39495490967dddff6c0ad1484bb42bd09f15779"
+   }
   },
   {
    "rank": 1742,
@@ -1318,7 +1687,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱلْقَيُّومُ",
+    "loc": "2:255:7",
+    "url": "/belajar/media/narration/quran-com/wbw/002_255_007.mp3",
+    "ms": 2714,
+    "start": 0,
+    "end": 2708,
+    "sha256": "50a0d8ca4a90d86774e2f94d06c1dd21d3191a0f095fe498230c986579d54c79"
+   }
   },
   {
    "rank": 1743,
@@ -1349,7 +1727,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "نَوْمٌ",
+    "loc": "2:255:12",
+    "url": "/belajar/media/narration/quran-com/wbw/002_255_012.mp3",
+    "ms": 1462,
+    "start": 0,
+    "end": 1457,
+    "sha256": "479d9c2bdd3dc43e50f26feeea70f477f38285556c138381eee694545f0aa187"
+   }
   },
   {
    "rank": 1744,
@@ -1379,7 +1766,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "حِفْظُهُمَا",
+    "loc": "2:255:47",
+    "url": "/belajar/media/narration/quran-com/wbw/002_255_047.mp3",
+    "ms": 2088,
+    "start": 0,
+    "end": 2058,
+    "sha256": "ccc747ea15da852d9f1674718bb95b9914cdb38bbfa9b7740adaa65caeb6b043"
+   }
   },
   {
    "rank": 1745,
@@ -1409,7 +1805,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱسْتَمْسَكَ",
+    "loc": "2:256:16",
+    "url": "/belajar/media/narration/quran-com/wbw/002_256_016.mp3",
+    "ms": 1827,
+    "start": 1,
+    "end": 1827,
+    "sha256": "05c98bda8aca11535cb0498ed4a0698cc5606cdd7af17d3bd8a486695125496b"
+   }
   },
   {
    "rank": 1746,
@@ -1446,7 +1851,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "فَكَسَوْنَا",
+    "loc": "23:14:11",
+    "url": "/belajar/media/narration/quran-com/wbw/023_014_011.mp3",
+    "ms": 1541,
+    "start": 0,
+    "end": 1541,
+    "sha256": "727fdce25d4d083bed17dfa01f9fe31b37a85b144646d42ff12bfb6c67bef356"
+   }
   },
   {
    "rank": 1747,
@@ -1476,7 +1890,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "جُزْءٌ",
+    "loc": "15:44:7",
+    "url": "/belajar/media/narration/quran-com/wbw/015_044_007.mp3",
+    "ms": 1408,
+    "start": 126,
+    "end": 1408,
+    "sha256": "a25ddd93509c8e0fa27ae49e80eb5bea96e7be4a2f30f0f4548e7309b4ebb1c5"
+   }
   },
   {
    "rank": 1748,
@@ -1506,7 +1929,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "رِئَآءَ",
+    "loc": "2:264:12",
+    "url": "/belajar/media/narration/quran-com/wbw/002_264_012.mp3",
+    "ms": 2819,
+    "start": 0,
+    "end": 2803,
+    "sha256": "42d914e507581e5fd4e0d596c9b1f71650e9add639e066d9f54fdd0266119486"
+   }
   },
   {
    "rank": 1749,
@@ -1534,7 +1966,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "وَابِلٌ",
+    "loc": "2:264:25",
+    "url": "/belajar/media/narration/quran-com/wbw/002_264_025.mp3",
+    "ms": 1383,
+    "start": 0,
+    "end": 1383,
+    "sha256": "3ac4998eb207f30b69ed551baaf961505fe760bc0f8d8b524b280495a388dba3"
+   }
   },
   {
    "rank": 1750,
@@ -1564,7 +2005,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "تَيَمَّمُوا۟",
+    "loc": "2:267:15",
+    "url": "/belajar/media/narration/quran-com/wbw/002_267_015.mp3",
+    "ms": 1931,
+    "start": 0,
+    "end": 1902,
+    "sha256": "5d0515067a053c008be47b9924b63034038f60fc2c6ca20ed8e10be6ff94ff5b"
+   }
   },
   {
    "rank": 1751,
@@ -1601,7 +2051,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ءَاخِذٌۢ",
+    "loc": "11:56:12",
+    "url": "/belajar/media/narration/quran-com/wbw/011_056_012.mp3",
+    "ms": 1331,
+    "start": 0,
+    "end": 1315,
+    "sha256": "b67d6d9c2f2174e24968d3175566d77992c761a0e5fd9d47586713efa5f544a0"
+   }
   },
   {
    "rank": 1752,
@@ -1638,7 +2097,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ضَرْبًا",
+    "loc": "2:273:9",
+    "url": "/belajar/media/narration/quran-com/wbw/002_273_009.mp3",
+    "ms": 1148,
+    "start": 0,
+    "end": 1148,
+    "sha256": "4658c8cd092360188e2bc11a5d2d0e42ea24bee0bccf5195c2e7a823b0daac6a"
+   }
   },
   {
    "rank": 1753,
@@ -1675,7 +2143,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "بَقِىَ",
+    "loc": "2:278:8",
+    "url": "/belajar/media/narration/quran-com/wbw/002_278_008.mp3",
+    "ms": 940,
+    "start": 0,
+    "end": 927,
+    "sha256": "eeb465b7c9158e670e2ee2790495a5b4272bf1b15f8df02d217321d6bd65ebbd"
+   }
   },
   {
    "rank": 1754,
@@ -1704,7 +2181,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "يُمِلَّ",
+    "loc": "2:282:47",
+    "url": "/belajar/media/narration/quran-com/wbw/002_282_047.mp3",
+    "ms": 1227,
+    "start": 0,
+    "end": 1213,
+    "sha256": "cd2205084dcb3e568277dd2a55bfb62d5652d004f22fd332ac3566c449a2addc"
+   }
   },
   {
    "rank": 1755,
@@ -1735,7 +2221,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "يَسْـَٔمُ",
+    "loc": "41:49:2",
+    "url": "/belajar/media/narration/quran-com/wbw/041_049_002.mp3",
+    "ms": 1071,
+    "start": 0,
+    "end": 1071,
+    "sha256": "4ce612f779522d432e2eb40c2aceb119040ea04effd505d6dfcfa4aa65a49232"
+   }
   },
   {
    "rank": 1756,
@@ -1765,7 +2260,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "صَغِيرٍ",
+    "loc": "54:53:2",
+    "url": "/belajar/media/narration/quran-com/wbw/054_053_002.mp3",
+    "ms": 1384,
+    "start": 0,
+    "end": 1384,
+    "sha256": "370160c29d30970e049f1ea0ad22020d1cc1bbcc364e5e893ae2538f17f8bb07"
+   }
   },
   {
    "rank": 1757,
@@ -1796,7 +2300,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ءَاثِمٌ",
+    "loc": "2:283:27",
+    "url": "/belajar/media/narration/quran-com/wbw/002_283_027.mp3",
+    "ms": 1488,
+    "start": 0,
+    "end": 1468,
+    "sha256": "b8e1611d2bcf2d8b9ae5373371e25513c874413c317f31fcd832f0c047a9d2bd"
+   }
   },
   {
    "rank": 1758,
@@ -1827,7 +2340,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "يُحَاسَبُ",
+    "loc": "84:8:2",
+    "url": "/belajar/media/narration/quran-com/wbw/084_008_002.mp3",
+    "ms": 1254,
+    "start": 0,
+    "end": 1254,
+    "sha256": "17704ba7e139391cf0f7edd59eeab1e8cf7b05eb8ed34185a984963c4ece3b84"
+   }
   },
   {
    "rank": 1759,
@@ -1864,7 +2386,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "إِصْرًا",
+    "loc": "2:286:24",
+    "url": "/belajar/media/narration/quran-com/wbw/002_286_024.mp3",
+    "ms": 1253,
+    "start": 0,
+    "end": 1247,
+    "sha256": "909a32b729cb34cd46cae41405815d16fc1abb9ac5e7c03e97e1b4eb1845e614"
+   }
   },
   {
    "rank": 1760,
@@ -1894,7 +2425,17 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱلْوَهَّابُ",
+    "loc": "3:8:15",
+    "url": "/belajar/media/narration/quran-com/wbw/003_008_015.mp3",
+    "ms": 1984,
+    "start": 0,
+    "end": 1974,
+    "sha256": "1be4b6c637986867082a4c4cb74ab1e5fc0887bcccabe3c94a279ca6722ecaad",
+    "final": true
+   }
   },
   {
    "rank": 1761,
@@ -1930,7 +2471,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "جَامِعُ",
+    "loc": "3:9:3",
+    "url": "/belajar/media/narration/quran-com/wbw/003_009_003.mp3",
+    "ms": 1279,
+    "start": 0,
+    "end": 1266,
+    "sha256": "867f5b18216e022ba19b9e488bb4af6bb7517da250b0b5cd5b2c5bd6f49df657"
+   }
   },
   {
    "rank": 1762,
@@ -1959,7 +2509,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱلشَّهَوَٰتِ",
+    "loc": "3:14:4",
+    "url": "/belajar/media/narration/quran-com/wbw/003_014_004.mp3",
+    "ms": 1618,
+    "start": 0,
+    "end": 1613,
+    "sha256": "9d12c786a89b44d921034f233e0f31e343f90848c7a0a989c7fe4af2fccffe8f"
+   }
   },
   {
    "rank": 1763,
@@ -1991,7 +2550,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "بِقِنطَارٍ",
+    "loc": "3:75:7",
+    "url": "/belajar/media/narration/quran-com/wbw/003_075_007.mp3",
+    "ms": 2271,
+    "start": 0,
+    "end": 2250,
+    "sha256": "9d59f95c5720465c878aedba6fa9205b8c86235193218a799b0689d2b2ef0b09"
+   }
   },
   {
    "rank": 1764,
@@ -2021,7 +2589,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "مُّسَوَّمَةً",
+    "loc": "11:83:1",
+    "url": "/belajar/media/narration/quran-com/wbw/011_083_001.mp3",
+    "ms": 1801,
+    "start": 0,
+    "end": 1781,
+    "sha256": "e95b2b264da27fc63189e48f3c5ade88e0938ffad0c2012898820bc9ab6a170d"
+   }
   },
   {
    "rank": 1765,
@@ -2052,7 +2629,17 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "بِسَحَرٍ",
+    "loc": "54:34:9",
+    "url": "/belajar/media/narration/quran-com/wbw/054_034_009.mp3",
+    "ms": 1176,
+    "start": 3,
+    "end": 1176,
+    "sha256": "286b16cd5119ec9cce0949318542e73374df670ea7198156d48766931966ee3f",
+    "final": true
+   }
   },
   {
    "rank": 1766,
@@ -2077,7 +2664,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "عِمْرَٰنَ",
+    "loc": "3:33:9",
+    "url": "/belajar/media/narration/quran-com/wbw/003_033_009.mp3",
+    "ms": 1540,
+    "start": 0,
+    "end": 1540,
+    "sha256": "7c230c1cf7f1bea2c6634a494e629b0f15bf6eaa3901d54060c39d0705e18299"
+   }
   },
   {
    "rank": 1767,
@@ -2114,7 +2710,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "سَيِّدَهَا",
+    "loc": "12:25:8",
+    "url": "/belajar/media/narration/quran-com/wbw/012_025_008.mp3",
+    "ms": 1696,
+    "start": 47,
+    "end": 1683,
+    "sha256": "593387f3e655735b7a89a38908ca383d89fb1bfdf6d8a54f790ededb208a3a4d"
+   }
   },
   {
    "rank": 1768,
@@ -2144,7 +2749,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "عَاقِرٌ",
+    "loc": "3:40:11",
+    "url": "/belajar/media/narration/quran-com/wbw/003_040_011.mp3",
+    "ms": 1488,
+    "start": 0,
+    "end": 1470,
+    "sha256": "d063e1d784eaf1cebd643efa891ad18a46a26d8e7d90b5d3da033e4883b36842"
+   }
   },
   {
    "rank": 1769,
@@ -2175,7 +2789,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "يَكْفُلُ",
+    "loc": "3:44:14",
+    "url": "/belajar/media/narration/quran-com/wbw/003_044_014.mp3",
+    "ms": 1540,
+    "start": 0,
+    "end": 1539,
+    "sha256": "16f72f5939f169587626a0f0047b72f97ab4889ef307f0b04ef086f39934cc45"
+   }
   },
   {
    "rank": 1770,
@@ -2206,7 +2829,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "أَحَسَّ",
+    "loc": "3:52:2",
+    "url": "/belajar/media/narration/quran-com/wbw/003_052_002.mp3",
+    "ms": 1227,
+    "start": 0,
+    "end": 1219,
+    "sha256": "dd67b6dad9e8180e14c19400d5460acabd880bc5d6fe46fbb05224acaecabb2f"
+   }
   },
   {
    "rank": 1771,
@@ -2243,7 +2875,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "يَلْوُۥنَ",
+    "loc": "3:78:4",
+    "url": "/belajar/media/narration/quran-com/wbw/003_078_004.mp3",
+    "ms": 1566,
+    "start": 0,
+    "end": 1552,
+    "sha256": "4375170670236715c12d84fc8497f519906304944ba1ca4a31134aa1a2250bdd"
+   }
   },
   {
    "rank": 1772,
@@ -2274,7 +2915,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "رَبَّٰنِيِّـۧنَ",
+    "loc": "3:79:21",
+    "url": "/belajar/media/narration/quran-com/wbw/003_079_021.mp3",
+    "ms": 2323,
+    "start": 0,
+    "end": 2307,
+    "sha256": "465c8d2af68dc1f42d9ad64a87300619c5ae8d128f3d240a249ae84629b84011"
+   }
   },
   {
    "rank": 1773,
@@ -2305,7 +2955,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱبْيَضَّتْ",
+    "loc": "3:107:3",
+    "url": "/belajar/media/narration/quran-com/wbw/003_107_003.mp3",
+    "ms": 1567,
+    "start": 0,
+    "end": 1567,
+    "sha256": "3eca29acc4efea51e6684cb4654b7884c64daec218e82d2df0870954c3e5e900"
+   }
   },
   {
    "rank": 1774,
@@ -2335,7 +2994,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ءَانَآءَ",
+    "loc": "3:113:11",
+    "url": "/belajar/media/narration/quran-com/wbw/003_113_011.mp3",
+    "ms": 3030,
+    "start": 0,
+    "end": 3030,
+    "sha256": "a9113089e6bace7a266c8eab6aa965c918328042e6a7c59e6a9d362be488ed00"
+   }
   },
   {
    "rank": 1775,
@@ -2365,7 +3033,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "عَنِتُّمْ",
+    "loc": "3:118:14",
+    "url": "/belajar/media/narration/quran-com/wbw/003_118_014.mp3",
+    "ms": 1332,
+    "start": 0,
+    "end": 1326,
+    "sha256": "1a8f7a15017bee19e9bb1ac7a3945e5b50082f232cc0f439880a557dba8dfd13"
+   }
   },
   {
    "rank": 1776,
@@ -2396,7 +3073,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "وَغَدَوْا۟",
+    "loc": "68:25:1",
+    "url": "/belajar/media/narration/quran-com/wbw/068_025_001.mp3",
+    "ms": 1045,
+    "start": 0,
+    "end": 1045,
+    "sha256": "5eb40db2310167538b9f1e8a387c0d76ac7c1fd8bd8ed7bce02e84b8dac3c3cc"
+   }
   },
   {
    "rank": 1777,
@@ -2427,7 +3113,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "خَمْسَةٌ",
+    "loc": "18:22:6",
+    "url": "/belajar/media/narration/quran-com/wbw/018_022_006.mp3",
+    "ms": 1488,
+    "start": 5,
+    "end": 1476,
+    "sha256": "afcc6d83b2d979044dd335c9c6744e5d218ed0f72e34c348e5bb0339573cf079"
+   }
   },
   {
    "rank": 1778,
@@ -2457,7 +3152,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "كُبِتَ",
+    "loc": "58:5:8",
+    "url": "/belajar/media/narration/quran-com/wbw/058_005_008.mp3",
+    "ms": 862,
+    "start": 0,
+    "end": 862,
+    "sha256": "024af13c8a13c3614d2abfd9fb84aef868f3a9ee6c58190369b8a507d8c24ef5"
+   }
   },
   {
    "rank": 1779,
@@ -2500,7 +3204,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "بَيَانٌ",
+    "loc": "3:138:2",
+    "url": "/belajar/media/narration/quran-com/wbw/003_138_002.mp3",
+    "ms": 1515,
+    "start": 0,
+    "end": 1515,
+    "sha256": "42cac75ed129805de79d8f29fa981b94c19bc500014b9c37677ba7aa1a8ba3c7"
+   }
   },
   {
    "rank": 1780,
@@ -2529,7 +3242,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "قَرْحٌ",
+    "loc": "3:140:3",
+    "url": "/belajar/media/narration/quran-com/wbw/003_140_003.mp3",
+    "ms": 1280,
+    "start": 0,
+    "end": 1280,
+    "sha256": "2e5b7b0648d5bd1ea258ad7b5b2578402df93d1621947b14b5fd4f8f7036359e"
+   }
   },
   {
    "rank": 1781,
@@ -2560,7 +3282,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "فَأَثَٰبَكُمْ",
+    "loc": "3:153:11",
+    "url": "/belajar/media/narration/quran-com/wbw/003_153_011.mp3",
+    "ms": 1515,
+    "start": 0,
+    "end": 1515,
+    "sha256": "0c6af51e2b435ea3d18bf7d6bf52c3754beff77062605263c73648b6e01d3f1f"
+   }
   },
   {
    "rank": 1782,
@@ -2589,7 +3320,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "فَاتَكُمْ",
+    "loc": "3:153:18",
+    "url": "/belajar/media/narration/quran-com/wbw/003_153_018.mp3",
+    "ms": 1437,
+    "start": 0,
+    "end": 1437,
+    "sha256": "5821806768b3c8acec45b85322aaa3fb5a9284695192c7cbc48bd9f3b31feb93"
+   }
   },
   {
    "rank": 1783,
@@ -2619,7 +3359,16 @@
      ]
     }
    ],
-   "review": "disputed"
+   "review": "disputed",
+   "voice": {
+    "form": "ٱلْمَضَاجِعِ",
+    "loc": "4:34:28",
+    "url": "/belajar/media/narration/quran-com/wbw/004_034_028.mp3",
+    "ms": 1489,
+    "start": 0,
+    "end": 1489,
+    "sha256": "16b66e2f8e6722b5fc00d5ae0271b267b3d09440bc364be5df2eb2f9c2193161"
+   }
   },
   {
    "rank": 1784,
@@ -2650,7 +3399,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱنفَضُّوٓا۟",
+    "loc": "62:11:6",
+    "url": "/belajar/media/narration/quran-com/wbw/062_011_006.mp3",
+    "ms": 2038,
+    "start": 0,
+    "end": 2038,
+    "sha256": "c8b7142e8c67155fa983ef12709ddde6b7c4d441e2cb25fec4b34d63aeffa6a3"
+   }
   },
   {
    "rank": 1785,
@@ -2686,7 +3444,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "قُرْبَانًا",
+    "loc": "5:27:9",
+    "url": "/belajar/media/narration/quran-com/wbw/005_027_009.mp3",
+    "ms": 1358,
+    "start": 0,
+    "end": 1358,
+    "sha256": "c523a05936dd69a6929e57d6f0712bc9edca82710a8536d528d73f23720eba60"
+   }
   },
   {
    "rank": 1786,
@@ -2715,7 +3482,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ذَآئِقَةُ",
+    "loc": "3:185:3",
+    "url": "/belajar/media/narration/quran-com/wbw/003_185_003.mp3",
+    "ms": 2247,
+    "start": 0,
+    "end": 2247,
+    "sha256": "c1fd597dcf44d32a975c1dc5f1ba16b96ecbd9765af2ec6bff7ec8d89aeb4d3f"
+   }
   },
   {
    "rank": 1787,
@@ -2745,7 +3521,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "فَازَ",
+    "loc": "3:185:17",
+    "url": "/belajar/media/narration/quran-com/wbw/003_185_017.mp3",
+    "ms": 1254,
+    "start": 0,
+    "end": 1254,
+    "sha256": "4da1dfa5655e771e6001d5e73d5b2cc812843c7a3190bc74344738b3d02e93ad"
+   }
   },
   {
    "rank": 1788,
@@ -2776,7 +3561,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "تُقْسِطُوا۟",
+    "loc": "4:3:4",
+    "url": "/belajar/media/narration/quran-com/wbw/004_003_004.mp3",
+    "ms": 1280,
+    "start": 0,
+    "end": 1276,
+    "sha256": "33b70d131f68efdd1b114b12c61eb01cd7615a7f5c3f20807a791d54fa479807"
+   }
   },
   {
    "rank": 1789,
@@ -2819,7 +3613,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "طَابَ",
+    "loc": "4:3:9",
+    "url": "/belajar/media/narration/quran-com/wbw/004_003_009.mp3",
+    "ms": 731,
+    "start": 0,
+    "end": 725,
+    "sha256": "d19edff8d7114998f6d0e5f811ececdeb8297c88114fc2b05267f41b24dee87c"
+   }
   },
   {
    "rank": 1790,
@@ -2849,7 +3652,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "مَثْنَىٰ",
+    "loc": "4:3:13",
+    "url": "/belajar/media/narration/quran-com/wbw/004_003_013.mp3",
+    "ms": 836,
+    "start": 0,
+    "end": 836,
+    "sha256": "517e58cd856dccb106a31245945da82d8151ad907337ef39c410b546dc188616"
+   }
   },
   {
    "rank": 1791,
@@ -2880,7 +3692,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "يَسْتَعْفِفْنَ",
+    "loc": "24:60:18",
+    "url": "/belajar/media/narration/quran-com/wbw/024_060_018.mp3",
+    "ms": 1646,
+    "start": 0,
+    "end": 1644,
+    "sha256": "5f1fffdbb1420fe1ee295646a5593233dc2cd48dfff710219278ef4abeebe3db"
+   }
   },
   {
    "rank": 1792,
@@ -2911,7 +3732,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "قِسْمَةٌ",
+    "loc": "53:22:3",
+    "url": "/belajar/media/narration/quran-com/wbw/053_022_003.mp3",
+    "ms": 1149,
+    "start": 0,
+    "end": 1149,
+    "sha256": "aa8e0c6961ecdaa7d68c8c69d6e74b33b2550eb8b548ac334a2139254bf82393"
+   }
   },
   {
    "rank": 1793,
@@ -2939,7 +3769,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "ٱلسُّدُسُ",
+    "loc": "4:11:27",
+    "url": "/belajar/media/narration/quran-com/wbw/004_011_027.mp3",
+    "ms": 1384,
+    "start": 0,
+    "end": 1376,
+    "sha256": "cad34dbc994b641589807003e24e16be46b59bfb620a2675d6a6673f4b247a80"
+   }
   },
   {
    "rank": 1794,
@@ -2968,7 +3807,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "مُّبَيِّنَةٍ",
+    "loc": "4:19:21",
+    "url": "/belajar/media/narration/quran-com/wbw/004_019_021.mp3",
+    "ms": 1228,
+    "start": 1,
+    "end": 1227,
+    "sha256": "1ca8bdb8ecd53803683b9874675fa6fedd5669e5a421c735cd5e9456978e2a89"
+   }
   },
   {
    "rank": 1795,
@@ -2999,7 +3847,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "عَمَّٰتِكُمْ",
+    "loc": "24:61:37",
+    "url": "/belajar/media/narration/quran-com/wbw/024_061_037.mp3",
+    "ms": 2325,
+    "start": 0,
+    "end": 2325,
+    "sha256": "a2d0250a0e829f6afc0dbbc0e8dbae062d2b9a5bffb45912265a5770364a53e7"
+   }
   },
   {
    "rank": 1796,
@@ -3030,7 +3887,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "خَٰلَٰتِكُمْ",
+    "loc": "24:61:43",
+    "url": "/belajar/media/narration/quran-com/wbw/024_061_043.mp3",
+    "ms": 1620,
+    "start": 0,
+    "end": 1620,
+    "sha256": "442611be429edd62188624838cb0bbde6cdeac3da66447e68991f0f7fc1b808c"
+   }
   },
   {
    "rank": 1797,
@@ -3066,7 +3932,16 @@
      ]
     }
    ],
-   "review": "corrected"
+   "review": "corrected",
+   "voice": {
+    "form": "ٱلطَّوْلِ",
+    "loc": "9:86:12",
+    "url": "/belajar/media/narration/quran-com/wbw/009_086_012.mp3",
+    "ms": 1176,
+    "start": 25,
+    "end": 1176,
+    "sha256": "3617f9539bea4665598912b0d1e52054b0c2ee9e7fb60c58cfdf248a8ead6973"
+   }
   },
   {
    "rank": 1798,
@@ -3097,7 +3972,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "مُتَّخِذَ",
+    "loc": "18:51:11",
+    "url": "/belajar/media/narration/quran-com/wbw/018_051_011.mp3",
+    "ms": 1462,
+    "start": 36,
+    "end": 1462,
+    "sha256": "6a0011c0b19bfaa7b13af08068f328d081af6e6320db94c9e7abcccfc5c49f24"
+   }
   },
   {
    "rank": 1799,
@@ -3133,7 +4017,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "فَيَمِيلُونَ",
+    "loc": "4:102:36",
+    "url": "/belajar/media/narration/quran-com/wbw/004_102_036.mp3",
+    "ms": 1698,
+    "start": 25,
+    "end": 1698,
+    "sha256": "546745783b808b8c7fbaab7b2bc932b74020a614928b573098ed08edb078a78c"
+   }
   },
   {
    "rank": 1800,
@@ -3163,7 +4056,16 @@
      ]
     }
    ],
-   "review": "passed"
+   "review": "passed",
+   "voice": {
+    "form": "مُدْخَلَ",
+    "loc": "17:80:4",
+    "url": "/belajar/media/narration/quran-com/wbw/017_080_004.mp3",
+    "ms": 1253,
+    "start": 6,
+    "end": 1236,
+    "sha256": "cc89237e968a0a959188e3b8d2d6ff7f836a3ee4f7522264cfe35001d78081e3"
+   }
   }
  ]
 }

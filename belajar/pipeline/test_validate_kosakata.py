@@ -14,7 +14,9 @@ import copy
 import sys
 import unittest
 
+import host_media as H
 import kosakata as K
+import kosakata_voice as V
 from common import load_sources
 
 NO_CORPUS = "--no-corpus" in sys.argv
@@ -108,6 +110,18 @@ class PlantedFaults(unittest.TestCase):
         self.f["index.json"]["status"] = "reviewed"
         self.assertCaught("no review step")
 
+    def test_a_word_with_no_recording(self):
+        del self.word(3)["voice"]
+        self.assertCaught("differs from pipeline/kosakata_voice.json")
+
+    def test_a_recording_of_another_place(self):
+        self.word(3)["voice"]["loc"] = "1:1:1"
+        self.assertCaught("differs from pipeline/kosakata_voice.json")
+
+    def test_a_list_row_that_plays_another_place(self):
+        self.f["index.json"]["rows"][2]["v"] = "1:1:1 0 500"
+        self.assertCaught("the index plays another recording")
+
     def test_too_many_senses(self):
         lem = next(iter(self.a["lemmas"]))
         s = self.a["lemmas"][lem]["senses"][0]
@@ -149,6 +163,97 @@ class PlantedFaults(unittest.TestCase):
         self.f[name]["ayat"][0]["ar"] += "x"
         errs = K.corpus_problems(self.f, AUTHORED, SHA, corpus, segs, K.lexeme_ids())
         self.assertTrue(any("differs from a fresh build" in e for e in errs), errs[:3])
+
+
+class Pins(unittest.TestCase):
+    GOOD = {"loc": "2:30:2", "form": "قَالَ", "qc_text": "قَالَ", "sha256": "a" * 64, "bytes": 100, "ms": 900, "start": 30, "end": 700}
+
+    def caught(self, fragment, wanted=None, **change):
+        pin = {**self.GOOD, **change}
+        errs = V.pin_problems({"words": {"qaAla": pin}}, wanted)
+        self.assertTrue(any(fragment in e for e in errs), f"{fragment!r} not in {errs}")
+
+    def test_a_sound_pin_passes(self):
+        self.assertEqual(V.pin_problems({"words": {"qaAla": self.GOOD}}), [])
+
+    def test_the_real_pins_pass(self):
+        self.assertEqual(V.pin_problems(V.load_pins()), [])
+
+    def test_a_file_number_that_names_another_word(self):
+        self.caught("the file is another word", qc_text="يَقُولُ")
+
+    def test_a_word_longer_than_its_file(self):
+        self.caught("not a plausible word", end=5000)
+
+    def test_a_word_too_short_to_be_one(self):
+        self.caught("not a plausible word", start=690)
+
+    def test_a_malformed_checksum(self):
+        self.caught("sha256", sha256="abc")
+
+    def test_a_malformed_place(self):
+        self.caught("not a word's place", loc="2:30")
+
+    def test_a_pin_the_rule_would_not_choose(self):
+        self.caught("the rule chooses", {"qaAla": {"loc": "7:5:1", "form": "قَالَ", "final": False}})
+
+    def test_a_word_with_no_pin(self):
+        self.caught("no recording pinned", {"qaAla": {"loc": "2:30:2", "form": "قَالَ", "final": False}, "kaAna": {"loc": "2:75:6", "form": "كَانَ", "final": False}})
+
+    def test_a_pin_for_no_word(self):
+        self.caught("no such lemma", {})
+
+    def test_the_address_is_the_place(self):
+        self.assertEqual(V.url_of("2:30:2"), "/belajar/media/narration/quran-com/wbw/002_030_002.mp3")
+        self.assertEqual(V.upstream_of("114:6:3"), "https://audio.qurancdn.com/wbw/114_006_003.mp3")
+
+    def test_the_row_carries_the_word_files_place(self):
+        self.assertEqual(V.row_voice(self.GOOD), "2:30:2 30 700")
+        self.assertNotIn("final", V.word_voice(self.GOOD))
+        self.assertIs(V.word_voice({**self.GOOD, "final": True})["final"], True)
+
+    def test_a_first_letter_doubled_by_the_word_before(self):
+        self.assertTrue(V.assimilated("مُّبِينٌ"))
+        self.assertFalse(V.assimilated("مُبِينٌ"))
+        self.assertFalse(V.assimilated("رَبِّ"))
+        self.assertFalse(V.assimilated("ٱلَّذِى"))
+
+    def test_the_media_check_knows_every_word(self):
+        refs, bad = H.referenced()
+        self.assertEqual(bad, [])
+        for w in FILES[K.file_for_rank(1)]["words"]:
+            rel = w["voice"]["url"][len(H.NARRATION_PREFIX):]
+            self.assertIn(rel, refs, w["lemma"])
+            self.assertEqual(H.pin_of(rel, H.load_pins(), None)["sha256"], w["voice"]["sha256"], w["lemma"])
+
+
+@unittest.skipIf(NO_CORPUS, "needs pipeline/cache")
+class PlaceRule(unittest.TestCase):
+    """The faults found by reading the first choices: they must not come back."""
+
+    @classmethod
+    def setUpClass(cls):
+        corpus, segs = K.load_corpus_and_qac()
+        cls.places = V.places(segs, corpus.T, K.headword)
+
+    def test_every_word_has_a_place(self):
+        self.assertEqual(sorted(set(AUTHORED["lemmas"]) - set(self.places)), [])
+
+    def test_a_word_qac_groups_with_another_plays_itself(self):
+        self.assertEqual(V.skeleton(self.places["EaZiym"]["form"]), V.skeleton("عَظِيم"))
+
+    def test_an_active_verb_does_not_play_its_passive(self):
+        self.assertNotIn("أُوتِ", self.places["A^taY"]["form"])
+
+    def test_the_headword_beats_a_more_frequent_form(self):
+        self.assertEqual(V.skeleton(self.places["{l~a*iY"]["form"]), V.skeleton(K.headword("{l~a*iY")))
+
+    def test_inside_an_ayah_before_at_its_end(self):
+        self.assertFalse(self.places["qaAla"]["final"])
+
+    def test_no_ayah_that_tanzil_and_qac_count_differently(self):
+        for lem, p in self.places.items():
+            self.assertNotIn(":".join(p["loc"].split(":")[:2]), {"2:181", "8:6", "13:37", "37:130"}, lem)
 
 
 class Rules(unittest.TestCase):

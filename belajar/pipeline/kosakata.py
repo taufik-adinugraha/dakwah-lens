@@ -7,7 +7,8 @@ counts, root, headword and transliteration (QAC 0.4), word forms and ayah text (
 translation (QuranEnc). The meanings alone come from authored/kosakata_meanings.json, written with
 Claude outside this pipeline (authoring/kosakata_generate.py): each sense cites ayat where the word
 carries it, and a separate pass checked it. They are lighter than the lesson Kosakata in
-library.json, which cites a kitab by page; the pages say so.
+library.json, which cites a kitab by page; the pages say so. Each word's recording is pinned in
+kosakata_voice.json (kosakata_voice.py has the rule).
 
 The output is split because the container has 256 MB (deploy/belajar/docker-compose.yml) and a
 page needs one word at a time. The app reads these files per request and never bundles them:
@@ -26,6 +27,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import ayat as AY
+import kosakata_voice as V
 from common import (
     AUTHORED_DIR,
     CONTENT_DIR,
@@ -274,6 +276,7 @@ def expected_versions(src: dict, files: dict[str, dict], authored_sha: str) -> d
         "quranenc": f"indonesian_affairs {tr['version']} (last_update {tr['last_update_unix']})",
         "sura_names": f"QuranEnc Indonesian sura list, extracted text sha256:{n['text_sha256']}",
         "meanings": f"pipeline/authored/kosakata_meanings.json sha256:{authored_sha}",
+        "voice": f"pipeline/kosakata_voice.json sha256:{sha256_bytes(V.PINS.read_bytes())}",
         "entries": f"sha256:{entries_sha256(files)}",
         "pipeline": PIPELINE_LINE,
     }
@@ -284,6 +287,10 @@ def build(authored: dict, authored_sha: str, corpus: AY.Corpus, segs: list, lexe
     not an ayah where the lemma occurs, a QuranEnc row whose footnotes do not match."""
     table = lemma_table(segs, corpus.T)
     lemmas = authored["lemmas"]
+    pins = V.load_pins()["words"]
+    unvoiced = [e["lemma"] for e in table if e["lemma"] not in pins]
+    if unvoiced:
+        raise ValueError(f"no recording pinned for {unvoiced[:5]} ({len(unvoiced)} in all): run build_kosakata_voice.py --fetch")
     missing = [e["lemma"] for e in table if e["lemma"] not in lemmas]
     extra = sorted(set(lemmas) - {e["lemma"] for e in table})
     if missing or extra:
@@ -310,11 +317,13 @@ def build(authored: dict, authored_sha: str, corpus: AY.Corpus, segs: list, lexe
                 "en": "; ".join(s["en"] for s in a["senses"][:2]),
                 "cum": round(running * 10000 / total),
                 "s": fold(" ".join([e["ar"], e["translit"]] + [s[k] for s in a["senses"] for k in ("id", "en")])),
+                "v": V.row_voice(pins[e["lemma"]]),
             }
         )
         word = {k: v for k, v in e.items() if not k.startswith("_")}
         word["senses"] = a["senses"]
         word["review"] = a["review"]
+        word["voice"] = V.word_voice(pins[e["lemma"]])
         if e["lemma"] in lexemes:
             word["lexeme"] = lexemes[e["lemma"]]
         shards[file_for_rank(e["rank"])].append(word)
@@ -406,6 +415,8 @@ def problems(files: dict[str, dict], authored: dict, authored_sha: str, src: dic
     index = files.get("index.json")
     if not index:
         return out + ["index.json is missing; run build_kosakata.py"]
+    pins = V.load_pins()
+    out += V.pin_problems(pins)
     rows = index["rows"]
     lemmas = authored["lemmas"]
     if index.get("status") != "draft":
@@ -450,6 +461,14 @@ def problems(files: dict[str, dict], authored: dict, authored_sha: str, src: dic
             out.append(f"rank {w['rank']}: {w['translit']!r} cannot be read (vowels side by side or a tripled letter)")
         if not w.get("forms"):
             out.append(f"rank {w['rank']}: no word forms")
+        pin = pins["words"].get(w["lemma"])
+        if pin is None:
+            out.append(f"rank {w['rank']}: no recording pinned; run build_kosakata_voice.py --fetch")
+        else:
+            if w.get("voice") != V.word_voice(pin):
+                out.append(f"rank {w['rank']}: the recording differs from pipeline/kosakata_voice.json")
+            if r.get("v") != V.row_voice(pin):
+                out.append(f"rank {w['rank']}: the index plays another recording than the word file")
         for s in w["senses"]:
             cited.update(s["ayat"])
     for loc in sorted(cited - set(ayat)):

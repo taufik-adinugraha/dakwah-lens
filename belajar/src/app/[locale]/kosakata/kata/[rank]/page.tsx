@@ -3,12 +3,14 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { ClipButton, ClipPlayerProvider } from "@/components/library/ClipButton";
+import { ClipNote } from "@/components/library/ClipNote";
 import { MixedText } from "@/components/library/MixedText";
 import { AyahChip, AyahDialogProvider } from "@/components/surah/AyahDialog";
 import { Link } from "@/i18n/navigation";
 import { parseAyahLoc } from "@/lib/ayah";
 import { kosakataIndex, kosakataWord } from "@/lib/kosakata";
-import { pageOfRank, parseRank } from "@/lib/kosakata-core";
+import { pageOfRank, parseRank, placeOf, wordClip } from "@/lib/kosakata-core";
 import { kosakataHref, kosakataWordHref, lexemeHref } from "@/lib/routes";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata/kata/[rank]">): Promise<Metadata> {
@@ -19,9 +21,10 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata
 }
 
 /**
- * One word of the Qur'an vocabulary list: its meanings, each with the ayat that show it (the chips
- * open the same ayah popup as the fact cards: Arabic, translation, the imam's recitation), its
- * counts, root and forms. Rendered per request from one small file (lib/kosakata.ts). Lighter than
+ * One word of the Qur'an vocabulary list: its recording, its meanings, each with the ayat that show it
+ * (the chips open the same ayah popup as the fact cards: Arabic, translation, the imam's recitation),
+ * its counts, root and forms. A lemma has no recording of its own, so the recording of one real place
+ * is played and the page says which form that is and where (pipeline/kosakata_voice.py). Rendered per request from one small file (lib/kosakata.ts). Lighter than
  * the lesson Kosakata page, which cites a kitab by page: this page says so, and links to that page
  * when the word has one.
  */
@@ -39,6 +42,7 @@ export default async function KosakataWordPage({ params }: PageProps<"/[locale]/
   const surahNames = Object.fromEntries(
     [...new Set(cited.map((loc) => String(parseAyahLoc(loc)?.surah)))].map((s) => [s, names[s]]),
   );
+  const place = placeOf(word.voice.loc);
 
   return (
     <AyahDialogProvider names={surahNames}>
@@ -66,6 +70,26 @@ export default async function KosakataWordPage({ params }: PageProps<"/[locale]/
             <p className="mt-1 text-sm text-ink-soft">{t("lemma_caption")}</p>
           </div>
         </div>
+
+        <ClipPlayerProvider prefetch={[word.voice.url]}>
+          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-hairline bg-white p-4">
+            <ClipButton
+              loc={word.voice.loc}
+              clip={wordClip(word.voice)}
+              word={word.translit}
+              noteId={word.voice.final ? "kosakata-voice-note" : undefined}
+            />
+            <p className="min-w-0 text-sm text-ink-muted">
+              {t("heard")}{" "}
+              <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-ink">
+                {word.voice.form}
+              </bdi>
+              <br />
+              {t("heard_place", { surah: names[place.surah], ayah: place.ayah, word: place.word })}
+            </p>
+            {word.voice.final ? <ClipNote id="kosakata-voice-note" kind="waqf" text={t("heard_final")} className="w-full" /> : null}
+          </div>
+        </ClipPlayerProvider>
 
         <section className="mt-6" aria-labelledby="meanings">
           <h2 id="meanings" className="text-lg font-semibold text-ink">
