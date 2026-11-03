@@ -392,7 +392,20 @@ async function frequencyList() {
   }
   if (/href="[^"]*\/en\/kosakata"/.test((await get("/belajar/en")).html)) fail("/belajar/en", "the English hub links to the hidden list");
   if ((await get("/belajar/en/kosakata/rahim")).status !== 200) fail("/belajar/en/kosakata/rahim", "a lesson word's English entry must stay");
-  console.log("kosakata list: pages, search, a word, its play buttons and the ayah popup answer");
+  // The learning path answers at its address, and the list does not link to it until it is listed.
+  for (const path of ["/belajar/id/kosakata/bertahap", "/belajar/id/kosakata/bertahap/0/1", "/belajar/id/kosakata/bertahap/1/1", "/belajar/id/kosakata/bertahap/1/1/tes", "/belajar/id/kosakata/bertahap/5/tes"]) {
+    const page = await get(path);
+    if (page.status !== 200) fail(path, `status ${page.status}, expected 200`);
+  }
+  for (const path of ["/belajar/id/kosakata/bertahap/9/1", "/belajar/id/kosakata/bertahap/1/99", "/belajar/id/kosakata/bertahap/1/99/tes", "/belajar/id/kosakata/bertahap/x/tes", "/belajar/en/kosakata/bertahap"]) {
+    if ((await get(path)).status !== 404) fail(path, "expected 404");
+  }
+  if (list.html.includes("data-kosakata-tabs")) fail("/kosakata", "the list links to the learning path before it is listed");
+  const count = (body) => fetch(`${BASE}/belajar/api/kosakata/hasil`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  if ((await count({ test: "1-3", passed: true })).status !== 204) fail("/api/kosakata/hasil", "a finished test is not counted");
+  if ((await count({ test: "9-9", passed: true })).status !== 400) fail("/api/kosakata/hasil", "a test that does not exist must be refused");
+  if ((await count({ test: "1-3" })).status !== 400) fail("/api/kosakata/hasil", "a malformed count must be refused");
+  console.log("kosakata list: pages, search, a word, its play buttons and the ayah popup answer; the path answers at its address");
 }
 
 async function checkHidden() {

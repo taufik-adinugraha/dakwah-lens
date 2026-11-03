@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { KosakataAyatFile, KosakataIndex, KosakataWordsFile } from "@/content/kosakata-schema";
+import { KosakataAyatFile, KosakataIndex, KosakataPath, KosakataWordsFile } from "@/content/kosakata-schema";
 
 import { parseAyahLoc } from "./ayah";
 import {
@@ -36,6 +36,7 @@ describe("the data files", () => {
   it("match their schemas, and the file names the app computes exist", () => {
     for (const name of files.filter((f) => f.startsWith("words-"))) KosakataWordsFile.parse(read(name));
     for (const name of files.filter((f) => f.startsWith("ayat-"))) KosakataAyatFile.parse(read(name));
+    KosakataPath.parse(read("path.json"));
     for (const rank of [1, 100, 101, total]) expect(files).toContain(wordsFileName(rank));
   });
 

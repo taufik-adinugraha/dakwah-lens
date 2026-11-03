@@ -46,6 +46,16 @@ export function kosakataEnglishOn(): boolean {
 }
 
 /**
+ * BELAJAR_KOSAKATA_BERTAHAP — whether the Kosakata list links to its learning path (operator,
+ * 2026-11-03; docs/belajar-plan.md L38). The pages answer at /kosakata/bertahap either way, so the
+ * operator can try them on the live site; `=on` adds the tabs on the list, with no rebuild, the same way
+ * as BELAJAR_WARIS above.
+ */
+export function kosakataPathListed(): boolean {
+  return process.env.BELAJAR_KOSAKATA_BERTAHAP === "on";
+}
+
+/**
  * BELAJAR_SURAHS — the surahs of the Qur'an track visitors can reach (operator, 2026-10-10:
  * "let's focus on alfatihah first, show cards for other surah as 'segera hadir', but not
  * clickable"; docs/belajar-plan.md L14). A comma-separated list of lesson slugs

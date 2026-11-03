@@ -1246,6 +1246,197 @@ async function kosakataVoiceChecks(page, vp) {
 }
 
 /**
+ * The Kosakata learning path (operator 2026-11-03), walked in a real browser as a learner walks it: what
+ * is locked, a locked address, a batch's cards, a test passed, a test failed and retried, a level tested
+ * out of, the anonymous count, and clearing the progress. The recordings are silent stand-ins of the
+ * same length (narrationRoute), so this shows the right file is asked for, not how it sounds.
+ */
+async function kosakataPathChecks(page, vp) {
+  const read = async (name) => JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "kosakata", name), "utf8"));
+  const pathFile = await read("path.json");
+  const { words } = await read("words-001.json");
+  const fail = (m) => {
+    throw new Error(`${vp} kosakata path: ${m}`);
+  };
+  const index = new Map();
+  for (const p of Object.values(pathFile.parts)) for (const e of p.examples) index.set(e.voice.url, e.voice.ms);
+  for (const w of words) index.set(w.voice.url, w.voice.ms);
+  const served = [];
+  const handler = narrationRoute(index, served, { failMediaFetch: true });
+  const counted = [];
+  const onRequest = (req) => {
+    if (req.url().includes("/belajar/api/kosakata/hasil")) counted.push(req.postDataBuffer()?.toString("utf8") ?? "");
+  };
+  const MAP = `${BASE}/belajar/id/kosakata/bertahap`;
+  const go = async (url) => {
+    await page.goto(url, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+  };
+  const sideways = async (where) => {
+    const wide = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    if (wide > 0) fail(`${where} scrolls sideways by ${wide}px`);
+  };
+  const tile = async (id) => page.locator(`[data-path-tile="${id}"]`).getAttribute("data-state");
+  const expectTile = async (id, state) => {
+    await page.waitForSelector(`[data-path-tile="${id}"][data-state="${state}"]`, { state: "attached", timeout: 8000 }).catch(async () => fail(`batch ${id} is ${await tile(id)}, expected ${state}`));
+  };
+  // Answers every question of the test on screen: right, or wrong, or by a function of the question's number.
+  const answerAll = async (rightOrNot) => {
+    let n = 0;
+    for (;;) {
+      await page.waitForSelector("[data-path-question], [data-path-result]", { timeout: 8000 });
+      if ((await page.locator("[data-path-result]").count()) > 0) return n;
+      const key = await page.locator("[data-path-question]").getAttribute("data-path-question");
+      const options = page.locator("[data-path-option]");
+      if ((await options.count()) !== 4) fail(`question ${n + 1} (${key}) has ${await options.count()} options`);
+      const right = typeof rightOrNot === "function" ? rightOrNot(n) : rightOrNot;
+      if (right) await page.locator(`[data-path-option="${key}"]`).click();
+      else await page.locator(`[data-path-option]:not([data-path-option="${key}"])`).first().click();
+      await page.waitForSelector(`[data-path-feedback="${right ? "right" : "wrong"}"]`, { timeout: 8000 });
+      if (n === 0) await page.screenshot({ path: `shots/${vp}-kosakata-path-feedback-${right ? "right" : "wrong"}.png`, fullPage: true });
+      await sideways(`question ${n + 1}`);
+      await page.locator("[data-path-next-q]").click();
+      // Polled from here: the CSP refuses the eval of waitForFunction.
+      for (let tries = 0; tries < 160; tries++) {
+        const moved = await page.evaluate((prev) => {
+          const q = document.querySelector("[data-path-question]");
+          return !!document.querySelector("[data-path-result]") || (q !== null && q.getAttribute("data-path-question") !== prev);
+        }, key);
+        if (moved) break;
+        if (tries === 159) fail(`question ${n + 1} (${key}) did not move on`);
+        await page.waitForTimeout(50);
+      }
+      n += 1;
+    }
+  };
+  await page.route(isNarration, handler);
+  page.on("request", onRequest);
+  try {
+    await go(MAP);
+    await page.evaluate(() => localStorage.removeItem("belajar:v1:kosakata-bertahap"));
+    await go(MAP);
+
+    // What is locked, and what a locked address says.
+    await expectTile("0-1", "open");
+    await expectTile("0-2", "locked");
+    await expectTile("1-1", "locked");
+    if ((await page.locator('[data-path-continue="0-1"]').count()) !== 1) fail("the map does not lead to the first batch");
+    const widths = await page.locator("[data-path-band] > span").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().width));
+    if (widths.length !== 5 || !(widths[0] > widths[1] && widths[1] > widths[2])) fail(`the band's levels are ${widths.join(", ")}px wide: not to scale`);
+    await sideways("the map");
+    await page.screenshot({ path: `shots/${vp}-kosakata-path-map.png`, fullPage: true });
+    await go(`${MAP}/1/1`);
+    await page.waitForSelector("[data-path-locked]", { timeout: 8000 });
+
+    // A batch of Level 0: a part with its word marked, card by card, then its test.
+    await go(`${MAP}/0/1`);
+    await page.waitForSelector('[data-path-card="p-wa"]', { timeout: 8000 });
+    if ((await page.locator("[data-path-part-word] .text-forest").count()) !== 1) fail("a part's card does not mark the part in its word");
+    await sideways("a part's card");
+    await page.screenshot({ path: `shots/${vp}-kosakata-path-part.png`, fullPage: true });
+    const cards = pathFile.levels[0].batches[0].length;
+    for (let i = 1; i < cards; i++) await page.locator("[data-path-next]").click();
+    await page.locator("[data-path-start-test]").click();
+    await page.waitForSelector("[data-path-begin]", { timeout: 8000 });
+    await page.locator("[data-path-begin]").click();
+    const asked = await answerAll(true);
+    if (asked !== cards) fail(`the test of ${cards} new parts asked ${asked} questions`);
+    await page.waitForSelector('[data-path-result="passed"]', { timeout: 8000 });
+    await page.screenshot({ path: `shots/${vp}-kosakata-path-passed.png`, fullPage: true });
+    if ((await page.locator('[data-path-go-next="0-2"]').count()) !== 1) fail("a passed test does not lead to the next batch");
+
+    // Failing keeps the next batch closed, says what to go over, and a retake can pass.
+    await go(MAP);
+    await expectTile("0-1", "passed");
+    await expectTile("0-2", "open");
+    await go(`${MAP}/0/2/tes`);
+    await page.waitForSelector("[data-path-begin]", { timeout: 8000 });
+    await page.locator("[data-path-begin]").click();
+    await answerAll(false);
+    await page.waitForSelector('[data-path-result="failed"]', { timeout: 8000 });
+    await page.screenshot({ path: `shots/${vp}-kosakata-path-failed.png`, fullPage: true });
+    if ((await page.locator("[data-path-missed]").count()) < 1) fail("a failed test does not say what to go over");
+    await page.locator("[data-path-retry]").click();
+    await answerAll(true);
+    await page.waitForSelector('[data-path-result="passed"]', { timeout: 8000 });
+
+    // A word's card: the Arabic, a recording, the ayah as Tanzil has it with the word marked.
+    await go(`${MAP}/1/1`);
+    const first = words[0];
+    await page.waitForSelector(`[data-path-card="w${first.rank}"]`, { timeout: 8000 });
+    const ayat = (await read(`ayat-${first.example.loc.split(":")[0].padStart(3, "0")}.json`)).ayat;
+    const shown = (await page.locator(`[data-path-ayah="${first.example.loc}"]`).innerText()).replace(/\s+/g, " ").trim();
+    const want = ayat.find((a) => a.loc === first.example.loc).ar.replace(/\s+/g, " ").trim();
+    if (shown !== want) fail(`the card's ayah is not Tanzil's text: ${JSON.stringify(shown)}`);
+    if ((await page.locator("[data-path-mark]").count()) !== first.example.hi.length) fail("the card's ayah does not mark the word");
+    if (!(await page.locator("main").innerText()).includes(first.senses[0].id)) fail("the card does not show the word's meaning");
+    await sideways("a word's card");
+    await page.screenshot({ path: `shots/${vp}-kosakata-path-word.png`, fullPage: true });
+
+    // A word's test, passed: a right answer plays that word's recording; the word Allah is never asked.
+    await go(`${MAP}/1/1/tes`);
+    await page.locator("[data-path-begin]").click();
+    await page.waitForSelector("[data-path-question]", { timeout: 8000 });
+    await page.screenshot({ path: `shots/${vp}-kosakata-path-question.png`, fullPage: true });
+    const firstKey = await page.locator("[data-path-question]").getAttribute("data-path-question");
+    await page.locator(`[data-path-option="${firstKey}"]`).click();
+    await page.waitForSelector('[data-path-feedback="right"]', { timeout: 8000 });
+    const rank = Number(firstKey.slice(1));
+    const url = words.find((w) => w.rank === rank).voice.url;
+    await page.waitForTimeout(300);
+    if (!served.some((l) => l.startsWith(url))) fail(`a right answer did not ask for ${url}`);
+    await page.locator("[data-path-next-q]").click();
+    await answerAll(true);
+    await page.waitForSelector('[data-path-result="passed"]', { timeout: 8000 });
+    await go(`${MAP}/1/1/tes`);
+    await page.locator("[data-path-begin]").click();
+    const keys = new Set();
+    for (let i = 0; i < 20; i++) {
+      const q = page.locator("[data-path-question]");
+      if ((await q.count()) === 0) break;
+      keys.add(await q.getAttribute("data-path-question"));
+      const k = await q.getAttribute("data-path-question");
+      await page.locator(`[data-path-option="${k}"]`).click();
+      await page.locator("[data-path-next-q]").click();
+      await page.waitForTimeout(80);
+    }
+    for (const r of pathFile.no_test) if (keys.has(`w${r}`)) fail(`word ${r} gets a card and no question, yet it was asked`);
+
+    // Testing out: a level's test, open at any time, opens the whole level and the next level's first batch.
+    await go(`${MAP}/2/tes`);
+    await page.locator("[data-path-begin]").click();
+    const taken = await answerAll(true);
+    if (taken !== pathFile.level_test_questions) fail(`the level test asked ${taken} questions, not ${pathFile.level_test_questions}`);
+    await go(MAP);
+    await page.locator('[data-path-level="2"] > summary').click().catch(() => {});
+    await expectTile("2-1", "passed");
+    await expectTile("2-20", "passed");
+    await expectTile("3-1", "open");
+    const covered = await page.locator("[data-path-covered]").getAttribute("data-path-covered");
+    if (!(Number(covered) > 0)) fail("the map does not say how much the passed batches cover");
+    await page.screenshot({ path: `shots/${vp}-kosakata-path-map-progress.png`, fullPage: true });
+
+    // The count: a test's id and whether it passed, and nothing else.
+    await page.waitForTimeout(200);
+    const bodies = counted.map((b) => JSON.parse(b));
+    if (!bodies.some((b) => b.test === "0-1" && b.passed === true)) fail(`no count of the passed test: ${JSON.stringify(counted)}`);
+    if (!bodies.some((b) => b.test === "0-2" && b.passed === false)) fail(`no count of the failed test: ${JSON.stringify(counted)}`);
+    if (!bodies.some((b) => b.test === "2-tes" && b.passed === true)) fail(`no count of the level test: ${JSON.stringify(counted)}`);
+    for (const b of bodies) if (Object.keys(b).sort().join() !== "passed,test") fail(`a count says more than it should: ${JSON.stringify(b)}`);
+
+    // Clearing takes two clicks, and then everything is locked again.
+    await page.locator("[data-path-reset]").click();
+    await expectTile("3-1", "open");
+    await page.locator("[data-path-reset]").click();
+    await expectTile("0-2", "locked");
+    console.log(`${vp} kosakata path: locks, cards, tests passed, failed and retried, a level tested out of, the counts and clearing all behave`);
+  } finally {
+    page.off("request", onRequest);
+    await page.unroute(isNarration, handler);
+  }
+}
+
+/**
  * The Konsep pages show grammar terms in Arabic script, measured in the real browser (operator
  * 2026-10-10: "mention the arabic word like majrur in arabic letter"; narration rule 15: a
  * transliteration and its Arabic never split across lines). On the index and on three concept
@@ -4443,6 +4634,7 @@ try {
     await konsepChecks(page, vp);
     await clipChecks(page, vp, narration);
     await kosakataVoiceChecks(page, vp);
+    await kosakataPathChecks(page, vp);
     await menuShots(page, vp);
     await headerShots(page, vp);
     await footerCheck(page, vp);

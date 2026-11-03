@@ -36,6 +36,13 @@
     "start": 0,
     "end": 987,
     "sha256": "8c75189f981c0fd6dfce3e2f6c6aef9bbe4008265a0b78faacf6228635821240"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "89:21",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -73,6 +80,13 @@
     "start": 39,
     "end": 1280,
     "sha256": "c0c7ac6a7597e0a8f8bca8f638cb9f2599ec6dfc9f176baadb5df178d7c783db"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "69:21",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -111,6 +125,13 @@
     "end": 1358,
     "sha256": "69939930e6949545dbf7edbea112cb08558f569dce1ab75e50024e519e203422",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "69:22",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -148,6 +169,13 @@
     "start": 99,
     "end": 1515,
     "sha256": "f0e6b14733555b2007bb198b9d198bdc3eeeb6b7754be025fa1a5277bb51e80f"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "69:23",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -185,6 +213,13 @@
     "start": 128,
     "end": 1306,
     "sha256": "3bd822f753673e46ab88b3776bb63197991a6df4d9138ca9fa220472ad4a903f"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "69:34",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -222,6 +257,13 @@
     "start": 115,
     "end": 1280,
     "sha256": "a71b085c6f15c1f0150c7e1c2db7417a9e1e7b418e40a6236586b250abbeb9e6"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "70:9",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -261,6 +303,13 @@
     "end": 1358,
     "sha256": "76391cb944b35bb073dcba1d110cf40578ab54197520221b33252f32c58b5d69",
     "final": true
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "84:23",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -299,6 +348,13 @@
     "end": 1437,
     "sha256": "015748c8c9b3abcc222f974d613684431ceaee14041717bcabaa54067d21ab4a",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "72:13",
+    "hi": [
+     13
+    ]
    }
   },
   {
@@ -344,6 +400,13 @@
     "end": 1384,
     "sha256": "8493a3062b1a12074a54255836f26b71824c3b267411930e9ef603b83611a504",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "72:9",
+    "hi": [
+     12
+    ]
    }
   },
   {
@@ -381,6 +444,13 @@
     "start": 0,
     "end": 2194,
     "sha256": "8d154578517d2fe25c14342f2630dc364a78be5094540327bea710d3c50f6dab"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "72:15",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -420,6 +490,13 @@
     "end": 1176,
     "sha256": "30a9a7f7efabf373d5cac136aac6408ab04c302caae70a9fe12737e4f61d6486",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "111:4",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -463,6 +540,13 @@
     "start": 0,
     "end": 1149,
     "sha256": "be4e6c7c29e4befa197e49748c3a8a55449b9f27fccafd287719843bec83c7b7"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "73:7",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -501,6 +585,13 @@
     "end": 1332,
     "sha256": "a9301c27ab805b9f17aabee1daabc5231018daa3bf27950ae5f49d493b7f44bc",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "73:7",
+    "hi": [
+     5
+    ]
    }
   },
   {
@@ -539,6 +630,13 @@
     "start": 49,
     "end": 1332,
     "sha256": "f5f894290c8477b035349080dd6c869ba6d784b7c53c8a13e2a86ea482d1c78d"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "86:17",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -576,6 +674,13 @@
     "start": 0,
     "end": 1306,
     "sha256": "ad95e35d0ef3c8e7220d6dc7307c80a33be5637bbe7a7c282a80a8366bca1f55"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "79:6",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -612,6 +717,14 @@
     "start": 0,
     "end": 1280,
     "sha256": "aa73a4e2286062f8ca22aab83775ab77ca6468a2765e1699235f7746aeb4be92"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "73:20",
+    "hi": [
+     27,
+     50
+    ]
    }
   },
   {
@@ -649,6 +762,13 @@
     "start": 0,
     "end": 1176,
     "sha256": "ff64383a95c4a2fc5d3017dc9a9506b1db6e3d2c769841dab7b5652900d99806"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "80:1",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -687,6 +807,13 @@
     "start": 10,
     "end": 1724,
     "sha256": "eb7bb09b2589b03399d52338781f911a67d169744abfe34ab7d111174d739593"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "83:24",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -732,6 +859,13 @@
     "end": 914,
     "sha256": "cbbc662b6dc93024896e662984c37b60fa17cc80a88734b9e7101f6fbfc1052c",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "76:15",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -771,6 +905,13 @@
     "end": 1672,
     "sha256": "edabb6bd5819f8749587006364d3a2d370656f0cc8812d459a45cb8f2eeabf55",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "89:14",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -816,6 +957,13 @@
     "end": 1593,
     "sha256": "5c8cd4eac0854f2a56870199ba12d98100434d42f60f1995dcf56becc176016c",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "78:35",
+    "hi": [
+     5
+    ]
    }
   },
   {
@@ -855,6 +1003,13 @@
     "end": 1332,
     "sha256": "890d682c66c8786161db8b9bac6c3ba532c417aa22779b274824542b440e0f5e",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "87:4",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -894,6 +1049,13 @@
     "start": 0,
     "end": 967,
     "sha256": "16c2acd7c73bae7448a2d6a18d9cff7213e1565decb4b9f2bc14329c2195b4c2"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "82:4",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -933,6 +1095,13 @@
     "end": 1802,
     "sha256": "cae2390ad6d35c20c7204a4b92419ccfdd0042feb96bc1c8ea0dfe9ae25633d9",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "83:8",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -971,6 +1140,13 @@
     "end": 1620,
     "sha256": "bcdff2413938d54f79db96196856c33b1a89fb944ae37a1ce4703d87ee5f3e5b",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "83:9",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -1010,6 +1186,13 @@
     "end": 2560,
     "sha256": "ad173d66b16bdade518b0068e78708fcfa5919f44d3988dbbc0141c2ddab4347",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "83:19",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -1048,6 +1231,13 @@
     "end": 1489,
     "sha256": "20741cb1218592f777fb2b3dbcd9fdd1034863881b817ff8ae08ea02936f1910",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "84:9",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -1087,6 +1277,13 @@
     "end": 1463,
     "sha256": "f8e759e184042c81ef9b68aefacdcbb91f31dcaf34ad82f24486a551626b9953",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "86:1",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -1125,6 +1322,13 @@
     "end": 1515,
     "sha256": "a7813a657df318c606cf578fbf26ee92087cad37786a2ef21f183868bffe4e64",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "87:8",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -1164,6 +1368,13 @@
     "end": 1097,
     "sha256": "45e5bfe13da607062328042d19d770497e5bfb89de9f8bdde10b3dea3cf694e5",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "101:11",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -1209,6 +1420,13 @@
     "end": 1071,
     "sha256": "08fb011452dced55f8b52790be5857cd349c1f00e80fa1a6c4ed87e62ca5fef8",
     "final": true
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "88:19",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -1248,6 +1466,13 @@
     "end": 1358,
     "sha256": "dc9de8997a18f2f76b1df7803b61bbbb360e3799789f6b82a62328be02b11557",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "90:11",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1287,6 +1512,13 @@
     "end": 1202,
     "sha256": "690fd963e2ab11a6fb0de075643300df3f94cf7abcb1a77edeac628d6614a65d",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "90:20",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1326,6 +1558,13 @@
     "end": 1149,
     "sha256": "e1b4a8796e46178223227c69cad4585d2568bd0f80a18c095bf02c7daf2f41fc",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "98:3",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -1364,6 +1603,13 @@
     "end": 1280,
     "sha256": "3eb908c02299edf6e5ded8cfae01bc2db7c439a48742f9b9a006f9e5ceb81eb4",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "98:7",
+    "hi": [
+     8
+    ]
    }
   },
   {
@@ -1403,6 +1649,13 @@
     "end": 1358,
     "sha256": "720706187a5795e6e2ba5a5aa4f7de4e9c2663d0c53410234d92aeb2dd25c5e3",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "104:5",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -1441,6 +1694,13 @@
     "start": 67,
     "end": 1672,
     "sha256": "b4f7237df8bd8b3e6abb9257cc9f46eba8f82f7b346b9fd7f138913786bb71bb"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "106:1",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -1478,6 +1738,14 @@
     "start": 0,
     "end": 1176,
     "sha256": "d333b6f74fae009a1534cf376eaadcfbb168fdf40affdd8a911330d21bc506c9"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "111:1",
+    "hi": [
+     0,
+     4
+    ]
    }
   },
   {
@@ -1515,6 +1783,13 @@
     "end": 2135,
     "sha256": "7cedf2ae2b89138d7054fe789ba99a6b27cdc09ed687d614fb32f09d16f9ec15"
    },
+   "kind": "noun",
+   "example": {
+    "loc": "1:7",
+    "hi": [
+     5
+    ]
+   },
    "lexeme": "maghdub"
   },
   {
@@ -1551,6 +1826,13 @@
     "start": 412,
     "end": 1563,
     "sha256": "b9aa213ed8362bde615764fdd74185655ee0e1c21af82ee609e56c128b484e5a"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:16",
+    "hi": [
+     6
+    ]
    }
   },
   {
@@ -1587,6 +1869,13 @@
     "start": 341,
     "end": 1785,
     "sha256": "d936f1fd936b9223ff31b110240cb2c55980a9c5c0c0b060034b55a4758620ac"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:17",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -1623,6 +1912,13 @@
     "start": 361,
     "end": 1749,
     "sha256": "ed854d412cda0744c85d28e8bac158ddc0abb19b8cd20009e5650f7cc8115c04"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:19",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -1659,6 +1955,13 @@
     "start": 359,
     "end": 1514,
     "sha256": "423ca02cc91fadaf6d4bf58ede4f6a533bf577c64c51951addde6eef762feee5"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:20",
+    "hi": [
+     10
+    ]
    }
   },
   {
@@ -1695,6 +1998,13 @@
     "start": 346,
     "end": 1785,
     "sha256": "62bdc32b3eec88bef0587a4e8ff980649694aa6c3901b6afbdcc6517bc75f78c"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:25",
+    "hi": [
+     16
+    ]
    }
   },
   {
@@ -1731,6 +2041,13 @@
     "start": 299,
     "end": 1744,
     "sha256": "e2bfb2d6141d67099ce7cee8e4b4cbe98b28e2dc4f2dedc646ac648f5746d130"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:26",
+    "hi": [
+     8
+    ]
    }
   },
   {
@@ -1767,6 +2084,13 @@
     "start": 314,
     "end": 1841,
     "sha256": "5fe5c72589208ce0cb79f6120968a8e4a86e496706460d10102909b550ca3bbe"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:30",
+    "hi": [
+     20
+    ]
    }
   },
   {
@@ -1803,6 +2127,13 @@
     "start": 25,
     "end": 1801,
     "sha256": "edfae3687e58db5445f1ef25342e7c0f1a2068393ac460cc627a7709fb8a1654"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:36",
+    "hi": [
+     0
+    ]
    }
   },
   {
@@ -1839,6 +2170,13 @@
     "start": 113,
     "end": 2233,
     "sha256": "35c3e54ab7d44e585d2d8e1c5efe8c82743b37a19bb6fa912a98d6281598e999"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:54",
+    "hi": [
+     8
+    ]
    }
   },
   {
@@ -1875,6 +2213,13 @@
     "start": 0,
     "end": 1904,
     "sha256": "8411987317e509c54a7c9efab882e48a88492ef3e175916d89ae3a1d9cdc4d34"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:60",
+    "hi": [
+     8
+    ]
    }
   },
   {
@@ -1911,6 +2256,13 @@
     "start": 79,
     "end": 1525,
     "sha256": "9852600de464d963205502a8964685b98a5ef57e88e469d5eb1264a33681ac69"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:61",
+    "hi": [
+     17
+    ]
    }
   },
   {
@@ -1947,6 +2299,13 @@
     "start": 83,
     "end": 3574,
     "sha256": "4f6ba7a4918d273a04ed4da5b38f924ef1d3c05fbd95527aa4680326491f7bf3"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:61",
+    "hi": [
+     18
+    ]
    }
   },
   {
@@ -1983,6 +2342,13 @@
     "start": 85,
     "end": 1600,
     "sha256": "5dca6e6f1b7ddc9e6b68bb44f89a510496c1a908171ab26b1a01739090e0f208"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:61",
+    "hi": [
+     19
+    ]
    }
   },
   {
@@ -2019,6 +2385,13 @@
     "start": 172,
     "end": 1929,
     "sha256": "5d2ecd25f90808da3d05a6f4e0283c67040584f960606d96217c1be6225d53b6"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:61",
+    "hi": [
+     20
+    ]
    }
   },
   {
@@ -2055,6 +2428,13 @@
     "start": 0,
     "end": 1749,
     "sha256": "d6afbea326160faa553c5203b0cc9f94af26cff5b108fc510a14922b0dc8d15c"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:61",
+    "hi": [
+     21
+    ]
    }
   },
   {
@@ -2091,6 +2471,13 @@
     "start": 191,
     "end": 1514,
     "sha256": "c360572272080cdabb09c64b861dba97366f32476680615f1392cc655cb84c46"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:68",
+    "hi": [
+     14
+    ]
    }
   },
   {
@@ -2127,6 +2514,13 @@
     "start": 192,
     "end": 1422,
     "sha256": "cc393f53939f12f14885b9b204bac15dc52212933625351df9f76d4a2b3f6fc3"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:68",
+    "hi": [
+     17
+    ]
    }
   },
   {
@@ -2163,6 +2557,13 @@
     "start": 0,
     "end": 2827,
     "sha256": "425bb90f4a8a49adbe36e2c50e510c5cf7e144ecf43e32af72aa3c5e49b2c1f7"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:69",
+    "hi": [
+     13
+    ]
    }
   },
   {
@@ -2199,6 +2600,13 @@
     "start": 29,
     "end": 1196,
     "sha256": "b15b706210629e03942eed8b125b5de7f4a0e177813079ed1d021170649f2c9b"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:69",
+    "hi": [
+     14
+    ]
    }
   },
   {
@@ -2235,6 +2643,13 @@
     "start": 0,
     "end": 1246,
     "sha256": "157db6f5ef85dcf93603bcd8a824b182fab9cbbe909f33c3892070e3e56d951f"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:69",
+    "hi": [
+     16
+    ]
    }
   },
   {
@@ -2271,6 +2686,13 @@
     "start": 0,
     "end": 1044,
     "sha256": "ffe0c39e0382edbbe84961c0d09ad00801c48416474f7e58e972b76ff1cfbc4c"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:71",
+    "hi": [
+     14
+    ]
    }
   },
   {
@@ -2307,6 +2729,13 @@
     "start": 9,
     "end": 2056,
     "sha256": "3ec4fb07bd691296be585abefe9cd110e61e93cc559555b3e7da25c956a2c327"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:72",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -2343,6 +2772,13 @@
     "start": 41,
     "end": 1473,
     "sha256": "2937fe4b62dc9b8edc969921d80c0958d2dc07c4fd966827817ae016016f6dc4"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:74",
+    "hi": [
+     10
+    ]
    }
   },
   {
@@ -2379,6 +2815,13 @@
     "start": 76,
     "end": 1692,
     "sha256": "094ff379ee72e571492e9b1a344536e4dec615a1eaebde64ab6f0703e401cff9"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:74",
+    "hi": [
+     15
+    ]
    }
   },
   {
@@ -2415,6 +2858,13 @@
     "start": 109,
     "end": 1774,
     "sha256": "23e66ff1e7d9fb376807b5f07d5bf988f99baad9a2b3ee688cee5db0faaa6b5c"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:85",
+    "hi": [
+     17
+    ]
    }
   },
   {
@@ -2451,6 +2901,13 @@
     "start": 61,
     "end": 1566,
     "sha256": "5b1b3ffd4f0a0d60144bc93115ce28a92db6a5fcfc33c69d524d1e978f933d35"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:93",
+    "hi": [
+     14
+    ]
    }
   },
   {
@@ -2487,6 +2944,13 @@
     "start": 112,
     "end": 1161,
     "sha256": "207bf28ce5575a80b6b2bbf8cf204751c8f1bcaa6475deb821da6ac5add15918"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:96",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -2524,6 +2988,13 @@
     "start": 78,
     "end": 2319,
     "sha256": "364636764bc71ff7846ee49dbb872e5def2eedab801cfbb565f54e002084509f"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:96",
+    "hi": [
+     16
+    ]
    }
   },
   {
@@ -2556,6 +3027,13 @@
     "start": 82,
     "end": 1502,
     "sha256": "a017fcbdb7c54ee7860cfa0d834c78f4e2a43a91e0069dc7958f9d5142b7363e"
+   },
+   "kind": "name",
+   "example": {
+    "loc": "2:98",
+    "hi": [
+     7
+    ]
    }
   },
   {
@@ -2588,6 +3066,13 @@
     "start": 0,
     "end": 1280,
     "sha256": "ca58ab2870b87d01a2f449b94211e8e0566718ade30ab20bfffc6e3cbfdc3902"
+   },
+   "kind": "name",
+   "example": {
+    "loc": "2:102",
+    "hi": [
+     20
+    ]
    }
   },
   {
@@ -2620,6 +3105,13 @@
     "start": 0,
     "end": 1411,
     "sha256": "1d036249cbf30fe9aee14ecda972b1d0672b6de46c462b625f8f524cad28e614"
+   },
+   "kind": "name",
+   "example": {
+    "loc": "2:102",
+    "hi": [
+     21
+    ]
    }
   },
   {
@@ -2652,6 +3144,13 @@
     "start": 0,
     "end": 1411,
     "sha256": "dd3120a891ef5eb7b85f04202c058260d7f5dc1f71b368c32556fbd7141e06ae"
+   },
+   "kind": "name",
+   "example": {
+    "loc": "2:102",
+    "hi": [
+     22
+    ]
    }
   },
   {
@@ -2688,6 +3187,13 @@
     "start": 119,
     "end": 1191,
     "sha256": "ee9996fa2833b00ec59a7636525cbaf2428e97f5b3c9c72dd04d5aacaa79f1c3"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:109",
+    "hi": [
+     11
+    ]
    }
   },
   {
@@ -2724,6 +3230,13 @@
     "start": 80,
     "end": 1459,
     "sha256": "d70d944db1be4166c78e2152d9d6ea38542ea65653208c63f4033f42ee2e2a7e"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:114",
+    "hi": [
+     12
+    ]
    }
   },
   {
@@ -2760,6 +3273,13 @@
     "start": 44,
     "end": 1693,
     "sha256": "3a218e52f83db001d97a78142d2061cee9443c4367b2259c9758dbab062a9070"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:121",
+    "hi": [
+     5
+    ]
    }
   },
   {
@@ -2796,6 +3316,13 @@
     "start": 14,
     "end": 1394,
     "sha256": "528c4c64963ce63e5ff7701fe00d9f3208fae06a8859e0e10cffa1cb52ba3698"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:125",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -2832,6 +3359,13 @@
     "start": 35,
     "end": 1305,
     "sha256": "a999537af49b8dfcc609d58026bfee1b6b13e5691a3d593b1d92d127c4678d4c"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:125",
+    "hi": [
+     10
+    ]
    }
   },
   {
@@ -2868,6 +3402,13 @@
     "start": 27,
     "end": 1357,
     "sha256": "1d50458818524f105df8bde9ac3de01647453246477c2f2a3fed580f0a8c5e16"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:128",
+    "hi": [
+     7
+    ]
    }
   },
   {
@@ -2904,6 +3445,13 @@
     "start": 18,
     "end": 913,
     "sha256": "e0f6bc08c9ec84f8f206828c86fcbb3e650da7f99eb137514375466f4d415540"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:130",
+    "hi": [
+     7
+    ]
    }
   },
   {
@@ -2940,6 +3488,13 @@
     "start": 122,
     "end": 1050,
     "sha256": "1396cab8270af52d3a6691a0a5fb908198343e9812697d9b7cebbc927de138b6"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:143",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -2976,6 +3531,13 @@
     "start": 83,
     "end": 1324,
     "sha256": "2bf263c5ece1034fd3d825a5f00dd553e7bb4a3a758bb88165fd34694e80486b"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:148",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -3012,6 +3574,13 @@
     "start": 24,
     "end": 1520,
     "sha256": "8a90179830dba26d68ca494fa81c58e589a11952bab1158178ee064a06ce3cb9"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:148",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -3044,6 +3613,13 @@
     "start": 100,
     "end": 1274,
     "sha256": "6ed2b384b0edea16bbb1a521e8f758173824a25ada30a82da494370d2f1f89c5"
+   },
+   "kind": "name",
+   "example": {
+    "loc": "2:158",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -3076,6 +3652,13 @@
     "start": 66,
     "end": 1696,
     "sha256": "ba1af27e49d93d977447463b7217c3d7099a74f50941fed841afaa6ec5d0cdfb"
+   },
+   "kind": "name",
+   "example": {
+    "loc": "2:158",
+    "hi": [
+     2
+    ]
    }
   },
   {
@@ -3112,6 +3695,13 @@
     "start": 95,
     "end": 1023,
     "sha256": "edbaa1db84eade66d63c8e4c64c4bb157786c88f0db7f8901cb3b111f16dd13e"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:158",
+    "hi": [
+     7
+    ]
    }
   },
   {
@@ -3148,6 +3738,13 @@
     "start": 72,
     "end": 1155,
     "sha256": "7d3b43d3251517675592a197945e7a890f52d98f1f442b66162f275d6c13a390"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:158",
+    "hi": [
+     10
+    ]
    }
   },
   {
@@ -3185,6 +3782,13 @@
     "end": 2502,
     "sha256": "95a5b29527cf10c486d18698dc41426108ae0fc80652401cf3915b6b250d38f4",
     "final": true
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:159",
+    "hi": [
+     19
+    ]
    }
   },
   {
@@ -3221,6 +3825,13 @@
     "start": 99,
     "end": 1708,
     "sha256": "0acf74179e9d3faa220099e2a60c9d06eb6bd8b6727dcd33bab15e721bcf2062"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:164",
+    "hi": [
+     36
+    ]
    }
   },
   {
@@ -3257,6 +3868,13 @@
     "start": 31,
     "end": 1118,
     "sha256": "3fab0a13e9a1126c8f7b757227f710ea0a423a13d93ed28b7d446879f68b8d9d"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:171",
+    "hi": [
+     5
+    ]
    }
   },
   {
@@ -3293,6 +3911,13 @@
     "start": 42,
     "end": 1723,
     "sha256": "fd072d4f91537a80f1c8531bd9da32db1f4996c511f0c19a64988617a603418e"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:177",
+    "hi": [
+     35
+    ]
    }
   },
   {
@@ -3329,6 +3954,13 @@
     "start": 48,
     "end": 1345,
     "sha256": "9d305e1680c504e7a98efdb5fbc795862afe6605e0aba8933a23d857c9cb08d2"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:178",
+    "hi": [
+     7
+    ]
    }
   },
   {
@@ -3365,6 +3997,13 @@
     "start": 52,
     "end": 3109,
     "sha256": "4ab17500dcf5964f68b031f1558889fd1908fa58c6e1fb26b5d0f73cf09b8433"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:178",
+    "hi": [
+     22
+    ]
    }
   },
   {
@@ -3401,6 +4040,13 @@
     "start": 0,
     "end": 1361,
     "sha256": "6fbde94b2fa5519a564f67cf2b074fd42c3b71069a1a58f84233a5dcde44f23d"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:178",
+    "hi": [
+     26
+    ]
    }
   },
   {
@@ -3437,6 +4083,13 @@
     "start": 35,
     "end": 940,
     "sha256": "cd2f90e4db7869243fbe1f994ce4af18de38abf9e2ed5a0425bce6c27b3c1aa6"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:182",
+    "hi": [
+     3
+    ]
    }
   },
   {
@@ -3473,6 +4126,13 @@
     "start": 100,
     "end": 1012,
     "sha256": "07e9abdeb085f4bc6cee8404b9feb8d6ac70695092c3000b36327d678595a40f"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:182",
+    "hi": [
+     4
+    ]
    }
   },
   {
@@ -3509,6 +4169,13 @@
     "start": 27,
     "end": 1956,
     "sha256": "da44f6d0239f07c46d99bfc5af93cea7fc9b2fb0369cb2cbb12c0537a9eaeb07"
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:184",
+    "hi": [
+     15
+    ]
    }
   },
   {
@@ -3541,6 +4208,13 @@
     "start": 28,
     "end": 1161,
     "sha256": "843054ceb3a840eef772d6d773734e71c733d3917a177fc14915e443f44ede25"
+   },
+   "kind": "name",
+   "example": {
+    "loc": "2:185",
+    "hi": [
+     1
+    ]
    }
   },
   {
@@ -3578,6 +4252,13 @@
     "end": 2105,
     "sha256": "a739bc6b4f8fcb6c85a9da885d7b71054ecaa93730742a8a81823377a918b57a",
     "final": true
+   },
+   "kind": "verb",
+   "example": {
+    "loc": "2:186",
+    "hi": [
+     16
+    ]
    }
   },
   {
@@ -3614,6 +4295,13 @@
     "start": 39,
     "end": 1409,
     "sha256": "6c6fac43378499d138d13da6e130d7e4c817a861db5d54f11f123189dc36e44f"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:187",
+    "hi": [
+     39
+    ]
    }
   },
   {
@@ -3650,6 +4338,13 @@
     "start": 38,
     "end": 1535,
     "sha256": "618474d1ca8d643204a9d9a9a6e3c912a3bf9d5b75bdcbe1899ca38e3dffb5c3"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:188",
+    "hi": [
+     8
+    ]
    }
   },
   {
@@ -3686,6 +4381,13 @@
     "start": 27,
     "end": 1533,
     "sha256": "75d868a8c094f8201bedc54eb33a46fa11333f6aa29f2c4c1569de1fbae64684"
+   },
+   "kind": "noun",
+   "example": {
+    "loc": "2:189",
+    "hi": [
+     2
+    ]
    }
   }
  ]

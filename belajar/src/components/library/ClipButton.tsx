@@ -27,6 +27,9 @@ export function ClipPlayerProvider({ children, prefetch = [] }: { children: Reac
   return <ClipPlayerContext.Provider value={player}>{children}</ClipPlayerContext.Provider>;
 }
 
+/** The page's player, for a caller that plays a word itself inside a click (a test, on a right answer). */
+export const useClipPlayerContext = () => useContext(ClipPlayerContext);
+
 /** The turning mark of a load (the lesson stage's and the ayah popup's): a dot with reduced motion. */
 function LoadingMark({ className }: { className?: string }) {
   return (
@@ -65,6 +68,8 @@ function LoadingMark({ className }: { className?: string }) {
  * - `compact`: the icon alone, still 48px and still named in full for a screen reader, for a list with
  *   one button per row, where the word "Dengarkan" a hundred times is noise. The load and a failure
  *   are said once, by the page's ClipPageStatus; the button shows only the turning mark.
+ * - `playerKey`: the player's key for this button, for a caller that also plays it itself (a test, on a
+ *   right answer), so the button shows that it is playing. By default the button's own id.
  * - Without a ClipPlayerProvider above it, nothing is drawn.
  */
 export function ClipButton({
@@ -74,6 +79,7 @@ export function ClipButton({
   noteId,
   className,
   compact = false,
+  playerKey,
 }: {
   loc: string;
   clip: Clip;
@@ -81,13 +87,15 @@ export function ClipButton({
   noteId?: string;
   className?: string;
   compact?: boolean;
+  playerKey?: string;
 }) {
   const player = useContext(ClipPlayerContext);
   const t = useTranslations("Clip");
   const ta = useTranslations("Ayah");
   const tg = useTranslations("Guided");
-  const id = useId();
-  const statusId = `${id}-status`;
+  const ownId = useId();
+  const id = playerKey ?? ownId;
+  const statusId = `${ownId}-status`;
   if (!player) return null;
   const view = clipView(player.state, id, player.notice);
   // Where the sound comes from, said on the button (operator 2026-10-15): Quran.com's recording of

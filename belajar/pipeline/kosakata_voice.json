@@ -49211,5 +49211,347 @@
 "end": 1657
 }
 },
-"_comment": "Written by pipeline/build_kosakata_voice.py --fetch: for each word of the Kosakata list, the one place whose Quran.com recording it plays (the rule is in kosakata_voice.py), what Quran.com calls that word, and the file's sha256 and length. Never edited by hand."
+"_comment": "Written by pipeline/build_kosakata_voice.py --fetch: for each word of the Kosakata list, the one place whose Quran.com recording it plays (the rule is in kosakata_voice.py), what Quran.com calls that word, and the file's sha256 and length. Never edited by hand.",
+"parts": {
+"14:25:6": {
+"loc": "14:25:6",
+"form": "رَبِّهَا",
+"qc_text": "رَبِّهَا ۗ",
+"sha256": "779676df54deadacc7c548fdabaf48fd53b6f114858d95cbfb218d2d99ba99af",
+"bytes": 31926,
+"ms": 1330,
+"start": 45,
+"end": 1318
+},
+"19:96:6": {
+"loc": "19:96:6",
+"form": "سَيَجْعَلُ",
+"qc_text": "سَيَجْعَلُ",
+"sha256": "3651812509d8b75891a4c583babc8b050715ab1ce2de4ab029658eeb4afa8d1b",
+"bytes": 62291,
+"ms": 1541,
+"start": 6,
+"end": 1541
+},
+"1:2:2": {
+"loc": "1:2:2",
+"form": "لِلَّهِ",
+"qc_text": "لِلَّهِ",
+"sha256": "df6f157f8a24b8b2072fefe5f50a30b879904c1bdcc4d3f56c913bbcd29cc877",
+"bytes": 68987,
+"ms": 1723,
+"start": 454,
+"end": 1716
+},
+"1:7:4": {
+"loc": "1:7:4",
+"form": "عَلَيْهِمْ",
+"qc_text": "عَلَيْهِمْ",
+"sha256": "e98790f900e1d8aa2418253e11848940218b64d9a735817fc1172ed6d13b7082",
+"bytes": 78383,
+"ms": 1958,
+"start": 381,
+"end": 1898
+},
+"1:7:8": {
+"loc": "1:7:8",
+"form": "وَلَا",
+"qc_text": "وَلَا",
+"sha256": "579ddddf5ec6491d1c3d07324155fbaba47ae1e8e1a144de01d557921c5d0a74",
+"bytes": 49151,
+"ms": 1227,
+"start": 306,
+"end": 1209
+},
+"2:108:6": {
+"loc": "2:108:6",
+"form": "كَمَا",
+"qc_text": "كَمَا",
+"sha256": "1a78959a8f6f126e09be67ad5a56711c96e09576970a07a76c6b667b691ba302",
+"bytes": 28854,
+"ms": 705,
+"start": 0,
+"end": 705
+},
+"2:10:10": {
+"loc": "2:10:10",
+"form": "بِمَا",
+"qc_text": "بِمَا",
+"sha256": "e9994c06348e410c86e0a10b9be693e265450592fabe691ca57a5d9c868ea9e0",
+"bytes": 53327,
+"ms": 1331,
+"start": 309,
+"end": 1316
+},
+"2:112:11": {
+"loc": "2:112:11",
+"form": "رَبِّهِۦ",
+"qc_text": "رَبِّهِۦ",
+"sha256": "4fc695896a3fd222e2d764b37fd88985a7d5b2ef4f5ebc7d34306e49d577bb5c",
+"bytes": 46618,
+"ms": 1149,
+"start": 58,
+"end": 1122
+},
+"2:11:7": {
+"loc": "2:11:7",
+"form": "ٱلْأَرْضِ",
+"qc_text": "ٱلْأَرْضِ",
+"sha256": "3fec4abcbfab0877ad9b1fa729214aa14197eab797df57c04cc0ce76ce041706",
+"bytes": 66899,
+"ms": 1670,
+"start": 389,
+"end": 1657
+},
+"2:127:8": {
+"loc": "2:127:8",
+"form": "رَبَّنَا",
+"qc_text": "رَبَّنَا",
+"sha256": "a7ea5865f38e220d2bc478f2e97e873786d4453974484e4202fe5c1db5a374ae",
+"bytes": 40799,
+"ms": 1018,
+"start": 27,
+"end": 1017
+},
+"2:130:17": {
+"loc": "2:130:17",
+"form": "لَمِنَ",
+"qc_text": "لَمِنَ",
+"sha256": "ea31c18a49f581f718cb47d789ddaba2f3004bdbdd506530d06d9638bab41667",
+"bytes": 36623,
+"ms": 914,
+"start": 42,
+"end": 896
+},
+"2:142:1": {
+"loc": "2:142:1",
+"form": "سَيَقُولُ",
+"qc_text": "۞ سَيَقُولُ",
+"sha256": "65789facb4c94ed83777e3f03db1190b6424d42f5553002a0f087d11222f4581",
+"bytes": 46618,
+"ms": 1149,
+"start": 65,
+"end": 1059
+},
+"2:142:11": {
+"loc": "2:142:11",
+"form": "عَلَيْهَا",
+"qc_text": "عَلَيْهَا ۚ",
+"sha256": "5a70ad9bc59ef73b7586614f31b93acf89450dbe11cf21bd7f6c9cbb5e5cd760",
+"bytes": 46618,
+"ms": 1149,
+"start": 45,
+"end": 1098
+},
+"2:154:3": {
+"loc": "2:154:3",
+"form": "لِمَن",
+"qc_text": "لِمَن",
+"sha256": "ed8996fb6e86b424f7fb68eeee75d71ef4a0d3b055f1ee62787bc5140c2641db",
+"bytes": 35124,
+"ms": 862,
+"start": 43,
+"end": 850
+},
+"2:16:6": {
+"loc": "2:16:6",
+"form": "فَمَا",
+"qc_text": "فَمَا",
+"sha256": "aab269ba34bf43ec3f66f97bb69c71d92bf1b2a9be180256ea41ffce2fa93b1e",
+"bytes": 46019,
+"ms": 1148,
+"start": 291,
+"end": 1134
+},
+"2:176:12": {
+"loc": "2:176:12",
+"form": "لَفِى",
+"qc_text": "لَفِى",
+"sha256": "02369ca63c146e56c9417e15f1505b36fc05b2b9264ca96361abe757396eac77",
+"bytes": 38711,
+"ms": 966,
+"start": 14,
+"end": 966
+},
+"2:21:1": {
+"loc": "2:21:1",
+"form": "يَٰٓأَيُّهَا",
+"qc_text": "يَـٰٓأَيُّهَا",
+"sha256": "c3f0320e69c0a20f3be9cac73239d1303343845f2d354fadca84dd7d85456799",
+"bytes": 81515,
+"ms": 2036,
+"start": 345,
+"end": 2036
+},
+"2:22:18": {
+"loc": "2:22:18",
+"form": "فَلَا",
+"qc_text": "فَلَا",
+"sha256": "7c7d50f29f5d96a3628f8f6c6250de7c90dc18e6691c5ef04ba2e03fc5576616",
+"bytes": 52283,
+"ms": 1305,
+"start": 331,
+"end": 1295
+},
+"2:252:5": {
+"loc": "2:252:5",
+"form": "عَلَيْكَ",
+"qc_text": "عَلَيْكَ",
+"sha256": "b2c37ef4dcceea28b6006aaffd0580df09046ad3ca73f656706c49e8b34ddf15",
+"bytes": 51239,
+"ms": 1279,
+"start": 119,
+"end": 1274
+},
+"2:260:16": {
+"loc": "2:260:16",
+"form": "قَلْبِى",
+"qc_text": "قَلْبِى ۖ",
+"sha256": "249703d95ba22982575fc8f69e1622e8f77bfcf1967232035cb8270b29618efa",
+"bytes": 48024,
+"ms": 1201,
+"start": 0,
+"end": 1201
+},
+"2:33:9": {
+"loc": "2:33:9",
+"form": "أَلَمْ",
+"qc_text": "أَلَمْ",
+"sha256": "936ba8e1c610a2fc175e301c090256e6375a0816ebb9904549ec9a9ed691a31b",
+"bytes": 42887,
+"ms": 1070,
+"start": 135,
+"end": 1069
+},
+"2:37:7": {
+"loc": "2:37:7",
+"form": "عَلَيْهِ",
+"qc_text": "عَلَيْهِ ۚ",
+"sha256": "b4a29fac93a6216637f6f1737bc4ba3c6743d03e3a47336957147d0dbd90558d",
+"bytes": 41843,
+"ms": 1044,
+"start": 0,
+"end": 1044
+},
+"2:40:7": {
+"loc": "2:40:7",
+"form": "عَلَيْكُمْ",
+"qc_text": "عَلَيْكُمْ",
+"sha256": "132a9cde99dcf9dce48231a136acc7eca423758c48b8a1706ee67d53c28d013f",
+"bytes": 57503,
+"ms": 1436,
+"start": 14,
+"end": 1436
+},
+"2:46:5": {
+"loc": "2:46:5",
+"form": "رَبِّهِمْ",
+"qc_text": "رَبِّهِمْ",
+"sha256": "090160f57477ad68a52dd5ab53f6a989839219baff71aff686a3a70b50601faa",
+"bytes": 46019,
+"ms": 1148,
+"start": 32,
+"end": 1145
+},
+"2:55:3": {
+"loc": "2:55:3",
+"form": "يَٰمُوسَىٰ",
+"qc_text": "يَـٰمُوسَىٰ",
+"sha256": "7146eaf87a59a3edef3a80042c2fba1b47a3131e702b73c68d2a4fa5aca45d10",
+"bytes": 73163,
+"ms": 1827,
+"start": 70,
+"end": 1827
+},
+"2:70:12": {
+"loc": "2:70:12",
+"form": "عَلَيْنَا",
+"qc_text": "عَلَيْنَا",
+"sha256": "606e28abfc1072dee8b808d9cd5d8aa5e9aaade4e07c0dcec2d37c1cc95c3c8f",
+"bytes": 57503,
+"ms": 1436,
+"start": 31,
+"end": 1423
+},
+"2:73:4": {
+"loc": "2:73:4",
+"form": "كَذَٰلِكَ",
+"qc_text": "كَذَٰلِكَ",
+"sha256": "3f71d7ba890f06f376d8b1ff03ed6539a64cd81f781249e4987c6f2d1bc7f490",
+"bytes": 51239,
+"ms": 1279,
+"start": 41,
+"end": 1259
+},
+"2:76:21": {
+"loc": "2:76:21",
+"form": "رَبِّكُمْ",
+"qc_text": "رَبِّكُمْ ۚ",
+"sha256": "4493fe8050a5b76d34f000b751b5f578b1210f09e1c544dd2681a5551941ca4b",
+"bytes": 56459,
+"ms": 1409,
+"start": 38,
+"end": 1393
+},
+"2:8:2": {
+"loc": "2:8:2",
+"form": "ٱلنَّاسِ",
+"qc_text": "ٱلنَّاسِ",
+"sha256": "b96f5dfc5ee5caea7571a893592aed5d89315dd12b34f58b01088de2e2fed12f",
+"bytes": 83603,
+"ms": 2088,
+"start": 344,
+"end": 2088
+},
+"2:8:6": {
+"loc": "2:8:6",
+"form": "بِٱللَّهِ",
+"qc_text": "بِٱللَّهِ",
+"sha256": "3606965c6d7167781200c48137809a93920f63591d6b3d29bdb6c3c0dca6ace5",
+"bytes": 64811,
+"ms": 1618,
+"start": 353,
+"end": 1615
+},
+"2:8:9": {
+"loc": "2:8:9",
+"form": "وَمَا",
+"qc_text": "وَمَا",
+"sha256": "29160683e15c706cfdc477e204c54d47a2be1463a227f17e7fd9acf9d525448e",
+"bytes": 51239,
+"ms": 1279,
+"start": 368,
+"end": 1279
+},
+"3:51:3": {
+"loc": "3:51:3",
+"form": "رَبِّى",
+"qc_text": "رَبِّى",
+"sha256": "d58b0a3d7386e76c1c222b0b7c5f81c70e349c2167d6b08ec9b6f3be9d818483",
+"bytes": 50112,
+"ms": 1253,
+"start": 0,
+"end": 1240
+},
+"6:115:3": {
+"loc": "6:115:3",
+"form": "رَبِّكَ",
+"qc_text": "رَبِّكَ",
+"sha256": "0850c3b0630fa95c553e0acac38db3149a18342c6407c82b5df9c9f685bbd616",
+"bytes": 42438,
+"ms": 1045,
+"start": 0,
+"end": 1045
+},
+"9:13:1": {
+"loc": "9:13:1",
+"form": "أَلَا",
+"qc_text": "أَلَا",
+"sha256": "67faf4bf5501298c4eb0060b9daa06fce5c9c5885438d0f1495777514a5fb2dc",
+"bytes": 27809,
+"ms": 679,
+"start": 0,
+"end": 677
+}
+}
 }
