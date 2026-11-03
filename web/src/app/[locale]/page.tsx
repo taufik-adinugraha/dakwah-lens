@@ -36,17 +36,20 @@ async function getCoverage(): Promise<Coverage> {
       .select({ n: count() })
       .from(schema.rssFeeds)
       .where(eq(schema.rssFeeds.enabled, true)),
-    // "Posts analyzed" = ones that actually completed the classification
-    // pipeline (Gemini relevance set). Heuristic-skipped + failed-classification
-    // rows stay in the table but don't count toward the figure shown on the
-    // homepage. We count mainstream RSS too; it's the majority of the corpus.
+    // "Posts analyzed" = posts the nightly Claude batch has labelled (theme +
+    // sentiment). Posts not labelled yet stay in the table but don't count
+    // toward the figure shown on the homepage. We count mainstream RSS too;
+    // it's the majority of the corpus. Until 2026-11-03 this read
+    // `dawah_opportunity IS NOT NULL`, which showed 1,151 against 68,272
+    // labelled posts once the score's classifier ran out of prepay.
     db
       .select({ n: count() })
       .from(schema.socialPosts)
       .where(
         and(
           sql`created_at >= now() - interval '30 days'`,
-          sql`dawah_opportunity IS NOT NULL`,
+          sql`theme_group IS NOT NULL`,
+          sql`sentiment_label IS NOT NULL`,
         ),
       ),
   ]);

@@ -70,10 +70,16 @@ celery_app.conf.update(
         # one hour OFFSET from the RSS ingest so a Gemini overload that
         # took down the previous tick has time to recover. Almost always
         # a no-op (0-25 rows); cost is < $0.003 per run when it does work.
-        "retry-failed-sentiment": {
-            "task": "api.workers.ingest.retry_failed_sentiment",
-            "schedule": crontab(minute=0, hour="1-23/2"),
-        },
+        #
+        # PAUSED 2026-11-03. Ingest no longer classifies, so every new post is
+        # NULL until the 00:00 WIB Claude batch by design; this retry would
+        # only re-send them to Gemini (402 since ~2026-07-27, prepay depleted),
+        # and pay for labels Claude then overwrites if the prepay is ever
+        # topped up. The task stays available for a manual run.
+        # "retry-failed-sentiment": {
+        #     "task": "api.workers.ingest.retry_failed_sentiment",
+        #     "schedule": crontab(minute=0, hour="1-23/2"),
+        # },
         # Social-media platforms scrape the FULL `ingest_queries` pool
         # (admin-editable at /admin/system/queries). Cadence varies by
         # platform, balancing freshness against Apify cost / free-actor
@@ -220,7 +226,7 @@ celery_app.conf.update(
         #     "task": "api.workers.ingest.recluster_all",
         #     "schedule": crontab(minute=0, hour=4),
         # },
-        # Claude theme + sentiment labels and the weekly Claude recluster
+        # Claude theme + sentiment + opportunity labels and the weekly Claude recluster
         # (operator decision 2026-11-01; workers/claude_jobs.py). The batch
         # is submitted at 00:00 WIB and applied by the poll once it ends
         # (most batches end within the hour). The poll starts Thursday's

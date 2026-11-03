@@ -77,6 +77,10 @@ async def fetch_trending_headlines(
         "posted_at >= :cutoff",
         "text IS NOT NULL",
         "length(text) >= 30",
+        # A 0.0 is not the bottom of this list: DESC NULLS LAST sorts it above
+        # every unscored post. Measured 2026-11-03: all 8 results were posts the
+        # old classifier had skipped as gossip or too short ("Mendadak…").
+        "(dawah_opportunity IS NULL OR dawah_opportunity > 0)",
     ]
     if exclude_lainnya:
         where_clauses.append("(theme_group IS NULL OR theme_group != 'Lainnya')")

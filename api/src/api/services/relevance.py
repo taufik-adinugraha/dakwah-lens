@@ -16,6 +16,11 @@ What remains here:
     da'i credibly use this in da'wah this week", calibrated against
     anchors at 0.2 / 0.4 / 0.6 / 0.8
 
+Since 2026-11-03 ingest does not call this classifier: the nightly Claude batch
+(`services/claude_labels.py`) writes the score, reusing OPPORTUNITY_SYSTEM_PROMPT
+below so there is one copy of the calibration. Only the manual `ingest_x` CLI
+still calls it.
+
 Cost: ~$0.0001 per classification on `gemini-2.5-flash-lite`. Pre-
 filter heuristic drops ~50% of calls (short/gossipy items get 0.0
 without ever hitting Gemini).

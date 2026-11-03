@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from types import SimpleNamespace
@@ -66,6 +67,8 @@ def test_system_prompt_carries_rulebook_and_rubric_but_not_the_tsv_contract():
         assert group in sp
     assert "THE RULE THAT DECIDES MOST HARD CASES" in sp  # rubric body
     assert "Output contract" not in sp
+    assert "Calibrated examples" in sp  # the opportunity anchors, one shared copy
+    assert "Return only valid JSON" not in sp  # the Gemini output line
     assert "TSV" not in sp
     assert "{{" not in sp
     assert f"cut at {cl.TEXT_CHARS} characters" in sp
@@ -76,6 +79,7 @@ def test_output_schema_enums_are_the_live_label_sets():
     item = cl.output_schema()["properties"]["labels"]["items"]["properties"]
     assert set(item["theme"]["enum"]) == set(ALL_GROUP_NAMES)
     assert set(item["sentiment"]["enum"]) == {s.value for s in SentimentLabel}
+    assert item["opportunity"] == {"type": "number"}
 
 
 def test_request_params_cache_the_system_prompt_and_number_the_posts():
@@ -94,19 +98,39 @@ def test_request_params_cache_the_system_prompt_and_number_the_posts():
 def test_parse_labels_maps_indices_and_drops_bad_entries():
     payload = {
         "labels": [
-            {"i": 0, "theme": "Hukum & Keadilan", "sentiment": "negative"},
-            {"i": 1, "theme": "aqidah dan ibadah", "sentiment": "Positive"},  # near-miss
-            {"i": 2, "theme": "Lainnya", "sentiment": "neutral"},
-            {"i": 2, "theme": "Lainnya", "sentiment": "neutral"},  # twice → dropped
-            {"i": 3, "theme": "Bukan Grup", "sentiment": "neutral"},  # invalid
-            {"i": 9, "theme": "Lainnya", "sentiment": "neutral"},  # out of range
-            {"i": True, "theme": "Lainnya", "sentiment": "neutral"},  # bool is not an index
+            {"i": 0, "theme": "Hukum & Keadilan", "sentiment": "negative", "opportunity": 0.5},
+            {
+                "i": 1,
+                "theme": "aqidah dan ibadah",
+                "sentiment": "Positive",
+                "opportunity": 0.5,
+            },  # near-miss
+            {"i": 2, "theme": "Lainnya", "sentiment": "neutral", "opportunity": 0.5},
+            {
+                "i": 2,
+                "theme": "Lainnya",
+                "sentiment": "neutral",
+                "opportunity": 0.5,
+            },  # twice → dropped
+            {"i": 3, "theme": "Bukan Grup", "sentiment": "neutral", "opportunity": 0.5},  # invalid
+            {
+                "i": 9,
+                "theme": "Lainnya",
+                "sentiment": "neutral",
+                "opportunity": 0.5,
+            },  # out of range
+            {
+                "i": True,
+                "theme": "Lainnya",
+                "sentiment": "neutral",
+                "opportunity": 0.5,
+            },  # bool is not an index
         ]
     }
     labels, problems = cl.parse_labels(json.dumps(payload), 5)
     assert labels == {
-        0: cl.Label("Hukum & Keadilan", "negative"),
-        1: cl.Label("Aqidah & Ibadah", "positive"),
+        0: cl.Label("Hukum & Keadilan", "negative", 0.5),
+        1: cl.Label("Aqidah & Ibadah", "positive", 0.5),
     }
     assert any("twice" in p for p in problems)
     assert any("3 of 5 posts unlabelled" in p for p in problems)
@@ -121,8 +145,8 @@ def test_collect_updates_counts_failures_and_totals_usage():
     manifest = {"requests": {"r00000": ids[:2], "r00001": ids[2:], "r00002": [str(uuid4())]}}
     ok = {
         "labels": [
-            {"i": 0, "theme": "Lainnya", "sentiment": "neutral"},
-            {"i": 1, "theme": "Teknologi & AI", "sentiment": "positive"},
+            {"i": 0, "theme": "Lainnya", "sentiment": "neutral", "opportunity": 0.5},
+            {"i": 1, "theme": "Teknologi & AI", "sentiment": "positive", "opportunity": 0.5},
         ]
     }
     results = [
@@ -135,6 +159,7 @@ def test_collect_updates_counts_failures_and_totals_usage():
     updates = cl.collect_updates(manifest, results, applied)
     assert [u["b_id"] for u in updates] == [UUID(ids[0]), UUID(ids[1])]
     assert updates[1]["b_theme"] == "Teknologi & AI" and updates[1]["b_sent"] == "positive"
+    assert updates[1]["b_opp"] == 0.5
     assert applied.requests_failed == 2
     assert any("unknown custom_id" in p for p in applied.problems)
     # usage counts every succeeded request, including the truncated one
@@ -258,8 +283,8 @@ def test_poll_applies_an_ended_batch_and_files_the_manifest(monkeypatch, tmp_pat
     monkeypatch.setattr(cl, "_write_updates", write)
     payload = {
         "labels": [
-            {"i": 0, "theme": "Lainnya", "sentiment": "neutral"},
-            {"i": 2, "theme": "Ekonomi & Bisnis", "sentiment": "negative"},
+            {"i": 0, "theme": "Lainnya", "sentiment": "neutral", "opportunity": 0.5},
+            {"i": 2, "theme": "Ekonomi & Bisnis", "sentiment": "negative", "opportunity": 0.5},
         ]
     }
     batches = FakeBatches(results=[succeeded("r00000", payload)])
@@ -597,3 +622,128 @@ def test_gate_sends_failures_back_and_keeps_the_draft_if_the_repair_call_fails()
 
     broken = FakeAuthor(RuntimeError("overloaded"))
     assert cr._gate(broken, draft, texts) == draft
+
+
+# ─── opportunity score ───────────────────────────────────────────────
+
+
+def test_parse_labels_clamps_the_score_and_drops_a_non_number():
+    def entry(i, opp):
+        return {"i": i, "theme": "Lainnya", "sentiment": "neutral", "opportunity": opp}
+
+    payload = {
+        "labels": [entry(0, 1.4), entry(1, -0.2), entry(2, 0), entry(3, "high"), entry(4, True)]
+    }
+    labels, problems = cl.parse_labels(json.dumps(payload), 5)
+    assert {i: lab.opportunity for i, lab in labels.items()} == {0: 1.0, 1: 0.0, 2: 0.0}
+    assert sum("invalid label" in p for p in problems) == 2
+
+
+def test_write_updates_sets_all_three_labels(monkeypatch):
+    from sqlalchemy.dialects import postgresql
+
+    seen: list = []
+
+    class Session:
+        async def execute(self, stmt, params):
+            seen.append((stmt, params))
+
+        async def commit(self):
+            seen.append("commit")
+
+    @asynccontextmanager
+    async def session():
+        yield Session()
+
+    monkeypatch.setattr(cl, "SessionLocal", session)
+    row = {"b_id": uuid4(), "b_theme": "Lainnya", "b_sent": "neutral", "b_opp": 0.25}
+    asyncio.run(cl._write_updates([row]))
+
+    (stmt, params), done = seen
+    assert done == "commit" and params == [row]
+    sql = str(stmt.compile(dialect=postgresql.dialect()))
+    for col in ("theme_group", "sentiment_label", "sentiment_score", "dawah_opportunity"):
+        assert f"{col}=" in sql
+
+
+def test_null_score_alone_does_not_select_a_post():
+    """~270,000 old posts have no score; selecting on it would re-send them all."""
+    import inspect
+
+    src = inspect.getsource(cl.select_posts)
+    assert "theme_group.is_(None)" in src and "sentiment_label.is_(None)" in src
+    assert "dawah_opportunity" not in src
+
+
+# ─── ingest no longer classifies ─────────────────────────────────────
+
+
+def test_ingest_makes_no_label_calls_and_keeps_existing_labels():
+    import inspect
+
+    from api.scripts import ingest
+
+    src = inspect.getsource(ingest)
+    assert "classify_sentiment" not in src and "classify_opportunity" not in src
+    # A re-scrape carries NULLs, which must not erase Claude's labels.
+    for col in ("sentiment_label", "sentiment_score", "dawah_opportunity", "theme_group"):
+        assert re.search(
+            rf'"{col}": func\.coalesce\(\s*insert\(SocialPost\)\.excluded\.{col},', src
+        ), col
+
+
+def test_gemini_retry_is_off_the_schedule_but_still_runnable():
+    from api.workers.celery_app import celery_app
+
+    celery_app.loader.import_default_modules()
+    assert "retry-failed-sentiment" not in celery_app.conf.beat_schedule
+    assert "api.workers.ingest.retry_failed_sentiment" in celery_app.tasks
+
+
+# ─── trending list ───────────────────────────────────────────────────
+
+
+def test_trending_headlines_leave_out_zero_scored_posts():
+    from api.services import trending_headlines as th
+
+    seen: list[str] = []
+
+    class Session:
+        async def execute(self, stmt, params):
+            seen.append(str(stmt))
+            return SimpleNamespace(all=lambda: [])
+
+    asyncio.run(th.fetch_trending_headlines(Session()))
+    assert "(dawah_opportunity IS NULL OR dawah_opportunity > 0)" in seen[0]
+    assert "ORDER BY dawah_opportunity DESC NULLS LAST" in seen[0]
+
+
+# ─── topic corpus held steady ────────────────────────────────────────
+
+
+def _sql(clause) -> str:
+    from sqlalchemy.dialects import postgresql
+
+    return str(clause.compile(dialect=postgresql.dialect()))
+
+
+def test_score_does_not_shape_the_topic_corpus_while_the_switch_is_off():
+    from api.scripts import cluster_topics as ct
+
+    assert ct.OPPORTUNITY_SHAPES_CORPUS is False
+    floor = _sql(ct._corpus_floor(True))
+    assert "dawah_opportunity IS NULL" in floor and "dawah_opportunity >" in floor
+    assert ">=" not in floor
+    order = [_sql(c) for c in ct._corpus_day_order()]
+    assert order == ["social_posts.posted_at DESC"]
+    assert ct._corpus_floor(False) is None
+
+
+def test_the_switch_restores_the_floor_and_the_score_ranking(monkeypatch):
+    from api.scripts import cluster_topics as ct
+
+    monkeypatch.setattr(ct, "OPPORTUNITY_SHAPES_CORPUS", True)
+    assert "dawah_opportunity >=" in _sql(ct._corpus_floor(True))
+    first, second = ct._corpus_day_order()
+    assert "coalesce(social_posts.dawah_opportunity" in _sql(first)
+    assert _sql(second) == "social_posts.posted_at DESC"

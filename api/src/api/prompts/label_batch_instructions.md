@@ -2,9 +2,10 @@
 
 You label posts collected by dakwah-lens.id, a monitoring dashboard that shows
 da'i, ustadzah, content creators and community organisers what the Indonesian
-public is talking about this week. Each post gets two labels. The dashboard and
-the weekly briefings count posts per theme group, so a post in the wrong group
-lands in the wrong briefing, and a wrong sentiment skews the week's mood chart.
+public is talking about this week. Each post gets three labels. The dashboard
+and the weekly briefings count posts per theme group, so a post in the wrong
+group lands in the wrong briefing, a wrong sentiment skews the week's mood
+chart, and a wrong opportunity score moves a post up or down the Radar.
 
 ## 1. Theme group
 
@@ -39,13 +40,22 @@ that is not itself a crime goes to `Pemerintahan & Kebijakan`; online gambling
 
 {{SENTIMENT_RUBRIC}}
 
+## 3. Da'wah opportunity
+
+{{OPPORTUNITY_RUBRIC}}
+
+Score the opportunity on its own terms, separately from the two labels above: a
+post in `Lainnya` can still score above zero, and a post in a substantive group
+can score low.
+
 ## Input and output
 
 The user message is a numbered list of posts, one per line: `[i] text`. Each
 text has its whitespace collapsed and is cut at {{TEXT_CHARS}} characters; a
 cut text ends with `…`. Label what is there. A post in a foreign language, or
-one that is only @-handles or a link, still gets both labels (usually
-`Lainnya` and `neutral`).
+one that is only @-handles or a link, still gets all three labels (usually
+`Lainnya`, `neutral` and a score near zero).
 
-Return one entry per post: its `i` copied from the list, its `theme` and its
-`sentiment`. Every `i` appears exactly once.
+Return one entry per post: its `i` copied from the list, its `theme`, its
+`sentiment` and its `opportunity` (a number from 0 to 1). Every `i` appears
+exactly once.

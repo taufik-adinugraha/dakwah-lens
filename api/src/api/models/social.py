@@ -91,14 +91,15 @@ class SocialPost(Base, TimestampMixin):
     """Original API/scraper response. Useful for re-classification later."""
 
     # ── sentiment (Stage 2) ─────────────────────────────────────────
-    # Single classifier across all platforms: Gemini Flash-Lite reading
-    # event valence (`services/sentiment.py`). Was a hybrid Gemini-for-
-    # news / IndoBERT-for-social setup until 2026-05-25 — IndoBERT was
-    # ~14% accurate on X positives (sarcasm + supportive opinion both
+    # Single classifier across all platforms: the 00:00 WIB Claude batch
+    # (`services/claude_labels.py`) reading event valence, since 2026-11-01.
+    # Was Gemini Flash-Lite before that; was a hybrid Gemini-for-news /
+    # IndoBERT-for-social setup until 2026-05-25 — IndoBERT was ~14%
+    # accurate on X positives (sarcasm + supportive opinion both
     # mislabelled).
     sentiment_label: Mapped[str | None] = mapped_column(String(20))
     sentiment_score: Mapped[float | None] = mapped_column(Float)
-    """Confidence of the predicted label, 0-1."""
+    """Confidence of the predicted label, 0-1. NULL on a Claude label."""
 
     # ── da'wah scoring ─────────────────────────────────────────────
     # `dawah_relevance` + `categories` (9 PRD scores) removed
@@ -106,20 +107,20 @@ class SocialPost(Base, TimestampMixin):
     # now produces a single `dawah_opportunity` score plus the
     # `theme_group` bucket below.
     dawah_opportunity: Mapped[float | None] = mapped_column(Float)
-    """'Would a da'i credibly use this?' score, 0-1 continuous.
-    Gemini Flash-Lite with prompt-side calibration anchors at
-    0.2/0.4/0.6/0.8. The UI sorts 'Top posts' by this — it's the
-    single relevance signal since the 9-PRD scoring was retired
-    2026-06-05."""
+    """'Would a da'i credibly use this?' score, 0-1 continuous, written
+    by the Claude batch since 2026-11-03 with the calibration anchors at
+    0.2/0.4/0.6/0.8 (`relevance.OPPORTUNITY_SYSTEM_PROMPT`). The UI sorts
+    'Top posts' by this — it's the single relevance signal since the 9-PRD
+    scoring was retired 2026-06-05. NULL on nearly every post from
+    2026-08-31 to 2026-11-03: the Gemini classifier had run out of prepay.
+    Those older rows are not backfilled."""
 
     theme_group: Mapped[str | None] = mapped_column(Text)
     """Coarse THEME_GROUPS bucket — one of the 14 group labels or
-    'Lainnya'. Populated at INGEST time by the same Gemini Flash-Lite
-    call that produces sentiment (`services.sentiment.classify_batch`)
-    — adds ~10 output tokens to that call, no new round-trip. Rows
-    whose Gemini call failed before this field could be set stay NULL;
-    read paths fall back to `classify_theme_group(topic.label)` regex
-    in that case."""
+    'Lainnya'. Populated by the 00:00 WIB Claude batch
+    (`services/claude_labels.py`), so a new post is NULL until that night's
+    batch is applied; read paths fall back to
+    `classify_theme_group(topic.label)` regex in that case."""
 
     # ── engagement (YouTube videos.list stats — 2026-05-23) ─────────
     # Per-video interaction counts. Populated for platforms with public

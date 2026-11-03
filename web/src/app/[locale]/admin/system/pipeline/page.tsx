@@ -39,13 +39,13 @@ import {
 // the same pair at the top of each beat-level task.
 const BEAT_SCHEDULE = [
   { name: "ingest-mainstream", task: "run_ingest", beatTask: "run_ingest", beatPlatform: "mainstream", platform: "mainstream", cron: "every 2h (even hours WIB)", query: "(all enabled RSS feeds)" },
-  { name: "retry-failed-sentiment", task: "retry_failed_sentiment", beatTask: "retry_failed_sentiment", beatPlatform: "all", platform: "—", cron: "every 2h (odd hours WIB)", query: "(re-classify failed sentiment rows)" },
+  { name: "retry-failed-sentiment", task: "retry_failed_sentiment", beatTask: "retry_failed_sentiment", beatPlatform: "all", platform: "—", cron: "every 2h (odd hours WIB)", query: "(re-classify failed sentiment rows)", pausedInBeat: true },
   { name: "ingest-youtube-channels", task: "run_ingest", beatTask: "youtube_channels_ingest", beatPlatform: "all", platform: "youtube", cron: "Wed 21:00 WIB", query: "(channel whitelist uploads)" },
   { name: "ingest-x-weekly", task: "run_ingest", beatTask: "rotating_ingest", beatPlatform: "x", platform: "x", cron: "Wed 22:00 WIB", query: "(rotating ingest_queries, lang:id)", pausedInBeat: true },
   { name: "ingest-tiktok-weekly", task: "run_ingest", beatTask: "rotating_ingest", beatPlatform: "tiktok", platform: "tiktok", cron: "Wed 22:10 WIB", query: "(rotating ingest_queries)", pausedInBeat: true },
   { name: "ingest-instagram-weekly", task: "run_ingest", beatTask: "rotating_ingest", beatPlatform: "instagram", platform: "instagram", cron: "Wed 22:20 WIB", query: "(rotating ingest_queries)", pausedInBeat: true },
   { name: "recluster-daily", task: "recluster_all", beatTask: "recluster_all", beatPlatform: "all", platform: "all", cron: "04:00 WIB daily", query: "(Gemini topic discovery)", pausedInBeat: true },
-  { name: "claude-label-daily", task: "claude_label_batch", beatTask: "claude_label_batch", beatPlatform: "all", platform: "all", cron: "00:00 WIB daily (applied by a 10-min poll)", query: "(Claude batch: theme_group + sentiment)" },
+  { name: "claude-label-daily", task: "claude_label_batch", beatTask: "claude_label_batch", beatPlatform: "all", platform: "all", cron: "00:00 WIB daily (applied by a 10-min poll)", query: "(Claude batch: theme_group + sentiment + opportunity)" },
   { name: "claude-recluster-weekly", task: "claude_recluster_weekly", beatTask: "claude_recluster_weekly", beatPlatform: "all", platform: "all", cron: "Thu, after the label batch (fallback 06:00 WIB)", query: "(Claude topic clusters: survey → author → dry runs)" },
   { name: "send-weekly-digest", task: "send_weekly_digest", beatTask: "send_weekly_digest", beatPlatform: "all", platform: "—", cron: "Thu 08:00 WIB", query: "(Resend → opt-in users)" },
   { name: "trending-ingest", task: "trending_ingest", beatTask: "trending_ingest", beatPlatform: "all", platform: "youtube", cron: "12:00 WIB daily", query: "(Trends + News RSS + YT mostPopular)" },
@@ -139,17 +139,18 @@ export default async function PipelinePage() {
       WHERE operation = 'billing_reconcile'
       ORDER BY occurred_at DESC LIMIT 1
     `) as unknown as Promise<Array<{ occurred_at: string }>>,
-    // Unique posts that completed Gemini classification in the last
+    // Unique posts the nightly Claude batch labelled in the last
     // 7 days. Matches the homepage's "postingan dianalisis" metric
-    // (same `social_posts` table, same `dawah_opportunity IS NOT NULL`
-    // filter, just a tighter 7d window for pipeline-health context).
+    // (same `social_posts` table, same theme + sentiment filter, just
+    // a tighter 7d window for pipeline-health context).
     // Apples-to-apples with the homepage so operators can mentally
     // scale: this number × ~4 ≈ the 30d homepage figure.
     db.execute(sql`
       SELECT COUNT(*)::int AS n
       FROM social_posts
       WHERE created_at >= now() - interval '7 days'
-        AND dawah_opportunity IS NOT NULL
+        AND theme_group IS NOT NULL
+        AND sentiment_label IS NOT NULL
     `) as unknown as Promise<Array<{ n: number }>>,
   ]);
   const classifiedCount = postsClassified7d[0]?.n ?? 0;
@@ -224,7 +225,7 @@ export default async function PipelinePage() {
             // counted raw per-run ingest events and double-counted
             // refreshes — making the number look much larger than
             // what actually reached the queryable corpus.
-            "Unique posts that finished Gemini classification (matches the homepage's 30d card, scoped to 7d here)."
+            "Unique posts labelled by the nightly Claude batch (matches the homepage's 30d card, scoped to 7d here)."
           }
           accent="brand"
         />

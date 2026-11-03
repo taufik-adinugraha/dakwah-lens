@@ -1,10 +1,13 @@
-"""Daily `theme_group` + `sentiment_label` labels by Claude, via the Message
-Batches API (50% of standard price; most batches end within the hour).
+"""Daily `theme_group` + `sentiment_label` + `dawah_opportunity` labels by
+Claude, via the Message Batches API (50% of standard price; most batches end
+within the hour).
 
-Operator decision 2026-11-01: Claude is the theme + sentiment labeller of
-record. The ingest-time Gemini call has failed since 2026-10-29 (depleted
-prepay), leaving every new post with both labels NULL; this job is what fills
-them. It runs on a separate key (`anthropic_labeling_api_key`, the org holding
+Operator decision 2026-11-01 (opportunity added 2026-11-03): Claude is the
+labeller of record. Ingest no longer classifies, so every new post arrives with
+all three NULL and this job is what fills them. The old ingest-time Gemini calls
+had been failing since about 2026-07-27 (402, prepay depleted); manual relabel
+runs hid that for labels until they stopped on 2026-10-29. It runs on a separate
+key (`anthropic_labeling_api_key`, the org holding
 the promotional Claude credit) so the spend never mixes with the briefing
 fallback's `anthropic_api_key`.
 
@@ -23,9 +26,13 @@ failure state, not a category (the theme-audit lesson): a post whose request
 errored stays NULL and is picked up again the next night, so nulls never age
 out of scope. Newest first, capped at MAX_POSTS_PER_RUN.
 
-What is written: `theme_group`, `sentiment_label`, and `sentiment_score =
-NULL` — NULL score is the existing marker for a Claude label (the manual
-`scripts/sent_relabel` pipeline writes the same).
+What is written: `theme_group`, `sentiment_label`, `dawah_opportunity`, and
+`sentiment_score = NULL` — NULL score is the existing marker for a Claude label
+(the manual `scripts/sent_relabel` pipeline writes the same).
+
+A NULL `dawah_opportunity` alone does NOT select a post: about 270,000 older
+posts have none, and re-sending them would cost far more than this job's daily
+run. Those stay unscored unless someone backfills them deliberately.
 
 The manifest (custom_id → post ids) lives on the persistent attachments
 volume because the batch results carry only the custom_id; without the
@@ -50,6 +57,7 @@ from api.db import SessionLocal
 from api.models.admin import IngestRun
 from api.models.social import SentimentLabel, SocialPost
 from api.services import ingest_runs
+from api.services.relevance import OPPORTUNITY_SYSTEM_PROMPT
 from api.services.theme_groups import (
     ALL_GROUP_NAMES,
     llm_group_options_prompt,
@@ -65,7 +73,7 @@ PLATFORM = "all"  # matches the admin pipeline page's (beatTask, beatPlatform)
 POSTS_PER_REQUEST = 50
 MAX_POSTS_PER_RUN = 15_000
 TEXT_CHARS = 600  # same cut as the manual theme audit (scripts/theme_audit/fetch.sh)
-MAX_TOKENS = 8_000  # ~25 tokens per label × 50, plus low-effort thinking
+MAX_TOKENS = 8_000  # ~35 tokens per label × 50, plus low-effort thinking
 EFFORT = "low"
 
 # Window when there is no successful run yet.
@@ -107,11 +115,18 @@ def sentiment_rubric() -> str:
     return body
 
 
+def opportunity_rubric() -> str:
+    """The calibration anchors of the Gemini classifier, one copy shared with
+    `relevance.py`, minus its JSON-array output line."""
+    return OPPORTUNITY_SYSTEM_PROMPT.split("\n\nReturn only valid JSON", 1)[0].strip()
+
+
 def build_system_prompt() -> str:
     tmpl = (PROMPT_DIR / "label_batch_instructions.md").read_text(encoding="utf-8")
     return (
         tmpl.replace("{{RULEBOOK}}", llm_group_options_prompt())
         .replace("{{SENTIMENT_RUBRIC}}", sentiment_rubric())
+        .replace("{{OPPORTUNITY_RUBRIC}}", opportunity_rubric())
         .replace("{{TEXT_CHARS}}", str(TEXT_CHARS))
     )
 
@@ -128,8 +143,9 @@ def output_schema() -> dict[str, Any]:
                         "i": {"type": "integer"},
                         "theme": {"type": "string", "enum": VALID_THEMES},
                         "sentiment": {"type": "string", "enum": VALID_SENTIMENTS},
+                        "opportunity": {"type": "number"},
                     },
-                    "required": ["i", "theme", "sentiment"],
+                    "required": ["i", "theme", "sentiment", "opportunity"],
                     "additionalProperties": False,
                 },
             }
@@ -174,6 +190,7 @@ def build_request_params(system_prompt: str, texts: list[str], *, model: str) ->
 class Label:
     theme: str
     sentiment: str
+    opportunity: float
 
 
 def parse_labels(text: str, n: int) -> tuple[dict[int, Label], list[str]]:
@@ -181,8 +198,9 @@ def parse_labels(text: str, n: int) -> tuple[dict[int, Label], list[str]]:
 
     An index outside the range, an index given twice, or a value outside
     the label sets is dropped (an index given twice is dropped entirely —
-    which of the two is right is unknowable). Dropped and missing posts
-    keep their current labels; NULL ones are retried next night."""
+    which of the two is right is unknowable). An opportunity outside 0-1 is
+    clamped; one that is not a number drops the entry. Dropped and missing
+    posts keep their current labels; NULL ones are retried next night."""
     try:
         entries = json.loads(text).get("labels", [])
     except (json.JSONDecodeError, AttributeError):
@@ -200,13 +218,19 @@ def parse_labels(text: str, n: int) -> tuple[dict[int, Label], list[str]]:
             continue
         theme = resolve_group_name(e.get("theme"))
         sentiment = str(e.get("sentiment", "")).strip().lower()
-        if theme is None or sentiment not in VALID_SENTIMENTS:
+        opportunity = e.get("opportunity")
+        if (
+            theme is None
+            or sentiment not in VALID_SENTIMENTS
+            or not isinstance(opportunity, int | float)
+            or isinstance(opportunity, bool)
+        ):
             problems.append(f"index {i}: invalid label")
             continue
         if i in out:
             twice.add(i)
             continue
-        out[i] = Label(theme, sentiment)
+        out[i] = Label(theme, sentiment, min(1.0, max(0.0, float(opportunity))))
     for i in twice:
         out.pop(i, None)
         problems.append(f"index {i} labelled twice")
@@ -293,7 +317,14 @@ def collect_updates(
         labels, problems = parse_labels(text, len(ids))
         applied.problems.extend(f"{r.custom_id}: {p}" for p in problems)
         for i, lab in labels.items():
-            updates.append({"b_id": UUID(ids[i]), "b_theme": lab.theme, "b_sent": lab.sentiment})
+            updates.append(
+                {
+                    "b_id": UUID(ids[i]),
+                    "b_theme": lab.theme,
+                    "b_sent": lab.sentiment,
+                    "b_opp": lab.opportunity,
+                }
+            )
     return updates
 
 
@@ -457,6 +488,7 @@ async def _write_updates(updates: list[dict[str, Any]]) -> None:
             theme_group=bindparam("b_theme"),
             sentiment_label=bindparam("b_sent"),
             sentiment_score=None,
+            dawah_opportunity=bindparam("b_opp"),
         )
     )
     async with SessionLocal() as session:

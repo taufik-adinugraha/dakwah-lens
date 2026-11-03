@@ -39,11 +39,7 @@ from api.services.apify import (
 )
 from api.services.language import detect_lang
 from api.services.normalizers import NORMALIZERS
-from api.services.relevance import (
-    classify_opportunity_batch as classify_opportunity,
-)
 from api.services.rss import scrape_mainstream
-from api.services.sentiment import classify_batch as classify_sentiment
 from api.services.youtube import scrape_youtube_uploads, search_youtube_videos
 
 log = structlog.get_logger()
@@ -231,7 +227,6 @@ async def _run(
     fresh_indices = [
         i for i, r in enumerate(rows) if r["external_id"] not in cached
     ]
-    fresh_texts = [texts[i] for i in fresh_indices]
     overlap_pct = (
         round(100.0 * len(cached) / len(rows), 1) if rows else 0.0
     )
@@ -249,40 +244,15 @@ async def _run(
         overlap_pct=overlap_pct,
     )
     print(
-        f"  Classifier skip: {len(cached)}/{len(rows)} already classified "
-        f"({overlap_pct}% overlap), running on {len(fresh_indices)} new items …"
+        f"  Already labelled: {len(cached)}/{len(rows)} ({overlap_pct}% overlap); "
+        f"{len(fresh_indices)} new items wait for the nightly label batch …"
     )
 
-    # Single Gemini Flash-Lite classifier for every platform. We
-    # previously routed mainstream → Gemini and social → IndoBERT, but
-    # the 2026-05-25 manual eval on X tweets showed IndoBERT mislabelled
-    # 6/7 positives (sarcasm + supportive opinion both read wrong).
-    # Per-item cost ~$0.0001, well inside the IDR 1M LLM cap.
-    sentiment_by_index: dict[int, object] = {}
-    if fresh_texts:
-        # Sentiment + theme_group come from the SAME Gemini call as of
-        # 2026-06-05 (theme_group folded into sentiment.py). Opportunity
-        # is still a separate call — independent calibration anchors,
-        # different prompt shape, runs sequentially since Flash-Lite is
-        # rate-limited per minute.
-        print(
-            f"  Running Gemini sentiment + theme_group on {len(fresh_texts)} posts …"
-        )
-        fresh_sentiments = classify_sentiment(fresh_texts)
-        for idx, s in zip(fresh_indices, fresh_sentiments, strict=False):
-            sentiment_by_index[idx] = s
-
-        print("  Running Gemini opportunity …")
-        fresh_opportunities = classify_opportunity(fresh_texts)
-    else:
-        fresh_opportunities = []
-
-    opportunity_by_index = {
-        idx: o
-        for idx, o in zip(fresh_indices, fresh_opportunities, strict=False)
-    }
-
-    for i, row in enumerate(rows):
+    # Labels are not computed here since 2026-11-03. A new post is stored with
+    # sentiment, theme_group and dawah_opportunity NULL, and the 00:00 WIB
+    # Claude batch fills all three (services/claude_labels.py). A post already
+    # labelled keeps its labels through `cached` and the COALESCEs below.
+    for row in rows:
         if row["external_id"] in cached:
             label, score, opp, tg = cached[row["external_id"]]
             row["sentiment_label"] = label
@@ -290,11 +260,10 @@ async def _run(
             row["dawah_opportunity"] = opp
             row["theme_group"] = tg
         else:
-            s = sentiment_by_index.get(i)
-            row["sentiment_label"] = getattr(s, "label", None)
-            row["sentiment_score"] = getattr(s, "score", None)
-            row["dawah_opportunity"] = opportunity_by_index.get(i)
-            row["theme_group"] = getattr(s, "theme_group", None)
+            row["sentiment_label"] = None
+            row["sentiment_score"] = None
+            row["dawah_opportunity"] = None
+            row["theme_group"] = None
 
         # Normalize engagement keys — non-YT platforms don't populate
         # these in their normalizers, but `insert.values(rows)` needs a
@@ -348,7 +317,10 @@ async def _run(
                     # the upsert SET since 2026-06-05 — those columns are
                     # retired but kept in the schema. Existing values are
                     # preserved; new rows just get NULL by column default.
-                    "dawah_opportunity": insert(SocialPost).excluded.dawah_opportunity,
+                    "dawah_opportunity": func.coalesce(
+                        insert(SocialPost).excluded.dawah_opportunity,
+                        SocialPost.dawah_opportunity,
+                    ),
                     "theme_group": func.coalesce(
                         insert(SocialPost).excluded.theme_group,
                         SocialPost.theme_group,
