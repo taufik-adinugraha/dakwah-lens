@@ -6,7 +6,7 @@
   "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512)",
   "sura_names": "QuranEnc Indonesian sura list, extracted text sha256:1cb44693cd863238093e21b6711eabfcdf78a9de58851b351c3a6f105d352eca",
   "meanings": "pipeline/authored/kosakata_meanings.json sha256:553d18bdd93e0ecdcc29bd40a83662ff36aa6402d35f9b19ced87e04e9d79d04",
-  "entries": "sha256:bd9034747b9c0e5acc39f9f63c187fd100bc1a108febe5b91991fdc00c5c5ed1",
+  "entries": "sha256:654d22eabdb4bafde52596891fc0396e70a168e52f06c1aff6437e1b2551788e",
   "pipeline": "belajar/pipeline/build_kosakata.py (stdlib only, no LLM)"
  },
  "total_tokens": 74608,
@@ -1324,12 +1324,12 @@
   {
    "rank": 120,
    "ar": "وَلِىّ",
-   "translit": "walīī",
+   "translit": "waliyy",
    "count": 86,
    "id": "pelindung; sekutu, teman setia",
    "en": "protector; ally, close friend",
    "cum": 6006,
-   "s": "ولي walii pelindung protector sekutu, teman setia ally, close friend"
+   "s": "ولي waliyy pelindung protector sekutu, teman setia ally, close friend"
   },
   {
    "rank": 121,
@@ -1344,12 +1344,12 @@
   {
    "rank": 122,
    "ar": "هُدًى",
-   "translit": "hudanā",
+   "translit": "hudan",
    "count": 85,
    "id": "petunjuk",
    "en": "guidance",
    "cum": 6029,
-   "s": "هدي hudana petunjuk guidance"
+   "s": "هدي hudan petunjuk guidance"
   },
   {
    "rank": 123,
@@ -1434,12 +1434,12 @@
   {
    "rank": 131,
    "ar": "بُنَىّ",
-   "translit": "bunāā",
+   "translit": "bunayy",
    "count": 80,
    "id": "anak laki-laki; keturunan",
    "en": "sons; children, descendants",
    "cum": 6129,
-   "s": "بني bunaa anak laki-laki sons keturunan children, descendants"
+   "s": "بني bunayy anak laki-laki sons keturunan children, descendants"
   },
   {
    "rank": 132,
@@ -1564,12 +1564,12 @@
   {
    "rank": 144,
    "ar": "نَبِىّ",
-   "translit": "nabīī",
+   "translit": "nabiyy",
    "count": 75,
    "id": "nabi",
    "en": "prophet",
    "cum": 6263,
-   "s": "نبي nabii nabi prophet"
+   "s": "نبي nabiyy nabi prophet"
   },
   {
    "rank": 145,
@@ -2004,12 +2004,12 @@
   {
    "rank": 188,
    "ar": "أَىّ",
-   "translit": "āā",
+   "translit": "ayy",
    "count": 60,
    "id": "yang mana; apa",
    "en": "which; what",
    "cum": 6664,
-   "s": "اي aa yang mana which apa what"
+   "s": "اي ayy yang mana which apa what"
   },
   {
    "rank": 189,
@@ -2924,12 +2924,12 @@
   {
    "rank": 280,
    "ar": "خَشِىَ",
-   "translit": "khasyīa",
+   "translit": "khasyiya",
    "count": 40,
    "id": "takut",
    "en": "fear",
    "cum": 7261,
-   "s": "خشي khasyia takut fear"
+   "s": "خشي khasyiya takut fear"
   },
   {
    "rank": 281,
@@ -3094,12 +3094,12 @@
   {
    "rank": 297,
    "ar": "رَضِىَ",
-   "translit": "raḍīa",
+   "translit": "raḍiya",
    "count": 38,
    "id": "rida, berkenan; puas, rela",
    "en": "be pleased, approve; be satisfied, content",
    "cum": 7350,
-   "s": "رضي radia rida, berkenan be pleased, approve puas, rela be satisfied, content"
+   "s": "رضي radiya rida, berkenan be pleased, approve puas, rela be satisfied, content"
   },
   {
    "rank": 298,
@@ -3314,12 +3314,12 @@
   {
    "rank": 319,
    "ar": "نَسِىَ",
-   "translit": "nasīa",
+   "translit": "nasiya",
    "count": 35,
    "id": "lupa; meninggalkan, mengabaikan",
    "en": "forget; abandon, disregard",
    "cum": 7457,
-   "s": "نسي nasia lupa forget meninggalkan, mengabaikan abandon, disregard"
+   "s": "نسي nasiya lupa forget meninggalkan, mengabaikan abandon, disregard"
   },
   {
    "rank": 320,
@@ -3584,12 +3584,12 @@
   {
    "rank": 346,
    "ar": "إِذًا",
-   "translit": "iżanā",
+   "translit": "iżan",
    "count": 31,
    "id": "jika demikian, maka",
    "en": "then, in that case",
    "cum": 7577,
-   "s": "اذا izana jika demikian, maka then, in that case"
+   "s": "اذا izan jika demikian, maka then, in that case"
   },
   {
    "rank": 347,
@@ -3794,12 +3794,12 @@
   {
    "rank": 367,
    "ar": "أَبَدًا",
-   "translit": "abadanā",
+   "translit": "abadan",
    "count": 28,
    "id": "selama-lamanya",
    "en": "forever",
    "cum": 7660,
-   "s": "ابدا abadana selama-lamanya forever"
+   "s": "ابدا abadan selama-lamanya forever"
   },
   {
    "rank": 368,
@@ -4404,12 +4404,12 @@
   {
    "rank": 428,
    "ar": "غَنِىّ",
-   "translit": "ganīī",
+   "translit": "ganiyy",
    "count": 24,
    "id": "mahakaya; kaya",
    "en": "free of need; rich",
    "cum": 7875,
-   "s": "غني ganii mahakaya free of need kaya rich"
+   "s": "غني ganiyy mahakaya free of need kaya rich"
   },
   {
    "rank": 429,
@@ -4694,12 +4694,12 @@
   {
    "rank": 457,
    "ar": "يَرْجُوا۟",
-   "translit": "yarjūā",
+   "translit": "yarjū",
    "count": 22,
    "id": "mengharapkan",
    "en": "hope for",
    "cum": 7963,
-   "s": "يرجوا yarjua mengharapkan hope for"
+   "s": "يرجوا yarju mengharapkan hope for"
   },
   {
    "rank": 458,
@@ -4944,12 +4944,12 @@
   {
    "rank": 482,
    "ar": "مُسَمًّى",
-   "translit": "musammanā",
+   "translit": "musamman",
    "count": 21,
    "id": "yang ditentukan",
    "en": "specified",
    "cum": 8035,
-   "s": "مسمي musammana yang ditentukan specified"
+   "s": "مسمي musamman yang ditentukan specified"
   },
   {
    "rank": 483,
@@ -5464,12 +5464,12 @@
   {
    "rank": 534,
    "ar": "أُخْفِىَ",
-   "translit": "ukhfīa",
+   "translit": "ukhfiya",
    "count": 18,
    "id": "menyembunyikan",
    "en": "conceal",
    "cum": 8170,
-   "s": "اخفي ukhfia menyembunyikan conceal"
+   "s": "اخفي ukhfiya menyembunyikan conceal"
   },
   {
    "rank": 535,
@@ -6134,12 +6134,12 @@
   {
    "rank": 601,
    "ar": "يُبْدِىَ",
-   "translit": "yubdīa",
+   "translit": "yubdiya",
    "count": 15,
    "id": "menampakkan",
    "en": "reveal",
    "cum": 8320,
-   "s": "يبدي yubdia menampakkan reveal"
+   "s": "يبدي yubdiya menampakkan reveal"
   },
   {
    "rank": 602,
@@ -6324,12 +6324,12 @@
   {
    "rank": 620,
    "ar": "أُوذِىَ",
-   "translit": "ūżīa",
+   "translit": "ūżiya",
    "count": 15,
    "id": "menyakiti; disakiti",
    "en": "harm; be harmed",
    "cum": 8358,
-   "s": "اوذي uzia menyakiti harm disakiti be harmed"
+   "s": "اوذي uziya menyakiti harm disakiti be harmed"
   },
   {
    "rank": 621,
@@ -6884,12 +6884,12 @@
   {
    "rank": 676,
    "ar": "مَثْوًى",
-   "translit": "maṡwanā",
+   "translit": "maṡwan",
    "count": 13,
    "id": "tempat tinggal",
    "en": "residence",
    "cum": 8462,
-   "s": "مثوي maswana tempat tinggal residence"
+   "s": "مثوي maswan tempat tinggal residence"
   },
   {
    "rank": 677,
@@ -7614,22 +7614,22 @@
   {
    "rank": 749,
    "ar": "هُزُو",
-   "translit": "huzū",
+   "translit": "huzuw",
    "count": 11,
    "id": "ejekan",
    "en": "ridicule",
    "cum": 8581,
-   "s": "هزو huzu ejekan ridicule"
+   "s": "هزو huzuw ejekan ridicule"
   },
   {
    "rank": 750,
    "ar": "خِزْى",
-   "translit": "khizā",
+   "translit": "khizy",
    "count": 11,
    "id": "kehinaan",
    "en": "disgrace",
    "cum": 8582,
-   "s": "خزي khiza kehinaan disgrace"
+   "s": "خزي khizy kehinaan disgrace"
   },
   {
    "rank": 751,
@@ -7984,12 +7984,12 @@
   {
    "rank": 786,
    "ar": "قَوِىّ",
-   "translit": "qawīī",
+   "translit": "qawiyy",
    "count": 11,
    "id": "mahakuat; kuat",
    "en": "powerful; strong",
    "cum": 8635,
-   "s": "قوي qawii mahakuat powerful kuat strong"
+   "s": "قوي qawiyy mahakuat powerful kuat strong"
   },
   {
    "rank": 787,
@@ -8334,12 +8334,12 @@
   {
    "rank": 821,
    "ar": "مِائَة",
-   "translit": "miā’ah",
+   "translit": "mi’ah",
    "count": 10,
    "id": "seratus",
    "en": "hundred",
    "cum": 8683,
-   "s": "مايه miaah seratus hundred"
+   "s": "مايه miah seratus hundred"
   },
   {
    "rank": 822,
@@ -8384,12 +8384,12 @@
   {
    "rank": 826,
    "ar": "عَشِىّ",
-   "translit": "‘asyīī",
+   "translit": "‘asyiyy",
    "count": 10,
    "id": "petang",
    "en": "evening",
    "cum": 8690,
-   "s": "عشي asyii petang evening"
+   "s": "عشي asyiyy petang evening"
   },
   {
    "rank": 827,
@@ -8724,12 +8724,12 @@
   {
    "rank": 860,
    "ar": "يَسْتَحْىِۦٓ",
-   "translit": "yastaḥāi",
+   "translit": "yastaḥyī",
    "count": 9,
    "id": "membiarkan hidup; malu",
    "en": "keep alive; be shy",
    "cum": 8735,
-   "s": "يستحي yastahai membiarkan hidup keep alive malu be shy"
+   "s": "يستحي yastahyi membiarkan hidup keep alive malu be shy"
   },
   {
    "rank": 861,
@@ -8924,12 +8924,12 @@
   {
    "rank": 880,
    "ar": "أَذًى",
-   "translit": "ażanā",
+   "translit": "ażan",
    "count": 9,
    "id": "gangguan menyakitkan; gangguan fisik",
    "en": "hurtful harm; physical discomfort",
    "cum": 8759,
-   "s": "اذي azana gangguan menyakitkan hurtful harm gangguan fisik physical discomfort"
+   "s": "اذي azan gangguan menyakitkan hurtful harm gangguan fisik physical discomfort"
   },
   {
    "rank": 881,
@@ -10594,12 +10594,12 @@
   {
    "rank": 1047,
    "ar": "رِبَوٰا",
-   "translit": "ribāā",
+   "translit": "ribā",
    "count": 7,
    "id": "riba",
    "en": "interest, usury",
    "cum": 8940,
-   "s": "ربوا ribaa riba interest, usury"
+   "s": "ربوا riba riba interest, usury"
   },
   {
    "rank": 1048,
@@ -10614,12 +10614,12 @@
   {
    "rank": 1049,
    "ar": "ٱلْتَقَى",
-   "translit": "altaqā",
+   "translit": "iltaqā",
    "count": 7,
    "id": "bertemu",
    "en": "meet",
    "cum": 8942,
-   "s": "التقي altaqa bertemu meet"
+   "s": "التقي iltaqa bertemu meet"
   },
   {
    "rank": 1050,
@@ -10834,12 +10834,12 @@
   {
    "rank": 1071,
    "ar": "عَمِىَ",
-   "translit": "‘amīa",
+   "translit": "‘amiya",
    "count": 7,
    "id": "menjadi buta; membutakan",
    "en": "be blind; make blind",
    "cum": 8963,
-   "s": "عمي amia menjadi buta be blind membutakan make blind menjadi gelap become obscured"
+   "s": "عمي amiya menjadi buta be blind membutakan make blind menjadi gelap become obscured"
   },
   {
    "rank": 1072,
@@ -10914,12 +10914,12 @@
   {
    "rank": 1079,
    "ar": "حَىَّ",
-   "translit": "ḥāāa",
+   "translit": "ḥayya",
    "count": 7,
    "id": "hidup",
    "en": "to live",
    "cum": 8970,
-   "s": "حي haaa hidup to live"
+   "s": "حي hayya hidup to live"
   },
   {
    "rank": 1080,
@@ -11354,12 +11354,12 @@
   {
    "rank": 1123,
    "ar": "أُمِّىّ",
-   "translit": "ummīī",
+   "translit": "ummiyy",
    "count": 6,
    "id": "buta huruf",
    "en": "unlettered",
    "cum": 9010,
-   "s": "امي ummii buta huruf unlettered"
+   "s": "امي ummiyy buta huruf unlettered"
   },
   {
    "rank": 1124,
@@ -12114,12 +12114,12 @@
   {
    "rank": 1199,
    "ar": "ضُحًى",
-   "translit": "ḍuḥanā",
+   "translit": "ḍuḥan",
    "count": 6,
    "id": "pagi hari; sinar pagi",
    "en": "morning; morning brightness",
    "cum": 9071,
-   "s": "ضحي duhana pagi hari morning sinar pagi morning brightness"
+   "s": "ضحي duhan pagi hari morning sinar pagi morning brightness"
   },
   {
    "rank": 1200,
@@ -12284,12 +12284,12 @@
   {
    "rank": 1216,
    "ar": "وَحْى",
-   "translit": "waḥā",
+   "translit": "waḥy",
    "count": 6,
    "id": "wahyu",
    "en": "revelation",
    "cum": 9085,
-   "s": "وحي waha wahyu revelation"
+   "s": "وحي wahy wahyu revelation"
   },
   {
    "rank": 1217,
@@ -13064,12 +13064,12 @@
   {
    "rank": 1294,
    "ar": "ٱللَّهُمَّ",
-   "translit": "alllahumma",
+   "translit": "Allāhumma",
    "count": 5,
    "id": "ya Allah",
    "en": "O Allah",
    "cum": 9141,
-   "s": "اللهم alllahumma ya allah o allah"
+   "s": "اللهم allahumma ya allah o allah"
   },
   {
    "rank": 1295,
@@ -14484,12 +14484,12 @@
   {
    "rank": 1436,
    "ar": "مُلَٰقُوا",
-   "translit": "mulāqūā",
+   "translit": "mulāqū",
    "count": 4,
    "id": "akan menemui",
    "en": "will meet",
    "cum": 9235,
-   "s": "ملقوا mulaqua akan menemui will meet"
+   "s": "ملقوا mulaqu akan menemui will meet"
   },
   {
    "rank": 1437,
@@ -15104,12 +15104,12 @@
   {
    "rank": 1498,
    "ar": "يَدْرَؤُا۟",
-   "translit": "yadra’uā",
+   "translit": "yadra’u",
    "count": 4,
    "id": "menolak, menghindarkan",
    "en": "avert, ward off",
    "cum": 9269,
-   "s": "يدروا yadraua menolak, menghindarkan avert, ward off"
+   "s": "يدروا yadrau menolak, menghindarkan avert, ward off"
   },
   {
    "rank": 1499,
@@ -15424,12 +15424,12 @@
   {
    "rank": 1530,
    "ar": "وُۥرِىَ",
-   "translit": "wurīa",
+   "translit": "wūriya",
    "count": 4,
    "id": "menutupi",
    "en": "conceal",
    "cum": 9286,
-   "s": "وري wuria menutupi conceal"
+   "s": "وري wuriya menutupi conceal"
   },
   {
    "rank": 1531,
@@ -17654,12 +17654,12 @@
   {
    "rank": 1753,
    "ar": "بَقِىَ",
-   "translit": "baqīa",
+   "translit": "baqiya",
    "count": 3,
    "id": "tersisa; menyisakan",
    "en": "remain; spare",
    "cum": 9396,
-   "s": "بقي baqia tersisa remain menyisakan spare"
+   "s": "بقي baqiya tersisa remain menyisakan spare"
   },
   {
    "rank": 1754,
@@ -19934,12 +19934,12 @@
   {
    "rank": 1981,
    "ar": "أَعْجَمِىّ",
-   "translit": "a‘jamīī",
+   "translit": "a‘jamiyy",
    "count": 3,
    "id": "asing (bukan Arab)",
    "en": "foreign, non-Arabic",
    "cum": 9488,
-   "s": "اعجمي ajamii asing (bukan arab) foreign, non-arabic"
+   "s": "اعجمي ajamiyy asing (bukan arab) foreign, non-arabic"
   },
   {
    "rank": 1982,
@@ -20244,12 +20244,12 @@
   {
    "rank": 2012,
    "ar": "سَامِرِىّ",
-   "translit": "sāmirīī",
+   "translit": "sāmiriyy",
    "count": 3,
    "id": "Samiri",
    "en": "the Samiri",
    "cum": 9500,
-   "s": "سامري samirii samiri the samiri"
+   "s": "سامري samiriyy samiri the samiri"
   },
   {
    "rank": 2013,
@@ -22034,12 +22034,12 @@
   {
    "rank": 2191,
    "ar": "رَأْى",
-   "translit": "ra’ā",
+   "translit": "ra’y",
    "count": 2,
    "id": "penglihatan; pendapat",
    "en": "sight; opinion",
    "cum": 9559,
-   "s": "راي raa penglihatan sight pendapat opinion"
+   "s": "راي ray penglihatan sight pendapat opinion"
   },
   {
    "rank": 2192,
@@ -22344,12 +22344,12 @@
   {
    "rank": 2222,
    "ar": "يُبْلِىَ",
-   "translit": "yublīa",
+   "translit": "yubliya",
    "count": 2,
    "id": "menguji",
    "en": "to test",
    "cum": 9568,
-   "s": "يبلي yublia menguji to test"
+   "s": "يبلي yubliya menguji to test"
   },
   {
    "rank": 2223,
@@ -24454,12 +24454,12 @@
   {
    "rank": 2433,
    "ar": "ٱلْتَقَطَ",
-   "translit": "altaqaṭa",
+   "translit": "iltaqaṭa",
    "count": 2,
    "id": "memungut",
    "en": "pick up",
    "cum": 9624,
-   "s": "التقط altaqata memungut pick up"
+   "s": "التقط iltaqata memungut pick up"
   },
   {
    "rank": 2434,
@@ -25714,12 +25714,12 @@
   {
    "rank": 2559,
    "ar": "خَفِىّ",
-   "translit": "khafīī",
+   "translit": "khafiyy",
    "count": 2,
    "id": "tersembunyi, diam-diam",
    "en": "hidden, covert",
    "cum": 9658,
-   "s": "خفي khafii tersembunyi, diam-diam hidden, covert"
+   "s": "خفي khafiyy tersembunyi, diam-diam hidden, covert"
   },
   {
    "rank": 2560,
@@ -25874,12 +25874,12 @@
   {
    "rank": 2575,
    "ar": "طُوًى",
-   "translit": "ṭūanā",
+   "translit": "ṭuwan",
    "count": 2,
    "id": "Tuwa (nama lembah)",
    "en": "Tuwa (valley name)",
    "cum": 9662,
-   "s": "طوي tuana tuwa (nama lembah) tuwa (valley name)"
+   "s": "طوي tuwan tuwa (nama lembah) tuwa (valley name)"
   },
   {
    "rank": 2576,
@@ -26834,12 +26834,12 @@
   {
    "rank": 2671,
    "ar": "مُفْتَرًى",
-   "translit": "muftaranā",
+   "translit": "muftaran",
    "count": 2,
    "id": "dibuat-buat",
    "en": "invented",
    "cum": 9688,
-   "s": "مفتري muftarana dibuat-buat invented"
+   "s": "مفتري muftaran dibuat-buat invented"
   },
   {
    "rank": 2672,
@@ -26914,12 +26914,12 @@
   {
    "rank": 2679,
    "ar": "مُحْى",
-   "translit": "muḥā",
+   "translit": "muḥyī",
    "count": 2,
    "id": "penghidup",
    "en": "giver of life",
    "cum": 9690,
-   "s": "محي muha penghidup giver of life"
+   "s": "محي muhyi penghidup giver of life"
   },
   {
    "rank": 2680,
@@ -27164,12 +27164,12 @@
   {
    "rank": 2704,
    "ar": "ذَآئِقُوا",
-   "translit": "żā’iqūā",
+   "translit": "żā’iqū",
    "count": 2,
    "id": "merasakan",
    "en": "taste, experience",
    "cum": 9697,
-   "s": "ذايقوا zaiqua merasakan taste, experience"
+   "s": "ذايقوا zaiqu merasakan taste, experience"
   },
   {
    "rank": 2705,
@@ -27264,12 +27264,12 @@
   {
    "rank": 2714,
    "ar": "أَيْيد",
-   "translit": "aiyd",
+   "translit": "aid",
    "count": 2,
    "id": "kekuatan",
    "en": "strength",
    "cum": 9699,
-   "s": "اييد aiyd kekuatan strength"
+   "s": "اييد aid kekuatan strength"
   },
   {
    "rank": 2715,
@@ -27304,12 +27304,12 @@
   {
    "rank": 2718,
    "ar": "صَالُوا",
-   "translit": "ṣālūā",
+   "translit": "ṣālū",
    "count": 2,
    "id": "masuk dan terbakar",
    "en": "enter and burn",
    "cum": 9701,
-   "s": "صالوا salua masuk dan terbakar enter and burn"
+   "s": "صالوا salu masuk dan terbakar enter and burn"
   },
   {
    "rank": 2719,
@@ -27404,12 +27404,12 @@
   {
    "rank": 2728,
    "ar": "عَمًى",
-   "translit": "‘amanā",
+   "translit": "‘aman",
    "count": 2,
    "id": "kebutaan",
    "en": "blindness",
    "cum": 9703,
-   "s": "عمي amana kebutaan blindness"
+   "s": "عمي aman kebutaan blindness"
   },
   {
    "rank": 2729,
@@ -28884,12 +28884,12 @@
   {
    "rank": 2876,
    "ar": "مُصَلًّى",
-   "translit": "muṣallanā",
+   "translit": "muṣallan",
    "count": 1,
    "id": "tempat salat",
    "en": "place of prayer",
    "cum": 9738,
-   "s": "مصلي musallana tempat salat place of prayer"
+   "s": "مصلي musallan tempat salat place of prayer"
   },
   {
    "rank": 2877,
@@ -30154,12 +30154,12 @@
   {
    "rank": 3003,
    "ar": "غُزًّى",
-   "translit": "guzzanā",
+   "translit": "guzzan",
    "count": 1,
    "id": "pejuang perang",
    "en": "fighters",
    "cum": 9755,
-   "s": "غزي guzzana pejuang perang fighters"
+   "s": "غزي guzzan pejuang perang fighters"
   },
   {
    "rank": 3004,
@@ -30834,12 +30834,12 @@
   {
    "rank": 3071,
    "ar": "ٱمْرُؤٌا",
-   "translit": "imru’unā",
+   "translit": "imru’un",
    "count": 1,
    "id": "seorang laki-laki",
    "en": "a man",
    "cum": 9764,
-   "s": "امروا imruuna seorang laki-laki a man"
+   "s": "امروا imruun seorang laki-laki a man"
   },
   {
    "rank": 3072,
@@ -33614,12 +33614,12 @@
   {
    "rank": 3349,
    "ar": "مَجْرىٰ",
-   "translit": "majrāā",
+   "translit": "majrā",
    "count": 1,
    "id": "pelayaran",
    "en": "sailing",
    "cum": 9801,
-   "s": "مجري majraa pelayaran sailing"
+   "s": "مجري majra pelayaran sailing"
   },
   {
    "rank": 3350,
@@ -33654,12 +33654,12 @@
   {
    "rank": 3353,
    "ar": "جُودِىّ",
-   "translit": "jūdīī",
+   "translit": "jūdiyy",
    "count": 1,
    "id": "gunung Judi",
    "en": "Mount Judi",
    "cum": 9802,
-   "s": "جودي judii gunung judi mount judi"
+   "s": "جودي judiyy gunung judi mount judi"
   },
   {
    "rank": 3354,
@@ -34184,12 +34184,12 @@
   {
    "rank": 3406,
    "ar": "تَفْتَؤُا۟",
-   "translit": "tafta’uā",
+   "translit": "tafta’u",
    "count": 1,
    "id": "tidak henti-hentinya",
    "en": "not cease",
    "cum": 9809,
-   "s": "تفتوا taftaua tidak henti-hentinya not cease"
+   "s": "تفتوا taftau tidak henti-hentinya not cease"
   },
   {
    "rank": 3407,
@@ -34204,12 +34204,12 @@
   {
    "rank": 3408,
    "ar": "أَشْكُوا۟",
-   "translit": "asykūā",
+   "translit": "asykū",
    "count": 1,
    "id": "mengadu",
    "en": "complain",
    "cum": 9809,
-   "s": "اشكوا asykua mengadu complain"
+   "s": "اشكوا asyku mengadu complain"
   },
   {
    "rank": 3409,
@@ -34894,12 +34894,12 @@
   {
    "rank": 3477,
    "ar": "يَتَفَيَّؤُا۟",
-   "translit": "yatafayya’uā",
+   "translit": "yatafayya’u",
    "count": 1,
    "id": "bergeser berbolak-balik",
    "en": "shift back and forth",
    "cum": 9818,
-   "s": "يتفيوا yatafayyaua bergeser berbolak-balik shift back and forth"
+   "s": "يتفيوا yatafayyau bergeser berbolak-balik shift back and forth"
   },
   {
    "rank": 3478,
@@ -36714,12 +36714,12 @@
   {
    "rank": 3659,
    "ar": "أَتَوَكَّؤُا۟",
-   "translit": "atawakka’uā",
+   "translit": "atawakka’u",
    "count": 1,
    "id": "bertumpu",
    "en": "lean upon",
    "cum": 9843,
-   "s": "اتوكوا atawakkaua bertumpu lean upon"
+   "s": "اتوكوا atawakkau bertumpu lean upon"
   },
   {
    "rank": 3660,
@@ -36854,12 +36854,12 @@
   {
    "rank": 3673,
    "ar": "سُوًى",
-   "translit": "sūanā",
+   "translit": "suwan",
    "count": 1,
    "id": "rata, terbuka",
    "en": "level, open",
    "cum": 9845,
-   "s": "سوي suana rata, terbuka level, open"
+   "s": "سوي suwan rata, terbuka level, open"
   },
   {
    "rank": 3674,
@@ -37074,12 +37074,12 @@
   {
    "rank": 3695,
    "ar": "تَظْمَؤُا۟",
-   "translit": "taẓma’uā",
+   "translit": "taẓma’u",
    "count": 1,
    "id": "merasa dahaga",
    "en": "be thirsty",
    "cum": 9848,
-   "s": "تظموا tazmaua merasa dahaga be thirsty"
+   "s": "تظموا tazmau merasa dahaga be thirsty"
   },
   {
    "rank": 3696,
@@ -37264,12 +37264,12 @@
   {
    "rank": 3714,
    "ar": "فَتًى",
-   "translit": "fatanā",
+   "translit": "fatan",
    "count": 1,
    "id": "pemuda",
    "en": "young man",
    "cum": 9850,
-   "s": "فتي fatana pemuda young man"
+   "s": "فتي fatan pemuda young man"
   },
   {
    "rank": 3715,
@@ -37464,12 +37464,12 @@
   {
    "rank": 3734,
    "ar": "طَىّ",
-   "translit": "ṭāā",
+   "translit": "ṭayy",
    "count": 1,
    "id": "penggulungan",
    "en": "rolling up",
    "cum": 9853,
-   "s": "طي taa penggulungan rolling up"
+   "s": "طي tayy penggulungan rolling up"
   },
   {
    "rank": 3735,
@@ -38224,12 +38224,12 @@
   {
    "rank": 3810,
    "ar": "دُرِّىّ",
-   "translit": "durrīī",
+   "translit": "durriyy",
    "count": 1,
    "id": "berkilauan seperti mutiara",
    "en": "pearly, brilliant",
    "cum": 9863,
-   "s": "دري durrii berkilauan seperti mutiara pearly, brilliant"
+   "s": "دري durriyy berkilauan seperti mutiara pearly, brilliant"
   },
   {
    "rank": 3811,
@@ -38304,12 +38304,12 @@
   {
    "rank": 3818,
    "ar": "لُجِّىّ",
-   "translit": "lujjīī",
+   "translit": "lujjiyy",
    "count": 1,
    "id": "dalam",
    "en": "deep",
    "cum": 9864,
-   "s": "لجي lujjii dalam deep"
+   "s": "لجي lujjiyy dalam deep"
   },
   {
    "rank": 3819,
@@ -38644,12 +38644,12 @@
   {
    "rank": 3852,
    "ar": "يَعْبَؤُا۟",
-   "translit": "ya‘ba’uā",
+   "translit": "ya‘ba’u",
    "count": 1,
    "id": "mengindahkan",
    "en": "care about",
    "cum": 9869,
-   "s": "يعبوا yabaua mengindahkan care about"
+   "s": "يعبوا yabau mengindahkan care about"
   },
   {
    "rank": 3853,
@@ -39254,12 +39254,12 @@
   {
    "rank": 3913,
    "ar": "غَوِىّ",
-   "translit": "gawīī",
+   "translit": "gawiyy",
    "count": 1,
    "id": "sesat",
    "en": "deviator",
    "cum": 9877,
-   "s": "غوي gawii sesat deviator"
+   "s": "غوي gawiyy sesat deviator"
   },
   {
    "rank": 3914,
@@ -39434,12 +39434,12 @@
   {
    "rank": 3931,
    "ar": "غَرْبِىّ",
-   "translit": "garbīī",
+   "translit": "garbiyy",
    "count": 1,
    "id": "barat",
    "en": "western",
    "cum": 9879,
-   "s": "غربي garbii barat western"
+   "s": "غربي garbiyy barat western"
   },
   {
    "rank": 3932,
@@ -39824,12 +39824,12 @@
   {
    "rank": 3970,
    "ar": "نَاكِسُوا",
-   "translit": "nākisūā",
+   "translit": "nākisū",
    "count": 1,
    "id": "menundukkan (kepala)",
    "en": "hanging (heads)",
    "cum": 9884,
-   "s": "ناكسوا nakisua menundukkan (kepala) hanging (heads)"
+   "s": "ناكسوا nakisu menundukkan (kepala) hanging (heads)"
   },
   {
    "rank": 3971,
@@ -41034,12 +41034,12 @@
   {
    "rank": 4091,
    "ar": "ٱلْتَقَمَ",
-   "translit": "altaqama",
+   "translit": "iltaqama",
    "count": 1,
    "id": "menelan",
    "en": "swallowed",
    "cum": 9901,
-   "s": "التقم altaqama menelan swallowed"
+   "s": "التقم iltaqama menelan swallowed"
   },
   {
    "rank": 4092,
@@ -41754,12 +41754,12 @@
   {
    "rank": 4163,
    "ar": "ٱلْغَ",
-   "translit": "alga",
+   "translit": "ilga",
    "count": 1,
    "id": "buat kegaduhan",
    "en": "speak noisily",
    "cum": 9910,
-   "s": "الغ alga buat kegaduhan speak noisily"
+   "s": "الغ ilga buat kegaduhan speak noisily"
   },
   {
    "rank": 4164,
@@ -41874,12 +41874,12 @@
   {
    "rank": 4175,
    "ar": "يُنَشَّؤُا۟",
-   "translit": "yunasysya’uā",
+   "translit": "yunasysya’u",
    "count": 1,
    "id": "dibesarkan",
    "en": "brought up",
    "cum": 9912,
-   "s": "ينشوا yunasysyaua dibesarkan brought up"
+   "s": "ينشوا yunasysyau dibesarkan brought up"
   },
   {
    "rank": 4176,
@@ -42104,12 +42104,12 @@
   {
    "rank": 4198,
    "ar": "غَلْى",
-   "translit": "galā",
+   "translit": "galy",
    "count": 1,
    "id": "mendidih",
    "en": "boiling",
    "cum": 9915,
-   "s": "غلي gala mendidih boiling"
+   "s": "غلي galy mendidih boiling"
   },
   {
    "rank": 4199,
@@ -42304,12 +42304,12 @@
   {
    "rank": 4218,
    "ar": "مُصَفًّى",
-   "translit": "muṣaffanā",
+   "translit": "muṣaffan",
    "count": 1,
    "id": "murni",
    "en": "purified",
    "cum": 9918,
-   "s": "مصفي musaffana murni purified"
+   "s": "مصفي musaffan murni purified"
   },
   {
    "rank": 4219,
@@ -42374,12 +42374,12 @@
   {
    "rank": 4225,
    "ar": "مَغْشِىّ",
-   "translit": "magsyīī",
+   "translit": "magsyiyy",
    "count": 1,
    "id": "pingsan",
    "en": "overcome, fainting",
    "cum": 9919,
-   "s": "مغشي magsyii pingsan overcome, fainting"
+   "s": "مغشي magsyiyy pingsan overcome, fainting"
   },
   {
    "rank": 4226,
@@ -43194,12 +43194,12 @@
   {
    "rank": 4307,
    "ar": "ٱللَّٰت",
-   "translit": "alllāt",
+   "translit": "allāt",
    "count": 1,
    "id": "Al-Lat",
    "en": "al-Lat",
    "cum": 9930,
-   "s": "اللت alllat al-lat al-lat"
+   "s": "اللت allat al-lat al-lat"
   },
   {
    "rank": 4308,
@@ -43754,12 +43754,12 @@
   {
    "rank": 4363,
    "ar": "عَبْقَرِىّ",
-   "translit": "‘abqarīī",
+   "translit": "‘abqariyy",
    "count": 1,
    "id": "permadani indah",
    "en": "fine carpets",
    "cum": 9937,
-   "s": "عبقري abqarii permadani indah fine carpets"
+   "s": "عبقري abqariyy permadani indah fine carpets"
   },
   {
    "rank": 4364,
@@ -44134,12 +44134,12 @@
   {
    "rank": 4401,
    "ar": "ٱلْتَمِسُ",
-   "translit": "altamisu",
+   "translit": "iltamisu",
    "count": 1,
    "id": "carilah",
    "en": "seek",
    "cum": 9942,
-   "s": "التمس altamisu carilah seek"
+   "s": "التمس iltamisu carilah seek"
   },
   {
    "rank": 4402,
@@ -45984,12 +45984,12 @@
   {
    "rank": 4586,
    "ar": "ٱلْتَفَّتِ",
-   "translit": "altaffati",
+   "translit": "iltaffati",
    "count": 1,
    "id": "bertaut",
    "en": "wound about",
    "cum": 9967,
-   "s": "التفت altaffati bertaut wound about"
+   "s": "التفت iltaffati bertaut wound about"
   },
   {
    "rank": 4587,
@@ -46014,22 +46014,22 @@
   {
    "rank": 4589,
    "ar": "سُدًى",
-   "translit": "sudanā",
+   "translit": "sudan",
    "count": 1,
    "id": "terabaikan, tanpa tujuan",
    "en": "neglected, without purpose",
    "cum": 9967,
-   "s": "سدي sudana terabaikan, tanpa tujuan neglected, without purpose"
+   "s": "سدي sudan terabaikan, tanpa tujuan neglected, without purpose"
   },
   {
    "rank": 4590,
    "ar": "مَنِىّ",
-   "translit": "manīī",
+   "translit": "maniyy",
    "count": 1,
    "id": "mani",
    "en": "semen",
    "cum": 9968,
-   "s": "مني manii mani semen"
+   "s": "مني maniyy mani semen"
   },
   {
    "rank": 4591,
@@ -47414,12 +47414,12 @@
   {
    "rank": 4729,
    "ar": "زَرَابِىّ",
-   "translit": "zarābīī",
+   "translit": "zarābiyy",
    "count": 1,
    "id": "permadani",
    "en": "carpets",
    "cum": 9986,
-   "s": "زرابي zarabii permadani carpets"
+   "s": "زرابي zarabiyy permadani carpets"
   },
   {
    "rank": 4730,
@@ -48374,12 +48374,12 @@
   {
    "rank": 4825,
    "ar": "كُفُو",
-   "translit": "kufū",
+   "translit": "kufuw",
    "count": 1,
    "id": "setara",
    "en": "equivalent",
    "cum": 9999,
-   "s": "كفو kufu setara equivalent"
+   "s": "كفو kufuw setara equivalent"
   },
   {
    "rank": 4826,

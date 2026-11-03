@@ -77,6 +77,11 @@ class PlantedFaults(unittest.TestCase):
         self.f["index.json"]["rows"][3]["ar"] = "لا"
         self.assertCaught("was typed, not derived")
 
+    def test_a_transliteration_that_cannot_be_read(self):
+        self.word(5)["translit"] = "nabīī"
+        self.f["index.json"]["rows"][4]["translit"] = "nabīī"
+        self.assertCaught("cannot be read")
+
     def test_a_cited_ayah_with_no_entry(self):
         loc = self.word(1)["senses"][0]["ayat"][0]
         name = K.file_for_sura(int(loc.split(":")[0]))
@@ -159,6 +164,38 @@ class Rules(unittest.TestCase):
         self.assertEqual(K.translit("<in~", {"ACC"}), "inna")
         self.assertEqual(K.translit("vum~", {"CONJ"}), "ṡumma")
         self.assertEqual(K.translit("rab~", {"N"}), "rabb")
+
+    def test_a_dotless_ya_that_is_a_consonant(self):
+        cases = {
+            "n~abiY~": "nabiyy", "waliY~": "waliyy", "bunaY~": "bunayy", ">aY~": "ayy", "HaY~a": "ḥayya",
+            "nasiYa": "nasiya", "xa$iYa": "khasyiya", "r~aDiYa": "raḍiya",
+            "waHoY": "waḥy", "ra>oY": "ra’y", "$aYo'": "syai’", "yasotaHoYi.^": "yastaḥyī",
+        }
+        for bw, want in cases.items():
+            self.assertEqual(K.translit(bw), want, bw)
+
+    def test_a_dotless_ya_that_is_a_long_vowel_stays_one(self):
+        cases = {"fiY": "fī", "EalaY`": "‘alā", "hadaY": "hadā", "bariY^'": "barī’", "majorY`": "majrā", "t~aworaY`p": "taurāh"}
+        for bw, want in cases.items():
+            self.assertEqual(K.translit(bw), want, bw)
+
+    def test_letters_that_are_written_but_not_read(self):
+        cases = {
+            "hudFY": "hudan", ">abadFA": "abadan", "m~usam~FY": "musamman", "TuwFY": "ṭuwan", "{moru&NA": "imru’un",
+            "yarojuwA@": "yarjū", "yadora&uA@": "yadra’u", "SaAluwA": "ṣālū", "miA}ap": "mi’ah", "r~ibaw`A": "ribā",
+            "wu,riYa": "wūriya",
+        }
+        for bw, want in cases.items():
+            self.assertEqual(K.translit(bw), want, bw)
+
+    def test_a_hamzat_wasl_before_lam(self):
+        cases = {
+            "{l~a*iY": "allażī", "{ll~a`t": "allāt", "{ll~ahum~a": "Allāhumma", "{ll~ah": "Allāh",
+            "{lotaqaY": "iltaqā", "{lotaf~ati": "iltaffati", "{loga": "ilga",
+            "{loyasaEa": "alyasa‘a", "{loEuz~aY`": "al‘uzzā",
+        }
+        for bw, want in cases.items():
+            self.assertEqual(K.translit(bw), want, bw)
 
     def test_homograph_numbers_are_not_shown(self):
         self.assertEqual(K.headword(">awofaY`2"), K.headword(">awofaY`"))
