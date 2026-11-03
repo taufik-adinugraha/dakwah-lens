@@ -402,7 +402,10 @@ async function frequencyList() {
   }
   if (list.html.includes("data-kosakata-tabs")) fail("/kosakata", "the list links to the learning path before it is listed");
   const count = (body) => fetch(`${BASE}/belajar/api/kosakata/hasil`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  // The route answers 204 whatever the database says, so the row itself is read back in the image job
+  // (deploy-belajar.yml): one passed and one failed, the second through the upsert's conflict path.
   if ((await count({ test: "1-3", passed: true })).status !== 204) fail("/api/kosakata/hasil", "a finished test is not counted");
+  if ((await count({ test: "1-3", passed: false })).status !== 204) fail("/api/kosakata/hasil", "a second result for a test is not counted");
   if ((await count({ test: "9-9", passed: true })).status !== 400) fail("/api/kosakata/hasil", "a test that does not exist must be refused");
   if ((await count({ test: "1-3" })).status !== 400) fail("/api/kosakata/hasil", "a malformed count must be refused");
   console.log("kosakata list: pages, search, a word, its play buttons and the ayah popup answer; the path answers at its address");
