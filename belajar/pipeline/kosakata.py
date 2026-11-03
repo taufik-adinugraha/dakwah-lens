@@ -65,6 +65,21 @@ _HAMZA = set("'><&}")
 _VOWELS = set("aiu")
 # QAC stores these particles without their final vowel: ثُمّ is thumma, لَٰكِنّ is lakinna.
 _FINAL_A_TAGS = {"ACC", "CONJ", "LOC"}
+# Words the spelling alone can't give: QAC marks no long vowel in Allahumma, the second ya of بِأَيْيْدٍ
+# is unread, مُحْىِ ends in a long vowel, and هُزُوًا and كُفُوًا keep their waw as a consonant.
+_SPOKEN = {
+    "{ll~ah": "Allāh",
+    "{ll~ahum~a": "Allāhumma",
+    ">ayoyd": "aid",
+    "muHoY": "muḥyī",
+    "huzuw": "huzuw",
+    "kufuw": "kufuw",
+}
+# The article's "a" on a hamzat wasl is {l~ in every other word; these two names keep it before a sukun.
+_WASL_A_NAMES = {"{loyasaEa", "{loEuz~aY`"}
+_VOWEL_OR_TANWIN = _VOWELS | set("FNK")
+_VOWEL_CLASH = re.compile("(?!ai|au)[aiuāīū][aiuāīū]")
+_TRIPLED = re.compile(r"(.)\1\1")
 
 
 def bare_lemma(bw: str) -> str:
@@ -77,10 +92,27 @@ def headword(bw: str) -> str:
     return bw_to_ar(bare_lemma(bw))
 
 
+def _spelled_as_read(s: str) -> str:
+    """The lemma with its Uthmani spelling reduced to what is read, so the letter rules below see one
+    spelling of each sound. Without this, نَبِىّ came out as nabīī and هُدًى as hudanā."""
+    s = re.sub(r"^\{ll~", "{l~", s)  # ٱللَّٰت is one doubled lam
+    s = re.sub(r"Y(?=[aiuo~])", "y", s)  # a dotless ya with a vowel or shaddah is the consonant: n~abiY~, xa$iYa
+    s = re.sub(r"oY$", "oy", s)  # so is one after a sukun: waHoY
+    s = re.sub(r"(?<!a)Y`", "`", s)  # one long vowel, not two: majorY`
+    s = s.replace("u,", "uw").replace("i.", "iy")  # the small waw and ya lengthen the vowel: wu,riYa
+    s = s.replace("A@", "").replace("iA}", "i}")  # a silent alif: yarojuwA@, miA}ap
+    s = re.sub(r"(?<=uw)A$", "", s)  # the same, unmarked, after a plural's waw: SaAluwA
+    s = re.sub(r"(?<=w`)A$", "", s)  # and after the long vowel of رِبَوٰا
+    return re.sub(r"(?<=[FN])[AY]$", "", s)  # the seat of a tanwin: hudFY, >abadFA
+
+
 def translit(bw: str, tags: set[str] | frozenset[str] = frozenset()) -> str:
     """A Buckwalter lemma in the module's transliteration, SKB 158/1987, by rule. An initial hamza
     is not written; a hamzat wasl is "a" in the article and "i" elsewhere."""
-    s = bare_lemma(bw).replace("^", "").replace("_", "")
+    spoken = _SPOKEN.get(bare_lemma(bw))
+    if spoken:
+        return spoken
+    s = _spelled_as_read(bare_lemma(bw).replace("^", "").replace("_", ""))
     out: list[str] = []
     i, n = 0, len(s)
     while i < n:
@@ -88,14 +120,11 @@ def translit(bw: str, tags: set[str] | frozenset[str] = frozenset()) -> str:
         nx = s[i + 1] if i + 1 < n else ""
         nx2 = s[i + 2] if i + 2 < n else ""
         if c == "{":
-            out.append("a" if nx == "l" else "i")
+            out.append("a" if s.startswith("{l~") or bare_lemma(bw) in _WASL_A_NAMES else "i")
         elif c == "|":
             out.append("ā" if i == 0 else "’ā")
         elif c == "a":
-            if nx == "Y" and nx2 == "o":  # QAC writes shay' as $aYo'
-                out.append("ai")
-                i += 1
-            elif nx == "w" and nx2 == "`":  # Uthmani waw + dagger alif: Salaw`p
+            if nx == "w" and nx2 == "`":  # Uthmani waw + dagger alif: Salaw`p
                 out.append("ā")
                 i += 2
             elif nx in ("A", "Y", "`"):
@@ -112,7 +141,7 @@ def translit(bw: str, tags: set[str] | frozenset[str] = frozenset()) -> str:
             else:
                 out.append("a")
         elif c == "i":
-            if nx == "y" and nx2 not in _VOWELS and nx2 != "~":
+            if nx == "y" and nx2 not in _VOWEL_OR_TANWIN and nx2 != "~":
                 out.append("ī")
                 i += 1
             elif nx == "Y":
@@ -121,7 +150,7 @@ def translit(bw: str, tags: set[str] | frozenset[str] = frozenset()) -> str:
             else:
                 out.append("i")
         elif c == "u":
-            if nx == "w" and nx2 not in _VOWELS and nx2 != "~":
+            if nx == "w" and nx2 not in _VOWEL_OR_TANWIN and nx2 != "~":
                 out.append("ū")
                 i += 1
             else:
@@ -145,7 +174,7 @@ def translit(bw: str, tags: set[str] | frozenset[str] = frozenset()) -> str:
     t = "".join(out)
     if s.endswith("~") and set(tags) & _FINAL_A_TAGS:
         t += "a"
-    return "Allāh" if bare_lemma(bw) == "{ll~ah" else t
+    return t
 
 
 def fold(text: str) -> str:
@@ -417,6 +446,8 @@ def problems(files: dict[str, dict], authored: dict, authored_sha: str, src: dic
             out.append(f"rank {w['rank']}: the index shows other meanings than the word file")
         if w["ar"] != headword(w["lemma"]) or w["translit"] != translit(w["lemma"], _tags_hint(w)):
             out.append(f"rank {w['rank']}: headword or transliteration was typed, not derived")
+        if _VOWEL_CLASH.search(w["translit"]) or _TRIPLED.search(w["translit"]):
+            out.append(f"rank {w['rank']}: {w['translit']!r} cannot be read (vowels side by side or a tripled letter)")
         if not w.get("forms"):
             out.append(f"rank {w['rank']}: no word forms")
         for s in w["senses"]:

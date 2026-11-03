@@ -54,7 +54,7 @@ describe("the data files", () => {
 
   it("names every surah, and the operator's reading of nasiya is there", () => {
     expect(Object.keys(index.names)).toHaveLength(114);
-    const nasiya = index.rows.find((r) => r.translit === "nasīa");
+    const nasiya = index.rows.find((r) => r.translit === "nasiya");
     expect(nasiya?.s).toContain("abandon, disregard");
   });
 });
