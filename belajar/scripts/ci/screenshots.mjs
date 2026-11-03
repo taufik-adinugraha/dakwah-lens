@@ -1278,6 +1278,10 @@ async function kosakataPathChecks(page, vp) {
     if (wide > 0) fail(`${where} scrolls sideways by ${wide}px`);
   };
   const tile = async (id) => page.locator(`[data-path-tile="${id}"]`).getAttribute("data-state");
+  const expectLine = async (want) => {
+    const said = (await page.locator("[data-path-covered]").innerText()).trim();
+    if (!want.test(said)) fail(`the line under the band says ${JSON.stringify(said)}, expected ${want}`);
+  };
   const expectTile = async (id, state) => {
     await page.waitForSelector(`[data-path-tile="${id}"][data-state="${state}"]`, { state: "attached", timeout: 8000 }).catch(async () => fail(`batch ${id} is ${await tile(id)}, expected ${state}`));
   };
@@ -1379,6 +1383,8 @@ async function kosakataPathChecks(page, vp) {
     await go(MAP);
     await expectTile("0-1", "passed");
     await expectTile("0-2", "open");
+    // Level 0's parts cover no word of the list, and the map must not then say that no test was passed.
+    await expectLine(/^Level 1 saja mencakup \d/);
     await go(`${MAP}/0/2/tes`);
     await page.waitForSelector("[data-path-begin]", { timeout: 8000 });
     await page.locator("[data-path-begin]").click();
@@ -1444,6 +1450,7 @@ async function kosakataPathChecks(page, vp) {
     await expectTile("3-1", "open");
     const covered = await page.locator("[data-path-covered]").getAttribute("data-path-covered");
     if (!(Number(covered) > 0)) fail("the map does not say how much the passed batches cover");
+    await expectLine(/^Batch yang sudah lulus mencakup \d/);
     await page.screenshot({ path: `shots/${vp}-kosakata-path-map-progress.png`, fullPage: true });
 
     // The count: a test's id and whether it passed, and nothing else.
@@ -1459,6 +1466,20 @@ async function kosakataPathChecks(page, vp) {
     await expectTile("3-1", "open");
     await page.locator("[data-path-reset]").click();
     await expectTile("0-2", "locked");
+    await expectLine(/^Belum ada tes yang lulus\./);
+
+    // The line names the levels when the passed batches are whole levels in a row (coverage-line.ts).
+    const passOnly = async (ids) => {
+      const stored = JSON.stringify({ passed: Object.fromEntries(ids.map((id) => [id, {}])), missed: {} });
+      await page.evaluate((v) => localStorage.setItem("belajar:v1:kosakata-bertahap", v), stored);
+      await go(MAP);
+    };
+    const whole = (n) => pathFile.levels[n].batches.map((_, i) => `${n}-${i + 1}`);
+    await passOnly(whole(1));
+    await expectLine(/^Level 1 mencakup \d/);
+    await passOnly([...whole(1), ...whole(2)]);
+    await expectLine(/^Level 1 sampai 2 mencakup \d/);
+    await page.evaluate(() => localStorage.removeItem("belajar:v1:kosakata-bertahap"));
     console.log(`${vp} kosakata path: locks, cards, tests passed, failed and retried, a level tested out of, the counts and clearing all behave`);
   } finally {
     page.off("request", onRequest);

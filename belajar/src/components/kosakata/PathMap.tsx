@@ -5,6 +5,7 @@ import { Check, Lock } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { coverageLine } from "@/components/kosakata/coverage-line";
 import { MixedText } from "@/components/library/MixedText";
 import { useKosakataProgress } from "@/hooks/useKosakataProgress";
 import { Link } from "@/i18n/navigation";
@@ -31,6 +32,7 @@ export function PathMap({ levels, partCount, attachedShare, totalTokens, passPer
   const next = nextBatch(p, order);
   const nextLevel = next ? parseBatchId(next).level : null;
   const covered = coveredPercent(p, levels, totalTokens);
+  const line = coverageLine(p.passed, levels);
   const words = levels.filter((l) => l.n > 0);
   const first = words[0];
   const allPassed = (l: MapLevel) => Array.from({ length: l.batches }, (_, i) => batchId(l.n, i + 1)).every((id) => id in p.passed);
@@ -58,7 +60,15 @@ export function PathMap({ levels, partCount, attachedShare, totalTokens, passPer
           })}
         </div>
         <p className="mt-2 text-sm text-ink-muted" data-path-covered={Math.round(covered)}>
-          {covered > 0 ? t("cov", { pct: pct(covered) }) : t("cov_none", { pct: pct(percent(first.cum ?? 0)) })}
+          {line.kind === "none"
+            ? t("cov_none", { pct: pct(percent(first.cum ?? 0)) })
+            : line.kind === "first"
+              ? t("cov_first", { pct: pct(percent(first.cum ?? 0)) })
+              : line.kind === "level"
+                ? t("cov_level", { n: line.n, pct: pct(covered) })
+                : line.kind === "levels"
+                  ? t("cov_levels", { from: line.from, to: line.to, pct: pct(covered) })
+                  : t("cov", { pct: pct(covered) })}
         </p>
       </div>
 
