@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { soundedAyahKeys } from "@/components/kosakata/ayah-sound";
 import { PathTest } from "@/components/kosakata/PathTest";
 import { kosakataIndex, kosakataPath } from "@/lib/kosakata";
 import { pathSource } from "@/lib/kosakata-path";
@@ -22,10 +23,12 @@ export default async function KosakataBatchTestPage({ params }: PageProps<"/[loc
   const level = levelOf(src, rawLevel);
   const batch = level ? batchOf(level, rawBatch) : null;
   if (!level || !batch) notFound();
+  const data = testData(src, level, batch);
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
       <PathTest
-        data={testData(src, level, batch)}
+        data={data}
+        ayahSounds={soundedAyahKeys(src, data)}
         level={level.n}
         batch={batch}
         passPercent={kosakataPath().pass_percent}
