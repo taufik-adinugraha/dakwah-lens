@@ -61,7 +61,18 @@ function Verdict({ right, children }: { right: boolean; children: ReactNode }) {
   );
 }
 
-function Runner({ data, level, batch, passPercent, order, source }:{ data: TestData; level: number; batch: number | null; passPercent: number; order: string[]; source: string }) {
+type TestProps = {
+  data: TestData;
+  level: number;
+  batch: number | null;
+  passPercent: number;
+  order: string[];
+  source: string;
+  /** The words whose ayah question may play their recording: the one that is of the marked word (ayah-sound.ts). */
+  ayahSounds?: readonly string[];
+};
+
+function Runner({ data, level, batch, passPercent, order, source, ayahSounds = [] }: TestProps) {
   const t = useTranslations("KosakataPath");
   const locale = useLocale();
   const lang = locale === "en" ? "en" : "id";
@@ -175,13 +186,17 @@ function Runner({ data, level, batch, passPercent, order, source }:{ data: TestD
   const item = q.item;
   const answered = run.picked !== null;
   const right = answered && q.options[run.picked as number].key === item.key;
+  // An ayah question marks a word in a verse, and the recording is the list's pinned one, which is often
+  // another form of the word (wa-man marked, man said). It plays only where it is of the marked word, so
+  // the speaker and the voice on a right answer both depend on this; the other kinds mark no word.
+  const plays = q.kind !== "ayah" || ayahSounds.includes(item.key);
 
   const pick = (i: number) => {
     if (run.picked !== null) return;
     const ok = q.options[i].key === item.key;
     setRun({ ...run, picked: i, score: run.score + (ok ? 1 : 0), missed: ok ? run.missed : [...run.missed, item] });
     // The voice on a right answer (narration rule 16): inside the click, so every browser lets it sound.
-    if (ok) player?.play(keyOf(run), item.clip);
+    if (ok && plays) player?.play(keyOf(run), item.clip);
   };
 
   const advance = () => {
@@ -243,9 +258,11 @@ function Runner({ data, level, batch, passPercent, order, source }:{ data: TestD
             {item.ar}
           </p>
         ) : null}
-        <div className="flex justify-center">
-          <ClipButton loc={item.loc} clip={item.clip} word={item.translit} playerKey={keyOf(run)} />
-        </div>
+        {plays ? (
+          <div className="flex justify-center">
+            <ClipButton loc={item.loc} clip={item.clip} word={item.translit} playerKey={keyOf(run)} />
+          </div>
+        ) : null}
         <div className="space-y-2">
           {q.options.map((o, i) => {
             const isAnswer = o.key === item.key;
@@ -288,7 +305,7 @@ function Runner({ data, level, batch, passPercent, order, source }:{ data: TestD
 }
 
 /** A batch's or a level's test. Nothing is sent but the anonymous count at the end. */
-export function PathTest(props: { data: TestData; level: number; batch: number | null; passPercent: number; order: string[]; source: string }) {
+export function PathTest(props: TestProps) {
   return (
     <ClipPlayerProvider prefetch={props.batch === null ? [] : props.data.fresh.map((i) => i.clip.url)}>
       <Runner {...props} />
