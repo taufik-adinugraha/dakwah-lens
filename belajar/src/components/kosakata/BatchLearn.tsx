@@ -99,7 +99,7 @@ function PartCardView({ card }: { card: PartCard }) {
         <h2 className="text-lg font-semibold text-ink">{t("part_example")}</h2>
         <p lang="ar" dir="rtl" data-path-part-word="" className="arabic-inline ar-clear mt-1 text-center text-ar-lg text-ink">
           {card.word[0]}
-          <span className="text-forest">{card.word[1]}</span>
+          <span className="word-mark">{card.word[1]}</span>
           {card.word[2]}
         </p>
         <div className="mt-2">

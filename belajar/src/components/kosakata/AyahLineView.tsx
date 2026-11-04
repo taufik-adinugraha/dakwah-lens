@@ -8,7 +8,7 @@ export function AyahText({ line }: { line: AyahLine }) {
       {line.tokens.map((token, i) => (
         <span key={i}>
           {i > 0 ? " " : null}
-          {line.hi.includes(i) ? <span data-path-mark="" className="rounded bg-ok-bg text-forest">{token}</span> : token}
+          {line.hi.includes(i) ? <span data-path-mark="" className="word-mark">{token}</span> : token}
         </span>
       ))}
     </p>
