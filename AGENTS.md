@@ -17,7 +17,7 @@ Read the PRD (`Dakwah-Lens_PRD_v0.4.pdf`) for full product context. Owner: Sukse
 | Sentiment + `theme_group` + `dawah_opportunity` (all platforms) | Claude Sonnet 5.5 via the Message Batches API, daily 00:00 WIB (`services/claude_labels.py`) since 2026-11-01 (score since 2026-11-03) — labels every arrival plus every post still missing a theme or sentiment. Ingest no longer classifies. The earlier Gemini classifiers had been failing since about 2026-07-27 (402, prepay depleted); manual relabel runs hid that until 2026-10-29 |
 | Topic clustering | Claude Sonnet 5.5, weekly on Thursday after that day's label batch (`services/claude_recluster.py`, fallback 06:00 WIB) since 2026-11-01 — the automated twin of `scripts/cluster_topics/` |
 | Rerank / comment moderation / trending keywords | Gemini 2.5 Flash-Lite |
-| Score in the topic corpus | Off (`OPPORTUNITY_SHAPES_CORPUS` in `scripts/cluster_topics.py`): the 0.4 floor would keep ~0–19% of Teknologi, Pendidikan, Ekonomi and Kesehatan posts on Claude's scores. Turning it on is an operator decision |
+| Score in the topic corpus | Off (`OPPORTUNITY_SHAPES_CORPUS` in `scripts/cluster_topics.py`): the 0.4 floor would keep only 7% of Teknologi, 13% of Ekonomi, 18% of Pemerintahan, 23% of Pendidikan, 30% of Lingkungan and 36% of Kesehatan posts on Claude's scores (18,553 posts, 2026-11-03). Turning it on is an operator decision |
 | Brief synthesis | Gemini 2.5 Pro (fallback: Claude Sonnet 4.6) |
 | Vector store | Self-hosted Qdrant in docker compose |
 | Hosting | IDCloudHost VPS (Indonesia residency per UU PDP §27/2022) |
