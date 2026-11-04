@@ -144,6 +144,7 @@ function WhyHarakatRound({
           </ul>
 
           <Feedback
+            bringIntoView={!guided && q.resolved !== null}
             kind={q.resolved === "right" ? "ok" : q.resolved === "revealed" ? "reveal" : q.tried.length ? "retry" : null}
             title={q.resolved === "right" ? t("right") : q.resolved === "revealed" ? t("revealed") : t("not_yet")}
             nonce={`${q.i}/${q.tried.length}/${q.resolved ?? ""}`}
@@ -163,7 +164,7 @@ function WhyHarakatRound({
             onReveal={q.reveal}
             onNext={q.next}
             revealGuide={mark("reveal")}
-            nextGuide={mark("next")}
+            nextInBar={!!guided}
           />
         </div>
       )}

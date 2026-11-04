@@ -72,9 +72,10 @@
  *    · a settled question ("next": answered right, or its answer shown) stays,
  *      after its feedback and explanation, for advanceHoldMs and then
  *      `exercise.advance` counts up: the exercise moves to its next
- *      question (or finishes) by itself. Its own "Lanjut" stays as a way to
- *      go sooner. "Tunggu saya" keeps the old way: the "next" prompt and
- *      spotlight, and the learner taps Lanjut.
+ *      question (or finishes) by itself. The bar's forward control says
+ *      "Lanjut" meanwhile (`exercise_next`, operator 2026-11-04), a way to go
+ *      sooner. "Tunggu saya" keeps the old way: the "next" prompt and a ring
+ *      on that control, and the learner clicks it.
  *    Every action that belongs to one control carries its `part`; when the
  *    exercise reports another control, those still queued are dropped and
  *    the one playing is cut short.
@@ -329,6 +330,9 @@ export type AutoplayEvent =
   | { type: "exercise_done"; key: ExerciseKey }
   /** "Lewati latihan". */
   | { type: "skip" }
+  /** The bar's "Lanjut" on a settled question (view.questionNext): it moves on now, as it would by
+   *  itself. Ignored on any other (the exercise's own next() is a no-op on an unsettled one too). */
+  | { type: "exercise_next" }
   | { type: "pause" }
   | { type: "resume" }
   /** While wantsIdleTicks(state): silent time passed, in ms (an exercise waiting: its reminders,
@@ -393,7 +397,7 @@ const holds = (s: AutoplayState, step: AutoplayStep, ref: CueRef) =>
   s.pace === "tunggu" && step.kind !== "exercise" && "c" in ref;
 
 /** Biasa / Pelan: a settled exercise question moves on by itself. "Tunggu
- *  saya": it waits for the exercise's own Lanjut. */
+ *  saya": it waits for the bar's Lanjut. */
 const autoAdvance = (pace: Pace) => pace !== "tunggu";
 
 function issue(s: AutoplayState, a: DistributiveOmit<Activity, "token">): AutoplayState {
@@ -1069,6 +1073,12 @@ function reduce(seq: AutoplaySequence, s: AutoplayState, e: AutoplayEvent): Auto
       return run(seq, { ...base, plan: [{ t: "hold" }], at: 0, part: 0, seg: 0, activity: null }, false);
     }
 
+    case "exercise_next": {
+      const ex = s.exercise;
+      if (!isOpen(ex) || ex.part !== "next") return s;
+      return { ...s, exercise: { ...ex, advance: ex.advance + 1 } };
+    }
+
     case "skip": {
       if (s.phase === "idle" || s.phase === "finished") return s;
       if (stepOf(seq, s).kind !== "exercise") return s;
@@ -1129,7 +1139,8 @@ function reduce(seq: AutoplaySequence, s: AutoplayState, e: AutoplayEvent): Auto
       const plan: Action[] = [
         ...sayPlan(s2, step, seq, { s: "reminder" }),
         ...partPlan(seq, s2, step, ex, ex.part, "say"),
-        ...(reminders === MAX_REMINDERS ? sayPlan(s2, step, seq, { s: "skip_offer" }) : []),
+        // Not on a settled question: the control says "Lanjut" there, and nothing is left to skip.
+        ...(reminders === MAX_REMINDERS && ex.part !== "next" ? sayPlan(s2, step, seq, { s: "skip_offer" }) : []),
         { t: "await" },
       ];
       return run(seq, { ...s2, plan, at: 0, part: 0, seg: 0 }, false);
@@ -1280,6 +1291,8 @@ export type AutoplayView = {
   /** False on an exercise step: forward there is "Lewati latihan". */
   canNext: boolean;
   showSkip: boolean;
+  /** An open exercise whose question is settled: forward is "Lanjut" (`exercise_next`) instead. */
+  questionNext: boolean;
   /** "Tunggu saya": show "Lanjut" (dispatch `next`). */
   showLanjut: boolean;
   error: ReciteError | null;
@@ -1306,6 +1319,7 @@ export function viewAutoplay(seq: AutoplaySequence, s: AutoplayState): AutoplayV
     hasPrev: s.idx > 0 || frameHop(seq, s, -1) !== null,
     canNext: live && !openExercise,
     showSkip: live && openExercise,
+    questionNext: live && openExercise && s.exercise?.part === "next",
     showLanjut: s.phase === "ready",
     error: s.error,
     intent: s.intent,

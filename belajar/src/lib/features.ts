@@ -46,10 +46,10 @@ export function kosakataEnglishOn(): boolean {
 }
 
 /**
- * BELAJAR_KOSAKATA_BERTAHAP — whether the Kosakata list links to its learning path (operator,
- * 2026-11-03; docs/belajar-plan.md L38). The pages answer at /kosakata/bertahap either way, so the
- * operator can try them on the live site; `=on` adds the tabs on the list, with no rebuild, the same way
- * as BELAJAR_WARIS above.
+ * BELAJAR_KOSAKATA_BERTAHAP — whether Kosakata opens on its learning path (operator, 2026-11-03;
+ * docs/belajar-plan.md L38). The pages answer at /kosakata/bertahap either way, so the operator can try
+ * them on the live site. `=on` adds the tabs on the list, sends bare /kosakata to the path (src/proxy.ts)
+ * and points the hub's card there, with its own text, with no rebuild, the same way as BELAJAR_WARIS above.
  */
 export function kosakataPathListed(): boolean {
   return process.env.BELAJAR_KOSAKATA_BERTAHAP === "on";

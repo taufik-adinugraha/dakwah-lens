@@ -315,8 +315,8 @@ describe("‹ Sebelumnya / Berikutnya › move frame by frame on a step with fra
 
   it("the runner: the Berikutnya button and Media Session's next track send `jump`; Lanjut does not", () => {
     const src = read("src/components/autoplay/useAutoplay.ts");
-    expect(src).toContain('set("nexttrack", () => dispatch(forwardIsSkip ? { type: "skip" } : { type: "next", jump: true }));');
-    expect(src).toContain('dispatch(view.showSkip ? { type: "skip" } : { type: "next", jump: true });');
+    expect(src).toContain('set("nexttrack", () => dispatch(forwardIsQuestion ? { type: "exercise_next" } : forwardIsSkip ? { type: "skip" } : { type: "next", jump: true }));');
+    expect(src).toContain('dispatch(view.questionNext ? { type: "exercise_next" } : view.showSkip ? { type: "skip" } : { type: "next", jump: true });');
     const lanjut = src.slice(src.indexOf("lanjut() {"), src.indexOf("lanjut() {") + 120);
     expect(lanjut).toContain('dispatch({ type: "next" });');
   });

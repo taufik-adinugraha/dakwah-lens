@@ -345,6 +345,47 @@ async function autoplayShots(page, vp) {
 }
 
 /**
+ * "Lanjut" on a standalone exercise under "Materi lengkap ayat ini" (operator 2026-11-04: the next step
+ * "always appear in the bottom of the screen"), which has no lesson bar: on a small phone a right answer
+ * shows its feedback above a button that is on screen, without a scroll by hand, and the button moves on.
+ */
+async function standaloneNextCheck(page, vp) {
+  const fail = (m) => {
+    throw new Error(`${vp}: standalone exercise: ${m}`);
+  };
+  const quiz = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content/quiz/al-fatihah.json"), "utf8"));
+  const [q1] = quiz.ayat.find((a) => a.ayah === 2).exercises.find((e) => e.key === "word-kind").questions;
+  const screenSize = page.viewportSize();
+  if (vp === "phone") await page.setViewportSize({ width: 360, height: 640 });
+  await page.goto(BASE + AYAH_2, { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+  await page.locator("[data-materials] > summary").click();
+  await page.locator("[data-materials][open]").waitFor({ state: "visible", timeout: 10_000 });
+  const practice = page.locator("#practice");
+  await practice.locator(`[data-option="${q1.kind}"]`).first().click();
+  const lanjut = practice.getByRole("button", { name: "Lanjut" }).first();
+  await lanjut.waitFor({ state: "visible", timeout: 5_000 });
+  await page.waitForTimeout(100);
+  await scrollStopped(page);
+  const button = await lanjut.boundingBox();
+  const said = await practice.locator('[role="status"] .bg-ok-bg').first().boundingBox();
+  const screen = page.viewportSize().height;
+  if (button.y < 0 || button.y + button.height > screen) fail(`“Lanjut” stands at ${button.y}..${button.y + button.height}px of a ${screen}px screen`);
+  if (said.y < 0) fail(`the feedback starts ${-said.y}px above the screen`);
+  const paddingTop = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0);
+  const fits = said.height <= button.y - paddingTop;
+  if (fits ? said.y + said.height > button.y : said.y > paddingTop + 0.5) fail(`the feedback stands at ${said.y}..${said.y + said.height}px with “Lanjut” from ${button.y}px`);
+  const wide = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  if (wide > 0) fail(`the page scrolls sideways by ${wide}px`);
+  await page.screenshot({ path: `shots/${vp}-exercise-standalone-lanjut.png` });
+  console.log(`shot ${vp}-exercise-standalone-lanjut`);
+  await lanjut.click();
+  await practice.getByText(/^Soal 2 dari \d+$/).first().waitFor({ state: "visible", timeout: 5_000 }).catch(() => fail("“Lanjut” did not go on to question 2"));
+  await page.setViewportSize(screenSize);
+  await page.goto("about:blank");
+}
+
+/**
  * The header's one "Menu" button, open, on the hub (viewport): the panel holding Halaman Belajar
  * (the hub, first: operator, 2026-10-17), Konsep tata bahasa, Kembali ke Dakwah-Lens and Sumber &
  * lisensi (no sign-in: operator, 2026-10-12). Checked (src/lib/dismiss.ts; operator, 2026-10-17:
@@ -1406,6 +1447,17 @@ async function kosakataPathChecks(page, vp) {
     await page.locator('[data-kosakata-tabs] a[href$="?hal=1"]').click();
     await page.waitForSelector("main button[data-clip]", { timeout: 8000 });
     if (!page.url().endsWith("/kosakata?hal=1")) fail(`the list's tab went to ${page.url()}`);
+    // The switch is on in this container (BELAJAR_KOSAKATA_BERTAHAP, the workflow's shots job): the list
+    // carries the same tabs with its own filled, bare /kosakata opens the path, and the hub's card goes
+    // there and says so.
+    const listTabs = await page.locator("[data-kosakata-tabs] a").evaluateAll((els) => els.map((e) => e.getAttribute("aria-current")));
+    if (JSON.stringify(listTabs) !== JSON.stringify([null, "page"])) fail(`the list's tabs are marked ${JSON.stringify(listTabs)}`);
+    await go(`${BASE}/belajar/id/kosakata`);
+    if (!page.url().endsWith("/kosakata/bertahap")) fail(`bare /kosakata went to ${page.url()}`);
+    await go(`${BASE}/belajar/id`);
+    const hubCard = page.locator('main a[href$="/kosakata/bertahap"]');
+    if ((await hubCard.count()) !== 1) fail(`the hub has ${await hubCard.count()} links to the path`);
+    if (!(await hubCard.innerText()).includes("sepuluh kata sekali belajar")) fail(`the hub's card says ${JSON.stringify(await hubCard.innerText())}`);
     await go(MAP);
 
     await go(`${MAP}/1/1`);
@@ -4099,15 +4151,29 @@ async function wordKindChecks(page, vp, index, { slug = "al-fatihah", ayah = 2 }
       await page.waitForTimeout(150);
     }
     await page.waitForTimeout(3_000);
+    // The bar's forward control says what it does (operator 2026-11-04: the next step "always appear
+    // in the bottom of the screen"): "Lewati latihan" on an open question, "Lanjut" on a settled one.
+    const forward = async () => (await next.innerText()).trim();
+    const forwardSays = async (word, why) => {
+      if (!(await until(page, async () => (await forward()) === word, 5_000))) throw new Error(`${vp}: ${why}, the bar's forward control says “${await forward()}”, not “${word}”`);
+    };
+    await forwardSays("Lewati latihan", "on an open question");
     // 3. A wrong pick: no explanation. The right one: the question's sentence.
     const wrong = kinds.find((k) => k !== q1.kind);
     await option(wrong).click();
     await page.waitForTimeout(600);
     if ((await exercise.innerText()).includes(head(q1.why))) throw new Error(`${vp}: a wrong pick (${wrong}) already shows the explanation`);
+    await forwardSays("Lewati latihan", "after a wrong pick");
     await option(q1.kind).click();
     if (!(await until(page, async () => (await exercise.innerText()).includes(head(q1.why)), 5_000))) {
       throw new Error(`${vp}: the right pick (${q1.kind}) does not show the question's sentence (“${head(q1.why)}…”)`);
     }
+    await forwardSays("Lanjut", "on a settled question");
+    if ((await exercise.getByRole("button", { name: "Lanjut" }).count()) !== 0) throw new Error(`${vp}: a settled question has a second “Lanjut” inside the exercise`);
+    const reach = await next.boundingBox();
+    const screenHeight = page.viewportSize().height;
+    if (reach.y < 0 || reach.y + reach.height > screenHeight) throw new Error(`${vp}: “Lanjut” stands at ${reach.y}..${reach.y + reach.height}px of a ${screenHeight}px screen`);
+    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-warm-up${tag}-settled-viewport.png` });
     // 4. On by itself, question by question, to the word of two parts (answered right each time).
     for (const q of warm.questions.slice(1)) {
       const here = exercise.locator(`[data-kind-word="${q.word}"][data-kind-part="${q.part}"]`);
@@ -4126,6 +4192,16 @@ async function wordKindChecks(page, vp, index, { slug = "al-fatihah", ayah = 2 }
       }
       await option(q.kind).click();
     }
+    // "Lanjut" moves a settled question on at once, not after its explanation and hold.
+    await forwardSays("Lewati latihan", `on question ${part.n}, still open`);
+    await option(part.kind).click();
+    await forwardSays("Lanjut", `on question ${part.n}, settled`);
+    const after = warm.questions.find((x) => x.n === part.n + 1);
+    await next.click();
+    if (!(await exercise.locator(`[data-kind-word="${after.word}"][data-kind-part="${after.part}"]`).waitFor({ state: "attached", timeout: 3_000 }).then(() => true, () => false))) {
+      throw new Error(`${vp}: 3 s after “Lanjut” on question ${part.n} the warm-up had not gone on to question ${after.n}`);
+    }
+    await forwardSays("Lewati latihan", `on question ${after.n}, just opened`);
     // 5. "Lewati latihan": on to the first word.
     await next.click();
     if (!(await until(page, async () => /^w1(?::|$)/.test((await stage.getAttribute("data-step")) ?? ""), 8_000))) {
@@ -4797,6 +4873,7 @@ try {
     await headerShots(page, vp);
     await footerCheck(page, vp);
     await materialsShot(page, vp);
+    await standaloneNextCheck(page, vp);
     await ayahDialogChecks(page, vp);
     await shareShots(page, vp);
     await surahEndBridgeShots(page, vp);

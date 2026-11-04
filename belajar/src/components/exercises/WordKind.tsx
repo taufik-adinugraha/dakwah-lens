@@ -176,6 +176,7 @@ function WordKindRound({ id, words, questions, kinds, guided, compact, restarted
           </div>
 
           <Feedback
+            bringIntoView={!guided && q.resolved !== null}
             kind={q.resolved === "right" ? "ok" : q.resolved === "revealed" ? "reveal" : q.tried.length ? "retry" : null}
             title={q.resolved === "right" ? t("right") : q.resolved === "revealed" ? t("revealed") : t("not_yet")}
             nonce={`${q.i}/${q.tried.length}/${q.resolved ?? ""}`}
@@ -190,7 +191,7 @@ function WordKindRound({ id, words, questions, kinds, guided, compact, restarted
             onReveal={q.reveal}
             onNext={q.next}
             revealGuide={mark("reveal")}
-            nextGuide={mark("next")}
+            nextInBar={!!guided}
           />
         </div>
       )}

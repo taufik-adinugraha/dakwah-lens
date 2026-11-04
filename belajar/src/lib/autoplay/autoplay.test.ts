@@ -767,7 +767,7 @@ describe("autoplay exercises: the learner only answers", () => {
     expect(r.s.caption).toEqual({ c: seq.steps[r.s.idx].exercise!.promptCue.play });
   });
 
-  it("Tunggu saya: a settled question waits for the exercise's Lanjut (prompt + spotlight)", () => {
+  it("Tunggu saya: a settled question waits for the bar's Lanjut (prompt + mark)", () => {
     const seq = seqFor("al-fatihah", 2);
     const r = waitingAt(seq, "tunggu");
     r.send({ type: "answered", key: "tap-word", correct: true });
@@ -781,6 +781,45 @@ describe("autoplay exercises: the learner only answers", () => {
     expect(r.s.activity).toMatchObject({ kind: "wait", ms: advanceHoldMs("biasa", true) });
     r.send(end(r.s.activity!));
     expect(r.s.exercise?.advance).toBe(1);
+  });
+
+  it("the bar's forward control: Lewati latihan on an open question, Lanjut on a settled one, which moves it on now", () => {
+    const seq = seqFor("al-fatihah", 2);
+    const r = waitingAt(seq);
+    r.send({ type: "exercise_guide", target: "exercise:tap-word:options" });
+    r.until((s) => s.phase === "waiting");
+    expect(viewAutoplay(seq, r.s)).toMatchObject({ showSkip: true, questionNext: false });
+    // Nothing settled: nothing moves.
+    r.send({ type: "exercise_next" });
+    expect(r.s.exercise?.advance).toBe(0);
+    r.send({ type: "answered", key: "tap-word", correct: true });
+    r.send({ type: "exercise_guide", target: "exercise:tap-word:next" });
+    expect(viewAutoplay(seq, r.s).questionNext).toBe(true);
+    // At once, with "Benar." still being said.
+    expect(r.s.activity).not.toBeNull();
+    r.send({ type: "exercise_next" });
+    expect(r.s.exercise?.advance).toBe(1);
+    expect(r.s.idx).toBe(tapAt(seq));
+    // The exercise opens its next question: the control is "Lewati latihan" again.
+    r.send({ type: "exercise_guide", target: "exercise:tap-word:options" });
+    expect(viewAutoplay(seq, r.s)).toMatchObject({ showSkip: true, questionNext: false });
+  });
+
+  it("Tunggu saya: the reminders of a settled question never offer to skip it, the control says Lanjut there", () => {
+    const seq = seqFor("al-fatihah", 2);
+    const r = waitingAt(seq, "tunggu");
+    r.send({ type: "answered", key: "tap-word", correct: true });
+    r.send({ type: "exercise_guide", target: "exercise:tap-word:next" });
+    r.until((s) => s.phase === "waiting");
+    for (let tick = 1; tick <= 600; tick++) {
+      r.until((s) => s.activity === null);
+      r.send({ type: "idle_tick", ms: 1000 });
+    }
+    r.until((s) => s.activity === null);
+    expect(r.s.exercise?.reminders).toBe(3);
+    expect(r.s.exercise?.skipOffered).toBe(false);
+    expect(r.s.guides.map((g) => g.target)).toEqual(["exercise:tap-word:next"]);
+    expect(viewAutoplay(seq, r.s).questionNext).toBe(true);
   });
 });
 
