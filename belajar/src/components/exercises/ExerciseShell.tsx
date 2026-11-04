@@ -78,10 +78,11 @@ export type { ExerciseGuide, ExerciseKey, GuideInfo, GuidePart, GuideTarget } fr
  *   - "reveal" follows two misses on a question; the options stay usable,
  *     so the prompt can offer both ("coba lagi, atau Tunjukkan jawaban").
  *   - "next" is "Lanjut", or "Selesai" on the last question. In guided mode
- *     the runner moves a settled question on by itself: each time
- *     `guided.advance` goes up, the choose-one exercises call their own
- *     next() (a no-op unless the question is settled). The button stays, to
- *     go sooner.
+ *     it is the lesson bar's forward control, never a second button here
+ *     (QuizActions, nextInBar), and the runner moves a settled question on by
+ *     itself: each time `guided.advance` goes up, the choose-one exercises
+ *     call their own next() (a no-op unless the question is settled). The
+ *     control is there to go sooner.
  *   - No target once the exercise is finished; onDone reports that.
  *   Sent from an effect, after the marked control is in the DOM. The same
  *   target is never sent twice in a row; a voiced reminder for an idle
@@ -451,15 +452,26 @@ export function Feedback({
   kind,
   title,
   nonce,
+  bringIntoView = false,
   children,
 }: {
   kind: FeedbackKind | null;
   title?: string;
   nonce?: string | number;
+  /** A standalone exercise's settled question: the click that settled it brings this into view, once,
+   *  above QuizActions' bar (scroll-mb). The button no longer makes anyone pass this on the way to it,
+   *  and no voice says it there. Never in guided mode: the lesson says it, and never scrolls by itself. */
+  bringIntoView?: boolean;
   children?: ReactNode;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!bringIntoView) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    ref.current?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+  }, [bringIntoView]);
   return (
-    <div role="status" aria-live="polite" aria-atomic="true">
+    <div ref={ref} role="status" aria-live="polite" aria-atomic="true" className="scroll-mb-24">
       {kind && title ? (
         <div key={nonce} className="mt-4">
           <FeedbackBox kind={kind} title={title}>
@@ -471,8 +483,14 @@ export function Feedback({
   );
 }
 
-/** "Tunjukkan jawaban" (after two misses) or "Lanjut"/"Selesai" (once the
- *  question is settled). */
+/**
+ * "Tunjukkan jawaban" (after two misses) or "Lanjut"/"Selesai" (once the question is settled), in a
+ * bar stuck to the bottom of the screen (operator 2026-11-04: the next step "always appear in the
+ * bottom of the screen"), or just above the lesson's bar (--panel-h, set on the stage). Its side
+ * gutters are ExerciseShell's p-5 sm:p-6. A sticky element cannot leave its parent: render it directly
+ * in the block that holds the question. In guided mode "Lanjut" is the lesson bar's own control
+ * (nextInBar), so only "Tunjukkan jawaban" comes here.
+ */
 export function QuizActions({
   resolved,
   canReveal,
@@ -480,23 +498,25 @@ export function QuizActions({
   onReveal,
   onNext,
   revealGuide,
-  nextGuide,
+  nextInBar = false,
 }: {
   resolved: Resolution;
   canReveal: boolean;
   last: boolean;
   onReveal: () => void;
   onNext: () => void;
-  /** Guided mode: the data-guide targets of the two buttons. */
+  /** Guided mode: the data-guide target of "Tunjukkan jawaban". */
   revealGuide?: GuideTarget;
-  nextGuide?: GuideTarget;
+  /** Guided mode: the lesson's bar holds "Lanjut". */
+  nextInBar?: boolean;
 }) {
   const t = useTranslations("Exercise");
   if (resolved === null && !canReveal) return null;
+  if (resolved !== null && nextInBar) return null;
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-3">
+    <div className="sticky bottom-[var(--panel-h,0px)] z-10 -mx-5 mt-4 flex flex-wrap items-center gap-3 border-t border-hairline bg-white/95 px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:-mx-6 sm:px-6">
       {resolved !== null ? (
-        <button type="button" onClick={onNext} data-guide={nextGuide} className="btn-primary w-full sm:w-auto">
+        <button type="button" onClick={onNext} className="btn-primary w-full sm:w-auto">
           {last ? t("finish") : t("next")}
           {last ? (
             <Check className="h-5 w-5" aria-hidden />

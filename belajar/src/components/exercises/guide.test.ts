@@ -101,7 +101,15 @@ describe("the exercises mark exactly the parts they declare", () => {
       expect(src).toContain(`guideMarker(guided, "${key}")`);
       expect(src).toContain(`guideTarget("${key}", part)`);
       const marked = [...src.matchAll(/\bmark\("([a-z]+)"\)/g)].map((m) => m[1] as GuidePart);
-      expect([...new Set(marked)].sort()).toEqual([...EXERCISE_GUIDE_PARTS[key]].sort());
+      // In guided mode "next" is the lesson bar's forward control, which carries that mark (below).
+      const own = EXERCISE_GUIDE_PARTS[key].filter((part) => part !== "next");
+      expect([...new Set(marked)].sort()).toEqual([...own].sort());
+      if (EXERCISE_GUIDE_PARTS[key].includes("next")) expect(src).toContain("nextInBar={!!guided}");
     });
   }
+
+  it('the lesson bar marks "next", the control the runner is told about and asks the learner to click', () => {
+    const stage = readFileSync(new URL("../lesson/LessonStage.tsx", import.meta.url), "utf8");
+    expect(stage).toContain("data-guide={view.questionNext && exerciseKey ? `exercise:${exerciseKey}:next` :");
+  });
 });

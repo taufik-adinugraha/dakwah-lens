@@ -26,7 +26,8 @@ export type ExerciseKey = (typeof EXERCISE_KEYS)[number];
  * - words   : the words still to sort (Kelompokkan, step 1)
  * - bins    : the four groups (Kelompokkan, step 2)
  * - reveal  : "Tunjukkan jawaban" (after two misses; the options stay usable)
- * - next    : "Lanjut", or "Selesai" on the last question
+ * - next    : "Lanjut", or "Selesai" on the last question (in guided mode the lesson bar's
+ *             forward control, which carries the data-guide)
  */
 export const GUIDE_PARTS = ["play", "options", "words", "bins", "reveal", "next"] as const;
 export type GuidePart = (typeof GUIDE_PARTS)[number];

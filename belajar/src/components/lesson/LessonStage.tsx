@@ -352,8 +352,12 @@ export function LessonStage({
   // A slide of lesson zero (operator 2026-10-15: kalimah is one word, the Indonesian kalimat is kalam): its cards.
   const lead = live ? (leads[step.id] ?? null) : null;
   const showMushaf = !started || (live && !spec);
-  const spotGuides = spec ? state.guides.filter((g) => g.target.startsWith("exercise:")) : [];
-  const skipGuide = view.showSkip ? state.guides.find((g) => g.target === "skip") : undefined;
+  // A settled question's "Lanjut" is the bar's forward control, so the page's spotlight has nothing
+  // to do for it: it is marked on the bar, as "Lewati latihan" is.
+  const spotGuides = spec ? state.guides.filter((g) => g.target.startsWith("exercise:") && !g.target.endsWith(":next")) : [];
+  const skipGuide = view.showSkip && !view.questionNext ? state.guides.find((g) => g.target === "skip") : undefined;
+  const nextGuide = view.questionNext ? state.guides.find((g) => g.target.endsWith(":next")) : undefined;
+  const forwardGuide = skipGuide ?? nextGuide;
   const lanjutGuide = view.showLanjut ? state.guides.find((g) => g.target === "lanjut") : undefined;
   const exerciseSteps = seq.steps.filter((s) => s.kind === "exercise");
   const exerciseN = exerciseSteps.findIndex((s) => s.id === step.id) + 1;
@@ -1052,11 +1056,11 @@ export function LessonStage({
                 {t("prev")}
               </button>
               <div className="relative min-w-0 sm:order-4">
-                {skipGuide && <BarSpotLabel label={skipGuide.label} align="end" />}
+                {forwardGuide && <BarSpotLabel label={forwardGuide.label} align="end" />}
                 <button
                   type="button"
                   data-autoplay="next"
-                  data-guide={view.showSkip ? "skip" : undefined}
+                  data-guide={view.questionNext && exerciseKey ? `exercise:${exerciseKey}:next` : view.showSkip ? "skip" : undefined}
                   onClick={actions.forward}
                   className={clsx(
                     // Narrow side padding on phones (and no skip icon) keeps
@@ -1065,10 +1069,18 @@ export function LessonStage({
                     // one row at the normal text size.
                     "btn-nav w-full sm:px-5!",
                     view.showSkip && "min-h-14! font-semibold",
-                    skipGuide && BAR_RING,
+                    forwardGuide && BAR_RING,
                   )}
                 >
-                  {view.showSkip ? (
+                  {/* A settled question moves on from here (operator 2026-11-04: the next step
+                      "always appear in the bottom of the screen"): an explanation can be taller
+                      than the screen, and a button under it was out of reach. */}
+                  {view.questionNext ? (
+                    <>
+                      {t("next_wait")}
+                      <ChevronRight aria-hidden className="h-5 w-5" />
+                    </>
+                  ) : view.showSkip ? (
                     <>
                       <SkipForward aria-hidden className="hidden h-5 w-5 sm:block" />
                       {t("skip")}

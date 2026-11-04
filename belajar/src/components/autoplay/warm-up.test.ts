@@ -430,7 +430,7 @@ describe("the CI scripts know it", () => {
     // toStep (screenshots.mjs) and the per-step sweep (linebreaks.mjs) both press the one button
     // the stage marks data-autoplay="next", which is the skip button on an exercise step.
     const stage = read("src/components/lesson/LessonStage.tsx");
-    expect(stage).toMatch(/data-autoplay="next"\s+data-guide=\{view\.showSkip \? "skip" : undefined\}\s+onClick=\{actions\.forward\}/);
+    expect(stage).toMatch(/data-autoplay="next"\s+data-guide=\{view\.questionNext && exerciseKey \? `exercise:\$\{exerciseKey\}:next` : view\.showSkip \? "skip" : undefined\}\s+onClick=\{actions\.forward\}/);
     const shots = read("scripts/ci/screenshots.mjs");
     expect(shots).toMatch(/async function toStep\(page, vp, id\) \{[\s\S]{0,400}?const next = page\.locator\('\[data-autoplay="next"\]'\);/);
     // … and no check names a step by a count of clicks from the start past the map.
