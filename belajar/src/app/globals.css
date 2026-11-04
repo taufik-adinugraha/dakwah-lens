@@ -79,6 +79,15 @@
   --color-ok-bg: #e6f0ea;
   --color-notice-bg: #fbefe3;
 
+  /* The word or part a question or a card points at (operator 2026-11-04: the
+     green was indistinguishable from the black). Red, as a teacher marks a
+     word in print; wrong answers stay amber, so red means one thing only.
+     Text 5.34:1 on white and 4.67:1 on its tint (AA). Against the ink 3.26:1,
+     where the forest was 2.11:1, and at least 43 apart (CIE76) for protan,
+     deutan and tritan eyes, where the forest was 24 to 36. */
+  --color-mark: #c8321e;
+  --color-mark-bg: #fdece8;
+
   /* Case colours (plan §4.1, senior-ux.md §3.2). GRAPHIC colours only: the
      shape icon and the chip border. A case label's TEXT is always ink, and
      the shape carries the meaning, never the colour alone. */
@@ -571,6 +580,16 @@ body {
       text-decoration-thickness: 2px;
     }
   }
+}
+
+/* The marked word or part in Kosakata: the ayah's word, the part of a word in a
+   question, the part card. One definition, so the three cannot drift. A colour
+   and a tint, no padding: the letters stay as they are, and padding inside a
+   word would break the join between its letters. */
+@utility word-mark {
+  border-radius: 0.25rem;
+  background-color: var(--color-mark-bg);
+  color: var(--color-mark);
 }
 
 /* <summary> of a disclosure: a 48px row with verb-first text and a chevron.

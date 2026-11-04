@@ -33,7 +33,7 @@ function PartWord({ word }: { word: readonly [string, string, string] }) {
   return (
     <p lang="ar" dir="rtl" data-path-part-word="" className="arabic-inline ar-clear text-center text-ar-lg text-ink">
       {word[0]}
-      <span data-path-mark="" className="text-forest">
+      <span data-path-mark="" className="word-mark">
         {word[1]}
       </span>
       {word[2]}

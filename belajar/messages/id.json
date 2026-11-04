@@ -564,7 +564,7 @@
     "example": "Contoh dalam ayat",
     "ayah_ref": "{surah} · ayat {ayah}",
     "part_example": "Contoh",
-    "part_note": "Bagian yang berwarna hijau adalah {translit}, yang artinya “{meaning}”.",
+    "part_note": "Bagian yang ditandai adalah {translit}, yang artinya “{meaning}”.",
     "concept_link": "Pelajari lebih lanjut",
     "prev": "Sebelumnya",
     "next": "Berikutnya",

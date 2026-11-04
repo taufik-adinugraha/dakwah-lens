@@ -1530,7 +1530,8 @@ async function kosakataPathChecks(page, vp) {
     // A batch of Level 0: a part with its word marked, card by card, then its test.
     await go(`${MAP}/0/1`);
     await page.waitForSelector('[data-path-card="p-wa"]', { timeout: 8000 });
-    if ((await page.locator("[data-path-part-word] .text-forest").count()) !== 1) fail("a part's card does not mark the part in its word");
+    // The hook is the attribute, not a colour class: the mark's colour has changed once already (green to red).
+    if ((await page.locator("[data-path-part-word] [data-path-mark]").count()) !== 1) fail("a part's card does not mark the part in its word");
     await sideways("a part's card");
     await page.screenshot({ path: `shots/${vp}-kosakata-path-part.png`, fullPage: true });
     const cards = pathFile.levels[0].batches[0].length;
