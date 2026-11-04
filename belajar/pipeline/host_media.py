@@ -132,7 +132,7 @@ def kosakata_pins() -> dict[str, dict]:
     """{path under narration/: its pin} of the Kosakata list's recordings."""
     out = {}
     pins = KV.load_pins()
-    for p in [*pins["words"].values(), *(pins.get("parts") or {}).values()]:
+    for p in [*pins["words"].values(), *(pins.get("parts") or {}).values(), *(pins.get("examples") or {}).values()]:
         rel = KV.url_of(p["loc"])[len(NARRATION_PREFIX):]
         out[rel] = {"upstream": KV.upstream_of(p["loc"]), "sha256": p["sha256"], "ms": p["ms"], "bytes": p["bytes"]}
     return out

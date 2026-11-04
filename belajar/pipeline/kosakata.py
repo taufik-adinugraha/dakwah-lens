@@ -285,21 +285,76 @@ def expected_versions(src: dict, files: dict[str, dict], authored_sha: str) -> d
     }
 
 
-def example_of(word: dict, positions: dict[str, list[int]], corpus: AY.Corpus, tokens: dict) -> dict | None:
-    """The ayah a learner sees the word in: the shortest cited ayah of its earliest sense that has one,
-    with no footnote where possible. `hi` is where the word stands in it, from QAC. None for a word
-    every citation of which falls in an ayah Tanzil and QAC count differently."""
+def lemma_positions(segs: list) -> dict[str, dict[str, list[int]]]:
+    """{QAC lemma: {"s:a": [token indexes where the lemma stands]}}: where each word is marked."""
+    positions: dict[str, dict[str, list[int]]] = defaultdict(lambda: defaultdict(list))
+    for g in segs:
+        lem = g.feat.get("LEM")
+        if lem and g.w - 1 not in positions[lem][f"{g.s}:{g.a}"]:
+            positions[lem][f"{g.s}:{g.a}"].append(g.w - 1)
+    return positions
+
+
+def example_of(word: dict, positions: dict[str, list[int]], corpus: AY.Corpus, tokens: dict, voice: dict, tested: bool) -> dict | None:
+    """The ayah a learner sees the word in: a cited ayah of its earliest sense that has one. `hi` is
+    where the word stands in it, from QAC. For a word the path tests, the ayah question plays a
+    recording and must play the marked word (operator 2026-11-04: "the screen highlight 'wa man' but
+    the sound only 'man'"), so within that sense the choice goes first by how the recordings can say
+    it: a verse whose marked tokens the word's own recording already is (`V.says_marked`), then one
+    whose marked tokens are spelt alike, which one recording of that place says, then the rest, among
+    them any verse too long to be asked (V.SHORT_AYAH_CHARS). A word the path does not test has no
+    ayah question, so its example is chosen as before. After that: no footnote where possible, then
+    the shortest. None for a word every citation of which falls in an ayah Tanzil and QAC count
+    differently."""
     for sense in word["senses"]:
         usable = []
         for loc in sense["ayat"]:
             s, a = AY.parse_loc(loc)
             if (s, a) in tokens and positions.get(loc):
                 row = corpus.rows[s][a]
-                usable.append((bool(AY.split_footnotes(row.get("footnotes"))), len(lesson_ayah(corpus.T, s, a)[0]), AY.parse_loc(loc), loc))
+                toks, marks = tokens[(s, a)], positions[loc]
+                length = len(lesson_ayah(corpus.T, s, a)[0])
+                if not tested:
+                    how = 0
+                elif length > V.SHORT_AYAH_CHARS:
+                    how = 2
+                elif V.says_marked(toks, marks, voice):
+                    how = 0
+                else:
+                    how = 1 if V.one_spelling(toks, marks) else 2
+                usable.append((how, bool(AY.split_footnotes(row.get("footnotes"))), length, AY.parse_loc(loc), loc))
         if usable:
-            loc = min(usable)[3]
+            loc = min(usable)[4]
             return {"loc": loc, "hi": positions[loc]}
     return None
+
+
+def recording_place(loc: str, marks: list[int], toks: list[str], voice: dict, tested: bool) -> str | None:
+    """The place ("s:a:w") whose own recording the example's ayah question needs, or None. None when
+    the word is not asked about, when its ayah is too long to be asked, when the word's own recording
+    already says the marked tokens, and when they are spelt differently, so that no single recording
+    would. `toks` are the ayah's Tanzil tokens, `voice` the word's pinned recording."""
+    if not tested or len(" ".join(toks)) > V.SHORT_AYAH_CHARS or V.says_marked(toks, marks, voice) or not V.one_spelling(toks, marks):
+        return None
+    s, a = AY.parse_loc(loc)
+    return f"{s}:{a}:{min(marks) + 1}"
+
+
+def example_recordings(table: list[dict], lemmas: dict, positions: dict, corpus: AY.Corpus, tokens: dict, pins_words: dict) -> dict[str, str]:
+    """{place: the Tanzil token there} of every recording the ayah questions need beyond the words' own."""
+    out: dict[str, str] = {}
+    for e in table:
+        lem = e["lemma"]
+        voice = pins_words[lem]
+        tested = P.tested(e["rank"], lem)
+        ex = example_of({"senses": lemmas[lem]["senses"]}, positions[lem], corpus, tokens, voice, tested)
+        if not ex:
+            continue
+        toks = tokens[AY.parse_loc(ex["loc"])]
+        place = recording_place(ex["loc"], ex["hi"], toks, voice, tested)
+        if place:
+            out[place] = toks[int(place.split(":")[2]) - 1]
+    return dict(sorted(out.items()))
 
 
 def build(authored: dict, authored_sha: str, corpus: AY.Corpus, segs: list, lexemes: dict[str, str]) -> dict[str, dict]:
@@ -307,7 +362,10 @@ def build(authored: dict, authored_sha: str, corpus: AY.Corpus, segs: list, lexe
     not an ayah where the lemma occurs, a QuranEnc row whose footnotes do not match."""
     table = lemma_table(segs, corpus.T)
     lemmas = authored["lemmas"]
-    pins = V.load_pins()["words"]
+    all_pins = V.load_pins()
+    pins = all_pins["words"]
+    example_pins = all_pins.get("examples") or {}
+    unrecorded: list[str] = []
     unvoiced = [e["lemma"] for e in table if e["lemma"] not in pins]
     if unvoiced:
         raise ValueError(f"no recording pinned for {unvoiced[:5]} ({len(unvoiced)} in all): run build_kosakata_voice.py --fetch")
@@ -320,11 +378,7 @@ def build(authored: dict, authored_sha: str, corpus: AY.Corpus, segs: list, lexe
     rows, shards = [], defaultdict(list)
     cited: set[str] = set()
     tokens, word_count = V.counted_alike(corpus.T, segs)
-    positions: dict[str, dict[str, list[int]]] = defaultdict(lambda: defaultdict(list))
-    for g in segs:
-        lem = g.feat.get("LEM")
-        if lem and g.w - 1 not in positions[lem][f"{g.s}:{g.a}"]:
-            positions[lem][f"{g.s}:{g.a}"].append(g.w - 1)
+    positions = lemma_positions(segs)
     for e in table:
         a = lemmas[e["lemma"]]
         for sense in a["senses"]:
@@ -352,12 +406,22 @@ def build(authored: dict, authored_sha: str, corpus: AY.Corpus, segs: list, lexe
         word["review"] = a["review"]
         word["voice"] = V.word_voice(pins[e["lemma"]])
         word["kind"] = rows[-1]["k"]
-        example = example_of(word, positions[e["lemma"]], corpus, tokens)
+        tested = P.tested(e["rank"], e["lemma"])
+        example = example_of(word, positions[e["lemma"]], corpus, tokens, pins[e["lemma"]], tested)
         if example:
+            place = recording_place(example["loc"], example["hi"], tokens[AY.parse_loc(example["loc"])], pins[e["lemma"]], tested)
+            if place and place not in example_pins:
+                unrecorded.append(place)
+            elif place:
+                example["voice"] = V.word_voice(example_pins[place])
             word["example"] = example
         if e["lemma"] in lexemes:
             word["lexeme"] = lexemes[e["lemma"]]
         shards[file_for_rank(e["rank"])].append(word)
+    if unrecorded:
+        raise ValueError(
+            f"no recording pinned for the ayah questions' places {sorted(set(unrecorded))[:5]} ({len(set(unrecorded))} in all): run build_kosakata_voice.py --fetch"
+        )
     by_sura: dict[int, list] = defaultdict(list)
     for loc in sorted(cited, key=AY.parse_loc):
         s, a = AY.parse_loc(loc)
@@ -482,6 +546,8 @@ def problems(files: dict[str, dict], authored: dict, authored_sha: str, src: dic
         out.append("the word files do not hold every rank in order")
     ayat = {e["loc"]: e for n, f in files.items() if n.startswith("ayat-") for e in f["ayat"]}
     cited: set[str] = set()
+    example_pins = pins.get("examples") or {}
+    used_examples: set[str] = set()
     for name in files:
         if name.startswith("words-") and len(files[name]["words"]) > WORDS_PER_FILE:
             out.append(f"{name} holds more than {WORDS_PER_FILE} words")
@@ -517,10 +583,31 @@ def problems(files: dict[str, dict], authored: dict, authored_sha: str, src: dic
             out.append(f"rank {w['rank']}: its example {ex['loc']} is not an ayah it cites")
         elif ex and any(i >= len(ayat[ex["loc"]]["ar"].split(" ")) for i in ex["hi"]):
             out.append(f"rank {w['rank']}: its example marks a word {ex['loc']} does not have")
+        elif ex and pin is not None:
+            # The ayah question plays the marked word: the word's own recording where that says it,
+            # else the recording of the marked place. A recording present or missing against the rule is a fault.
+            want = recording_place(ex["loc"], ex["hi"], ayat[ex["loc"]]["ar"].split(" "), pin, P.tested(w["rank"], w["lemma"]))
+            have = ex.get("voice")
+            if want and not have:
+                out.append(f"rank {w['rank']}: its ayah question needs the recording of {want}, and the example has none")
+            elif have and not want:
+                out.append(f"rank {w['rank']}: the example carries a recording its ayah question does not need")
+            elif have:
+                used_examples.add(want)
+                ex_pin = example_pins.get(want)
+                if ex_pin is None:
+                    out.append(f"rank {w['rank']}: no recording pinned for the example's place {want}")
+                elif have != V.word_voice(ex_pin):
+                    out.append(f"rank {w['rank']}: the example's recording differs from pipeline/kosakata_voice.json")
         if w.get("kind") not in {"verb", "noun", "particle", "name"} or r.get("k") != w.get("kind"):
             out.append(f"rank {w['rank']}: kind {w.get('kind')!r} / {r.get('k')!r}")
         for s in w["senses"]:
             cited.update(s["ayat"])
+    for loc in sorted(set(example_pins) - used_examples):
+        out.append(f"example at {loc}: pinned, but no word's ayah question uses it")
+    for loc, p in example_pins.items():
+        if p.get("loc") != loc:
+            out.append(f"example at {loc}: the pin is for {p.get('loc')}")
     out += P.path_problems(files.get("path.json"), words)
     for part in P.load_parts():
         have = (files.get("path.json") or {}).get("parts", {}).get(part["key"])

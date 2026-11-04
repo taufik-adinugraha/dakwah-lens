@@ -44,7 +44,16 @@
     "loc": "29:67",
     "hi": [
      6
-    ]
+    ],
+    "voice": {
+     "form": "وَيُتَخَطَّفُ",
+     "loc": "29:67:7",
+     "url": "/belajar/media/narration/quran-com/wbw/029_067_007.mp3",
+     "ms": 1567,
+     "start": 23,
+     "end": 1567,
+     "sha256": "1d35740b72c1bb91d1c60a71c126f4a503ad93340f3f1b0cd37b4fdbb2df784d"
+    }
    }
   },
   {
@@ -88,9 +97,9 @@
    },
    "kind": "verb",
    "example": {
-    "loc": "9:10",
+    "loc": "9:8",
     "hi": [
-     1
+     5
     ]
    }
   },
@@ -134,10 +143,9 @@
    },
    "kind": "verb",
    "example": {
-    "loc": "9:62",
+    "loc": "9:8",
     "hi": [
-     3,
-     8
+     10
     ]
    }
   },
@@ -371,7 +379,16 @@
     "loc": "20:4",
     "hi": [
      5
-    ]
+    ],
+    "voice": {
+     "form": "ٱلْعُلَى",
+     "loc": "20:4:6",
+     "url": "/belajar/media/narration/quran-com/wbw/020_004_006.mp3",
+     "ms": 993,
+     "start": 26,
+     "end": 993,
+     "sha256": "36363211a8aeb1ac8f8f124b4d773a1498b4e89520f5aa6bd508ebaf9c58f084"
+    }
    }
   },
   {
@@ -415,9 +432,9 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "52:31",
+    "loc": "20:135",
     "hi": [
-     5
+     2
     ]
    }
   },
@@ -609,7 +626,16 @@
     "loc": "68:32",
     "hi": [
      9
-    ]
+    ],
+    "voice": {
+     "form": "رَٰغِبُونَ",
+     "loc": "68:32:10",
+     "url": "/belajar/media/narration/quran-com/wbw/068_032_010.mp3",
+     "ms": 1855,
+     "start": 0,
+     "end": 1855,
+     "sha256": "f620bf3b8f783839a915e5c343896a0c1a7ae368f589d0548802c9dc085d82c8"
+    }
    }
   },
   {
@@ -703,7 +729,16 @@
     "loc": "9:77",
     "hi": [
      1
-    ]
+    ],
+    "voice": {
+     "form": "نِفَاقًا",
+     "loc": "9:77:2",
+     "url": "/belajar/media/narration/quran-com/wbw/009_077_002.mp3",
+     "ms": 1358,
+     "start": 0,
+     "end": 1358,
+     "sha256": "a1ee02360a229a836bc41724009d7285193ead43c189532e299ef3672c3e6647"
+    }
    }
   },
   {
@@ -849,7 +884,16 @@
     "loc": "99:4",
     "hi": [
      2
-    ]
+    ],
+    "voice": {
+     "form": "أَخْبَارَهَا",
+     "loc": "99:4:3",
+     "url": "/belajar/media/narration/quran-com/wbw/099_004_003.mp3",
+     "ms": 1463,
+     "start": 5,
+     "end": 1463,
+     "sha256": "9fb3d37a28e23a48ed81dd8c3e6112d1c78f2f3b49f190b3015db2a7636148e8"
+    }
    }
   },
   {
@@ -939,9 +983,9 @@
    },
    "kind": "verb",
    "example": {
-    "loc": "67:11",
+    "loc": "9:102",
     "hi": [
-     0
+     1
     ]
    }
   },
@@ -1037,10 +1081,19 @@
    },
    "kind": "verb",
    "example": {
-    "loc": "9:120",
+    "loc": "33:27",
     "hi": [
-     31
-    ]
+     6
+    ],
+    "voice": {
+     "form": "تَطَـُٔوهَا",
+     "loc": "33:27:7",
+     "url": "/belajar/media/narration/quran-com/wbw/033_027_007.mp3",
+     "ms": 1593,
+     "start": 60,
+     "end": 1593,
+     "sha256": "be3ea42f432f6aedc4bbd1d67a10a87c475e4e08c44b4caf4e23ddd21d0a42de"
+    }
    }
   },
   {
@@ -1133,7 +1186,16 @@
     "loc": "21:48",
     "hi": [
      5
-    ]
+    ],
+    "voice": {
+     "form": "وَضِيَآءً",
+     "loc": "21:48:6",
+     "url": "/belajar/media/narration/quran-com/wbw/021_048_006.mp3",
+     "ms": 2821,
+     "start": 0,
+     "end": 2821,
+     "sha256": "01e365278c2956a7c8949b37233f5709bb84fec6f0cc58190a43a851022478ac"
+    }
    }
   },
   {
@@ -1229,10 +1291,19 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "28:7",
+    "loc": "28:85",
     "hi": [
-     17
-    ]
+     5
+    ],
+    "voice": {
+     "form": "لَرَآدُّكَ",
+     "loc": "28:85:6",
+     "url": "/belajar/media/narration/quran-com/wbw/028_085_006.mp3",
+     "ms": 3944,
+     "start": 0,
+     "end": 3937,
+     "sha256": "31c28be230ee99581171b390c0013b38d369f542f57ff2f74472ec1328d6c47c"
+    }
    }
   },
   {
@@ -1276,7 +1347,7 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "41:49",
+    "loc": "11:9",
     "hi": [
      9
     ]
@@ -1326,7 +1397,16 @@
     "loc": "37:36",
     "hi": [
      2
-    ]
+    ],
+    "voice": {
+     "form": "لَتَارِكُوٓا۟",
+     "loc": "37:36:3",
+     "url": "/belajar/media/narration/quran-com/wbw/037_036_003.mp3",
+     "ms": 1254,
+     "start": 0,
+     "end": 1254,
+     "sha256": "598eefb0c8e0021884569084e67dd7f04c4db24206ca90b1c068aa2700d3b08e"
+    }
    }
   },
   {
@@ -1422,9 +1502,9 @@
    },
    "kind": "verb",
    "example": {
-    "loc": "11:37",
+    "loc": "25:63",
     "hi": [
-     5
+     8
     ]
    }
   },
@@ -1670,7 +1750,16 @@
     "loc": "11:97",
     "hi": [
      9
-    ]
+    ],
+    "voice": {
+     "form": "بِرَشِيدٍ",
+     "loc": "11:97:10",
+     "url": "/belajar/media/narration/quran-com/wbw/011_097_010.mp3",
+     "ms": 1618,
+     "start": 0,
+     "end": 1618,
+     "sha256": "3cbac3edeb5918e807964f49b177a7b919211a8fe8ab6a4dea005cb3934224d0"
+    }
    }
   },
   {
@@ -1820,7 +1909,16 @@
     "loc": "11:92",
     "hi": [
      2
-    ]
+    ],
+    "voice": {
+     "form": "أَرَهْطِىٓ",
+     "loc": "11:92:3",
+     "url": "/belajar/media/narration/quran-com/wbw/011_092_003.mp3",
+     "ms": 1488,
+     "start": 6,
+     "end": 1477,
+     "sha256": "46d2ac0213cf5a5eedcb2116293b8d5e2c926ac2a7381c3b60d4551a8366b41b"
+    }
    }
   },
   {
@@ -1864,9 +1962,9 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "18:34",
+    "loc": "11:92",
     "hi": [
-     11
+     3
     ]
    }
   },
@@ -1912,9 +2010,9 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "85:3",
+    "loc": "11:103",
     "hi": [
-     1
+     15
     ]
    }
   },
@@ -2014,7 +2112,16 @@
     "loc": "21:13",
     "hi": [
      5
-    ]
+    ],
+    "voice": {
+     "form": "أُتْرِفْتُمْ",
+     "loc": "21:13:6",
+     "url": "/belajar/media/narration/quran-com/wbw/021_013_006.mp3",
+     "ms": 1541,
+     "start": 44,
+     "end": 1541,
+     "sha256": "cda17415e846d533bf1169cc1707a86d8962e1932b7764e75c6d2b79c535c3cc"
+    }
    }
   },
   {
@@ -2112,7 +2219,16 @@
     "loc": "19:71",
     "hi": [
      3
-    ]
+    ],
+    "voice": {
+     "form": "وَارِدُهَا",
+     "loc": "19:71:4",
+     "url": "/belajar/media/narration/quran-com/wbw/019_071_004.mp3",
+     "ms": 1384,
+     "start": 8,
+     "end": 1381,
+     "sha256": "5f1482b7fcff2e5831968cfe1e477f06eb903b24b6a417e90405ffe2dea6010f"
+    }
    }
   },
   {
@@ -2159,7 +2275,16 @@
     "loc": "12:35",
     "hi": [
      8
-    ]
+    ],
+    "voice": {
+     "form": "لَيَسْجُنُنَّهُۥ",
+     "loc": "12:35:9",
+     "url": "/belajar/media/narration/quran-com/wbw/012_035_009.mp3",
+     "ms": 2819,
+     "start": 11,
+     "end": 2817,
+     "sha256": "06f9c7a24d69430fcdefde8e20437f93fc1d9f5f9f9fb2a305890a28ae3a0774"
+    }
    }
   },
   {
@@ -2202,9 +2327,9 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "18:62",
+    "loc": "12:30",
     "hi": [
-     3
+     7
     ]
    }
   },
@@ -2499,9 +2624,9 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "12:75",
+    "loc": "12:70",
     "hi": [
-     5
+     6
     ]
    }
   },
@@ -2684,9 +2809,9 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "20:101",
+    "loc": "12:72",
     "hi": [
-     6
+     7
     ]
    }
   },
@@ -2786,7 +2911,16 @@
     "loc": "20:91",
     "hi": [
      2
-    ]
+    ],
+    "voice": {
+     "form": "نَّبْرَحَ",
+     "loc": "20:91:3",
+     "url": "/belajar/media/narration/quran-com/wbw/020_091_003.mp3",
+     "ms": 1280,
+     "start": 43,
+     "end": 1280,
+     "sha256": "956ee28fd51317bb6418d37aacbcca82bed90d8690d274ba87969dad9a30eaf7"
+    }
    }
   },
   {
@@ -2928,9 +3062,9 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "12:95",
+    "loc": "46:11",
     "hi": [
-     5
+     18
     ]
    }
   },
@@ -3020,9 +3154,9 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "13:8",
+    "loc": "32:5",
     "hi": [
-     14
+     12
     ]
    }
   },
@@ -3164,7 +3298,16 @@
     "loc": "40:81",
     "hi": [
      5
-    ]
+    ],
+    "voice": {
+     "form": "تُنكِرُونَ",
+     "loc": "40:81:6",
+     "url": "/belajar/media/narration/quran-com/wbw/040_081_006.mp3",
+     "ms": 2116,
+     "start": 30,
+     "end": 2116,
+     "sha256": "d05da0275e6c9c99beaeccc4693b65d705254bfc1224af7cda3ac580c28562e7"
+    }
    }
   },
   {
@@ -3211,7 +3354,16 @@
     "loc": "13:39",
     "hi": [
      0
-    ]
+    ],
+    "voice": {
+     "form": "يَمْحُوا۟",
+     "loc": "13:39:1",
+     "url": "/belajar/media/narration/quran-com/wbw/013_039_001.mp3",
+     "ms": 1356,
+     "start": 124,
+     "end": 1348,
+     "sha256": "0c13407a5fe643f8a4f95431012459fba6ccb6149f3b226b5a93885b5115d9c7"
+    }
    }
   },
   {
@@ -3264,7 +3416,16 @@
     "loc": "59:5",
     "hi": [
      8
-    ]
+    ],
+    "voice": {
+     "form": "أُصُولِهَا",
+     "loc": "59:5:9",
+     "url": "/belajar/media/narration/quran-com/wbw/059_005_009.mp3",
+     "ms": 1384,
+     "start": 115,
+     "end": 1384,
+     "sha256": "49c4c9c2b5f2f2aa5d30c96ed6f7c864308dd4e7a01920d52bec056207dfb2c4"
+    }
    }
   },
   {
@@ -3353,11 +3514,19 @@
    },
    "kind": "verb",
    "example": {
-    "loc": "35:41",
+    "loc": "14:46",
     "hi": [
-     6,
-     8
-    ]
+     9
+    ],
+    "voice": {
+     "form": "لِتَزُولَ",
+     "loc": "14:46:10",
+     "url": "/belajar/media/narration/quran-com/wbw/014_046_010.mp3",
+     "ms": 1330,
+     "start": 75,
+     "end": 1271,
+     "sha256": "b528753e468216fc55a6859018e8ea47b736f75bc3dd9dc3fb562a3b5f52aeb0"
+    }
    }
   },
   {
@@ -3450,7 +3619,16 @@
     "loc": "14:50",
     "hi": [
      0
-    ]
+    ],
+    "voice": {
+     "form": "سَرَابِيلُهُم",
+     "loc": "14:50:1",
+     "url": "/belajar/media/narration/quran-com/wbw/014_050_001.mp3",
+     "ms": 1904,
+     "start": 116,
+     "end": 1869,
+     "sha256": "3e923c56073b14e2f670ce81c4c82dd41bbd69efbccebfb818be4c79152e3b2a"
+    }
    }
   },
   {
@@ -3722,9 +3900,9 @@
    },
    "kind": "verb",
    "example": {
-    "loc": "23:65",
+    "loc": "23:64",
     "hi": [
-     1
+     7
     ]
    }
   },
@@ -4051,9 +4229,9 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "17:22",
+    "loc": "68:49",
     "hi": [
-     7
+     9
     ]
    }
   },
@@ -4193,9 +4371,9 @@
    },
    "kind": "verb",
    "example": {
-    "loc": "26:182",
+    "loc": "83:3",
     "hi": [
-     0
+     3
     ]
    }
   },
@@ -4484,9 +4662,9 @@
    },
    "kind": "verb",
    "example": {
-    "loc": "26:187",
+    "loc": "17:92",
     "hi": [
-     0
+     1
     ]
    }
   },
@@ -4576,9 +4754,9 @@
    },
    "kind": "noun",
    "example": {
-    "loc": "17:109",
+    "loc": "36:8",
     "hi": [
-     1
+     7
     ]
    }
   },
@@ -4633,7 +4811,16 @@
     "loc": "42:28",
     "hi": [
      8
-    ]
+    ],
+    "voice": {
+     "form": "وَيَنشُرُ",
+     "loc": "42:28:9",
+     "url": "/belajar/media/narration/quran-com/wbw/042_028_009.mp3",
+     "ms": 1933,
+     "start": 134,
+     "end": 1933,
+     "sha256": "f7263ea1be90dd67865a42f8801f2bcca8ce76dd0c03582b26f2826700df65b2"
+    }
    }
   },
   {

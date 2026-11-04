@@ -4,21 +4,28 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { KosakataAyatFile, KosakataIndex, KosakataPath, KosakataWordsFile } from "@/content/kosakata-schema";
+import { KosakataAyatFile, KosakataIndex, KosakataPath, KosakataVoice, KosakataWordsFile } from "@/content/kosakata-schema";
 import { ayatFileName, wordsFileName } from "@/lib/kosakata-core";
 import type { AyahLine } from "@/lib/kosakata-path-core";
 import { levelOf, type PathSource, testData } from "@/lib/kosakata-path-data";
 
-import { recordingIsMarkedWord, soundedAyahKeys } from "./ayah-sound";
+import { ayahSoundFor, ayahSounds, recordingIsMarkedWord } from "./ayah-sound";
 
 // Operator 2026-11-04, on Level 1's second test: "the screen highlight 'wa man' but the sound only 'man',
 // its confusing. i believe many similar cases like this." An ayah question marks a token of a verse; the
-// speaker plays the word's pinned recording, chosen by another rule. They agree for 36% of the words
-// that get an ayah question. This pins the rule that the speaker is there only when they agree.
+// speaker played the word's pinned recording, chosen by another rule, and they agreed for 36% of the words
+// that get an ayah question. The speaker now belongs to the question only when it says what is marked: the
+// word's own recording where that is spelt as the marked token, else the recording of the marked place
+// itself (example.voice, pinned by the pipeline). This pins that rule.
 
-const line = (tokens: string[], hi: number[]): AyahLine => ({ loc: "1:1", surah: "x", ayah: 1, tokens, hi, text: "", footnotes: [] });
+const line = (tokens: string[], hi: number[], loc = "26:65"): AyahLine => ({ loc, surah: "x", ayah: 1, tokens, hi, text: "", footnotes: [] });
 
-describe("recordingIsMarkedWord: the speaker says what is marked", () => {
+const voice = (form: string, loc: string, extra: Partial<KosakataVoice> = {}): KosakataVoice => {
+  const [s, a, w] = loc.split(":").map((n) => n.padStart(3, "0"));
+  return { form, loc, url: `/belajar/media/narration/quran-com/wbw/${s}_${a}_${w}.mp3`, ms: 900, start: 10, end: 800, sha256: "a".repeat(64), ...extra };
+};
+
+describe("recordingIsMarkedWord: the word's own recording says what is marked", () => {
   it("is not the case when the verse marks wa-man and the recording is man (the report)", () => {
     expect(recordingIsMarkedWord(line(["قَالَ", "وَمَن", "فِى"], [1]), { form: "مَن" })).toBe(false);
   });
@@ -48,6 +55,45 @@ describe("recordingIsMarkedWord: the speaker says what is marked", () => {
   });
 });
 
+describe("ayahSoundFor: what the speaker plays", () => {
+  const verse = line(["قَالَ", "وَمَن", "فِى"], [1]); // loc 26:65, the marked token is the second word
+
+  it("plays the word's own recording where that says the marked token", () => {
+    const own = voice("وَمَن", "2:8:3");
+    const sound = ayahSoundFor(verse, { voice: own });
+    expect(sound).toMatchObject({ loc: "2:8:3", form: "وَمَن" });
+    expect(sound!.clip).toEqual({ url: own.url, start: own.start, end: own.end, source: "quran.com" });
+  });
+
+  it("plays the recording of the marked place when the word's own is spelt otherwise (wa-man marked, man pinned)", () => {
+    const marked = voice("وَمَن", "26:65:2");
+    expect(ayahSoundFor(verse, { voice: voice("مَن", "2:8:3"), example: { loc: "26:65", hi: [1], voice: marked } })).toMatchObject({ loc: "26:65:2", form: "وَمَن" });
+  });
+
+  it("prefers the word's own recording when both would say it", () => {
+    const both = ayahSoundFor(verse, { voice: voice("وَمَن", "2:8:3"), example: { loc: "26:65", hi: [1], voice: voice("وَمَن", "26:65:2") } });
+    expect(both?.loc).toBe("2:8:3");
+  });
+
+  it("plays nothing when the recording of the place is of another token", () => {
+    expect(ayahSoundFor(verse, { voice: voice("مَن", "2:8:3"), example: { loc: "26:65", hi: [1], voice: voice("فِى", "26:65:2") } })).toBeNull();
+  });
+
+  it("plays nothing when the recording is of a place the verse does not mark", () => {
+    expect(ayahSoundFor(verse, { voice: voice("مَن", "2:8:3"), example: { loc: "26:65", hi: [1], voice: voice("وَمَن", "26:65:3") } })).toBeNull();
+    expect(ayahSoundFor(verse, { voice: voice("مَن", "2:8:3"), example: { loc: "26:65", hi: [1], voice: voice("وَمَن", "9:9:2") } })).toBeNull();
+  });
+
+  it("plays nothing when the marked tokens are spelt differently, though one recording says one of them", () => {
+    const mixed = line(["مَن", "وَمَن"], [0, 1]);
+    expect(ayahSoundFor(mixed, { voice: voice("مَن", "2:8:3"), example: { loc: "26:65", hi: [0, 1], voice: voice("وَمَن", "26:65:2") } })).toBeNull();
+  });
+
+  it("plays nothing when the word has no recording of the place", () => {
+    expect(ayahSoundFor(verse, { voice: voice("مَن", "2:8:3") })).toBeNull();
+  });
+});
+
 // The real path, read as the pages read it.
 const DIR = fileURLToPath(new URL("../../../content/kosakata/", import.meta.url));
 const read = (name: string): unknown => JSON.parse(readFileSync(join(DIR, name), "utf8"));
@@ -73,55 +119,59 @@ const src: PathSource = {
 };
 
 describe("the real path", () => {
-  it("lets a speaker through only where the recording is spelt as every marked token", () => {
+  it("plays a recording only where it is of every marked token, and the place it names is that place", () => {
     let withAyah = 0;
     let sounded = 0;
+    let ownRecordings = 0;
     for (const level of path.levels.slice(1)) {
       level.batches.forEach((_, i) => {
         const data = testData(src, level, i + 1);
-        const keys = soundedAyahKeys(src, data);
-        expect(new Set(keys).size, data.id).toBe(keys.length);
+        const sounds = ayahSounds(src, data);
         for (const item of data.fresh) {
           if (!item.ayah) {
-            expect(keys, `${data.id}: ${item.translit} has no ayah question`).not.toContain(item.key);
+            expect(sounds, `${data.id}: ${item.translit} has no ayah question`).not.toHaveProperty(item.key);
             continue;
           }
           withAyah++;
-          const voice = src.word(Number(item.key.slice(1)))!.voice;
           const { tokens, hi } = item.ayah;
+          const word = src.word(Number(item.key.slice(1)))!;
           const marked = hi.map((h) => tokens[h]);
-          const midAyah = hi.some((h) => h !== tokens.length - 1);
-          if (keys.includes(item.key)) {
+          const sound = sounds[item.key];
+          if (sound) {
             sounded++;
-            expect(marked, `${data.id}: ${item.translit} has a speaker`).toEqual(marked.map(() => voice.form));
-            expect(voice.final && midAyah, `${data.id}: ${item.translit} plays a stop form on a word inside its ayah`).toBeFalsy();
+            expect(marked, `${data.id}: ${item.translit} has a speaker`).toEqual(marked.map(() => sound.form));
+            const place = sound.loc.split(":").map((n) => n.padStart(3, "0")).join("_");
+            expect(sound.clip.url, `${data.id}: ${item.translit}`).toMatch(new RegExp(`/${place}\\.mp3$`));
+            if (sound.loc === word.voice.loc) {
+              expect(word.voice.final && hi.some((h) => h !== tokens.length - 1), `${data.id}: ${item.translit} plays a stop form on a word inside its ayah`).toBeFalsy();
+            } else {
+              ownRecordings++;
+              expect(hi.map((h) => `${item.ayah!.loc}:${h + 1}`), `${data.id}: ${item.translit} plays a place the verse does not mark`).toContain(sound.loc);
+            }
           } else {
-            const spelt = marked.some((m) => m !== voice.form);
-            const stopForm = voice.final === true && midAyah;
-            expect(spelt || stopForm, `${data.id}: ${item.translit} has no speaker, though it marks ${marked.join(" ")} and the recording is ${voice.form}`).toBe(true);
+            // Silent only for a reason: nothing says the marked token.
+            const spelt = marked.some((m) => m !== word.voice.form) || (word.voice.final === true && hi.some((h) => h !== tokens.length - 1));
+            const alike = marked.every((m) => m === marked[0]);
+            expect(spelt, `${data.id}: ${item.translit} has no speaker, though its own recording says what is marked`).toBe(true);
+            expect(alike && word.example?.voice, `${data.id}: ${item.translit} has a recording of the place and does not play it`).toBeFalsy();
           }
         }
       });
     }
-    // A rule that let nothing through would pass every check above.
-    expect(sounded / withAyah).toBeGreaterThan(0.2);
-    expect(sounded).toBeLessThan(withAyah);
+    // A rule that let nothing through would pass every check above; and most ayah questions can now speak.
+    expect(ownRecordings).toBeGreaterThan(500);
+    expect(sounded / withAyah).toBeGreaterThan(0.9);
   }, 120_000);
 
-  it("answers the report: Level 1, batch 2, marks wa-man for man, and its ayah question has no speaker", () => {
+  it("answers the report: every word of Level 1, batch 2 has an ayah question that speaks, and man marks man", () => {
     const data = testData(src, levelOf(src, "1")!, 2);
-    const keys = soundedAyahKeys(src, data);
+    const sounds = ayahSounds(src, data);
+    for (const item of data.fresh) expect(sounds, item.translit).toHaveProperty(item.key);
     const man = data.fresh.find((i) => i.key === "w12")!;
     expect(man.translit).toBe("man");
-    const marked = man.ayah!.hi.map((h) => man.ayah!.tokens[h]);
     const heard = src.word(12)!.voice.form;
-    // The verse marks the word with wa- in front of it; the recording is the word alone.
-    expect(marked).toHaveLength(1);
-    expect(marked[0]).not.toBe(heard);
-    expect(marked[0].endsWith(heard)).toBe(true);
-    expect(keys).not.toContain("w12");
-    // la, where the verse marks la and the recording says la, keeps its speaker.
-    expect(keys).toContain("w4");
+    expect(man.ayah!.hi.map((h) => man.ayah!.tokens[h])).toEqual([heard]);
+    expect(sounds["w12"].form).toBe(heard);
   });
 
   it("leaves a level test with no ayah question, so it has nothing to hand the page", () => {
@@ -135,18 +185,22 @@ describe("the pages obey it", () => {
   const code = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
   const test = code("./PathTest.tsx");
 
-  it("shows the speaker and plays on a right answer only where the question may", () => {
-    expect(test).toMatch(/const plays = q\.kind !== "ayah" \|\| ayahSounds\.includes\(item\.key\);/);
-    expect(test).toMatch(/\{plays \? \(\s*<div className="flex justify-center">\s*<ClipButton loc=\{item\.loc\}/);
-    expect(test).toMatch(/if \(ok && plays\) player\?\.play\(keyOf\(run\), item\.clip\);/);
-    // The other two places a recording sounds are not an ayah question's.
+  it("shows the speaker, and plays on a right answer, only for a question that has a sound", () => {
+    expect(test).toMatch(/const sound = q\.kind === "ayah" \? \(ayahSounds\[item\.key\] \?\? null\) : \{ loc: item\.loc, clip: item\.clip \};/);
+    expect(test).toMatch(/\{sound \? \(\s*<div className="flex justify-center">\s*<ClipButton loc=\{sound\.loc\} clip=\{sound\.clip\}/);
+    expect(test).toMatch(/if \(ok && sound\) player\?\.play\(keyOf\(run\), sound\.clip\);/);
+    // The other places a recording sounds are not an ayah question's.
     expect(test.match(/player\?\.play\(/g)).toHaveLength(3);
     expect(test.match(/<ClipButton /g)).toHaveLength(2);
   });
 
-  it("is handed the keys by the batch test's page", () => {
+  it("fetches the recordings an ayah question may play along with the words'", () => {
+    expect(test).toMatch(/Object\.values\(props\.ayahSounds \?\? \{\}\)\.map\(\(s\) => s\.clip\.url\)/);
+  });
+
+  it("is handed the sounds by the batch test's page", () => {
     const page = code("../../app/[locale]/kosakata/bertahap/[level]/[batch]/tes/page.tsx");
-    expect(page).toContain('import { soundedAyahKeys } from "@/components/kosakata/ayah-sound";');
-    expect(page).toMatch(/ayahSounds=\{soundedAyahKeys\(src, data\)\}/);
+    expect(page).toContain('import { ayahSounds } from "@/components/kosakata/ayah-sound";');
+    expect(page).toMatch(/ayahSounds=\{ayahSounds\(src, data\)\}/);
   });
 });

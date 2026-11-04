@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Pins Quran.com's recording of one place for every word in the Kosakata list (kosakata_voice.py has
-the rule). Run from belajar/pipeline:
+the rule), of the places Level 0 plays, and of the places the test's ayah questions play where the
+word's own recording is not the marked token. Run from belajar/pipeline:
 
     python3 build_kosakata_voice.py --fetch [--max-rank N]   # read-only downloads, then writes the pins
     python3 build_kosakata_voice.py --check                  # the rule's places against the pins (needs cache)
@@ -141,14 +142,49 @@ def fetch(max_rank: int | None) -> int:
                 errs.append(err)
             else:
                 pins["parts"][loc] = pin
+    # The test's ayah questions play the marked word: where the word's own recording is not spelt as the
+    # marked token, that place's own recording (kosakata.example_recordings decides, kosakata_voice.py says why).
+    wanted_examples = K.example_recordings(table, K.load_authored()["lemmas"], K.lemma_positions(segs), corpus, tokens, pins["words"])
+    for ch in sorted({int(loc.split(":")[0]) for loc in wanted_examples}):
+        words.update(chapter_words(ch))
+
+    def one_example(item: tuple[str, str]) -> tuple[str, dict | None, str | None]:
+        loc, form = item
+        s, a, n = (int(x) for x in loc.split(":"))
+        listed = words.get(f"{s}:{a}") or []
+        if n > len(listed):
+            return loc, None, f"example at {loc}: Quran.com has {len(listed)} words in {s}:{a}, not word {n}"
+        f = QC_CACHE / V.upstream_of(loc).rsplit("/", 1)[1]
+        if not f.exists():
+            try:
+                f.write_bytes(get(V.upstream_of(loc)))
+            except urllib.error.HTTPError as err:
+                return loc, None, f"example at {loc}: {V.upstream_of(loc)}: HTTP {err.code}"
+        body = f.read_bytes()
+        ms, start, end = word_span(f)
+        return loc, {"loc": loc, "form": form, "qc_text": listed[n - 1], "sha256": hashlib.sha256(body).hexdigest(),
+                     "bytes": len(body), "ms": ms, "start": start, "end": end}, None
+
+    pins["examples"] = {}
+    with ThreadPoolExecutor(THREADS) as pool:
+        for n_done, (loc, pin, err) in enumerate(pool.map(one_example, wanted_examples.items()), 1):
+            if err:
+                errs.append(err)
+            else:
+                pins["examples"][loc] = pin
+            if n_done % 200 == 0:
+                print(f"  {n_done} of {len(wanted_examples)} example places", flush=True)
     pins["_comment"] = ("Written by pipeline/build_kosakata_voice.py --fetch: for each word of the Kosakata list, the one place whose Quran.com "
-                        "recording it plays (the rule is in kosakata_voice.py), what Quran.com calls that word, and the file's sha256 and length. Never edited by hand.")
+                        "recording it plays (the rule is in kosakata_voice.py), what Quran.com calls that word, and the file's sha256 and length; "
+                        "`parts` the places Level 0 plays; `examples` the places the test's ayah questions play where the word's own recording is not the "
+                        "marked token. Never edited by hand.")
     pins["words"] = dict(sorted(pins["words"].items()))
     pins["parts"] = dict(sorted(pins["parts"].items()))
+    pins["examples"] = dict(sorted(pins["examples"].items()))
     V.PINS.write_text(json.dumps(pins, ensure_ascii=False, indent=0) + "\n", encoding="utf-8")
-    problems = V.pin_problems(pins)
-    size = sum(p["bytes"] for p in [*pins["words"].values(), *pins["parts"].values()])
-    print(f"pinned {len(pins['words'])} words and {len(pins['parts'])} places of Level 0, {size / 1e6:.1f} MB; {len(errs)} failed, {len(problems)} pin problems", flush=True)
+    problems = V.pin_problems(pins, None, wanted_examples)
+    size = sum(p["bytes"] for p in [*pins["words"].values(), *pins["parts"].values(), *pins["examples"].values()])
+    print(f"pinned {len(pins['words'])} words, {len(pins['parts'])} places of Level 0 and {len(pins['examples'])} of the ayah questions, {size / 1e6:.1f} MB; {len(errs)} failed, {len(problems)} pin problems", flush=True)
     for line in (errs + problems)[:40]:
         print("  " + line, file=sys.stderr)
     return 1 if errs or problems else 0
@@ -160,7 +196,11 @@ def upload_list() -> int:
     host_media.py --deliver, which also wants the imam's ayah files on this machine and copies 289 MB
     a second time. Prints the upload; never runs it."""
     pins = V.load_pins()
-    words = {**pins["words"], **{f"part at {k}": v for k, v in (pins.get("parts") or {}).items()}}
+    words = {
+        **pins["words"],
+        **{f"part at {k}": v for k, v in (pins.get("parts") or {}).items()},
+        **{f"example at {k}": v for k, v in (pins.get("examples") or {}).items()},
+    }
     root = QC_CACHE.parents[1]
     bad, listed = [], []
     for lem, p in sorted(words.items(), key=lambda kv: kv[1]["loc"]):
@@ -201,7 +241,11 @@ def main() -> int:
         errs = V.pin_problems(pins)
     else:
         corpus, segs = K.load_corpus_and_qac()
-        errs = V.pin_problems(pins, V.places(segs, corpus.T, K.headword))
+        tokens, _ = V.counted_alike(corpus.T, segs)
+        wanted_examples = K.example_recordings(
+            K.lemma_table(segs, corpus.T), K.load_authored()["lemmas"], K.lemma_positions(segs), corpus, tokens, pins["words"]
+        )
+        errs = V.pin_problems(pins, V.places(segs, corpus.T, K.headword), wanted_examples)
     if errs:
         print(f"{len(errs)} problem(s):\n  " + "\n  ".join(errs[:40]), file=sys.stderr)
         return 1

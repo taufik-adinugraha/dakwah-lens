@@ -13,6 +13,7 @@ import { afterTest, batchTest, levelTest, nextBatch, NO_PROGRESS, parseBatchId, 
 import type { TestData } from "@/lib/kosakata-path-data";
 import { kosakataBatchHref, kosakataPathHref } from "@/lib/routes";
 
+import type { AyahSound } from "./ayah-sound";
 import { AyahText, AyahTranslation } from "./AyahLineView";
 import { NextBarPage } from "./NextBarPage";
 
@@ -68,11 +69,11 @@ type TestProps = {
   passPercent: number;
   order: string[];
   source: string;
-  /** The words whose ayah question may play their recording: the one that is of the marked word (ayah-sound.ts). */
-  ayahSounds?: readonly string[];
+  /** What each word's ayah question plays, by the word's key: the recording that is of the marked word (ayah-sound.ts). A word absent from it has no speaker. */
+  ayahSounds?: Readonly<Record<string, AyahSound>>;
 };
 
-function Runner({ data, level, batch, passPercent, order, source, ayahSounds = [] }: TestProps) {
+function Runner({ data, level, batch, passPercent, order, source, ayahSounds = {} }: TestProps) {
   const t = useTranslations("KosakataPath");
   const locale = useLocale();
   const lang = locale === "en" ? "en" : "id";
@@ -186,17 +187,17 @@ function Runner({ data, level, batch, passPercent, order, source, ayahSounds = [
   const item = q.item;
   const answered = run.picked !== null;
   const right = answered && q.options[run.picked as number].key === item.key;
-  // An ayah question marks a word in a verse, and the recording is the list's pinned one, which is often
-  // another form of the word (wa-man marked, man said). It plays only where it is of the marked word, so
-  // the speaker and the voice on a right answer both depend on this; the other kinds mark no word.
-  const plays = q.kind !== "ayah" || ayahSounds.includes(item.key);
+  // An ayah question marks a word in a verse, and what it plays must be that word: the word's recording
+  // where that is spelt as the marked token, else the recording of the marked place itself, else nothing
+  // (wa-man marked, man said was the report; ayah-sound.ts). The other kinds mark no word.
+  const sound = q.kind === "ayah" ? (ayahSounds[item.key] ?? null) : { loc: item.loc, clip: item.clip };
 
   const pick = (i: number) => {
     if (run.picked !== null) return;
     const ok = q.options[i].key === item.key;
     setRun({ ...run, picked: i, score: run.score + (ok ? 1 : 0), missed: ok ? run.missed : [...run.missed, item] });
     // The voice on a right answer (narration rule 16): inside the click, so every browser lets it sound.
-    if (ok && plays) player?.play(keyOf(run), item.clip);
+    if (ok && sound) player?.play(keyOf(run), sound.clip);
   };
 
   const advance = () => {
@@ -258,9 +259,9 @@ function Runner({ data, level, batch, passPercent, order, source, ayahSounds = [
             {item.ar}
           </p>
         ) : null}
-        {plays ? (
+        {sound ? (
           <div className="flex justify-center">
-            <ClipButton loc={item.loc} clip={item.clip} word={item.translit} playerKey={keyOf(run)} />
+            <ClipButton loc={sound.loc} clip={sound.clip} word={item.translit} playerKey={keyOf(run)} />
           </div>
         ) : null}
         <div className="space-y-2">
@@ -307,7 +308,7 @@ function Runner({ data, level, batch, passPercent, order, source, ayahSounds = [
 /** A batch's or a level's test. Nothing is sent but the anonymous count at the end. */
 export function PathTest(props: TestProps) {
   return (
-    <ClipPlayerProvider prefetch={props.batch === null ? [] : props.data.fresh.map((i) => i.clip.url)}>
+    <ClipPlayerProvider prefetch={props.batch === null ? [] : [...new Set([...props.data.fresh.map((i) => i.clip.url), ...Object.values(props.ayahSounds ?? {}).map((s) => s.clip.url)])]}>
       <Runner {...props} />
     </ClipPlayerProvider>
   );
