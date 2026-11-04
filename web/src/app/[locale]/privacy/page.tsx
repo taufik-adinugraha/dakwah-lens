@@ -131,6 +131,7 @@ function SectionList({ t }: { t: T }) {
             <li>{t("s1_item_4")}</li>
             <li>{t("s1_item_5")}</li>
             <li>{t("s1_item_6")}</li>
+            <li>{t("s1_item_7")}</li>
           </ul>
         </div>
       ),
@@ -267,6 +268,7 @@ function SectionList({ t }: { t: T }) {
             <li>{t("s7_item_2")}</li>
             <li>{t("s7_item_3")}</li>
             <li>{t("s7_item_4")}</li>
+            <li>{t("s7_item_5")}</li>
           </ul>
         </div>
       ),
