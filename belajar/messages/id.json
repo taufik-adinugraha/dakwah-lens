@@ -164,7 +164,7 @@
     "data_versions_library": "Pustaka Konsep, Kosakata, dan Akar",
     "data_versions_ayat": "Ayat yang dibuka dari kartu “Tahukah Anda?”",
     "kosakata_heading": "Kosakata Al-Qur'an",
-    "kosakata_body": "Peringkat, jumlah, akar, dan bentuk kata dihitung dari Quranic Arabic Corpus 0.4 dan teks Tanzil. Terjemahan ayat dari QuranEnc. Arti kata ditulis dengan bantuan AI (Claude) dari ayat-ayat yang dikutip, dengan terjemahan QuranEnc dan Saheeh International, lalu diperiksa AI. Arti ini belum merujuk ke kitab. Suara tiap kata: rekaman kata demi kata Quran.com / Quran Foundation, dari satu tempat kata itu muncul dalam Al-Qur'an. Salinannya tanpa perubahan ada di server kami. Tes di Belajar bertahap dibuat dengan aturan dari data yang sama. Kami hanya menghitung berapa kali tiap tes dicoba dan lulus, tanpa nama, akun, atau alamat IP."
+    "kosakata_body": "Peringkat, jumlah, akar, dan bentuk kata dihitung dari Quranic Arabic Corpus 0.4 dan teks Tanzil. Terjemahan ayat dari QuranEnc. Arti kata ditulis dengan bantuan AI (Claude) dari ayat-ayat yang dikutip, dengan terjemahan QuranEnc dan Saheeh International, lalu diperiksa AI. Arti ini belum merujuk ke kitab. Suara tiap kata: rekaman kata demi kata Quran.com / Quran Foundation, dari satu tempat kata itu muncul dalam Al-Qur'an. Salinannya tanpa perubahan ada di server kami. Tes di Belajar bertahap dibuat dengan aturan dari data yang sama. Kami hanya menghitung angka: berapa browser membuka tiap bagian, dan berapa kali tiap tes dicoba dan lulus, tanpa nama, akun, atau alamat IP."
   },
   "NotFound": {
     "title": "Halaman tidak ditemukan",
@@ -550,7 +550,7 @@
     "passed": "Lulus",
     "open": "Terbuka",
     "progress_note": "Progres tersimpan di browser ini saja. Di perangkat lain mulai dari awal, dan tes level bisa membukanya kembali.",
-    "counts_note": "Kami hanya menghitung berapa kali tiap tes dicoba dan lulus, tanpa nama, akun, atau alamat IP.",
+    "counts_note": "Kami hanya menghitung angka: berapa browser membuka tiap bagian, dan berapa kali tiap tes dicoba dan lulus, tanpa nama, akun, atau alamat IP.",
     "reset": "Hapus progres",
     "reset_sure": "Klik sekali lagi untuk menghapus",
     "back": "Peta belajar",
