@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { and, count, eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
@@ -16,7 +16,7 @@ import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { ForWhom } from "@/components/landing/ForWhom";
 import { Support } from "@/components/landing/Support";
 import { ACTIVE_SOCIAL_PLATFORMS } from "@/lib/ingest-status";
-import { getLandingInsights } from "@/lib/landing-data";
+import { getLandingCoverage, getLandingInsights } from "@/lib/landing-data";
 import { formatPanggilan } from "@/lib/panggilan";
 import type { UserProfile } from "@/db/schema";
 
@@ -27,40 +27,6 @@ type Coverage = {
   postsAnalyzed30d: number;
 };
 
-
-async function getCoverage(): Promise<Coverage> {
-  // Run the counts in parallel. Each hits an indexed column so the
-  // landing page stays fast (<10ms on the queries themselves).
-  const [outletRows, postRows] = await Promise.all([
-    db
-      .select({ n: count() })
-      .from(schema.rssFeeds)
-      .where(eq(schema.rssFeeds.enabled, true)),
-    // "Posts analyzed" = posts the nightly Claude batch has labelled (theme +
-    // sentiment). Posts not labelled yet stay in the table but don't count
-    // toward the figure shown on the homepage. We count mainstream RSS too;
-    // it's the majority of the corpus. Until 2026-11-03 this read
-    // `dawah_opportunity IS NOT NULL`, which showed 1,151 against 68,272
-    // labelled posts once the score's classifier ran out of prepay.
-    db
-      .select({ n: count() })
-      .from(schema.socialPosts)
-      .where(
-        and(
-          sql`created_at >= now() - interval '30 days'`,
-          sql`theme_group IS NOT NULL`,
-          sql`sentiment_label IS NOT NULL`,
-        ),
-      ),
-  ]);
-  return {
-    outlets: outletRows[0]?.n ?? 0,
-    // The social platforms fetched TODAY (YouTube only since 2026-10-13),
-    // not every platform a scraper exists for: lib/ingest-status.ts.
-    socialPlatforms: ACTIVE_SOCIAL_PLATFORMS.length,
-    postsAnalyzed30d: postRows[0]?.n ?? 0,
-  };
-}
 
 /**
  * Landing page — 2026-07 "serene spiritual minimalism" redesign.
@@ -106,13 +72,22 @@ export default async function LandingPage({
   // chose marketing-view. Safe to start the heavier rendering work.
   setRequestLocale(locale);
 
-  const [tLanding, tDaleel, tDonate, coverage, insights] = await Promise.all([
+  // The two data reads come from lib/landing-data.ts, which keeps them for an
+  // hour: the post count scans the whole table (~3 s), and this page used to
+  // run it on every visit. Do not put a query for either back in this file.
+  const [tLanding, tDaleel, tDonate, counts, insights] = await Promise.all([
     getTranslations("Landing"),
     getTranslations("Daleel"),
     getTranslations("Donate"),
-    getCoverage(),
+    getLandingCoverage(),
     getLandingInsights(),
   ]);
+  const coverage: Coverage = {
+    ...counts,
+    // The social platforms fetched TODAY (YouTube only since 2026-10-13),
+    // not every platform a scraper exists for: lib/ingest-status.ts.
+    socialPlatforms: ACTIVE_SOCIAL_PLATFORMS.length,
+  };
 
   // Look up the profile so we can address signed-in viewers by their
   // preferred panggilan instead of their bare first name.

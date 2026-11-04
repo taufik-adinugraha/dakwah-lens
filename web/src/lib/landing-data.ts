@@ -1,9 +1,17 @@
 import "server-only";
 
-import { sql } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 
-import { db } from "@/db";
+import { db, schema } from "@/db";
 import { briefingListedSql } from "@/lib/briefing-listing";
+import { cached } from "@/lib/stale-while-revalidate";
+
+/** How long the landing page's figures are kept before they are read again.
+ *  They change when the nightly label batch runs (00:00 WIB) and when a
+ *  briefing is saved, so an hour is invisible to a visitor. Reading them cost
+ *  a visit 2.8 s (the post count scans the whole table: `created_at` has no
+ *  index), which is what the cache is for. Measured 2026-11-04. */
+export const LANDING_TTL_MS = 60 * 60 * 1000;
 
 /** Lightweight rows for the landing "live Insights preview" — the
  *  redesign's proof that the product is real: latest briefing per
@@ -31,7 +39,49 @@ export type LandingInsights = {
   topics: LandingTopic[];
 };
 
-export async function getLandingInsights(): Promise<LandingInsights> {
+/** The two figures the landing page counts live: feeds on, and posts the
+ *  nightly Claude batch has labelled in the last 30 days. The platforms line
+ *  is not here: it is a constant (lib/ingest-status.ts), not a query. */
+export type LandingCoverage = {
+  outlets: number;
+  postsAnalyzed30d: number;
+};
+
+async function loadCoverage(): Promise<LandingCoverage> {
+  // Two counts in parallel. The feeds count is a table of a few dozen rows. The posts
+  // count is NOT cheap: `social_posts.created_at` has no index, so Postgres
+  // reads the whole table (2.8 s and ~0.5 GB on 2026-11-04). It used to run
+  // on every visit under the comment "hits an indexed column (<10ms)", which
+  // it never did; it now runs once an hour (see getLandingCoverage).
+  const [outletRows, postRows] = await Promise.all([
+    db
+      .select({ n: count() })
+      .from(schema.rssFeeds)
+      .where(eq(schema.rssFeeds.enabled, true)),
+    // "Posts analyzed" = posts the nightly Claude batch has labelled (theme +
+    // sentiment). Posts not labelled yet stay in the table but don't count
+    // toward the figure shown on the homepage. We count mainstream RSS too;
+    // it's the majority of the corpus. Until 2026-11-03 this read
+    // `dawah_opportunity IS NOT NULL`, which showed 1,151 against 68,272
+    // labelled posts once the score's classifier ran out of prepay.
+    db
+      .select({ n: count() })
+      .from(schema.socialPosts)
+      .where(
+        and(
+          sql`created_at >= now() - interval '30 days'`,
+          sql`theme_group IS NOT NULL`,
+          sql`sentiment_label IS NOT NULL`,
+        ),
+      ),
+  ]);
+  return {
+    outlets: outletRows[0]?.n ?? 0,
+    postsAnalyzed30d: postRows[0]?.n ?? 0,
+  };
+}
+
+async function loadInsights(): Promise<LandingInsights> {
   const [briefingRows, topicRows] = await Promise.all([
     // Latest briefing per theme_group, ranked by that group's 7d post
     // volume (NOT recency — the weekly batch publishes low-volume
@@ -85,4 +135,21 @@ export async function getLandingInsights(): Promise<LandingInsights> {
       postCount: Number(r.post_count),
     })),
   };
+}
+
+/** What the landing page reads. Both are kept for `LANDING_TTL_MS` and
+ *  reloaded behind a visit, never in front of one (stale-while-revalidate.ts).
+ *  The landing page must not run its own query for either: a test pins that. */
+export function getLandingCoverage(): Promise<LandingCoverage> {
+  return cached("landing:coverage", loadCoverage, { ttlMs: LANDING_TTL_MS });
+}
+
+export function getLandingInsights(): Promise<LandingInsights> {
+  return cached("landing:insights", loadInsights, { ttlMs: LANDING_TTL_MS });
+}
+
+/** Load both now. instrumentation.ts calls this at boot, so the first visit
+ *  after a deploy finds them ready instead of waiting for the count. */
+export function warmLanding(): Promise<unknown> {
+  return Promise.all([getLandingCoverage(), getLandingInsights()]);
 }
