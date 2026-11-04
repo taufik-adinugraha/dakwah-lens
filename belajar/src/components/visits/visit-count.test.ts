@@ -14,7 +14,6 @@ describe("sectionOf: which part of Belajar a page is in", () => {
     ["/id/kosakata/kata/12", "kosakata-daftar"],
     ["/id/kosakata/bertahap", "kosakata-bertahap"],
     ["/id/kosakata/bertahap/1/3/tes", "kosakata-bertahap"],
-    ["/id/waris/hitung", "waris"],
     ["/id/kredit", "kredit"],
   ])("%s is %s", (path, section) => {
     expect(sectionOf(path)).toBe(section);
@@ -22,6 +21,10 @@ describe("sectionOf: which part of Belajar a page is in", () => {
 
   it("counts a page that is in no section for nothing", () => {
     expect(sectionOf("/id/alamat-keliru")).toBeNull();
+  });
+
+  it.each(["/id/waris", "/id/waris/hitung", "/id/waris/laporan", "/en/waris/hitung"])("sends nothing from Ilmu Waris, which promises no server path: %s", (path) => {
+    expect(sectionOf(path)).toBeNull();
   });
 
   it("never names the module's own row, which the route adds itself", () => {

@@ -6,8 +6,14 @@
  * already counted for, and reports only yes or no: is this its first view of this section today, or ever?
  */
 
-/** The parts of Belajar a visit is counted for. They are the only values the route accepts. */
-export const VISIT_SECTIONS = ["hub", "quran", "konsep", "kosakata-bertahap", "kosakata-daftar", "waris", "kredit"] as const;
+/**
+ * The parts of Belajar a visit is counted for. They are the only values the route accepts.
+ *
+ * Ilmu Waris is not one of them, and its pages send nothing at all: the track handles family and financial
+ * details and promises "no server path" (docs/waris-plan.md §9.4), and its CI run fails on any POST
+ * (scripts/ci/waris-e2e.mjs, which caught this count when it was first written).
+ */
+export const VISIT_SECTIONS = ["hub", "quran", "konsep", "kosakata-bertahap", "kosakata-daftar", "kredit"] as const;
 export type VisitSection = (typeof VISIT_SECTIONS)[number];
 
 /** The row of the module as a whole. Sections do not add up to it: one browser can visit several in a day. */
@@ -27,7 +33,7 @@ export type VisitMemory = { day: string; today: string[]; ever: string[] };
 
 /**
  * The section of a page's path, as usePathname gives it (the locale first, no basePath), or null for a page
- * that counts for none, such as a mistyped address.
+ * that sends nothing: Ilmu Waris (above), or a mistyped address.
  */
 export function sectionOf(pathname: string): VisitSection | null {
   const [first, second] = pathname.split("/").filter(Boolean).slice(1);
@@ -36,7 +42,6 @@ export function sectionOf(pathname: string): VisitSection | null {
       return "hub";
     case "quran":
     case "konsep":
-    case "waris":
     case "kredit":
       return first;
     case "kosakata":
