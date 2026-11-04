@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 // 2026-11-04: the landing page took 2.2 to 3.6 s to open. Its "posts analyzed" count filters
-// `social_posts` on `created_at`, which has no index, so every visit made Postgres read the whole
+// `social_posts` on `created_at`, which had no index, so every visit made Postgres read the whole
 // table (2.8 s, ~0.5 GB), and the comment above it said the query "hits an indexed column
 // (<10ms)". The query needs the database, so this pins the source instead: the page asks
 // lib/landing-data.ts for its figures, that file keeps them for a while, and the boot hook loads

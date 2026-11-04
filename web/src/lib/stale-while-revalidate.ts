@@ -3,8 +3,9 @@
  * change slowly: the landing page's figures.
  *
  * Why it exists (2026-11-04): the landing page counted 30 days of posts on
- * every visit. `social_posts.created_at` has no index, so Postgres read the
- * whole table, about 0.5 GB and 2.8 s each time, and the page waited for it.
+ * every visit. `social_posts.created_at` had no index then (migration
+ * 20261104_0900 added one), so Postgres read the whole table, about 0.5 GB and
+ * 2.8 s each time, and the page waited for it.
  * The figure only changes when the nightly label batch runs, so it is read
  * once an hour instead and a visitor never waits for it.
  *

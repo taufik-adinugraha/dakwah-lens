@@ -9,8 +9,9 @@ import { cached } from "@/lib/stale-while-revalidate";
 /** How long the landing page's figures are kept before they are read again.
  *  They change when the nightly label batch runs (00:00 WIB) and when a
  *  briefing is saved, so an hour is invisible to a visitor. Reading them cost
- *  a visit 2.8 s (the post count scans the whole table: `created_at` has no
- *  index), which is what the cache is for. Measured 2026-11-04. */
+ *  a visit 2.8 s (the post count scanned the whole table: `created_at` had no
+ *  index until migration 20261104_0900), which is what the cache is for.
+ *  Measured 2026-11-04. */
 export const LANDING_TTL_MS = 60 * 60 * 1000;
 
 /** Lightweight rows for the landing "live Insights preview" — the
@@ -49,9 +50,9 @@ export type LandingCoverage = {
 
 async function loadCoverage(): Promise<LandingCoverage> {
   // Two counts in parallel. The feeds count is a table of a few dozen rows. The posts
-  // count is NOT cheap: `social_posts.created_at` has no index, so Postgres
-  // reads the whole table (2.8 s and ~0.5 GB on 2026-11-04). It used to run
-  // on every visit under the comment "hits an indexed column (<10ms)", which
+  // count was the expensive one: until migration 20261104_0900 `social_posts.created_at`
+  // had no index, so Postgres read the whole table (2.8 s and ~0.5 GB on 2026-11-04). It
+  // used to run on every visit under the comment "hits an indexed column (<10ms)", which
   // it never did; it now runs once an hour (see getLandingCoverage).
   const [outletRows, postRows] = await Promise.all([
     db
