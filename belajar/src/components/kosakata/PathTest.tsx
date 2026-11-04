@@ -3,9 +3,9 @@
 import clsx from "clsx";
 import { ArrowLeft, Check, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
-import { ClipButton, ClipPlayerProvider, useClipPlayerContext } from "@/components/library/ClipButton";
+import { ClipButton, ClipPageStatus, ClipPlayerProvider, useClipPlayerContext } from "@/components/library/ClipButton";
 import { MixedText } from "@/components/library/MixedText";
 import { useKosakataProgress } from "@/hooks/useKosakataProgress";
 import { Link } from "@/i18n/navigation";
@@ -14,8 +14,9 @@ import type { TestData } from "@/lib/kosakata-path-data";
 import { kosakataBatchHref, kosakataPathHref } from "@/lib/routes";
 
 import { AyahText, AyahTranslation } from "./AyahLineView";
+import { NextBarPage } from "./NextBarPage";
 
-type Run = { questions: Question[]; i: number; picked: number | null; score: number; missed: TestItem[]; done: boolean; passed: boolean };
+type Run ={ questions: Question[]; i: number; picked: number | null; score: number; missed: TestItem[]; done: boolean; passed: boolean };
 
 const keyOf = (run: Run) => `q-${run.i}`;
 
@@ -40,7 +41,27 @@ function PartWord({ word }: { word: readonly [string, string, string] }) {
   );
 }
 
-function Runner({ data, level, batch, passPercent, order, source }: { data: TestData; level: number; batch: number | null; passPercent: number; order: string[]; source: string }) {
+/**
+ * The verdict on an answer, brought into view once, by the click that gave the answer (the lesson's "Mulai"
+ * does the same). The button no longer makes anyone scroll past this on the way to it (NextBarPage), and on
+ * a phone it starts under the fold. Taller than the room above the bar, it shows from its first line.
+ */
+function Verdict({ right, children }: { right: boolean; children: ReactNode }) {
+  const t = useTranslations("KosakataPath");
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    ref.current?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+  }, []);
+  return (
+    <div ref={ref} role="status" data-path-feedback={right ? "right" : "wrong"} className={clsx("mt-4 rounded-2xl p-4", right ? "bg-ok-bg" : "bg-notice-bg")}>
+      <p className={clsx("font-semibold", right ? "text-forest" : "text-notice")}>{t(right ? "right" : "wrong")}</p>
+      {children}
+    </div>
+  );
+}
+
+function Runner({ data, level, batch, passPercent, order, source }:{ data: TestData; level: number; batch: number | null; passPercent: number; order: string[]; source: string }) {
   const t = useTranslations("KosakataPath");
   const locale = useLocale();
   const lang = locale === "en" ? "en" : "id";
@@ -140,6 +161,8 @@ function Runner({ data, level, batch, passPercent, order, source }: { data: Test
                 </li>
               ))}
             </ul>
+            {/* A compact button says nothing of a load or a failure itself. */}
+            <ClipPageStatus />
           </section>
         ) : (
           <p className="mt-4 text-base text-ink-muted">{t("all_right")}</p>
@@ -189,7 +212,17 @@ function Runner({ data, level, batch, passPercent, order, source }: { data: Test
   };
 
   return (
-    <div data-path-question={item.key} data-q-kind={q.kind}>
+    <NextBarPage
+      data-path-question={item.key}
+      data-q-kind={q.kind}
+      bar={
+        answered ? (
+          <button type="button" data-path-next-q="" className="btn-primary w-full" onClick={advance}>
+            {t(run.i === total - 1 ? "see_result" : "next_q")}
+          </button>
+        ) : null
+      }
+    >
       {back}
       <p className="mt-4 text-sm font-semibold text-forest">{title}</p>
       <p className="text-base text-ink-muted">{t("q_of", { i: run.i + 1, n: total })}</p>
@@ -241,22 +274,16 @@ function Runner({ data, level, batch, passPercent, order, source }: { data: Test
         </div>
       </section>
       {answered ? (
-        <div className="mt-4">
-          <div role="status" data-path-feedback={right ? "right" : "wrong"} className={clsx("rounded-2xl p-4", right ? "bg-ok-bg" : "bg-notice-bg")}>
-            <p className={clsx("font-semibold", right ? "text-forest" : "text-notice")}>{t(right ? "right" : "wrong")}</p>
-            <p className="mt-1 text-base text-ink">
-              <MixedText text={t("answer", { word: item.ar, translit: item.translit, meaning: item.meaning[lang] })} />
-            </p>
-            {q.kind === "ayah" && item.ayah ? (
-              <AyahTranslation line={item.ayah} reference={t("ayah_ref", { surah: item.ayah.surah, ayah: item.ayah.ayah })} source={source} />
-            ) : null}
-          </div>
-          <button type="button" data-path-next-q="" className="btn-primary mt-4 w-full" onClick={advance}>
-            {t(run.i === total - 1 ? "see_result" : "next_q")}
-          </button>
-        </div>
+        <Verdict right={right}>
+          <p className="mt-1 text-base text-ink">
+            <MixedText text={t("answer", { word: item.ar, translit: item.translit, meaning: item.meaning[lang] })} />
+          </p>
+          {q.kind === "ayah" && item.ayah ? (
+            <AyahTranslation line={item.ayah} reference={t("ayah_ref", { surah: item.ayah.surah, ayah: item.ayah.ayah })} source={source} />
+          ) : null}
+        </Verdict>
       ) : null}
-    </div>
+    </NextBarPage>
   );
 }
 
