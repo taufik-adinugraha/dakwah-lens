@@ -1308,6 +1308,9 @@ async function kosakataPathChecks(page, vp) {
   const index = new Map();
   for (const p of Object.values(pathFile.parts)) for (const e of p.examples) index.set(e.voice.url, e.voice.ms);
   for (const w of words) index.set(w.voice.url, w.voice.ms);
+  // Level 2's words too, for its test below. An unserved word fails, and its failure line pushes the
+  // question and the verdict down after the verdict was brought into view (CI 2026-11-04: by 86px).
+  for (const file of ["words-002.json", "words-003.json"]) for (const w of (await read(file)).words) index.set(w.voice.url, w.voice.ms);
   const served = [];
   const handler = narrationRoute(index, served, { failMediaFetch: true });
   const counted = [];
