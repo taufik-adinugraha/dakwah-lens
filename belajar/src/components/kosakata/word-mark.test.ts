@@ -61,14 +61,20 @@ describe("word-mark: the marked word can be told from the text beside it", () =>
     expect(util).not.toMatch(/padding|margin|font-weight|text-decoration/);
   });
 
-  it("is what the ayah's word, the part in a question and the part card all use", () => {
+  it("is what the ayah's word, the part in a question and the part card all use, each with the hook CI selects on", () => {
     for (const file of ["AyahLineView.tsx", "PathTest.tsx", "BatchLearn.tsx"]) {
       const src = read(`src/components/kosakata/${file}`);
-      expect(src, file).toContain('className="word-mark"');
+      // data-path-mark is what scripts/ci/screenshots.mjs looks for; the colour class is not a hook
+      expect(src, file).toContain('<span data-path-mark="" className="word-mark">');
       expect(src, file).not.toMatch(/data-path-mark=""\s+className="[^"]*(text-forest|bg-ok-bg)/);
     }
-    // the part card's span has no data-path-mark; it must not keep the old green either
     expect(read("src/components/kosakata/BatchLearn.tsx")).not.toContain('<span className="text-forest">{card.word[1]}</span>');
+  });
+
+  it("the screenshot run finds the part by its hook, not by the colour it had (it failed once on .text-forest)", () => {
+    const run = read("scripts/ci/screenshots.mjs");
+    expect(run).toContain('page.locator("[data-path-part-word] [data-path-mark]")');
+    expect(run).not.toMatch(/data-path-part-word\][^"'`]*\.text-forest/);
   });
 
   it("no sentence names the colour, so it stays true for a reader who cannot tell colours apart", () => {
