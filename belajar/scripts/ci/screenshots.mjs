@@ -1470,6 +1470,9 @@ async function kosakataPathChecks(page, vp) {
       for (let i = 0; i < batchSize; i++) {
         const where = `card ${i + 1} at text size ${size ?? "normal"}`;
         const button = i === batchSize - 1 ? "[data-path-start-test]" : "[data-path-next]";
+        // The bar grows when "Sebelumnya" comes in on the second card, and its scroll padding follows
+        // through a ResizeObserver, which the browser runs before its next paint: look after that.
+        await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
         const m = await measureBar(button);
         expectInReach(m, where);
         if (m.y !== 0) fail(`${where} opens ${m.y}px down the page`);
