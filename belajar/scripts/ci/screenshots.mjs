@@ -399,8 +399,11 @@ async function visitCountChecks(page, vp) {
   const HUB = `${BASE}/belajar/id`;
   const KONSEP = `${BASE}/belajar/id/konsep`;
   const sent = [];
-  const onRequest = (req) => {
-    if (req.url().endsWith("/belajar/api/kunjungan")) sent.push(req.postDataBuffer()?.toString("utf8") ?? "");
+  // Through a route: a beacon's Blob body is readable only while its request is intercepted.
+  const BEACON = "**/belajar/api/kunjungan";
+  const onBeacon = (route) => {
+    sent.push(route.request().postDataBuffer()?.toString("utf8") ?? "");
+    return route.continue();
   };
   // A row's views, visitors and new visitors, over all days, read as the workflow's smoke reads its counts.
   const row = (section) =>
@@ -415,7 +418,7 @@ async function visitCountChecks(page, vp) {
     if (sent.length !== 1) fail(`${url} sent ${sent.length} counts: ${sent.join(" ")}`);
     if (JSON.stringify(JSON.parse(sent[0])) !== JSON.stringify(want)) fail(`${url} sent ${sent[0]}, expected ${JSON.stringify(want)}`);
   };
-  page.on("request", onRequest);
+  await page.route(BEACON, onBeacon);
   try {
     await page.goto(HUB, { waitUntil: "networkidle" });
     await page.evaluate((k) => localStorage.removeItem(k), KEY);
@@ -441,7 +444,7 @@ async function visitCountChecks(page, vp) {
     if (!counted) fail(`konsep went from ${konsep} to ${await row("konsep")} and semua from ${whole} to ${await row("semua")}`);
     console.log(`${vp} visit counts: what a page view reports, day by day, and what reaches the table`);
   } finally {
-    page.off("request", onRequest);
+    await page.unroute(BEACON, onBeacon);
   }
   await page.goto("about:blank");
 }
