@@ -152,6 +152,14 @@ class SocialPost(Base, TimestampMixin):
         Index("ix_social_posts_opportunity", "dawah_opportunity"),
         Index("ix_social_posts_platform_posted", "platform", "posted_at"),
         Index("ix_social_posts_platform_region", "platform", "region"),
+        # The 7/14/30-day windows the landing page, /dashboard and the pipeline page count
+        # over. INCLUDE: those aggregates read exactly these columns, so the planner can
+        # answer them from the index alone. Migration a3f9c2e8b5d1 has the reasoning.
+        Index(
+            "ix_social_posts_created_at",
+            "created_at",
+            postgresql_include=["platform", "theme_group", "sentiment_label", "topic_id"],
+        ),
     )
 
 
