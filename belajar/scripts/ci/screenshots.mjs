@@ -18,6 +18,7 @@
 // offers Al-Ikhlas) — and, since 2026-10-19, Al-Ikhlas's lesson checks
 // (warm-up, lesson map, reminder card, composition fit), which only this
 // container can reach while the live site hides it.
+import { execFile } from "node:child_process";
 import { mkdir, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -382,6 +383,69 @@ async function standaloneNextCheck(page, vp) {
   await lanjut.click();
   await practice.getByText(/^Soal 2 dari \d+$/).first().waitFor({ state: "visible", timeout: 5_000 }).catch(() => fail("“Lanjut” did not go on to question 2"));
   await page.setViewportSize(screenSize);
+  await page.goto("about:blank");
+}
+
+/**
+ * The anonymous visit counts (operator 2026-11-04; plan L40): what a page view reports, read from the request,
+ * and what reaches the table, read back from the database because the route swallows a database error. Each
+ * body holds a section and four yes-or-no answers and nothing else. A page in no section sends nothing.
+ */
+async function visitCountChecks(page, vp) {
+  const fail = (m) => {
+    throw new Error(`${vp} visit counts: ${m}`);
+  };
+  const KEY = "belajar:v1:kunjungan";
+  const HUB = `${BASE}/belajar/id`;
+  const KONSEP = `${BASE}/belajar/id/konsep`;
+  const sent = [];
+  // Through a route: a beacon's Blob body is readable only while its request is intercepted.
+  const BEACON = "**/belajar/api/kunjungan";
+  const onBeacon = (route) => {
+    sent.push(route.request().postDataBuffer()?.toString("utf8") ?? "");
+    return route.continue();
+  };
+  // A row's views, visitors and new visitors, over all days, read as the workflow's smoke reads its counts.
+  const row = (section) =>
+    new Promise((done, reject) => {
+      const query = `select coalesce(sum(views),0), coalesce(sum(visitors),0), coalesce(sum(new_visitors),0) from belajar_visit_counts where section = '${section}'`;
+      execFile("docker", ["run", "--rm", "--network", "host", "postgres:16-alpine", "psql", "postgres://smoke:smoke@127.0.0.1:5432/smoke", "-tAc", query], (err, stdout) => (err ? reject(err) : done(stdout.trim().split("|").map(Number))));
+    });
+  const visit = async (url, want) => {
+    sent.length = 0;
+    await page.goto(url, { waitUntil: "networkidle" });
+    if (!(await until(page, async () => sent.length > 0, 5_000))) fail(`${url} sent no count`);
+    if (sent.length !== 1) fail(`${url} sent ${sent.length} counts: ${sent.join(" ")}`);
+    if (JSON.stringify(JSON.parse(sent[0])) !== JSON.stringify(want)) fail(`${url} sent ${sent[0]}, expected ${JSON.stringify(want)}`);
+  };
+  await page.route(BEACON, onBeacon);
+  try {
+    await page.goto(HUB, { waitUntil: "networkidle" });
+    await page.evaluate((k) => localStorage.removeItem(k), KEY);
+    const [konsep, whole] = [await row("konsep"), await row("semua")];
+    await visit(HUB, { section: "hub", firstToday: true, firstEver: true, firstTodayAll: true, firstEverAll: true });
+    await visit(HUB, { section: "hub", firstToday: false, firstEver: false, firstTodayAll: false, firstEverAll: false });
+    await visit(KONSEP, { section: "konsep", firstToday: true, firstEver: true, firstTodayAll: false, firstEverAll: false });
+    // The next day: a visitor of the day again, and no longer a new one.
+    await page.evaluate((k) => {
+      const kept = JSON.parse(localStorage.getItem(k));
+      localStorage.setItem(k, JSON.stringify({ ...kept, day: "2000-01-01" }));
+    }, KEY);
+    await visit(KONSEP, { section: "konsep", firstToday: true, firstEver: false, firstTodayAll: true, firstEverAll: false });
+    // A mistyped address is in no section.
+    sent.length = 0;
+    await page.goto(`${BASE}/belajar/id/alamat-keliru`, { waitUntil: "networkidle" });
+    await page.waitForTimeout(300);
+    if (sent.length !== 0) fail(`a mistyped address sent ${sent.join(" ")}`);
+    // In the table: two views of Konsep, two visitors of their days, one new; four views of the module,
+    // two visitors of their days, one new.
+    const grew = (now, was, by) => now.every((n, i) => n === was[i] + by[i]);
+    const counted = await until(page, async () => grew(await row("konsep"), konsep, [2, 2, 1]) && grew(await row("semua"), whole, [4, 2, 1]), 8_000);
+    if (!counted) fail(`konsep went from ${konsep} to ${await row("konsep")} and semua from ${whole} to ${await row("semua")}`);
+    console.log(`${vp} visit counts: what a page view reports, day by day, and what reaches the table`);
+  } finally {
+    await page.unroute(BEACON, onBeacon);
+  }
   await page.goto("about:blank");
 }
 
@@ -4869,6 +4933,7 @@ try {
     await clipChecks(page, vp, narration);
     await kosakataVoiceChecks(page, vp);
     await kosakataPathChecks(page, vp);
+    await visitCountChecks(page, vp);
     await menuShots(page, vp);
     await headerShots(page, vp);
     await footerCheck(page, vp);

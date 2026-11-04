@@ -8,6 +8,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { FooterDisclaimer } from "@/components/FooterDisclaimer";
 import { HeaderControls } from "@/components/HeaderControls";
 import { LineFit } from "@/components/LineFit";
+import { VisitCount } from "@/components/visits/VisitCount";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { IS_PUBLIC } from "@/lib/flags";
@@ -151,6 +152,8 @@ export default async function LocaleLayout({
           {/* Kept-together text wider than its line breaks in the paragraph's flow
               (line breaks, operator 2026-10-10; src/lib/lineFit.ts). */}
           <LineFit />
+          {/* The anonymous count of this page view (operator 2026-11-04; plan L40). */}
+          <VisitCount />
 
           <footer className="mt-16 border-t border-hairline">
             <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-8 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
