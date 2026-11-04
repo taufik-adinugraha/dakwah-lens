@@ -19,6 +19,14 @@ place, by rule and never by hand (`places`):
 Four ayat are left out because Tanzil and QAC count their words differently (2:181, 8:6, 13:37,
 37:130), so a QAC word number there is not a Tanzil token. They are found, not listed.
 
+A second kind of recording serves the test's ayah question (operator 2026-11-04: "the screen highlight
+'wa man' but the sound only 'man', its confusing"). That question marks a word in a verse, and what
+is heard must be that word. The lemma's recording says it where the marked token is spelt exactly as
+the recording is (`says_marked`). Where it is not, the marked token's own place is recorded too, and
+pinned under `examples` (keyed by place, like a Level 0 part's), only for the words the learning path
+tests and only where one spelling covers every marked token. kosakata.example_of prefers a verse
+that needs none, then one that needs a single recording, so fewer are needed.
+
 kosakata_voice.json holds the pins: place, Quran.com's own text of that word (the check that the
 file number is this word), sha256, and the word's [start, end] inside its file. build_kosakata_voice.py
 writes it. The files themselves are on the media store (host_media.py), so CI sees only the pins.
@@ -37,6 +45,23 @@ from common import bw_to_ar, lesson_ayah
 PINS = Path(__file__).resolve().parent / "kosakata_voice.json"
 _SHADDAH = "ّ"
 _LOC = re.compile(r"[1-9]\d{0,2}:[1-9]\d{0,2}:[1-9]\d{0,2}")
+# An ayah longer than this is not asked about: the question would not fit a phone's screen. The app's
+# own copy is SHORT_AYAH_CHARS in src/lib/kosakata-path-data.ts; test_validate_kosakata.py keeps them equal.
+SHORT_AYAH_CHARS = 170
+
+
+def says_marked(tokens: list[str], marks: list[int], voice: dict) -> bool:
+    """Whether the word's recording (`voice`: its form, and `final` when its place ends its ayah) is of
+    every token the example marks: each spelt exactly as heard, because a different spelling is a
+    different sound. A recording of an ayah's last word is its stop form, so it is the marked word only
+    where that word ends its ayah as well."""
+    last = len(tokens) - 1
+    return all(tokens[i] == voice["form"] and (not voice.get("final") or i == last) for i in marks)
+
+
+def one_spelling(tokens: list[str], marks: list[int]) -> bool:
+    """Whether every marked token is spelt the same, so one recording says all of them."""
+    return len({tokens[i] for i in marks}) == 1
 
 
 def skeleton(ar: str) -> str:
@@ -138,11 +163,17 @@ def row_voice(pin: dict) -> str:
     return f"{pin['loc']} {pin['start']} {pin['end']}"
 
 
-def pin_problems(pins: dict, wanted: dict[str, dict] | None = None) -> list[str]:
-    """The pins alone (CI), and against the rule's places when they are given (local, with the corpus)."""
+def pin_problems(pins: dict, wanted: dict[str, dict] | None = None, wanted_examples: dict[str, str] | None = None) -> list[str]:
+    """The pins alone (CI), and against the rule's places when they are given (local, with the corpus):
+    `wanted` is the lemmas' places, `wanted_examples` the {place: form} of the ayah questions' recordings."""
     out = []
     words = pins.get("words") or {}
-    for lem, p in [*words.items(), *((f"part at {k}", v) for k, v in (pins.get("parts") or {}).items())]:
+    examples = pins.get("examples") or {}
+    for lem, p in [
+        *words.items(),
+        *((f"part at {k}", v) for k, v in (pins.get("parts") or {}).items()),
+        *((f"example at {k}", v) for k, v in examples.items()),
+    ]:
         loc = str(p.get("loc"))
         if not _LOC.fullmatch(loc):
             out.append(f"{lem}: {loc!r} is not a word's place")
@@ -165,4 +196,13 @@ def pin_problems(pins: dict, wanted: dict[str, dict] | None = None) -> list[str]
                 out.append(f"{lem}: pinned {p.get('loc')} {p.get('form')!r}, but the rule chooses {w['loc']} {w['form']!r}")
         for lem in sorted(set(words) - set(wanted)):
             out.append(f"{lem}: pinned, but no such lemma")
+    if wanted_examples is not None:
+        for loc, form in sorted(wanted_examples.items()):
+            p = examples.get(loc)
+            if p is None:
+                out.append(f"example at {loc}: no recording pinned (build_kosakata_voice.py --fetch)")
+            elif p.get("loc") != loc or p.get("form") != form:
+                out.append(f"example at {loc}: pinned {p.get('loc')} {p.get('form')!r}, but the ayah question marks {form!r}")
+        for loc in sorted(set(examples) - set(wanted_examples)):
+            out.append(f"example at {loc}: pinned, but no ayah question needs it")
     return out

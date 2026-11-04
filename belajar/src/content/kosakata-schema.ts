@@ -56,8 +56,18 @@ export const KosakataWord = z.object({
   lexeme: z.string().optional(),
   voice: KosakataVoice,
   kind: KosakataKind,
-  /** The ayah a learner sees the word in; `hi`: where it stands there, as token indexes. */
-  example: z.object({ loc: z.string().regex(/^[1-9]\d{0,2}:[1-9]\d{0,2}$/), hi: z.array(z.number().int().nonnegative()).min(1) }).optional(),
+  /**
+   * The ayah a learner sees the word in; `hi`: where it stands there, as token indexes. `voice`: the
+   * recording of that marked place itself, present only where the word's own recording is not spelt as
+   * the marked token, so the test's ayah question can play the word it marks (pipeline/kosakata_voice.py).
+   */
+  example: z
+    .object({
+      loc: z.string().regex(/^[1-9]\d{0,2}:[1-9]\d{0,2}$/),
+      hi: z.array(z.number().int().nonnegative()).min(1),
+      voice: KosakataVoice.optional(),
+    })
+    .optional(),
 });
 export type KosakataWord = z.infer<typeof KosakataWord>;
 

@@ -6,8 +6,8 @@
   "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512)",
   "sura_names": "QuranEnc Indonesian sura list, extracted text sha256:1cb44693cd863238093e21b6711eabfcdf78a9de58851b351c3a6f105d352eca",
   "meanings": "pipeline/authored/kosakata_meanings.json sha256:32b073114498d9154076f399d4bcd89a11eb0695eb943d5662a823b7bf129963",
-  "voice": "pipeline/kosakata_voice.json sha256:f08883e7b2579005eb1e2a9237af2f4d8e38c16aab1853a31ca34f09ecb130de",
-  "entries": "sha256:5b03605c513020c6161914a87785d822eb82ff3f83006a644e4deffcf73d6d1d",
+  "voice": "pipeline/kosakata_voice.json sha256:9274102fbe4500c24e23be1a336a8755c4f8122ac95171c7300c415eb605229a",
+  "entries": "sha256:566bde09e38f63922cf0468de862fc6cecb76a9b013b6a0c5c1b3ed87420862f",
   "pipeline": "belajar/pipeline/build_kosakata.py (stdlib only, no LLM)"
  },
  "total_tokens": 74608,

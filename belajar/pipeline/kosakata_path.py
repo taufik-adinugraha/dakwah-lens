@@ -32,6 +32,11 @@ LEVEL_TEST_QUESTIONS = 30
 REVIEW_QUESTIONS = 5
 # A card, never a question: wrong options do not belong beside these words.
 NO_TEST = ("{ll~ah", "{ll~ahum~a")
+
+
+def tested(rank: int, lemma: str) -> bool:
+    """Whether the path asks about this word: it is in a level and not one of NO_TEST."""
+    return rank <= LEVELS[-1][1] and lemma not in NO_TEST
 _MARKS_AS_LETTERS = "ۥۦـ"
 
 

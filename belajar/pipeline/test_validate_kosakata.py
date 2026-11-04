@@ -11,8 +11,11 @@ belajar/pipeline after build_kosakata.py:
 from __future__ import annotations
 
 import copy
+import pathlib
+import re
 import sys
 import unittest
+from unittest import mock
 
 import host_media as H
 import kosakata as K
@@ -174,6 +177,70 @@ class PlantedFaults(unittest.TestCase):
         self.word(3)["example"]["hi"] = [999]
         self.assertCaught("marks a word")
 
+    # The test's ayah question plays the marked word (operator 2026-11-04: "the screen highlight
+    # 'wa man' but the sound only 'man'"): the word's own recording where that says it, else the
+    # recording of the marked place. Each way that can go wrong:
+
+    def tested(self):
+        no_test = set(self.path()["no_test"])
+        return [w for n in sorted(self.f) if n.startswith("words-") for w in self.f[n]["words"] if w["rank"] <= 2000 and w["rank"] not in no_test]
+
+    def own_recording(self):
+        """A tested word whose ayah question plays the marked place's own recording."""
+        return next(w for w in self.tested() if (w.get("example") or {}).get("voice"))
+
+    def says_it_already(self):
+        """A tested word whose own recording already says its example's marked tokens."""
+        ayat = {e["loc"]: e for n, f in self.f.items() if n.startswith("ayat-") for e in f["ayat"]}
+        pins = V.load_pins()["words"]
+        for w in self.tested():
+            ex = w.get("example")
+            if ex and not ex.get("voice") and V.says_marked(ayat[ex["loc"]]["ar"].split(" "), ex["hi"], pins[w["lemma"]]) and len(ayat[ex["loc"]]["ar"]) <= V.SHORT_AYAH_CHARS:
+                return w
+        raise AssertionError("no such word")
+
+    def test_an_ayah_question_that_needs_its_own_recording_and_has_none(self):
+        del self.own_recording()["example"]["voice"]
+        self.assertCaught("needs the recording of")
+
+    def test_a_recording_on_an_example_the_words_own_recording_already_says(self):
+        self.says_it_already()["example"]["voice"] = copy.deepcopy(self.own_recording()["example"]["voice"])
+        self.assertCaught("does not need")
+
+    def test_an_example_recording_of_another_place(self):
+        self.own_recording()["example"]["voice"]["loc"] = "1:1:1"
+        self.assertCaught("differs from pipeline/kosakata_voice.json")
+
+    def test_an_example_recording_edited_by_hand(self):
+        self.own_recording()["example"]["voice"]["start"] += 1
+        self.assertCaught("differs from pipeline/kosakata_voice.json")
+
+    def planted_pins(self, change):
+        pins = copy.deepcopy(V.load_pins())
+        change(pins)
+        with mock.patch.object(V, "load_pins", return_value=pins):
+            return check(self.f)
+
+    def test_an_example_recording_with_no_pin(self):
+        place = self.own_recording()["example"]["voice"]["loc"]
+        errs = self.planted_pins(lambda pins: pins["examples"].pop(place))
+        self.assertTrue(any("no recording pinned for the example's place" in e for e in errs), errs[:5])
+
+    def test_an_example_pin_no_ayah_question_uses(self):
+        def add(pins):
+            pins["examples"]["1:1:1"] = {**next(iter(pins["examples"].values())), "loc": "1:1:1"}
+
+        errs = self.planted_pins(add)
+        self.assertTrue(any("no word's ayah question uses it" in e for e in errs), errs[:5])
+
+    def test_an_example_pin_filed_under_another_place(self):
+        def move(pins):
+            loc = next(iter(pins["examples"]))
+            pins["examples"][loc]["loc"] = "1:1:1"
+
+        errs = self.planted_pins(move)
+        self.assertTrue(any("the pin is for" in e for e in errs), errs[:5])
+
     def test_a_semicolon_inside_a_gloss(self):
         lem = next(iter(self.a["lemmas"]))
         self.a["lemmas"][lem]["senses"][0]["id"] = "dari; ke"
@@ -260,6 +327,25 @@ class Pins(unittest.TestCase):
     def test_a_pin_for_no_word(self):
         self.caught("no such lemma", {})
 
+    def example_caught(self, fragment, pins, wanted):
+        errs = V.pin_problems({"words": {}, **pins}, None, wanted)
+        self.assertTrue(any(fragment in e for e in errs), f"{fragment!r} not in {errs}")
+
+    def test_a_sound_example_pin_passes(self):
+        self.assertEqual(V.pin_problems({"words": {}, "examples": {"2:30:2": self.GOOD}}, None, {"2:30:2": "قَالَ"}), [])
+
+    def test_an_example_pin_whose_file_is_another_word(self):
+        self.example_caught("the file is another word", {"examples": {"2:30:2": {**self.GOOD, "qc_text": "يَقُولُ"}}}, None)
+
+    def test_an_ayah_question_that_needs_a_recording_nobody_pinned(self):
+        self.example_caught("no recording pinned", {"examples": {}}, {"2:30:2": "قَالَ"})
+
+    def test_an_example_pin_no_ayah_question_needs(self):
+        self.example_caught("no ayah question needs it", {"examples": {"2:30:2": self.GOOD}}, {})
+
+    def test_an_example_pin_of_another_form_than_the_question_marks(self):
+        self.example_caught("the ayah question marks", {"examples": {"2:30:2": self.GOOD}}, {"2:30:2": "وَقَالَ"})
+
     def test_the_address_is_the_place(self):
         self.assertEqual(V.url_of("2:30:2"), "/belajar/media/narration/quran-com/wbw/002_030_002.mp3")
         self.assertEqual(V.upstream_of("114:6:3"), "https://audio.qurancdn.com/wbw/114_006_003.mp3")
@@ -311,6 +397,88 @@ class PlaceRule(unittest.TestCase):
     def test_no_ayah_that_tanzil_and_qac_count_differently(self):
         for lem, p in self.places.items():
             self.assertNotIn(":".join(p["loc"].split(":")[:2]), {"2:181", "8:6", "13:37", "37:130"}, lem)
+
+
+class ExampleRule(unittest.TestCase):
+    """What the test's ayah question may play (operator 2026-11-04: "the screen highlight 'wa man'
+    but the sound only 'man'"): the strings are the report's own."""
+
+    TOKS = ["قَالَ", "وَمَن", "فِى"]
+
+    def test_wa_man_is_not_man(self):
+        self.assertFalse(V.says_marked(self.TOKS, [1], {"form": "مَن"}))
+        self.assertTrue(V.says_marked(self.TOKS, [1], {"form": "وَمَن"}))
+
+    def test_every_marked_token_must_be_the_recording(self):
+        self.assertFalse(V.says_marked(["مَن", "وَمَن"], [0, 1], {"form": "مَن"}))
+        self.assertTrue(V.says_marked(["مَن", "x", "مَن"], [0, 2], {"form": "مَن"}))
+
+    def test_a_stop_form_is_the_marked_word_only_where_that_ends_its_ayah_too(self):
+        stop = {"form": "أَحَدٌ", "final": True}
+        self.assertTrue(V.says_marked(["كُفُوًا", "أَحَدٌ"], [1], stop))
+        self.assertFalse(V.says_marked(["أَحَدٌ", "كُفُوًا"], [0], stop))
+        self.assertTrue(V.says_marked(["أَحَدٌ", "كُفُوًا"], [0], {"form": "أَحَدٌ"}))
+
+    def test_one_recording_says_marks_spelt_alike(self):
+        self.assertTrue(V.one_spelling(["مَن", "x", "مَن"], [0, 2]))
+        self.assertFalse(V.one_spelling(["مَن", "وَمَن"], [0, 1]))
+
+    def test_the_place_to_record(self):
+        voice = {"form": "مَن"}
+        self.assertEqual(K.recording_place("26:65", [1], self.TOKS, voice, True), "26:65:2")
+        self.assertEqual(K.recording_place("26:65", [0, 2], ["مَن", "x", "مَن"], {"form": "غَيْر"}, True), "26:65:1")
+
+    def test_no_place_to_record_when_it_is_not_needed_or_cannot_help(self):
+        voice = {"form": "مَن"}
+        self.assertIsNone(K.recording_place("26:65", [1], self.TOKS, voice, False), "a word the path does not test")
+        self.assertIsNone(K.recording_place("26:65", [1], self.TOKS, {"form": "وَمَن"}, True), "the word's own recording says it")
+        self.assertIsNone(K.recording_place("26:65", [0, 1], ["مَن", "وَمَن"], {"form": "غَيْر"}, True), "marks spelt differently")
+        self.assertIsNone(K.recording_place("26:65", [0], ["x" * 100, "y" * 100], voice, True), "an ayah too long to be asked")
+
+    def test_the_apps_limit_on_a_long_ayah_is_this_ones(self):
+        ts = (pathlib.Path(__file__).resolve().parents[1] / "src/lib/kosakata-path-data.ts").read_text(encoding="utf-8")
+        m = re.search(r"const SHORT_AYAH_CHARS = (\d+);", ts)
+        self.assertIsNotNone(m, "SHORT_AYAH_CHARS not found in src/lib/kosakata-path-data.ts")
+        self.assertEqual(int(m.group(1)), V.SHORT_AYAH_CHARS)
+
+
+@unittest.skipIf(NO_CORPUS, "needs pipeline/cache")
+class ExampleChoice(unittest.TestCase):
+    """The verse a word is shown in, chosen against the real corpus."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.corpus, cls.segs = K.load_corpus_and_qac()
+        cls.table = {e["rank"]: e for e in K.lemma_table(cls.segs, cls.corpus.T)}
+        cls.tokens, _ = V.counted_alike(cls.corpus.T, cls.segs)
+        cls.positions = K.lemma_positions(cls.segs)
+        cls.pins = V.load_pins()["words"]
+
+    def pick(self, rank, tested):
+        lem = self.table[rank]["lemma"]
+        ex = K.example_of({"senses": AUTHORED["lemmas"][lem]["senses"]}, self.positions[lem], self.corpus, self.tokens, self.pins[lem], tested)
+        return lem, ex, self.tokens[tuple(int(x) for x in ex["loc"].split(":"))]
+
+    def test_man_is_shown_where_man_is_heard(self):
+        lem, ex, toks = self.pick(12, True)
+        self.assertEqual(self.table[12]["translit"], "man")
+        self.assertTrue(V.says_marked(toks, ex["hi"], self.pins[lem]), "the ayah question can speak")
+
+    def test_man_was_shown_as_wa_man_before_the_path_chose_by_sound(self):
+        lem, ex, toks = self.pick(12, False)
+        self.assertFalse(V.says_marked(toks, ex["hi"], self.pins[lem]))
+        self.assertTrue(toks[ex["hi"][0]].endswith(self.pins[lem]["form"]))
+
+    def test_a_word_the_path_does_not_test_keeps_the_shortest_verse(self):
+        rank = 2500
+        lem, ex, _ = self.pick(rank, False)
+        senses = AUTHORED["lemmas"][lem]["senses"]
+        self.assertEqual(ex, K.example_of({"senses": senses}, self.positions[lem], self.corpus, self.tokens, self.pins[lem], False))
+        self.assertFalse(P.tested(rank, lem))
+
+    def test_what_the_builder_wants_recorded_is_what_is_pinned(self):
+        wanted = K.example_recordings(list(self.table.values()), AUTHORED["lemmas"], self.positions, self.corpus, self.tokens, self.pins)
+        self.assertEqual(sorted(wanted), sorted(V.load_pins()["examples"]))
 
 
 class Path(unittest.TestCase):
