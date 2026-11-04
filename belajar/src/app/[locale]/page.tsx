@@ -105,11 +105,12 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
   const visible = await warisVisible();
   if (locale !== "en" || kosakataEnglishOn()) {
     tracks.push({
-      // While the learning path is listed the section opens on it (src/proxy.ts), so the card goes there directly.
+      // While the learning path is listed the section opens on it (src/proxy.ts), so the card goes there directly
+      // and says so. With the switch off the card opens the list and must not promise the path.
       href: kosakataPathListed() ? kosakataPathHref() : kosakataHref(),
       Icon: BookText,
       title: t("kosakata_title"),
-      body: t("kosakata_body"),
+      body: t(kosakataPathListed() ? "kosakata_body_path" : "kosakata_body"),
       notes: [{ tone: "ok", items: [t("kosakata_available", { n: kosakataIndex().rows.length })] }],
     });
   }

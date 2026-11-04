@@ -122,6 +122,11 @@ const VIEWPORTS = [
 async function settleScroll(page) {
   await page.locator('[data-autoplay="panel"]').first().waitFor({ state: "visible", timeout: 15_000 });
   await page.waitForTimeout(150);
+  return scrollStopped(page);
+}
+
+/** Twelve animation frames without a scroll, awaited in the page. */
+function scrollStopped(page) {
   return page.evaluate(
     () =>
       new Promise((done) => {
@@ -1262,6 +1267,9 @@ async function kosakataPathChecks(page, vp) {
   const index = new Map();
   for (const p of Object.values(pathFile.parts)) for (const e of p.examples) index.set(e.voice.url, e.voice.ms);
   for (const w of words) index.set(w.voice.url, w.voice.ms);
+  // Level 2's words too, for its test below. An unserved word fails, and its failure line pushes the
+  // question and the verdict down after the verdict was brought into view (CI 2026-11-04: by 86px).
+  for (const file of ["words-002.json", "words-003.json"]) for (const w of (await read(file)).words) index.set(w.voice.url, w.voice.ms);
   const served = [];
   const handler = narrationRoute(index, served, { failMediaFetch: true });
   const counted = [];
@@ -1285,6 +1293,46 @@ async function kosakataPathChecks(page, vp) {
   const expectTile = async (id, state) => {
     await page.waitForSelector(`[data-path-tile="${id}"][data-state="${state}"]`, { state: "attached", timeout: 8000 }).catch(async () => fail(`batch ${id} is ${await tile(id)}, expected ${state}`));
   };
+  // The bar of the next step (operator 2026-11-04: "current design we need to scroll down, better to use
+  // sticky button so it always appear in the bottom of the screen"), and what is under it.
+  const measureBar = (button) =>
+    page.evaluate((sel) => {
+      const box = (e) => {
+        if (!e) return null;
+        const r = e.getBoundingClientRect();
+        return { top: r.top, bottom: r.bottom, left: r.left, right: r.right, height: r.height };
+      };
+      const root = document.documentElement;
+      const style = getComputedStyle(root);
+      return {
+        bar: box(document.querySelector("[data-next-bar]")),
+        button: box(document.querySelector(sel)),
+        card: box(document.querySelector("[data-path-card]")),
+        verdict: box(document.querySelector("[data-path-feedback]")),
+        screen: window.innerHeight,
+        width: root.clientWidth,
+        y: window.scrollY,
+        paddingTop: parseFloat(style.scrollPaddingTop) || 0,
+        paddingBottom: parseFloat(style.scrollPaddingBottom) || 0,
+      };
+    }, button);
+  const expectInReach = (m, where) => {
+    if (!m.bar || !m.button) fail(`${where}: no bar or no button`);
+    if (m.button.top < 0 || m.button.bottom > m.screen + 0.5) fail(`${where}: the button stands at ${m.button.top}..${m.button.bottom}px of a ${m.screen}px screen`);
+    if (m.button.left < 0 || m.button.right > m.width + 0.5) fail(`${where}: the button stands at ${m.button.left}..${m.button.right}px of a ${m.width}px width`);
+    if (m.paddingBottom < m.bar.height) fail(`${where}: a focused element can hide under the ${m.bar.height}px bar (scroll padding ${m.paddingBottom}px)`);
+  };
+  // A right or a wrong answer, seen without scrolling: the verdict whole above the bar, or from its first
+  // line where it is taller than the room there.
+  const expectVerdictInView = async (where) => {
+    await page.waitForTimeout(100);
+    await scrollStopped(page);
+    const m = await measureBar("[data-path-next-q]");
+    expectInReach(m, where);
+    const room = m.bar.top - m.paddingTop;
+    const seen = m.verdict.height <= room ? m.verdict.top >= 0 && m.verdict.bottom <= m.bar.top + 0.5 : m.verdict.top >= 0 && m.verdict.top <= m.paddingTop + 0.5;
+    if (!seen) fail(`${where}: the verdict stands at ${m.verdict.top}..${m.verdict.bottom}px with the bar from ${m.bar.top}px`);
+  };
   // Answers every question of the test on screen: right, or wrong, or by a function of the question's number.
   const answerAll = async (rightOrNot) => {
     let n = 0;
@@ -1298,6 +1346,7 @@ async function kosakataPathChecks(page, vp) {
       if (right) await page.locator(`[data-path-option="${key}"]`).click();
       else await page.locator(`[data-path-option]:not([data-path-option="${key}"])`).first().click();
       await page.waitForSelector(`[data-path-feedback="${right ? "right" : "wrong"}"]`, { timeout: 8000 });
+      await expectVerdictInView(`question ${n + 1} (${key})`);
       if (n === 0) await page.screenshot({ path: `shots/${vp}-kosakata-path-feedback-${right ? "right" : "wrong"}.png`, fullPage: true });
       await sideways(`question ${n + 1}`);
       await page.locator("[data-path-next-q]").click();
@@ -1409,6 +1458,46 @@ async function kosakataPathChecks(page, vp) {
     await sideways("a word's card");
     await page.screenshot({ path: `shots/${vp}-kosakata-path-word.png`, fullPage: true });
 
+    // The next step on the cards, on a small phone (on a desktop, its own screen), at every text size: on
+    // screen on every card with no scrolling, and at the page's end nothing is left under the bar. On a
+    // phone the bar is on the screen's bottom edge and the button does not move from card to card.
+    const screenSize = page.viewportSize();
+    const barShot = (name) => page.screenshot({ path: `shots/${vp}-kosakata-bar-${name}.png`, fullPage: false });
+    if (vp === "phone") await page.setViewportSize({ width: 360, height: 640 });
+    const batchSize = pathFile.levels[1].batches[0].length;
+    for (const size of [null, "besar", "sangat-besar"]) {
+      await go(`${MAP}/1/1`);
+      await page.waitForSelector(`[data-path-card="w${first.rank}"]`, { timeout: 8000 });
+      await setTextSizeAttr(page, size);
+      let place = null;
+      for (let i = 0; i < batchSize; i++) {
+        const where = `card ${i + 1} at text size ${size ?? "normal"}`;
+        const button = i === batchSize - 1 ? "[data-path-start-test]" : "[data-path-next]";
+        // The bar grows when "Sebelumnya" comes in on the second card, and its scroll padding follows
+        // through a ResizeObserver, which the browser runs before its next paint: look after that.
+        await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+        const m = await measureBar(button);
+        expectInReach(m, where);
+        if (m.y !== 0) fail(`${where} opens ${m.y}px down the page`);
+        if (vp === "phone" && Math.abs(m.bar.bottom - m.screen) > 1) fail(`${where}: the bar ends at ${m.bar.bottom}px of a ${m.screen}px screen`);
+        if (vp === "phone" && i >= 2 && (Math.abs(m.button.top - place.top) > 1 || Math.abs(m.button.right - place.right) > 1)) {
+          fail(`${where}: the button moved from ${JSON.stringify(place)} to ${JSON.stringify(m.button)}`);
+        }
+        if (i === 1) place = m.button;
+        await sideways(where);
+        if (i === 0 && !size) await barShot("first-card");
+        if (i === 1 && !size) await barShot("card");
+        if (i === 1 && size === "sangat-besar") await barShot("card-sangat-besar");
+        await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+        const end = await measureBar(button);
+        if (end.card.bottom > end.bar.top + 0.5) fail(`${where}: at the page's end the bar covers the card's last ${end.card.bottom - end.bar.top}px`);
+        if (i === 1 && !size) await barShot("page-end");
+        await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+        if (i < batchSize - 1) await page.locator("[data-path-next]").click();
+      }
+    }
+    await page.setViewportSize(screenSize);
+
     // A word's test, passed: a right answer plays that word's recording; the word Allah is never asked.
     await go(`${MAP}/1/1/tes`);
     await page.locator("[data-path-begin]").click();
@@ -1424,6 +1513,24 @@ async function kosakataPathChecks(page, vp) {
     await page.locator("[data-path-next-q]").click();
     await answerAll(true);
     await page.waitForSelector('[data-path-result="passed"]', { timeout: 8000 });
+
+    // The same test on a small phone, where a verdict starts under the fold (answerAll looks at each one).
+    if (vp === "phone") {
+      await page.setViewportSize({ width: 360, height: 640 });
+      await go(`${MAP}/1/1/tes`);
+      await page.locator("[data-path-begin]").click();
+      await page.waitForSelector("[data-path-question]", { timeout: 8000 });
+      const key = await page.locator("[data-path-question]").getAttribute("data-path-question");
+      await page.locator(`[data-path-option="${key}"]`).click();
+      await page.waitForSelector('[data-path-feedback="right"]', { timeout: 8000 });
+      await expectVerdictInView("a small phone's first question");
+      await barShot("verdict");
+      await page.locator("[data-path-next-q]").click();
+      await answerAll(true);
+      await page.waitForSelector('[data-path-result="passed"]', { timeout: 8000 });
+      await page.setViewportSize(screenSize);
+    }
+
     await go(`${MAP}/1/1/tes`);
     await page.locator("[data-path-begin]").click();
     const keys = new Set();

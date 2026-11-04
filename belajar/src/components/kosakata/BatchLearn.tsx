@@ -15,6 +15,7 @@ import type { Card, PartCard, WordCard } from "@/lib/kosakata-path-data";
 import { conceptHref, kosakataLevelTestHref, kosakataPathHref } from "@/lib/routes";
 
 import { AyahText, AyahTranslation } from "./AyahLineView";
+import { NextBarPage } from "./NextBarPage";
 
 /** What is heard and where: a lemma has no recording of its own (pipeline/kosakata_voice.py). */
 function Heard({ card, noteId }: { card: Card; noteId: string }) {
@@ -161,48 +162,53 @@ export function BatchLearn({ level, batch, cards, order, testHref, source }: { l
   };
   return (
     <ClipPlayerProvider prefetch={cards.map((c) => c.voice.clip.url)}>
-      {back}
-      <p className="mt-4 text-sm font-semibold text-forest">{t("batch_eyebrow", { level, batch })}</p>
-      <p className="text-base text-ink-muted">{t(level === 0 ? "part_of" : "word_of", { i: i + 1, n: cards.length })}</p>
-      <ol aria-label={t("steps_label")} className="mt-2 flex flex-wrap gap-1.5">
-        {cards.map((c, k) => (
-          <li key={c.key}>
-            <button
-              type="button"
-              aria-current={k === i ? "step" : undefined}
-              aria-label={t(level === 0 ? "part_of" : "word_of", { i: k + 1, n: cards.length })}
-              onClick={() => go(k)}
-              className={clsx(
-                "size-10 cursor-pointer rounded-full border text-sm tabular-nums",
-                k === i ? "border-forest bg-forest font-semibold text-paper" : "border-border-ui bg-white text-ink-muted",
-              )}
-            >
-              {k + 1}
-            </button>
-          </li>
-        ))}
-      </ol>
-      <div className="mt-4">{card.type === "word" ? <WordCardView key={card.key} card={card} source={source} /> : <PartCardView key={card.key} card={card} />}</div>
-      <nav className="mt-4 flex items-center justify-between gap-3">
-        {i > 0 ? (
-          <button type="button" className="btn-nav" onClick={() => go(i - 1)}>
-            <ChevronLeft aria-hidden className="size-4" />
-            {t("prev")}
-          </button>
-        ) : (
-          <span />
-        )}
-        {last ? (
-          <Link href={testHref} data-path-start-test="" className="btn-primary">
-            {t("start_test")}
-          </Link>
-        ) : (
-          <button type="button" data-path-next="" className="btn-primary" onClick={() => go(i + 1)}>
-            {t("next")}
-            <ChevronRight aria-hidden className="size-4" />
-          </button>
-        )}
-      </nav>
+      <NextBarPage
+        bar={
+          // Side by side while each gets 9.5rem, which "‹ Sebelumnya" needs at any text size, else stacked,
+          // as in the lesson's bar. On a phone the right-hand button is where the thumb already is, card after card.
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))] gap-2 sm:flex sm:items-center sm:justify-between">
+            {i > 0 ? (
+              <button type="button" className="btn-nav w-full sm:w-auto" onClick={() => go(i - 1)}>
+                <ChevronLeft aria-hidden className="size-4 shrink-0" />
+                {t("prev")}
+              </button>
+            ) : null}
+            {last ? (
+              <Link href={testHref} data-path-start-test="" className="btn-primary w-full px-3! sm:ms-auto sm:w-auto sm:px-6!">
+                {t("start_test")}
+              </Link>
+            ) : (
+              <button type="button" data-path-next="" className="btn-primary w-full px-3! sm:ms-auto sm:w-auto sm:px-6!" onClick={() => go(i + 1)}>
+                {t("next")}
+                <ChevronRight aria-hidden className="size-4 shrink-0" />
+              </button>
+            )}
+          </div>
+        }
+      >
+        {back}
+        <p className="mt-4 text-sm font-semibold text-forest">{t("batch_eyebrow", { level, batch })}</p>
+        <p className="text-base text-ink-muted">{t(level === 0 ? "part_of" : "word_of", { i: i + 1, n: cards.length })}</p>
+        <ol aria-label={t("steps_label")} className="mt-2 flex flex-wrap gap-1.5">
+          {cards.map((c, k) => (
+            <li key={c.key}>
+              <button
+                type="button"
+                aria-current={k === i ? "step" : undefined}
+                aria-label={t(level === 0 ? "part_of" : "word_of", { i: k + 1, n: cards.length })}
+                onClick={() => go(k)}
+                className={clsx(
+                  "size-10 cursor-pointer rounded-full border text-sm tabular-nums",
+                  k === i ? "border-forest bg-forest font-semibold text-paper" : "border-border-ui bg-white text-ink-muted",
+                )}
+              >
+                {k + 1}
+              </button>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-4">{card.type === "word" ? <WordCardView key={card.key} card={card} source={source} /> : <PartCardView key={card.key} card={card} />}</div>
+      </NextBarPage>
       {last ? null : (
         <p className="mt-3 text-sm">
           <Link href={testHref} className="text-ink-muted underline underline-offset-2">

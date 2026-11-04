@@ -23,6 +23,7 @@
     "concepts_available": "{n, plural, one {# nahwu or sharaf concept} other {# nahwu and sharaf concepts}}",
     "kosakata_title": "Qur'an vocabulary",
     "kosakata_body": "Every word of the Qur'an, most frequent first, with its meanings and the ayat that show them.",
+    "kosakata_body_path": "Learn the Qur'an's words in stages, ten at a time, or search all of them.",
     "kosakata_available": "{n, number} words"
   },
   "Quran": {
