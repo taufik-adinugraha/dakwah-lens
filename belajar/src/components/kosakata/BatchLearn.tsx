@@ -16,6 +16,7 @@ import { conceptHref, kosakataLevelTestHref, kosakataPathHref } from "@/lib/rout
 
 import { AyahText, AyahTranslation } from "./AyahLineView";
 import { NextBarPage } from "./NextBarPage";
+import { PartTiles } from "./PartTiles";
 
 /** What is heard and where: a lemma has no recording of its own (pipeline/kosakata_voice.py). */
 function Heard({ card, noteId }: { card: Card; noteId: string }) {
@@ -97,12 +98,10 @@ function PartCardView({ card }: { card: PartCard }) {
       </section>
       <section>
         <h2 className="text-lg font-semibold text-ink">{t("part_example")}</h2>
-        <p lang="ar" dir="rtl" data-path-part-word="" className="arabic-inline ar-clear mt-1 text-center text-ar-lg text-ink">
-          {card.word[0]}
-          <span data-path-mark="" className="word-mark">{card.word[1]}</span>
-          {card.word[2]}
-        </p>
         <div className="mt-2">
+          <PartTiles word={card.word} />
+        </div>
+        <div className="mt-3">
           <Heard card={card} noteId={`voice-note-${card.key}`} />
         </div>
         <p className="mt-3 text-base text-ink">

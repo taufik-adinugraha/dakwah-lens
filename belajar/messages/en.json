@@ -565,6 +565,7 @@
     "ayah_ref": "{surah} · ayah {ayah}",
     "part_example": "Example",
     "part_note": "The marked part is {translit}, which means “{meaning}”.",
+    "part_marked": "marked",
     "concept_link": "Learn more",
     "prev": "Previous",
     "next": "Next",

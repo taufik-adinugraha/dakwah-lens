@@ -6,10 +6,13 @@ import { describe, expect, it } from "vitest";
 
 // The marked word or part in Kosakata (operator 2026-11-04: "'bagian yang ditandai' use green which
 // is indistinguishable from black"). The forest green against the ink is 2.11:1, so a mark drawn in
-// it could not be told from the text beside it. The mark is now one utility, globals.css
-// `word-mark`; this pins that the colour keeps its distance from the ink and from the ground it
-// stands on, and that the three places that mark something all use that one utility. How it looks is
-// seen in the CI screenshots (scripts/ci/screenshots.mjs, the question and card shots).
+// it could not be told from the text beside it. The colour is one pair of tokens that two utilities
+// in globals.css take: `word-mark` for a whole word of an ayah, `mark-tile` for the tile of a part
+// of a word (2026-11-05: a part coloured inside its word cut through the shapes Amiri draws across
+// neighbouring letters, and كَمَا showed no mim). This pins that the colour keeps its distance from
+// the ink and from the ground it stands on, that both utilities take it from the tokens, and that a
+// part of a word is never coloured inside its word again. How it looks is seen in the CI
+// screenshots (scripts/ci/screenshots.mjs, the question and card shots).
 
 const BELAJAR = fileURLToPath(new URL("../../../", import.meta.url));
 const read = (rel: string) => readFileSync(join(BELAJAR, rel), "utf8");
@@ -61,12 +64,30 @@ describe("word-mark: the marked word can be told from the text beside it", () =>
     expect(util).not.toMatch(/padding|margin|font-weight|text-decoration/);
   });
 
-  it("is what the ayah's word, the part in a question and the part card all use, each with the hook CI selects on", () => {
-    for (const file of ["AyahLineView.tsx", "PathTest.tsx", "BatchLearn.tsx"]) {
+  it("mark-tile takes the same colour and tint as word-mark, and an edge of that colour", () => {
+    const tile = /@utility mark-tile \{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
+    expect(tile).toContain("color: var(--color-mark);");
+    expect(tile).toContain("background-color: var(--color-mark-bg);");
+    expect(tile).toContain("border-color: var(--color-mark);");
+  });
+
+  it("an ayah's word is marked by word-mark and a part by a tile, each with the hook CI selects on", () => {
+    // data-path-mark is what scripts/ci/screenshots.mjs looks for; the colour class is not a hook
+    const ayah = read("src/components/kosakata/AyahLineView.tsx");
+    expect(ayah).toContain('<span data-path-mark="" className="word-mark">');
+    expect(ayah).not.toMatch(/data-path-mark=""\s+className="[^"]*(text-forest|bg-ok-bg)/);
+    const tiles = read("src/components/kosakata/PartTiles.tsx");
+    expect(tiles).toContain('data-path-part-word=""');
+    expect(tiles).toContain('data-path-mark={marked ? "" : undefined}');
+    expect(tiles).toMatch(/marked \? "mark-tile border-2"/);
+  });
+
+  it("a part of a word is never coloured inside its word: the card and the question draw it on a tile", () => {
+    for (const file of ["PathTest.tsx", "BatchLearn.tsx"]) {
       const src = read(`src/components/kosakata/${file}`);
-      // data-path-mark is what scripts/ci/screenshots.mjs looks for; the colour class is not a hook
-      expect(src, file).toContain('<span data-path-mark="" className="word-mark">');
-      expect(src, file).not.toMatch(/data-path-mark=""\s+className="[^"]*(text-forest|bg-ok-bg)/);
+      expect(src, file).toContain("<PartTiles word=");
+      expect(src, file).not.toContain("word-mark");
+      expect(src, file).not.toContain("data-path-mark");
     }
     expect(read("src/components/kosakata/BatchLearn.tsx")).not.toContain('<span className="text-forest">{card.word[1]}</span>');
   });
