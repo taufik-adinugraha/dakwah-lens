@@ -16,6 +16,7 @@ import { kosakataBatchHref, kosakataPathHref } from "@/lib/routes";
 import type { AyahSound } from "./ayah-sound";
 import { AyahText, AyahTranslation } from "./AyahLineView";
 import { NextBarPage } from "./NextBarPage";
+import { PartTiles } from "./PartTiles";
 
 type Run ={ questions: Question[]; i: number; picked: number | null; score: number; missed: TestItem[]; done: boolean; passed: boolean };
 
@@ -28,18 +29,6 @@ function count(test: string, passed: boolean) {
   } catch {
     // A count is not worth an error.
   }
-}
-
-function PartWord({ word }: { word: readonly [string, string, string] }) {
-  return (
-    <p lang="ar" dir="rtl" data-path-part-word="" className="arabic-inline ar-clear text-center text-ar-lg text-ink">
-      {word[0]}
-      <span data-path-mark="" className="word-mark">
-        {word[1]}
-      </span>
-      {word[2]}
-    </p>
-  );
 }
 
 /**
@@ -247,7 +236,7 @@ function Runner({ data, level, batch, passPercent, order, source, ayahSounds = {
       </div>
       <section className="mt-4 space-y-4 rounded-2xl border border-hairline bg-white p-5">
         <h1 className="text-lg font-semibold text-ink">{t(q.kind === "part" ? "q_part" : q.kind === "hear" ? "q_hear" : q.kind === "ayah" ? "q_ayah" : "q_word")}</h1>
-        {q.kind === "part" && item.word ? <PartWord word={item.word} /> : null}
+        {q.kind === "part" && item.word ? <PartTiles word={item.word} /> : null}
         {q.kind === "word" ? (
           <p lang="ar" dir="rtl" className="arabic-inline ar-clear text-center text-ar-xl text-ink">
             {item.ar}

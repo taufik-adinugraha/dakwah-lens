@@ -582,12 +582,24 @@ body {
   }
 }
 
-/* The marked word or part in Kosakata: the ayah's word, the part of a word in a
-   question, the part card. One definition, so the three cannot drift. A colour
-   and a tint, no padding: the letters stay as they are, and padding inside a
-   word would break the join between its letters. */
+/* The marked word in Kosakata: the ayah's word on a card or in a question. A
+   colour and a tint, no padding: the letters stay as they are, and padding
+   inside a word would break the join between its letters. Only a whole word is
+   marked this way. A part of a word is marked on a tile of its own (mark-tile,
+   below), because a colour cut through a word cuts through the shapes Amiri
+   draws across neighbouring letters: it turned the next letter red or hid it
+   under the tint (2026-11-05: كَمَا showed no mim). */
 @utility word-mark {
   border-radius: 0.25rem;
+  background-color: var(--color-mark-bg);
+  color: var(--color-mark);
+}
+
+/* The marked tile of a word cut into parts (Kosakata, Level 0; PartTiles.tsx):
+   word-mark's colour and tint, and an edge of the same colour, so the part is
+   told from the rest by its fill and its edge as well as by its colour. */
+@utility mark-tile {
+  border-color: var(--color-mark);
   background-color: var(--color-mark-bg);
   color: var(--color-mark);
 }
