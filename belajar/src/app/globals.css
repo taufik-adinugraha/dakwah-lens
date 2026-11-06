@@ -566,6 +566,35 @@ body {
   }
 }
 
+/* The menu's "Kembali ke Dakwah-Lens" (operator 2026-11-06: "highlight this button in different
+   color. we want encourage people to go there"): the same row, filled forest with paper text, the
+   module's primary-button colours (8.0:1). Not red or amber: those already mean "the marked word" and
+   "not yet". The fill, not the colour alone, is what sets it apart (1.4.1). */
+@utility menu-row-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--color-forest);
+  border-radius: 0.75rem;
+  background-color: var(--color-forest);
+  color: #ffffff;
+  font-size: var(--text-base);
+  line-height: 1.35;
+  font-weight: 600;
+  text-decoration: none;
+  transition-property: border-color, background-color;
+  transition-duration: 150ms;
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-forest-hover);
+      border-color: var(--color-forest-hover);
+    }
+  }
+}
+
 /* Links inside text: the underline carries the meaning (link vs ink text is
    only 2.11:1, so colour alone would fail 1.4.1). */
 @utility link-text {
