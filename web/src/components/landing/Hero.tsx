@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, BookOpen } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
@@ -19,7 +19,10 @@ type HeroCoverage = {
  * One idea per screen: an eyebrow, a single serif-display headline with a
  * lone forest-green accent clause, one line of body, one primary action
  * (into public Insights, no signup — the "show value instantly" goal),
- * and an understated live-proof line. No gradients, no icon tiles, no
+ * one outlined secondary action into Belajar (operator 2026-11-06: the
+ * learning module reaches people beyond da'i; outlined, never a second
+ * filled button, so Insights stays the one primary), and an understated
+ * live-proof line. No gradients, no icon tiles, no
  * ornament — whitespace, type and a single accent carry it.
  */
 export function Hero({
@@ -71,6 +74,17 @@ export function Hero({
               {t("hero_cta_primary")}
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </Link>
+            {/* Belajar is its own app under /belajar/<locale> (Caddy routes
+                it): a plain <a> with a full page load, never the
+                locale-aware <Link>, same as the header's Belajar link. */}
+            <a
+              href={`/belajar/${locale}`}
+              data-hero-belajar=""
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-full border-[1.5px] border-forest bg-paper px-7 text-sm font-semibold text-forest transition hover:bg-forest-tint"
+            >
+              <BookOpen aria-hidden className="h-4 w-4" />
+              {t("hero_cta_belajar")}
+            </a>
             <Link
               href="#how-it-works"
               className="inline-flex h-12 items-center gap-1.5 text-sm font-semibold text-ink-muted transition hover:text-ink"
