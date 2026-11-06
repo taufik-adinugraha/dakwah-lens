@@ -350,6 +350,61 @@ async def _prepare_unranked_candidates(
     }
 
 
+def _resolve_picks(
+    pool: list[dict[str, Any]],
+    citations: list[str],
+    indices: list[int] | None,
+    label: str,
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Map picks back to candidate entries; returns (entries, missing citations).
+
+    One corpus point can yield two candidates under ONE citation: Riyad
+    as-Salihin 1032 is one hadith carrying the shahada and the tawwabin
+    du'a, and the du'a pool lists both as "Riyad as-Salihin 1032". A
+    citation-keyed dict kept only the last of them, so picking the tawwabin
+    du'a silently staged the shahada (found 2026-11-06).
+
+    `indices` (1-based, numbered as in the candidates markdown) are exact
+    and win when given; each is checked against its citation when the picks
+    carry both, which also catches a stale candidates cache. A citation-only
+    pick that matches more than one candidate is refused.
+    """
+    if indices:
+        if citations and len(citations) != len(indices):
+            raise SystemExit(
+                f"{label}: {len(indices)} indices but {len(citations)} citations in the picks."
+            )
+        out: list[dict[str, Any]] = []
+        for n, i in enumerate(indices):
+            if not isinstance(i, int) or not 1 <= i <= len(pool):
+                raise SystemExit(
+                    f"{label} index {i!r} is outside the candidate pool (1..{len(pool)}) — "
+                    f"likely a stale candidates cache. Re-run `dump-candidates`."
+                )
+            entry = pool[i - 1]
+            if citations and entry.get("citation") != citations[n]:
+                raise SystemExit(
+                    f"{label} #{i} is {entry.get('citation')!r} in the candidates cache but "
+                    f"the picks say {citations[n]!r} — stale candidates cache. "
+                    f"Re-run `dump-candidates`."
+                )
+            out.append(entry)
+        return out, []
+
+    positions: dict[str, list[int]] = {}
+    for i, d in enumerate(pool, 1):
+        positions.setdefault(d.get("citation", ""), []).append(i)
+    ambiguous = {c: positions[c] for c in citations if len(positions.get(c, [])) > 1}
+    if ambiguous:
+        detail = "; ".join(f"{c!r} = candidates #{', #'.join(map(str, p))}" for c, p in ambiguous.items())
+        raise SystemExit(
+            f"{label} picks name a citation that more than one candidate shares ({detail}). "
+            f"Pass `{label}_idx` (the candidate numbers) so the right entry is staged."
+        )
+    out = [pool[positions[c][0] - 1] for c in citations if c in positions]
+    return out, [c for c in citations if c not in positions]
+
+
 def _build_picks_context(
     group: str,
     candidates: dict[str, Any],
@@ -383,18 +438,13 @@ def _build_picks_context(
     kisah_seeds = candidates["kisah_seeds"]
     calendar_block = candidates["calendar_block"]
 
-    # Index by citation for O(1) lookup.
-    daleel_by_citation = {d["citation"]: d for d in daleel_candidates}
-    dua_by_citation = {d["citation"]: d for d in dua_candidates}
-
     # Filter daleel + dua to picks, in picks-supplied order.
-    daleel_picks = picks.get("daleel_picks") or []
-    dua_picks = picks.get("dua_picks") or []
-    daleel = [daleel_by_citation[c] for c in daleel_picks if c in daleel_by_citation]
-    adhkar = [dua_by_citation[c] for c in dua_picks if c in dua_by_citation]
-
-    missing_daleel = [c for c in daleel_picks if c not in daleel_by_citation]
-    missing_dua = [c for c in dua_picks if c not in dua_by_citation]
+    daleel, missing_daleel = _resolve_picks(
+        daleel_candidates, picks.get("daleel_picks") or [], picks.get("daleel_idx"), "daleel"
+    )
+    adhkar, missing_dua = _resolve_picks(
+        dua_candidates, picks.get("dua_picks") or [], picks.get("dua_idx"), "dua"
+    )
     if missing_daleel or missing_dua:
         raise SystemExit(
             f"Picks reference citations not in the candidate pool — "
