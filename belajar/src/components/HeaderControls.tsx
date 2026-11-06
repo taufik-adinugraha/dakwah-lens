@@ -34,7 +34,8 @@ const toggleClass = (on: boolean) =>
  * The Menu panel holds, first, Halaman Belajar, the hub (operator,
  * 2026-10-17: the module's root, also behind the brand mark), then
  * everything the header row used to carry: Konsep tata bahasa, Kembali ke
- * Dakwah-Lens (a plain <a>: cross-app), Sumber & lisensi.
+ * Dakwah-Lens (a plain <a>: cross-app; filled forest, the one highlighted row,
+ * operator 2026-11-06), Sumber & lisensi.
  * No sign-in (operator, 2026-10-12: "there should be no login feature here").
  *
  * Both panels are always rendered (hidden when closed), so aria-controls
@@ -186,8 +187,10 @@ export function HeaderControls({ locale }: { locale: string }) {
               <li>
                 {/* Cross-app: a plain <a>, never next-intl Link (it would
                     prefix /belajar and soft-navigate across apps). */}
-                <a href={`/${locale}`} className="menu-row">
-                  <ArrowLeft aria-hidden className="h-5 w-5 shrink-0 text-forest" />
+                {/* Highlighted (operator 2026-11-06): the one row that leads
+                    people on to the main site, filled where the others are white. */}
+                <a href={`/${locale}`} data-header-menu-main="" className="menu-row-main">
+                  <ArrowLeft aria-hidden className="h-5 w-5 shrink-0" />
                   {/* "Dakwah-Lens" is never cut at its hyphen (line breaks, 2026-10-10). */}
                   <span>
                     <MixedText text={t("back_to_main")} />

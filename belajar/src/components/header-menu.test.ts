@@ -78,11 +78,13 @@ describe("the header's Menu", () => {
       expect(main.a.href).toBe(`/${locale}`);
       expect(credits.a.href).toBe(`/belajar/${locale}/kredit`);
       expect("data-header-menu-home" in home.a).toBe(true);
-      // Same row as the others: the 48px menu-row, an icon because they all carry one.
+      // Same 48px row as the others, an icon because they all carry one; "Kembali ke Dakwah-Lens"
+      // is the highlighted row (operator 2026-11-06), the rest are plain.
       for (const r of rows) {
-        expect(r.a.class).toBe("menu-row");
+        expect(r.a.class).toBe(r === main ? "menu-row-main" : "menu-row");
         expect(r.icon).toBe(true);
       }
+      expect("data-header-menu-main" in main.a).toBe(true);
     }
   });
 
