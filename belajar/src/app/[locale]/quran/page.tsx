@@ -6,7 +6,6 @@ import { ForestGlow } from "@/components/ForestGlow";
 import { IntroCard } from "@/components/lesson/IntroCard";
 import { MixedText } from "@/components/library/MixedText";
 import { MainSiteBridge } from "@/components/MainSiteBridge";
-import { ShareButton } from "@/components/ShareButton";
 import { Link } from "@/i18n/navigation";
 import { comingUnits } from "@/lib/comingUnits";
 import { SURAHS } from "@/lib/content";
@@ -14,10 +13,10 @@ import { CURRICULUM, introOpen } from "@/lib/curriculum";
 import { visibleSurahs } from "@/lib/features";
 import { surahNamesFor } from "@/lib/ayat";
 import { ayahHref, curriculumHref, rumusHref, surahHref } from "@/lib/routes";
-import { pageUrl, shareMetadata } from "@/lib/share";
+import { shareMetadata } from "@/lib/share";
 
 /** This page's path, lib/routes.ts quranHref() (src/lib/share.test.ts holds them equal), for
- *  its share card and its share link. */
+ *  its share card. */
 const TRACK_PATH = "/quran";
 
 export async function generateMetadata({
@@ -85,7 +84,6 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
     { Icon: Library, title: t("p2_title"), body: t("p2_body") },
     { Icon: BookOpenCheck, title: t("p3_title"), body: t("p3_body") },
   ];
-  const tshare = await getTranslations("Share");
   const ti = await getTranslations("Intro");
   // The curriculum block: the most new steps any lesson teaches and the unit the basic level
   // ends with, both read from the file.
@@ -114,11 +112,6 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
             <MixedText text={t("intro")} />
           </p>
         </section>
-
-        {/* One "Bagikan" in the page head, under the intro (operator,
-            2026-10-10): the track is the page worth passing on to someone
-            starting out. */}
-        <ShareButton className="mt-6" url={pageUrl(locale, TRACK_PATH)} text={tshare("track_text")} />
 
         <section className="mt-10" aria-labelledby="start">
           <h2 id="start" className="text-lg font-semibold text-ink">
