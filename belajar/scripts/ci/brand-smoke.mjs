@@ -206,12 +206,12 @@ for (const locale of ["id", "en"]) {
   const hub = await chrome(hubPath, locale);
   await shareMeta(hubPath, hub, { card: `${hubPath}/og` });
   bridge(hubPath, hub, "hub", `${SITE}/${locale}?${utm("hub")}`);
+  shareButton(hubPath, hub, `${SITE}${hubPath}`);
 
   const trackPath = `/belajar/${locale}/quran`;
   const track = await chrome(trackPath, locale);
   await shareMeta(trackPath, track, { card: `${trackPath}/og` });
   bridge(trackPath, track, "track", `${SITE}/${locale}/kitab?${utm("track")}`);
-  shareButton(trackPath, track, `${SITE}${trackPath}`);
 
   // The curriculum page: the same header and footer, og tags that name its own card.
   const curriculumPath = `/belajar/${locale}/quran/kurikulum`;

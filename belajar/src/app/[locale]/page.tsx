@@ -6,6 +6,7 @@ import { ForestGlow } from "@/components/ForestGlow";
 import { MixedText } from "@/components/library/MixedText";
 import { AiChip } from "@/components/waris/report/AiChip";
 import { MainSiteBridge } from "@/components/MainSiteBridge";
+import { ShareButton } from "@/components/ShareButton";
 import { NoteRow, type PillTone } from "@/components/StatusPill";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
@@ -14,7 +15,7 @@ import { kosakataEnglishOn, kosakataPathListed, visibleSurahs, warisVisible } fr
 import { kosakataIndex } from "@/lib/kosakata";
 import { LIBRARY } from "@/lib/library";
 import { conceptIndexHref, kosakataHref, kosakataPathHref, quranHref, warisHref } from "@/lib/routes";
-import { shareMetadata } from "@/lib/share";
+import { pageUrl, shareMetadata } from "@/lib/share";
 
 export async function generateMetadata({
   params,
@@ -72,6 +73,7 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Hub");
+  const tshare = await getTranslations("Share");
 
   const published = new Set(await visibleSurahs());
   const available = SURAHS.filter((s) => published.has(s.slug));
@@ -142,6 +144,10 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
             <MixedText text={t("intro")} />
           </p>
         </section>
+
+        {/* One "Bagikan" in the hub's head, under the intro (operator, 2026-11-06: moved here from
+            the Qur'an track page): the hub is the page worth passing on to someone starting out. */}
+        <ShareButton className="mt-6" url={pageUrl(locale, "/")} text={tshare("hub_text")} />
 
         <section className="mt-10" aria-labelledby="tracks">
           <h2 id="tracks" className="text-lg font-semibold text-ink">
