@@ -164,7 +164,7 @@
     "data_versions_library": "Concept, vocabulary and root library",
     "data_versions_ayat": "Ayat opened from the “Did you know?” cards",
     "kosakata_heading": "Qur'an vocabulary",
-    "kosakata_body": "Rank, counts, roots and word forms are computed from the Quranic Arabic Corpus 0.4 and the Tanzil text. Ayah translations are from QuranEnc. Word meanings were written with AI (Claude) from the cited ayat, using the QuranEnc and Saheeh International translations, then checked by AI. These meanings do not yet cite a kitab. Each word's sound: Quran.com / Quran Foundation's word-by-word recording of one place where the word occurs in the Qur'an. Unaltered copies are on our server. The tests in the step-by-step path are built by rule from the same data. We only count numbers: how many browsers open each section, and how many times each test is tried and passed, with no name, account or IP address."
+    "kosakata_body": "Rank, counts, roots and word forms are computed from the Quranic Arabic Corpus 0.4 and the Tanzil text. Ayah translations are from QuranEnc. Word meanings were written with AI (Claude) from the cited ayat, using the QuranEnc and Saheeh International translations, then checked by AI. These meanings do not yet cite a kitab. Each word's sound: Quran.com / Quran Foundation's word-by-word recording of one place where the word occurs in the Qur'an. Unaltered copies are on our server. The tests in the step-by-step path are built by rule from the same data. We only count numbers: how many browsers open each section, how many visits arrive from the main Dakwah-Lens site, and how many times each test is tried and passed, with no name, account or IP address."
   },
   "NotFound": {
     "title": "Page not found",
@@ -550,7 +550,7 @@
     "passed": "Passed",
     "open": "Open",
     "progress_note": "Progress is kept in this browser only. On another device you start again, and the level test can open it back up.",
-    "counts_note": "We only count numbers: how many browsers open each section, and how many times each test is tried and passed, with no name, account or IP address.",
+    "counts_note": "We only count numbers: how many browsers open each section, how many visits arrive from the main Dakwah-Lens site, and how many times each test is tried and passed, with no name, account or IP address.",
     "reset": "Clear progress",
     "reset_sure": "Click again to clear",
     "back": "Learning map",

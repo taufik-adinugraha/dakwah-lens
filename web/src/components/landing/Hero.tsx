@@ -76,9 +76,12 @@ export function Hero({
             </Link>
             {/* Belajar is its own app under /belajar/<locale> (Caddy routes
                 it): a plain <a> with a full page load, never the
-                locale-aware <Link>, same as the header's Belajar link. */}
+                locale-aware <Link>, same as the header's Belajar link. The
+                utm pair lets Belajar's anonymous counts tell a click on this
+                button from any other arrival (belajar visit-count.ts HERO_UTM;
+                a test there keeps the two the same). */}
             <a
-              href={`/belajar/${locale}`}
+              href={`/belajar/${locale}?utm_source=dakwah-lens&utm_medium=hero`}
               data-hero-belajar=""
               className="inline-flex h-12 items-center justify-center gap-2 rounded-full border-[1.5px] border-forest bg-paper px-7 text-sm font-semibold text-forest transition hover:bg-forest-tint"
             >

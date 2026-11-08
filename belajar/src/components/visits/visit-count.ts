@@ -19,6 +19,57 @@ export type VisitSection = (typeof VISIT_SECTIONS)[number];
 /** The row of the module as a whole. Sections do not add up to it: one browser can visit several in a day. */
 export const WHOLE_MODULE = "semua";
 
+/**
+ * Where a page view came from, in one word (operator 2026-11-08: "count visits that arrive from the main
+ * site"): `hero` came through the homepage's Belajar button, `main` from another page of the main site,
+ * `other` is everything else, including every page view after the first of a visit. The route turns it
+ * into two numbers (from_main, from_hero); the word says nothing about who sent it.
+ */
+export const ARRIVALS = ["hero", "main", "other"] as const;
+export type Arrival = (typeof ARRIVALS)[number];
+
+/** The module's address under the main site: pages of Belajar are not "the main site". */
+const BASE_PATH = "/belajar";
+
+/**
+ * The homepage button's link carries these two (web/src/components/landing/Hero.tsx; a test reads that file,
+ * so the two cannot drift apart). Both must be there, with a referrer on the main site, to count as `hero`:
+ * a copied address that still holds them, opened from a chat, is not a click on the button.
+ */
+export const HERO_UTM = { utm_source: "dakwah-lens", utm_medium: "hero" } as const;
+
+/**
+ * Where the page the browser has just opened came from. `referrer` is document.referrer, `origin` the page's
+ * own, `navigationType` what Navigation Timing says ("navigate", "reload", "back_forward"), `search` the
+ * address's query. Only a fresh navigation counts: a reload or Back keeps the old referrer, and the visit it
+ * belonged to has been counted already. Pure.
+ */
+export function arrivalOf(i: { referrer: string; origin: string; navigationType?: string; search: string }): Arrival {
+  if (i.navigationType === "reload" || i.navigationType === "back_forward") return "other";
+  let from: URL;
+  try {
+    from = new URL(i.referrer);
+  } catch {
+    return "other";
+  }
+  if (from.origin !== i.origin) return "other";
+  if (from.pathname === BASE_PATH || from.pathname.startsWith(`${BASE_PATH}/`)) return "other";
+  const q = new URLSearchParams(i.search);
+  const hero = Object.entries(HERO_UTM).every(([k, v]) => q.get(k) === v);
+  return hero ? "hero" : "main";
+}
+
+/**
+ * What an address asks of the counting, so the owner can leave their own browsers out (operator 2026-11-08):
+ * `?kunjungan=tidak` stops counting in this browser, `?kunjungan=ya` starts again, anything else asks for
+ * nothing. The browser keeps the choice; the server never hears of it.
+ */
+export const OPT_OUT_PARAM = "kunjungan";
+export function optOutRequest(search: string): "off" | "on" | null {
+  const v = new URLSearchParams(search).get(OPT_OUT_PARAM);
+  return v === "tidak" ? "off" : v === "ya" ? "on" : null;
+}
+
 export type VisitReport = {
   section: VisitSection;
   firstToday: boolean;
@@ -26,6 +77,8 @@ export type VisitReport = {
   /** The same two questions of the module as a whole. */
   firstTodayAll: boolean;
   firstEverAll: boolean;
+  /** Where this page view came from. */
+  arrival: Arrival;
 };
 
 /** What the browser remembers. */
@@ -70,10 +123,10 @@ export function parseVisitMemory(raw: string | null): VisitMemory | null {
 }
 
 /** A page view that cannot be remembered (blocked storage): a view, and no visitor, or each page would be a new one. */
-export const viewOnly = (section: VisitSection): VisitReport => ({ section, firstToday: false, firstEver: false, firstTodayAll: false, firstEverAll: false });
+export const viewOnly = (section: VisitSection, arrival: Arrival = "other"): VisitReport => ({ section, firstToday: false, firstEver: false, firstTodayAll: false, firstEverAll: false, arrival });
 
 /** This view's report, and what the browser remembers after it. */
-export function countVisit(memory: VisitMemory | null, section: VisitSection, day: string): { report: VisitReport; memory: VisitMemory } {
+export function countVisit(memory: VisitMemory | null, section: VisitSection, day: string, arrival: Arrival = "other"): { report: VisitReport; memory: VisitMemory } {
   const today = memory?.day === day ? memory.today : [];
   const ever = memory?.ever ?? [];
   const add = (list: string[]) => (list.includes(section) ? list : [...list, section]);
@@ -84,6 +137,7 @@ export function countVisit(memory: VisitMemory | null, section: VisitSection, da
       firstEver: !ever.includes(section),
       firstTodayAll: today.length === 0,
       firstEverAll: ever.length === 0,
+      arrival,
     },
     memory: { day, today: add(today), ever: add(ever) },
   };
