@@ -470,7 +470,8 @@ async function visitCountChecks(page, vp) {
     // The next page of a visit is not an arrival, whatever the referrer still says.
     await wantArrival(HUB, { referer: `${BASE}/id` }, "main");
     sent.length = 0;
-    await page.locator('a[href$="/id/konsep"]').first().click();
+    // The hub's own card, in <main>: the first such link in the page is the closed Menu's row, which is hidden.
+    await page.locator('main a[href$="/id/konsep"]').first().click();
     if (!(await until(page, async () => sent.length > 0, 5_000))) fail("the next page of a visit sent no count");
     const next = JSON.parse(sent[0]).arrival;
     if (next !== "other") fail(`the next page of a visit reported arrival ${next}, expected other`);
