@@ -389,7 +389,10 @@ async function standaloneNextCheck(page, vp) {
 /**
  * The anonymous visit counts (operator 2026-11-04; plan L40): what a page view reports, read from the request,
  * and what reaches the table, read back from the database because the route swallows a database error. Each
- * body holds a section and four yes-or-no answers and nothing else. A page in no section sends nothing.
+ * body holds a section, four yes-or-no answers and where the view came from (one of three words), and
+ * nothing else. A page in no section sends nothing. Then (operator 2026-11-08): an arrival from the main
+ * site is told from any other, the homepage button's tag counts only with that referrer, the next page of a
+ * visit is no arrival, and ?kunjungan=tidak leaves a browser out until ?kunjungan=ya.
  */
 async function visitCountChecks(page, vp) {
   const fail = (m) => {
@@ -408,7 +411,7 @@ async function visitCountChecks(page, vp) {
   // A row's views, visitors and new visitors, over all days, read as the workflow's smoke reads its counts.
   const row = (section) =>
     new Promise((done, reject) => {
-      const query = `select coalesce(sum(views),0), coalesce(sum(visitors),0), coalesce(sum(new_visitors),0) from belajar_visit_counts where section = '${section}'`;
+      const query = `select coalesce(sum(views),0), coalesce(sum(visitors),0), coalesce(sum(new_visitors),0), coalesce(sum(from_main),0), coalesce(sum(from_hero),0) from belajar_visit_counts where section = '${section}'`;
       execFile("docker", ["run", "--rm", "--network", "host", "postgres:16-alpine", "psql", "postgres://smoke:smoke@127.0.0.1:5432/smoke", "-tAc", query], (err, stdout) => (err ? reject(err) : done(stdout.trim().split("|").map(Number))));
     });
   const visit = async (url, want) => {
@@ -423,15 +426,15 @@ async function visitCountChecks(page, vp) {
     await page.goto(HUB, { waitUntil: "networkidle" });
     await page.evaluate((k) => localStorage.removeItem(k), KEY);
     const [konsep, whole] = [await row("konsep"), await row("semua")];
-    await visit(HUB, { section: "hub", firstToday: true, firstEver: true, firstTodayAll: true, firstEverAll: true });
-    await visit(HUB, { section: "hub", firstToday: false, firstEver: false, firstTodayAll: false, firstEverAll: false });
-    await visit(KONSEP, { section: "konsep", firstToday: true, firstEver: true, firstTodayAll: false, firstEverAll: false });
+    await visit(HUB, { section: "hub", firstToday: true, firstEver: true, firstTodayAll: true, firstEverAll: true, arrival: "other" });
+    await visit(HUB, { section: "hub", firstToday: false, firstEver: false, firstTodayAll: false, firstEverAll: false, arrival: "other" });
+    await visit(KONSEP, { section: "konsep", firstToday: true, firstEver: true, firstTodayAll: false, firstEverAll: false, arrival: "other" });
     // The next day: a visitor of the day again, and no longer a new one.
     await page.evaluate((k) => {
       const kept = JSON.parse(localStorage.getItem(k));
       localStorage.setItem(k, JSON.stringify({ ...kept, day: "2000-01-01" }));
     }, KEY);
-    await visit(KONSEP, { section: "konsep", firstToday: true, firstEver: false, firstTodayAll: true, firstEverAll: false });
+    await visit(KONSEP, { section: "konsep", firstToday: true, firstEver: false, firstTodayAll: true, firstEverAll: false, arrival: "other" });
     // A mistyped address is in no section.
     sent.length = 0;
     await page.goto(`${BASE}/belajar/id/alamat-keliru`, { waitUntil: "networkidle" });
@@ -440,9 +443,61 @@ async function visitCountChecks(page, vp) {
     // In the table: two views of Konsep, two visitors of their days, one new; four views of the module,
     // two visitors of their days, one new.
     const grew = (now, was, by) => now.every((n, i) => n === was[i] + by[i]);
-    const counted = await until(page, async () => grew(await row("konsep"), konsep, [2, 2, 1]) && grew(await row("semua"), whole, [4, 2, 1]), 8_000);
+    const counted = await until(page, async () => grew(await row("konsep"), konsep, [2, 2, 1, 0, 0]) && grew(await row("semua"), whole, [4, 2, 1, 0, 0]), 8_000);
     if (!counted) fail(`konsep went from ${konsep} to ${await row("konsep")} and semua from ${whole} to ${await row("semua")}`);
     console.log(`${vp} visit counts: what a page view reports, day by day, and what reaches the table`);
+
+    // Where a visit came from. Playwright's goto `referer` is what document.referrer shows on the page it opens.
+    const whole2 = await row("semua");
+    const TAG = "?utm_source=dakwah-lens&utm_medium=hero";
+    const arrival = async (url, options) => {
+      sent.length = 0;
+      await page.goto(url, { waitUntil: "networkidle", ...options });
+      if (!(await until(page, async () => sent.length > 0, 5_000))) fail(`${url} sent no count`);
+      return JSON.parse(sent[0]).arrival;
+    };
+    const wantArrival = async (url, options, want) => {
+      const got = await arrival(url, options);
+      if (got !== want) fail(`${url} (referer ${options?.referer ?? "none"}) reported arrival ${got}, expected ${want}`);
+    };
+    await wantArrival(`${HUB}${TAG}`, { referer: `${BASE}/id` }, "hero");
+    await wantArrival(HUB, { referer: `${BASE}/en/briefings` }, "main");
+    // A copied address that still holds the tag, opened from nowhere, is no click on the button.
+    await wantArrival(`${HUB}${TAG}`, undefined, "other");
+    // From a page of Belajar itself is no arrival from the main site. (No two visits in a row share an address:
+    // Chromium treats opening the address already shown as a reload, which is never an arrival.)
+    await wantArrival(KONSEP, { referer: `${BASE}/belajar/id/quran` }, "other");
+    // The next page of a visit is not an arrival, whatever the referrer still says.
+    await wantArrival(HUB, { referer: `${BASE}/id` }, "main");
+    sent.length = 0;
+    // The hub's own card, in <main>: the first such link in the page is the closed Menu's row, which is hidden.
+    await page.locator('main a[href$="/id/konsep"]').first().click();
+    if (!(await until(page, async () => sent.length > 0, 5_000))) fail("the next page of a visit sent no count");
+    const next = JSON.parse(sent[0]).arrival;
+    if (next !== "other") fail(`the next page of a visit reported arrival ${next}, expected other`);
+
+    // Leaving a browser out: nothing is sent, on this page or the next, until it asks to be counted again.
+    const OPT_OUT_KEY = "belajar:v1:kunjungan-tidak";
+    const quiet = async (url) => {
+      sent.length = 0;
+      await page.goto(url, { waitUntil: "networkidle" });
+      await page.waitForTimeout(500);
+      if (sent.length !== 0) fail(`${url} sent ${sent.join(" ")} though this browser asked to be left out`);
+    };
+    await quiet(`${HUB}?kunjungan=tidak`);
+    await quiet(KONSEP);
+    if ((await page.evaluate((k) => localStorage.getItem(k), OPT_OUT_KEY)) !== "1") fail("the choice to be left out was not kept");
+    await wantArrival(`${HUB}?kunjungan=ya`, undefined, "other");
+    if ((await page.evaluate((k) => localStorage.getItem(k), OPT_OUT_KEY)) !== null) fail("?kunjungan=ya did not clear the choice");
+
+    // In the table: seven page views of the module (five arrivals' first pages, the next page of one visit,
+    // and the one that asked to be counted again), three of them from the main site, one through the button.
+    const now2 = await until(page, async () => {
+      const n = await row("semua");
+      return n[0] === whole2[0] + 7 && n[3] === whole2[3] + 3 && n[4] === whole2[4] + 1;
+    }, 8_000);
+    if (!now2) fail(`semua went from ${whole2} to ${await row("semua")}; expected 7 more views, 3 more from the main site, 1 more through the button`);
+    console.log(`${vp} visit counts: arrivals told apart, the next page is no arrival, a browser can be left out`);
   } finally {
     await page.unroute(BEACON, onBeacon);
   }
