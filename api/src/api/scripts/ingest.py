@@ -106,7 +106,7 @@ async def _run(
         result = _scrape(platform, query, limit, actor_id=actor_id)
     cost = result.cost_usd or 0
     dur = result.duration_s or 0
-    print(f"✓ Apify pulled {len(result.items)} items (cost ${cost:.4f}, {dur:.1f}s)")
+    print(f"✓ {platform}: pulled {len(result.items)} items (cost ${cost:.4f}, {dur:.1f}s)")
     if not result.items:
         return 0
 
