@@ -174,43 +174,58 @@ def record_usage(
         )
     )
 
+    event = {
+        "provider": provider,
+        "model": model,
+        "operation": operation,
+        "tokens_in": tokens_in,
+        "tokens_out": tokens_out,
+        "units": units,
+        "cost_usd": final_cost,
+        "meta": meta,
+    }
     try:
         try:
             loop = asyncio.get_running_loop()
-            # We're inside an event loop — fire-and-forget the insert.
-            loop.create_task(
-                _insert_async(
-                    provider=provider,
-                    model=model,
-                    operation=operation,
-                    tokens_in=tokens_in,
-                    tokens_out=tokens_out,
-                    units=units,
-                    cost_usd=final_cost,
-                    meta=meta,
-                )
-            )
         except RuntimeError:
             # No running loop (typical: called from a Celery sync task or
             # the ingest CLI). Run synchronously.
-            asyncio.run(
-                _insert_async(
-                    provider=provider,
-                    model=model,
-                    operation=operation,
-                    tokens_in=tokens_in,
-                    tokens_out=tokens_out,
-                    units=units,
-                    cost_usd=final_cost,
-                    meta=meta,
-                )
-            )
+            _insert_in_thread(event)
+            return
+        # Inside an event loop: hand the insert to the loop's default thread
+        # pool instead of `loop.create_task`. Worker tasks run one short
+        # `asyncio.run` each, and its shutdown CANCELS unfinished tasks — a
+        # task created here was cancelled mid-insert whenever the caller
+        # returned right after (a 0-item YouTube search: "Exception closing
+        # connection ... CancelledError", and a lost row if the cancel came
+        # before the commit). Executor work is not cancelled, and
+        # `asyncio.run` waits for the default executor before returning, so
+        # the row always lands. A long-lived loop (FastAPI) is not blocked.
+        loop.run_in_executor(None, _insert_in_thread, event)
     except Exception:
         log.exception(
             "usage.record_failed",
             provider=provider,
             operation=operation,
             model=model,
+        )
+
+
+def _insert_in_thread(event: dict[str, Any]) -> None:
+    """Run one usage insert on a fresh event loop in the calling thread.
+
+    Safe across loops because the engine uses NullPool: the connection is
+    opened and closed inside this loop. Errors are logged, never raised —
+    nobody awaits the executor future.
+    """
+    try:
+        asyncio.run(_insert_async(**event))
+    except Exception:
+        log.exception(
+            "usage.record_failed",
+            provider=event.get("provider"),
+            operation=event.get("operation"),
+            model=event.get("model"),
         )
 
 
