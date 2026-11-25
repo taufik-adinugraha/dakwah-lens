@@ -25,7 +25,7 @@
     "belajar": "Learn",
     "briefs_library": "Brief catalog",
     "pustaka_kajian": "Pustaka Kajian",
-    "flyers_library": "Flyer gallery",
+    "media_library": "Media gallery",
     "donate": "Donate",
     "dashboard": "Dashboard",
     "saved": "Saved",
@@ -2651,5 +2651,29 @@
     "empty_week_khutbah": "No khutbah scripts for this week yet.",
     "empty_week_kultum": "No kultum scripts for this week yet.",
     "disclaimer": "AI-assisted, not an authoritative fatwa. Review the daleel and content before delivering."
+  },
+  "Media": {
+    "meta_title": "Dakwah-Lens Media Gallery: Videos & Flyers",
+    "meta_description": "Weekly explainer videos and ready-to-share da'wah flyers from Dakwah-Lens, drawn from the past week's events, with daleel from the reference kitab.",
+    "eyebrow": "Media gallery",
+    "heading": "Da'wah videos & flyers",
+    "intro": "Choose a kind of media: weekly explainer videos, or ready-to-share flyers for WhatsApp and social media.",
+    "video_title": "Videos",
+    "video_body": "Short weekly videos: what happened, why, what we can do, and the message from the Qur'an and sunnah.",
+    "flyer_title": "Flyers",
+    "flyer_body": "Ready-to-share da'wah flyers, one message and one daleel per card.",
+    "open": "Open"
+  },
+  "MediaVideo": {
+    "meta_title": "Weekly Da'wah Videos",
+    "meta_description": "Short weekly videos from Dakwah-Lens: the past week's events, why they happened, and the message from the Qur'an and sunnah.",
+    "back": "Media gallery",
+    "eyebrow": "Weekly videos",
+    "heading": "Videos",
+    "intro": "Every week, one or two short videos about an event people are talking about: what happened, why, what we can do, and the message from the Qur'an and sunnah. The videos are in Indonesian.",
+    "week_of": "Week of {date}",
+    "watch_on_youtube": "Watch on YouTube",
+    "empty": "The first video is coming soon.",
+    "ai_note": "Made with AI assistance, not a fatwa. The 3D scenes are illustrations; daleel are taken from the reference kitab."
   }
 }

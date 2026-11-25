@@ -25,7 +25,7 @@
     "belajar": "Belajar",
     "briefs_library": "Katalog Kajian",
     "pustaka_kajian": "Pustaka Kajian",
-    "flyers_library": "Galeri Flyer",
+    "media_library": "Galeri Media",
     "donate": "Donasi",
     "dashboard": "Dashboard",
     "saved": "Tersimpan",
@@ -2651,5 +2651,29 @@
     "empty_week_khutbah": "Belum ada naskah khutbah untuk pekan ini.",
     "empty_week_kultum": "Belum ada naskah kultum untuk pekan ini.",
     "disclaimer": "Dibantu AI, bukan fatwa otoritatif. Periksa kembali dalil dan isinya sebelum disampaikan."
+  },
+  "Media": {
+    "meta_title": "Galeri Media Dakwah-Lens: Video & Flyer",
+    "meta_description": "Video penjelasan pekanan dan flyer dakwah siap-bagi dari Dakwah-Lens, berangkat dari peristiwa sepekan terakhir, dengan dalil dari kitab rujukan.",
+    "eyebrow": "Galeri Media",
+    "heading": "Video & flyer dakwah",
+    "intro": "Pilih jenis media: video penjelasan pekanan, atau flyer siap-bagi untuk WhatsApp dan media sosial.",
+    "video_title": "Video",
+    "video_body": "Video pendek pekanan: apa yang terjadi, kenapa, apa yang bisa kita lakukan, dan pesan dari Al-Qur'an dan sunnah.",
+    "flyer_title": "Flyer",
+    "flyer_body": "Flyer dakwah siap-bagi, satu pesan dan satu dalil per kartu.",
+    "open": "Buka"
+  },
+  "MediaVideo": {
+    "meta_title": "Video Dakwah Pekanan",
+    "meta_description": "Video pendek pekanan dari Dakwah-Lens: peristiwa sepekan terakhir, penjelasannya, dan pesan dari Al-Qur'an dan sunnah.",
+    "back": "Galeri Media",
+    "eyebrow": "Video pekanan",
+    "heading": "Video",
+    "intro": "Setiap pekan, satu atau dua video pendek tentang peristiwa yang ramai dibicarakan: apa yang terjadi, kenapa, apa yang bisa kita lakukan, dan pesan dari Al-Qur'an dan sunnah.",
+    "week_of": "Pekan {date}",
+    "watch_on_youtube": "Tonton di YouTube",
+    "empty": "Video pertama segera hadir.",
+    "ai_note": "Disusun dengan bantuan AI, bukan fatwa. Adegan 3D adalah ilustrasi; dalil diambil dari kitab rujukan."
   }
 }

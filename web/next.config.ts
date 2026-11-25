@@ -21,6 +21,8 @@ const csp = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "connect-src 'self'",
+  // YouTube's privacy-enhanced player, for the videos on /media/video.
+  "frame-src https://www.youtube-nocookie.com",
   "frame-ancestors 'none'",
   "form-action 'self'",
   "base-uri 'self'",
