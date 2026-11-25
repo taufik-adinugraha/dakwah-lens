@@ -1151,7 +1151,21 @@
     "group_topic_filter_clear": "Hapus filter topik",
     "group_posts_filter_label": "Filter sentimen:",
     "m_seo_title": "Artikel Dakwah Tema {theme}: {hook}",
-    "m_seo_description": "{hook} — artikel dakwah mingguan bertema {theme}, dengan rujukan Al-Qur'an dan hadits serta tanya-jawab. Edisi {date}."
+    "m_seo_description": "{hook} — artikel dakwah mingguan bertema {theme}, dengan rujukan Al-Qur'an dan hadits serta tanya-jawab. Edisi {date}.",
+    "numbers_posts": "Unggahan pekan ini",
+    "numbers_posts_unit": "unggahan",
+    "numbers_from_prev": "dari {n} pekan lalu",
+    "numbers_negative_share": "Porsi negatif",
+    "numbers_vs_baseline": "poin dari garis dasar {base}",
+    "numbers_biggest_topic": "Topik terbesar",
+    "numbers_sentiment_title": "Nada percakapan",
+    "numbers_all": "Semua platform",
+    "numbers_negative": "Negatif",
+    "numbers_neutral": "Netral",
+    "numbers_positive": "Positif",
+    "numbers_topics_title": "Topik terbesar pekan ini (jumlah unggahan)",
+    "numbers_show_text": "Lihat versi teks",
+    "numbers_platform_mainstream": "Media arus utama"
   },
   "Youtube": {
     "page_title": "YouTube",
