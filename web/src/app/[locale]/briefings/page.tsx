@@ -1,7 +1,7 @@
 import { ForestWash } from "@/components/ForestWash";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowRight, Info } from "lucide-react";
+import { ArrowRight, CirclePlay, Info } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 
@@ -120,6 +120,14 @@ export default async function InsightsPage({
           <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-[1.7] text-ink-muted sm:text-lg">
             {t("hub_hero_subtitle")}
           </p>
+          {/* Owner 2026-11-26: a highlighted way in to the weekly videos. */}
+          <Link
+            href="/media/video"
+            className="mt-7 inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-full bg-forest px-5 py-2.5 text-sm font-semibold text-paper shadow transition hover:bg-forest-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+          >
+            <CirclePlay className="h-4 w-4 shrink-0" aria-hidden />
+            <span className="text-balance">{t("hub_video_cta")}</span>
+          </Link>
         </div>
       </section>
 
