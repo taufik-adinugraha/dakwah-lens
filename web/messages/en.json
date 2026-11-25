@@ -1151,7 +1151,21 @@
     "group_topic_filter_clear": "Clear topic filter",
     "group_posts_filter_label": "Sentiment filter:",
     "m_seo_title": "Da'wah Article on {theme}: {hook}",
-    "m_seo_description": "{hook} — a weekly da'wah article on {theme}, grounded in Qur'an and hadith references, with Q&A. {date} edition."
+    "m_seo_description": "{hook} — a weekly da'wah article on {theme}, grounded in Qur'an and hadith references, with Q&A. {date} edition.",
+    "numbers_posts": "Posts this week",
+    "numbers_posts_unit": "posts",
+    "numbers_from_prev": "from {n} the week before",
+    "numbers_negative_share": "Negative share",
+    "numbers_vs_baseline": "points vs the {base} baseline",
+    "numbers_biggest_topic": "Biggest topic",
+    "numbers_sentiment_title": "Tone of the conversation",
+    "numbers_all": "All platforms",
+    "numbers_negative": "Negative",
+    "numbers_neutral": "Neutral",
+    "numbers_positive": "Positive",
+    "numbers_topics_title": "Biggest topics this week (posts)",
+    "numbers_show_text": "Show as text",
+    "numbers_platform_mainstream": "Mainstream media"
   },
   "Youtube": {
     "page_title": "YouTube",

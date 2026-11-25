@@ -348,6 +348,7 @@ OUTPUT: briefing analisis dalam Bahasa Indonesia, dibagi ke 5 BAGIAN dengan head
 - Komposisi sentimen dengan angka verbatim
 - Dua benang merah utama pekan ini
 - Bisa di-skim dalam 30 detik
+- Tebalkan (`**...**`) 3-5 FRASA KUNCI — nama isu, kelompok, tempat, atau benang merah (mis. `**lapak kecil yang terhimpit**`, `**sertifikasi halal UMK**`) — supaya pembaca yang hanya memindai langsung menangkapnya; halaman menampilkannya berwarna hijau. Tebalkan frasa 2-5 kata, BUKAN kalimat utuh, BUKAN angka (halaman menyorot angka sendiri), BUKAN kata sambung. (Pemilik, 2026-11-25.)
 
 ## Numerik & Tren Pekan Ini (200-250 kata)
 - Ekspos angka dengan konteks — jangan sekadar daftar, hubungkan ke cerita
@@ -364,6 +365,7 @@ CRITICAL — TOPIC_GROUP SCOPE: baca TOPIC_GROUP di input. Briefing ini fokus pa
 - Gunakan headlines dari pool untuk MENGENALI POLA, lalu deskripsikan polanya dengan bahasa observasional. Contoh transformasi: alih-alih "562 postingan korupsi dan 440 postingan pinjol membentuk benang ekonomi", tulis "korupsi pejabat bertumpukan dengan jeratan pinjol pada pekan yang sama, membentuk benang keprihatinan ekonomi yang nyata".
 - Struktur: 2-3 BENANG (atau SPIRAL) utama, tiap benang ~150-200 kata yang menjelaskan apa polanya, kenapa muncul bersama, dan apa implikasinya bagi audiens dakwah. Tutup dengan satu paragraf benang merah lintas-tema.
 - Verba observasional ("menyoroti", "memetakan", "menunjukkan", "tercermin dari", "menenun"), bukan perintah ("wajib", "harus", "pentingnya").
+- SOROTAN: buka tiap benang dengan label tebal (`**Lapak kecil yang terhimpit.**`), lalu di dalam paragrafnya tebalkan 3-5 FRASA KUNCI (pelaku atau kelompok, tempat, istilah dakwah seperti *amanah*) — frasa 2-5 kata, BUKAN kalimat utuh. Halaman menampilkan teks tebal berwarna hijau, jadi pembaca bisa memindai benang dari frasa tebalnya saja. Jangan menebalkan sitasi dalil (memang dilarang di section ini). (Pemilik, 2026-11-25.)
 - HANYA pola yang berakar di pool sample_headlines. JANGAN mengarang cerita atau mengangkat tema yang tidak hadir di data.
 
 ## Poin Kunci (180-260 kata)
@@ -1198,6 +1200,7 @@ OUTPUT: analytical briefing in clear English, split into 5 SECTIONS with H2 (##)
 - Sentiment composition verbatim
 - Two main throughlines this week
 - 30-second skimmable
+- Bold (`**...**`) 3-5 KEY PHRASES — the issue, group, place or throughline (e.g. `**small stalls under pressure**`) — so a reader who only skims catches them; the page shows bold in green. Bold phrases of 2-5 words, NOT whole sentences, NOT numbers (the page highlights numbers itself), NOT connectives. (Owner, 2026-11-25.)
 
 ## Numbers & Trends This Week (200-250 words)
 - Numbers in context — connect to stories, don't just list
@@ -1212,6 +1215,7 @@ CRITICAL — TOPIC_GROUP SCOPE: read TOPIC_GROUP in the input. This briefing cov
 - The source headlines are Indonesian — translate or paraphrase them naturally into English, but keep the Indonesian context intact (kakek = "an elderly man / grandfather", pengajian = "Qur'an study circle / pengajian")
 - NOT a list — identify the PATTERN connecting these stories
 - IDENTIFY THE OVERARCHING THROUGHLINE between topics at the end
+- HIGHLIGHTS: open each thread with a bold label (`**Small stalls under pressure.**`), then bold 3-5 KEY PHRASES inside its paragraph (actors or groups, places, da'wah terms like *amanah*) — phrases of 2-5 words, NOT whole sentences. The page shows bold text in green, so a reader can skim a thread by its bold phrases alone. (Owner, 2026-11-25.)
 - Prefer observation verbs ("highlights", "maps", "tracks", "surfaces") over command verbs ("must", "should", "the importance of")
 - Only use headlines from the pool I provide. Do NOT invent stories.
 

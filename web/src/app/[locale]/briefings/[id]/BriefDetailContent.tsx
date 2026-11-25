@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { briefingNumbers } from "@/lib/briefing-numbers";
 import { ArrowLeft, Clock, Hourglass, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
@@ -213,6 +214,31 @@ export async function BriefDetailContent({
             )}
             <BriefingNarrative
               text={body}
+              numbers={briefingNumbers(brief.headlineStats)}
+              numbersLabels={{
+                posts: t("numbers_posts"),
+                postsUnit: t("numbers_posts_unit"),
+                // {n} / {base} are filled in by the infographic.
+                fromPrev: t.raw("numbers_from_prev") as string,
+                negativeShare: t("numbers_negative_share"),
+                vsBaseline: t.raw("numbers_vs_baseline") as string,
+                biggestTopic: t("numbers_biggest_topic"),
+                sentimentTitle: t("numbers_sentiment_title"),
+                all: t("numbers_all"),
+                negative: t("numbers_negative"),
+                neutral: t("numbers_neutral"),
+                positive: t("numbers_positive"),
+                topicsTitle: t("numbers_topics_title"),
+                showText: t("numbers_show_text"),
+                platformNames: {
+                  mainstream: t("numbers_platform_mainstream"),
+                  youtube: "YouTube",
+                  tiktok: "TikTok",
+                  instagram: "Instagram",
+                  x: "X",
+                  facebook: "Facebook",
+                },
+              }}
               daleelRefs={brief.daleelRefs}
               adhkarRefs={brief.adhkarRefs}
               citedDaleelLabel={t("exec_daleel_label")}

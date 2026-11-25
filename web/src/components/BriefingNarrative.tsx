@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import {
   BarChart3,
@@ -10,7 +11,12 @@ import {
 
 import type { DaleelRef } from "@/db/schema";
 import { wrapInlineArabic } from "@/lib/inline-arabic";
+import type { BriefingNumbers } from "@/lib/briefing-numbers";
 import { BriefDeliverableCards } from "./BriefDeliverableCards";
+import {
+  BriefNumbersInfographic,
+  type NumbersLabels,
+} from "./BriefNumbersInfographic";
 import { BriefFlyerSection } from "./BriefFlyerSection";
 import { DaleelChips } from "./DaleelChips";
 import { MahasiswaPosterCard } from "./MahasiswaPosterCard";
@@ -39,6 +45,36 @@ function stripFlyerMessagesSection(md: string): string {
     }
   }
   return md;
+}
+
+/** Split out `## Numerik & Tren Pekan Ini` / `## Numbers & Trends This
+ *  Week` (heading line, its body, and what comes before/after) so the
+ *  page can draw it as an infographic (owner 2026-11-25). Null when the
+ *  section is absent. */
+function splitNumbersSection(md: string): {
+  before: string;
+  heading: string;
+  body: string;
+  after: string;
+} | null {
+  const lines = md.split("\n");
+  const start = lines.findIndex((l) =>
+    /^##\s+(?:numerik\s*&\s*tren|numbers\s*&\s*trends)\b/i.test(l),
+  );
+  if (start === -1) return null;
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (lines[i].startsWith("## ")) {
+      end = i;
+      break;
+    }
+  }
+  return {
+    before: lines.slice(0, start).join("\n"),
+    heading: lines[start],
+    body: lines.slice(start + 1, end).join("\n"),
+    after: lines.slice(end).join("\n"),
+  };
 }
 
 // NOTE: word-count annotations like `(2300-3200 kata)` / `(~80 kata)`
@@ -83,8 +119,15 @@ export function BriefingNarrative({
   initialDeliverable,
   locale,
   posterLabels,
+  numbers,
+  numbersLabels,
 }: {
   text: string;
+  /** The week's numbers from headline_stats (lib/briefing-numbers). When
+   *  given with numbersLabels, the Numerik & Tren section is drawn as an
+   *  infographic and its prose moves behind a "show as text" toggle. */
+  numbers?: BriefingNumbers | null;
+  numbersLabels?: NumbersLabels & { showText: string };
   daleelRefs: DaleelRef[] | null;
   /** Du'a / dzikir pool retrieved alongside the thematic daleel. The
    *  Sunnah-call (Pesan Flyer 5) + Du'a hero (Flyer 6) cite from this
@@ -191,14 +234,38 @@ export function BriefingNarrative({
     !!split?.section4HeadingLine &&
     /^\s*##\s+artikel\s+(fiqh|tafsir)\b/i.test(split.section4HeadingLine);
 
+  // Markdown with the Numerik section drawn as an infographic when the
+  // numbers are available; otherwise plain markdown, as before.
+  const prose = (md: string) => {
+    const ns = numbers && numbersLabels ? splitNumbersSection(md) : null;
+    if (!ns) {
+      return <ReactMarkdown components={makeMarkdownComponents()}>{md}</ReactMarkdown>;
+    }
+    return (
+      <>
+        <ReactMarkdown components={makeMarkdownComponents()}>{ns.before}</ReactMarkdown>
+        <ReactMarkdown components={makeMarkdownComponents()}>{ns.heading}</ReactMarkdown>
+        <BriefNumbersInfographic data={numbers!} labels={numbersLabels!} locale={locale ?? "id"} />
+        <details className="group mt-4 print:hidden">
+          <summary className="cursor-pointer select-none text-sm font-medium text-slate-500 hover:text-slate-800">
+            {numbersLabels!.showText}
+          </summary>
+          <ReactMarkdown components={makeMarkdownComponents()}>{ns.body}</ReactMarkdown>
+        </details>
+        <div className="hidden print:block">
+          <ReactMarkdown components={makeMarkdownComponents()}>{ns.body}</ReactMarkdown>
+        </div>
+        <ReactMarkdown components={makeMarkdownComponents()}>{ns.after}</ReactMarkdown>
+      </>
+    );
+  };
+
   return (
     <div className="mt-5">
       <article className="text-pretty text-slate-800">
         {split ? (
           <>
-            <ReactMarkdown components={makeMarkdownComponents()}>
-              {split.before}
-            </ReactMarkdown>
+            {prose(split.before)}
             {split.section4 && (
               <>
                 <ReactMarkdown components={makeMarkdownComponents()}>
@@ -244,9 +311,7 @@ export function BriefingNarrative({
             </ReactMarkdown>
           </>
         ) : (
-          <ReactMarkdown components={makeMarkdownComponents()}>
-            {bodyForDisplay}
-          </ReactMarkdown>
+          prose(bodyForDisplay)
         )}
       </article>
 
@@ -478,17 +543,46 @@ function childrenToString(children: React.ReactNode): string {
  * factory takes a "current section theme" ref so blockquotes can pick up
  * the active section's color. h2 mutates the theme as the doc unfolds.
  */
+/** A number with its unit ("689 unggahan", "22,5%", "0,7 poin
+ *  persentase"), bold in tabular figures so the summary's figures stand
+ *  out (owner 2026-11-25). Dates and plain numbers are left alone. */
+const NUMBER_WITH_UNIT =
+  /(\d+(?:[.,]\d+)*\s?(?:%|persen\b|poin(?:\s+persentase)?\b|unggahan\b|posts?\b|percentage points?\b|points?\b))/gi;
+
+function highlightNumbers(node: React.ReactNode): React.ReactNode {
+  if (typeof node === "string") {
+    const parts = node.split(NUMBER_WITH_UNIT);
+    if (parts.length === 1) return node;
+    return parts.map((part, i) =>
+      i % 2 === 1 ? (
+        <strong key={i} className="font-semibold tabular-nums text-slate-900">
+          {part}
+        </strong>
+      ) : (
+        part
+      ),
+    );
+  }
+  if (Array.isArray(node)) {
+    return node.map((n, i) => <Fragment key={i}>{highlightNumbers(n)}</Fragment>);
+  }
+  return node;
+}
+
 function makeMarkdownComponents(): Components {
   // Mutable theme tracked across the markdown render. ReactMarkdown
   // renders elements in document order so this is safe — h2 sets the
   // theme, subsequent elements read it. Resets at the next h2.
   const themeRef = { current: DEFAULT_THEME as ReturnType<typeof themeForHeading> };
+  // The current ## heading, so the summary's numbers can be highlighted.
+  const sectionRef = { current: "" };
 
   return {
     h2: ({ children }) => {
       const text = childrenToString(children);
       const theme = themeForHeading(text);
       themeRef.current = theme;
+      sectionRef.current = text;
       const Icon = theme.icon;
       return (
         <h2
@@ -534,7 +628,9 @@ function makeMarkdownComponents(): Components {
       // a <bdi> so the surrounding Indonesian doesn't bidi-flip.
       return (
         <p className="mt-2 text-pretty leading-relaxed text-slate-700">
-          {wrapInlineArabic(children)}
+          {/ringkasan eksekutif|executive summary/i.test(sectionRef.current)
+            ? highlightNumbers(wrapInlineArabic(children))
+            : wrapInlineArabic(children)}
         </p>
       );
     },
@@ -563,8 +659,16 @@ function makeMarkdownComponents(): Components {
         </blockquote>
       );
     },
+    // Key phrases the writer bolded show in the brand green (owner
+    // 2026-11-25); bullet labels ("**Masalah:**", "**Aksi:**") stay ink.
     strong: ({ children }) => (
-      <strong className="font-semibold text-slate-900">{children}</strong>
+      <strong
+        className={`font-semibold ${
+          /:\s*$/.test(childrenToString(children)) ? "text-slate-900" : "text-emerald-800"
+        }`}
+      >
+        {children}
+      </strong>
     ),
     em: ({ children }) => <em className="italic text-slate-700">{children}</em>,
     a: ({ href, children }) => (
