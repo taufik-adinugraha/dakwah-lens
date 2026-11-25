@@ -58,6 +58,7 @@ describe("briefingNumbers", () => {
 describe("cleanTopicLabel", () => {
   it("strips the Domain prefix and shortens Lainnya", () => {
     expect(cleanTopicLabel("Domain Teknologi dan AI")).toBe("Teknologi dan AI");
+    expect(cleanTopicLabel("Magnet Pemerintahan dan Kebijakan")).toBe("Pemerintahan dan Kebijakan");
     expect(cleanTopicLabel("Lainnya — Tidak Terklasifikasi")).toBe("Lainnya");
     expect(cleanTopicLabel("Prabowo di KTT ASEAN ke-49 Manila")).toBe("Prabowo di KTT ASEAN ke-49 Manila");
   });

@@ -46,13 +46,13 @@ function sentimentFrom(
   return { negative, neutral, positive };
 }
 
-/** "Domain Ekonomi dan Bisnis" -> "Ekonomi dan Bisnis"; "Lainnya — Tidak
+/** "Domain Ekonomi dan Bisnis" / "Magnet Ekonomi dan Bisnis" -> "Ekonomi dan Bisnis"; "Lainnya — Tidak
  *  Terklasifikasi" -> "Lainnya". Event topics ("Prabowo di KTT ASEAN …")
  *  keep their name. */
 export function cleanTopicLabel(label: string): string {
   const s = label.trim();
   if (/^lainnya\b/i.test(s)) return "Lainnya";
-  return s.replace(/^domain\s+/i, "");
+  return s.replace(/^(domain|magnet)\s+/i, "");
 }
 
 export function briefingNumbers(stats: unknown): BriefingNumbers | null {
