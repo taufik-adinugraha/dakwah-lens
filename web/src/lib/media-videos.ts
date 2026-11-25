@@ -20,7 +20,24 @@ export type MediaVideo = {
   shape: "vertical" | "wide";
 };
 
-export const MEDIA_VIDEOS: MediaVideo[] = [];
+export const MEDIA_VIDEOS: MediaVideo[] = [
+  {
+    youtubeId: "3Eu5n4gqGEM",
+    title: "Kenapa Banjir Datang di Akhir Tahun?",
+    blurb:
+      "Banjir sudah datang, padahal puncak musim hujan secara umum baru Desember sampai Februari. Kenapa hujan datang di akhir tahun, kenapa arus yang tampak tenang bisa menyeret kita, dan doa Rasulullah ﷺ saat hujan membawa bahaya.",
+    week: "2026-11-23",
+    shape: "vertical",
+  },
+  {
+    youtubeId: "HFwVVbLqPY8",
+    title: "Kenapa Badak Jawa Mau Dipindah?",
+    blurb:
+      "Badak Jawa tinggal kurang dari seratus ekor, semuanya di Ujung Kulon. Kenapa ada wacana memindahkan sebagian, kenapa banyak yang menolak, dan pesan Islam tentang menjaga satwa.",
+    week: "2026-11-23",
+    shape: "vertical",
+  },
+];
 
 const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
 
