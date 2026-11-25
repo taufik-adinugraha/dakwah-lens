@@ -26,6 +26,8 @@ const STATIC_PATHS = [
   "/pustaka-kajian",
   "/discussions",
   "/flyers/public",
+  "/media",
+  "/media/video",
   "/khutbah-kultum",
 ] as const;
 

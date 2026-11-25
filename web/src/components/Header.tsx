@@ -31,7 +31,9 @@ export async function Header() {
     { href: `/${locale}/khutbah-kultum`, label: t("khutbah_kultum") },
     { href: `/${locale}/discussions`, label: t("discussions") },
     { href: `/${locale}/kitab`, label: t("kitab") },
-    { href: `/${locale}/flyers/public`, label: t("flyers_library") },
+    // Galeri Media (owner 2026-11-25): one entry for videos and flyers; the
+    // flyer gallery itself is unchanged at /flyers/public.
+    { href: `/${locale}/media`, label: t("media_library") },
     // Belajar Al-Qur'an is its own app (own container, routed by Caddy
     // under /belajar/<locale>), so it is a plain link with a full page
     // load, never a locale-aware <Link>.
@@ -115,11 +117,8 @@ export async function Header() {
             <Link href="/kitab" className="hover:text-ink transition">
               {t("kitab")}
             </Link>
-            <Link
-              href="/flyers/public"
-              className="hover:text-ink transition"
-            >
-              {t("flyers_library")}
+            <Link href="/media" className="hover:text-ink transition">
+              {t("media_library")}
             </Link>
             {/* Belajar Al-Qur'an: a separate app under /belajar/<locale>
                 (Caddy routes it), so a plain <a>, not the locale-aware
