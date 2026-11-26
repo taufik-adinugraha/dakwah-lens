@@ -173,7 +173,7 @@ export function renderEmail(layout: EmailLayout): string {
             </td>
           </tr>
         </table>
-        <p style="margin:0 0 6px;font-size:12px;color:${FAINT};">Atau salin tautan ini:</p>
+        <p style="margin:0 0 6px;font-size:12px;color:${FAINT};">Atau copy link ini:</p>
         <p style="margin:0 0 16px;font-size:12px;color:${MUTED};word-break:break-all;"><a href="${cta.url}" style="color:${BRAND};text-decoration:underline;">${cta.url}</a></p>
       `
     : "";
