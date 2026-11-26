@@ -31,6 +31,9 @@ export async function Header() {
     { href: `/${locale}/khutbah-kultum`, label: t("khutbah_kultum") },
     { href: `/${locale}/discussions`, label: t("discussions") },
     { href: `/${locale}/kitab`, label: t("kitab") },
+    // Pustaka Doa: here and in the footer, not in the desktop row (see
+    // the note there).
+    { href: `/${locale}/doa`, label: t("doa") },
     // Galeri Media (owner 2026-11-25): one entry for videos and flyers; the
     // flyer gallery itself is unchanged at /flyers/public.
     { href: `/${locale}/media`, label: t("media_library") },
@@ -117,6 +120,10 @@ export async function Header() {
             <Link href="/kitab" className="hover:text-ink transition">
               {t("kitab")}
             </Link>
+            {/* No Pustaka Doa here (owner 2026-11-26: only if it fits).
+                Signed in at 1024px this row has no room for another label,
+                and this one adds about 104px, so it sits in the mobile menu
+                and the footer. */}
             <Link href="/media" className="hover:text-ink transition">
               {t("media_library")}
             </Link>

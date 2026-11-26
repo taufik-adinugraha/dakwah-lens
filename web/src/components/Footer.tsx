@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { marketingSectionLink } from "@/lib/marketing-href";
+import { SOCIAL_ACCOUNTS, SOCIAL_ICON_PATHS } from "@/lib/social-accounts";
 import { I18nText } from "./I18nText";
 
 /**
@@ -46,6 +47,31 @@ export async function Footer() {
               text={t("tagline")}
               className="mt-4 block max-w-xs text-pretty text-sm leading-relaxed text-white/55"
             />
+            {/* Official social accounts: external, so plain anchors that
+                open a new tab. Muted at rest; hover and keyboard focus put
+                the glyph on a forest disc (forest on its own is too dark to
+                read as a glyph colour on this ground). */}
+            <div className="-ml-2 mt-5 flex items-center gap-1">
+              {SOCIAL_ACCOUNTS.map(({ platform, name, url }) => (
+                <a
+                  key={platform}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={t("social_link", { platform: name })}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-white/55 transition hover:bg-forest hover:text-white focus-visible:bg-forest focus-visible:text-white"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden
+                    className="h-[18px] w-[18px]"
+                  >
+                    <path d={SOCIAL_ICON_PATHS[platform]} />
+                  </svg>
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* Product */}
@@ -70,6 +96,7 @@ export async function Footer() {
                 {tNav("khutbah_kultum")}
               </FooterLink>
               <FooterLink href="/kitab">{tNav("kitab")}</FooterLink>
+              <FooterLink href="/doa">{tNav("doa")}</FooterLink>
               <a
                 href={sectionLink("#donate")}
                 className="w-fit font-semibold text-emerald-300 transition hover:text-emerald-200"
