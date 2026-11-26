@@ -24,7 +24,9 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata
   if (!rank || !row) return { title: "—" };
   const t = await getTranslations({ locale, namespace: "Seo" });
   return {
-    title: `${row.translit} (${row.ar})`,
+    // Not the lesson word's entry's title (/kosakata/{id}, `translit (ar)`): the same word has both pages, and two
+    // pages with one title are filed as duplicates. The rank tells them apart.
+    title: t("kosakata_word_title", { translit: row.translit, ar: row.ar, rank }),
     description: t("kosakata_word", { translit: row.translit, ar: row.ar, meaning: locale === "en" ? row.en : row.id, count: row.count }),
     alternates: alternatesFor(locale, kosakataWordHref(rank)),
     // 4,832 short pages: taken into the index only when the operator says so (lib/features.ts
