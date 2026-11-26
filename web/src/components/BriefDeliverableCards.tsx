@@ -77,15 +77,15 @@ type DeliverableCard = {
 type Labels = {
   /** Card CTA: "Baca selengkapnya" / "Read full content". */
   open: string;
-  /** Modal toolbar: "Salin" / "Copy". */
+  /** Modal toolbar: "Copy" (both locales). */
   copy: string;
-  /** Modal toolbar: confirmation after copy: "Disalin!". */
+  /** Modal toolbar: confirmation after copy: "Copied!". */
   copied: string;
-  /** Modal toolbar: "Unduh" / "Download". */
+  /** Modal toolbar: "Download PDF" (both locales). */
   download: string;
-  /** Modal toolbar: "Cetak" / "Print". */
+  /** Modal toolbar: "Print" (both locales). */
   print: string;
-  /** Modal toolbar: "Unduh Flyer" / "Download Flyer". */
+  /** Modal toolbar: "Download Flyer" (both locales). */
   flyer: string;
   /** Modal toolbar: "Kunjungi halaman" / "Visit page" — opens the
    *  standalone /d/{slug}/{kind} share page in a new tab. */
@@ -659,7 +659,7 @@ function CardDownloadButton({ url }: { url: string }) {
       href={url}
       download
       onClick={(e) => e.stopPropagation()}
-      aria-label="Unduh PDF"
+      aria-label="Download PDF"
       className="inline-flex h-7 items-center gap-1 rounded-full border border-slate-200 bg-white/90 px-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white"
     >
       <Download className="h-3 w-3" />
@@ -673,7 +673,7 @@ function CardShareButton({ url, title }: { url: string; title: string }) {
   return (
     <button
       type="button"
-      aria-label="Bagikan"
+      aria-label="Share"
       onClick={async (e) => {
         // Don't bubble — the surrounding card div opens the modal on click.
         e.stopPropagation();
@@ -704,12 +704,12 @@ function CardShareButton({ url, title }: { url: string; title: string }) {
       {copied ? (
         <>
           <Check className="h-3 w-3 text-emerald-600" />
-          Tertaut!
+          Copied!
         </>
       ) : (
         <>
           <Share2 className="h-3 w-3" />
-          Bagikan
+          Share
         </>
       )}
     </button>

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * One row in the dashboard "Yang baru Anda simpan" card.
+ * One row in the dashboard "Yang baru Anda save" card.
  *
  * Owns local hidden state for optimistic deletion — when the user
  * clicks the trash, we call toggleBookmark (which deletes when the row

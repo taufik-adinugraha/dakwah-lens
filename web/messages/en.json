@@ -22,6 +22,7 @@
     "khutbah_kultum": "Khutbah & Kultum",
     "discussions": "Discussions",
     "kitab": "Kitab Library",
+    "doa": "Du'a Library",
     "belajar": "Learn",
     "briefs_library": "Brief catalog",
     "pustaka_kajian": "Pustaka Kajian",
@@ -444,7 +445,8 @@
     "terms": "Terms",
     "section_product": "Product",
     "section_info": "More",
-    "tagline": "Empowering da'i with AI-driven media insights. A non-profit project from Sukses & Berkah Group."
+    "tagline": "Empowering da'i with AI-driven media insights. A non-profit project from Sukses & Berkah Group.",
+    "social_link": "Dakwah-Lens on {platform}"
   },
   "Common": {
     "loading": "Loading...",

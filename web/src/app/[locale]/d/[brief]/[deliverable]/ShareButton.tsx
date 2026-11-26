@@ -66,12 +66,12 @@ export function ShareButton({
         {copied ? (
           <>
             <Check className="h-3.5 w-3.5 text-emerald-600" />
-            Tertaut!
+            Copied!
           </>
         ) : (
           <>
             <Share2 className="h-3.5 w-3.5" />
-            Bagikan
+            Share
           </>
         )}
       </button>
@@ -90,7 +90,7 @@ export function ShareButton({
           ) : (
             <>
               <Download className="h-3.5 w-3.5" />
-              Unduh PDF
+              Download PDF
             </>
           )}
         </button>
