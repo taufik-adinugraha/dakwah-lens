@@ -166,7 +166,7 @@ export type Action =
   | { type: "ringkasan" }
   /** Start over. */
   | { type: "ulang" }
-  /** Load answers (sessionStorage, "Simpan di perangkat ini", or a #j= link). Invalid keys are dropped. */
+  /** Load answers (sessionStorage, "Save di perangkat ini", or a #j= link). Invalid keys are dropped. */
   | { type: "muat"; answers: Answers };
 
 /**

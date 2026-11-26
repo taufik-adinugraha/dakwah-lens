@@ -1,5 +1,5 @@
 /**
- * "Salin ringkasan teks" (plan §6 Print and PDF, D9): plain text for WhatsApp, rendered from the
+ * "Copy ringkasan teks" (plan §6 Print and PDF, D9): plain text for WhatsApp, rendered from the
  * view-model (no new copy, no Arabic). Rupiah only when the user ticks "Sertakan nilai rupiah"
  * (the same opt-in as the link). Always carries the disclaimer line and the privacy line.
  * Returns null for a report that may not be shared (the E-BUNUH class, plan §9.4): the killer

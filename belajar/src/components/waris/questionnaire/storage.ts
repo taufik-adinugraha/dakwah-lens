@@ -7,7 +7,7 @@
  * |----------------|-----------------------------|-----------------------------------------------|
  * | React state    | —                           | always (useReducer over the machine)          |
  * | sessionStorage | belajar:v1:waris:draft      | autosave on every answer; gone with the tab   |
- * | localStorage   | belajar:v1:waris:saved      | only after "Simpan di perangkat ini"; "Hapus" |
+ * | localStorage   | belajar:v1:waris:saved      | only after "Save di perangkat ini"; "Hapus"   |
  * | URL fragment   | #j=v1.<token>               | only as the hand-off fallback when the tab     |
  * |                |                             | cannot store, or when a #j= link is opened    |
  * | URL fragment   | #baru                       | "Hitung untuk beliau" (routes.ts warisHref):   |
@@ -191,7 +191,7 @@ export function dropFragment(): void {
 }
 
 // ---------------------------------------------------------------------------------------------
-// "Simpan di perangkat ini" (localStorage, explicit only)
+// "Save di perangkat ini" (localStorage, explicit only)
 // ---------------------------------------------------------------------------------------------
 
 const savedListeners = new Set<() => void>();

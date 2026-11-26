@@ -686,10 +686,10 @@ async function footerCheck(page, vp) {
 }
 
 /**
- * "Bagikan" on Al-Fatihah ayah 1, under the ayah navigation: a 48px labelled button. On the CI
+ * "Share" on Al-Fatihah ayah 1, under the ayah navigation: a 48px labelled button. On the CI
  * runner Chromium has no share sheet (Linux), so the fallback panel opens: "Kirim lewat WhatsApp"
- * (wa.me, the address tagged utm_source=share&utm_medium=whatsapp) and "Salin tautan", which
- * copies the address tagged utm_medium=share and says "Tautan disalin." (the context grants the
+ * (wa.me, the address tagged utm_source=share&utm_medium=whatsapp) and "Copy link", which
+ * copies the address tagged utm_medium=share and says "Link sudah di-copy." (the context grants the
  * clipboard). Shots: phone + desktop, at the normal and the largest text size.
  */
 async function shareShots(page, vp) {
@@ -703,7 +703,7 @@ async function shareShots(page, vp) {
   for (const size of [null, "sangat-besar"]) {
     await setTextSizeAttr(page, size);
     const h = (await toggle.boundingBox())?.height ?? 0;
-    if (h < 47.5) throw new Error(`${vp}: Bagikan is ${Math.round(h)}px tall (< 48)`);
+    if (h < 47.5) throw new Error(`${vp}: Share is ${Math.round(h)}px tall (< 48)`);
   }
   await setTextSizeAttr(page, null);
   if (hasSheet) {
@@ -718,7 +718,7 @@ async function shareShots(page, vp) {
     }
     await page.locator("[data-share-copy]").click();
     const status = page.locator("[data-share-status]");
-    await status.filter({ hasText: "Tautan disalin" }).waitFor({ state: "visible", timeout: 5_000 });
+    await status.filter({ hasText: "Link sudah di-copy" }).waitFor({ state: "visible", timeout: 5_000 });
     const copied = await page.evaluate(() => navigator.clipboard.readText());
     if (copied !== `${url}?utm_source=share&utm_medium=share`) throw new Error(`${vp}: copied "${copied}"`);
     console.log(`  share ok ${vp}: WhatsApp → …utm_medium=whatsapp, copied ${copied}`);
@@ -4928,7 +4928,7 @@ const browser = await chromium.launch();
 try {
   for (const [vp, viewport, scale] of VIEWPORTS) {
     const ctx = await browser.newContext({ viewport, deviceScaleFactor: scale, locale: "id-ID" });
-    // "Salin tautan" (shareShots) writes to the clipboard and the check reads it back.
+    // "Copy link" (shareShots) writes to the clipboard and the check reads it back.
     if (!WARIS_ONLY) await ctx.grantPermissions(["clipboard-read", "clipboard-write"], { origin: new URL(BASE).origin });
     const page = await ctx.newPage();
     for (const [name, path] of WARIS_ONLY ? WARIS_PAGES : SURAHS_ON ? SURAH_PAGES : PAGES) {

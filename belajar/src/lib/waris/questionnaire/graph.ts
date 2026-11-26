@@ -146,7 +146,7 @@ export interface ExitDef {
   id: ExitId;
   /** RuleNotes for "the rule, with its dalil where we have one" (plan §5.4 item 3). */
   rules: readonly RuleId[];
-  /** "Cetak ringkasan jawaban Anda" offered. Never on E-BUNUH (plan §5.4 item 5, §9.4). */
+  /** "Print ringkasan jawaban Anda" offered. Never on E-BUNUH (plan §5.4 item 5, §9.4). */
   print: boolean;
   /** E-HIDUP offers "Lanjutkan sebagai simulasi" (action lanjut_simulasi). */
   lanjutSimulasi: boolean;

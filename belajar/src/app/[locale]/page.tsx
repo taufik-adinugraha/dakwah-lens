@@ -145,7 +145,7 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
           </p>
         </section>
 
-        {/* One "Bagikan" in the hub's head, under the intro (operator, 2026-11-06: moved here from
+        {/* One "Share" in the hub's head, under the intro (operator, 2026-11-06: moved here from
             the Qur'an track page): the hub is the page worth passing on to someone starting out. */}
         <ShareButton className="mt-6" url={pageUrl(locale, "/")} text={tshare("hub_text")} />
 

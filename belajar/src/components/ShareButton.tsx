@@ -8,14 +8,14 @@ import { useId, useRef, useState } from "react";
 import { shareUrl, whatsappHref } from "@/lib/share";
 
 /**
- * "Bagikan" (operator, 2026-10-10: the module should bring people to dakwah-lens.id): ONE
+ * "Share" (operator, 2026-10-10: the module should bring people to dakwah-lens.id): ONE
  * labelled button, 48px, outside the lesson stage (the lesson page puts it under the ayah
  * navigation, the hub in its head; operator 2026-11-06: moved there from the Qur'an track page).
  *   - Where the browser has a share sheet (navigator.share: phones, most desktop browsers), the
  *     sheet opens with the page address tagged utm_source=share&utm_medium=share.
  *   - Elsewhere, or when the sheet fails, a small panel opens under the button: "Kirim lewat
  *     WhatsApp" (wa.me with the message and the address, utm_medium=whatsapp, in a new tab: it
- *     leaves for WhatsApp) and "Salin tautan", which says "Tautan disalin." right there
+ *     leaves for WhatsApp) and "Copy link", which says "Link sudah di-copy." right there
  *     (role=status). If the clipboard refuses, the address is shown in a read-only field,
  *     selected, to copy by hand.
  * The panel is always in the static HTML, hidden while closed, so aria-controls points at a real

@@ -101,12 +101,12 @@
     "hub_label": "Lihat naskah khutbah, kultum, dan Pustaka Kitab di Dakwah-Lens"
   },
   "Share": {
-    "button": "Bagikan",
-    "panel": "Bagikan halaman ini",
+    "button": "Share",
+    "panel": "Share halaman ini",
     "whatsapp": "Kirim lewat WhatsApp",
-    "copy": "Salin tautan",
-    "copied": "Tautan disalin.",
-    "copy_manual": "Tautan belum bisa disalin otomatis. Salin tautan ini:",
+    "copy": "Copy link",
+    "copied": "Link sudah di-copy.",
+    "copy_manual": "Link belum bisa di-copy otomatis. Copy link ini:",
     "lesson_text": "Belajar bahasa Arab Al-Qur'an kata demi kata: {surah} · Ayat {n}",
     "hub_text": "Belajar memahami agama sedikit demi sedikit di Dakwah-Lens: bahasa Arab Al-Qur'an kata demi kata, konsep tata bahasa, dan kosakata"
   },
@@ -481,7 +481,7 @@
     "size_sangat_besar": "Sangat besar",
     "selected": "Dipilih",
     "panel_title": "Ukuran huruf",
-    "panel_body": "Semua tulisan ikut membesar, termasuk huruf Arab. Pilihan Anda disimpan di perangkat ini.",
+    "panel_body": "Semua tulisan ikut membesar, termasuk huruf Arab. Pilihan Anda di-save di perangkat ini.",
     "close": "Tutup"
   },
   "Kosakata": {
@@ -549,7 +549,7 @@
     "locked": "Terkunci",
     "passed": "Lulus",
     "open": "Terbuka",
-    "progress_note": "Progres tersimpan di browser ini saja. Di perangkat lain mulai dari awal, dan tes level bisa membukanya kembali.",
+    "progress_note": "Progres di-save di browser ini saja. Di perangkat lain mulai dari awal, dan tes level bisa membukanya kembali.",
     "counts_note": "Kami hanya menghitung angka: berapa browser membuka tiap bagian, berapa kunjungan yang datang dari situs utama Dakwah-Lens, dan berapa kali tiap tes dicoba dan lulus, tanpa nama, akun, atau alamat IP.",
     "reset": "Hapus progres",
     "reset_sure": "Klik sekali lagi untuk menghapus",

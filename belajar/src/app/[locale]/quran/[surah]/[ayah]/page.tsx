@@ -112,7 +112,7 @@ function Deeper({ title, children }: { title: string; children: ReactNode }) {
  * ONE collapsed row, "Materi lengkap ayat ini": word by word, the
  * standalone practice, "learn more" (structure, concepts, tafsir, facts),
  * content unchanged, and last two links to the main site → the ayah
- * navigation, once, at the bottom → one "Bagikan" under it. The forest
+ * navigation, once, at the bottom → one "Share" under it. The forest
  * glow sits behind the page. Nothing gives positional instructions ("di
  * atas"); every citation (Rujukan) stays reachable inside the row.
  */
@@ -522,7 +522,7 @@ export default async function AyahPage({
           </nav>
         ) : null}
 
-        {/* 5. One "Bagikan", under the ayah navigation, outside the stage
+        {/* 5. One "Share", under the ayah navigation, outside the stage
             (operator, 2026-10-10: one focused stage; sharing comes after
             the lesson). Only for a lesson that may be shared: the one check,
             lib/share.ts lessonShareable. */}

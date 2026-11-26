@@ -790,8 +790,8 @@ jobs:
       # mark + Aa + Menu, no overlap, one row on the desktop, at most two on a
       # phone) and shot at the normal and largest size; the footer's rendered
       # "Bagian dari Dakwah-Lens" link (href checked on the element); the
-      # Bagikan fallback panel (WhatsApp link, Salin tautan → "Tautan
-      # disalin"); the end-of-surah card with its Tafsir Pekan Ini bridge; and
+      # Share fallback panel (WhatsApp link, Copy link → "Link sudah
+      # di-copy"); the end-of-surah card with its Tafsir Pekan Ini bridge; and
       # two share cards (hub, Al-Fatihah 1) saved as served. The fact cards' ayah
       # popup (operator 2026-10-12): a chip opens a modal dialog with the ayah as
       # content/ayat/locations.json has it, the address unchanged and no page

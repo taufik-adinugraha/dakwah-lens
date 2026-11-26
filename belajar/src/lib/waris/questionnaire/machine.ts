@@ -1291,7 +1291,7 @@ export function screenCount(answers: Answers): number {
   return walk(answers).steps.filter((x) => NODE[x.id].screen).length;
 }
 
-/** The answers in path order, for the review screen and "Cetak ringkasan jawaban Anda". */
+/** The answers in path order, for the review screen and "Print ringkasan jawaban Anda". */
 export function answerSummary(s: QState): { key: QKey; id: NodeId; instance: number; section: SectionId; value: AnswerValue }[] {
   return walk(s.answers).steps.map((x) => ({ key: x.key, id: x.id, instance: x.i, section: NODE[x.id].section, value: x.value }));
 }

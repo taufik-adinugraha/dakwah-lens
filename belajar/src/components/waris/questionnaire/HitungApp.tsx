@@ -50,7 +50,7 @@ import { clearDraft, dropFragment, readBoot, serverBoot, subscribeBoot, writeDra
  * are the only state, and the path, the screen, the family tree and the outcome are derived.
  *
  * Privacy (plan §9.4): no server call of any kind. The working answers live in memory and in
- * sessionStorage (autosaved from an effect, never the cursor); localStorage only after "Simpan di
+ * sessionStorage (autosaved from an effect, never the cursor); localStorage only after "Save di
  * perangkat ini". The killer option (A3 k6) never enters the reducer: a3Route() sends it to the
  * E-BUNUH page, held in this component's memory only, with no printout and nothing stored.
  *

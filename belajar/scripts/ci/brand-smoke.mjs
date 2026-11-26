@@ -152,10 +152,10 @@ function bridge(path, html, id, want) {
   if (!text(p)) fail(path, `bridge ${id} has no words`);
 }
 
-/** The "Bagikan" button with its WhatsApp fallback link, UTM-tagged, for `url`. */
+/** The "Share" button with its WhatsApp fallback link, UTM-tagged, for `url`. */
 function shareButton(path, html, url) {
   const main = region(html, "main");
-  if (!/data-share-toggle=""/.test(main)) return fail(path, "no Bagikan button (data-share-toggle) in <main>");
+  if (!/data-share-toggle=""/.test(main)) return fail(path, "no Share button (data-share-toggle) in <main>");
   const wa = tags(main, "a").find((a) => "data-share-whatsapp" in a)?.href ?? "";
   let sent = "";
   try {

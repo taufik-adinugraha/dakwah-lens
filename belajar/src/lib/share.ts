@@ -5,7 +5,7 @@ import { SURAH_SLUGS } from "./routes";
 /**
  * Sharing a Belajar page (operator, 2026-10-10: the module should bring people to
  * dakwah-lens.id): its canonical address, the share card (Open Graph / Twitter image) and the
- * UTM-tagged address the "Bagikan" button hands out. The pages stay noindex (lib/flags.ts); a
+ * UTM-tagged address the "Share" button hands out. The pages stay noindex (lib/flags.ts); a
  * share preview does not need indexing.
  */
 
@@ -49,7 +49,7 @@ export function lessonShareable(slug: string): boolean {
   return (SURAH_SLUGS as readonly string[]).includes(slug);
 }
 
-/** How a link left the page: the native share sheet or "Salin tautan" (share), or WhatsApp. */
+/** How a link left the page: the native share sheet or "Copy link" (share), or WhatsApp. */
 export type ShareMedium = "share" | "whatsapp";
 
 /** A shared address: the page address + utm_source=share&utm_medium=<medium>. */

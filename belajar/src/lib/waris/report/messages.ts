@@ -322,7 +322,7 @@ export const REPORT_MESSAGES = {
   "laporan.rujuk.ke_mana": "Silakan berkonsultasi ke Pengadilan Agama, KUA, atau ustadz yang memahami faraid.",
   "laporan.rujuk.tidak_tahu_ganda":
     "Lebih dari satu jawaban «Tidak tahu» dapat mengubah pembagian. Pastikan dulu jawaban-jawaban itu, atau silakan berkonsultasi.",
-  "laporan.rujuk.tanpa_cetak": "Halaman ini tidak menyediakan cetakan ringkasan jawaban.",
+  "laporan.rujuk.tanpa_cetak": "Halaman ini tidak menyediakan hasil print ringkasan jawaban.",
 
   // ── Ringkasan teks (WhatsApp) ────────────────────────────────────────────────────────────────
   "laporan.teks.judul": "{judul} ({subjudul})",
