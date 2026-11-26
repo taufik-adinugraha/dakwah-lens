@@ -22,7 +22,7 @@ const ROLE_NODE: Partial<Record<ExitHit["id"], "A3c" | "A3d" | "A3e">> = {
 
 /**
  * An exit page ("Konsultasikan", plan §5.4; ux.md §4.5): what the situation is, why the tool
- * stops, the rule with its dalil where we have one, next steps, then "Ubah jawaban", "Cetak
+ * stops, the rule with its dalil where we have one, next steps, then "Ubah jawaban", "Print
  * ringkasan jawaban Anda" and "Kembali ke pelajaran". A refusal shows no number at all (plan
  * M2.8). E-BUNUH has no print button and no answer printout, and nothing about the answer that
  * led here was stored (plan §9.4): the parent passes answers = null for it.

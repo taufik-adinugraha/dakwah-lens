@@ -25,7 +25,7 @@ export const Q_TEXT = {
   "umum.kembali": "Kembali",
   "umum.ubah": "Ubah",
   "umum.ubah_jawaban": "Ubah jawaban",
-  "umum.cetak_ringkasan": "Cetak ringkasan jawaban Anda",
+  "umum.cetak_ringkasan": "Print ringkasan jawaban Anda",
   "umum.kembali_pelajaran": "Kembali ke pelajaran",
   "umum.mengapa": "Kenapa kami tanyakan ini?",
   "umum.pertanyaan_baru": "Ada pertanyaan baru karena perubahan Anda.",

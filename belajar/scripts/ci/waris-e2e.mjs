@@ -346,7 +346,7 @@ async function measurePrint(page) {
   return { width, height, pageHeight: Math.round(pageHeight), estimate: Math.round((height / pageHeight) * 100) / 100, marginsMm: mm };
 }
 
-/** A real Chromium print (the same engine as "Simpan sebagai PDF"): page count. */
+/** A real Chromium print (the same engine as "Save sebagai PDF"): page count. */
 async function printPdf(page, name) {
   try {
     const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true });

@@ -54,7 +54,7 @@ export function ReviewList({ rows, onUbah }: { rows: readonly AnswerRow[]; onUba
 }
 
 /**
- * "Cetak ringkasan jawaban Anda" (plan §5.4 item 5): printed only, so someone can bring it to an
+ * "Print ringkasan jawaban Anda" (plan §5.4 item 5): printed only, so someone can bring it to an
  * ustadz, an ahli faraid or the Pengadilan Agama. Answers only, never a number. Not rendered at
  * all on E-BUNUH (the parent passes no rows there).
  */

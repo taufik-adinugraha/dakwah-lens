@@ -184,7 +184,7 @@
   accent-color: var(--wr-forest);
 }
 
-/* ── Print and "Simpan sebagai PDF" (plan §6; ux.md §5.3) ─────────────────────────────────── */
+/* ── Print and "Save sebagai PDF" (plan §6; ux.md §5.3) ───────────────────────────────────── */
 @media print {
   @page {
     size: A4 portrait;

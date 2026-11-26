@@ -14,11 +14,11 @@ import { clearAnswers } from "./source";
 
 /**
  * The report's controls (plan §6 "Print and PDF", D9). None of them prints (data-print="hide").
- *  - "Cetak / Simpan sebagai PDF" (56px, the one primary action) calls window.print(); the browser's
+ *  - "Print / Save sebagai PDF" (56px, the one primary action) calls window.print(); the browser's
  *    "Save as PDF" covers the PDF, there is no server PDF engine.
- *  - "Salin tautan laporan": the answers in the URL fragment only (never a query string), rupiah
+ *  - "Copy link laporan": the answers in the URL fragment only (never a query string), rupiah
  *    only when "Sertakan nilai rupiah" is ticked, with a plain warning about who can read a link.
- *  - "Salin ringkasan teks": plain text for WhatsApp with the disclaimer line, the same rupiah rule.
+ *  - "Copy ringkasan teks": plain text for WhatsApp with the disclaimer line, the same rupiah rule.
  *  - "Hapus jawaban dari perangkat ini", confirmed on the page (no browser dialog). Opening the
  *    confirmation moves focus to its safe button ("Batal"); "Batal" returns focus to "Hapus", so
  *    keyboard and screen-reader users keep their place.

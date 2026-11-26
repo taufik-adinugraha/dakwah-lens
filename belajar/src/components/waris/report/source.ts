@@ -5,7 +5,7 @@
  *  1. the URL fragment "#j=v1.<token>" (a shared link; may carry rupiah when the sender ticked it);
  *  2. memory: handOffToReport(), for a questionnaire that navigates here client-side;
  *  3. sessionStorage "belajar:v1:waris:draft" (the questionnaire's autosave; gone with the tab);
- *  4. localStorage "belajar:v1:waris:saved" (only after "Simpan di perangkat ini").
+ *  4. localStorage "belajar:v1:waris:saved" (only after "Save di perangkat ini").
  *
  * Storage holds the answers object, or a QState ({ v, answers, at }); either is accepted, and the
  * reducer's "muat" action drops unknown keys and invalid values. Rupiah amounts are never read

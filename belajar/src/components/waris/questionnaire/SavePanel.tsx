@@ -13,7 +13,7 @@ type Notice = "gagal" | "terhapus" | null;
 
 /**
  * "Jawaban Anda" (plan §9.4): the working copy lives in this tab only; localStorage is written
- * only when the learner taps "Simpan di perangkat ini", with a visible "Hapus jawaban dari
+ * only when the learner taps "Save di perangkat ini", with a visible "Hapus jawaban dari
  * perangkat ini". "Mulai dari awal" asks first, inside the page (the viewer has no confirm()):
  * opening the question moves focus to its safe button ("Batal"), and "Batal" returns it to
  * "Mulai dari awal", so keyboard and screen-reader users keep their place.
