@@ -423,7 +423,10 @@
     "kitab_count_embedded": "{count} entries embedded",
     "kitab_count_not_yet": "Not yet embedded",
     "library_search_hint": "Run a semantic search above —",
-    "library_search_cta": "open search"
+    "library_search_cta": "open search",
+    "doa_card_title": "Du'a Library",
+    "doa_card_body": "{count} everyday du'a from the hadith books, grouped by need: forgiveness, protection, provision and more. Each comes with Arabic, transliteration, translation and its source. The pages are in Indonesian.",
+    "doa_card_cta": "Open Du'a Library"
   },
   "Donate": {
     "badge": "Support our journey",
