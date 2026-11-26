@@ -385,8 +385,6 @@ export async function getTopEngagedPosts(
  * empty state without inventing numbers.
  * ────────────────────────────────────────────────────────────────── */
 export type OverviewInsights = {
-  totalPosts: number;
-  classifiedPosts: number;
   sentimentMix: { positive: number; neutral: number; negative: number };
   /** Post count per THEME_GROUP for the last 7 days. Always emits all
    *  14 groups + Lainnya (zero-count groups render as a 0-width bar)
@@ -1470,22 +1468,19 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
   // which made the briefing pill say "22.4% concerned" while the bar
   // beneath it read "22.8% concerned" — same population, different
   // windows, no labels. Aligning everything to 7d removes that confusion.
-  // `totalPosts` stays lifetime as a "scale-of-corpus" badge — it's
-  // clearly labeled below the category panel and represents total ingest.
+  //
+  // The lifetime `totalPosts` and `classifiedPosts` counts were removed on
+  // 2026-11-26: nothing displayed them any more, and each one read the whole
+  // table (552k rows, 2.1 s and 3.4 s, one after the other) on every /radar
+  // visit. Only "is there any data at all?" is still needed, and one row
+  // answers that.
   const sevenDaysAgo = sql`now() - interval '7 days'`;
 
-  const [{ totalPosts = 0 } = { totalPosts: 0 }] = (await db
-    .select({ totalPosts: count() })
-    .from(schema.socialPosts)) as Array<{ totalPosts: number }>;
-
-  if (totalPosts === 0) return null;
-
-  const [{ classifiedPosts = 0 } = { classifiedPosts: 0 }] = (await db
-    .select({ classifiedPosts: count() })
+  const anyPost = await db
+    .select({ id: schema.socialPosts.id })
     .from(schema.socialPosts)
-    .where(isNotNull(schema.socialPosts.sentimentLabel))) as Array<{
-    classifiedPosts: number;
-  }>;
+    .limit(1);
+  if (anyPost.length === 0) return null;
 
   // Sentiment mix — 7-day window only (was lifetime).
   const sentimentRows = (await db
@@ -1643,8 +1638,6 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
   ];
 
   return {
-    totalPosts,
-    classifiedPosts,
     sentimentMix,
     dominantGroups,
     trendingTopics: trendingTopics.map((t) => ({

@@ -2,13 +2,11 @@ import { ForestWash } from "@/components/ForestWash";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-// Revalidate every 5 minutes. The page queries social_posts aggregates
-// that update on the ingest schedule (RSS every 2h, X+TT+IG weekly).
-// A 5-min cache means the heavy multi-query render hits the DB at most
-// once per 5min per locale — huge p95 improvement for anonymous visitors
-// who would otherwise pay the full Promise.all every page view. We were
-// `force-dynamic` until 2026-05-26 when an audit showed no auth() call
-// in the request path, so per-user caching keys don't apply here.
+// `revalidate` alone never cached this page: the locale layout reads the
+// session cookie (PendingApprovalBanner → auth()), which renders every page
+// per request. The figures are kept in lib/radar-data.ts instead (15 min,
+// rebuilt behind a visit, loaded at boot). Measured 2026-11-26: 5-10 s per
+// visit before. The export stays for the day the layout stops being dynamic.
 export const revalidate = 300;
 import {
   ArrowRight,
@@ -23,17 +21,8 @@ import { Link } from "@/i18n/navigation";
 import { CoverageBreakdown } from "@/components/CoverageBreakdown";
 import { I18nText } from "@/components/I18nText";
 import { TrendingTopicsList } from "@/components/TrendingTopicsList";
-import { getOverviewInsights } from "@/lib/briefing-data";
-import {
-  getPlatformDistribution7d,
-  getSentimentByPlatform7d,
-  getSentimentDistribution7d,
-  getTopIssues,
-  getTopicDistribution7d,
-  getTopicsByPlatform7d,
-  LAINNYA_GROUP,
-  slugifyGroup,
-} from "@/lib/dashboard-metrics";
+import { LAINNYA_GROUP, slugifyGroup } from "@/lib/dashboard-metrics";
+import { getRadarOverview } from "@/lib/radar-data";
 
 /**
  * Data-exploration hub. Surfaces what used to live BELOW the briefing
@@ -69,7 +58,7 @@ export default async function InsightsExplorePage({
 
   const t = await getTranslations("Briefing");
 
-  const [
+  const {
     overview,
     topIssues,
     platformDist,
@@ -77,18 +66,7 @@ export default async function InsightsExplorePage({
     sentimentByPlatform,
     topicDist,
     topicsByPlatform,
-  ] = await Promise.all([
-    getOverviewInsights(),
-    // High cap, not "no limit" — the SQL HAVING count >= 2 already
-    // does the real curation; this just protects against a pathological
-    // ingest spike spamming the page.
-    getTopIssues(100),
-    getPlatformDistribution7d(),
-    getSentimentDistribution7d(),
-    getSentimentByPlatform7d(),
-    getTopicDistribution7d(10),
-    getTopicsByPlatform7d(5),
-  ]);
+  } = await getRadarOverview();
 
   const trendingRows = topIssues;
 

@@ -27,19 +27,19 @@ import {
 import { routing } from "@/i18n/routing";
 import { isPausedPlatform } from "@/lib/ingest-status";
 import {
-  getPlatformInsights,
-  getTopEngagedPosts,
   type InsightsFilters,
   type PlatformInsights,
   type ScopeFilter,
   type TopEngagedPost,
 } from "@/lib/briefing-data";
 import {
-  getRisingVideos,
-  getThemeGroupReachDelta,
   type RisingVideo,
   type ThemeGroupReach,
 } from "@/lib/dashboard-metrics";
+import {
+  getCachedPlatformExtras,
+  getCachedPlatformInsights,
+} from "@/lib/radar-data";
 
 export function generateStaticParams() {
   // Pre-render every (locale, platform) combination.
@@ -121,28 +121,16 @@ export default async function PlatformDrilldownPage({
   //     complement each other.
   //   - X / Instagram: top-engaged posts only (no time series).
   //   - Mainstream / TT / FB: skip — no useful engagement signal.
-  const isYouTube = platform === "youtube";
-  const hasEngagement =
-    platform === "x" || platform === "instagram" || platform === "youtube";
-  // Bucket-reach widget is meaningful on every platform that has either
-  // engagement (YT/X/IG, sums views) or a per-article count (mainstream,
-  // sums articles). Skip on TikTok (disabled) and Facebook (no data).
-  const showBucketReach =
-    platform === "youtube" ||
-    platform === "x" ||
-    platform === "instagram" ||
-    platform === "mainstream";
-  const [live, session, risingVideos, topEngaged, themeGroupReach] =
+  //
+  // Which panels each platform gets is decided in lib/radar-data.ts, and the
+  // figures are kept there (15 min, rebuilt behind a visit, loaded at boot):
+  // they are all-time totals, ~16 s of queries on YouTube (2026-11-26). The
+  // session is per visitor and is read here, never cached.
+  const [live, session, { risingVideos, topEngaged, themeGroupReach }] =
     await Promise.all([
-      getPlatformInsights(platform, filters),
+      getCachedPlatformInsights(platform, filters),
       auth(),
-      isYouTube ? getRisingVideos(10) : Promise.resolve([] as RisingVideo[]),
-      hasEngagement
-        ? getTopEngagedPosts(platform, 10)
-        : Promise.resolve([] as TopEngagedPost[]),
-      showBucketReach
-        ? getThemeGroupReachDelta(platform)
-        : Promise.resolve([] as ThemeGroupReach[]),
+      getCachedPlatformExtras(platform),
     ]);
 
   // Use real da'wah-category clusters when we have a meaningful number of
