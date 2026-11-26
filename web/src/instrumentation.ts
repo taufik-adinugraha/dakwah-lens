@@ -2,7 +2,7 @@
  * Next.js instrumentation hook — runs once per worker process at boot,
  * before the server starts accepting requests.
  *
- * We use it for two things, both warm-ups that move a first-request cost
+ * We use it for three things, all warm-ups that move a first-request cost
  * off the user's path:
  *
  * 1. Eager Chromium warmup. Without this, the first user to hit a flyer
@@ -47,6 +47,11 @@ export async function register() {
   // here may be awaited past the import, and a failed import or a database
   // that is not up yet must never stop the server from starting. The first
   // visitor then loads the figures instead, as before this existed.
+  //
+  // 3. The /radar pages' figures (lib/radar-data.ts, ~5 s for /radar and up to
+  //    ~16 s per platform page uncached). They start only after the landing
+  //    figures are done, and radar-data loads one page at a time, so the boot
+  //    never runs heavy reads side by side on the 2 GB VM.
   try {
     const { warmLanding } = await import("./lib/landing-data");
     const started = Date.now();
@@ -58,6 +63,22 @@ export async function register() {
         const msg = err instanceof Error ? err.message : String(err);
         console.warn(
           `[landing] warm-up failed (the first visit will load the figures): ${msg}`,
+        );
+      })
+      .then(() => {
+        // Imported here, not above: a radar module that fails to load must
+        // not cost the landing page its warm-up.
+        const radarStarted = Date.now();
+        return import("./lib/radar-data")
+          .then(({ warmRadar }) => warmRadar())
+          .then(() => {
+            console.info(`[radar] figures warmed in ${Date.now() - radarStarted} ms`);
+          });
+      })
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn(
+          `[radar] warm-up failed (the first visit will load the figures): ${msg}`,
         );
       });
   } catch (err) {
