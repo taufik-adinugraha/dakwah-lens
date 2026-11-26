@@ -16,26 +16,26 @@ See `Dakwah-Lens_PRD_v0.4.pdf` for the full product spec.
                            │ REST
 ┌──────────────────────────┴──────────────────────────────────┐
 │  api/   FastAPI + Celery workers                            │
-│   ├─ ingestion   (RSS + YouTube + Apify actors)             │
-│   ├─ ml          (Gemini Flash-Lite for sentiment +         │
-│   │              da'wah classifier + topic discovery)       │
+│   ├─ ingestion   (RSS + YouTube; Apify actors paused)       │
+│   ├─ ml          (Claude Sonnet 5.5 batch: sentiment,       │
+│   │              theme, da'wah score; weekly topics)        │
 │   ├─ rag         (OpenAI embeddings → Qdrant retrieval)     │
-│   └─ briefs      (Gemini 2.5 Pro primary,                   │
-│                   Claude Sonnet 4.6 fallback)               │
+│   └─ briefs      (weekly: composed manually with Claude;    │
+│                   on-demand kajian: Gemini 2.5 Pro)         │
 └──────────┬──────────────┬───────────────┬───────────────────┘
            │              │               │
         Postgres       Qdrant          Redis
         (data)         (vectors)       (queue)
 ```
 
-## Locked decisions (current as of 2026-05-22)
+## Locked decisions (current as of 2026-11-26; AGENTS.md is the full list)
 
 - Languages: Indonesian (primary) + English via next-intl
 - Embedding model: OpenAI `text-embedding-3-large`
 - VPS: IDCloudHost (Indonesia residency per UU PDP §27/2022)
 - Kitab corpus (20 works; live list on `/how-it-works`): **Qur'an & tafsir** — Al-Qur'an (AR + ID Kemenag + EN Sahih International), Tafsir Ibn Katsir (AR + EN), Tafsir Ath-Thabari (AR — verse-keyed for the Tafsir Pekan Ini track, *not* in `/kitab` free-text search); **hadith** — Sahih al-Bukhari, Sahih Muslim, Riyad as-Salihin, Bulugh al-Maram; **sirah & sahabat** — Sirah Ibn Hisham, Ash-Shama'il al-Muhammadiyyah, Hayat as-Sahabah, Al-Bidayah wan-Nihayah; **fiqh** — Al-Umm, Fiqh as-Sunnah, Fath al-Mu'in, Fath al-Qarib; **aqidah & adab** — Bidayatul Hidayah, Nashaihul Ibad, Adab al-'Alim wa al-Muta'allim, 'Aqidat al-'Awam, Thalathat al-Ushul
 - Multi-tenant: `organizations` + `org_members` (owner/admin/member), app-level scoping
-- Tiered LLM: Gemini Flash-Lite for classify/topic/rerank → Gemini 2.5 Pro for brief synthesis → Claude Sonnet 4.6 only as a Pro fallback
+- LLMs: Claude Sonnet 5.5 (Message Batches) labels sentiment, theme and da'wah score nightly and clusters topics weekly; Gemini Flash-Lite for rerank, query expansion, comment moderation and trending keywords, with rule and cosine fallbacks (Gemini prepaid credit ran out around 2026-07-27, so the fallbacks run today); Gemini 2.5 Pro for on-demand kajian, with Claude Sonnet 4.5 as fallback when `ANTHROPIC_API_KEY` is set; weekly briefings are composed manually with Claude
 
 ## Local development
 
