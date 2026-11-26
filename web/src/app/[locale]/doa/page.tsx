@@ -64,6 +64,14 @@ export default async function DoaIndexPage({ params }: Props) {
             </li>
           ))}
         </ul>
+
+        <p className="mt-12 border-t border-ink/10 pt-6 text-sm leading-relaxed text-ink/70">
+          Mencari dalil lain, tafsir, atau penjelasan fiqh?{" "}
+          <Link href="/kitab" className="font-semibold text-forest underline">
+            Telusuri Pustaka Kitab
+          </Link>
+          , tempat setiap kutipan bisa ditelusuri sampai ke sumber aslinya.
+        </p>
       </section>
     </div>
   );

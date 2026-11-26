@@ -423,7 +423,10 @@
     "kitab_count_embedded": "{count} entri sudah di-embed",
     "kitab_count_not_yet": "Belum di-embed",
     "library_search_hint": "Jalankan pencarian semantik di atas —",
-    "library_search_cta": "buka pencarian"
+    "library_search_cta": "buka pencarian",
+    "doa_card_title": "Pustaka Doa",
+    "doa_card_body": "{count} doa harian dari kitab hadits, dikelompokkan menurut kebutuhan: ampunan, perlindungan, rezeki, dan lainnya. Lengkap dengan Arab, bacaan latin, terjemahan, dan rujukannya.",
+    "doa_card_cta": "Buka Pustaka Doa"
   },
   "Donate": {
     "badge": "Dukung perjalanan kami",

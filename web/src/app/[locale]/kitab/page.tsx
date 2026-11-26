@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { BookOpen, ShieldCheck } from "lucide-react";
+import { BookOpen, HandHeart, ShieldCheck } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { ForestWash } from "@/components/ForestWash";
@@ -20,6 +20,7 @@ import { KitabCorpusSelector } from "./KitabCorpusSelector";
 import { KitabTranslationBody } from "./KitabTranslationBody";
 import { KitabSearchInput } from "@/components/KitabSearchInput";
 import { localeAlternates } from "@/lib/seo";
+import { DUAS } from "@/lib/doa";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -382,6 +383,7 @@ export default async function KitabPage({
   return (
     <div className="bg-paper font-body text-ink">
       <Hero t={t} />
+      <DoaCard t={t} count={DUAS.length} />
       <SearchForm
         t={t}
         query={query}
@@ -434,6 +436,36 @@ function Hero({ t }: { t: T }) {
         <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-[1.7] text-ink-muted sm:text-lg">
           {t("body")}
         </p>
+      </div>
+    </section>
+  );
+}
+
+/* A pointer to Pustaka Doa (/doa): it is in the footer and the mobile menu but not in the
+ * desktop header, so this is where a desktop visitor looking for sourced texts finds it. */
+function DoaCard({ t, count }: { t: T; count: number }) {
+  return (
+    <section className="pb-6">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <div className="flex flex-col gap-4 rounded-2xl border border-hairline bg-white p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="flex items-start gap-4">
+            <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-forest/10 text-forest">
+              <HandHeart className="h-5 w-5" aria-hidden />
+            </span>
+            <div>
+              <h2 className="font-display text-lg font-medium text-ink">{t("doa_card_title")}</h2>
+              <p className="mt-1 max-w-xl text-sm leading-relaxed text-ink-muted">
+                {t("doa_card_body", { count })}
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/doa"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-forest/40 px-5 py-2 text-sm font-semibold text-forest transition hover:bg-forest hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+          >
+            {t("doa_card_cta")}
+          </Link>
+        </div>
       </div>
     </section>
   );
