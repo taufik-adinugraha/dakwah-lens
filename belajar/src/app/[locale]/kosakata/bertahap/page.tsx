@@ -6,14 +6,27 @@ import { ForestGlow } from "@/components/ForestGlow";
 import { KosakataTabs } from "@/components/kosakata/KosakataTabs";
 import { PathMap } from "@/components/kosakata/PathMap";
 import { MixedText } from "@/components/library/MixedText";
+import { kosakataPathListed } from "@/lib/features";
 import { kosakataIndex, kosakataPath } from "@/lib/kosakata";
 import { pathSource } from "@/lib/kosakata-path";
 import { mapLevels } from "@/lib/kosakata-path-data";
+import { kosakataPathHref } from "@/lib/routes";
+import { NOINDEX } from "@/lib/seo";
+import { alternatesFor } from "@/lib/share";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata/bertahap">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "KosakataPath" });
-  return { title: t("title") };
+  return {
+    title: t("title"),
+    description: t("intro"),
+    alternates: alternatesFor(locale, kosakataPathHref()),
+    // While the path is not listed (BELAJAR_KOSAKATA_BERTAHAP) it answers at its address but is linked
+    // from nowhere, so it stays out of the index like any other page the operator has not shown yet
+    // (lib/indexing.ts; the proxy says the same in a header). The key is left out, not set to undefined:
+    // Next would read an undefined `robots` as "none" and drop the locale layout's noindex for English.
+    ...(kosakataPathListed() ? {} : { robots: NOINDEX }),
+  };
 }
 
 /**

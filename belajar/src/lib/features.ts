@@ -50,9 +50,25 @@ export function kosakataEnglishOn(): boolean {
  * docs/belajar-plan.md L38). The pages answer at /kosakata/bertahap either way, so the operator can try
  * them on the live site. `=on` adds the tabs on the list, sends bare /kosakata to the path (src/proxy.ts)
  * and points the hub's card there, with its own text, with no rebuild, the same way as BELAJAR_WARIS above.
+ * Search engines follow it (lib/indexing.ts): while it is off the path is reachable but unlisted, so its
+ * overview page is `noindex` and out of the sitemap; its batch cards and tests never are indexed.
  */
 export function kosakataPathListed(): boolean {
   return process.env.BELAJAR_KOSAKATA_BERTAHAP === "on";
+}
+
+/**
+ * BELAJAR_KOSAKATA_WORDS_INDEXED — whether the vocabulary's 4,832 word pages (/kosakata/kata/{rank})
+ * may be indexed by search engines (docs/belajar-plan.md L42). Off by default: the pages are open
+ * to anyone, and linked from the list, but carry `noindex, follow` and are not in the sitemap. The
+ * list's own pages (a hundred words each, with their meanings) are what the index gets first;
+ * thousands of short word pages, each a few hundred characters of AI-assisted meanings, are a
+ * bigger step and the operator's call to take once the list's pages have been seen to do well in
+ * Search Console. `=on` takes it, with no rebuild, the same way as BELAJAR_WARIS above: the word
+ * pages' robots tag, the header (src/proxy.ts) and the sitemap all read it per request.
+ */
+export function kosakataWordsIndexed(): boolean {
+  return process.env.BELAJAR_KOSAKATA_WORDS_INDEXED === "on";
 }
 
 /**
@@ -110,6 +126,9 @@ export function surahPublished(slug: string): boolean {
  *     /belajar/api/surahs (the end of the surah before it) does not send anyone there.
  * Showing it for real later is one line: add the slug to BELAJAR_SURAHS (it needs no change here).
  * Read per request, like BELAJAR_SURAHS.
+ * While the module is public (lib/flags.ts) an unlisted lesson must still stay out of search engines:
+ * src/proxy.ts answers its pages with `X-Robots-Tag: noindex` (lib/indexing.ts) and the sitemap does not
+ * list them. Both read publishedSurahs() per request, so publishing the surah makes it indexable at once.
  */
 export const DEFAULT_UNLISTED: readonly string[] = ["al-ikhlas"];
 

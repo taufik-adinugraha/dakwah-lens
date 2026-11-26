@@ -93,7 +93,7 @@ export const KosakataRow = z.object({
 export type KosakataRow = z.infer<typeof KosakataRow>;
 
 export const KosakataIndex = z.object({
-  /** Pipeline state: there is no review step (plan L11). A public build refuses "draft". */
+  /** Pipeline state: there is no review step (plan L11), so this is always "draft" and does not keep the list from being public. */
   status: z.literal("draft"),
   data_versions: z.record(z.string(), z.string()),
   total_tokens: z.number().int().positive(),

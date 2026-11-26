@@ -8,11 +8,13 @@ import { kosakataIndex, kosakataPath } from "@/lib/kosakata";
 import { pathSource } from "@/lib/kosakata-path";
 import { batchOrder } from "@/lib/kosakata-path-core";
 import { batchOf, levelOf, mapLevels, testData } from "@/lib/kosakata-path-data";
+import { NOINDEX } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata/bertahap/[level]/[batch]/tes">): Promise<Metadata> {
   const { locale, level, batch } = await params;
   const t = await getTranslations({ locale, namespace: "KosakataPath" });
-  return { title: t("test_title_batch", { level, batch }) };
+  // A quiz: out of the index (lib/indexing.ts).
+  return { title: t("test_title_batch", { level, batch }), robots: NOINDEX };
 }
 
 /** One batch's test: the new words, and some earlier ones. */

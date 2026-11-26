@@ -15,6 +15,8 @@ import { SURAH_INDEX, WORD_AR, WORD_INFO } from "@/lib/content";
 import { visibleSurahs } from "@/lib/features";
 import { getBasic, getConcept, LIBRARY, TERMS } from "@/lib/library";
 import { conceptHref, conceptIndexHref } from "@/lib/routes";
+import { shorten } from "@/lib/seo";
+import { alternatesFor } from "@/lib/share";
 import { annotate, prepareSigns, Scope, titleParts } from "@/lib/terms";
 
 export const dynamicParams = false;
@@ -26,9 +28,16 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/konsep/[id]">): Promise<Metadata> {
-  const { id } = await params;
-  // The plain title (no markup, no Arabic) names the browser tab.
-  return { title: getBasic(id)?.title ?? getConcept(id)?.title ?? "—" };
+  const { locale, id } = await params;
+  const record = getBasic(id) ?? getConcept(id);
+  if (!record) return { title: "—" };
+  // The plain title (no markup, no Arabic) names the browser tab, and the plain summary is the page's
+  // own description: both differ from one concept to the next.
+  return {
+    title: record.title,
+    description: shorten(record.summary),
+    alternates: alternatesFor(locale, conceptHref(id)),
+  };
 }
 
 /**

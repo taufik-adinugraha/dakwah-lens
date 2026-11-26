@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import { SurahContent } from "@/content/schema";
 
-import { getAyah, getSurah, hasDrafts, SURAHS } from "./content";
+import { getAyah, getSurah, SURAHS } from "./content";
+import { PIPELINE_STATE, statusValues } from "./publishable";
 
 const fatihah = getSurah("al-fatihah")!;
 
@@ -29,8 +30,8 @@ describe("Al-Fatihah content (build-time invariants)", () => {
     for (const a of fatihah.ayat) expect(a.translation.source_label).not.toMatch(/2019/);
   });
 
-  it("is still a draft (pipeline state; no human review, plan L11) and getAyah resolves", () => {
-    expect(hasDrafts(fatihah)).toBe(true);
+  it("says only what the pipeline says of itself (status draft: no human review, plan L11) and getAyah resolves", () => {
+    expect([...statusValues(fatihah)]).toEqual([PIPELINE_STATE]);
     expect(getAyah(fatihah, 5)?.loc).toBe("1:5");
   });
 });
@@ -109,8 +110,8 @@ describe.each(EXPECTED)("$name content (build-time invariants)", ({ slug, surah,
     }
   });
 
-  it("is still a draft (pipeline state; no human review, plan L11) and getAyah resolves", () => {
-    expect(hasDrafts(s)).toBe(true);
+  it("says only what the pipeline says of itself (status draft: no human review, plan L11) and getAyah resolves", () => {
+    expect([...statusValues(s)]).toEqual([PIPELINE_STATE]);
     for (const a of s.ayat) {
       expect(a.status).toBe("draft");
       for (const w of a.words) expect(w.status).toBe("draft");

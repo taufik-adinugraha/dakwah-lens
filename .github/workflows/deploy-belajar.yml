@@ -411,6 +411,11 @@ jobs:
         with:
           node-version: "22"
 
+      # No build argument for BELAJAR_PUBLIC here, on purpose: the module is PUBLIC (indexable) by the
+      # Dockerfile's own default (operator 2026-11-26, plan L42), and this one image is what every job
+      # below smoke-tests and screenshots and what `ship` deploys, so the configuration that is tested is
+      # the configuration that runs. A unit test (src/lib/flags.test.ts) fails if one appears here, and
+      # seo-smoke.mjs fails if the image answers noindex where it must not.
       - name: Build image
         id: build
         run: |
@@ -675,7 +680,9 @@ jobs:
           # apple-touch icon under /belajar (same bytes), the footer's "Bagian dari Dakwah-Lens"
           # link to the main home (matched inside <footer>, never in the messages payload), the
           # bridges' UTM-tagged main-site addresses, og:/twitter: tags on the hub, the track and
-          # every lesson (og:url = canonical, still noindex), and every share card: 200
+          # every lesson (og:url = canonical; sharing changes nothing about indexing: an Indonesian page
+          # has no noindex, an English one has it; seo-smoke.mjs below is the indexing check), and every
+          # share card: 200
           # image/png 1200×630 (hub, track, each lesson in id + en); unknown lessons' cards 404,
           # the hidden waris 404 carries no card. Lists every problem; fails after the restart check.
           brand_rc=0
@@ -704,6 +711,18 @@ jobs:
           # link. Lists every problem, then fails the step after the restart check below.
           surahs_rc=0
           node belajar/scripts/ci/surahs-smoke.mjs --hidden || surahs_rc=$?
+          # What Google may see (operator 2026-11-26: "publish belajar so google can see"; plan L42),
+          # on this container, which starts as the image's own defaults have it (public; Al-Fatihah
+          # published, Al-Ikhlas unlisted, the learning path not listed, the word pages not taken):
+          # /belajar/sitemap.xml lists exactly the pages that may be indexed (read from the data, not from
+          # the app) and none of what is hidden; every listed URL answers 200 with no noindex (tag or
+          # header), its own canonical, a title and description of its own, no hreflang, the AI label and
+          # no promise of a review; the English pages, Ilmu Waris, the unlisted Al-Ikhlas, the list's
+          # search and variants, the learning path's cards and tests, the word pages, the share cards and
+          # the JSON endpoints all say noindex and are not listed. The same script runs on the shots job's
+          # container (production's own switches), the every-surah container and the waris container.
+          seo_rc=0
+          node belajar/scripts/ci/seo-smoke.mjs || seo_rc=$?
           # The Kosakata count route swallows a database error on purpose (a count is not worth an
           # error), so its 204 proves nothing about the row. The smoke above posted test 1-3 twice,
           # once passed and once failed, so the second went through the upsert's conflict path.
@@ -723,6 +742,7 @@ jobs:
           [[ "$brand_rc" -eq 0 ]] || { echo "✗ brand / bridge / share-card checks failed (listed above)"; exit 1; }
           [[ "$waris_rc" -eq 0 ]] || { echo "✗ Ilmu Waris is not hidden (listed above)"; exit 1; }
           [[ "$surahs_rc" -eq 0 ]] || { echo "✗ the unpublished surahs are not hidden (listed above)"; exit 1; }
+          [[ "$seo_rc" -eq 0 ]] || { echo "✗ search-engine checks failed: the sitemap, a noindex or what must stay out (listed above)"; exit 1; }
 
       # Once built and smoke-tested, the image is handed to the browser jobs and the release.
       - name: Save the image
@@ -811,13 +831,21 @@ jobs:
             curl -fsS http://127.0.0.1:3300/belajar/api/health >/dev/null 2>&1 && break
             sleep 2
           done
+          # This container is production's own switches (the learning path listed): what Google may see,
+          # there (scripts/ci/seo-smoke.mjs --bertahap; the image smoke step runs it on the defaults).
+          # Run before the browser, from the checkout, which is where the script reads the data from.
+          seo_rc=0
+          node belajar/scripts/ci/seo-smoke.mjs --bertahap || seo_rc=$?
           mkdir -p /tmp/shots-run && cp belajar/scripts/ci/screenshots.mjs belajar/scripts/ci/narration-route.mjs /tmp/shots-run/
           cd /tmp/shots-run
           npm init -y >/dev/null
           npm install --no-audit --no-fund --silent playwright@1.49.1
           npx playwright install --with-deps chromium >/dev/null
-          BELAJAR_DIR="$GITHUB_WORKSPACE/belajar" node screenshots.mjs
+          shots_rc=0
+          BELAJAR_DIR="$GITHUB_WORKSPACE/belajar" node screenshots.mjs || shots_rc=$?
           docker rm -f shots >/dev/null
+          [[ "$seo_rc" -eq 0 ]] || { echo "✗ search-engine checks on the production-like container failed (listed above)"; exit 1; }
+          [[ "$shots_rc" -eq 0 ]] || { echo "✗ screenshots failed (above)"; exit 1; }
 
 
       - name: Upload screenshots
@@ -975,8 +1003,13 @@ jobs:
       #         where the pages a learner reaches by links include every Mu'awwidzat surah and ayah
       #         page and the concept and word pages link into them (the end of Al-Fatihah offers
       #         "Surah berikutnya: Al-Ikhlas"); its results in shots/linebreaks-semua-surah.json and
-      #         lb-semua-surah-*.png.
-      # Each lists its problems; the step fails after all three have run.
+      #         lb-semua-surah-*.png;
+      #   search engines (seo-smoke.mjs --surahs --words): a surah the operator publishes is indexable
+      #         with no rebuild: the sitemap lists every ayah page of all four surahs and each answers 200
+      #         with no noindex, its own canonical and a description of its own; the container also takes
+      #         the word pages (BELAJAR_KOSAKATA_WORDS_INDEXED=on), so the sitemap lists all 4,832 and a
+      #         sample of them is fetched. (The hidden state of the same pages is the image smoke step's.)
+      # Each lists its problems; the step fails after all four have run.
       - name: Al-Mu'awwidzat with every surah listed (smoke, screenshots, line breaks)
         run: |
           set -euo pipefail
@@ -984,6 +1017,7 @@ jobs:
           trap 'docker rm -f surahs >/dev/null 2>&1 || true' EXIT
           docker run -d --name surahs --network host -e PORT=3300 \
             -e BELAJAR_SURAHS=al-fatihah,al-ikhlas,al-falaq,an-nas \
+            -e BELAJAR_KOSAKATA_WORDS_INDEXED=on \
             -e DATABASE_URL=postgres://smoke:smoke@127.0.0.1:5432/smoke \
             dakwah-belajar-web:latest
           ok=""
@@ -994,6 +1028,8 @@ jobs:
           [[ -n "$ok" ]] || { docker logs surahs 2>&1 | tail -20; echo "✗ container never became healthy"; exit 1; }
           smoke_rc=0
           node belajar/scripts/ci/surahs-smoke.mjs || smoke_rc=$?
+          seo_rc=0
+          node belajar/scripts/ci/seo-smoke.mjs --surahs --words || seo_rc=$?
           mkdir -p /tmp/shots-run
           cp belajar/scripts/ci/screenshots.mjs belajar/scripts/ci/narration-route.mjs \
              belajar/scripts/ci/linebreaks.mjs belajar/scripts/ci/linebreaks-measure.mjs \
@@ -1012,6 +1048,7 @@ jobs:
           docker rm -f surahs >/dev/null
           rc=0
           [[ "$smoke_rc" -eq 0 ]] || { echo "✗ Mu'awwidzat smoke checks failed (listed above)"; rc=1; }
+          [[ "$seo_rc" -eq 0 ]] || { echo "✗ search-engine checks with every surah published (and the word pages taken) failed (listed above)"; rc=1; }
           [[ "$shots_rc" -eq 0 ]] || { echo "✗ Mu'awwidzat screenshots failed (above)"; rc=1; }
           [[ "$lb_rc" -eq 0 ]] || { echo "✗ line breaks with every surah listed failed (listed above)"; rc=1; }
           exit "$rc"
@@ -1067,9 +1104,13 @@ jobs:
       # (BELAJAR_WARIS=on): the track is hidden on the live site (operator, 2026-10-10;
       # src/lib/features.ts) but stays built and tested, so showing it again is an env change.
       #   smoke (docs/waris-plan.md §10 M2.7, M2.13): every waris route (track, hitung, laporan;
-      #         id + en) answers 200, noindex, with the AI chip and "bukan fatwa", and no visible
+      #         id + en) answers 200, noindex in the page's tag and in an X-Robots-Tag header (the
+      #         module is public since 2026-11-26, plan L42, and Ilmu Waris is never indexed), with
+      #         the AI chip and "bukan fatwa", and no visible
       #         text promises an ustadz review (there is none); unknown waris paths 404; the hub
       #         card and the track's door link through;
+      #   search engines (seo-smoke.mjs --waris): with the track shown, the sitemap still lists none
+      #         of it and the rest of the module is as on the production container;
       #   screenshots of the three waris pages (screenshots.mjs --waris, phone + desktop);
       # and end to end (docs/waris-plan.md §10):
       #   M2.6  a simple, an 'aul and a radd family driven through /waris/hitung screen by screen
@@ -1103,6 +1144,8 @@ jobs:
           [[ -n "$ok" ]] || { docker logs waris 2>&1 | tail -20; echo "✗ container never became healthy"; exit 1; }
           smoke_rc=0
           node belajar/scripts/ci/waris-smoke.mjs || smoke_rc=$?
+          seo_rc=0
+          node belajar/scripts/ci/seo-smoke.mjs --waris || seo_rc=$?
           cp belajar/scripts/ci/screenshots.mjs belajar/scripts/ci/narration-route.mjs belajar/scripts/ci/waris-e2e.mjs /tmp/shots-run/
           cd /tmp/shots-run
           # Normally installed by the screenshots step; install here if that step did not get there.
@@ -1116,6 +1159,7 @@ jobs:
           node waris-e2e.mjs waris-plan.json
           docker rm -f waris >/dev/null
           [[ "$smoke_rc" -eq 0 ]] || { echo "✗ waris smoke checks failed (listed above)"; exit 1; }
+          [[ "$seo_rc" -eq 0 ]] || { echo "✗ search-engine checks with Ilmu Waris shown failed (listed above)"; exit 1; }
           [[ "$shots_rc" -eq 0 ]] || { echo "✗ waris screenshots failed (above)"; exit 1; }
 
 

@@ -15,7 +15,8 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/waris">)
   return {
     title: t("meta_title"),
     description: t("meta_description"),
-    // noindex beta, like the rest of the module (plan §9.1); promoting waris is a separate decision
+    // Never indexed, even though the module is public (plan §9.1, L42): promoting waris is a separate
+    // decision (lib/indexing.ts and the proxy's header say the same; the sitemap never lists it).
     robots: { index: false, follow: true },
   };
 }

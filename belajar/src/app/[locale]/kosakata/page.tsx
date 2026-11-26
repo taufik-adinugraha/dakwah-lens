@@ -9,13 +9,34 @@ import { MixedText } from "@/components/library/MixedText";
 import { Link } from "@/i18n/navigation";
 import { kosakataPathListed } from "@/lib/features";
 import { kosakataIndex } from "@/lib/kosakata";
-import { MILESTONES, pageCount, pageOfRank, pageRows, parsePage, percent, rowVoice, searchRows } from "@/lib/kosakata-core";
+import { listAddress, MILESTONES, PAGE_SIZE, pageCount, pageOfRank, pageRows, parsePage, percent, rowVoice, searchRows } from "@/lib/kosakata-core";
 import { kosakataHref, kosakataWordHref } from "@/lib/routes";
+import { NOINDEX } from "@/lib/seo";
+import { alternatesFor } from "@/lib/share";
 
-export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata">): Promise<Metadata> {
+/** A query value as a list: absent, one value, or repeated. */
+const all = (value: string | string[] | undefined): string[] => (value === undefined ? [] : Array.isArray(value) ? value : [value]);
+
+export async function generateMetadata({ params, searchParams }: PageProps<"/[locale]/kosakata">): Promise<Metadata> {
   const { locale } = await params;
+  const { hal, q } = await searchParams;
   const t = await getTranslations({ locale, namespace: "Kosakata" });
-  return { title: t("title") };
+  const ts = await getTranslations({ locale, namespace: "Seo" });
+  const total = kosakataIndex().rows.length;
+  // Search engines (lib/kosakata-core.ts listAddress, docs/belajar-plan.md L42): a real page of the list
+  // (`?hal=N`, or the bare address, which is the first page) is indexable and its canonical is `?hal=N`;
+  // a search, and any other address that is only the first page again (`?hal=0`, `?hal=999`, a repeated
+  // `hal`, the form's empty `?q=`), is `noindex` and has no canonical.
+  const address = listAddress(all(hal), all(q), pageCount(total));
+  if (!address) return { title: t("title"), robots: NOINDEX };
+  const from = (address.page - 1) * PAGE_SIZE + 1;
+  const to = Math.min(address.page * PAGE_SIZE, total);
+  return {
+    // One title per page of the list: the same title on 49 pages is what a crawler files as duplicates.
+    title: address.page === 1 ? t("title") : ts("kosakata_list_title", { from, to }),
+    description: ts("kosakata_list", { from, to, total }),
+    alternates: alternatesFor(locale, `${kosakataHref()}?hal=${address.page}`),
+  };
 }
 
 /**

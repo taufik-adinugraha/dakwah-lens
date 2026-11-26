@@ -7,6 +7,8 @@ import { AYAT_DATA_VERSIONS } from "@/lib/ayat";
 import { SURAHS } from "@/lib/content";
 import { visibleSurahs } from "@/lib/features";
 import { LIBRARY } from "@/lib/library";
+import { creditsHref } from "@/lib/routes";
+import { alternatesFor } from "@/lib/share";
 import { SOURCES } from "@/lib/sources";
 
 export async function generateMetadata({
@@ -14,7 +16,12 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/kredit">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Credits" });
-  return { title: t("title") };
+  const ts = await getTranslations({ locale, namespace: "Seo" });
+  return {
+    title: t("title"),
+    description: ts("credits"),
+    alternates: alternatesFor(locale, creditsHref()),
+  };
 }
 
 /** Pinned data inputs, as the content pipeline wrote them into content/. */

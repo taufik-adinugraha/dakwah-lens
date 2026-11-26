@@ -11,9 +11,13 @@
  *    pipeline checks bytes; this schema only shapes it);
  *  - every explanatory claim carries ≥1 SourceRef (kitab + vol/page or a
  *    dataset + version) — "retrieved, never invented";
- *  - every record has a review `status`; "draft" renders with a visible
- *    "menunggu tinjauan ustadz" label, and BELAJAR_PUBLIC builds refuse to
- *    ship drafts (enforced in lib/content.ts).
+ *  - every record has a `status`, which is PIPELINE STATE and not a review
+ *    (docs/belajar-plan.md L11: there is no human review step, so "draft" is
+ *    all it ever says, and no page shows it). Nothing in the module may claim
+ *    a review: a record marked "reviewed", or a sentence promising one
+ *    ("menunggu tinjauan ustadz" ...), refuses the build (lib/publishable.ts,
+ *    run by lib/content.ts and lib/library.ts). The reader is told what the
+ *    material is instead: AI-assisted, not a fatwa (the layout's footer).
  */
 import { z } from "zod";
 

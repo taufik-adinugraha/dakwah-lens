@@ -23,7 +23,8 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/quran/ru
     description: t("description"),
     alternates: alternatesFor(locale, rumusHref()),
     // Share preview with this page's own card (rumus/og/route.ts); og:url = the canonical.
-    // Still noindex, like every page of the module (the locale layout, lib/flags.ts).
+    // Indexable in Indonesian, like the module's other pages: it sets no robots tag of its own (the
+    // locale layout decides, lib/indexing.ts layoutRobots), and its canonical is its own address.
     ...shareMetadata({
       locale,
       path: rumusHref(),

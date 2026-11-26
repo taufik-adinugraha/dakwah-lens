@@ -7,7 +7,8 @@ import { MarkCircle } from "@/components/library/MarkCircle";
 import { Headword, TermText } from "@/components/library/TermText";
 import { Link } from "@/i18n/navigation";
 import { LIBRARY, TERMS } from "@/lib/library";
-import { conceptHref } from "@/lib/routes";
+import { conceptHref, conceptIndexHref } from "@/lib/routes";
+import { alternatesFor } from "@/lib/share";
 import { annotate, type HeadTerm, prepareSigns, Scope, titleParts, type Token } from "@/lib/terms";
 
 export async function generateMetadata({
@@ -15,7 +16,11 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/konsep">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Concept" });
-  return { title: t("index_title") };
+  return {
+    title: t("index_title"),
+    description: t("index_intro"),
+    alternates: alternatesFor(locale, conceptIndexHref()),
+  };
 }
 
 

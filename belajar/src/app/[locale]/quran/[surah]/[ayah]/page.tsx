@@ -61,11 +61,16 @@ export async function generateMetadata({
   const a = s ? getAyah(s, Number(ayah)) : undefined;
   if (!s || !a) return { title: "—" };
   const path = ayahHref(s.slug, a.ayah);
-  const meta: Metadata = { title: `${s.name_id} ${ayah}`, alternates: alternatesFor(locale, path) };
+  const to = await getTranslations({ locale, namespace: "Og" });
+  // The page's own description (and its share preview's): the ayah's translation, so it differs
+  // from one lesson to the next. Whether this lesson may be indexed is not decided here (the page is
+  // prerendered, BELAJAR_SURAHS is read per request): the proxy's X-Robots-Tag header and the sitemap
+  // follow the switch (lib/indexing.ts).
+  const description = to("lesson_description", { translation: translationExcerpt(a.translation.text) });
+  const meta: Metadata = { title: `${s.name_id} ${ayah}`, description, alternates: alternatesFor(locale, path) };
   // Share preview (og:*, twitter:*) only for a lesson that may be shared: the one check,
   // lib/share.ts lessonShareable. Its card is this folder's og/route.ts.
   if (!lessonShareable(s.slug)) return meta;
-  const to = await getTranslations({ locale, namespace: "Og" });
   const card = lessonCard(to, s, a);
   return {
     ...meta,
@@ -73,7 +78,7 @@ export async function generateMetadata({
       locale,
       path,
       title: `${card.title} · ${card.eyebrow}`,
-      description: to("lesson_description", { translation: translationExcerpt(a.translation.text) }),
+      description,
       imageAlt: to("lesson_image_alt", { surah: s.name_id, n: a.ayah }),
     }),
   };

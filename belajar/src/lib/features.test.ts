@@ -8,7 +8,15 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const request = vi.hoisted(() => ({ arrive: (): void => undefined }));
 vi.mock("next/server", () => ({ connection: async () => request.arrive() }));
 
-import { publishedSurahs, reachableSurahs, unlistedSurahs, visibleSurahs, warisSwitchOn, warisVisible } from "./features";
+import {
+  kosakataWordsIndexed,
+  publishedSurahs,
+  reachableSurahs,
+  unlistedSurahs,
+  visibleSurahs,
+  warisSwitchOn,
+  warisVisible,
+} from "./features";
 
 const BELAJAR = fileURLToPath(new URL("../../", import.meta.url));
 const read = (rel: string) => readFileSync(join(BELAJAR, rel), "utf8");
@@ -116,5 +124,23 @@ describe("BELAJAR_UNLISTED (operator, 2026-10-20: Al-Ikhlas answers at its addre
     delete process.env.BELAJAR_SURAHS;
     delete process.env.BELAJAR_UNLISTED;
     expect(await visibleSurahs()).toEqual(["al-fatihah"]);
+  });
+});
+
+describe("BELAJAR_KOSAKATA_WORDS_INDEXED (docs/belajar-plan.md L42: the word pages are not taken into the index unless the operator says so)", () => {
+  const before = process.env.BELAJAR_KOSAKATA_WORDS_INDEXED;
+  afterEach(() => {
+    if (before === undefined) delete process.env.BELAJAR_KOSAKATA_WORDS_INDEXED;
+    else process.env.BELAJAR_KOSAKATA_WORDS_INDEXED = before;
+  });
+
+  it("takes them for the exact value on only; unset (the production default) leaves them out", () => {
+    process.env.BELAJAR_KOSAKATA_WORDS_INDEXED = "on";
+    expect(kosakataWordsIndexed()).toBe(true);
+    for (const v of [undefined, "", "off", "true", "1", "ON", " on"]) {
+      if (v === undefined) delete process.env.BELAJAR_KOSAKATA_WORDS_INDEXED;
+      else process.env.BELAJAR_KOSAKATA_WORDS_INDEXED = v;
+      expect(kosakataWordsIndexed(), JSON.stringify(v)).toBe(false);
+    }
   });
 });

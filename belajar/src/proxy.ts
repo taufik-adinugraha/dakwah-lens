@@ -3,7 +3,9 @@ import createIntlMiddleware from "next-intl/middleware";
 
 import { routing } from "@/i18n/routing";
 import { kosakataEnglishOn, kosakataPathListed, reachableSurahs, warisSwitchOn } from "@/lib/features";
+import { indexingRuntime, noindexReason } from "@/lib/indexing";
 import { kosakataPathHref, SURAH_SLUGS } from "@/lib/routes";
+import { NOINDEX_HEADER } from "@/lib/seo";
 
 // Locale routing, plus the runtime switches of what is hidden. The module has
 // no protected routes and no sign-in (plan L16, §7.3): progress stays in the
@@ -60,6 +62,9 @@ const NOT_FOUND = "/_tersembunyi";
  * /id/waris%20 arrive looking like no hidden path and are rewritten to
  * /belajar/id/waris itself. A redirect needs no check: the redirected
  * request comes back through here.
+ *
+ * What is reachable is not always for search engines either: after the gate, a page that must stay out
+ * of the index is answered with an X-Robots-Tag header (withRobots below; lib/indexing.ts says which).
  */
 export default function proxy(request: NextRequest) {
   const response = intl(request);
@@ -67,10 +72,31 @@ export default function proxy(request: NextRequest) {
   const locale =
     hiddenLocale(request.nextUrl.pathname, hidden) ??
     hiddenLocale(rewrittenPathname(request, response), hidden);
-  if (!locale) return kosakataOpening(request) ?? response;
+  if (!locale) return kosakataOpening(request) ?? withRobots(request, response);
   const url = request.nextUrl.clone();
   url.pathname = `/${locale}${NOT_FOUND}`;
   return NextResponse.rewrite(url);
+}
+
+/**
+ * Search engines (docs/belajar-plan.md L42): a page that is reachable but must not be indexed — the
+ * English pages, an unlisted surah, Ilmu Waris when it is shown, a share card, the Kosakata search ... —
+ * is answered with `X-Robots-Tag: noindex, follow`, beside any robots tag in its own HTML. Everything
+ * lib/indexing.ts says yes to is left without the header. The header is the layer that follows the runtime
+ * switches (BELAJAR_SURAHS, BELAJAR_PUBLIC ...) with no rebuild, and it reaches the prerendered lesson
+ * pages, whose own tags were fixed at build time. Asked for the address as it arrived and for the path
+ * next-intl serves, like the gate above, so a spelling cleaned on its way to the page cannot slip past. A
+ * redirect is no page, and a hidden page (404) is answered before this.
+ */
+function withRobots(request: NextRequest, response: NextResponse): NextResponse {
+  if (response.status >= 300 && response.status < 400) return response;
+  const rt = indexingRuntime();
+  const { searchParams } = request.nextUrl;
+  const asked = [request.nextUrl.pathname, rewrittenPathname(request, response)].filter(Boolean);
+  if (asked.some((path) => noindexReason(path, searchParams, rt) !== null)) {
+    response.headers.set("X-Robots-Tag", NOINDEX_HEADER);
+  }
+  return response;
 }
 
 /**

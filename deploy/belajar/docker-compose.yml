@@ -23,7 +23,15 @@ services:
     # line is absent (operator, 2026-10-10: the others "segera hadir");
     # BELAJAR_UNLISTED=al-ikhlas,… lists surahs that answer at their address
     # but are linked from nowhere (default al-ikhlas while the line is absent,
-    # empty = none; operator, 2026-10-20). The
+    # empty = none; operator, 2026-10-20). Search engines (docs/belajar-plan.md
+    # L42, 2026-11-26): the module is PUBLIC by the image's own default
+    # (BELAJAR_PUBLIC=true, set in the Dockerfile), so nothing is needed here
+    # for Google to see it; the English pages, Ilmu Waris, an unlisted or
+    # unpublished surah, the share cards, the Kosakata search and the word
+    # pages carry noindex and are not in /belajar/sitemap.xml. Two optional
+    # lines: BELAJAR_PUBLIC=false is a kill switch (noindex on every response,
+    # an empty sitemap, no rebuild); BELAJAR_KOSAKATA_WORDS_INDEXED=on takes
+    # the 4,832 word pages (/kosakata/kata/{rank}) into the index. The
     # file is read when the container is created: after editing it,
     # `up -d --force-recreate` (a restart keeps the old values).
     env_file: /srv/dakwah-lens/belajar.env

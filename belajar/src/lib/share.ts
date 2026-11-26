@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 
+import { INDEXED_LOCALES, routing } from "@/i18n/routing";
+
 import { SURAH_SLUGS } from "./routes";
 
 /**
  * Sharing a Belajar page (operator, 2026-10-10: the module should bring people to
  * dakwah-lens.id): its canonical address, the share card (Open Graph / Twitter image) and the
- * UTM-tagged address the "Share" button hands out. The pages stay noindex (lib/flags.ts); a
- * share preview does not need indexing.
+ * UTM-tagged address the "Share" button hands out. The canonical address is also what a search engine
+ * is told (the module is public since 2026-11-26, plan L42; what may be indexed is lib/indexing.ts):
+ * one address per page, so og:url, the canonical link and the sitemap cannot disagree.
  */
 
 /** The module's public address: the main site's origin plus the basePath (next.config.ts). */
@@ -103,10 +106,21 @@ export function shareMetadata(p: {
   };
 }
 
-/** Canonical + language alternates of a page, the shape the hub and the track already use. */
+/**
+ * The canonical address of a page, and its hreflang alternates only while EVERY locale is indexed
+ * (INDEXED_LOCALES, src/i18n/routing.ts). Today only Indonesian is, because English is a translated
+ * shell around Indonesian lessons: an alternate pointing at a `noindex` page is an error Search Console
+ * reports, and an English page is not an equivalent of the Indonesian one. An /en page's own canonical
+ * is itself (it is `noindex`, so it is never a rival of the /id page).
+ */
 export function alternatesFor(locale: string, path: string): NonNullable<Metadata["alternates"]> {
+  const canonical = pageUrl(locale, path);
+  if (INDEXED_LOCALES.length !== routing.locales.length) return { canonical };
   return {
-    canonical: pageUrl(locale, path),
-    languages: { id: pageUrl("id", path), en: pageUrl("en", path), "x-default": pageUrl("id", path) },
+    canonical,
+    languages: {
+      ...Object.fromEntries(routing.locales.map((l) => [l, pageUrl(l, path)])),
+      "x-default": pageUrl(routing.defaultLocale, path),
+    },
   };
 }

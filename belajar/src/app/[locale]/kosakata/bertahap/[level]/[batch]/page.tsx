@@ -8,11 +8,14 @@ import { pathSource } from "@/lib/kosakata-path";
 import { batchOrder } from "@/lib/kosakata-path-core";
 import { batchCards, batchOf, levelOf, mapLevels } from "@/lib/kosakata-path-data";
 import { kosakataBatchTestHref } from "@/lib/routes";
+import { NOINDEX } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata/bertahap/[level]/[batch]">): Promise<Metadata> {
   const { locale, level: rawLevel, batch: rawBatch } = await params;
   const t = await getTranslations({ locale, namespace: "KosakataPath" });
-  return { title: t("batch_eyebrow", { level: rawLevel, batch: rawBatch }) };
+  // A flashcard flow, one card at a time (a few hundred characters of text), not a page to find in a
+  // search: out of the index, the words themselves being on the list's pages (lib/indexing.ts).
+  return { title: t("batch_eyebrow", { level: rawLevel, batch: rawBatch }), robots: NOINDEX };
 }
 
 /** One batch of the learning path: its cards, one at a time, then its test. */

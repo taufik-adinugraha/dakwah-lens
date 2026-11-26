@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import { SURAHS } from "./content";
-import { CURRICULUM } from "./curriculum";
+import { CURRICULUM, ZERO_HOST } from "./curriculum";
 import {
   ayahHref,
   conceptHref,
   curriculumHref,
   hubHref,
   introHref,
+  INTRO_HOST,
   lessonHref,
   lexemeHref,
   quranHref,
@@ -69,6 +70,11 @@ describe("route helpers (plan L9: hub + /quran track)", () => {
 
   it("only uses slugs that are safe inside the redirect pattern", () => {
     for (const slug of SURAH_SLUGS) expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+  });
+
+  it("names, in the proxy's light module, the surah that hosts lesson zero: the one the content derives", () => {
+    expect(INTRO_HOST).toBe(ZERO_HOST?.slug);
+    expect(SURAH_SLUGS as readonly string[]).toContain(INTRO_HOST);
   });
 });
 

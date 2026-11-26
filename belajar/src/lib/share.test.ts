@@ -78,11 +78,11 @@ describe("sharing (lib/share.ts)", () => {
     const images = (meta.openGraph as { images: { url: string; width: number; height: number }[] }).images;
     expect(images).toEqual([expect.objectContaining({ url: ogImageUrl("id", path), width: 1200, height: 630 })]);
     expect(meta.twitter).toMatchObject({ card: "summary_large_image", images: [{ url: ogImageUrl("id", path) }] });
-    expect(alternatesFor("en", path).languages).toEqual({
-      id: "https://dakwah-lens.id/belajar/id/quran/al-fatihah/1",
-      en: "https://dakwah-lens.id/belajar/en/quran/al-fatihah/1",
-      "x-default": "https://dakwah-lens.id/belajar/id/quran/al-fatihah/1",
-    });
+    // Each locale's canonical is its own address, and there are no hreflang alternates while only
+    // Indonesian is indexed (src/i18n/routing.ts INDEXED_LOCALES): an alternate must be an indexable
+    // page, and the English page is not (it is noindex, a translated shell around Indonesian lessons).
+    expect(alternatesFor("en", path)).toEqual({ canonical: "https://dakwah-lens.id/belajar/en/quran/al-fatihah/1" });
+    expect(alternatesFor("id", path)).toEqual({ canonical: "https://dakwah-lens.id/belajar/id/quran/al-fatihah/1" });
   });
 
   it("has one check for what may be shared", () => {

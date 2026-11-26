@@ -15,7 +15,8 @@ import { surahNamesFor } from "@/lib/ayat";
 import { getSurah, SURAHS } from "@/lib/content";
 import { ZERO_HOST } from "@/lib/curriculum";
 import { TERMS } from "@/lib/library";
-import { ayahHref, quranHref } from "@/lib/routes";
+import { ayahHref, quranHref, surahHref } from "@/lib/routes";
+import { alternatesFor } from "@/lib/share";
 import { lessonLookup } from "@/lib/terms";
 
 export const dynamicParams = false;
@@ -27,9 +28,18 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/quran/[surah]">): Promise<Metadata> {
-  const { surah: slug } = await params;
+  const { locale, surah: slug } = await params;
   const s = getSurah(slug);
-  return { title: s ? s.name_id : "—" };
+  if (!s) return { title: "—" };
+  const t = await getTranslations({ locale, namespace: "Seo" });
+  // Whether this surah may be indexed is not decided here: the page is prerendered, so the switch that
+  // publishes surahs (BELAJAR_SURAHS) is answered per request by the proxy's X-Robots-Tag header and by
+  // the sitemap (lib/indexing.ts), which follow it with no rebuild.
+  return {
+    title: s.name_id,
+    description: t("surah", { name: s.name_id, ayat: s.ayat.length }),
+    alternates: alternatesFor(locale, surahHref(s.slug)),
+  };
 }
 
 /**

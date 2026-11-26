@@ -429,7 +429,9 @@ describe("metadata: as the track page does it", () => {
       const url = (l: string) => `https://dakwah-lens.id/belajar/${l}${curriculumHref()}`;
       expect(meta.title).toBe(MSG[locale].Curriculum.title);
       expect(meta.description).toBe(MSG[locale].Curriculum.description);
-      expect(meta.alternates).toEqual({ canonical: url(locale), languages: { id: url("id"), en: url("en"), "x-default": url("id") } });
+      // The canonical address only: hreflang alternates are written while every locale is indexed, and
+      // only Indonesian is (src/i18n/routing.ts INDEXED_LOCALES, lib/share.ts alternatesFor).
+      expect(meta.alternates).toEqual({ canonical: url(locale) });
       expect(meta.openGraph).toMatchObject({
         url: url(locale),
         title: MSG[locale].App.title_template.replace("%s", MSG[locale].Curriculum.title),
@@ -437,10 +439,11 @@ describe("metadata: as the track page does it", () => {
         images: [{ url: `${url(locale)}/og`, width: 1200, height: 630 }],
       });
       expect(meta.twitter).toMatchObject({ card: "summary_large_image", images: [{ url: `${url(locale)}/og` }] });
-      // robots is the locale layout's (noindex until BELAJAR_PUBLIC): the page sets none of its own.
+      // robots is the locale layout's (none for an indexed locale of a public module, noindex for the
+      // rest: lib/indexing.ts layoutRobots): the page sets none of its own.
       expect(meta.robots).toBeUndefined();
     }
-    expect(read("src/app/[locale]/layout.tsx")).toContain("robots: IS_PUBLIC ? undefined : { index: false, follow: true }");
+    expect(read("src/app/[locale]/layout.tsx")).toContain("robots: layoutRobots(locale)");
     // Its card is drawn by a route in the page's own folder, as the track's.
     expect(existsSync(join(BELAJAR, "src/app/[locale]/quran/kurikulum/og/route.ts"))).toBe(true);
     expect(read("src/app/[locale]/quran/kurikulum/og/route.ts")).toContain("cardResponse(curriculumCard(t))");

@@ -7,7 +7,10 @@
 //   - no flag, on a container started with BELAJAR_WARIS=on: checkShown(), as follows.
 //
 // For /belajar/{id,en}/waris, …/waris/hitung and …/waris/laporan:
-//   - 200, and noindex (the module is a noindex beta; a report is personal);
+//   - 200, and noindex in the page's robots meta AND in an X-Robots-Tag header, although the module
+//     is public since 2026-11-26 (docs/belajar-plan.md L42): a calculator families act on and a
+//     personal report never go into the index (src/lib/indexing.ts; seo-smoke.mjs --waris checks the
+//     same and that none of them is in the sitemap);
 //   - the AI chip ("Dibantu AI · bukan fatwa" on /id; each page's own chip from
 //     messages/waris/en.json on /en, which keeps the Indonesian words), "bukan fatwa" on every
 //     waris page in both locales (M2.7), and on /id the D16 label
@@ -64,7 +67,7 @@ const mainOf = (html) => /<main\b[^>]*>([\s\S]*)<\/main>/i.exec(html)?.[1] ?? ""
 
 async function get(path) {
   const res = await fetch(BASE + path, { redirect: "manual" });
-  return { status: res.status, html: await res.text() };
+  return { status: res.status, html: await res.text(), robotsHeader: res.headers.get("x-robots-tag") ?? "" };
 }
 
 const msgs = { id: await readJson("messages/waris/id.json"), en: await readJson("messages/waris/en.json") };
@@ -170,13 +173,15 @@ async function checkShown() {
   for (const locale of ["id", "en"]) {
     for (const [page, sub] of PAGES) {
       const path = `/belajar/${locale}${sub}`;
-      const { status, html } = await get(path);
+      const { status, html, robotsHeader } = await get(path);
       console.log(`${path} -> ${status}`);
       if (status !== 200) {
         fail(path, `status ${status}, expected 200`);
         continue;
       }
+      // Never indexed, although the module is public (plan L42): in the page's own tag and in the proxy's header.
       if (!/<meta[^>]+name="robots"[^>]+content="[^"]*noindex/i.test(html)) fail(path, "no noindex robots meta");
+      if (!/noindex/i.test(robotsHeader)) fail(path, `no noindex in the X-Robots-Tag header (${JSON.stringify(robotsHeader)})`);
       if (/<form\b/i.test(html)) fail(path, "contains a <form> (no server path for answers, plan §9.4)");
       const text = visibleText(html);
       const chip = chipOf(locale, page);
@@ -216,5 +221,5 @@ if (problems.length > 0) {
 console.log(
   HIDDEN
     ? "✓ waris smoke (--hidden): every waris route 404s with nothing of the track in it; the hub has no card and no link"
-    : "✓ waris smoke (BELAJAR_WARIS=on): routes, labels, noindex, 404s and links OK",
+    : "✓ waris smoke (BELAJAR_WARIS=on): routes, labels, noindex (tag and header), 404s and links OK",
 );

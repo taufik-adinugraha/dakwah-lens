@@ -9,15 +9,30 @@ import { MixedText } from "@/components/library/MixedText";
 import { AyahChip, AyahDialogProvider } from "@/components/surah/AyahDialog";
 import { Link } from "@/i18n/navigation";
 import { parseAyahLoc } from "@/lib/ayah";
+import { kosakataWordsIndexed } from "@/lib/features";
 import { kosakataIndex, kosakataWord } from "@/lib/kosakata";
 import { pageOfRank, parseRank, placeOf, wordClip } from "@/lib/kosakata-core";
 import { kosakataHref, kosakataWordHref, lexemeHref } from "@/lib/routes";
+import { NOINDEX } from "@/lib/seo";
+import { alternatesFor } from "@/lib/share";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata/kata/[rank]">): Promise<Metadata> {
-  const { rank: raw } = await params;
-  const rank = parseRank(raw, kosakataIndex().rows.length);
-  const row = rank ? kosakataIndex().rows[rank - 1] : null;
-  return { title: row ? `${row.translit} (${row.ar})` : "—" };
+  const { locale, rank: raw } = await params;
+  const { rows } = kosakataIndex();
+  const rank = parseRank(raw, rows.length);
+  const row = rank ? rows[rank - 1] : null;
+  if (!rank || !row) return { title: "—" };
+  const t = await getTranslations({ locale, namespace: "Seo" });
+  return {
+    title: `${row.translit} (${row.ar})`,
+    description: t("kosakata_word", { translit: row.translit, ar: row.ar, meaning: locale === "en" ? row.en : row.id, count: row.count }),
+    alternates: alternatesFor(locale, kosakataWordHref(rank)),
+    // 4,832 short pages: taken into the index only when the operator says so (lib/features.ts
+    // kosakataWordsIndexed; the proxy's header and the sitemap read the same switch, lib/indexing.ts).
+    // The key is left out, not set to undefined: Next would read an undefined `robots` as "none" and
+    // drop the locale layout's noindex for the English pages.
+    ...(kosakataWordsIndexed() ? {} : { robots: NOINDEX }),
+  };
 }
 
 /**

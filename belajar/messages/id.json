@@ -600,5 +600,12 @@
     "missed": "Yang perlu diulang",
     "all_right": "Semua jawaban benar.",
     "what_batch": "Level {level}, Batch {batch}"
+  },
+  "Seo": {
+    "surah": "Surah {name}, {ayat} ayat: pelajari kata demi kata dengan bacaan imam, arti tiap kata, akar katanya, dan alasan harakat di akhirnya.",
+    "kosakata_list": "Kata Al-Qur'an dari yang paling sering muncul, kata ke-{from, number} sampai ke-{to, number} dari {total, number}: arti dalam bahasa Indonesia dan rekaman bacaan tiap kata.",
+    "kosakata_list_title": "Kosakata Al-Qur'an: kata ke-{from, number} sampai ke-{to, number}",
+    "kosakata_word": "Arti kata {translit} ({ar}) dalam Al-Qur'an: {meaning}. Muncul {count, number} kali, lengkap dengan akar kata dan ayat contohnya.",
+    "credits": "Sumber, data, dan lisensi di balik Belajar: teks dan terjemahan Al-Qur'an, bacaan imam, rekaman kata, kitab rujukan, dan suara narator AI."
   }
 }
