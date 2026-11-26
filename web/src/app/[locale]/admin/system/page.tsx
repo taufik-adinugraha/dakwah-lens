@@ -243,7 +243,7 @@ export default async function SystemOverviewPage() {
       severity: "critical",
       title: "No brief-generator LLM configured",
       hint:
-        "Set GEMINI_API_KEY (primary) or ANTHROPIC_API_KEY (fallback) in .env. Without either, /briefs/new errors out.",
+        "Set ANTHROPIC_API_KEY (primary, Claude Sonnet 5.5) or GEMINI_API_KEY (fallback) in .env. Without either, /briefs/new errors out.",
     });
   }
   if (!process.env.OPENAI_API_KEY) {

@@ -1,26 +1,22 @@
 /**
- * LLM provider abstraction with a deterministic fallback chain.
+ * LLM provider abstraction with a deterministic fallback chain, for
+ * synthesis-grade work (on-demand kajian, deliverables).
  *
- * Per the agreed policy (config B — cost-optimized):
- *   1. Try Gemini 2.5 Pro — top-tier reasoning at ~35% lower cost than Sonnet.
- *   2. If Gemini is unavailable (missing key or API error), try Anthropic.
+ *   1. Claude Sonnet 5.5 (since 2026-11-26; lib/claude.ts) — structured outputs.
+ *   2. Gemini 2.5 Pro — fallback; its prepaid credit ran out ~2026-07-27.
  *   3. If both fail, throw `LlmUnavailableError` — never silently return a stub.
  *
- * Both models are in the same quality bracket; Gemini just happens to be
- * cheaper. Sonnet stays as the diversification fallback so a Google outage
- * doesn't take the product down.
- *
- * Pricing (per brief: ~1K in + ~1.5K out):
- *   - Gemini 2.5 Pro             : $1.25/MT in · $10/MT out → ~$0.016/brief
- *   - Anthropic Claude Sonnet 4.5: $3/MT in · $15/MT out  → ~$0.025/brief
+ * Cost per kajian (~3.7K in + ~2.8K out, measured on Gemini's 18 runs):
+ *   - Claude Sonnet 5.5: $2/MT in · $10/MT out → ~$0.035 plus thinking
+ *   - Gemini 2.5 Pro   : $1.25/MT in · $10/MT out → ~$0.03
  *
  * Callers should `try/catch` `LlmUnavailableError` and surface a user-facing
  * error (the brief generator does this and returns `error_llm_unavailable`).
  */
 
-import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenAI, Type } from "@google/genai";
 
+import { CLAUDE_WRITER_MODEL, callClaudeJson, claudeConfigured } from "@/lib/claude";
 import { recordUsage } from "@/lib/usage-log";
 
 export class LlmUnavailableError extends Error {
@@ -47,7 +43,8 @@ export type LlmResult<T> = {
 
 /**
  * JSON Schema describing the expected response shape, in a format that both
- * Anthropic (via tool-use) and Gemini (via responseSchema) accept.
+ * Anthropic (structured outputs, made strict by `strictSchema` in lib/claude.ts) and
+ * Gemini (via responseSchema) accept.
  *
  * Keep this in sync with the consumer's Zod/TS type. Loose `string` everywhere
  * because Gemini's structured-output is strict and we want to validate via
@@ -66,12 +63,14 @@ export type LlmRequest = {
   temperature?: number;
 };
 
-const ANTHROPIC_MODEL = "claude-sonnet-4-5";
-// Gemini fallback uses the Pro tier to match Anthropic Sonnet's reasoning
-// quality. ~$0.016 per brief vs ~$0.025 for Sonnet — comparable bracket.
-// Don't drop to Flash here: brief synthesis is exactly the kind of nuanced
-// task where the smaller model's quality gap is visible to the da'i reader.
+// Claude Sonnet 5.5 is the primary since 2026-11-26 (lib/claude.ts): Gemini's prepaid credit
+// ran out around 2026-07-27, and no Anthropic key was set, so no kajian could be generated.
+// Gemini 2.5 Pro stays as the fallback for the day its credit is topped up.
+const ANTHROPIC_MODEL = CLAUDE_WRITER_MODEL;
 const GEMINI_MODEL = "gemini-2.5-pro";
+
+/** Room for Sonnet 5.5's adaptive thinking on top of the caller's output cap. */
+const THINKING_ROOM = 8_000;
 
 /**
  * Try Anthropic first, fall back to Gemini, throw `LlmUnavailableError` if both
@@ -82,36 +81,21 @@ export async function generateJson<T = unknown>(
 ): Promise<LlmResult<T>> {
   const errors: string[] = [];
 
-  // 1. Gemini Pro — cost-optimized primary (~35% cheaper than Sonnet).
-  if (process.env.GEMINI_API_KEY) {
+  // 1. Claude Sonnet 5.5 — structured outputs (forced tool_choice and a custom temperature
+  //    both return 400 on this model, so `req.temperature` is not sent).
+  if (claudeConfigured()) {
     try {
-      const { data, tokensIn, tokensOut } = await callGemini<T>(req);
-      return {
-        data,
-        provider: "gemini",
-        model: GEMINI_MODEL,
-        tokensIn,
-        tokensOut,
-      };
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.warn(`[llm] Gemini failed: ${msg}`);
-      errors.push(`gemini: ${msg}`);
-    }
-  }
-
-  // 2. Anthropic Sonnet — diversification fallback. Different cloud, similar
-  //    quality bracket. Activates when Gemini is missing or errors out.
-  if (process.env.ANTHROPIC_API_KEY) {
-    try {
-      const { data, tokensIn, tokensOut } = await callAnthropic<T>(req);
-      return {
-        data,
-        provider: "anthropic",
+      const { data, tokensIn, tokensOut } = await callClaudeJson<T>({
+        operation: "synth_brief",
         model: ANTHROPIC_MODEL,
-        tokensIn,
-        tokensOut,
-      };
+        system: req.systemPrompt,
+        prompt: req.userPrompt,
+        schema: req.responseSchema,
+        maxTokens: (req.maxTokens ?? 2000) + THINKING_ROOM,
+        effort: "medium",
+        timeoutMs: 10 * 60_000,
+      });
+      return { data, provider: "anthropic", model: ANTHROPIC_MODEL, tokensIn, tokensOut };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`[llm] Anthropic failed: ${msg}`);
@@ -119,68 +103,23 @@ export async function generateJson<T = unknown>(
     }
   }
 
-  throw new LlmUnavailableError(
-    errors.length === 0
-      ? "Neither GEMINI_API_KEY nor ANTHROPIC_API_KEY is set."
-      : `All providers failed. ${errors.join(" | ")}`,
-  );
-}
-
-/* ────────────────────────────────────────────────────────────
- * Anthropic — tool-use trick for guaranteed JSON
- * ────────────────────────────────────────────────────────────
- * The cleanest way to get strict JSON out of Claude is to define a tool
- * whose `input_schema` matches what we want, then force the model to call
- * that tool. Claude returns the tool's `input` as the structured output.
- */
-
-let _anthropic: Anthropic | null = null;
-function getAnthropic(): Anthropic {
-  if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  }
-  return _anthropic;
-}
-
-async function callAnthropic<T>(
-  req: LlmRequest,
-): Promise<{ data: T; tokensIn: number | null; tokensOut: number | null }> {
-  const client = getAnthropic();
-  const response = await client.messages.create({
-    model: ANTHROPIC_MODEL,
-    max_tokens: req.maxTokens ?? 2000,
-    temperature: req.temperature ?? 0.6,
-    system: req.systemPrompt,
-    tools: [
-      {
-        name: "emit_brief",
-        description:
-          "Emit the structured da'wah brief. You MUST call this tool exactly once.",
-        input_schema: req.responseSchema as Anthropic.Tool.InputSchema,
-      },
-    ],
-    tool_choice: { type: "tool", name: "emit_brief" },
-    messages: [{ role: "user", content: req.userPrompt }],
-  });
-
-  const tokensIn = response.usage?.input_tokens ?? null;
-  const tokensOut = response.usage?.output_tokens ?? null;
-
-  void recordUsage({
-    provider: "anthropic",
-    operation: "synth_brief",
-    model: ANTHROPIC_MODEL,
-    tokensIn,
-    tokensOut,
-  });
-
-  // First tool_use block IS the structured output.
-  for (const block of response.content) {
-    if (block.type === "tool_use" && block.name === "emit_brief") {
-      return { data: block.input as T, tokensIn, tokensOut };
+  // 2. Gemini 2.5 Pro — fallback; only useful once its credit is topped up.
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      const { data, tokensIn, tokensOut } = await callGemini<T>(req);
+      return { data, provider: "gemini", model: GEMINI_MODEL, tokensIn, tokensOut };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`[llm] Gemini failed: ${msg}`);
+      errors.push(`gemini: ${msg}`);
     }
   }
-  throw new Error("Anthropic response did not contain a tool_use block.");
+
+  throw new LlmUnavailableError(
+    errors.length === 0
+      ? "Neither ANTHROPIC_API_KEY nor GEMINI_API_KEY is set."
+      : `All providers failed. ${errors.join(" | ")}`,
+  );
 }
 
 /* ────────────────────────────────────────────────────────────

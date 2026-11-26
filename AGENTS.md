@@ -16,9 +16,9 @@ Read the PRD (`Dakwah-Lens_PRD_v0.4.pdf`) for full product context. Owner: Sukse
 | Embedding model | `text-embedding-3-large` (OpenAI) |
 | Sentiment + `theme_group` + `dawah_opportunity` (all platforms) | Claude Sonnet 5.5 via the Message Batches API, daily 00:00 WIB (`services/claude_labels.py`) since 2026-11-01 (score since 2026-11-03) — labels every arrival plus every post still missing a theme or sentiment. Ingest no longer classifies. The earlier Gemini classifiers had been failing since about 2026-07-27 (402, prepay depleted); manual relabel runs hid that until 2026-10-29 |
 | Topic clustering | Claude Sonnet 5.5, weekly on Thursday after that day's label batch (`services/claude_recluster.py`, fallback 06:00 WIB) since 2026-11-01 — the automated twin of `scripts/cluster_topics/` |
-| Rerank / comment moderation / trending keywords | Gemini 2.5 Flash-Lite |
+| Rerank / query expansion / comment moderation / trending keywords | Claude Haiku 5.5 since 2026-11-26 (`web/src/lib/claude.ts`, `services/trending_topics.py`), each with its rule/cosine fallback. Gemini Flash-Lite before; its prepaid credit ran out around 2026-07-27 and these ran on fallbacks until the switch |
 | Score in the topic corpus | Off (`OPPORTUNITY_SHAPES_CORPUS` in `scripts/cluster_topics.py`): the 0.4 floor would keep only 7% of Teknologi, 13% of Ekonomi, 18% of Pemerintahan, 23% of Pendidikan, 30% of Lingkungan and 36% of Kesehatan posts on Claude's scores (18,553 posts, 2026-11-03). Turning it on is an operator decision |
-| Brief synthesis | Gemini 2.5 Pro (fallback: Claude Sonnet 4.6) |
+| On-demand kajian synthesis, Flyer Builder text, web hadith translation | Claude Sonnet 5.5 since 2026-11-26 (`web/src/lib/claude.ts`; structured outputs, server-side refusal fallback), Gemini 2.5 Pro as fallback (credit gone) |
 | Vector store | Self-hosted Qdrant in docker compose |
 | Hosting | IDCloudHost VPS (Indonesia residency per UU PDP §27/2022) |
 | Auth | NextAuth.js (email + Google OAuth) |
@@ -37,7 +37,8 @@ Read the PRD (`Dakwah-Lens_PRD_v0.4.pdf`) for full product context. Owner: Sukse
 
 - Budget cap: IDR ~1.5-2M/month (~IDR 1M LLM + ~IDR 500K VPS).
 - The Claude label batch and weekly recluster run on `ANTHROPIC_LABELING_API_KEY`, an org funded by a $200/month promotional Claude credit, not on this cap. Estimated ~$30–40/month together; each run's cost is on its `ingest_runs` row and in api-costs (`label_batch`, `recluster`).
-- Tiered LLM routing — Claude Sonnet 5.5 batch for classify, weekly Claude Sonnet 5.5 for topics; Gemini Flash-Lite for rerank; Gemini 2.5 Pro reserved for brief synthesis; Claude Sonnet 4.6 only as a Pro fallback.
+- The web's Claude calls and the trending filter run on `ANTHROPIC_API_KEY` (set on web, api and worker), not on the labelling key's variable. Estimated ~$0.2/month at Gemini's old call volume; usage_events provider `anthropic`, operations `daleel_rerank`, `kitab_query_expand`, `comment_moderation`, `trending_filter`, `synth_brief`, `user_flyer_content_gen`, `translate_hadith_to_id`.
+- Tiered LLM routing — Claude Sonnet 5.5 batch for classify, weekly Claude Sonnet 5.5 for topics; Claude Haiku 5.5 for rerank, query expansion, moderation and trending; Claude Sonnet 5.5 for on-demand writing; Gemini 2.5 Pro only as a fallback.
 - Aggressive caching: never re-embed an unchanged kitab chunk; cache topic classifications.
 - Batch classification calls whenever the API supports it.
 - Flag any suggestion that would breach the cap before implementing.

@@ -20,11 +20,16 @@
  *    Islamic reference must come from the corpus, never invented).
  */
 
-import { GoogleGenAI } from "@google/genai";
 import { QdrantClient } from "@qdrant/js-client-rest";
 import OpenAI from "openai";
 
 import { recordUsage } from "@/lib/usage-log";
+import {
+  CLAUDE_SMALL_MODEL,
+  callClaude,
+  callClaudeJson,
+  claudeConfigured,
+} from "@/lib/claude";
 
 /**
  * Thrown when semantic retrieval can't produce any daleel — no OpenAI key
@@ -66,7 +71,7 @@ export class WeakRelevanceError extends Error {
 /**
  * Cosine-similarity floor below which a hit is considered too weak to
  * include in a brief. Recalibrated 2026-05-29 against an 11-query probe
- * (text-embedding-3-large + Gemini-Flash-Lite query expansion, run
+ * (text-embedding-3-large + Claude Haiku 5.5 query expansion, run
  * against the live prod corpus). Observed score bands:
  *
  *   ≥ 0.55 strongly on-topic   ("sabar menghadapi musibah" → 0.62,
@@ -360,7 +365,7 @@ export async function retrieveDaleel(
     throw new RetrievalUnavailableError("OPENAI_API_KEY not configured");
   }
 
-  // Flash-Lite query expansion — same helper `searchKitabBrowse` uses.
+  // Query expansion (Claude Haiku 5.5) — same helper `searchKitabBrowse` uses.
   // Without this, raw user topics like "belajar agama utk gen z atau
   // alpha" land at <0.40 cosine similarity (the kitab corpus has no
   // "gen z" tokens) and trigger WeakRelevanceError even when the
@@ -457,7 +462,7 @@ export async function retrieveDaleel(
 
 /**
  * Re-rank embedding-retrieved daleel candidates by THEMATIC fit
- * using Gemini Flash-Lite.
+ * using Claude Haiku 5.5 (Gemini Flash-Lite until 2026-11-26).
  *
  * Cosine similarity matches passages whose embedding tokens overlap
  * the query — for "isu youth" it surfaces verses that contain `muda`
@@ -482,7 +487,7 @@ export async function rerankDaleel(
   if (candidates.length === 0 || candidates.length <= topN) {
     return candidates.slice(0, topN);
   }
-  if (!process.env.GEMINI_API_KEY) {
+  if (!claudeConfigured()) {
     return candidates.slice(0, topN);
   }
 
@@ -525,27 +530,21 @@ ${numbered}
 Kembalikan JSON: {"indices": [i1, i2, ...]} dengan SEMUA index daleel yang BENAR-BENAR cocok (jumlah bisa antara 0 hingga ${topN}, urutan dari paling relevan). Kalau tidak ada satu pun yang cocok secara tematik, kembalikan {"indices": []}.`;
 
   try {
-    const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    const resp = await genai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        temperature: 0.1,
-        maxOutputTokens: 200,
-        thinkingConfig: { thinkingBudget: 0 },
+    // Claude Haiku 5.5 since 2026-11-26 (Gemini credit gone since ~2026-07-27; lib/claude.ts).
+    const { data } = await callClaudeJson<unknown>({
+      operation: "daleel_rerank",
+      model: CLAUDE_SMALL_MODEL,
+      prompt,
+      maxTokens: 300,
+      effort: "low",
+      noThinking: true,
+      timeoutMs: 20_000,
+      schema: {
+        type: "object",
+        properties: { indices: { type: "array", items: { type: "integer" } } },
+        required: ["indices"],
       },
     });
-    void recordUsage({
-      provider: "gemini",
-      operation: "daleel_rerank",
-      model: "gemini-2.5-flash-lite",
-      tokensIn: resp.usageMetadata?.promptTokenCount ?? null,
-      tokensOut: resp.usageMetadata?.candidatesTokenCount ?? null,
-    });
-
-    const raw = resp.text ?? "{}";
-    const data: unknown = JSON.parse(raw);
     if (
       !data ||
       typeof data !== "object" ||
@@ -633,26 +632,17 @@ export async function getKitabCounts(): Promise<Record<KitabCorpus, number>> {
  * query before embedding — adding its translation + 1-2 thematic
  * synonyms — flattens this asymmetry without re-embedding the corpus.
  *
- * Detection is implicit: we ask Flash-Lite to produce a "bilingual,
+ * Detection is implicit: we ask a small model (Claude Haiku 5.5) to produce a "bilingual,
  * synonym-enriched" version of whatever the user typed; the model
  * figures out source language and supplies the missing translation.
  *
- * Cost: ~$0.0001 per search call on gemini-2.5-flash-lite. Latency adds
+ * Cost: ~$0.0001 per search call (Claude Haiku 5.5 since 2026-11-26; was gemini-2.5-flash-lite). Latency adds
  * ~200-400ms but kitab search is already a "submit a form, wait for
  * results" interaction — that envelope is comfortable.
  *
- * Falls back to the original query string on any Gemini failure so
+ * Falls back to the original query string on any model failure so
  * search never breaks because of the expansion step.
  * ───────────────────────────────────────────────────────────── */
-
-let _genai: GoogleGenAI | null = null;
-function getGenai(): GoogleGenAI | null {
-  if (!process.env.GEMINI_API_KEY) return null;
-  if (_genai === null) {
-    _genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  }
-  return _genai;
-}
 
 async function expandQuery(query: string): Promise<string> {
   const trimmed = query.trim();
@@ -661,8 +651,7 @@ async function expandQuery(query: string): Promise<string> {
   // expansion; skip to save the LLM call.
   if (trimmed.length > 80) return trimmed;
 
-  const genai = getGenai();
-  if (!genai) return trimmed;
+  if (!claudeConfigured()) return trimmed;
 
   const prompt = `User search query for an Islamic kitab library: "${trimmed}"
 
@@ -686,27 +675,18 @@ Examples:
 Expanded query:`;
 
   try {
-    const resp = await genai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: prompt,
-      config: {
-        temperature: 0.2,
-        // Bumped 60 → 120 (2026-06-10): adding Arabic-script terms costs
-        // extra tokens; 60 was clipping the AR portion on multi-word
-        // queries.
-        maxOutputTokens: 120,
-        // No reasoning needed — this is template-fill.
-        thinkingConfig: { thinkingBudget: 0 },
-      },
-    });
-    const expanded = (resp.text ?? "").trim().replace(/^["']|["']$/g, "");
-    void recordUsage({
-      provider: "gemini",
+    // Claude Haiku 5.5 since 2026-11-26 (lib/claude.ts). 160 tokens: the Arabic-script terms
+    // need room (60 once clipped them, 2026-06-10). No reasoning needed — this is template-fill.
+    const { text } = await callClaude({
       operation: "kitab_query_expand",
-      model: "gemini-2.5-flash-lite",
-      tokensIn: resp.usageMetadata?.promptTokenCount ?? null,
-      tokensOut: resp.usageMetadata?.candidatesTokenCount ?? null,
+      model: CLAUDE_SMALL_MODEL,
+      prompt,
+      maxTokens: 160,
+      effort: "low",
+      noThinking: true,
+      timeoutMs: 10_000,
     });
+    const expanded = text.trim().replace(/^["']|["']$/g, "");
     // Sanity check — if expansion returned empty or weirdly long
     // (~runaway generation), fall back to the original. Cap raised
     // 300 → 500 to accommodate the Arabic-script terms (Arabic +

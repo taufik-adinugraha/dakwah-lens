@@ -219,7 +219,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     }
   }
 
-  // 1. Flash-Lite writes the copy + search theme.
+  // 1. The writer model (lib/claude.ts) writes the copy + search theme.
   let content;
   try {
     content = await generateUserFlyerContent({
@@ -260,7 +260,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       // Hadith corpora ship only EN in Qdrant — without this enrichment
       // Indonesian flyers show English daleel even when the user asked
       // for Bahasa. Hits the (corpus, hadithnumber) cache first; falls
-      // back to a Flash-Lite translate-then-persist on miss. Quran hits
+      // back to a model translate-then-persist on miss. Quran hits
       // already carry Kemenag ID — skip them.
       let translation = top.translation;
       if (top.corpus !== "quran" && top.corpus !== "tafsir" && top.hadithNumber !== undefined) {

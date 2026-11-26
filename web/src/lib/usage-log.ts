@@ -34,6 +34,12 @@ const PRICES: Record<string, Record<string, number>> = {
     "claude-sonnet-4-5_out": 15.0,
     "claude-sonnet-4-6_in": 3.0,
     "claude-sonnet-4-6_out": 15.0,
+    // lib/claude.ts (2026-11-26): writer and small-job models. Thinking tokens are billed as
+    // output and are included in usage.output_tokens.
+    "claude-sonnet-5-5_in": 2.0,
+    "claude-sonnet-5-5_out": 10.0,
+    "claude-haiku-5-5_in": 0.1,
+    "claude-haiku-5-5_out": 0.5,
   },
   // Resend transactional email. Free tier: 3,000 emails/month + 100/day.
   // Pro tier: $20/month → 50,000 emails → $0.0004/email amortized.
