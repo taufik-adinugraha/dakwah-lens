@@ -36,7 +36,7 @@ export default async function HowItWorksPage({
       <IngestionPipeline t={t} />
       <DiscoveryStrategy t={t} />
       <PlatformStrategy t={t} />
-      <InsightsBriefingPipeline t={t} />
+      <InsightsBriefingPipeline t={t} locale={locale} />
       <BriefPipeline t={t} />
       <ModelsTable t={t} />
       <MonthlyCost t={t} />
@@ -181,7 +181,7 @@ function StackGrid({ t }: { t: T }) {
       items: [
         { name: "OpenAI Embeddings", role: t("stack_ai_openai") },
         { name: "Gemini 2.5 Pro / Flash-Lite", role: t("stack_ai_gemini") },
-        { name: "Anthropic Claude Sonnet 4.5", role: t("stack_ai_anthropic") },
+        { name: "Anthropic Claude", role: t("stack_ai_anthropic") },
         { name: "trafilatura", role: t("stack_ai_trafilatura") },
       ],
     },
@@ -211,10 +211,10 @@ function StackGrid({ t }: { t: T }) {
               <h3 className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
                 {g.title}
               </h3>
-              {/* Grid (not flex) so wrapped names — e.g. "Anthropic Claude Sonnet
-               * 4.5" — keep the role column starting at the top of the row instead
-               * of jumping to the first-line baseline. Column widths are explicit
-               * so role text in every row starts at the same x-offset. */}
+              {/* Grid (not flex) so wrapped names — e.g. "Gemini 2.5 Pro /
+               * Flash-Lite" — keep the role column starting at the top of the row
+               * instead of jumping to the first-line baseline. Column widths are
+               * explicit so role text in every row starts at the same x-offset. */}
               <ul className="space-y-2.5 text-sm">
                 {g.items.map((it) => (
                   <li
@@ -280,7 +280,7 @@ function SystemDiagram({ t }: { t: T }) {
           {/* Tier 4: third-party */}
           <DiagramTier label={t("system_tier_external")}>
             <DiagramBox title="LLM providers" sub="OpenAI · Gemini · Anthropic" />
-            <DiagramBox title={t("system_scrapers")} sub="Apify · YouTube API · RSS" />
+            <DiagramBox title={t("system_scrapers")} sub="YouTube API · RSS" />
             <DiagramBox title="Resend" sub={t("system_resend_role")} />
           </DiagramTier>
         </div>
@@ -621,18 +621,18 @@ function BriefPipeline({ t }: { t: T }) {
  * Weekly insights briefings pipeline.
  *
  * Different from BriefPipeline (which describes the on-demand user-created
- * brief flow). Insights briefings are public, long-form analyst reports
- * that combine 5 markdown sections + 6 ready-to-use deliverables in
- * Section 4 + 2 share-ready flyers per briefing. See
- * insights_summary.py for the pipeline, scripts/manual_briefing.py for
- * the current manual operator flow, and /briefings/[id] for the
+ * brief flow). Insights briefings are public, long-form analyst reports:
+ * 6 markdown sections (Section 5 carries 8 ready-to-use deliverables) plus
+ * 6 flyer messages and 1 campus poster per briefing. See
+ * services/briefing.py for the prompt + stats, scripts/manual_briefing.py
+ * for the current manual operator flow, and /briefings/[id] for the
  * public viewer.
  *
- * The cron is wired for Thursday 05:00 WIB but currently PAUSED
- * (2026-05-23) — operator runs manually via Claude-in-the-loop to keep
- * Gemini Pro spend at zero during the dev phase.
+ * The cron (generate_briefings, Thursday 05:00 WIB) is still in the code but
+ * switched off since 2026-05-23 — briefings are composed manually with
+ * Claude in a chat session and saved with model "claude-manual".
  */
-function InsightsBriefingPipeline({ t }: { t: T }) {
+function InsightsBriefingPipeline({ t, locale }: { t: T; locale: string }) {
   const stages = [
     {
       title: t("insights_brief_stage_1_title"),
@@ -641,17 +641,17 @@ function InsightsBriefingPipeline({ t }: { t: T }) {
     },
     {
       title: t("insights_brief_stage_2_title"),
-      module: "services/insights_summary.py::_compute_stats",
+      module: "services/briefing.py::_compute_stats",
       body: t("insights_brief_stage_2_body"),
     },
     {
       title: t("insights_brief_stage_3_title"),
-      module: "services/kitab_retrieval.py + rerank_daleel (top_n=10)",
+      module: "services/kitab_retrieval.py::retrieve_daleel",
       body: t("insights_brief_stage_3_body"),
     },
     {
       title: t("insights_brief_stage_4_title"),
-      module: "Gemini 2.5 Pro (paused) → Claude manual",
+      module: "Claude (manual) — Gemini 2.5 Pro job disabled",
       body: t("insights_brief_stage_4_body"),
     },
     {
@@ -670,7 +670,7 @@ function InsightsBriefingPipeline({ t }: { t: T }) {
         />
         <StageList stages={stages} />
 
-        <BriefingAnatomy t={t} />
+        <BriefingAnatomy t={t} locale={locale} />
 
         <div className="mt-8 max-w-3xl rounded-xl bg-forest-tint p-4 text-xs leading-relaxed text-ink">
           <strong>{t("insights_brief_callout_strong")}</strong>{" "}
@@ -682,78 +682,110 @@ function InsightsBriefingPipeline({ t }: { t: T }) {
 }
 
 /**
- * "What's inside one briefing" — visual breakdown of the 5 markdown
- * sections (with Section 4 expanded into its 6 ready-to-use deliverables)
- * plus the 2 share-ready flyers Puppeteer renders alongside.
+ * "What's inside one briefing" — visual breakdown of the 6 markdown
+ * sections (with Section 5 expanded into its 8 ready-to-use deliverables)
+ * plus the 6 flyer messages and the campus poster the web renders alongside.
+ *
+ * Section order and word ranges mirror the real briefings: 7 H2s
+ * (Ringkasan Eksekutif, Numerik & Tren, Tema Utama, Poin Kunci, Strategi &
+ * Aksi, Dalil & Sumber, Pesan Flyer). The ranges are the min–max measured on
+ * the 39 theme briefings of the 2026-11-12, -19 and -26 editions (table
+ * `briefings`, same word counter as validate_briefing._count_words), rounded
+ * outward; Kisah Pendek is the p10–p90 because one edition carried a 27-word
+ * placeholder. Re-measure when the prompt's length targets change.
  *
  * Placed under the 5-stage pipeline so readers see HOW the system runs
  * AND then what they actually receive — closes the loop between the
  * tech explanation and the user-visible output.
  */
-function BriefingAnatomy({ t }: { t: T }) {
+function BriefingAnatomy({ t, locale }: { t: T; locale: string }) {
+  const nf = new Intl.NumberFormat(locale === "en" ? "en-US" : "id-ID");
+  const range = (lo: number, hi: number) => `${nf.format(lo)}-${nf.format(hi)}`;
+  const unit = t("anatomy_words_unit");
+
   const sections = [
     {
       n: "1",
       title: t("anatomy_s1_title"),
       body: t("anatomy_s1_body"),
-      words: "100-130",
+      words: range(110, 140),
     },
     {
       n: "2",
       title: t("anatomy_s2_title"),
       body: t("anatomy_s2_body"),
-      words: "250-350",
+      words: range(200, 280),
     },
     {
       n: "3",
       title: t("anatomy_s3_title"),
       body: t("anatomy_s3_body"),
-      words: "350-450",
+      words: range(420, 580),
     },
     {
-      n: "5",
+      n: "4",
+      title: t("anatomy_s_poin_title"),
+      body: t("anatomy_s_poin_body"),
+      words: range(180, 270),
+    },
+    {
+      n: "6",
       title: t("anatomy_s5_title"),
       body: t("anatomy_s5_body"),
-      words: "500-700",
+      words: range(600, 1150),
     },
   ];
 
+  // The eight deliverables, in the order the cards show them
+  // (components/BriefDeliverableCards.tsx KIND_ORDER).
   const deliverables = [
     {
       key: "khutbah",
       title: t("anatomy_kit_khutbah_title"),
       body: t("anatomy_kit_khutbah_body"),
-      words: "2,300-3,200",
+      words: range(3850, 5200),
+    },
+    {
+      key: "kultum",
+      title: t("anatomy_kit_kultum_title"),
+      body: t("anatomy_kit_kultum_body"),
+      words: range(1100, 1450),
     },
     {
       key: "kajian",
       title: t("anatomy_kit_kajian_title"),
       body: t("anatomy_kit_kajian_body"),
-      words: "800-1,100",
+      words: range(1450, 2200),
+    },
+    {
+      key: "kisah",
+      title: t("anatomy_kit_kisah_title"),
+      body: t("anatomy_kit_kisah_body"),
+      words: range(500, 1500),
     },
     {
       key: "home",
       title: t("anatomy_kit_home_title"),
       body: t("anatomy_kit_home_body"),
-      words: "500-700",
+      words: range(550, 850),
     },
     {
       key: "content",
       title: t("anatomy_kit_content_title"),
       body: t("anatomy_kit_content_body"),
-      words: "100-130",
+      words: range(100, 130),
     },
     {
       key: "genz",
       title: t("anatomy_kit_genz_title"),
       body: t("anatomy_kit_genz_body"),
-      words: "800-1,100",
+      words: range(950, 1250),
     },
     {
       key: "action",
       title: t("anatomy_kit_action_title"),
       body: t("anatomy_kit_action_body"),
-      words: "600-900",
+      words: range(650, 850),
     },
   ];
 
@@ -766,12 +798,12 @@ function BriefingAnatomy({ t }: { t: T }) {
         {t("anatomy_subtitle")}
       </p>
 
-      {/* Top row: 5-section structure (Section 4 expanded below) */}
+      {/* Top row: the narrative sections (Section 5 expanded below) */}
       <div className="mt-8">
         <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
           {t("anatomy_sections_label")}
         </p>
-        <ul className="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-5">
           {sections.map((s) => (
             <li key={s.n} className="border-t border-hairline pt-4">
               <div className="flex items-baseline justify-between gap-2">
@@ -779,7 +811,7 @@ function BriefingAnatomy({ t }: { t: T }) {
                   {s.n}
                 </span>
                 <span className="font-mono text-[10px] tabular-nums text-ink-faint">
-                  ~{s.words} kata
+                  ~{s.words} {unit}
                 </span>
               </div>
               <p className="mt-2 text-[13px] font-semibold text-ink">
@@ -793,7 +825,7 @@ function BriefingAnatomy({ t }: { t: T }) {
         </ul>
       </div>
 
-      {/* Section 4 deep-dive: 6 ready-to-use deliverables */}
+      {/* Section 5 deep-dive: 8 ready-to-use deliverables */}
       <div className="mt-10 rounded-2xl bg-forest-tint p-5 sm:p-7">
         <div className="flex items-baseline justify-between gap-3">
           <div>
@@ -805,7 +837,7 @@ function BriefingAnatomy({ t }: { t: T }) {
             </p>
           </div>
           <span className="shrink-0 font-mono text-[10px] tabular-nums text-forest">
-            5,400-7,800 kata
+            {range(10000, 12500)} {unit}
           </span>
         </div>
         <ul className="mt-6 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -949,66 +981,54 @@ function ModelsTable({ t }: { t: T }) {
 }
 
 /**
- * Estimated monthly API spend across all providers. Snapshot pulled
- * from the live billing endpoints + usage_events — the live numbers
- * live in `/admin/system/api-costs` (superadmin).
+ * Estimated monthly spend across providers, measured on the production
+ * database (read-only) on 2026-11-26. The live numbers live in
+ * `/admin/system/api-costs` (superadmin); invoiced spending (VPS, domain,
+ * subscriptions) is public at /transparency.
  *
- * Apify rows refreshed 2026-06-07 from authoritative `/v2/users/me/limits`
- * for cycle 2026-05-19 → 2026-06-18:
- *   · cycle spent so far: $24.80 / $29 Starter cap (85.5% used)
- *   · day 20 of 31 — daily avg $1.24/day
- *   · projected cycle-end: ~$38 (WILL exceed $29 plan cap by ~$9)
- *
- * Per-platform extrapolated from tracked `scrape` rows × (31/20),
- * with the daily 06:00 `billing_reconcile` delta ($9.15/cycle, mostly
- * apidojo/tweet-scraper late-billed events) folded into X. TikTok is
- * the highest per-call line ($0.063/call) despite the 49→28 keyword
- * prune; Instagram volume is running ~40% of the projection that
- * assumed limit=60 would saturate.
- *
- * Gemini Flash-Lite reflects post-2026-05-25 IndoBERT→Gemini sentiment
- * switch PLUS the 14-theme-group classifier added 2026-06-05.
- *
- * Briefings cron still paused per 2026-05-23; Gemini Pro row covers
- * only on-demand user briefs (manual weekly briefings go through
- * Claude, not Gemini Pro).
+ *   · Claude Sonnet 5.5 — `ingest_runs` task_name claude_label_batch +
+ *     claude_recluster_weekly (cost_usd on the row). Last 7 nights = $7.49
+ *     ($0.93-1.38 a night for 1,647-2,692 posts) + the Thursday recluster
+ *     $2.48 = $9.98 → × 30/7 ≈ $42.76 a month. It runs on
+ *     ANTHROPIC_LABELING_API_KEY, an org funded by a promotional Claude
+ *     credit, not on the IDR cap (AGENTS.md); it is still counted in the
+ *     total below so the figure stays conservative.
+ *   · OpenAI embeddings — `usage_events` provider openai, operation
+ *     embedding, last 30 days: $0.71 (844 events: the Thursday recluster
+ *     and query embeddings). The one-off corpus re-embeds of 2026-11-06
+ *     ($0.25) are not run-rate.
+ *   · Gemini — no `usage_events` row after 2026-10-29 01:00
+ *     (classify_sentiment) although trending_ingest ran every day: $0.
+ *   · YouTube / RSS — usage_events cost 0 (free quota / no API).
+ *   · Apify — token blank since 2026-11-13, daily reconcile switched off
+ *     (app_settings pipeline:reconcile_apify_costs:all = disabled); the
+ *     last usage_events row is 2026-11-08 ($0.001).
+ *   · VPS — manual_costs: IDCloudHost top-up Rp 455.100 for 2026-10-16 →
+ *     2026-11-30 (45 days) ≈ Rp 303K a month. On the VM: nproc 2, free ≈
+ *     2 GB, df / 38 GB. Update `monthly` and the note together if the plan
+ *     changes.
+ *   · USD→IDR 18,000 = the `usd_to_idr` row in app_settings (admin-editable).
  */
 function MonthlyCost({ t }: { t: T }) {
+  const USD_TO_IDR = 18_000;
   const rows = [
     {
-      provider: "Gemini 2.5 Pro (user briefs only)",
-      use: t("cost_gemini_pro_use"),
-      // Auto-briefing cron paused since 2026-05-23; the manual 5/27 +
-      // 5/28 generations went through Claude (not Gemini Pro). Pro now
-      // only serves the on-demand `synth_brief` path (user-initiated
-      // briefs via /briefs/new). 7d observed: 3 synth_brief events at
-      // $0.065 total → $0.28/mo at current usage. Scales with user
-      // adoption — bump this when /briefs/new traffic ramps.
-      monthly: 0.3,
-      note: "On-demand user briefs only · ~$0.07/brief · auto-cron paused",
-    },
-    {
-      provider: "Gemini Flash-Lite",
-      use: t("cost_gemini_use"),
-      // 7d observed = $4.04 → $17.40/mo run-rate at the post-2026-05-25
-      // state (sentiment switched from IndoBERT to Gemini Flash-Lite
-      // after the IndoBERT eval showed ~14% accuracy on X positives).
-      // Breakdown by pipeline trigger:
-      //   · Every-2h RSS classifier        ~$7.80/mo (rel + news-sent + opp)
-      //   · Weekly social Wed scrape       ~$5.60/mo (Wed burst across X/TT/IG)
-      //   · Daily 04:00 recluster          ~$2.70/mo (topic_discovery)
-      //   · Daily 12:00 trending           ~$1.30/mo (trending_filter + fan-out classify)
-      //   · Misc rerank/translate/flyer    ~$0.10/mo
-      monthly: 17.4,
-      note: "Per-post classifier + daily topic-discovery + daily trending fan-out + weekly social burst",
+      provider: "Anthropic Claude Sonnet 5.5 (labels + topics)",
+      use: t("cost_claude55_use"),
+      monthly: 42.76,
+      note: t("cost_active"),
     },
     {
       provider: "OpenAI embeddings",
       use: t("cost_openai_use"),
-      // Real 30d observed: $0.20. Mostly topic-recluster embedding
-      // (daily 04:00) plus kitab-query embeddings on user briefs.
-      monthly: 0.2,
-      note: "Topic-recluster vectors + per-brief kitab query embeddings",
+      monthly: 0.71,
+      note: t("cost_openai_note"),
+    },
+    {
+      provider: "Gemini Flash-Lite / 2.5 Pro",
+      use: t("cost_gemini_use"),
+      monthly: 0,
+      note: t("cost_gemini_note"),
     },
     {
       provider: "YouTube Data API",
@@ -1032,52 +1052,24 @@ function MonthlyCost({ t }: { t: T }) {
     {
       provider: "VPS · IDCloudHost (Jakarta)",
       use: t("cost_vps_use"),
-      // Rp 300K/bulan @ rate ≈ Rp 16,300/USD → ~$18.40. Spec as of
-      // 2026-05-29: 2 vCPU · 4 GB RAM · 30 GB disk. Update both
-      // `monthly` and the `note` together when the plan changes.
-      monthly: 18,
-      note: "≈ Rp 300K/bulan · 2 vCPU · 4 GB RAM · 30 GB disk",
+      monthly: 300_000 / USD_TO_IDR,
+      note: "≈ Rp 300K/bulan · 2 vCPU · 2 GB RAM · 38 GB disk",
     },
-    // ── Apify scrapers ── per-row projections at documented Starter
-    // rates. Combined target ≤ $15/mo (Apify Starter included credit).
+    // ── Apify scrapers (X, Instagram, TikTok): paused ──
     {
-      provider: "Apify · X (apidojo, incl. late-bill)",
-      use: t("cost_x_use"),
-      // Cycle 2026-05-19→06-18 day 20: tracked-scrape $3.89 + the
-      // bulk of $9.15 billing_reconcile delta (apidojo bills per-event
-      // late, captured by daily 06:00 reconcile job). Extrapolated
-      // ($3.89 + $9.15) × 31/20 = $20.21/mo.
-      monthly: 20.21,
-      note: "Weekly Wed 22:00 + daily trending overlay · ~$0.016/tracked-call · apidojo bills late, captured by daily reconcile",
-    },
-    {
-      provider: "Apify · Instagram",
-      use: t("cost_ig_use"),
-      // Cycle observed: $3.85 (83 calls × $0.046/call avg) ×
-      // 31/20 = $5.97/mo. Real volume ~40% of the projected $14
-      // (limit=60 didn't saturate as expected).
-      monthly: 5.97,
-      note: "37 kw · weekly Wed 22:20 · ~$0.046/item · real volume ~40% of projection",
-    },
-    {
-      provider: "Apify · TikTok",
-      use: t("cost_tt_use"),
-      // Cycle observed: $7.92 (126 calls × $0.063/call avg, highest
-      // per-call cost in the stack) × 31/20 = $12.28/mo. Even after
-      // 49→28 keyword prune, TT is the dominant Apify line item.
-      monthly: 12.28,
-      note: "28 kw (post-prune) · weekly Wed 22:10 · ~$0.063/call (highest per-call in stack)",
+      provider: "Apify (X, Instagram, TikTok)",
+      use: t("cost_apify_use"),
+      monthly: 0,
+      note: t("cost_paused"),
     },
   ];
 
   const total = rows.reduce((s, r) => s + r.monthly, 0);
-  const totalIDR = total * 16300;
-  // Total operating budget cap = ~IDR 2M / month (~$123). Covers
-  // EVERYTHING — server + API + Apify scrapers when re-enabled. Earlier
-  // value of $60 only covered the API portion; updated 2026-05-22 after
-  // we added the VPS line item for full operating cost.
-  const cap = 123;
-  const capIDR = cap * 16300;
+  const totalIDR = total * USD_TO_IDR;
+  // Total operating budget cap = IDR 1.5-2M / month; the bar uses the upper
+  // end. Covers server + API (AGENTS.md "Cost discipline").
+  const capIDR = 2_000_000;
+  const cap = Math.round(capIDR / USD_TO_IDR);
   const usedPct = Math.min(100, (total / cap) * 100);
 
   return (
@@ -1156,11 +1148,13 @@ function MonthlyCost({ t }: { t: T }) {
 }
 
 function KitabCorpus({ t }: { t: T }) {
-  // 20 kitabs grouped into 5 thematic categories. Order within each
-  // group mirrors the /kitab library page so a reader who's been there
-  // sees the same mental model — EXCEPT Tafsir Ath-Thabari, which is
-  // Arabic-only and retrieved verse-keyed for the Tafsir Pekan Ini track
-  // (not part of the /kitab semantic search). Update both places together.
+  // 20 Qdrant collections grouped into 5 thematic categories: the 19 that
+  // /kitab searches (Kitab.library_subtitle says "19 kitab") plus Tafsir
+  // Ath-Thabari. Order within each group mirrors the /kitab library page so
+  // a reader who's been there sees the same mental model — EXCEPT Tafsir
+  // Ath-Thabari, which is Arabic-only and retrieved verse-keyed for the
+  // Tafsir Pekan Ini track (not part of the /kitab semantic search). Counts
+  // verified against Qdrant on 2026-11-26. Update both places together.
   const categories: Array<{ heading: string; note?: string; items: Array<{ title: string; detail: string }> }> = [
     {
       heading: t("kitab_cat_quran_tafsir"),
