@@ -1,8 +1,9 @@
 /**
  * Lesson content, validated at BUILD time (lesson pages are prerendered):
  * a malformed or unsourced value fails `next build` in CI instead of
- * reaching a learner. Public builds refuse content still marked "draft"
- * (pipeline state; there is no human review step, plan L11).
+ * reaching a learner. So does content that claims a human review or is left
+ * unfinished (lib/publishable.ts): the module is public (plan L42), and
+ * "draft" is only pipeline state, since there is no human review step (L11).
  *
  * One JSON per surah, in mushaf order: Al-Fatihah, then Al-Mu'awwidzat
  * (Al-Ikhlas, Al-Falaq, An-Nas). belajar/pipeline/validate.py checks that
@@ -15,8 +16,8 @@ import anNas from "../../content/an-nas.json";
 
 import { SurahContent, type Ayah, type SurahContent as Surah } from "@/content/schema";
 
-import { IS_PUBLIC } from "./flags";
 import { assertReferences } from "./library";
+import { assertPublishable } from "./publishable";
 
 function load(raw: unknown, name: string): Surah {
   const result = SurahContent.safeParse(raw);
@@ -52,29 +53,10 @@ for (let i = 1; i < SURAHS.length; i++) {
 // Every lemma / concept a lesson points at must exist in the libraries.
 assertReferences(SURAHS);
 
-/** Is any record in this surah still marked "draft" (pipeline state, plan L11)? */
-export function hasDrafts(s: Surah): boolean {
-  return (
-    s.ayat.some(
-      (a) =>
-        a.status === "draft" ||
-        a.tafsir?.status === "draft" ||
-        a.words.some((w) => w.status === "draft"),
-    ) ||
-    s.facts.some((f) => f.status === "draft") ||
-    s.hadith.some((h) => h.status === "draft")
-  );
-}
-
-if (IS_PUBLIC) {
-  const pending = SURAHS.filter(hasDrafts).map((s) => s.slug);
-  if (pending.length) {
-    throw new Error(
-      `BELAJAR_PUBLIC build refused: content still marked "draft" in ${pending.join(", ")}. ` +
-        "Revisit this gate before any indexed build (plan L11: there is no human review step).",
-    );
-  }
-}
+// Every record's `status` is "draft": pipeline state, not a review (plan L11), so it is not a reason to
+// keep a build from going public. What would be a reason is content that promises a review nobody
+// does, or that is left unfinished: refused here, in every build (lib/publishable.ts).
+for (const s of SURAHS) assertPublishable(s, `content/${s.slug}.json`);
 
 export function getSurah(slug: string): Surah | undefined {
   return SURAHS.find((s) => s.slug === slug);

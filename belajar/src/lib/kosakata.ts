@@ -12,7 +12,6 @@ import { join } from "node:path";
 import type { KosakataAyatFile, KosakataIndex, KosakataPath, KosakataWord, KosakataWordsFile } from "@/content/kosakata-schema";
 
 import { parseAyahLoc, type AyahPayload } from "./ayah";
-import { IS_PUBLIC } from "./flags";
 import { ayatFileName, wordsFileName } from "./kosakata-core";
 
 const read = <T>(name: string): T => JSON.parse(readFileSync(join(process.cwd(), "content/kosakata", name), "utf8")) as T;
@@ -21,14 +20,11 @@ let index: KosakataIndex | null = null;
 
 /** Every word's row: the list, the search and the counts. */
 export function kosakataIndex(): KosakataIndex {
-  if (!index) {
-    const loaded = read<KosakataIndex>("index.json");
-    // As lib/content.ts refuses draft lessons: going public is a decision, and this data is draft.
-    if (IS_PUBLIC && loaded.status === "draft") {
-      throw new Error("content/kosakata is marked draft; a public build must not serve it");
-    }
-    index = loaded;
-  }
+  // `status` is "draft" here as everywhere: pipeline state, not a review (docs/belajar-plan.md L11), so it
+  // does not keep a public module from serving the list. That the files claim no review and hold no
+  // unfinished text is checked on every file by src/lib/publishable.test.ts (they are read per request,
+  // too large to scan at run time; lib/publishable.ts has the rule).
+  if (!index) index = read<KosakataIndex>("index.json");
   return index;
 }
 

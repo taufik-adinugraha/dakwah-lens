@@ -14,8 +14,9 @@
 //     main-site addresses verified by page title (src/lib/mainSite.ts), written out here again;
 //   - og:* / twitter:* on the hub, the track, the curriculum page (plan L30), the cheat sheet
 //     (plan L32) and every published
-//     lesson: og:url = the canonical link, the image = the page's own /og card; the pages stay
-//     noindex;
+//     lesson: og:url = the canonical link, the image = the page's own /og card; sharing does not
+//     change what is indexed (the module is public since 2026-11-26, plan L42: an Indonesian page
+//     carries no noindex, an English one does; what Google may index is seo-smoke.mjs's part);
 //   - every card: 200, image/png, a real PNG of 1200×630; unknown lessons' cards 404; nothing
 //     hidden is shared: the waris address's 404 page carries no card and no share button, and
 //     where the image lists its published surahs (/belajar/api/surahs, BELAJAR_SURAHS) an
@@ -129,8 +130,12 @@ async function shareMeta(path, html, { card, title }) {
   if (meta(html, "twitter:image") !== `${SITE}${card}`) fail(path, `twitter:image ${meta(html, "twitter:image")}`);
   if (title && meta(html, "og:title") !== title) fail(path, `og:title "${meta(html, "og:title")}", expected "${title}"`);
   if (!meta(html, "og:description")) fail(path, "no og:description");
-  // The module stays a noindex beta (lib/flags.ts); sharing must not change that.
-  if (!/noindex/.test(meta(html, "robots") ?? "")) fail(path, `robots is "${meta(html, "robots")}", expected noindex`);
+  // The module is public (plan L42), and only Indonesian is indexed (src/i18n/routing.ts INDEXED_LOCALES):
+  // sharing must not change that. An Indonesian page has no noindex; an English one still has it.
+  const robots = meta(html, "robots") ?? "";
+  const locale = path.split("/")[2];
+  if (locale === "id" && /noindex/.test(robots)) fail(path, `robots is "${robots}", expected no noindex (the Indonesian pages are indexable)`);
+  if (locale === "en" && !/noindex/.test(robots)) fail(path, `robots is "${robots}", expected noindex (English is not indexed)`);
 }
 
 async function cardImage(card) {

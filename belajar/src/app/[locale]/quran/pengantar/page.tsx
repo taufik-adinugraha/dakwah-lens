@@ -17,12 +17,17 @@ import { CURRICULUM, taughtInZero, ZERO_HOST } from "@/lib/curriculum";
 import { getConcept } from "@/lib/library";
 import { quizAyah } from "@/lib/quiz-content";
 import { ayahHref, conceptHref, introHref, quranHref } from "@/lib/routes";
+import { shorten } from "@/lib/seo";
 import { alternatesFor } from "@/lib/share";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/quran/pengantar">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Intro" });
-  return { title: t("title"), alternates: alternatesFor(locale, introHref()) };
+  return {
+    title: t("title"),
+    description: shorten(t("about", { surah: ZERO_HOST?.name_id ?? "" })),
+    alternates: alternatesFor(locale, introHref()),
+  };
 }
 
 /**

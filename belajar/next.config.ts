@@ -109,7 +109,13 @@ const nextConfig: NextConfig = {
     ];
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // The JSON endpoints (ayah popup, surah list, health, the anonymous counts) are no pages: they stay
+      // out of search engines, now that the module is public (docs/belajar-plan.md L42). The pages' own
+      // rule, and the share cards', is src/proxy.ts (lib/indexing.ts); the proxy does not run on /api.
+      { source: "/api/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex" }] },
+    ];
   },
 };
 

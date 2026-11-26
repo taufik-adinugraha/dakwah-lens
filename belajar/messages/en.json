@@ -600,5 +600,12 @@
     "missed": "To go over again",
     "all_right": "Every answer was right.",
     "what_batch": "Level {level}, Batch {batch}"
+  },
+  "Seo": {
+    "surah": "Surah {name}, {ayat} ayat: learn it word by word with the imam's recitation, each word's meaning, its root, and why its ending is read the way it is.",
+    "kosakata_list": "Words of the Qur'an, most frequent first, words {from, number} to {to, number} of {total, number}: meanings and a recording of each word.",
+    "kosakata_list_title": "Qur'an vocabulary: words {from, number} to {to, number}",
+    "kosakata_word": "The meaning of {translit} ({ar}) in the Qur'an: {meaning}. It occurs {count, number} times, with its root and example ayat.",
+    "credits": "Sources, data and licences behind Learn: the Qur'an's text and translation, the imam's recitation, the word recordings, the kitabs cited, and the AI narrator's voice."
   }
 }

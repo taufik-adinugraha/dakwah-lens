@@ -8,9 +8,13 @@ import { SourcesDisclosure } from "@/components/library/SourceList";
 import { Prose } from "@/components/library/TermText";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
-import { visibleSurahs } from "@/lib/features";
+import { publishedSurahs, visibleSurahs } from "@/lib/features";
 import { getLexeme, LIBRARY, parseLoc, rootFor, TERMS } from "@/lib/library";
-import { ayahHref } from "@/lib/routes";
+import { ayahHref, lexemeHref } from "@/lib/routes";
+import { lexemeIndexable } from "@/lib/indexing";
+import { lexemeSurahsOf } from "@/lib/lexemes";
+import { NOINDEX, shorten } from "@/lib/seo";
+import { alternatesFor } from "@/lib/share";
 import { markedTokens, Scope } from "@/lib/terms";
 
 export const dynamicParams = false;
@@ -22,9 +26,21 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/kosakata/[id]">): Promise<Metadata> {
-  const { id } = await params;
+  const { locale, id } = await params;
   const l = getLexeme(id);
-  return { title: l ? `${l.translit} (${l.lemma_ar})` : "—" };
+  if (!l) return { title: "—" };
+  return {
+    title: `${l.translit} (${l.lemma_ar})`,
+    // The entry opens with the lemma's core meaning, which differs from one entry to the next.
+    description: shorten(`${l.translit} (${l.lemma_ar}): ${l.meaning}`),
+    alternates: alternatesFor(locale, lexemeHref(l.id)),
+    // Indexable only while a published surah's lesson uses the word (lib/indexing.ts lexemeIndexable): an
+    // entry used only by a hidden or unlisted surah would put that surah's vocabulary in the index. The
+    // page renders per request, so BELAJAR_SURAHS is read now, and publishing the surah needs no rebuild;
+    // the sitemap asks the same question. The key is left out, not set to undefined (Next would read that
+    // as "none" and drop the locale layout's noindex for English).
+    ...(lexemeIndexable(lexemeSurahsOf(l.id), new Set(publishedSurahs())) ? {} : { robots: NOINDEX }),
+  };
 }
 
 /**

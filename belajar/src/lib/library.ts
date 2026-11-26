@@ -1,6 +1,7 @@
 /**
- * Shared libraries (Konsep, Kosakata, Akar): written once, reviewed once,
- * reused by every surah (plan: re-use materials across ayat and surahs).
+ * Shared libraries (Konsep, Kosakata, Akar): written once, checked once by
+ * the pipeline (no human review exists, plan L11), reused by every surah
+ * (plan: re-use materials across ayat and surahs).
  * Validated at build time, including cross-references from the lessons —
  * a word pointing at a lemma or concept that doesn't exist fails CI.
  */
@@ -17,7 +18,7 @@ import {
   type WordParts,
 } from "@/content/schema";
 
-import { IS_PUBLIC } from "./flags";
+import { assertPublishable } from "./publishable";
 import { voiceFrom, type WordVoiceManifest } from "./wordvoice";
 import { lookupFrom, type Lookup } from "./terms";
 
@@ -28,6 +29,9 @@ if (!parsed.success) {
       JSON.stringify(parsed.error.issues.slice(0, 10), null, 2),
   );
 }
+// Every record is "draft": pipeline state, not a review (plan L11), so no reason to refuse a public build.
+// Refused, in every build: a record that claims a review nobody did, or text left unfinished (lib/publishable.ts).
+assertPublishable(parsed.data, "content/library.json");
 /**
  * The voice of every Qur'anic word, run and part of a word the library shows: the narrator's
  * recording of its bytes (content/wordvoice.json, pipeline/wordvoice.py), NEVER a cut of the
@@ -71,16 +75,6 @@ export function rootFor(letters: string[] | null): Root | undefined {
   return LIBRARY.roots.find((r) => r.letters.join("") === key);
 }
 
-export function libraryHasDrafts(): boolean {
-  return (
-    LIBRARY.concepts.some((c) => c.status === "draft") ||
-    LIBRARY.basics.some((b) => b.status === "draft") ||
-    LIBRARY.parts.some((p) => p.status === "draft") ||
-    LIBRARY.lexicon.some((l) => l.status === "draft") ||
-    LIBRARY.roots.some((r) => r.status === "draft")
-  );
-}
-
 // Where a Konsep is TAUGHT is the curriculum's (src/lib/curriculum.ts taughtAt; operator-approved
 // 2026-10-13, plan L26). Until then: conceptsIntroducedIn here, the ayah of its first example.
 
@@ -111,10 +105,4 @@ export function assertReferences(surahs: SurahContent[]): void {
   if (problems.length) {
     throw new Error("Broken content references:\n" + problems.slice(0, 20).join("\n"));
   }
-}
-
-if (IS_PUBLIC && libraryHasDrafts()) {
-  throw new Error(
-    "BELAJAR_PUBLIC build refused: unreviewed records in content/library.json (plan §8).",
-  );
 }

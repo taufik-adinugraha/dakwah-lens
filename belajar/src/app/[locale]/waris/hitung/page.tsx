@@ -8,6 +8,7 @@ import { AiChip } from "@/components/waris/report/AiChip";
 import { HitungApp } from "@/components/waris/questionnaire/HitungApp";
 import { buildRulePack } from "@/components/waris/questionnaire/rulePack";
 import { hubHref, warisHref } from "@/lib/routes";
+import { alternatesFor } from "@/lib/share";
 import { loadWarisContent } from "@/lib/waris-content";
 import type { ReportDalilRecord, ReportRules } from "@/lib/waris/report/content";
 import { REPORT_MESSAGES, type ReportMsgKey } from "@/lib/waris/report/messages";
@@ -23,16 +24,10 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/waris/hi
   return {
     title: t("meta_judul"),
     description: t("meta_deskripsi"),
-    // A calculator families act on: never indexed while the module is a beta (plan §9.1).
+    // A calculator families act on: never indexed, even though the module is public (plan §9.1, L42;
+    // lib/indexing.ts and the proxy's header say the same, and the sitemap never lists it).
     robots: { index: false, follow: true },
-    alternates: {
-      canonical: `https://dakwah-lens.id/belajar/${locale}${warisHref.hitung()}`,
-      languages: {
-        id: `https://dakwah-lens.id/belajar/id${warisHref.hitung()}`,
-        en: `https://dakwah-lens.id/belajar/en${warisHref.hitung()}`,
-        "x-default": `https://dakwah-lens.id/belajar/id${warisHref.hitung()}`,
-      },
-    },
+    alternates: alternatesFor(locale, warisHref.hitung()),
   };
 }
 

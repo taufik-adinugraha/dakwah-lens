@@ -14,8 +14,8 @@ import { comingUnits } from "@/lib/comingUnits";
 import { kosakataEnglishOn, kosakataPathListed, visibleSurahs, warisVisible } from "@/lib/features";
 import { kosakataIndex } from "@/lib/kosakata";
 import { LIBRARY } from "@/lib/library";
-import { conceptIndexHref, kosakataHref, kosakataPathHref, quranHref, warisHref } from "@/lib/routes";
-import { pageUrl, shareMetadata } from "@/lib/share";
+import { conceptIndexHref, hubHref, kosakataHref, kosakataPathHref, quranHref, warisHref } from "@/lib/routes";
+import { alternatesFor, pageUrl, shareMetadata } from "@/lib/share";
 
 export async function generateMetadata({
   params,
@@ -27,17 +27,12 @@ export async function generateMetadata({
   const title = `${t("heading")} · Dakwah-Lens`;
   return {
     title: { absolute: title },
-    alternates: {
-      canonical: `https://dakwah-lens.id/belajar/${locale}`,
-      languages: {
-        id: "https://dakwah-lens.id/belajar/id",
-        en: "https://dakwah-lens.id/belajar/en",
-        "x-default": "https://dakwah-lens.id/belajar/id",
-      },
-    },
+    description: ta("description"),
+    // The canonical address, and hreflang only while every locale is indexed (lib/share.ts).
+    alternates: alternatesFor(locale, hubHref()),
     // Share preview with the hub's card (app/[locale]/og/route.ts); og:url = the canonical.
     // "/" is the hub (lib/routes.ts hubHref).
-    ...shareMetadata({ locale, path: "/", title, description: ta("description"), imageAlt: to("image_alt") }),
+    ...shareMetadata({ locale, path: hubHref(), title, description: ta("description"), imageAlt: to("image_alt") }),
   };
 }
 

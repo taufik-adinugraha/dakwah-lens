@@ -47,6 +47,14 @@ export const INTRO_SEGMENT = "pengantar";
 export const introHref = () => `/${QURAN}/${INTRO_SEGMENT}`;
 
 /**
+ * The surah that hosts lesson zero: the one whose harakat primer plays there (src/lib/curriculum.ts
+ * ZERO_HOST, which derives it from the content; src/lib/routes.test.ts holds the two equal). Written out
+ * here because src/proxy.ts decides, per request, whether lesson zero may be indexed — only while its
+ * surah is published (lib/curriculum.ts introOpen) — and the proxy must not import the content.
+ */
+export const INTRO_HOST = "al-fatihah";
+
+/**
  * One ayah's lesson; with `wordLoc` ("1:2:3"), straight to that word's card
  * ("#w-1-2-3", the id WordCard renders).
  */

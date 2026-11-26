@@ -13,10 +13,10 @@ import { CURRICULUM, introOpen } from "@/lib/curriculum";
 import { visibleSurahs } from "@/lib/features";
 import { surahNamesFor } from "@/lib/ayat";
 import { ayahHref, curriculumHref, rumusHref, surahHref } from "@/lib/routes";
-import { shareMetadata } from "@/lib/share";
+import { alternatesFor, shareMetadata } from "@/lib/share";
 
 /** This page's path, lib/routes.ts quranHref() (src/lib/share.test.ts holds them equal), for
- *  its share card. */
+ *  its canonical address and its share card. */
 const TRACK_PATH = "/quran";
 
 export async function generateMetadata({
@@ -28,14 +28,9 @@ export async function generateMetadata({
   const to = await getTranslations({ locale, namespace: "Og" });
   return {
     title: t("title"),
-    alternates: {
-      canonical: `https://dakwah-lens.id/belajar/${locale}/quran`,
-      languages: {
-        id: "https://dakwah-lens.id/belajar/id/quran",
-        en: "https://dakwah-lens.id/belajar/en/quran",
-        "x-default": "https://dakwah-lens.id/belajar/id/quran",
-      },
-    },
+    description: t("intro"),
+    // The canonical address, and hreflang only while every locale is indexed (lib/share.ts).
+    alternates: alternatesFor(locale, TRACK_PATH),
     // Share preview with the track's card (quran/og/route.ts); og:url = the canonical.
     ...shareMetadata({
       locale,

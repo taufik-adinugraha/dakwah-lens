@@ -11,7 +11,7 @@ import { LineFit } from "@/components/LineFit";
 import { VisitCount } from "@/components/visits/VisitCount";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { IS_PUBLIC } from "@/lib/flags";
+import { layoutRobots } from "@/lib/indexing";
 import { mainSiteHref } from "@/lib/mainSite";
 import { creditsHref, hubHref } from "@/lib/routes";
 
@@ -67,11 +67,18 @@ export async function generateMetadata({
   // module wears the Dakwah-Lens brand. Before them a tab showed the main favicon only through the
   // browser's /favicon.ico guess, and a phone's home screen got no icon. The main site's PWA
   // manifest is not linked: it describes the main app, not this module.
+  //
+  // robots: the module is public (lib/flags.ts) and the Indonesian pages are indexable, so they carry
+  // no robots tag at all; the English ones (not yet a complete version, src/i18n/routing.ts
+  // INDEXED_LOCALES) and every page of a module that is not public carry `noindex, follow`. A page
+  // that must stay out of the index in a locale that is indexed says so itself (waris, the Kosakata
+  // flow pages), or the proxy does, per request (lib/indexing.ts; src/proxy.ts). Never blocked in
+  // robots.txt: Google cannot see a noindex on a page it may not fetch.
   return {
     metadataBase: new URL("https://dakwah-lens.id"),
     title: { default: t("name"), template: t("title_template") },
     description: t("description"),
-    robots: IS_PUBLIC ? undefined : { index: false, follow: true },
+    robots: layoutRobots(locale),
   };
 }
 

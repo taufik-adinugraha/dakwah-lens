@@ -132,6 +132,7 @@ describe("every place that lists or links surahs reads the switch", () => {
       "src/app/[locale]/quran/page.tsx", // published surahs only; the others are "Segera hadir" cards
       "src/lib/curriculumOutline.ts", // the curriculum page's lessons: a written ayah of a published surah; the others plain text
       "src/lib/rumusSheet.ts", // the cheat sheet's example links: only a step whose lesson lessonLink() gives a page (a published surah)
+      "src/lib/sitemap-paths.ts", // the sitemap's lessons: each address is asked lib/indexing.ts noindexReason, which says no to an unpublished surah
       "src/app/[locale]/kosakata/[id]/page.tsx", // published surahs only; the others plain text
       "src/components/library/ConceptCard.tsx", // surahPublished()
       "src/app/[locale]/quran/[surah]/page.tsx", // within its own surah, reached only when published

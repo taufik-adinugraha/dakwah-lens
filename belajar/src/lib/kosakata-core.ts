@@ -23,6 +23,26 @@ export function parsePage(raw: unknown, total: number): number {
   return n <= pageCount(total) ? n : 1;
 }
 
+/**
+ * Which page of the list an address names, for search engines (docs/belajar-plan.md L42). The list
+ * answers many addresses with the same hundred words: `parsePage` gives the first page for a `hal`
+ * that is malformed or beyond the last page, the form's empty `?q=` shows the first page too, and a
+ * repeated `hal` is read as its first value. Left alone, each of them would be one more near-copy of
+ * a list page in the index. So only an address that names a real page — no `hal` (the first page), or one
+ * `hal` that is a plain number from 1 to the last page, and no `q` — is a page of the list, and
+ * the page says it is (`{ page }`, its canonical being `?hal=<page>`); every other address is `null`:
+ * a search (`q`) or a variant, `noindex` and with no canonical. `pages` is the last page's number, or null
+ * where it is not at hand (the proxy, which must not load the list): then only the address's shape is checked.
+ * One rule for the page's metadata, the proxy's header and the sitemap, so they cannot drift apart.
+ */
+export function listAddress(hal: readonly string[], q: readonly string[], pages: number | null): { page: number } | null {
+  if (q.length > 0 || hal.length > 1) return null;
+  if (hal.length === 0) return { page: 1 };
+  if (!/^[1-9]\d{0,3}$/.test(hal[0])) return null;
+  const page = Number(hal[0]);
+  return pages !== null && page > pages ? null : { page };
+}
+
 /** The rows of one page. */
 export function pageRows<T>(rows: readonly T[], page: number): readonly T[] {
   return rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);

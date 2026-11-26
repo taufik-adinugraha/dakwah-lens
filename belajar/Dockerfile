@@ -12,9 +12,14 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Build-time: lesson pages are prerendered, so the public/noindex flag is
-# baked in at build (plan §7.6). Flipping it is a redeploy.
-ARG BELAJAR_PUBLIC=false
+# The module is PUBLIC, i.e. indexable (operator, 2026-11-26: "publish belajar so google can see";
+# plan L42, src/lib/flags.ts). This default is the one place that says so: CI builds this image once,
+# smoke-tests that very image and ships it, so what is tested is what runs. The prerendered lesson
+# pages read the flag HERE, at build time; the proxy, the sitemap and every page rendered per
+# request read it at RUN time, so the runner stage below carries it too (without that line they
+# would see it unset and answer `noindex` to everything). Do not pass --build-arg for the shipped
+# image. BELAJAR_PUBLIC=false in belajar.env (then a container recreate) is the kill switch.
+ARG BELAJAR_PUBLIC=true
 ENV BELAJAR_PUBLIC=$BELAJAR_PUBLIC
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
@@ -23,6 +28,10 @@ RUN npm run build
 FROM node:22-alpine AS runner
 WORKDIR /app
 RUN apk add --no-cache tini
+# The same flag as the builder's (an ARG is scoped to its stage): read at run time by the proxy, the
+# sitemap and the pages rendered per request. `env_file`/`-e` in the compose file override it.
+ARG BELAJAR_PUBLIC=true
+ENV BELAJAR_PUBLIC=$BELAJAR_PUBLIC
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000

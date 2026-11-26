@@ -7,11 +7,13 @@ import { kosakataIndex, kosakataPath } from "@/lib/kosakata";
 import { pathSource } from "@/lib/kosakata-path";
 import { batchOrder } from "@/lib/kosakata-path-core";
 import { levelOf, mapLevels, testData } from "@/lib/kosakata-path-data";
+import { NOINDEX } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/kosakata/bertahap/[level]/tes">): Promise<Metadata> {
   const { locale, level } = await params;
   const t = await getTranslations({ locale, namespace: "KosakataPath" });
-  return { title: t("test_title_level", { level }) };
+  // A quiz: out of the index (lib/indexing.ts).
+  return { title: t("test_title_level", { level }), robots: NOINDEX };
 }
 
 /**

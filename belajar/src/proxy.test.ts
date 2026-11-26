@@ -336,3 +336,145 @@ describe("proxy: an unlisted surah answers at its address (BELAJAR_UNLISTED; def
     for (const path of MUAWWIDZAT) expect(landing(path), path).toBe(path);
   });
 });
+
+// ── Search engines (docs/belajar-plan.md L42; operator 2026-11-26: "publish belajar so google can see").
+// The module is public, so what is reachable but must stay out of the index says so in an X-Robots-Tag
+// header, which follows the switches per request and reaches the prerendered lesson pages; what may be
+// indexed carries none. lib/indexing.ts has the rule (src/lib/indexing.test.ts holds it to the list the
+// operator gave); here the real proxy is asked, as Next calls it.
+describe("proxy: X-Robots-Tag for what must stay out of the index", () => {
+  const KEYS = [
+    "BELAJAR_PUBLIC",
+    "BELAJAR_WARIS",
+    "BELAJAR_SURAHS",
+    "BELAJAR_UNLISTED",
+    "BELAJAR_KOSAKATA_BERTAHAP",
+    "BELAJAR_KOSAKATA_EN",
+    "BELAJAR_KOSAKATA_WORDS_INDEXED",
+  ] as const;
+  const before = Object.fromEntries(KEYS.map((k) => [k, process.env[k]]));
+  beforeEach(() => {
+    for (const k of KEYS) delete process.env[k];
+    process.env.BELAJAR_PUBLIC = "true";
+    // As production has it (the image's own default is public; the learning path is listed there).
+    process.env.BELAJAR_KOSAKATA_BERTAHAP = "on";
+  });
+  afterEach(() => {
+    for (const k of KEYS) {
+      if (before[k] === undefined) delete process.env[k];
+      else process.env[k] = before[k];
+    }
+  });
+
+  const NOINDEX = "noindex, follow";
+  const response = (path: string) => proxy(new NextRequest(`http://127.0.0.1:3200${path}`, { nextConfig: { basePath: "/belajar" } }));
+  const tag = (path: string) => response(path).headers.get("x-robots-tag");
+
+  it("leaves what may be indexed without the header: the Indonesian pages that are live", () => {
+    for (const path of [
+      "/belajar/id",
+      "/belajar/id/quran",
+      "/belajar/id/quran/al-fatihah",
+      "/belajar/id/quran/al-fatihah/1",
+      "/belajar/id/quran/pengantar",
+      "/belajar/id/quran/kurikulum",
+      "/belajar/id/quran/rumus",
+      "/belajar/id/konsep",
+      "/belajar/id/konsep/harakat",
+      "/belajar/id/kosakata/rahim",
+      "/belajar/id/kosakata/bertahap",
+      "/belajar/id/kosakata?hal=2",
+      "/belajar/id/kosakata?hal=2&utm_source=share&utm_medium=whatsapp",
+      "/belajar/id/kredit",
+    ]) {
+      expect(tag(path), path).toBeNull();
+      expect(landing(path), path).not.toMatch(HIDDEN_404);
+    }
+  });
+
+  it("marks the English pages: a translated shell around Indonesian lessons is not indexed", () => {
+    for (const path of ["/belajar/en", "/belajar/en/quran", "/belajar/en/quran/al-fatihah/1", "/belajar/en/konsep/harakat", "/belajar/en/kredit"]) {
+      expect(tag(path), path).toBe(NOINDEX);
+    }
+  });
+
+  it("marks an unlisted surah, which answers at its address, and follows BELAJAR_SURAHS when it is published", () => {
+    for (const path of ["/belajar/id/quran/al-ikhlas", "/belajar/id/quran/al-ikhlas/1", "/belajar/id/quran/al-ikhlas/4/og"]) {
+      expect(landing(path), path).toBe(path);
+      expect(tag(path), path).toBe(NOINDEX);
+    }
+    // A hidden surah answers 404 and needs no tag; Al-Fatihah, published, needs none.
+    expect(landing("/belajar/id/quran/al-falaq/1")).toMatch(HIDDEN_404);
+    expect(tag("/belajar/id/quran/al-fatihah/1")).toBeNull();
+    // Published, it is indexable at once, with no rebuild.
+    setSurahs("al-fatihah,al-ikhlas");
+    for (const path of ["/belajar/id/quran/al-ikhlas", "/belajar/id/quran/al-ikhlas/1"]) expect(tag(path), path).toBeNull();
+    expect(tag("/belajar/id/quran/al-ikhlas/1/og")).toBe(NOINDEX);
+    // Lesson zero goes with the surah that hosts it.
+    expect(tag("/belajar/id/quran/pengantar")).toBeNull();
+    setSurahs("an-nas");
+    expect(tag("/belajar/id/quran/pengantar")).toBe(NOINDEX);
+  });
+
+  it("marks Ilmu Waris when the operator shows it, the report included", () => {
+    setSwitch("on");
+    for (const path of ["/belajar/id/waris", "/belajar/id/waris/hitung", "/belajar/id/waris/laporan", "/belajar/en/waris/hitung"]) {
+      expect(landing(path), path).toBe(path);
+      expect(tag(path), path).toBe(NOINDEX);
+    }
+  });
+
+  it("marks every share card, which is an image", () => {
+    for (const path of ["/belajar/id/og", "/belajar/en/og", "/belajar/id/quran/og", "/belajar/id/quran/kurikulum/og", "/belajar/id/quran/rumus/og", "/belajar/id/quran/al-fatihah/1/og"]) {
+      expect(tag(path), path).toBe(NOINDEX);
+    }
+  });
+
+  it("marks the Kosakata list's searches and variants, the learning path's cards and tests, and the word pages", () => {
+    for (const path of [
+      "/belajar/id/kosakata?q=tangan",
+      "/belajar/id/kosakata?q=",
+      "/belajar/id/kosakata?hal=0",
+      "/belajar/id/kosakata?hal=abc",
+      "/belajar/id/kosakata?hal=1&hal=2",
+      "/belajar/id/kosakata/bertahap/1/1",
+      "/belajar/id/kosakata/bertahap/1/1/tes",
+      "/belajar/id/kosakata/bertahap/1/tes",
+      "/belajar/id/kosakata/kata/1",
+    ]) {
+      expect(tag(path), path).toBe(NOINDEX);
+    }
+    // The word pages, taken by the operator; and the path's overview, while it is not listed.
+    process.env.BELAJAR_KOSAKATA_WORDS_INDEXED = "on";
+    expect(tag("/belajar/id/kosakata/kata/1")).toBeNull();
+    delete process.env.BELAJAR_KOSAKATA_BERTAHAP;
+    expect(tag("/belajar/id/kosakata/bertahap")).toBe(NOINDEX);
+  });
+
+  it("asks about the address as it arrived and as the page is served, so a cleaned spelling does not slip past", () => {
+    for (const path of ["/belajar/id/quran/al-%69khlas/1", "/belajar/id/quran/al-ikh%09las", "/belajar/id/quran/al-ikhlas/"]) {
+      expect(tag(path), path).toBe(NOINDEX);
+    }
+  });
+
+  it("says noindex everywhere while the module is not public (BELAJAR_PUBLIC): the kill switch", () => {
+    for (const value of ["false", undefined]) {
+      if (value === undefined) delete process.env.BELAJAR_PUBLIC;
+      else process.env.BELAJAR_PUBLIC = value;
+      for (const path of ["/belajar/id", "/belajar/id/quran/al-fatihah/1", "/belajar/id/konsep/harakat", "/belajar/id/kosakata?hal=2"]) {
+        expect(tag(path), `${path} ${value}`).toBe(NOINDEX);
+      }
+    }
+  });
+
+  it("answers no hreflang Link header (only Indonesian is indexed), and tags no redirect", () => {
+    for (const path of ["/belajar/id", "/belajar/en", "/belajar/id/quran/al-fatihah/1"]) {
+      expect(response(path).headers.get("link"), path).toBeNull();
+    }
+    for (const path of ["/belajar", "/belajar/waris", "/belajar/id/kosakata"]) {
+      const res = response(path);
+      expect(res.status, path).toBe(307);
+      expect(res.headers.get("x-robots-tag"), path).toBeNull();
+    }
+  });
+});
