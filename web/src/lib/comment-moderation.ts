@@ -9,7 +9,7 @@
  *                                       phone+contact lure, fake-testimonial money pattern
  *   4. Gibberish heuristics           — repeated chars, consonant runs,
  *                                       low-letter-ratio (emoji walls, gibberish)
- *   5. (Optional) LLM escalator       — Flash-Lite, fired only for borderline cases
+ *   5. (Optional) LLM escalator       — Claude Haiku 5.5, fired only for borderline cases
  *                                       (long + clean-looking but has digits/links).
  *                                       Returns ok|blocked + 1-word reason.
  *
@@ -22,9 +22,8 @@
  * exact tripwires.
  */
 
-import { GoogleGenAI } from "@google/genai";
 
-import { recordUsage } from "@/lib/usage-log";
+import { CLAUDE_SMALL_MODEL, callClaude, claudeConfigured } from "@/lib/claude";
 
 export type ModerationReason =
   | "empty"
@@ -87,7 +86,7 @@ export async function moderateComment(
     return { ok: false, reason: "gibberish" };
 
   // Borderline-but-clean: long body with digits or URLs that survived
-  // the regexes — escalate to Flash-Lite. Cheap (~Rp 0.5/call) and
+  // the regexes — escalate to the small model. Cheap (~Rp 0.5/call) and
   // catches the disguised-spam tail the patterns miss.
   if (opts.useLlm && shouldEscalate(trimmed)) {
     const verdict = await llmScreen(trimmed);
@@ -251,7 +250,7 @@ function isGibberish(s: string): boolean {
 }
 
 /* ────────────────────────────────────────────────────────────
- * 4. LLM escalator (Gemini Flash-Lite)
+ * 4. LLM escalator (Claude Haiku 5.5)
  * ──────────────────────────────────────────────────────────── */
 
 /** Only call the LLM when the comment has spam-shaped attributes but
@@ -262,18 +261,9 @@ function shouldEscalate(s: string): boolean {
   return s.length >= 40 && (hasDigits || hasUrlish);
 }
 
-// Direct Flash-Lite call (not via @/lib/llm — that path is locked to
-// Pro/Sonnet for synthesis-grade work). Moderation is a one-word
-// classifier; Flash-Lite at ~Rp 0.5/call is the right tier.
-
-let _genai: GoogleGenAI | null = null;
-function getGenai(): GoogleGenAI | null {
-  if (!process.env.GEMINI_API_KEY) return null;
-  if (_genai === null) {
-    _genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  }
-  return _genai;
-}
+// A small-model call (not via @/lib/llm — that path is for synthesis-grade
+// work). Moderation is a one-word classifier: Claude Haiku 5.5 since
+// 2026-11-26 (Gemini Flash-Lite before; its credit ran out ~2026-07-27).
 
 const MOD_PROMPT = `You moderate a public Indonesian Islamic discussion on a college campus.
 
@@ -302,28 +292,20 @@ Comment:
 One-word decision:`;
 
 async function llmScreen(body: string): Promise<ModerationDecision> {
-  const genai = getGenai();
-  if (!genai) return { ok: true };
+  if (!claudeConfigured()) return { ok: true };
 
   try {
-    const resp = await genai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: MOD_PROMPT.replace("{BODY}", body),
-      config: {
-        temperature: 0,
-        maxOutputTokens: 8,
-        thinkingConfig: { thinkingBudget: 0 },
-      },
-    });
-    void recordUsage({
-      provider: "gemini",
+    const { text } = await callClaude({
       operation: "comment_moderation",
-      model: "gemini-2.5-flash-lite",
-      tokensIn: resp.usageMetadata?.promptTokenCount ?? null,
-      tokensOut: resp.usageMetadata?.candidatesTokenCount ?? null,
+      model: CLAUDE_SMALL_MODEL,
+      prompt: MOD_PROMPT.replace("{BODY}", body),
+      maxTokens: 16,
+      effort: "low",
+      noThinking: true,
+      timeoutMs: 10_000,
     });
 
-    const d = (resp.text ?? "")
+    const d = text
       .toLowerCase()
       .trim()
       .replace(/[^a-z_]/g, "");
@@ -343,7 +325,7 @@ async function llmScreen(body: string): Promise<ModerationDecision> {
     // Fail OPEN — regex already caught the bulk. We'd rather pass an
     // edge-case comment than 503 the whole discussion form.
     console.warn(
-      "[comment-moderation] Flash-Lite screen failed:",
+      "[comment-moderation] model screen failed:",
       err instanceof Error ? err.message : err,
     );
     return { ok: true };

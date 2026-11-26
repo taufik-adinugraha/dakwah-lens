@@ -1,7 +1,7 @@
 """Daily trending-topic discovery for the ad-hoc ingest overlay.
 
 Three free, official signals merged into one candidate pool, then filtered
-by Gemini Flash-Lite for da'wah-relevance:
+by Claude Haiku 5.5 (Gemini Flash-Lite until 2026-11-26) for da'wah-relevance:
 
   1. **Google Trends Indonesia** — what people are searching for right now.
      Official Google RSS endpoint, no auth, decade-stable.
@@ -21,7 +21,7 @@ Output: a deduplicated list of short keyword strings (e.g.
 ['halal oktober', 'gibran wisata', 'gizi anak']) ready to feed into
 the existing scrape pipeline as ad-hoc Apify queries.
 
-Cost: ~$0.009/mo for the Gemini filter call (~3K tokens/day).
+Cost: ~$0.05/mo for the filter call (~3K tokens in + ~2.5K out per day on Haiku 5.5).
 """
 
 from __future__ import annotations
@@ -31,11 +31,10 @@ import re
 from dataclasses import dataclass
 from typing import Literal
 
+import anthropic
 import feedparser
 import httpx
 import structlog
-from google import genai
-from google.genai import types
 
 from api.config import settings
 
@@ -49,10 +48,13 @@ GOOGLE_TRENDS_RSS_FALLBACK = (
 GOOGLE_NEWS_RSS = "https://news.google.com/rss?gl=ID&hl=id&ceid=ID:id"
 YOUTUBE_API = "https://www.googleapis.com/youtube/v3/videos"
 
-# Gemini model — same as relevance classifier for consistency
-FILTER_MODEL = "gemini-2.5-flash-lite"
+# Claude Haiku 5.5 since 2026-11-26, on the web's key (`anthropic_api_key`), never the nightly
+# labelling key. Gemini Flash-Lite before; its prepaid credit ran out around 2026-07-27 (the
+# last `trending_filter` usage row), and since then every run fell back to `_heuristic_keywords`.
+FILTER_MODEL = "claude-haiku-5-5"
+FILTER_MAX_TOKENS = 8000
 
-# Per-source pull cap. Too many candidates wastes Gemini tokens; too few
+# Per-source pull cap. Too many candidates wastes model tokens; too few
 # starves the merger. 40 each = ~120 candidates → ~6K-token prompt.
 # Bumped 20 → 40 on 2026-06-14 to widen the filter's selection pool —
 # audit showed 8/8 cap utilization with ~50 candidates → 16% pass rate,
@@ -200,11 +202,11 @@ debate", "K-pop fandom", "stadium tragedy", "athlete transfer", etc.).
 
 
 # ── LLM-free heuristic fallback ──────────────────────────────────
-# When Gemini is unavailable (no key / rate-limit / prepay outage), the
+# When the model is unavailable (no key / rate-limit / prepay outage), the
 # pipeline must NOT go dark: fetching is separable from the relevance
 # judgment, exactly like RSS ingests unclassified and the daily theme-audit
 # backfills theme_group later. This rule-based selector approximates the
-# Gemini filter — clean each candidate to a short search keyword, drop the
+# Model filter — clean each candidate to a short search keyword, drop the
 # obvious pure-entertainment, prefer da'wah/society-relevant + editorial
 # (news) signals, and cap at the same TOTAL_KEEP_LIMIT budget so cost stays
 # bounded. Intentionally PERMISSIVE ("when in doubt keep", per SYSTEM_PROMPT)
@@ -257,7 +259,7 @@ def _clean_keyword(text: str) -> str:
 
 
 def _heuristic_keywords(candidates: list[Candidate]) -> list[str]:
-    """LLM-free keep-list used when Gemini is unavailable. Prefer
+    """LLM-free keep-list used when the model is unavailable. Prefer
     relevance-matched, then editorial (news), then trends, then youtube;
     drop obvious pure-entertainment; dedupe; cap at TOTAL_KEEP_LIMIT."""
     src_rank = {"google_news": 1, "google_trends": 2, "youtube": 3}
@@ -284,62 +286,78 @@ def _heuristic_keywords(candidates: list[Candidate]) -> list[str]:
     return kept
 
 
-def filter_with_gemini(candidates: list[Candidate]) -> list[str]:
-    """Send merged candidates to Gemini Flash-Lite for keyword extraction
+def filter_with_llm(candidates: list[Candidate]) -> list[str]:
+    """Send merged candidates to Claude Haiku 5.5 for keyword extraction
     and da'wah-relevance filtering. Returns the deduplicated keep-list — or,
-    if Gemini is unavailable (no key / rate-limit / outage), falls back to
+    if the model is unavailable (no key / rate-limit / outage), falls back to
     `_heuristic_keywords` so the fetch keeps flowing instead of going dark."""
     if not candidates:
         return []
-    if not settings.gemini_api_key:
-        log.warning("trending.gemini.no_api_key")
+    if not settings.anthropic_api_key:
+        log.warning("trending.llm.no_api_key")
         return _heuristic_keywords(candidates)
 
-    client = genai.Client(api_key=settings.gemini_api_key)
+    client = anthropic.Anthropic(api_key=settings.anthropic_api_key, max_retries=2)
     numbered = "\n".join(
         f"[{i + 1}] ({c.source}) {c.text[:200]}"
         for i, c in enumerate(candidates)
     )
     user_prompt = f"Filter these {len(candidates)} candidate topics:\n\n{numbered}"
 
+    # Structured outputs need an object at the root, and `additionalProperties: false` on
+    # every object; the list sits under "items".
     response_schema = {
-        "type": "array",
-        "items": {
-            "type": "object",
-            "properties": {
-                "keyword": {"type": "string"},
-                "keep": {"type": "boolean"},
-                "reason": {"type": "string"},
-            },
-            "required": ["keyword", "keep", "reason"],
+        "type": "object",
+        "properties": {
+            "items": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "keyword": {"type": "string"},
+                        "keep": {"type": "boolean"},
+                        "reason": {"type": "string"},
+                    },
+                    "required": ["keyword", "keep", "reason"],
+                    "additionalProperties": False,
+                },
+            }
         },
+        "required": ["items"],
+        "additionalProperties": False,
     }
 
     try:
-        resp = client.models.generate_content(
+        # Haiku 5.5 rejects a custom temperature; thinking off at low effort (a filter, not
+        # an essay). One JSON object per candidate (~120) fits well inside FILTER_MAX_TOKENS.
+        resp = client.messages.create(
             model=FILTER_MODEL,
-            contents=user_prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                response_mime_type="application/json",
-                response_schema=response_schema,
-                temperature=0.2,
-            ),
+            max_tokens=FILTER_MAX_TOKENS,
+            system=SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": user_prompt}],
+            thinking={"type": "disabled"},
+            output_config={
+                "effort": "low",
+                "format": {"type": "json_schema", "schema": response_schema},
+            },
         )
-        parsed = json.loads(resp.text or "[]")
 
         # Log usage so the superadmin api-costs page sees this spend.
-        from api.services.usage import gemini_output_tokens, record_usage
+        from api.services.usage import record_usage
 
-        usage_md = getattr(resp, "usage_metadata", None)
+        usage = getattr(resp, "usage", None)
         record_usage(
-            provider="gemini",
+            provider="anthropic",
             operation="trending_filter",
             model=FILTER_MODEL,
-            tokens_in=getattr(usage_md, "prompt_token_count", None),
-            tokens_out=gemini_output_tokens(usage_md),
+            tokens_in=getattr(usage, "input_tokens", None),
+            tokens_out=getattr(usage, "output_tokens", None),
             meta={"candidates": len(candidates)},
         )
+        if resp.stop_reason in ("refusal", "max_tokens"):
+            raise RuntimeError(f"trending filter stopped: {resp.stop_reason}")
+        text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
+        parsed = json.loads(text or "{}").get("items", [])
 
         # Dedupe by lowercase keyword. Preserve first-seen order so the
         # top-scoring source-merge order roughly reflects priority.
@@ -370,7 +388,7 @@ def filter_with_gemini(candidates: list[Candidate]) -> list[str]:
         )
         return kept
     except Exception as e:  # noqa: BLE001
-        log.error("trending.gemini.failed", error=str(e))
+        log.error("trending.llm.failed", error=str(e))
         return _heuristic_keywords(candidates)
 
 
@@ -382,7 +400,7 @@ def get_trending_keywords() -> list[str]:
     surviving da'wah-relevant keyword list. Caller dispatches scrapes.
 
     Returns [] only if all three gather sources fail (nothing to fetch). If
-    Gemini filtering is unavailable (no key / rate-limit / prepay outage), it
+    the model filter is unavailable (no key / rate-limit / outage), it
     falls back to a rule-based keep-list (`_heuristic_keywords`) so the
     trending fetch keeps flowing unclassified — the daily theme-audit
     backfills classification later, exactly like the RSS pipeline.
@@ -398,4 +416,4 @@ def get_trending_keywords() -> list[str]:
     }
     log.info("trending.gather", **by_source, total=len(candidates))
 
-    return filter_with_gemini(candidates)
+    return filter_with_llm(candidates)

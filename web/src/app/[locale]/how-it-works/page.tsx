@@ -180,8 +180,8 @@ function StackGrid({ t }: { t: T }) {
       title: t("stack_ai_title"),
       items: [
         { name: "OpenAI Embeddings", role: t("stack_ai_openai") },
-        { name: "Gemini 2.5 Pro / Flash-Lite", role: t("stack_ai_gemini") },
         { name: "Anthropic Claude", role: t("stack_ai_anthropic") },
+        { name: "Gemini 2.5 Pro", role: t("stack_ai_gemini") },
         { name: "trafilatura", role: t("stack_ai_trafilatura") },
       ],
     },
@@ -906,11 +906,18 @@ function ModelsTable({ t }: { t: T }) {
       where: t("models_sonnet55_where"),
     },
     {
-      name: "Gemini 2.5 Flash-Lite",
-      id: "gemini-2.5-flash-lite",
-      role: t("models_flash_role"),
-      why: t("models_flash_why"),
-      where: t("models_flash_where"),
+      name: "Claude Haiku 5.5",
+      id: "claude-haiku-5-5",
+      role: t("models_haiku_role"),
+      why: t("models_haiku_why"),
+      where: t("models_haiku_where"),
+    },
+    {
+      name: "Claude Sonnet 5.5 (web)",
+      id: "claude-sonnet-5-5",
+      role: t("models_writer_role"),
+      why: t("models_writer_why"),
+      where: t("models_writer_where"),
     },
     {
       name: "Gemini 2.5 Pro",
@@ -918,13 +925,6 @@ function ModelsTable({ t }: { t: T }) {
       role: t("models_pro_role"),
       why: t("models_pro_why"),
       where: t("models_pro_where"),
-    },
-    {
-      name: "Claude Sonnet 4.5",
-      id: "claude-sonnet-4-5",
-      role: t("models_claude_role"),
-      why: t("models_claude_why"),
-      where: t("models_claude_where"),
     },
     {
       name: "OpenAI text-embedding-3-large",
@@ -997,8 +997,14 @@ function ModelsTable({ t }: { t: T }) {
  *     embedding, last 30 days: $0.71 (844 events: the Thursday recluster
  *     and query embeddings). The one-off corpus re-embeds of 2026-11-06
  *     ($0.25) are not run-rate.
- *   · Gemini — no `usage_events` row after 2026-10-29 01:00
- *     (classify_sentiment) although trending_ingest ran every day: $0.
+ *   · Claude Haiku 5.5 + Sonnet 5.5 (web, lib/claude.ts, since 2026-11-26)
+ *     — estimated from Gemini's own call volume while it worked (May-July
+ *     2026, usage_events): ~191 reranks/month × 4.4K tokens, ~30 trending
+ *     filters × (2.8K in + 2.3K out), ~70 query expansions, a handful of
+ *     kajian/flyers ≈ $0.2/month. Replace with the measured rate after a
+ *     month of anthropic rows with these operations.
+ *   · Gemini — the last non-labelling call (trending_filter) is 2026-07-27;
+ *     its prepaid credit ran out then: $0.
  *   · YouTube / RSS — usage_events cost 0 (free quota / no API).
  *   · Apify — token blank since 2026-11-13, daily reconcile switched off
  *     (app_settings pipeline:reconcile_apify_costs:all = disabled); the
@@ -1025,7 +1031,13 @@ function MonthlyCost({ t }: { t: T }) {
       note: t("cost_openai_note"),
     },
     {
-      provider: "Gemini Flash-Lite / 2.5 Pro",
+      provider: "Anthropic Claude Haiku 5.5 + Sonnet 5.5 (web)",
+      use: t("cost_claude_web_use"),
+      monthly: 0.2,
+      note: t("cost_claude_web_note"),
+    },
+    {
+      provider: "Gemini 2.5 Pro",
       use: t("cost_gemini_use"),
       monthly: 0,
       note: t("cost_gemini_note"),
@@ -1041,12 +1053,6 @@ function MonthlyCost({ t }: { t: T }) {
       use: t("cost_rss_use"),
       monthly: 0,
       note: t("cost_free"),
-    },
-    {
-      provider: "Anthropic Claude (fallback)",
-      use: t("cost_claude_use"),
-      monthly: 0,
-      note: t("cost_on_demand"),
     },
     // ── Server / infrastructure (non-API) ──
     {

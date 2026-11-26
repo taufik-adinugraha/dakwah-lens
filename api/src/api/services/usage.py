@@ -60,6 +60,9 @@ PRICES: dict[str, dict[str, float]] = {
         # claude_labels.cost_usd(); these rows are the fallback estimate.
         "claude-sonnet-5-5_in": 2.00,
         "claude-sonnet-5-5_out": 10.00,
+        # trending_topics.py filter (2026-11-26).
+        "claude-haiku-5-5_in": 0.10,
+        "claude-haiku-5-5_out": 0.50,
     },
     # YouTube Data API — $0 inside free quota (10K units/day), $0 outside
     # (Google doesn't sell extra quota). We still log unit usage so we can
