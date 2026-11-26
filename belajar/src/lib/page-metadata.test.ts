@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createElement, type ReactNode } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from "vitest";
 
 import { generateMetadata as hub } from "@/app/[locale]/page";
 import { generateMetadata as konsepIndex } from "@/app/[locale]/konsep/page";
@@ -206,11 +206,26 @@ describe("the pages' robots tags: none for an indexable page, noindex for the re
 });
 
 describe("a title and a description of its own, for every page of the sitemap", () => {
-  it("never repeats one across the indexable pages (a page type, or the pages of a list, that shares one is filed as a duplicate)", async () => {
-    const seen = { titles: new Map<string, string>(), descriptions: new Map<string, string>() };
+  it("never repeats one across every page the sitemap can list, with every surah published and the word pages taken (a page type, or the pages of a list, that shares one is filed as a duplicate)", async () => {
+    // The widest configuration: the lesson word's entry (/kosakata/{id}) and the word page (/kosakata/kata/{rank})
+    // are both listed for the same word, and must still differ in title, description and canonical.
+    const savedSurahs = process.env.BELAJAR_SURAHS;
+    process.env.BELAJAR_SURAHS = SURAHS.map((s) => s.slug).join(",");
+    process.env.BELAJAR_KOSAKATA_WORDS_INDEXED = "on";
+    onTestFinished(() => {
+      if (savedSurahs === undefined) delete process.env.BELAJAR_SURAHS;
+      else process.env.BELAJAR_SURAHS = savedSurahs;
+    });
+    const seen = { titles: new Map<string, string>(), descriptions: new Map<string, string>(), canonicals: new Map<string, string>() };
     const take = (label: string, m: Metadata) => {
       const title = titleOf(m);
       const description = m.description as string;
+      const canonical = (m.alternates as { canonical?: string } | undefined)?.canonical;
+      expect(canonical, label).toBeTruthy();
+      expect(seen.canonicals.get(canonical!), `${label}: canonical ${canonical} is also ${seen.canonicals.get(canonical!)}`).toBeUndefined();
+      seen.canonicals.set(canonical!, label);
+      const ogUrl = (m.openGraph as { url?: string } | undefined)?.url;
+      if (ogUrl) expect(ogUrl, label).toBe(canonical);
       expect(title, label).toBeTruthy();
       expect(description, label).toBeTruthy();
       expect(seen.titles.get(title), `${label}: title "${title}" is also ${seen.titles.get(title)}`).toBeUndefined();
@@ -223,7 +238,10 @@ describe("a title and a description of its own, for every page of the sitemap", 
     take("hub", await id$(hub));
     take("track", await id$(track));
     take("surah", await id$(surah, { surah: "al-fatihah" }));
-    for (const a of FATIHAH.ayat) take(`ayah ${a.ayah}`, await id$(ayah, { surah: "al-fatihah", ayah: String(a.ayah) }));
+    for (const sr of SURAHS) {
+      if (sr.slug !== "al-fatihah") take(`surah ${sr.slug}`, await id$(surah, { surah: sr.slug }));
+      for (const a of sr.ayat) take(`ayah ${sr.slug} ${a.ayah}`, await id$(ayah, { surah: sr.slug, ayah: String(a.ayah) }));
+    }
     take("lesson zero", await id$(intro));
     take("curriculum", await id$(curriculum));
     take("cheat sheet", await id$(rumus));
@@ -233,7 +251,9 @@ describe("a title and a description of its own, for every page of the sitemap", 
     for (const l of LIBRARY.lexicon) take(`lexeme ${l.id}`, await id$(lexeme, { id: l.id }));
     for (let page = 1; page <= 49; page++) take(`list ${page}`, await id$(list, {}, { hal: String(page) }));
     take("credits", await id$(credits));
-    expect(seen.titles.size).toBe(1 + 1 + 1 + 7 + 3 + 1 + 38 + 1 + 52 + 49 + 1);
+    for (let rank = 1; rank <= 4832; rank++) take(`word ${rank}`, await id$(word, { rank: String(rank) }));
+    const lessons = SURAHS.reduce((n, sr) => n + 1 + sr.ayat.length, 0);
+    expect(seen.titles.size).toBe(1 + 1 + lessons + 3 + 1 + 38 + 1 + 52 + 49 + 1 + 4832);
   });
 
   it("a list page says which words it holds; a word page the word and its meaning", async () => {
@@ -244,7 +264,7 @@ describe("a title and a description of its own, for every page of the sitemap", 
     expect(titleOf(last)).toBe("Kosakata Al-Qur'an: kata ke-4.801 sampai ke-4.832");
     expect(titleOf(await meta(list, { locale: "id" }, { hal: "1" }))).toBe(MSG.id.Kosakata.title);
     const first = await meta(word, { locale: "id", rank: "1" });
-    expect(titleOf(first)).toBe("min (مِن)");
+    expect(titleOf(first)).toBe("min (مِن): kata ke-1 dalam Al-Qur'an");
     expect(first.description).toContain("dari; di antara");
     expect(first.description).toMatch(/3\.226 kali/);
   });
