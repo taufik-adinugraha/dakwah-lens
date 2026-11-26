@@ -175,8 +175,8 @@ async function sendVerificationEmail(email: string): Promise<void> {
     subject: "Verifikasi email · Dakwah-Lens",
     text:
       `Assalamu'alaykum,\n\n` +
-      `Klik tautan ini untuk memverifikasi email Anda dan menyelesaikan pendaftaran Dakwah-Lens:\n\n${link}\n\n` +
-      `Tautan ini berlaku 24 jam. Kalau Anda tidak merasa mendaftar, abaikan email ini.\n\n` +
+      `Klik link ini untuk memverifikasi email Anda dan menyelesaikan pendaftaran Dakwah-Lens:\n\n${link}\n\n` +
+      `Link ini berlaku 24 jam. Kalau Anda tidak merasa mendaftar, abaikan email ini.\n\n` +
       `— Dakwah-Lens · Sukses & Berkah Group`,
     html: renderEmail({
       greeting: "Assalamu'alaykum,",
@@ -186,7 +186,7 @@ async function sendVerificationEmail(email: string): Promise<void> {
       ],
       cta: { label: "Verifikasi email", url: link },
       footnote:
-        "Tautan ini berlaku 24 jam. Kalau Anda tidak merasa mendaftar, abaikan saja email ini.",
+        "Link ini berlaku 24 jam. Kalau Anda tidak merasa mendaftar, abaikan saja email ini.",
     }),
   });
 }
@@ -341,8 +341,8 @@ export async function forgotPasswordAction(
       subject: "Reset password · Dakwah-Lens",
       text:
         `Assalamu'alaykum,\n\n` +
-        `Kami menerima permintaan untuk mereset password akun Dakwah-Lens Anda. Klik tautan ini untuk membuat password baru:\n\n${link}\n\n` +
-        `Tautan ini berlaku 1 jam. Kalau bukan Anda yang meminta, abaikan email ini — password lama tetap aman.\n\n` +
+        `Kami menerima permintaan untuk mereset password akun Dakwah-Lens Anda. Klik link ini untuk membuat password baru:\n\n${link}\n\n` +
+        `Link ini berlaku 1 jam. Kalau bukan Anda yang meminta, abaikan email ini — password lama tetap aman.\n\n` +
         `— Dakwah-Lens · Sukses & Berkah Group`,
       html: renderEmail({
         greeting: "Assalamu'alaykum,",
@@ -352,7 +352,7 @@ export async function forgotPasswordAction(
         ],
         cta: { label: "Reset password", url: link },
         footnote:
-          "Tautan ini berlaku <strong>1 jam</strong>. Kalau bukan Anda yang meminta, abaikan email ini — password lama tetap aman.",
+          "Link ini berlaku <strong>1 jam</strong>. Kalau bukan Anda yang meminta, abaikan email ini — password lama tetap aman.",
       }),
     });
   }
