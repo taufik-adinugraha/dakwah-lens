@@ -148,14 +148,15 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
         {/* The Belajar video (owner 2026-11-27: "show belajar video"), before "Share": the
             promo "Berapa Kata di Dalam Al-Qur'an?" (2:13) on the Dakwah-Lens YouTube channel.
             A link in a new tab, like Share's WhatsApp link: the module's CSP allows no frames,
-            and nothing on this page loads from YouTube until the learner asks for it. */}
+            and nothing on this page loads from YouTube until the learner asks for it. Green
+            (btn-primary), like the main site's primary button (owner 2026-11-27). */}
         <div className="mt-6 flex flex-wrap items-start gap-3">
           <a
             href={`https://www.youtube.com/shorts/${BELAJAR_VIDEO_ID}`}
             target="_blank"
             rel="noopener noreferrer"
             data-hub-video=""
-            className="btn-secondary"
+            className="btn-primary"
           >
             <CirclePlay aria-hidden className="h-5 w-5 shrink-0" />
             <span>{t("video_cta")}</span>
