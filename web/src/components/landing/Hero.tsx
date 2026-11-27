@@ -50,13 +50,15 @@ export function Hero({
       <ForestWash />
 
       <div className="mx-auto max-w-3xl px-6 pt-10 pb-24 text-center sm:pt-16 sm:pb-32">
-        <Reveal>
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
-            {viewer.signedIn && viewer.name
-              ? t("signed_in_greeting", { name: viewer.name })
-              : t("hero_eyebrow_audience")}
-          </p>
-        </Reveal>
+        {/* The audience eyebrow ("Untuk da'i, ustadzah, kreator, …") was removed (owner
+            2026-11-28); a signed-in visitor still gets the greeting here. */}
+        {viewer.signedIn && viewer.name ? (
+          <Reveal>
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
+              {t("signed_in_greeting", { name: viewer.name })}
+            </p>
+          </Reveal>
+        ) : null}
 
         <Reveal delay={70}>
           <h1 className="mt-5 text-balance font-display text-[clamp(2.25rem,5.5vw,4rem)] font-medium leading-[1.05] tracking-[-0.02em] text-ink">
