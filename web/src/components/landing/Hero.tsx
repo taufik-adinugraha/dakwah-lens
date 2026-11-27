@@ -66,8 +66,22 @@ export function Hero({
           </p>
         </Reveal>
 
+        {/* The overview video (owner 2026-11-27: "barely noticeable … move it above Baca
+            Insights"), between the lede and the actions, in place of the old "Lihat cara
+            kerjanya" link. A pill with a filled play disc, not a filled button, so "Baca
+            Insights" stays the one primary. */}
+        <Reveal delay={190}>
+          <div className="mt-9 flex justify-center">
+            <HeroVideo
+              label={t("hero_video_cta")}
+              title={t("hero_video_title")}
+              closeLabel={t("hero_video_close")}
+            />
+          </div>
+        </Reveal>
+
         <Reveal delay={230}>
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/briefings"
               className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-forest px-7 text-sm font-semibold text-paper shadow-sm transition hover:bg-forest-hover"
@@ -89,24 +103,6 @@ export function Hero({
               <BookOpen aria-hidden className="h-4 w-4" />
               {t("hero_cta_belajar")}
             </a>
-            <Link
-              href="#how-it-works"
-              className="inline-flex h-12 items-center gap-1.5 text-sm font-semibold text-ink-muted transition hover:text-ink"
-            >
-              {t("hero_cta_secondary")}
-            </Link>
-          </div>
-        </Reveal>
-
-        {/* The overview video (owner 2026-11-27), under the actions: a quiet text link, not a
-            fourth button, so "Baca Insights" stays the one primary. */}
-        <Reveal delay={270}>
-          <div className="mt-6 flex justify-center">
-            <HeroVideo
-              label={t("hero_video_cta")}
-              title={t("hero_video_title")}
-              closeLabel={t("hero_video_close")}
-            />
           </div>
         </Reveal>
 
