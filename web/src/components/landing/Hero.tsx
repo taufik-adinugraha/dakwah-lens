@@ -7,6 +7,12 @@ import { Reveal } from "./Reveal";
 
 type LandingT = Awaited<ReturnType<typeof getTranslations<"Landing">>>;
 
+/** The hero's three actions (the video, Insights, Belajar) share one width (owner 2026-11-28:
+ *  "make the 3 buttons in equal size/width, especially in mobile"): the full column on a phone,
+ *  up to 20rem, which holds the longest label ("Belajar bahasa Arab Al-Qur'an"). Two of them sit
+ *  side by side from md (2 x 20rem + gap needs ~41rem); below that all three stack. */
+const ACTION_WIDTH = "w-full max-w-80 md:w-80";
+
 type HeroCoverage = {
   outlets: number;
   socialPlatforms: number;
@@ -78,9 +84,9 @@ export function Hero({
               target="_blank"
               rel="noopener noreferrer"
               data-hero-video=""
-              className="group inline-flex h-12 items-center gap-3 rounded-full border border-forest/30 bg-white/80 py-1.5 pr-5 pl-1.5 text-sm font-semibold text-ink shadow-sm transition hover:border-forest hover:bg-forest-tint"
+              className={`${ACTION_WIDTH} group inline-flex h-12 items-center justify-center gap-3 rounded-full border-[1.5px] border-forest/30 bg-white/80 px-5 text-sm font-semibold text-ink shadow-sm transition hover:border-forest hover:bg-forest-tint`}
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-forest text-paper transition group-hover:scale-105">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-forest text-paper transition group-hover:scale-105">
                 <Play aria-hidden className="h-4 w-4 translate-x-px fill-current" />
               </span>
               {t("hero_video_cta")}
@@ -91,10 +97,10 @@ export function Hero({
         </Reveal>
 
         <Reveal delay={230}>
-          <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:gap-4 sm:justify-center">
+          <div className="mt-3 flex flex-col items-center gap-3 md:mt-4 md:flex-row md:justify-center md:gap-4">
             <Link
               href="/briefings"
-              className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-forest px-7 text-sm font-semibold text-paper shadow-sm transition hover:bg-forest-hover"
+              className={`${ACTION_WIDTH} group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-forest px-7 text-sm font-semibold text-paper shadow-sm transition hover:bg-forest-hover`}
             >
               {t("hero_cta_primary")}
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
@@ -108,7 +114,7 @@ export function Hero({
             <a
               href={`/belajar/${locale}?utm_source=dakwah-lens&utm_medium=hero`}
               data-hero-belajar=""
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-full border-[1.5px] border-forest bg-paper px-7 text-sm font-semibold text-forest transition hover:bg-forest-tint"
+              className={`${ACTION_WIDTH} inline-flex h-12 items-center justify-center gap-2 rounded-full border-[1.5px] border-forest bg-paper px-7 text-sm font-semibold text-forest transition hover:bg-forest-tint`}
             >
               <BookOpen aria-hidden className="h-4 w-4" />
               {t("hero_cta_belajar")}
