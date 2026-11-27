@@ -1,9 +1,8 @@
-import { ArrowRight, BookOpen } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BookOpen, Play } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
 import { ForestWash } from "@/components/ForestWash";
-import { HeroVideo } from "./HeroVideo";
 import { Reveal } from "./Reveal";
 
 type LandingT = Awaited<ReturnType<typeof getTranslations<"Landing">>>;
@@ -44,7 +43,7 @@ export function Hero({
     <section className="relative isolate overflow-hidden bg-paper font-body">
       <ForestWash />
 
-      <div className="mx-auto max-w-3xl px-6 pt-24 pb-28 text-center sm:pt-32 sm:pb-36">
+      <div className="mx-auto max-w-3xl px-6 pt-10 pb-24 text-center sm:pt-16 sm:pb-32">
         <Reveal>
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
             {viewer.signedIn && viewer.name
@@ -54,34 +53,45 @@ export function Hero({
         </Reveal>
 
         <Reveal delay={70}>
-          <h1 className="mt-6 text-balance font-display text-[clamp(2.5rem,6vw,4.5rem)] font-medium leading-[1.05] tracking-[-0.02em] text-ink">
+          <h1 className="mt-5 text-balance font-display text-[clamp(2.25rem,5.5vw,4rem)] font-medium leading-[1.05] tracking-[-0.02em] text-ink">
             {t("hero_headline_lead")}{" "}
             <span className="text-forest">{t("hero_headline_accent")}</span>
           </h1>
         </Reveal>
 
         <Reveal delay={150}>
-          <p className="mx-auto mt-7 max-w-xl text-pretty text-lg leading-[1.7] text-ink-muted">
+          <p className="mx-auto mt-5 max-w-xl text-pretty text-base sm:text-lg leading-[1.7] text-ink-muted">
             {t("hero_lede")}
           </p>
         </Reveal>
 
-        {/* The overview video (owner 2026-11-27: "barely noticeable … move it above Baca
-            Insights"), between the lede and the actions, in place of the old "Lihat cara
-            kerjanya" link. A pill with a filled play disc, not a filled button, so "Baca
-            Insights" stays the one primary. */}
+        {/* The overview video "Apa Itu Dakwah-Lens?" (2:55; owner 2026-11-27), between the lede
+            and the actions: a pill with a filled play disc, not a filled button, so "Baca
+            Insights" stays the one primary. It opens the Short on YouTube in a new tab (owner:
+            "better as new tab in youtube instead of popup"), so the page loads nothing from
+            YouTube. The hero is kept short enough that both actions show without scrolling on a
+            laptop screen (owner 2026-11-27; measured at 1437x697). */}
         <Reveal delay={190}>
-          <div className="mt-9 flex justify-center">
-            <HeroVideo
-              label={t("hero_video_cta")}
-              title={t("hero_video_title")}
-              closeLabel={t("hero_video_close")}
-            />
+          <div className="mt-7 flex justify-center">
+            <a
+              href="https://www.youtube.com/shorts/jGSlhTQlZBc"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-hero-video=""
+              className="group inline-flex h-12 items-center gap-3 rounded-full border border-forest/30 bg-white/80 py-1.5 pr-5 pl-1.5 text-sm font-semibold text-ink shadow-sm transition hover:border-forest hover:bg-forest-tint"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-forest text-paper transition group-hover:scale-105">
+                <Play aria-hidden className="h-4 w-4 translate-x-px fill-current" />
+              </span>
+              {t("hero_video_cta")}
+              <span className="sr-only">{t("hero_video_where")}</span>
+              <ArrowUpRight aria-hidden className="h-4 w-4 text-ink-faint transition group-hover:text-forest" />
+            </a>
           </div>
         </Reveal>
 
         <Reveal delay={230}>
-          <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:gap-4 sm:justify-center">
             <Link
               href="/briefings"
               className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-forest px-7 text-sm font-semibold text-paper shadow-sm transition hover:bg-forest-hover"
