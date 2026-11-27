@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowRight, BookOpen, BookText, Library, Scale } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BookOpen, BookText, CirclePlay, Library, Scale } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
@@ -35,6 +35,9 @@ export async function generateMetadata({
     ...shareMetadata({ locale, path: hubHref(), title, description: ta("description"), imageAlt: to("image_alt") }),
   };
 }
+
+/** "Berapa Kata di Dalam Al-Qur'an?" (2:13, vertical), on the Dakwah-Lens YouTube channel. */
+const BELAJAR_VIDEO_ID = "69AP9M8Kxd0";
 
 /** One hub card. */
 type TrackCard = {
@@ -142,7 +145,25 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
 
         {/* One "Share" in the hub's head, under the intro (operator, 2026-11-06: moved here from
             the Qur'an track page): the hub is the page worth passing on to someone starting out. */}
-        <ShareButton className="mt-6" url={pageUrl(locale, "/")} text={tshare("hub_text")} />
+        {/* The Belajar video (owner 2026-11-27: "show belajar video"), before "Share": the
+            promo "Berapa Kata di Dalam Al-Qur'an?" (2:13) on the Dakwah-Lens YouTube channel.
+            A link in a new tab, like Share's WhatsApp link: the module's CSP allows no frames,
+            and nothing on this page loads from YouTube until the learner asks for it. */}
+        <div className="mt-6 flex flex-wrap items-start gap-3">
+          <a
+            href={`https://www.youtube.com/shorts/${BELAJAR_VIDEO_ID}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-hub-video=""
+            className="btn-secondary"
+          >
+            <CirclePlay aria-hidden className="h-5 w-5 shrink-0" />
+            <span>{t("video_cta")}</span>
+            <span className="sr-only">{t("video_where")}</span>
+            <ArrowUpRight aria-hidden className="h-5 w-5 shrink-0" />
+          </a>
+          <ShareButton url={pageUrl(locale, "/")} text={tshare("hub_text")} />
+        </div>
 
         <section className="mt-10" aria-labelledby="tracks">
           <h2 id="tracks" className="text-lg font-semibold text-ink">
