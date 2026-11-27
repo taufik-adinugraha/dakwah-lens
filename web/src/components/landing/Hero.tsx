@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
 import { ForestWash } from "@/components/ForestWash";
+import { HeroVideo } from "./HeroVideo";
 import { Reveal } from "./Reveal";
 
 type LandingT = Awaited<ReturnType<typeof getTranslations<"Landing">>>;
@@ -94,6 +95,18 @@ export function Hero({
             >
               {t("hero_cta_secondary")}
             </Link>
+          </div>
+        </Reveal>
+
+        {/* The overview video (owner 2026-11-27), under the actions: a quiet text link, not a
+            fourth button, so "Baca Insights" stays the one primary. */}
+        <Reveal delay={270}>
+          <div className="mt-6 flex justify-center">
+            <HeroVideo
+              label={t("hero_video_cta")}
+              title={t("hero_video_title")}
+              closeLabel={t("hero_video_close")}
+            />
           </div>
         </Reveal>
 

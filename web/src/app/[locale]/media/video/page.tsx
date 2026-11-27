@@ -70,7 +70,7 @@ function VideoCard({
       </div>
       <div className="flex flex-1 flex-col p-5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-forest">
-          {weekOf(weekLabel(video.week, locale))}
+          {video.week ? weekOf(weekLabel(video.week, locale)) : video.about}
         </p>
         <h2 className="mt-1.5 text-balance font-display text-xl font-medium leading-snug text-ink">
           {video.title}
