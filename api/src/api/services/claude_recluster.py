@@ -1,6 +1,8 @@
 """Weekly topic recluster by Claude — the automated twin of the manual
 `scripts/cluster_topics/run.sh` + `inject.sh` flow (operator decision
-2026-11-01: Thursday, after the 00:00 WIB label batch is applied).
+2026-11-01: Thursday, after the 00:00 WIB label batch is applied; since
+2026-11-28 also Tuesday and Saturday, workers/claude_jobs.RECLUSTER_DAYS).
+Each run reads the same rolling 7-day window, whatever the day.
 
 Same corpus, same rules, same gate, same assignment as the manual run;
 only the hands change:
