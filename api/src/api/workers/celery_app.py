@@ -229,10 +229,11 @@ celery_app.conf.update(
         # Claude theme + sentiment + opportunity labels and the weekly Claude recluster
         # (operator decision 2026-11-01; workers/claude_jobs.py). The batch
         # is submitted at 00:00 WIB and applied by the poll once it ends
-        # (most batches end within the hour). The poll starts Thursday's
+        # (most batches end within the hour). On Tuesday, Thursday and
+        # Saturday (Thursday only until 2026-11-28) the poll starts the
         # recluster as soon as that day's batch is applied; the 06:00 WIB
         # entry is the fallback if it has not run by then (the task runs
-        # at most once per day). Costs ride on the promotional Claude
+        # at most once per day). ~$2.45 a recluster. Costs ride on the promotional Claude
         # credit (ANTHROPIC_LABELING_API_KEY), not the IDR budget.
         "claude-label-daily": {
             "task": "api.workers.claude_jobs.label_daily_submit",
@@ -244,8 +245,9 @@ celery_app.conf.update(
         },
         "claude-recluster-weekly": {
             "task": "api.workers.claude_jobs.recluster_weekly",
-            # day_of_week=4 = Thursday in Celery's crontab (Sun=0).
-            "schedule": crontab(minute=0, hour=6, day_of_week=4),
+            # Tue, Thu, Sat in Celery's crontab (Sun=0); claude_jobs.RECLUSTER_DAYS
+            # holds the same days for the poll.
+            "schedule": crontab(minute=0, hour=6, day_of_week="2,4,6"),
             "kwargs": {"fallback": True},
         },
         # Insights briefing generation — PAUSED 2026-05-23 for cost.

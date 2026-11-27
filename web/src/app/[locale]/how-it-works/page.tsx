@@ -989,7 +989,9 @@ function ModelsTable({ t }: { t: T }) {
  *   · Claude Sonnet 5.5 — `ingest_runs` task_name claude_label_batch +
  *     claude_recluster_weekly (cost_usd on the row). Last 7 nights = $7.49
  *     ($0.93-1.38 a night for 1,647-2,692 posts) + the Thursday recluster
- *     $2.48 = $9.98 → × 30/7 ≈ $42.76 a month. It runs on
+ *     $2.48 = $9.98 → × 30/7 ≈ $42.76 a month. Since 2026-11-28 the
+ *     recluster runs Tue/Thu/Sat (owner): $7.49 + 3 × $2.48 = $14.93 a
+ *     week → × 30/7 ≈ $63.99 a month. It runs on
  *     ANTHROPIC_LABELING_API_KEY, an org funded by a promotional Claude
  *     credit, not on the IDR cap (AGENTS.md); it is still counted in the
  *     total below so the figure stays conservative.
@@ -1021,7 +1023,7 @@ function MonthlyCost({ t }: { t: T }) {
     {
       provider: "Anthropic Claude Sonnet 5.5 (labels + topics)",
       use: t("cost_claude55_use"),
-      monthly: 42.76,
+      monthly: 63.99,
       note: t("cost_active"),
     },
     {

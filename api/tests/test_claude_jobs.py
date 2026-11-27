@@ -326,17 +326,23 @@ def test_poll_leaves_a_running_batch_and_fails_an_all_error_batch(monkeypatch, t
     assert fin["status"] == "failed" and fin["items_stored"] == 0
 
 
-# ─── Thursday trigger ────────────────────────────────────────────────
+# ─── Tuesday / Thursday / Saturday trigger ───────────────────────────
 
 
 @pytest.mark.parametrize(
     ("started_at", "triggers"),
     [
-        ("2026-11-04T17:00:05+00:00", True),  # Thu 00:00 WIB = Wed 17:00 UTC
-        ("2026-11-03T17:00:05+00:00", False),  # Wed 00:00 WIB
+        # 00:00 WIB is 17:00 UTC the day before.
+        ("2026-11-29T17:00:05+00:00", False),  # Mon 30 Nov
+        ("2026-11-30T17:00:05+00:00", True),  # Tue 1 Dec
+        ("2026-12-01T17:00:05+00:00", False),  # Wed
+        ("2026-12-02T17:00:05+00:00", True),  # Thu
+        ("2026-12-03T17:00:05+00:00", False),  # Fri
+        ("2026-12-04T17:00:05+00:00", True),  # Sat
+        ("2026-12-05T17:00:05+00:00", False),  # Sun
     ],
 )
-def test_poll_starts_the_recluster_after_thursdays_batch(monkeypatch, started_at, triggers):
+def test_poll_starts_the_recluster_after_tue_thu_sat_batches(monkeypatch, started_at, triggers):
     from api.workers import claude_jobs as jobs
 
     monkeypatch.setattr(jobs.settings, "anthropic_labeling_api_key", "k")
@@ -356,6 +362,17 @@ def test_poll_starts_the_recluster_after_thursdays_batch(monkeypatch, started_at
     assert jobs.label_batch_poll() == {"applied": ["b"]}
     assert usage_calls[0]["operation"] == "label_batch"
     assert bool(delayed) is triggers
+
+
+def test_fallback_schedule_runs_on_the_same_days_as_the_poll():
+    from api.workers import claude_jobs as jobs
+    from api.workers.celery_app import celery_app
+
+    entry = celery_app.conf.beat_schedule["claude-recluster-weekly"]
+    # crontab counts Sunday as 0, datetime.weekday() counts Monday as 0.
+    cron_days = {(d - 1) % 7 for d in entry["schedule"].day_of_week}
+    assert cron_days == set(jobs.RECLUSTER_DAYS) == {1, 3, 5}
+    assert entry["schedule"].hour == {6} and entry["kwargs"] == {"fallback": True}
 
 
 # ─── recluster helpers ───────────────────────────────────────────────

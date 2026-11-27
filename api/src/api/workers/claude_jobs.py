@@ -2,10 +2,13 @@
 
   label_daily_submit   00:00 WIB daily   submit the theme + sentiment batch
   label_batch_poll     every 10 min      apply batches that have ended; after
-                                         Thursday's batch is applied, start
-                                         the weekly recluster
-  recluster_weekly     Thursday          after that batch (or at 06:00 WIB as
-                                         a fallback, if it has not run yet)
+                                         a Tuesday, Thursday or Saturday batch
+                                         is applied, start the recluster
+  recluster_weekly     Tue, Thu, Sat     after that batch (or at 06:00 WIB as
+                                         a fallback, if it has not run yet).
+                                         Thursday only until 2026-11-28; the
+                                         task keeps its name (kill switch and
+                                         ingest_runs rows use it)
 
 Both jobs skip, with a log line, when `anthropic_labeling_api_key` is unset.
 Kill switches (admin → System → Pipeline): `claude_label_batch` stops new
@@ -31,7 +34,10 @@ from api.workers.celery_app import celery_app
 log = structlog.get_logger()
 
 WIB = ZoneInfo("Asia/Jakarta")
-THURSDAY = 3  # datetime.weekday()
+# The recluster days, as datetime.weekday() (Mon=0): Tuesday, Thursday, Saturday (owner
+# 2026-11-28: "add also on saturday and tuesday"; Thursday alone before). Keep in step with
+# the "claude-recluster-weekly" beat entry in celery_app.py (crontab counts Sun=0: "2,4,6").
+RECLUSTER_DAYS = frozenset({1, 3, 5})
 LABEL_TASK = "claude_label_batch"
 RECLUSTER_TASK = "claude_recluster_weekly"
 
@@ -87,7 +93,7 @@ def label_batch_poll() -> dict[str, Any]:
             },
         )
         submitted = datetime.fromisoformat(a.started_at).astimezone(WIB)
-        if submitted.weekday() == THURSDAY:
+        if submitted.weekday() in RECLUSTER_DAYS:
             recluster_weekly.delay()
     return {"applied": [a.batch_id for a in applied]}
 
