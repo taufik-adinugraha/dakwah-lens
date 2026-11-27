@@ -1,13 +1,13 @@
 "use client";
 
-import { CirclePlay, X } from "lucide-react";
+import { Play, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 /** "Apa Itu Dakwah-Lens?" (2:55, vertical), on the Dakwah-Lens YouTube channel. */
 export const OVERVIEW_VIDEO_ID = "jGSlhTQlZBc";
 
 /**
- * The hero's "Dakwah-Lens dalam 3 menit" link (owner 2026-11-27): the overview video in a player
+ * The hero's "Dakwah-Lens dalam 3 menit" pill (owner 2026-11-27), above the actions: the overview video in a player
  * over the page, so the visitor stays on the landing page. It is a plain link to the Short on
  * YouTube, so it still works before the script loads; a click opens the player instead. The
  * YouTube frame (privacy-enhanced player, allowed by frame-src in next.config.ts) is only put on
@@ -46,9 +46,11 @@ export function HeroVideo({ label, title, closeLabel }: { label: string; title: 
           e.preventDefault();
           setOpen(true);
         }}
-        className="group inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold text-forest transition hover:bg-forest-tint"
+        className="group inline-flex h-12 items-center gap-3 rounded-full border border-forest/30 bg-white/80 py-1.5 pr-6 pl-1.5 text-sm font-semibold text-ink shadow-sm transition hover:border-forest hover:bg-forest-tint"
       >
-        <CirclePlay aria-hidden className="h-5 w-5 transition group-hover:scale-110" />
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-forest text-paper transition group-hover:scale-105">
+          <Play aria-hidden className="h-4 w-4 translate-x-px fill-current" />
+        </span>
         {label}
       </a>
 
