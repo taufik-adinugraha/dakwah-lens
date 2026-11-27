@@ -14,13 +14,32 @@ export type MediaVideo = {
   title: string;
   /** One or two sentences: what the video explains. */
   blurb: string;
-  /** Monday of the week the video is about, YYYY-MM-DD. */
-  week: string;
+  /** Monday of the week the video is about, YYYY-MM-DD. A video about the site itself (no week)
+   *  leaves it out and names its subject in `about` instead. */
+  week?: string;
+  /** For a video about Dakwah-Lens or Belajar rather than a week's news: the card's small label. */
+  about?: string;
   /** Vertical (Shorts, 9:16) or wide (16:9). */
   shape: "vertical" | "wide";
 };
 
 export const MEDIA_VIDEOS: MediaVideo[] = [
+  {
+    youtubeId: "jGSlhTQlZBc",
+    title: "Apa Itu Dakwah-Lens?",
+    blurb:
+      "Apa yang dibutuhkan umat pekan ini, dan apa dalilnya? Cara Dakwah-Lens membaca berita, memilahnya ke 14 tema, dan menerbitkan briefing setiap Kamis dengan 8 bahan siap pakai, dalilnya diambil dari kitab.",
+    about: "Tentang Dakwah-Lens",
+    shape: "vertical",
+  },
+  {
+    youtubeId: "69AP9M8Kxd0",
+    title: "Berapa Kata di Dalam Al-Qur'an?",
+    blurb:
+      "Al-Qur'an memuat lebih dari 77.000 kata, tapi kata dasarnya hanya 4.832, dan 60 kata yang paling sering muncul sudah mencakup separuhnya. Cara mulai memahaminya di Belajar, 10 kata sekali belajar.",
+    about: "Tentang Belajar",
+    shape: "vertical",
+  },
   {
     youtubeId: "3Eu5n4gqGEM",
     title: "Kenapa Banjir Datang di Akhir Tahun?",
